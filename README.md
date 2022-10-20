@@ -1,7 +1,8 @@
 # Research and Development Project
 
-Calculating national and regional research and development expenditure as part of national accounts.
+Calculating national and regional research and development expenditure as part of [national accounts](https://www.ons.gov.uk/economy/nationalaccounts).
 
+Additional information about the aims and objectives of the project will go here when it is available. The project is currently in pre-discovery.
 
 ## For developers
 
@@ -16,21 +17,35 @@ To get developers set up, we have created this guide to make setting up your wor
 
 ### Using VS Code
 
-We strongly suggest that developers on teh team use VS Code for programming as it is an industry-standard tool, and we are more like to be able to support it if you run into problems, rather than an IDE we are not familiar with.
+We strongly suggest that developers on the team use VS Code for programming as it is an industry-standard tool and we are more likely to be able to support it if you run into problems, compared to an IDE we are not familiar with.
 
 #### Downloading VS Code
 
-You can download VS code from internet [VS code download link](https://code.visualstudio.com/download). Select the correct installer for your OS and follow the instructions.
+You can download VS code from the [VS code download page](https://code.visualstudio.com/download). Select the correct installer for your OS and follow the instructions.
 
 ## Conda
 
 On the project team, virtual environments (VE) will be used. Conda is our chosen VE manager. You will need to make a service desk request to get the Anaconda suite installed.
 
-## Recreating the environment
+## Recreating the environment and installing requirements
 
 Once you have cloned this repository, you will have acces to a file called `environment.yml`. You will use conda to recreate the environment with all the dependencies you need for this project using this command:
 
 `conda env create -f environment.yml -v`
+
+This should create and environment for you with Python 3.10+ installed and every other dependency of the project so far.
+
+## Secrets
+
+A `.secrets` file with the [required secrets and
+  credentials](#required-secrets-and-credentials)
+- [load environment variables][docs-loading-environment-variables] from `.env`
+
+To install the Python requirements, open your terminal and enter:
+
+```shell
+pip install -r requirements.txt
+```
 
 ### Update the environment yaml
 
@@ -59,20 +74,7 @@ Ensure that if you are using a `.gitconfig` file to store your token that the CD
 
 
 
-### Requirements
 
-[```Contributors have some additional requirements!```][contributing]
-
-- Python 3.10+ installed
-- a `.secrets` file with the [required secrets and
-  credentials](#required-secrets-and-credentials)
-- [load environment variables][docs-loading-environment-variables] from `.env`
-
-To install the Python requirements, open your terminal and enter:
-
-```shell
-pip install -r requirements.txt
-```
 
 ## Required secrets and credentials
 
