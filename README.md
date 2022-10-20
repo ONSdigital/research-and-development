@@ -104,7 +104,7 @@ contributing guidelines][contributing].
 ## Acknowledgements
 
 [This project structure is based on the `govcookiecutter` template
-project][govcookiecutter].
+project][govcookiecutter]. Guidance on using the govcookiecutter can be found on [this youtube video](https://www.youtube.com/watch?v=N7_d3k3uQ_M) and in the [documentation here](https://dataingovernment.blog.gov.uk/2021/07/20/govcookiecutter-a-template-for-data-science-projects/).
 
 The text in the "For Developers" section was adapted from the README of the [Transport Efficiency Project](https://github.com/jwestw/Public_Transport_Efficiency) which was mostly written by Chloe Murrell.
 
