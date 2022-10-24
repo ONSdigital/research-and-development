@@ -5,10 +5,11 @@ classes and functions exposed in `src.*` namespace are public.
 
 ```{toctree}
 :maxdepth: 2
-./make_data.md
-./make_features.md
-./make_models.md
-./make_visualisations.md
+./data_cleaning.md
+./data_ingest.md
+./data_validation.md
+./data_processing.md
+./data_visualisations.md
 ./utils.md
 ./src.md
 ```
