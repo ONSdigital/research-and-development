@@ -6,26 +6,6 @@ know how to write good documentation take a look at [Write the Docs guide on wri
 documentation][writethedocs]. [For Agile projects, consider documenting
 late][agilemodeling] as well.
 
-## Why should I bother? And why Sphinx?
-
-Keeping as much of the documentation in a centralised location is a good thing. It
-means contributors, users, and anyone else can quickly find as much information as they
-need to understand and/or run what you've done.
-
-Sphinx is a Python-based package to compile documentation into different formats,
-including HTML. This means you can write your documentation and, with a single terminal
-command, build it into a searchable website.
-
-It's widely used, such as for the documentation of the [`pandas`][pandas], and
-[PyTorch][pytorch] Python packages as well as many [others][sphinx-examples]. It is
-highly customisable with different extensions, and themes. Included with this project
-is:
-
-- support for both [reStructuredText (ReST)][sphinx-rest], and [ReST-enabled
-  Markdown][myst];
-- automatic building of documentation from Python docstrings; and
-- support for [ReStructuredText][docstring-rst], [NumPy][docstring-numpy], or
-  [Google][docstring-google] docstring formats.
 
 ### Creating a searchable website
 
