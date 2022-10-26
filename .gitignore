@@ -88,6 +88,8 @@ instance/
 # Sphinx documentation
 docs/_build/
 doc/_build/
+!docs\_build\index.html
+!docs/_build/index.html
 
 # PyBuilder
 target/
@@ -366,7 +368,7 @@ modules.xml
 ### pydev ###
 .pydevproject
 
-### Python ###
+### Python ###d
 # Byte-compiled / optimized / DLL files
 
 # C extensions
