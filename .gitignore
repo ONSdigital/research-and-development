@@ -89,6 +89,7 @@ instance/
 docs/_build/*
 doc/_build/
 !docs/_build/index.html
+!docs/_build/.nojekyll
 
 # PyBuilder
 target/
