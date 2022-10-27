@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Writing Sphinx documentation &#8212; Research and Development 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Analytical quality assurance" href="../aqa/README.html" />
+    <link rel="prev" title="Writing accessible documentation" href="writing_accessible_documentation.html" />
+
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="writing-sphinx-documentation">
+<h1>Writing Sphinx documentation<a class="headerlink" href="#writing-sphinx-documentation" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="https://www.sphinx-doc.org/">This project is set up to produce documentation using Sphinx</a>; this page
+should give you a quick overview on how to write documentation for it. If you’d like to
+know how to write good documentation take a look at <a class="reference external" href="https://www.writethedocs.org/guide/writing/beginners-guide-to-docs/">Write the Docs guide on writing
+documentation</a>. <a class="reference external" href="http://agilemodeling.com/essays/documentLate.htm">For Agile projects, consider documenting
+late</a> as well.</p>
+<section id="creating-a-searchable-website">
+<h2>Creating a searchable website<a class="headerlink" href="#creating-a-searchable-website" title="Permalink to this heading">¶</a></h2>
+<p>To create a website with your documentation, run the following command in your terminal
+at the top-level of this project:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make docs
+</pre></div>
+</div>
+<p>This should create an HTML version of your documentation accessible from
+<code class="docutils literal notranslate"><span class="pre">docs/_build/index.html</span></code>.</p>
+</section>
+<section id="writing-in-restructuredtext">
+<h2>Writing in reStructuredText<a class="headerlink" href="#writing-in-restructuredtext" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">Sphinx provides good documentation on writing in ReST</a> — we would highly
+recommend reading that for guidance. We will cover automatically creating docstrings in
+the next subsection.</p>
+<section id="automatically-creating-docstring-documentation-rest">
+<h3>Automatically creating docstring documentation (ReST)<a class="headerlink" href="#automatically-creating-docstring-documentation-rest" title="Permalink to this heading">¶</a></h3>
+<p>Let us say that <code class="docutils literal notranslate"><span class="pre">src/__init__.py</span></code> has functions called <code class="docutils literal notranslate"><span class="pre">hello</span></code> and <code class="docutils literal notranslate"><span class="pre">world</span></code> imported
+into it, and both have docstrings. To automatically generate docstring documentation,
+create a ReST file, and add the following line to reference the <code class="docutils literal notranslate"><span class="pre">src</span></code> module:</p>
+<div class="highlight-rest notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">currentmodule</span><span class="p">::</span> src
+</pre></div>
+</div>
+<p>Then, elsewhere in the body, <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html">call the <code class="docutils literal notranslate"><span class="pre">autosummary</span></code> directive to generate the
+docstrings as ReST stub files</a>.</p>
+<div class="highlight-rest notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">autosummary</span><span class="p">::</span>
+    <span class="nc">:toctree:</span> api/
+
+    hello
+    world
+
+</pre></div>
+</div>
+<p><a class="reference external" href="https://pandas.pydata.org/docs/reference/index.html">This will create something similar to the <code class="docutils literal notranslate"><span class="pre">pandas</span></code> API
+reference</a>.</p>
+</section>
+</section>
+<section id="writing-in-rest-enabled-markdown">
+<h2>Writing in ReST-enabled Markdown<a class="headerlink" href="#writing-in-rest-enabled-markdown" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://myst-parser.readthedocs.io/">We use the <code class="docutils literal notranslate"><span class="pre">myst-parser</span></code> package (MyST) to write Markdown that can also include ReST
+elements</a>. The package documentation is detailed, so we would recommend reviewing
+it. We will cover some of the more widely used elements in the following subsections.</p>
+<section id="embedding-rest-directives">
+<h3>Embedding ReST directives<a class="headerlink" href="#embedding-rest-directives" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/syntax.html">Most ReST directives can be embedded into MyST Markdown</a>.</p>
+</section>
+<section id="automatically-creating-docstring-documentation-myst-markdown">
+<h3>Automatically creating docstring documentation (MyST Markdown)<a class="headerlink" href="#automatically-creating-docstring-documentation-myst-markdown" title="Permalink to this heading">¶</a></h3>
+<p>Let us say that <code class="docutils literal notranslate"><span class="pre">src/__init__.py</span></code> has functions called <code class="docutils literal notranslate"><span class="pre">hello</span></code> and <code class="docutils literal notranslate"><span class="pre">world</span></code> imported
+into it, and both have docstrings. To automatically generate docstring documentation,
+create a Markdown file, and add the following line to reference the <code class="docutils literal notranslate"><span class="pre">src</span></code> module:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>```{eval-rst}
+.. currentmodule:: src
+```
+</pre></div>
+</div>
+<p>Then, elsewhere in the body, <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html">call the <code class="docutils literal notranslate"><span class="pre">autosummary</span></code> directive to generate the
+docstrings as ReST stub files</a>.</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>```{eval-rst}
+.. autosummary::
+    :toctree: api/
+
+    hello
+    world
+
+```
+</pre></div>
+</div>
+</section>
+<section id="including-markdown-files-outside-the-docs-folder">
+<h3>Including Markdown files outside the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder<a class="headerlink" href="#including-markdown-files-outside-the-docs-folder" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/sphinx/use.html#include-a-file-from-outside-the-docs-folder-like-readme-md">MyST lets you include Markdown files outside the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder</a>.</p>
+<p>If a Markdown file (<code class="docutils literal notranslate"><span class="pre">../example.md</span></code>) only contains links that do not reference anything
+else in this project (including images), create a Markdown file within the <code class="docutils literal notranslate"><span class="pre">docs</span></code>
+folder with the following lines:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>```{include} ../example.md
+```
+</pre></div>
+</div>
+<p>However, if it includes relative links referencing other files in this project
+(including images), we need to tell MyST what those links actually refer. For example,
+if the relative link is <code class="docutils literal notranslate"><span class="pre">../hello/world.md</span></code>, we need to create a Markdown file within
+the <code class="docutils literal notranslate"><span class="pre">docs</span></code> folder with the following lines:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>```{include} ../example.md
+:relative-docs: ../hello
+:relative-images:
+```
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Research and Development</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Research and Development Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/README.html">User guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="README.html">Contributing guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CODE_OF_CONDUCT.html">Code of conduct for <code class="docutils literal notranslate"><span class="pre">research-and-development</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pre_commit_hooks.html">Pre-commit hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_gitignore.html">Updating the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_accessible_documentation.html">Writing accessible documentation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing Sphinx documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../aqa/README.html">Analytical quality assurance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure/README.html"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/README.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> API reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="README.html">Contributing guide</a><ul>
+      <li>Previous: <a href="writing_accessible_documentation.html" title="previous chapter">Writing accessible documentation</a></li>
+      <li>Next: <a href="../aqa/README.html" title="next chapter">Analytical quality assurance</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="../_sources/contributor_guide/writing_sphinx_documentation.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

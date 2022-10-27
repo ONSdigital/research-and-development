@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Pre-commit hooks &#8212; Research and Development 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Updating the .gitignore file" href="updating_gitignore.html" />
+    <link rel="prev" title="Contributing" href="CONTRIBUTING.html" />
+
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="pre-commit-hooks">
+<h1>Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="https://pre-commit.com/">This repository uses the Python package <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> to manage pre-commit
+hooks</a>. Pre-commit hooks are actions which are run automatically, typically
+on each commit, to perform some common set of tasks. For example, a pre-commit hook
+might be used to run any code linting automatically before code is committed, ensuring
+common code quality.</p>
+<section id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this heading">¶</a></h2>
+<p>For this repository, we are using <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> for a number of purposes:</p>
+<ul class="simple">
+<li><p>checking for secrets being committed accidentally — there is a strict <a class="reference internal" href="#definition-of-a-secret-according-to-detect-secrets"><span class="std std-doc">definition of
+a “secret”</span></a>; and</p></li>
+<li><p>checking for any large files (over 5 MB) being committed.</p></li>
+<li><p>cleaning Jupyter notebooks, which means removing all outputs, execution counts,
+Python kernels, and, for Google Colaboratory (Colab), stripping out user information.</p></li>
+</ul>
+<p>We have configured <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> to run automatically on every commit. By running on
+each commit, we ensure that <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> will be able to detect all contraventions and
+keep our repository in a healthy state.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pre-commit hooks and Google Colab
+No pre-commit hooks will be run on Google Colab notebooks pushed directly to GitHub.
+For security reasons, it is recommended that you manually download your notebook, and
+commit up locally to ensure pre-commit hooks are run on your changes.</p>
+</div>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<p>In order for <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> to run, action is needed to configure it on your system.</p>
+<ul class="simple">
+<li><p>install the <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> package into your Python environment from
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>; and</p></li>
+<li><p>run <code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code> in your terminal to set up <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> to run when code is
+committed.</p></li>
+</ul>
+</section>
+<section id="using-the-detect-secrets-pre-commit-hook">
+<h2>Using the <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> pre-commit hook<a class="headerlink" href="#using-the-detect-secrets-pre-commit-hook" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Secret detection limitations
+The <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> package does its best to prevent accidental committing of secrets,
+but it may miss things. Instead, focus on good software development practices! See the
+<a class="reference internal" href="#definition-of-a-secret-according-to-detect-secrets"><span class="std std-doc">definition of a secret for further
+information</span></a>.</p>
+</div>
+<p><a class="reference external" href="https://github.com/Yelp/detect-secrets">We use <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> to check that no secrets are accidentally
+committed</a>. This hook requires you to generate a baseline file if one
+is not already present within the root directory. To create the baseline file, run the
+following at the root of the repository:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>detect-secrets scan &gt; .secrets.baseline
+</pre></div>
+</div>
+<p>Next, audit the baseline that has been generated by running:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>detect-secrets audit .secrets.baseline
+</pre></div>
+</div>
+<p>When you run this command, you’ll enter an interactive console. This will present you
+with a list of high-entropy string and/or anything which could be a secret. It will
+then ask you to verify whether this is the case. This allows the hook to remember false
+positives in the future, and alert you to new secrets.</p>
+<section id="definition-of-a-secret-according-to-detect-secrets">
+<h3>Definition of a “secret” according to <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code><a class="headerlink" href="#definition-of-a-secret-according-to-detect-secrets" title="Permalink to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> documentation, as of January 2021, says it works:</p>
+<blockquote>
+<div><p>…by running periodic diff outputs against heuristically crafted [regular
+expression] statements, to identify whether any new secret has been committed.</p>
+</div></blockquote>
+<p>This means it uses regular expression patterns to scan your code changes for anything
+that looks like a secret according to the patterns. By definition, there are only a
+limited number of patterns, so the <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> package cannot detect every
+conceivable type of secret.</p>
+<p>To understand what types of secrets will be detected, read the <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code>
+documentation on caveats, and the list of supported plugins. Also, you should use
+secret variable names with words that will trip the KeywordDetector plugin; see the
+[<code class="docutils literal notranslate"><span class="pre">DENYLIST</span></code> variable for the full list of words][detect-secrets-keyword-detector].</p>
+</section>
+<section id="if-pre-commit-detects-secrets-during-commit">
+<h3>If <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> detects secrets during commit<a class="headerlink" href="#if-pre-commit-detects-secrets-during-commit" title="Permalink to this heading">¶</a></h3>
+<p>If <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> detects any secrets when you try to create a commit, it will detail
+what it found and where to go to check the secret.</p>
+<p>If the detected secret is a false positive, there are two options to resolve this, and
+prevent your commit from being blocked:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#inline-allowlisting-recommended"><span class="std std-doc">inline allowlisting of false positives
+(recommended)</span></a>; or</p></li>
+<li><p><a class="reference internal" href="#updating-secrets-baseline"><span class="std std-doc">updating the <code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code> to include the false
+positives</span></a>.</p></li>
+</ul>
+<p>In either case, if an actual secret is detected (or a combination of actual secrets and
+false positives), first remove the actual secret. Then following either of these
+processes.</p>
+<section id="inline-allowlisting-recommended">
+<h4>Inline allowlisting (recommended)<a class="headerlink" href="#inline-allowlisting-recommended" title="Permalink to this heading">¶</a></h4>
+<p>To exclude a false positive, add a <code class="docutils literal notranslate"><span class="pre">pragma</span></code> comment such as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">secret</span> <span class="o">=</span> <span class="s2">&quot;Password123&quot;</span>  <span class="c1"># pragma: allowlist secret</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#  pragma: allowlist nextline secret</span>
+<span class="n">secret</span> <span class="o">=</span> <span class="s2">&quot;Password123&quot;</span>
+</pre></div>
+</div>
+<p>If the detected secret is actually a secret (or other sensitive information), remove
+the secret and re-commit; there is no need to add any <code class="docutils literal notranslate"><span class="pre">pragma</span></code> comments.</p>
+<p>If your commit contains a mixture of false positives and actual secrets, remove the
+actual secrets first before adding <code class="docutils literal notranslate"><span class="pre">pragma</span></code> comments to the false positives.</p>
+</section>
+<section id="updating-secrets-baseline">
+<h4>Updating <code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code><a class="headerlink" href="#updating-secrets-baseline" title="Permalink to this heading">¶</a></h4>
+<p>To exclude a false positive, you can also <a class="reference internal" href="#using-the-detect-secrets-pre-commit-hook"><span class="std std-doc">update the <code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code> by repeating
+the same two commands as in the initial
+setup</span></a>.</p>
+<p>During auditing, if the detected secret is actually a secret (or other sensitive
+information), remove the secret and re-commit. There is no need to update the
+<code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code> file in this case.</p>
+<p>If your commit contains a mixture of false positives and actual secrets, remove the
+actual secrets first before updating and auditing the <code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code> file.</p>
+</section>
+</section>
+</section>
+<section id="keeping-specific-jupyter-notebook-outputs">
+<h2>Keeping specific Jupyter notebook outputs<a class="headerlink" href="#keeping-specific-jupyter-notebook-outputs" title="Permalink to this heading">¶</a></h2>
+<p>It may be necessary or useful to keep certain output cells of a Jupyter notebook, for
+example charts or graphs visualising some set of data. To do this, <a class="reference external" href="https://github.com/kynan/nbstripout">according to the
+documentation for the <code class="docutils literal notranslate"><span class="pre">nbstripout</span></code> package</a>, either:</p>
+<ol class="arabic simple">
+<li><p>add a <code class="docutils literal notranslate"><span class="pre">keep_output</span></code> tag to the desired cell; or</p></li>
+<li><p>add <code class="docutils literal notranslate"><span class="pre">&quot;keep_output&quot;:</span> <span class="pre">true</span></code> to the desired cell’s metadata.</p></li>
+</ol>
+<p>You can access cell tags or metadata in Jupyter by enabling the “Tags” or
+“Edit Metadata” toolbar (View &gt; Cell Toolbar &gt; Tags; View &gt; Cell Toolbar &gt;
+Edit Metadata).</p>
+<p>For the tags approach, enter <code class="docutils literal notranslate"><span class="pre">keep_output</span></code> in the text field for each desired cell, and
+press the “Add tag” button. For the metadata approach, press the “Edit Metadata” button
+on each desired cell, and edit the metadata to look like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;keep_output&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This will tell the hook not to strip the resulting output of the desired cell(s),
+allowing the output(s) to be committed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Tags and metadata on Google Colab
+Currently (March 2020) there is no way to add tags and/or metadata to Google Colab
+notebooks.</p>
+<p>It’s strongly suggested that you download the Colab as a .ipynb file, and edit tags
+and/or metadata using Jupyter before committing the code if you want to keep some
+outputs.</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Research and Development</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Research and Development Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/README.html">User guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="README.html">Contributing guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CODE_OF_CONDUCT.html">Code of conduct for <code class="docutils literal notranslate"><span class="pre">research-and-development</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pre-commit hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updating_gitignore.html">Updating the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_accessible_documentation.html">Writing accessible documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_sphinx_documentation.html">Writing Sphinx documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../aqa/README.html">Analytical quality assurance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure/README.html"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/README.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> API reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="README.html">Contributing guide</a><ul>
+      <li>Previous: <a href="CONTRIBUTING.html" title="previous chapter">Contributing</a></li>
+      <li>Next: <a href="updating_gitignore.html" title="next chapter">Updating the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="../_sources/contributor_guide/pre_commit_hooks.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

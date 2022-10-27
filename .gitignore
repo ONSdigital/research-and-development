@@ -86,10 +86,10 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/*
-doc/_build/
-!docs/_build/index.html
-!docs/_build/.nojekyll
+# docs/_build/*
+# doc/_build/
+# !docs/_build/index.html
+# !docs/_build/.nojekyll
 
 # PyBuilder
 target/

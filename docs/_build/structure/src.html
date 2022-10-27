@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>src package overview &#8212; Research and Development 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tests folder overview" href="tests.html" />
+    <link rel="prev" title="outputs folder overview" href="outputs.html" />
+
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="src-package-overview">
+<h1><code class="docutils literal notranslate"><span class="pre">src</span></code> package overview<a class="headerlink" href="#src-package-overview" title="Permalink to this heading">¶</a></h1>
+<p>All functions for this project, should be stored in this folder. All tests should be
+stored in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> folder, which is one-level above this folder in the main project
+directory.</p>
+<p>The sub-folders should be used as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">make_data</span></code>: data processing-related functions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make_features</span></code>: feature-related functions, for example, functions to create features
+from processed data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make_models</span></code>: model-related functions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make_visualisations</span></code>: functions to produce visualisations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utils</span></code>: utility functions that are helpful in the project</p></li>
+</ul>
+<p>Feel free to create/rename/delete these folders as required, as they will not be
+necessary for each and every project.</p>
+<p>It is strongly suggested that you import functions in the <code class="docutils literal notranslate"><span class="pre">src/__init__.py</span></code> script. You
+should also try to use absolute imports in this script whenever possible. Relative
+imports are not discouraged, but can be an issue for projects where the directory
+structure is likely to change. See <a class="reference external" href="https://www.python.org/dev/peps/pep-0328/">PEP 328 for details on absolute imports</a>.</p>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Research and Development</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Research and Development Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/README.html">User guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_guide/README.html">Contributing guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aqa/README.html">Analytical quality assurance</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="README.html"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data.html"><code class="docutils literal notranslate"><span class="pre">data</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs.html"><code class="docutils literal notranslate"><span class="pre">docs</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html"><code class="docutils literal notranslate"><span class="pre">notebooks</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html"><code class="docutils literal notranslate"><span class="pre">outputs</span></code> folder overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">src</span></code> package overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html"><code class="docutils literal notranslate"><span class="pre">tests</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#top-level-files">Top-level files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/README.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> API reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="README.html"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a><ul>
+      <li>Previous: <a href="outputs.html" title="previous chapter"><code class="docutils literal notranslate"><span class="pre">outputs</span></code> folder overview</a></li>
+      <li>Next: <a href="tests.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">tests</span></code> folder overview</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="../_sources/structure/src.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

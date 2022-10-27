@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Loading environment variables &#8212; Research and Development 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing guide" href="../contributor_guide/README.html" />
+    <link rel="prev" title="User guide" href="README.html" />
+
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="loading-environment-variables">
+<h1>Loading environment variables<a class="headerlink" href="#loading-environment-variables" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="https://saurabh-kumar.com/python-dotenv/">We use <code class="docutils literal notranslate"><span class="pre">python-dotenv</span></code> to load environment variables</a>, as these are only loaded when
+inside the project folder. This can prevent accidental conflicts with identically named
+variables. Alternatively you can use <a class="reference external" href="https://direnv.net/"><code class="docutils literal notranslate"><span class="pre">direnv</span></code> to load environment variables</a> if
+you meet <a class="reference internal" href="#installing-direnv"><span class="std std-doc">certain conditions</span></a>.</p>
+<section id="using-python-dotenv">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">python-dotenv</span></code><a class="headerlink" href="#using-python-dotenv" title="Permalink to this heading">¶</a></h2>
+<p>To load the environment variables, first make sure you have
+python-dotenv install, and <a class="reference internal" href="#storing-secrets-and-credentials"><span class="std std-doc">make sure you have a <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file to store
+secrets and credentials</span></a>. Then to load in the
+environment variables into a python script see instructions in <code class="docutils literal notranslate"><span class="pre">.env</span></code> file.</p>
+</section>
+<section id="using-direnv">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">direnv</span></code><a class="headerlink" href="#using-direnv" title="Permalink to this heading">¶</a></h2>
+<p>To load the environment variables, first <a class="reference internal" href="#installing-direnv"><span class="std std-doc">follow the <code class="docutils literal notranslate"><span class="pre">direnv</span></code> installation
+instructions</span></a>, and <a class="reference internal" href="#storing-secrets-and-credentials"><span class="std std-doc">make sure you have a <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file to store
+secrets and credentials</span></a>. Then:</p>
+<ol class="arabic">
+<li><p>Open your terminal;</p></li>
+<li><p>Navigate to the project folder; and</p>
+<ul>
+<li><p>You should see the following message:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>direnv: error .envrc is blocked. Run <span class="sb">`</span>direnv allow<span class="sb">`</span> to approve its content.
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>Allow <code class="docutils literal notranslate"><span class="pre">direnv</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>direnv allow
+</pre></div>
+</div>
+</li>
+</ol>
+<p>You only need to do this once, and again each time <code class="docutils literal notranslate"><span class="pre">.envrc</span></code> and <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> are modified.</p>
+<section id="installing-direnv">
+<h3>Installing <code class="docutils literal notranslate"><span class="pre">direnv</span></code><a class="headerlink" href="#installing-direnv" title="Permalink to this heading">¶</a></h3>
+<p>These instructions assume you are running on macOS with administrator privileges using
+a bash terminal. For other ways of installing <code class="docutils literal notranslate"><span class="pre">direnv</span></code>, and its shell hooks, consult
+the <code class="docutils literal notranslate"><span class="pre">direnv</span></code> documentation.</p>
+<ol class="arabic">
+<li><p>Open your terminal;</p></li>
+<li><p><a class="reference external" href="https://brew.sh/">Install <code class="docutils literal notranslate"><span class="pre">direnv</span></code> using Homebrew</a>;</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>brew install direnv
+</pre></div>
+</div>
+</li>
+<li><p>Add the shell hooks to your <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>;</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s1">&#39;eval &quot;$(direnv hook bash)&quot;&#39;</span> &gt;&gt; ~/.bash_profile
+</pre></div>
+</div>
+</li>
+<li><p>Check that the shell hooks have been added correctly; and</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cat ~/.bash_profile
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>This should display <code class="docutils literal notranslate"><span class="pre">eval</span> <span class="pre">&quot;$(direnv</span> <span class="pre">hook</span> <span class="pre">bash)&quot;</span></code></p></li>
+</ul>
+</li>
+<li><p>Restart your terminal.</p></li>
+</ol>
+</section>
+</section>
+<section id="storing-secrets-and-credentials">
+<h2>Storing secrets and credentials<a class="headerlink" href="#storing-secrets-and-credentials" title="Permalink to this heading">¶</a></h2>
+<p>Secrets and credentials must be stored in the <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file. This file is not
+version-controlled, so no secrets should be committed to GitHub.</p>
+<p>In your terminal navigate to the root folder, and create a <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>touch .secrets
+</pre></div>
+</div>
+<p>Open this new <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file using your preferred text editor, and add any secrets as
+environmental variables. For example, to add a JSON credentials file for Google
+BigQuery, save the following changes to <code class="docutils literal notranslate"><span class="pre">.secrets</span></code>.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">GOOGLE_APPLICATION_CREDENTIALS</span><span class="o">=</span><span class="s2">&quot;path/to/credentials.json&quot;</span>
+</pre></div>
+</div>
+<p>Once complete, load the <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> file using:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>from dotenv import load_dotenv
+import os
+
+<span class="c1">#Load secrets from the `.secrets` file, overriding any system environment variables</span>
+load_dotenv<span class="o">(</span><span class="s2">&quot;.secrets&quot;</span>, <span class="nv">override</span><span class="o">=</span>True<span class="o">)</span>
+<span class="c1">#Example variable</span>
+<span class="nv">EXAMPLE_VARIABLE</span> <span class="o">=</span> os.getenv<span class="o">(</span><span class="s2">&quot;EXAMPLE_VARIABLE&quot;</span><span class="o">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Research and Development</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Research and Development Project</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="README.html">User guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Loading environment variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_guide/README.html">Contributing guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aqa/README.html">Analytical quality assurance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure/README.html"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/README.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> API reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="README.html">User guide</a><ul>
+      <li>Previous: <a href="README.html" title="previous chapter">User guide</a></li>
+      <li>Next: <a href="../contributor_guide/README.html" title="next chapter">Contributing guide</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="../_sources/user_guide/loading_environment_variables.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>research-and-development structure &#8212; Research and Development 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="data folder overview" href="data.html" />
+    <link rel="prev" title="Assumptions and caveats log" href="../aqa/assumptions_caveats.html" />
+
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="research-and-development-structure">
+<h1><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure<a class="headerlink" href="#research-and-development-structure" title="Permalink to this heading">¶</a></h1>
+<p>This page provides information on the repository’s structure. The repository’s folder
+structure is explained here:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data.html"><code class="docutils literal notranslate"><span class="pre">data</span></code> folder overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs.html"><code class="docutils literal notranslate"><span class="pre">docs</span></code> folder overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs.html#analytical-quality-assurance-aqa">Analytical quality assurance (AQA)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html"><code class="docutils literal notranslate"><span class="pre">notebooks</span></code> folder overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html"><code class="docutils literal notranslate"><span class="pre">outputs</span></code> folder overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="src.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> package overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html"><code class="docutils literal notranslate"><span class="pre">tests</span></code> folder overview</a></li>
+</ul>
+</div>
+<section id="top-level-files">
+<h2>Top-level files<a class="headerlink" href="#top-level-files" title="Permalink to this heading">¶</a></h2>
+<p>Each subsection here contains a brief description about the files at the top-level of
+this Git repository.</p>
+<section id="env">
+<h3><code class="docutils literal notranslate"><span class="pre">.env</span></code><a class="headerlink" href="#env" title="Permalink to this heading">¶</a></h3>
+<p>Environment variables go here, and can be read in by Python using the <code class="docutils literal notranslate"><span class="pre">python-dotenv</span></code> package, and <code class="docutils literal notranslate"><span class="pre">os.getenv</span></code>:</p>
+<div class="highlight-in notranslate"><div class="highlight"><pre><span></span>from dotenv import load_dotenv
+import os
+
+#Load the environment variables from the `.env` file, overriding any system
+#environment variables
+load_dotenv(override=True)
+
+# Example variable
+EXAMPLE_VARIABLE = os.getenv(&quot;EXAMPLE_VARIABLE&quot;)
+</pre></div>
+</div>
+</section>
+<section id="envrc">
+<h3><code class="docutils literal notranslate"><span class="pre">.envrc</span></code><a class="headerlink" href="#envrc" title="Permalink to this heading">¶</a></h3>
+<p>Orchestration file to load environment variables from the <code class="docutils literal notranslate"><span class="pre">.env</span></code> and <code class="docutils literal notranslate"><span class="pre">.secrets</span></code> files.
+Only used by systems with <code class="docutils literal notranslate"><span class="pre">direnv</span></code> (https://direnv.net/) installed. Environment
+variables can be read in by Python using <code class="docutils literal notranslate"><span class="pre">os.getenv</span></code> <em>without</em> using <code class="docutils literal notranslate"><span class="pre">python-dotenv</span></code>:</p>
+<div class="highlight-in notranslate"><div class="highlight"><pre><span></span>import os
+
+# Example variable
+EXAMPLE_VARIABLE = os.getenv(&quot;EXAMPLE_VARIABLE&quot;)
+</pre></div>
+</div>
+</section>
+<section id="flake8">
+<h3><code class="docutils literal notranslate"><span class="pre">.flake8</span></code><a class="headerlink" href="#flake8" title="Permalink to this heading">¶</a></h3>
+<p>A configuration file for the <code class="docutils literal notranslate"><span class="pre">flake8</span></code> Python package that provides linting. This file
+is based on the <a class="reference external" href="https://gds-way.cloudapps.digital/manuals/programming-languages/python/python.html#common-configuration">common configuration described in the GDS Way</a>.</p>
+</section>
+<section id="gitignore">
+<h3><code class="docutils literal notranslate"><span class="pre">.gitignore</span></code><a class="headerlink" href="#gitignore" title="Permalink to this heading">¶</a></h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file to ignore certain files and folders from this Git repository. <a class="reference internal" href="../contributor_guide/updating_gitignore.html"><span class="doc std std-doc">See
+the contributor guide to modift the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file</span></a>.</p>
+</section>
+<section id="pre-commit-config-yaml">
+<h3><code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code><a class="headerlink" href="#pre-commit-config-yaml" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="../contributor_guide/pre_commit_hooks.html"><span class="doc std std-doc">A pre-commit hook configuration file</span></a>.</p>
+</section>
+<section id="secrets">
+<h3><code class="docutils literal notranslate"><span class="pre">.secrets</span></code><a class="headerlink" href="#secrets" title="Permalink to this heading">¶</a></h3>
+<p>A file to store all secrets and credentials as environment variables. <a class="reference internal" href="#envrc"><span class="std std-doc">This file is
+read-in by <code class="docutils literal notranslate"><span class="pre">.envrc</span></code></span></a>, when <a class="reference external" href="https://direnv.net/">loading environment variables with the <code class="docutils literal notranslate"><span class="pre">direnv</span></code>
+shell extension</a>, but is not tracked by Git.</p>
+</section>
+<section id="secrets-baseline">
+<h3><code class="docutils literal notranslate"><span class="pre">.secrets.baseline</span></code><a class="headerlink" href="#secrets-baseline" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference external" href="https://github.com/Yelp/detect-secrets">Baseline file for the <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> to detect secrets</a>. In
+conjunction with <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code>, <code class="docutils literal notranslate"><span class="pre">detect-secrets</span></code> prevents secrets from being committed
+to the repository. The baseline file flags secret-like data that the user deliberately
+wishes to commit the to repository.</p>
+</section>
+<section id="code-of-conduct-md">
+<h3><code class="docutils literal notranslate"><span class="pre">CODE_OF_CONDUCT.md</span></code><a class="headerlink" href="#code-of-conduct-md" title="Permalink to this heading">¶</a></h3>
+<p><a class="reference internal" href="../contributor_guide/CODE_OF_CONDUCT.html"><span class="doc std std-doc">The Code of Conduct for contributors to this project</span></a>, including
+maintainers and <code class="docutils literal notranslate"><span class="pre">ONSdigital</span></code> organisation owners.</p>
+</section>
+<section id="conftest-py">
+<h3><code class="docutils literal notranslate"><span class="pre">conftest.py</span></code><a class="headerlink" href="#conftest-py" title="Permalink to this heading">¶</a></h3>
+<p>File to contain shared fixture functions for the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> tests in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> folder.</p>
+</section>
+<section id="contributing-md">
+<h3><code class="docutils literal notranslate"><span class="pre">CONTRIBUTING.md</span></code><a class="headerlink" href="#contributing-md" title="Permalink to this heading">¶</a></h3>
+<p>The contributing guidelines for this project.</p>
+</section>
+<section id="license">
+<h3><code class="docutils literal notranslate"><span class="pre">LICENSE</span></code><a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h3>
+<p>The licence for this project. Unless stated otherwise, the codebase is released under
+the MIT License. This covers both the codebase and any sample code in the
+documentation. The documentation is © Crown copyright and available under the terms of
+the Open Government 3.0 licence.</p>
+</section>
+<section id="makefile">
+<h3><code class="docutils literal notranslate"><span class="pre">Makefile</span></code><a class="headerlink" href="#makefile" title="Permalink to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> contains a set of commands for the <code class="docutils literal notranslate"><span class="pre">make</span></code> utility. Run the <code class="docutils literal notranslate"><span class="pre">help</span></code>
+command for further information at the top-level of the Git repository.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make <span class="nb">help</span>
+</pre></div>
+</div>
+</section>
+<section id="pyproject-toml">
+<h3><code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code><a class="headerlink" href="#pyproject-toml" title="Permalink to this heading">¶</a></h3>
+<p>A file containing Python project settings. This includes configuration settings for:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#isort"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">isort</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#pytest"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pytest</span></code></span></a></p></li>
+<li><p><a class="reference internal" href="#code-coverage"><span class="std std-doc">code coverage</span></a></p></li>
+</ul>
+<section id="isort">
+<h4><code class="docutils literal notranslate"><span class="pre">isort</span></code><a class="headerlink" href="#isort" title="Permalink to this heading">¶</a></h4>
+<p>Python imports are arranged according to the <a class="reference external" href="https://black.readthedocs.io/en/stable/">specification defined by <code class="docutils literal notranslate"><span class="pre">black</span></code></a>.</p>
+</section>
+<section id="pytest">
+<h4><code class="docutils literal notranslate"><span class="pre">pytest</span></code><a class="headerlink" href="#pytest" title="Permalink to this heading">¶</a></h4>
+<p>To run the tests within the <code class="docutils literal notranslate"><span class="pre">tests</span></code> folder using the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> Python package, enter
+the following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pytest
+</pre></div>
+</div>
+</section>
+<section id="code-coverage">
+<h4>Code coverage<a class="headerlink" href="#code-coverage" title="Permalink to this heading">¶</a></h4>
+<p>To run code coverage using the <code class="docutils literal notranslate"><span class="pre">coverage</span></code> Python package with <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, enter the
+following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>coverage run -m pytest
+coverage html
+</pre></div>
+</div>
+<p>or using the <code class="docutils literal notranslate"><span class="pre">make</span></code> command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make coverage_html
+</pre></div>
+</div>
+<p>A code coverage report in HTML will be produced on the code in the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder. This
+HTML report can be accessed at <code class="docutils literal notranslate"><span class="pre">htmlcov/index.html</span></code>.</p>
+</section>
+</section>
+<section id="readme-md">
+<h3><code class="docutils literal notranslate"><span class="pre">README.md</span></code><a class="headerlink" href="#readme-md" title="Permalink to this heading">¶</a></h3>
+<p>An overview of the Git repository, including all necessary instructions to run the code.</p>
+</section>
+<section id="requirements-txt">
+<h3><code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code><a class="headerlink" href="#requirements-txt" title="Permalink to this heading">¶</a></h3>
+<p>A list of Python package requirements for this Git repository, which can be installed
+using the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> command.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip install --requirement requirements.txt
+</pre></div>
+</div>
+<p>Alternatively, to install the requirements file along with pre-commit hooks, run the
+following command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make requirements
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Research and Development</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Research and Development Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/README.html">User guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_guide/README.html">Contributing guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../aqa/README.html">Analytical quality assurance</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">research-and-development</span></code> structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data.html"><code class="docutils literal notranslate"><span class="pre">data</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs.html"><code class="docutils literal notranslate"><span class="pre">docs</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html"><code class="docutils literal notranslate"><span class="pre">notebooks</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html"><code class="docutils literal notranslate"><span class="pre">outputs</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> package overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html"><code class="docutils literal notranslate"><span class="pre">tests</span></code> folder overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#top-level-files">Top-level files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/README.html"><code class="docutils literal notranslate"><span class="pre">src</span></code> API reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../aqa/assumptions_caveats.html" title="previous chapter">Assumptions and caveats log</a></li>
+      <li>Next: <a href="data.html" title="next chapter"><code class="docutils literal notranslate"><span class="pre">data</span></code> folder overview</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+
+      |
+      <a href="../_sources/structure/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>
