@@ -1,4 +1,4 @@
-# `research-and-development` structure
+# Project structure
 
 This page provides information on the repository's structure. The repository's folder
 structure is explained here:
