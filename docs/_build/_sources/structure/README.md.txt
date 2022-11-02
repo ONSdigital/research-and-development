@@ -1,4 +1,4 @@
-# `research-and-development` structure
+# Project structure
 
 This page provides information on the repository's structure. The repository's folder
 structure is explained here:
@@ -22,7 +22,7 @@ this Git repository.
 
 Environment variables go here, and can be read in by Python using the `python-dotenv` package, and `os.getenv`:
 
-```in script
+```python
 from dotenv import load_dotenv
 import os
 
@@ -40,7 +40,7 @@ Orchestration file to load environment variables from the `.env` and `.secrets` 
 Only used by systems with `direnv` (https://direnv.net/) installed. Environment
 variables can be read in by Python using `os.getenv` _without_ using `python-dotenv`:
 
-```in script
+```python
 import os
 
 # Example variable

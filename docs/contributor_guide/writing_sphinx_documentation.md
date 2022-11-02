@@ -7,7 +7,7 @@ documentation][writethedocs]. [For Agile projects, consider documenting
 late][agilemodeling] as well.
 
 
-### Creating a searchable website
+## Creating a searchable website
 
 To create a website with your documentation, run the following command in your terminal
 at the top-level of this project:

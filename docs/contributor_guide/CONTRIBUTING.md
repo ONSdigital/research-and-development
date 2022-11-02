@@ -36,11 +36,6 @@ documentation][docs-pre-commit-hooks].
 
 The Research and Development project is being developed in the open in line with recommendations in the [Government Service Manual](https://www.gov.uk/service-manual/service-standard/point-12-make-new-source-code-open) that state that new code should be open. Hosting the code on GitHub is an easy way to adhere to this.
 
-## Contributing
-We are not looking for developers external to ONS, but anybody may scrutinise the code and give feedback.
-
-[If you want to help us build, and improve `research-and-development`, view our
-contributing guidelines][contributing].
 
 ## Developer set up
 
@@ -126,7 +121,7 @@ length of 88; the flake8 pre-commit hook should help with this!
 Local links can be written as normal, but external links should be referenced at the
 bottom of the Markdown file for clarity. For example:
 
-Use a [local link to reference the `README.md`](../../README.md) file, but [an external
+Use a [local link to reference the `README.md`](./README.md) file, but [an external
 link for GOV.UK][gov-uk].
 
 We also try to wrap Markdown to a line length of 88 characters, but this is not

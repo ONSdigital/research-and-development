@@ -3,7 +3,7 @@
 All documentation for the project should be included in this folder in either
 reStructuredText or Markdown files, with acceptable formatting for Sphinx. [Guidance on
 how to write Sphinx documentation is supplied in the contributor
-guide][writing-sphinx-documentation].
+guide][./contributor_guide/writing-sphinx-documentation].
 
 To build the documentation, run the `docs` command [from `Makefile` using the `make`
 utility at the top-level of this repository][docs-makefile].
