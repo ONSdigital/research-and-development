@@ -4,25 +4,9 @@ Calculating national and regional research and development expenditure as part o
 
 Additional information about the aims and objectives of the project will go here when it is available. The project is currently in pre-discovery.
 
+This readme is just a stub, please refer to our [project homepage](https://onsdigital.github.io/research-and-development/_build/index.html) for more information.
 
 
-
-
-
-
-## Required secrets and credentials
-
-To run this project, [you need a `.secrets` file with secrets/credentials as
-environmental variables][docs-loading-environment-variables-secrets]. The
-secrets/credentials should have the following environment variable name(s):
-
-| Secret/credential | Environment variable name | Description                                |
-|-------------------|---------------------------|--------------------------------------------|
-| Secret 1          | `SECRET_VARIABLE_1`       | Plain English description of Secret 1.     |
-| Credential 1      | `CREDENTIAL_VARIABLE_1`   | Plain English description of Credential 1. |
-
-Once you've added, [load these environment variables using
-`.env`][docs-loading-environment-variables].
 
 ## Licence
 
