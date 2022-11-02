@@ -47,6 +47,9 @@ conda env export > environment.yml
 
 ### WARNING: This will export a section in the `environment.yml` called `channels` which contains your Artifactory password. Delete this entire section.
 
+
+![](..\img\what_to_delete.png)
+
 Then do the normal:
 ```
 git add environment.yml
