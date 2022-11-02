@@ -12,7 +12,7 @@ utility at the top-level of this repository][docs-makefile].
 make docs
 ```
 
-or, alternatively, run:
+or alternatively, run:
 
 ```shell
 sphinx-build -b linkcheck ./docs ./docs/_build
