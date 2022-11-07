@@ -1,4 +1,4 @@
-# Code of conduct for `research-and-development`
+# Code of conduct
 
 Contributors to this repository hosted by `ONSdigital` are expected to follow the
 Contributor Covenant Code of Conduct, and those working within Her Majesty's Government
