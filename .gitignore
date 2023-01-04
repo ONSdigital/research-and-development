@@ -93,6 +93,9 @@ doc/_build/
 target/
 
 # Jupyter Notebook
+notebooks/*
+!notebooks/.gitkeep
+!notebooks/.README.md
 .ipynb_checkpoints
 
 # IPython
@@ -871,6 +874,19 @@ data/processed/*
 !data/interim/.gitkeep
 !data/processed/.gitkeep
 
+# Ignore specific data file types, wherever they are in the repo
+*.csv
+*.feather
+*.h5
+*.hd
+*.hdf5
+*.json
+*.parquet
+*.txt
+*.xlsx
+*.xml
+*.zip
+
 # Ignore the `docs/reference/api` folder
 docs/reference/api/*
 
@@ -883,3 +899,4 @@ docs/reference/api/*
 
 # Ignore Sphinx documentation link checking folder
 docs/_linkcheck/
+
