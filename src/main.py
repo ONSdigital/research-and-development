@@ -6,3 +6,6 @@ from src.utils.testfunctions import add
 def run_pipeline():
     """Run the pipeline"""
     return add(1, 2)
+
+def add_numbers(a, b):
+    return a + B
