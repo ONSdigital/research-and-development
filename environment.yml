@@ -1,6 +1,6 @@
 name: resdev310
 dependencies:
-  - arrow=1.2.2=pyhd3eb1b0_0
+  - arrow=1.2.2
   - binaryornot=0.4.4=pyhd3eb1b0_1
   - brotlipy=0.7.0=py310h2bbff1b_1002
   - bzip2=1.0.8=he774522_0
