@@ -1,7 +1,24 @@
 """The main pipeline"""
+from src.utils.configuration import ConfigReader
+import logging
+import time
+from datetime import datetime, timedelta
+import sys
 
 from src.utils.testfunctions import add
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+# set up different logs for different modules. (i.e. data cleaning, data visualisation etc.)
+file_handler = logging.FileHandler('src/utils/mylog.log')
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+
+
+logger.addHandler(file_handler)
+
+#%%
 
 def run_pipeline():
     """Run the pipeline"""
@@ -29,3 +46,20 @@ if __name__ == "__main__":
     df = dummy_function()
     df = manipulate_df(df)
     print(df)
+    logger.info("Starting function call")
+
+    total_time = round(time.time(), 0)
+    timestamp = str(datetime.now())
+    config = ConfigReader('src/utils/testconfig.ini')
+    global_config = config.config_setup("global")
+    
+    try:
+        c = a + b
+        logger.info("Finished function call")
+        return c
+    except TypeError:
+        print("error")
+        logger.error("Error with input.")
+        return
+        
+    
