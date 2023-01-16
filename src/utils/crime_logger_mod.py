@@ -11,6 +11,13 @@ import numpy as np
 
 from table_logger import TableLogger
 
+table_config = "SingleLine"
+
+import configparser
+config= configparser.ConfigParser()
+config.read(r'src/utils/testconfig.ini')
+global_config = config['global']
+
 # Create the logger which can be imported into any module for logging
 logger = logging.getLogger(__name__)
 
@@ -33,7 +40,7 @@ def logger_creator(global_config):
         # Add a unique timestamp string to avoid overwriting
         timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")      
         # Create log handlers so logs are written to file and stdout
-        log_handlers = [logging.FileHandler(f'logs/crime_pipeline_{timestamp_string}.log'),
+        log_handlers = [logging.FileHandler(f'src/utils/mylogs_{timestamp_string}.log'),
                         logging.StreamHandler()]
 
         logging.basicConfig(level=logging_level,
@@ -133,6 +140,7 @@ def exception_wrap(func):
     return wrapper
 
 
+
 def df_change_wrap(func):
     """Define a decorator to log the difference between the input and output.
 
@@ -191,51 +199,9 @@ def df_measure_change(df, rows_before, cols_before, table_config):
         logger.warning("""Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified.""")
 
-
+logger_creator(global_config)
 if __name__ == "__main__":
-
-    class DfMakerChanger:
-        """Define a class for testing wrappers."""
-
-        def __init__(self) -> None:
-            """Create the class."""
-            self.data = {
-                "calories": [420, 380, 390],
-                "duration": [50, 40, 45]
-            }
-            self.index = ["day1", "day2", "day3"]
-            self.vf_df = pd.DataFrame(self.data, self.index)
-
-        def _add_df_col(self, col_header, data):
-            self.vf_df[col_header] = data
-
-        def _del_df_col(self, col_header):
-            cols_lst = list(self.vf_df.columns)
-            cols_lst.remove(col_header)
-            self.vf_df = self.vf_df[cols_lst]
-
-        def _add_rand_rows(self, rows_to_add):
-            """Add rows of random data."""
-            num_cols = self.vf_df.shape[1]
-            new_rows_data = {}
-            for _ in range(num_cols):
-                for col in df_obj.vf_df.columns:
-                    min = df_obj.vf_df[col].min()
-                    max = df_obj.vf_df[col].max()
-                    new_rows_data[col] = np.random.randint(low=min, high=max + 1, size=rows_to_add)
-            new_rows_df = pd.DataFrame(new_rows_data)
-            self.vf_df = pd.concat([self.vf_df, new_rows_df])
-
-        @df_change_wrap
-        def create_n_change_df(self):
-            """Define a function that emulates the crime pipeline."""
-            self._add_df_col("fat", [9, 8, 7])
-            self._add_rand_rows(9)
-            return self.vf_df
-
-    df_obj = DfMakerChanger()
-    df_obj.create_n_change_df()
-
+    
     @exception_wrap
     def divbyzero(num):
         """Define a testing function that will throw an exception."""
@@ -257,6 +223,6 @@ if __name__ == "__main__":
         return ans
 
     # Calling functions to test the logging wrappers
-    # this_definitely_works(10)
-    # divbyzero(10)
+    this_definitely_works(10)
+    #divbyzero(10)
     print(takes_a_while(10000))
