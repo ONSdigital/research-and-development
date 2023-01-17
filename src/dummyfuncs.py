@@ -1,5 +1,5 @@
 import logging
-from src.utils.crime_logger_mod import logger_creator, time_logger_wrap, exception_wrap
+from src.utils.loggingfuncs import logger_creator, time_logger_wrap, exception_wrap
 import configparser
 config= configparser.ConfigParser()
 config.read(r'src/utils/testconfig.ini')
