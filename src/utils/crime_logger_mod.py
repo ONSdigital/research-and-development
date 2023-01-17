@@ -37,15 +37,11 @@ def logger_creator(global_config):
     log_to_file = eval(global_config["log_to_file"])
     # How to log is determined by log_to_file in the config
     if log_to_file:
-        # Add a unique timestamp string to avoid overwriting
-        timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")      
-        # Create log handlers so logs are written to file and stdout
-        log_handlers = [logging.FileHandler(f'src/utils/mylogs_{timestamp_string}.log'),
-                        logging.StreamHandler()]
-
-        logging.basicConfig(level=logging_level,
-                            format="%(asctime)-15s %(levelname)-8s %(message)s",
-                            handlers=log_handlers)
+        formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+        file_handler = logging.FileHandler('src/utils/mylog.log')
+        file_handler.setLevel(logging_level)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
     else:
         logging.basicConfig(level=logging_level,
                             format="%(asctime)-15s %(levelname)-8s %(message)s")
@@ -224,5 +220,5 @@ if __name__ == "__main__":
 
     # Calling functions to test the logging wrappers
     this_definitely_works(10)
-    #divbyzero(10)
+    divbyzero(10)
     print(takes_a_while(10000))
