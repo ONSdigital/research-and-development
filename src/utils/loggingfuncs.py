@@ -199,7 +199,7 @@ def df_measure_change(df, rows_before, cols_before, table_config):
         logger.warning("""Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified.""")
         
-logger_creator(global_config)
+#logger_creator(global_config)
 if __name__ == "__main__":
     
     @exception_wrap
