@@ -38,7 +38,7 @@ def logger_creator(global_config):
     # How to log is determined by log_to_file in the config
     if log_to_file:
         formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-        file_handler = logging.FileHandler('src/utils/mylog.log')
+        file_handler = logging.FileHandler('src/utils/mylogs.log')
         file_handler.setLevel(logging_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
@@ -220,5 +220,5 @@ if __name__ == "__main__":
 
     # Calling functions to test the logging wrappers
     this_definitely_works(10)
-    divbyzero(10)
     print(takes_a_while(10000))
+    divbyzero(10)
