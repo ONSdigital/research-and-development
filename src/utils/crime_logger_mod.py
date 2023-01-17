@@ -37,11 +37,15 @@ def logger_creator(global_config):
     log_to_file = eval(global_config["log_to_file"])
     # How to log is determined by log_to_file in the config
     if log_to_file:
-        formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-        file_handler = logging.FileHandler('src/utils/mylogs.log')
-        file_handler.setLevel(logging_level)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        # Add a unique timestamp string to avoid overwriting
+        timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M%S")      
+        # Create log handlers so logs are written to file and stdout
+        log_handlers = [logging.FileHandler(f'src/utils/savedlogs_{timestamp_string}.log'),
+                        logging.StreamHandler()]
+
+        logging.basicConfig(level=logging_level,
+                            format="%(asctime)-15s %(levelname)-8s %(message)s",
+                            handlers=log_handlers)
     else:
         logging.basicConfig(level=logging_level,
                             format="%(asctime)-15s %(levelname)-8s %(message)s")
@@ -194,7 +198,7 @@ def df_measure_change(df, rows_before, cols_before, table_config):
     else:
         logger.warning("""Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified.""")
-
+        
 logger_creator(global_config)
 if __name__ == "__main__":
     
