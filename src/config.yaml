@@ -1,0 +1,5 @@
+runlog_writer:
+  write_csv: True # Write the runlog to a CSV file
+  write_hdf5: True # Write the runlog to an HDF5 file
+  write_sql: True # Write the runlog to a SQL database
+  display: False # Display the runlog in the terminal
