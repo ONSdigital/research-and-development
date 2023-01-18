@@ -17,18 +17,19 @@ class ConfigReader:
         The full filepath and filename of the .ini config file to load.
 
     """
+
     def __init__(self, config_file_path):
         """Initialise, read and validate config settings."""
-        
+
         self.config_file_path = config_file_path
         self.config = configparser.ConfigParser(interpolation=ExtendedInterpolation())
-        
+
         try:
             self.config.read_file(open(self.config_file_path))
 
         except FileNotFoundError as e:
             raise FileNotFoundError(
-                f'Could not find configuration file: {self.config_file_path}'
+                f"Could not find configuration file: {self.config_file_path}"
             ) from e
 
         self.validate_config()
@@ -41,7 +42,7 @@ class ConfigReader:
         """Add all configuration settings in section defined by name to Logger."""
         LOGGER.info("==============================================")
         LOGGER.info(f"Loading {name} configuration settings")
-        
+
         # Only output the first n items, where n=limit
         key_list = list(self.config[name])
         if limit > 0:
@@ -50,11 +51,10 @@ class ConfigReader:
             LOGGER.info(f"  {key}: {self.config[name][key]}")
         LOGGER.info("")
 
-
     def config_setup(self, name):
         """Return a dictionary of the config settings for name."""
         return self.config[name]
-        
+
     def config_global(self):
         """Return a dictionary of the global config settings."""
         self.log_config_settings("global")

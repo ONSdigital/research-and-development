@@ -899,4 +899,3 @@ docs/reference/api/*
 
 # Ignore Sphinx documentation link checking folder
 docs/_linkcheck/
-
