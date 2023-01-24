@@ -2,58 +2,13 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
-from datetime import datetime
 from table_logger import TableLogger
-import configparser
-
-"""Wrappers to handle logging of functions."""
 
 table_config = "SingleLine"
 
-
-config = configparser.ConfigParser()
-config.read(r"src/utils/testconfig.ini")
-global_config = config["global"]
-
 # Create the logger which can be imported into any module for logging
-logger = logging.getLogger(__name__)
-
-
-def get_logging_level_command(lev_from_conf):
-    """Translate a single word into a logging level command."""
-    loglevels_dict = {
-        "DEBUG": logging.DEBUG,
-        "INFO": logging.INFO,
-        "WARNING": logging.WARNING,
-    }
-    logging_level = loglevels_dict[lev_from_conf]
-    return logging_level
-
-
-def logger_creator(global_config):
-    """Set up config for logging."""
-    logging_level = get_logging_level_command(global_config["logging_level"])
-    log_to_file = eval(global_config["log_to_file"])
-    # How to log is determined by log_to_file in the config
-    if log_to_file:
-        # Add a unique timestamp string to avoid overwriting
-        timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M%S")
-        # Create log handlers so logs are written to file and stdout
-        log_handlers = [
-            logging.FileHandler(f"src/utils/savedlogs_{timestamp_string}.log"),
-            logging.StreamHandler(),
-        ]
-
-        logging.basicConfig(
-            level=logging_level,
-            format="%(asctime)-15s %(levelname)-8s %(message)s",
-            handlers=log_handlers,
-        )
-    else:
-        logging.basicConfig(
-            level=logging_level, format="%(asctime)-15s %(levelname)-8s %(message)s"
-        )
-    return logger
+# logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
+logger = logging.getLogger("wrappers")
 
 
 def time_logger_wrap(func):
@@ -65,8 +20,8 @@ def time_logger_wrap(func):
         """Define the decorator itself."""
         enter_time = starting_time()
         result = func(*args, **kwargs)
-        finishing_time(func, enter_time)
-        return result
+        time_taken = finishing_time(func, enter_time)
+        return result, time_taken
 
     return decorator
 
@@ -84,6 +39,8 @@ def finishing_time(func, enter_time):
         f"Running the {func.__name__} function took: "
         f"{round((exit_time-enter_time), 2)} seconds"
     )
+
+    return exit_time - enter_time
 
 
 def start_finish_wrapper(func):
@@ -224,32 +181,3 @@ def df_measure_change(df, rows_before, cols_before, table_config):
             """Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified."""
         )
-
-
-# logger_creator(global_config)
-if __name__ == "__main__":
-
-    @exception_wrap
-    def divbyzero(num):
-        """Define a testing function that will throw an exception."""
-        ans = num / 0
-        return ans
-
-    @exception_wrap
-    def this_definitely_works(num):
-        """Define a testing function that will not throw an exception."""
-        ans = num**num
-        return ans
-
-    @time_logger_wrap
-    def takes_a_while(num):
-        """Define a testing function that takes some time to run."""
-        ans = 0
-        for _ in range(num):
-            ans += (num**2) ** 2
-        return ans
-
-    # Calling functions to test the logging wrappers
-    this_definitely_works(10)
-    print(takes_a_while(10000))
-    divbyzero(10)
