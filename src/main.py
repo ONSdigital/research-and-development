@@ -3,7 +3,7 @@
 
 from utils import runlog
 import pandas as pd
-import numpy as np 
+import numpy as np
 import logging
 from _version import __version__ as version
 from utils.helpers import Config_settings
@@ -11,7 +11,7 @@ from utils.helpers import Config_settings
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 # create a file handler
-handler = logging.FileHandler('logs/pipeline.log')
+handler = logging.FileHandler('../logs/pipeline.log')
 
 LOGGER.info("Starting pipeline")
 
