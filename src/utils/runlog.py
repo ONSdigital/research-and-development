@@ -3,7 +3,7 @@
 import logging
 
 # import utils.helpers as hlp
-from _version import __version__ as version
+
 from datetime import datetime
 import numpy as np
 import pandas as pd
