@@ -899,3 +899,8 @@ docs/reference/api/*
 
 # Ignore Sphinx documentation link checking folder
 docs/_linkcheck/
+
+# logs files
+logs/*
+!logs/.gitkeep
+!logs/README.md
