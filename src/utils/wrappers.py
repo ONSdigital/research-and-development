@@ -8,7 +8,7 @@ table_config = "SingleLine"
 
 # Create the logger which can be imported into any module for logging
 # logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
-logger = logging.getLogger("wrappers")
+logger = logging.getLogger(__name__)
 
 
 def time_logger_wrap(func):
