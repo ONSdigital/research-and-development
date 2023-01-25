@@ -2,7 +2,7 @@ from src.utils.wrappers import time_logger_wrap, exception_wrap
 import time
 
 # logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
-# logger = logging.getLogger('testfunctions')
+# logger = logging.getLogger(__name__)
 
 
 @exception_wrap
