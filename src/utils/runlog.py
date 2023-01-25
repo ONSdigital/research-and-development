@@ -11,16 +11,15 @@ import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
 
+
 class RunLog:
-    """ Creates a runlog instance for the pipeline.
-    """
+    """Creates a runlog instance for the pipeline."""
 
     def __init__(self, config, version):
         self.config = config
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
-        self.time_taken = self.record_time_taken()
 
     def _create_run_id(self):
         """Create a unique run_id from the timestamp and a random number.
@@ -36,7 +35,7 @@ class RunLog:
             Unique run_id.
 
         """
-        # get the time now 
+        # get the time now
         timestamp = datetime.now()
         run_id = f"{timestamp}_{np.random.randint(0,1000)}"
         return run_id
@@ -53,12 +52,13 @@ class RunLog:
         # self.time_taken = time_taken
         pass
 
-    def _create_runlog_dict(self): 
-        """Create a dictionary from the config settings, run_id and version and logs list."""
+    def _create_runlog_dict(self):  # noqa
+        """Create a dictionary from the config settings,
+        run_id and version and logs list."""
         self.runlog_dict = {
             "run_id": self.run_id,
             "version": self.version,
-            "time_taken": self.time_taken
+            "time_taken": self.time_taken,
         }
 
         # Add all the config settings to the dictionary
@@ -82,7 +82,7 @@ class RunLog:
 
     def _write_runlog(self):
         """Write the runlog to a file."""
-        
+
         # Get filename from run_id
         filename = self.run_id
 
@@ -98,5 +98,5 @@ class RunLog:
         if write_sql:
             # write the runlog to a sql database
             self.runlog_df.to_sql(f"{filename}_runlog.sql")
-        
+
         return None

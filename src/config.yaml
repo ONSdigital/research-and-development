@@ -3,7 +3,7 @@ runlog_writer:
   write_hdf5: True # Write the runlog to an HDF5 file
   write_sql: True # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
-  log_path: "data/log",
+  log_path: "data/log"
 run_log_sql:
-  log_db: "test_runlog",
-  log_mode: "append",
+  log_db: "test_runlog"
+  log_mode: "append"
