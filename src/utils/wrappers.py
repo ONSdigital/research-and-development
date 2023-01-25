@@ -3,12 +3,35 @@ from functools import wraps
 from time import perf_counter
 import traceback
 from table_logger import TableLogger
+import logging.config
+import configparser
 
 table_config = "SingleLine"
 
 # Create the logger which can be imported into any module for logging
 # logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
+
+
+def logger_creator(global_config):
+    """Set up config for logging."""
+    log_to_file = eval(global_config["log_to_file"])
+    config = configparser.ConfigParser()
+    conf_file = config.read("src/utils/testconfig.ini")
+    # How to log is determined by log_to_file in the config
+    if log_to_file:
+        # Add a unique timestamp string to avoid overwriting
+        # timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")
+        # Create log handlers so logs are written to file and stdout
+
+        logging.config.fileConfig(conf_file, disable_existing_loggers=False)
+
+    else:
+        # TODO: Learn how to delete file handler from config file
+        sections_lst = list(config.sections())
+        sections_lst.remove("handler_fileHandler")
+
+    return logger
 
 
 def time_logger_wrap(func):

@@ -6,7 +6,6 @@ import time
 import numpy as np
 import pandas as pd
 
-logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 x_vals = [22, 33, 61, 42, 10]
