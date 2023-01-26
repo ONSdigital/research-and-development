@@ -52,6 +52,15 @@ class RunLog:
         # self.time_taken = time_taken
         pass
 
+    def get_logs(self):
+        """
+        Get all of the logs from the pipeline (from the log files)
+        and append them to self.logs list
+
+        """
+
+        pass
+
     def _create_runlog_dict(self):  # noqa
         """Create a dictionary from the config settings,
         run_id and version and logs list."""

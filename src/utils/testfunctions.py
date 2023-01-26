@@ -7,9 +7,15 @@ def add(a:int, b: int):
         raise TypeError("a and b must be integers")
 from src.utils.wrappers import time_logger_wrap, exception_wrap
 import time
+import numpy as np
+import pandas as pd
+import logging
 
 # logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
 # logger = logging.getLogger(__name__)
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 
 @exception_wrap
@@ -43,3 +49,20 @@ def add(a, b):
     c = a + b
     time.sleep(0.5)
     return c
+
+
+@time_logger_wrap
+@exception_wrap
+def dummy_function(seed=42):
+    np.random.seed(seed=seed)
+    df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
+    LOGGER.info("Dummy dataframe has been created")
+    return df
+
+
+@time_logger_wrap
+@exception_wrap
+def manipulate_df(df):
+    df = df * 2
+    LOGGER.info("Dummy dataframe has been manipulated")
+    return df

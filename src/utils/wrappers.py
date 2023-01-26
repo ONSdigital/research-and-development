@@ -24,15 +24,17 @@ def logger_creator(global_config):
         # Add a unique timestamp string to avoid overwriting
         # timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")
         # Create log handlers so logs are written to file and stdout
-
         logging.config.fileConfig(conf_file, disable_existing_loggers=False)
-
+        logger = logging.getLogger(__name__)
     else:
-        config["handlers"]["keys"] = "consoleHandler"
+        logging.basicConfig(
+            level="DEBUG", format="%(asctime)s - %(levelname)s:%(message)s"
+        )
+        logger = logging.getLogger(__name__)
+        # config["handlers"]["keys"] = "consoleHandler"
         # TODO: Learn how to delete file handler from config file
-        sections_lst = list(config.sections())
-        sections_lst.remove("handler_fileHandler")
-
+        # sections_lst = list(config.sections())
+        # sections_lst.remove("handler_fileHandler")
     return logger
 
 
