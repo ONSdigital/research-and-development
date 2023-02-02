@@ -37,6 +37,6 @@ def pipeline():
 
 if __name__ == "__main__":
 
-    pipeline()
+    # pipeline()
     time_taken = pipeline()[1]
     runlog_obj.record_time_taken(time_taken=time_taken)

@@ -7,7 +7,8 @@ import logging
 from datetime import datetime
 import numpy as np
 import pandas as pd
-
+import configparser
+from src._version import __version__  # noqa
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class RunLog:
 
         """
         # get the time now
+        # get latest run_id
+        # append datetime stamp to new run_id
         timestamp = datetime.now()
         run_id = f"{timestamp}_{np.random.randint(0,1000)}"
         return run_id
@@ -47,10 +50,9 @@ class RunLog:
 
         """
 
-        # Not sure how this is going to work until we have the timing wrapper
-        # Somehow get the time from the timing wrapper
-        # self.time_taken = time_taken
-        pass
+        self.time_taken = str(round(time_taken, 5))
+
+        return self.time_taken
 
     def get_logs(self):
         """
@@ -60,6 +62,16 @@ class RunLog:
         """
 
         pass
+
+    def get_configs(self, module):
+        config = configparser.ConfigParser()
+        config.read("src/utils/testconfig.ini")
+        config = config[module]
+        settings_str = ""
+        for key, item in config.items():
+            settings_str += f"  {key}: {item}"
+
+        return settings_str
 
     def _create_runlog_dict(self):  # noqa
         """Create a dictionary from the config settings,
