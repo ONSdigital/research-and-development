@@ -5,7 +5,7 @@ import traceback
 from table_logger import TableLogger
 import logging.config
 import configparser
-
+# Testing to see if i can commit
 table_config = "SingleLine"
 
 # Create the logger which can be imported into any module for logging
