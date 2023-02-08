@@ -2,9 +2,11 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
+
 from table_logger import TableLogger
 import logging.config
 import configparser
+
 # Testing to see if i can commit
 table_config = "SingleLine"
 
@@ -16,7 +18,7 @@ conf_file = config.read("src/utils/testconfig.ini")
 global_config = config["global"]
 
 
-def logger_creator(global_config):
+def logger_creator(global_config, run_id):
     """Set up config for logging."""
     log_to_file = eval(global_config["log_to_file"])
     # How to log is determined by log_to_file in the config
@@ -24,7 +26,10 @@ def logger_creator(global_config):
         # Add a unique timestamp string to avoid overwriting
         # timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")
         # Create log handlers so logs are written to file and stdout
-        logging.config.fileConfig(conf_file, disable_existing_loggers=False)
+
+        logging.config.fileConfig(
+            conf_file, defaults={"run_id": run_id}, disable_existing_loggers=False
+        )  #
         logger = logging.getLogger(__name__)
     else:
         logging.basicConfig(

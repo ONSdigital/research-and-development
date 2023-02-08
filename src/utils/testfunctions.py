@@ -6,6 +6,7 @@ def add(a:int, b: int):
     if not isinstance(a, int) or not isinstance(b, int):
         raise TypeError("a and b must be integers")
 from src.utils.wrappers import time_logger_wrap, exception_wrap
+from utils.wrappers import time_logger_wrap, exception_wrap
 import time
 import numpy as np
 import pandas as pd
@@ -53,7 +54,7 @@ def add(a, b):
 
 @time_logger_wrap
 @exception_wrap
-def dummy_function(seed=42):
+def create_dummy_df(seed=42):
     np.random.seed(seed=seed)
     df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
     LOGGER.info("Dummy dataframe has been created")

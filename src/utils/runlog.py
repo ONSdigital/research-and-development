@@ -7,8 +7,6 @@ import logging
 from datetime import datetime
 import numpy as np
 import pandas as pd
-import configparser
-from src._version import __version__  # noqa
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +19,10 @@ class RunLog:
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
+
+    def findhighest(self):
+        "Finds the highest number pre-pending the name of the log files"
+        pass
 
     def _create_run_id(self):
         """Create a unique run_id from the timestamp and a random number.
@@ -39,7 +41,11 @@ class RunLog:
         # get the time now
         # get latest run_id
         # append datetime stamp to new run_id
+        # TODO: find the most recent and highest number, and add
+        # one instead of a random number
         timestamp = datetime.now()
+        # plus_one = findhighest() + 1
+        # run_id = f"{plus_one}_{timestamp}"
         run_id = f"{timestamp}_{np.random.randint(0,1000)}"
         return run_id
 
@@ -54,24 +60,28 @@ class RunLog:
 
         return self.time_taken
 
-    def get_logs(self):
+    def retrieve_pipeline_logs(self):
         """
         Get all of the logs from the pipeline (from the log files)
         and append them to self.logs list
 
         """
 
+        # Read .log file for this run
+        # with open ("logs/")
+
+        # self.logs.append(pipeline_logs)
         pass
 
-    def get_configs(self, module):
-        config = configparser.ConfigParser()
-        config.read("src/utils/testconfig.ini")
-        config = config[module]
-        settings_str = ""
-        for key, item in config.items():
-            settings_str += f"  {key}: {item}"
+    # def get_configs(self, module):
+    #     config = configparser.ConfigParser()
+    #     config.read("src/utils/testconfig.ini")
+    #     config = config[module]
+    #     settings_str = ""
+    #     for key, item in config.items():
+    #         settings_str += f"  {key}: {item}"
 
-        return settings_str
+    #     return settings_str
 
     def _create_runlog_dict(self):  # noqa
         """Create a dictionary from the config settings,
@@ -94,7 +104,7 @@ class RunLog:
 
     def _get_runlog_settings(self):
         """Get the runlog settings from the config file."""
-        runlog_settings = self._get_config_settings()["runlog_writer"]
+        runlog_settings = self.config["runlog_writer"]
         write_csv = runlog_settings["write_csv"]
         write_hdf5 = runlog_settings["write_hdf5"]
         write_sql = runlog_settings["write_sql"]
