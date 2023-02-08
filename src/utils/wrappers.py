@@ -7,24 +7,15 @@ import datetime
 import logging.config
 import configparser
 
-# Testing to see if i can commit
 table_config = "SingleLine"
 
-# Create the logger which can be imported into any module for logging
-# logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
-config = configparser.ConfigParser()
-conf_file = config.read("src/utils/testconfig.ini")
-global_config = config["global"]
-
 
 def logger_creator(global_config, run_id):
     """Set up config for logging."""
-    log_to_file = eval(global_config["log_to_file"])
-    # How to log is determined by log_to_file in the config
-    if log_to_file:
+    if global_config["log_to_file"] == True:
         logging.basicConfig(level="DEBUG",
-        format="%(asctime)s %(name)s - %(funcName)s - %(levelname)s:%(message)s",
+        format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
         handlers=[logging.FileHandler(f"logs/{run_id}.log"),
         logging.StreamHandler()]
         )

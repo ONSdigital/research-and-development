@@ -1,3 +1,5 @@
+global:
+  log_to_file: True # Write logs to .log file 
 runlog_writer:
   write_csv: True # Write the runlog to a CSV file
   write_hdf5: True # Write the runlog to an HDF5 file
