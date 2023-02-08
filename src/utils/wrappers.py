@@ -2,8 +2,8 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
-
-from table_logger import TableLogger
+import datetime
+# from table_logger import TableLogger
 import logging.config
 import configparser
 
@@ -23,24 +23,19 @@ def logger_creator(global_config, run_id):
     log_to_file = eval(global_config["log_to_file"])
     # How to log is determined by log_to_file in the config
     if log_to_file:
-        # Add a unique timestamp string to avoid overwriting
-        # timestamp_string = datetime.now().strftime("%Y-%m-%d %H%M")
-        # Create log handlers so logs are written to file and stdout
-
-        logging.config.fileConfig(
-            conf_file, defaults={"run_id": run_id}, disable_existing_loggers=False
-        )  #
+        logging.basicConfig(level="DEBUG",
+        format="%(asctime)s %(name)s - %(funcName)s - %(levelname)s:%(message)s",
+        handlers=[logging.FileHandler(f"logs/{run_id}.log"),
+        logging.StreamHandler()]
+        )
         logger = logging.getLogger(__name__)
     else:
         logging.basicConfig(
             level="DEBUG", format="%(asctime)s - %(levelname)s:%(message)s"
         )
         logger = logging.getLogger(__name__)
-        # config["handlers"]["keys"] = "consoleHandler"
-        # TODO: Learn how to delete file handler from config file
-        # sections_lst = list(config.sections())
-        # sections_lst.remove("handler_fileHandler")
     return logger
+
 
 
 def time_logger_wrap(func):

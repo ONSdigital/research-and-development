@@ -43,7 +43,7 @@ class RunLog:
         # append datetime stamp to new run_id
         # TODO: find the most recent and highest number, and add
         # one instead of a random number
-        timestamp = datetime.now()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H%M%S")
         # plus_one = findhighest() + 1
         # run_id = f"{plus_one}_{timestamp}"
         run_id = f"{timestamp}_{np.random.randint(0,1000)}"
