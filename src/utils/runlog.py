@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 import numpy as np
 import pandas as pd
-
+import os
 LOGGER = logging.getLogger(__name__)
 
 
@@ -38,15 +38,18 @@ class RunLog:
             Unique run_id.
 
         """
-        # get the time now
-        # get latest run_id
-        # append datetime stamp to new run_id
-        # TODO: find the most recent and highest number, and add
-        # one instead of a random number
-        timestamp = datetime.now().strftime("%Y-%m-%d %H%M%S")
-        # plus_one = findhighest() + 1
-        # run_id = f"{plus_one}_{timestamp}"
-        run_id = f"{timestamp}_{np.random.randint(0,1000)}"
+        # TODO: Split string using seperator. 
+        # Write function to find latest run_id
+        # merge the 2 into this space
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        files = os.listdir('logs/')
+        log_files=[f for f in files if '.log' in f]
+        #if log_files:
+            
+        # else:
+        #     ids = 0
+            
+        run_id = f"id_{timestamp}"
         return run_id
 
     def record_time_taken(self, time_taken):
@@ -66,7 +69,9 @@ class RunLog:
         and append them to self.logs list
 
         """
-
+        with open ("logs/", 'r') as file:
+            lines = file.read().splitlines()
+            self.logs.append(lines)
         # Read .log file for this run
         # with open ("logs/")
 
