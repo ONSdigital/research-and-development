@@ -35,4 +35,3 @@ if __name__ == "__main__":
     runlog_obj.record_time_taken(time_taken=time_taken)
     # runlog_obj.retrieve_pipeline_logs(logs)
 
-    

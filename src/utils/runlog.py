@@ -38,18 +38,18 @@ class RunLog:
             Unique run_id.
 
         """
-        # TODO: Split string using seperator. 
-        # Write function to find latest run_id
-        # merge the 2 into this space
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
         files = os.listdir('logs/')
         log_files=[f for f in files if '.log' in f]
-        #if log_files:
-            
-        # else:
-        #     ids = 0
-            
-        run_id = f"id_{timestamp}"
+        if log_files:
+            id_list = []
+            for i in range(len(log_files)):
+                ids = log_files[i].split('_')[1]
+                ids = ids.split('.')[0]
+                id_list.append(ids)
+            latest_id = int(max(id_list))
+        else:
+            latest_id = 0
+        run_id = latest_id + 1
         return run_id
 
     def record_time_taken(self, time_taken):
@@ -72,21 +72,13 @@ class RunLog:
         with open ("logs/", 'r') as file:
             lines = file.read().splitlines()
             self.logs.append(lines)
-        # Read .log file for this run
+            
+        # TODO: Read .log file for this run
         # with open ("logs/")
 
         # self.logs.append(pipeline_logs)
         pass
 
-    # def get_configs(self, module):
-    #     config = configparser.ConfigParser()
-    #     config.read("src/utils/testconfig.ini")
-    #     config = config[module]
-    #     settings_str = ""
-    #     for key, item in config.items():
-    #         settings_str += f"  {key}: {item}"
-
-    #     return settings_str
 
     def _create_runlog_dict(self):  # noqa
         """Create a dictionary from the config settings,

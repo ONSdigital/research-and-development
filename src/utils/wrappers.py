@@ -13,10 +13,11 @@ logger = logging.getLogger(__name__)
 
 def logger_creator(global_config, run_id):
     """Set up config for logging."""
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
     if global_config["log_to_file"] == True:
         logging.basicConfig(level="DEBUG",
         format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
-        handlers=[logging.FileHandler(f"logs/{run_id}.log"),
+        handlers=[logging.FileHandler(f"logs/{timestamp}_{run_id}.log"),
         logging.StreamHandler()]
         )
         logger = logging.getLogger(__name__)
