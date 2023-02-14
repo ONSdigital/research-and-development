@@ -23,3 +23,14 @@ doctest_optionflags = "NORMALIZE_WHITESPACE"
 testpaths = [
     "./tests"
 ]
+
+
+# `poetry` configurations
+[tool.poetry]
+name = "resdev"
+version = "0.1.0"
+description = "Research and Development project: Calculating statistics for national and regional research and development expenditure"
+authors = ["Roddy Macrae Roddy.Macrae@ext.ons.gov.uk"]
+
+[tool.poetry.dependencies]
+python = "3.10.9"
