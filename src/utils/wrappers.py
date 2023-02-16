@@ -58,8 +58,7 @@ def finishing_time(func, enter_time):
         f"Running the {func.__name__} function took: "
         f"{round((exit_time-enter_time), 2)} seconds"
     )
-
-    return exit_time - enter_time
+    
 
 
 def start_finish_wrapper(func):

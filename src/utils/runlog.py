@@ -19,10 +19,8 @@ class RunLog:
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
-
-    def findhighest(self):
-        "Finds the highest number pre-pending the name of the log files"
-        pass
+        self.timestamp = self._generate_time()
+        
 
     def _create_run_id(self):
         """Create a unique run_id from the timestamp and a random number.
@@ -45,22 +43,22 @@ class RunLog:
             for i in range(len(log_files)):
                 ids = log_files[i].split('_')[1]
                 ids = ids.split('.')[0]
-                id_list.append(ids)
-            latest_id = int(max(id_list))
+                id_list.append(int(ids))
+            latest_id = max(id_list)
         else:
             latest_id = 0
         run_id = latest_id + 1
         return run_id
 
-    def record_time_taken(self, time_taken):
+    def _record_time_taken(self, time_taken):
         """Get the time taken for the pipeline to run.
 
         This is for the total pipeline run time, not the time taken for each step.
 
         """
-
-        self.time_taken = str(round(time_taken, 5))
-
+        
+        self.time_taken = str(time_taken)
+        
         return self.time_taken
 
     def retrieve_pipeline_logs(self):
@@ -69,37 +67,62 @@ class RunLog:
         and append them to self.logs list
 
         """
-        with open ("logs/", 'r') as file:
-            lines = file.read().splitlines()
+    
+        files = os.listdir("logs/")
+        log_files=[f for f in files if f"{self.run_id}.log" in f]
+        for i in range(len(log_files)):
+            f = open(os.path.join('logs/', log_files[i]), "r")
+            lines = f.read().splitlines()
             self.logs.append(lines)
             
-        # TODO: Read .log file for this run
-        # with open ("logs/")
+        return self
 
-        # self.logs.append(pipeline_logs)
-        pass
-
-
-    def _create_runlog_dict(self):  # noqa
-        """Create a dictionary from the config settings,
-        run_id and version and logs list."""
-        self.runlog_dict = {
+    def _generate_time(self):
+        timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+        return timestamp
+    
+    def _create_main_dict(self): 
+        """Create unique dictionaries for runlogs, configs
+        and loggers with run_id as identifier"""
+        
+        self.runlog_main_dict = {
             "run_id": self.run_id,
+            "timestamp": self.timestamp,
             "version": self.version,
-            "time_taken": self.time_taken,
+            "run_time": self.time_taken,
         }
-
-        # Add all the config settings to the dictionary
-        self.runlog_dict.update(self.config)
+        
+        return self
+        
+        
+    def _create_config_dict(self):
+        
+        self.runlog_configs_dict = {
+            "run_id": self.run_id,
+            "configs": self.config,
+        }
+        
+        return self
+    def _create_logs_dict(self):
+        
+        self.runlog_logs_dict = {
+            "run_id": self.run_id,
+            "logs": self.logs,
+        }
 
         return self
 
-    def _create_runlog_df(self):
-        """Convert runlog_dict to a pandas dataframe."""
-        self.runlog_df = pd.DataFrame(self.runlog_dict)
+    def _create_runlog_dfs(self):
+        """Convert dictionaries to pandas dataframes."""
+        
+        self.runlog_main_dict = pd.DataFrame(self.runlog_main_dict)
+        self.runlog_configs_dict = pd.DataFrame(self.runlog_configs_dict)
+        self.runlog_logs_dict = pd.DataFrame(self.runlog_logs_dict)
+        
         return self
 
     def _get_runlog_settings(self):
+        
         """Get the runlog settings from the config file."""
         runlog_settings = self.config["runlog_writer"]
         write_csv = runlog_settings["write_csv"]
