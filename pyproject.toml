@@ -34,3 +34,11 @@ authors = ["Roddy Macrae Roddy.Macrae@ext.ons.gov.uk"]
 
 [tool.poetry.dependencies]
 python = "3.10.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "7.2.1"
+
+[[tool.poetry.source]]
+name = "ONS"
+url = "http://art-p-01/artifactory/api/pypi/pypi-virtual/simple"
+default = true
