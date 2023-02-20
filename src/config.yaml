@@ -2,8 +2,8 @@ global:
   log_to_file: True # Write logs to .log file
 runlog_writer:
   write_csv: True # Write the runlog to a CSV file
-  write_hdf5: True # Write the runlog to an HDF5 file
-  write_sql: True # Write the runlog to a SQL database
+  write_hdf5: False # Write the runlog to an HDF5 file
+  write_sql: False # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
   log_path: "data/log"
 run_log_sql:

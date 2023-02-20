@@ -22,6 +22,7 @@ def run_pipeline(start):
     df = create_dummy_df()
     df = manipulate_df(df)
     time.sleep(5)
+    print(df)
     logger.info("Finshing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
@@ -33,12 +34,6 @@ def run_pipeline(start):
     runlog_obj._create_config_dict()
     runlog_obj._create_logs_dict()
 
-    # print("RUN TIME: ", runlog_obj.time_taken)
-    # print("LOGS: ", runlog_obj.logs)
-    # print("CONFIGS: ", runlog_obj.config)
-    # print("VERSION: ", runlog_obj.version)
-    # print("TIMESTAMP: ", runlog_obj.timestamp)
-    # print("ID: ", runlog_obj.run_id)
-    print("MAIN DICT: ", runlog_obj.runlog_main_dict)
-    print("CONFIG DICT: ", runlog_obj.runlog_configs_dict)
-    print("LOGS DICT: ", runlog_obj.runlog_logs_dict)
+    runlog_obj._create_runlog_dfs()
+    runlog_obj.create_runlog_files()
+    runlog_obj._write_runlog()

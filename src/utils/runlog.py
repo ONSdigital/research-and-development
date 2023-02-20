@@ -37,16 +37,25 @@ class RunLog:
         """
         files = os.listdir("logs/")
         log_files = [f for f in files if ".log" in f]
+        # if log_files:
+        #     id_list = []
+        #     for i in range(len(log_files)):
+        #         ids = log_files[i].split("_")[1]
+        #         ids = ids.split(".")[0]
+        #         id_list.append(int(ids))
+        #     latest_id = max(id_list)
+        # else:
+        #     latest_id = 0
+        # run_id = latest_id + 1
+
+        # To read run_id from csv file instead
         if log_files:
-            id_list = []
-            for i in range(len(log_files)):
-                ids = log_files[i].split("_")[1]
-                ids = ids.split(".")[0]
-                id_list.append(int(ids))
-            latest_id = max(id_list)
+            files = pd.read_csv("main_runlog.csv")
+            latest_id = max(files.run_id)
         else:
             latest_id = 0
         run_id = latest_id + 1
+
         return run_id
 
     def _record_time_taken(self, time_taken):
@@ -73,6 +82,9 @@ class RunLog:
             f = open(os.path.join("logs/", log_files[i]), "r")
             lines = f.read().splitlines()
             self.logs.append(lines)
+
+        # TODO: Add config setting to keep or delete log file:
+        # Only after saving run to dataframe
 
         return self
 
@@ -114,9 +126,15 @@ class RunLog:
     def _create_runlog_dfs(self):
         """Convert dictionaries to pandas dataframes."""
 
-        self.runlog_main_dict = pd.DataFrame(self.runlog_main_dict)
-        self.runlog_configs_dict = pd.DataFrame(self.runlog_configs_dict)
-        self.runlog_logs_dict = pd.DataFrame(self.runlog_logs_dict)
+        self.runlog_main_df = pd.DataFrame(
+            {k: [v] for k, v in self.runlog_main_dict.items()}
+        )
+        self.runlog_configs_df = pd.DataFrame(
+            {k: [v] for k, v in self.runlog_configs_dict.items()}
+        )
+        self.runlog_logs_df = pd.DataFrame(
+            {k: [v] for k, v in self.runlog_logs_dict.items()}
+        )
 
         return self
 
@@ -130,23 +148,66 @@ class RunLog:
 
         return write_csv, write_hdf5, write_sql
 
+    def create_runlog_files(self):
+
+        main_columns = ["run_id", "timestamp", "version", "run_time"]
+        fn = "main_runlog.csv"
+        if not os.path.exists(fn):
+            with open(fn, mode="w", encoding="utf-8") as f:
+                f.write(",".join(main_columns) + "\n")
+
+        config_columns = ["run_id", "configs"]
+        fn = "configs_runlog.csv"
+        if not os.path.exists(fn):
+            with open(fn, mode="w", encoding="utf-8") as f:
+                f.write(",".join(config_columns) + "\n")
+
+        log_columns = ["run_id", "logs"]
+        fn = "logs_runlog.csv"
+        if not os.path.exists(fn):
+            with open(fn, mode="w", encoding="utf-8") as f:
+                f.write(",".join(log_columns) + "\n")
+
+        return None
+
     def _write_runlog(self):
         """Write the runlog to a file."""
-
-        # Get filename from run_id
-        filename = self.run_id
 
         # Get the runlog settings from the config file
         write_csv, write_hdf5, write_sql = self._get_runlog_settings()
 
         if write_csv:
             # write the runlog to a csv file
-            self.runlog_df.to_csv(f"{filename}_runlog.csv")
+            self.runlog_main_df.to_csv(
+                "main_runlog.csv", mode="a", index=False, header=False
+            )
+            self.runlog_configs_df.to_csv(
+                "configs_runlog.csv", mode="a", index=False, header=False
+            )
+            self.runlog_logs_df.to_csv(
+                "logs_runlog.csv", mode="a", index=False, header=False
+            )
         if write_hdf5:
             # write the runlog to a hdf5 file
-            self.runlog_df.to_hdf(f"{filename}_runlog.hdf5")
+            self.runlog_main_df.to_hdf(
+                "main_runlog.hdf", mode="a", index=False, header=False
+            )
+            self.runlog_configs_df.to_hdf(
+                "configs_runlog.hdf", mode="a", index=False, header=False
+            )
+            self.runlog_logs_df.to_hdf(
+                "logs_runlog.hdf", mode="a", index=False, header=False
+            )
         if write_sql:
             # write the runlog to a sql database
-            self.runlog_df.to_sql(f"{filename}_runlog.sql")
+            self.runlog_main_df.to_sql(
+                "main_runlog.sql", mode="a", index=False, header=False
+            )
+            self.runlog_configs_df.to_sql(
+                "configs_runlog.sql", mode="a", index=False, header=False
+            )
+            self.runlog_logs_df.to_sql(
+                "logs_runlog.sql", mode="a", index=False, header=False
+            )
 
         return None
