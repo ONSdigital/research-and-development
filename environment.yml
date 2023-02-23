@@ -1,95 +1,17 @@
-name: resdev36
+name: resdev36-test
 dependencies:
-- alabaster=0.7.10=py36_0
-- asn1crypto=0.22.0=py36_0
-- babel=2.5.0=py36_0
-- bzip2=1.0.6=3
-- certifi=2016.2.28=py36_0
-- cffi=1.10.0=py36_0
-- chardet=3.0.4=py36_0
-- click=6.7=py36_0
-- colorama=0.3.9=py36_0
-- coverage=4.4.1=py36_0
-- cryptography=1.8.1=py36_0
-- docutils=0.14=py36_0
-- filelock=2.0.7=py36_0
-- idna=2.6=py36_0
-- imagesize=0.7.1=py36_0
-- jinja2=2.9.6=py36_0
-- libffi=3.2.1=1
-- markupsafe=1.0=py36_0
-- openssl=1.0.2l=0
-- packaging=16.8=py36_0
-- pip=9.0.1=py36_1
-- py=1.4.34=py36_0
-- pycparser=2.18=py36_0
-- pygments=2.2.0=py36_0
-- pyopenssl=17.0.0=py36_0
-- pyparsing=2.2.0=py36_0
-- pysocks=1.6.6=py36_0
+- python=3.6.2
 - pytest=3.2.1=py36_0
-- python=3.6.2=0
-- python-dateutil=2.6.1=py36_0
-- pytz=2017.2=py36_0
-- pyyaml=3.12=py36_0
-- readline=6.2=2
-- requests=2.14.2=py36_0
-- setuptools=36.4.0=py36_1
-- six=1.10.0=py36_0
-- snowballstemmer=1.2.1=py36_0
-- sphinx=1.6.3=py36_0
-- sphinxcontrib=1.0=py36_0
-- sphinxcontrib-websupport=1.0.1=py36_0
-- sqlite=3.13.0=0
-- tk=8.5.18=0
-- unidecode=0.04.21=py36_0
-- urllib3=1.21.1=py36_0
-- virtualenv=15.1.0=py36_0
-- wheel=0.29.0=py36_0
-- xz=5.2.3=0
-- yaml=0.1.6=0
-- zlib=1.2.11=0
+- pyyaml
+- pandas=1.1.5
+- numpy=1.19.5
+- requests
+- sphinx
+- pip
 - pip:
-  - arrow==1.2.3
-  - asgiref==3.4.1
-  - attrs==21.4.0
-  - binaryornot==0.4.4
-  - brotlipy==0.7.0
-  - cfgv==3.3.1
-  - charset-normalizer==2.0.12
-  - cookiecutter==1.7.3
-  - detect-secrets==1.4.0
-  - distlib==0.3.6
-  - django==3.2.18
-  - identify==2.4.4
-  - image==1.5.33
-  - importlib-metadata==4.8.3
-  - importlib-resources==5.2.3
-  - jinja2-time==0.2.0
-  - markdown-it-py==2.0.1
-  - mdit-py-plugins==0.3.0
-  - mdurl==0.1.0
-  - myst-parser==0.16.1
-  - nodeenv==1.6.0
-  - pillow==8.4.0
-  - platformdirs==2.4.0
-  - poyo==0.5.0
+  - arrow
+  - cookiecutter
+  - detect-secrets
+  - myst-parser
   - pre-commit==2.17.0
-  - python-dotenv==0.20.0
-  - python-slugify==6.1.2
-  - sphinxcontrib-applehelp==1.0.2
-  - sphinxcontrib-devhelp==1.0.2
-  - sphinxcontrib-htmlhelp==2.0.0
-  - sphinxcontrib-jsmath==1.0.1
-  - sphinxcontrib-qthelp==1.0.3
-  - sphinxcontrib-serializinghtml==1.1.5
-  - sqlparse==0.4.3
-  - text-unidecode==1.3
-  - toml==0.10.2
-  - typing-extensions==4.1.1
-  - tzdata==2022.7
-  - ukkonen==1.0.1
-  - vc==2018.7.10
-  - win-inet-pton==1.1.0
-  - wincertstore==0.2
-  - zipp==3.6.0
+  - python-dotenv
