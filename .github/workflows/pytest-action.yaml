@@ -1,0 +1,34 @@
+name: Run pytest on pull request
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v2
+
+    - name: Create Conda environment
+      run: conda env create -f environment.yml
+
+    - name: Activate Conda environment
+      run: conda activate resdev36
+
+    - name: Run pytest
+      run: pytest
