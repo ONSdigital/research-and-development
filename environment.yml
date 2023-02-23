@@ -1,10 +1,10 @@
 name: resdev36
 dependencies:
 - python=3.6.2
-- pytest=3.2.1=py36_0
+- pytest=3.2.1
 - pyyaml
-- pandas=1.1.5
-- numpy=1.19.5
+- pandas=1.1
+- numpy=1.19
 - requests
 - sphinx
 - pip
