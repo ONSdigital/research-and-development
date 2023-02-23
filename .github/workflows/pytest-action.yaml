@@ -24,15 +24,10 @@ jobs:
     - name: Set up Conda
       uses: conda-incubator/setup-miniconda@v2
     
-    - name: Initialize Conda
-      run: conda init bash && source ~/.bashrc
-
-
-    - name: Create Conda environment
-      run: conda env create -f environment.yml python=3.7.2
-
-    - name: Activate Conda environment
-      run: conda activate resdev36
+    - name: Install dependencies
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        $CONDA/bin/conda env update --file environment.yml --name base
 
     - name: Run pytest
       run: pytest
