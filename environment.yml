@@ -1,4 +1,4 @@
-name: resdev36-test
+name: resdev36
 dependencies:
 - python=3.6.2
 - pytest=3.2.1=py36_0
