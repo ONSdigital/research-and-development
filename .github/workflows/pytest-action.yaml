@@ -27,14 +27,6 @@ jobs:
 # 4) Install dependencies
       - name: Install dependencies
         run: conda env create -f environment.yml
-
-
-
-# runs on python 3.6
-
-
-
-# 2) install python 3.6
-# 3) use conda to install dependencies from the environment yaml
-# 4) run pytest
-# 5) generate a coverage report
+# 5) run pytest and generate coverage report
+      - name: Run pytest
+        run: pytest --cov=src
