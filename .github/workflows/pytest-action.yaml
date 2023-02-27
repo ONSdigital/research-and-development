@@ -24,7 +24,9 @@ jobs:
 # 3) Install conda
       - name: Check conda version
         run: conda --version
-
+# 4) Install dependencies
+      - name: Install dependencies
+        run: conda install --file environment.yml 
 
 
 
