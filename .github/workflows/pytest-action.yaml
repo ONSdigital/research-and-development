@@ -26,7 +26,7 @@ jobs:
         run: conda --version
 # 4) Install dependencies
       - name: Install dependencies
-        run: conda install --file environment.yml 
+        run: conda env create -f environment.yml
 
 
 
