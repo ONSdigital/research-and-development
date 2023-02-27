@@ -1,33 +1,38 @@
-name: Run pytest on pull request
+name: Run pytest on pull request to develop
 
+# runs on every pull request to develop
 on:
   pull_request:
     branches:
       - develop
 
+# runs on ubuntu-latest
 jobs:
   pytest:
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ["3.7.2"]
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+# 1) Add the deadsnakes ppa
+      - name: Add deadsnakes ppa
+        run: sudo add-apt-repository ppa:deadsnakes/ppa
+        # refresh the package list
+      - name: Refresh package list
+        run: sudo apt-get update
+# 2) Install python 3.6
+      - name: Install python 3.6
+        run: sudo apt-get install python3.6
+# 3) Install conda
+      - name: Check conda version
+        run: conda --version
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v2
-    
-    - name: Install dependencies
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        $CONDA/bin/conda env update --file environment.yml --name base
 
-    - name: Run pytest
-      run: pytest
+
+# runs on python 3.6
+
+
+
+# 2) install python 3.6
+# 3) use conda to install dependencies from the environment yaml
+# 4) run pytest
+# 5) generate a coverage report
