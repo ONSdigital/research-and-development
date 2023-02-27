@@ -7,6 +7,7 @@ def add(a:int, b: int):
         raise TypeError("a and b must be integers")
 from src.utils.wrappers import time_logger_wrap, exception_wrap
 from utils.wrappers import time_logger_wrap, exception_wrap
+from src.utils.wrappers import time_logger_wrap, exception_wrap
 import time
 import numpy as np
 import pandas as pd

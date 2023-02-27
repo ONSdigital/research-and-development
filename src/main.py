@@ -1,10 +1,10 @@
 """The main pipeline"""
 
-from utils import runlog
-from _version import __version__ as version
-from utils.helpers import Config_settings
-from utils.wrappers import logger_creator
-from utils.testfunctions import create_dummy_df, manipulate_df
+from src.utils import runlog
+from src._version import __version__ as version
+from src.utils.helpers import Config_settings
+from src.utils.wrappers import logger_creator
+from src.utils.testfunctions import create_dummy_df, manipulate_df
 import time
 
 
@@ -30,10 +30,7 @@ def run_pipeline(start):
     run_time = round(time.time() - start, 5)
     runlog_obj._record_time_taken(run_time)
 
-    runlog_obj._create_main_dict()
-    runlog_obj._create_config_dict()
-    runlog_obj._create_logs_dict()
-
+    runlog_obj._create_runlog_dicts()
     runlog_obj._create_runlog_dfs()
     runlog_obj.create_runlog_files()
     runlog_obj._write_runlog()

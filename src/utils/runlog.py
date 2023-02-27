@@ -35,27 +35,13 @@ class RunLog:
             Unique run_id.
 
         """
-        files = os.listdir("logs/")
-        log_files = [f for f in files if ".log" in f]
-        # if log_files:
-        #     id_list = []
-        #     for i in range(len(log_files)):
-        #         ids = log_files[i].split("_")[1]
-        #         ids = ids.split(".")[0]
-        #         id_list.append(int(ids))
-        #     latest_id = max(id_list)
-        # else:
-        #     latest_id = 0
-        # run_id = latest_id + 1
-
-        # To read run_id from csv file instead
-        if log_files:
-            files = pd.read_csv("main_runlog.csv")
+        fp = "main_runlog.csv"
+        if os.path.isfile(fp):
+            files = pd.read_csv(fp)
             latest_id = max(files.run_id)
         else:
             latest_id = 0
         run_id = latest_id + 1
-
         return run_id
 
     def _record_time_taken(self, time_taken):
@@ -76,12 +62,12 @@ class RunLog:
 
         """
 
-        files = os.listdir("logs/")
-        log_files = [f for f in files if f"{self.run_id}.log" in f]
-        for i in range(len(log_files)):
-            f = open(os.path.join("logs/", log_files[i]), "r")
-            lines = f.read().splitlines()
-            self.logs.append(lines)
+        # files = os.listdir("logs/")
+        # log_files = [f for f in files if f"{self.run_id}.log" in f]
+        # for i in range(len(log_files)):
+        f = open("logs/main.log", "r")
+        lines = f.read().splitlines()
+        self.logs.append(lines)
 
         # TODO: Add config setting to keep or delete log file:
         # Only after saving run to dataframe
@@ -92,7 +78,7 @@ class RunLog:
         timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
         return timestamp
 
-    def _create_main_dict(self):
+    def _create_runlog_dicts(self):
         """Create unique dictionaries for runlogs, configs
         and loggers with run_id as identifier"""
 
@@ -103,19 +89,11 @@ class RunLog:
             "run_time": self.time_taken,
         }
 
-        return self
-
-    def _create_config_dict(self):
-
         self.runlog_configs_dict = {
             "run_id": self.run_id,
             "configs": self.config,
         }
-
-        return self
-
-    def _create_logs_dict(self):
-
+        
         self.runlog_logs_dict = {
             "run_id": self.run_id,
             "logs": self.logs,

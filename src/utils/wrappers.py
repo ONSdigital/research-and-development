@@ -20,7 +20,7 @@ def logger_creator(global_config, run_id):
             level="DEBUG",
             format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
             handlers=[
-                logging.FileHandler(f"logs/{timestamp}_{run_id}.log"),
+                logging.FileHandler("logs/main.log", mode='w'),
                 logging.StreamHandler(),
             ],
         )
