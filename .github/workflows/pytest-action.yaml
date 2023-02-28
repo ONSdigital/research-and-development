@@ -22,5 +22,5 @@ jobs:
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: python -m pytest tests/*.py
+        run: coverage run -m pytest tests/*.py
 
