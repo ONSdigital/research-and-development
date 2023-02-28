@@ -34,8 +34,7 @@ jobs:
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: pwd
-        run: ls
+        run: pwd && ls -a 
         # run: python -m pytest src/main.py
 # # 4) Install dependencies
 #       - name: Install dependencies
