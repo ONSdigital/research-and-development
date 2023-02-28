@@ -34,7 +34,7 @@ jobs:
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: python -m pytest src/test_main.py
+        run: python -m pytest tests/*.py
 # # 4) Install dependencies
 #       - name: Install dependencies
 #         run: conda env create -f environment.yml
