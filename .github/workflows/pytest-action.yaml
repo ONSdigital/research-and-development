@@ -1,0 +1,29 @@
+name: Run pytest on pull request to develop
+
+# runs on every pull request to develop
+on:
+  pull_request:
+    branches:
+      - develop
+
+# runs on version 20.04 of ubuntu
+jobs:
+  pytest:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+# 1) Use Setup Miniconda github action
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.6
+          environment-file: environment.yml
+          activate-environment: resdev36
+# 2) Run pytest to run all tests in the tests folder
+      - name: Run pytest
+      # Specify shell to run the command in
+        shell: bash -l {0}
+        run: coverage run -m pytest tests/*.py
+      - name: Get coverage report
+        shell: bash -l {0}
+        run: coverage report -m
+
