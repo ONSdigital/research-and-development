@@ -27,6 +27,9 @@ jobs:
 # 4) Install dependencies
       - name: Install dependencies
         run: conda env create -f environment.yml
-# 5) run pytest and generate coverage report
+# 5) Activate environment
+      - name: Activate environment
+        run: conda activate resdev36
+# 6) run pytest and generate coverage report
       - name: Run pytest
         run: python -m pytest src/main.py --cov=src --cov-report=xml
