@@ -12,18 +12,18 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-# 1) Add the deadsnakes ppa
-      - name: Add deadsnakes ppa
-        run: sudo add-apt-repository ppa:deadsnakes/ppa
-        # refresh the package list
-      - name: Refresh package list
-        run: sudo apt-get update
-# 2) Install python 3.6
-      - name: Install python 3.6
-        run: sudo apt-get install python3.6
-# 3) Install conda
-      - name: Check conda version
-        run: conda --version
+# # 1) Add the deadsnakes ppa
+#       - name: Add deadsnakes ppa
+#         run: sudo add-apt-repository ppa:deadsnakes/ppa
+#         # refresh the package list
+#       - name: Refresh package list
+#         run: sudo apt-get update
+# # 2) Install python 3.6
+#       - name: Install python 3.6
+#         run: sudo apt-get install python3.6
+# # 3) Install conda
+#       - name: Check conda version
+#         run: conda --version
 # 4) Use Setup Miniconda github action
       - uses: conda-incubator/setup-miniconda@v2
         with:
