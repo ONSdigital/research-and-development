@@ -105,13 +105,13 @@ class RunLog:
         """Convert dictionaries to pandas dataframes."""
 
         self.runlog_main_df = pd.DataFrame(
-            {k: [v] for k, v in self.runlog_main_dict.items()}
+           [self.runlog_main_dict],columns=['run_id','timestamp','version','run_time']
         )
         self.runlog_configs_df = pd.DataFrame(
-            {k: [v] for k, v in self.runlog_configs_dict.items()}
+            [self.runlog_configs_dict],columns=['run_id','configs']
         )
         self.runlog_logs_df = pd.DataFrame(
-            {k: [v] for k, v in self.runlog_logs_dict.items()}
+            [self.runlog_logs_dict],columns=['run_id','logs']
         )
 
         return self
