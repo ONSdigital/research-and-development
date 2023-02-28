@@ -33,8 +33,7 @@ jobs:
 # 5) Run pytest and generate coverage report (see environment.yml for dependencies)
       - name: Run pytest
         shell: bash -l {0}
-        run: python -m pytest src/main.py --cov=src --cov-report=xml
-
+        run: python -m pytest src/main.py
 # # 4) Install dependencies
 #       - name: Install dependencies
 #         run: conda env create -f environment.yml
