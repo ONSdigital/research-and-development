@@ -32,6 +32,7 @@ jobs:
           activate-environment: resdev36
 # 5) Run pytest and generate coverage report (see environment.yml for dependencies)
       - name: Run pytest
+        shell: bash -l {0}
         run: python -m pytest src/main.py --cov=src --cov-report=xml
 
 # # 4) Install dependencies
