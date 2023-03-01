@@ -7,7 +7,7 @@ class Config_settings:
     """Get the config settings from the config file."""
 
     def __init__(self):
-        self.config_file = "src/config.yaml"
+        self.config_file = "src/developer_config.yaml"
         self.config_dict = self._get_config_settings()
 
     def _get_config_settings(self):
