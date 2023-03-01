@@ -1,54 +1,18 @@
-# `coverage` configurations
-[tool.coverage.run]
-source = [
-    "./src"
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "if __name__ == .__main__.:"
-]
-
-# `isort` configurations
-[tool.isort]
-profile = "black"
-
-# `pytest` configurations
-[tool.pytest.ini_options]
-addopts = [
-    "-vv",
-    "--doctest-modules"
-]
-doctest_optionflags = "NORMALIZE_WHITESPACE"
-testpaths = [
-    "./tests"
-]
-
-
 # `poetry` configurations
 [tool.poetry]
-name = "resdev"
+name = "resdev36"
 version = "0.1.0"
 description = "Research and Development project: Calculating statistics for national and regional research and development expenditure"
 authors = ["Roddy Macrae Roddy.Macrae@ext.ons.gov.uk"]
 
 [tool.poetry.dependencies]
-python = "3.6.8"
-
-[tool.poetry.dev-dependencies]
-pytest = "7.2.1"
-
-#[[tool.poetry.source]]
-#name = "ONS"
-#url = "http://art-p-01/artifactory/api/pypi/pypi-virtual/simple"
-#default = true
+python = "3.6.2"
+numpy = "1.15.2"
 
 [[tool.poetry.source]]
-name = "main-private-artifactory"
-url = "https://xx.yy"
+name = "ONS"
+url = "http://art-p-01/artifactory/api/pypi/pypi-virtual/simple"
 default = true
 
-
-[[tool.poetry.source]]
-name = "special-private-arti"
-url = "https://xx.mm"
+#[tool.poetry.dev-dependencies]
+#pytest = "7.2.1"
