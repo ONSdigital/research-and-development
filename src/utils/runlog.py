@@ -63,7 +63,7 @@ class RunLog:
             "run_id": self.run_id,
             "timestamp": self.timestamp,
             "version": self.version,
-            "run_time": self.time_taken,
+            "duration": self.time_taken,
         }
 
         self.runlog_configs_dict = {
@@ -82,7 +82,7 @@ class RunLog:
         """Convert dictionaries to pandas dataframes."""
 
         self.runlog_main_df = pd.DataFrame(
-           [self.runlog_main_dict],columns=['run_id','timestamp','version','run_time']
+           [self.runlog_main_dict],columns=['run_id','timestamp','version','duration']
         )
         self.runlog_configs_df = pd.DataFrame(
             [self.runlog_configs_dict],columns=['run_id','configs']
@@ -105,7 +105,7 @@ class RunLog:
 
     def create_runlog_files(self):
 
-        main_columns = ["run_id", "timestamp", "version", "run_time"]
+        main_columns = ["run_id", "timestamp", "version", "duration"]
         fn = "main_runlog.csv"
         if not os.path.exists(fn):
             with open(fn, mode="w", encoding="utf-8") as f:
