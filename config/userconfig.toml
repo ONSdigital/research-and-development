@@ -1,8 +1,18 @@
 title = "TOML Example"
 
 [period]
-start = 10/10/1990
-end = 10/05/2000
+start = "10/10/1990"
+end = "10/05/2000"
 
 [source_file]
-location = "D:\Data\"
+location = "D:/Data"
+filename = "file.txt"
+
+[output_location]
+hive_db = "hive.db"
+tableName = "name.table"
+
+[outlier_correction]
+location = "D:/"
+filename = "outliers.txt"
+bool = true
