@@ -31,9 +31,6 @@ def run_pipeline(start):
     runlog_obj._record_time_taken(run_time)
 
     runlog_obj._create_runlog_dicts()
-    print(runlog_obj.runlog_main_dict)
-    print("TEST.....",pd.DataFrame([runlog_obj.runlog_main_dict],columns=['run_id','timestamp','version','run_time']))
     runlog_obj._create_runlog_dfs()
-    # print(runlog_obj.runlog_main_df)
     runlog_obj.create_runlog_files()
     runlog_obj._write_runlog()

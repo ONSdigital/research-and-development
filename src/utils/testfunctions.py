@@ -13,12 +13,8 @@ import numpy as np
 import pandas as pd
 import logging
 
-# logging.config.fileConfig("src/utils/testconfig.ini", disable_existing_loggers=False)
-# logger = logging.getLogger(__name__)
-
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
-
 
 @exception_wrap
 def divbyzero(num):

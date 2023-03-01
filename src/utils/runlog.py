@@ -1,15 +1,7 @@
-# """Generate run log output."""
-
 import logging
-
-# import utils.helpers as hlp
-
 from datetime import datetime
 import pandas as pd
 import os
-
-LOGGER = logging.getLogger(__name__)
-
 
 class RunLog:
     """Creates a runlog instance for the pipeline."""
@@ -22,17 +14,7 @@ class RunLog:
         self.timestamp = self._generate_time()
 
     def _create_run_id(self):
-        """Create a unique run_id from the timestamp and a random number.
-
-        Parameters
-        ----------
-        timestamp : str
-            Timestamp of the run.
-
-        Returns
-        -------
-        str
-            Unique run_id.
+        """Create a unique run_id from the previous iteration
 
         """
         fp = "main_runlog.csv"
@@ -57,24 +39,19 @@ class RunLog:
 
     def retrieve_pipeline_logs(self):
         """
-        Get all of the logs from the pipeline (from the log files)
+        Get all of the logs from the pipeline run
         and append them to self.logs list
 
         """
-
-        # files = os.listdir("logs/")
-        # log_files = [f for f in files if f"{self.run_id}.log" in f]
-        # for i in range(len(log_files)):
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
         self.logs.append(lines)
-
-        # TODO: Add config setting to keep or delete log file:
-        # Only after saving run to dataframe
-
+        
         return self
 
     def _generate_time(self):
+        """ Generate unqiue timestamp for when each run
+        """
         timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
         return timestamp
 
