@@ -4,7 +4,7 @@ from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.utils.testfunctions import create_dummy_df, manipulate_df
+from src.utils.testfunctions import create_dummy_df, Manipulate_data
 import time
 
 
@@ -26,8 +26,9 @@ def run_pipeline(start):
     logger.info("Launching Pipeline .......................")
     # Pipeline functions are located here:
     df = create_dummy_df()
-    df = manipulate_df(df)
-    print(df)
+    obj = Manipulate_data(df)
+    obj.manipulate_df()
+    print(obj.manipulate_df())
     logger.info("Finshing Pipeline .......................")
     # Runlog metadata is recorded and saved here:
     runlog_obj.retrieve_pipeline_logs()

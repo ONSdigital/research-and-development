@@ -1,5 +1,6 @@
 import time
-from src.utils.wrappers import time_logger_wrap, exception_wrap
+from src.utils.wrappers import time_logger_wrap, exception_wrap, df_change_wrap
+import time
 import numpy as np
 import pandas as pd
 
@@ -79,22 +80,27 @@ def create_dummy_df(seed=42):
     """
     np.random.seed(seed=seed)
     df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
+    # LOGGER.info("Dummy dataframe has been created")
     return df
 
 
-@time_logger_wrap
-@exception_wrap
-def manipulate_df(df: pd.DataFrame):
-    """Change dataframe values using simple equation
 
-    Args:
-        df (pd.DataFrame): Pandas dataframe with integer values
-
-    Returns:
-        pd.Dataframe: Pandas dataframe with integer values
-    """
-    df = df * 2
-    return df
+class Manipulate_data():
+    
+    def __init__(self,df):
+        self.vf_df = df
+        self.table_config = "SingleLine"
+        self.df = self.manipulate_df()[0]
+    
+    @df_change_wrap
+    @time_logger_wrap
+    @exception_wrap
+    def manipulate_df(self):
+        df1 = self.vf_df
+        df2 = self.vf_df * 2
+        df = df1.append(df2)
+    
+        return df
 
 
 def add(a: int, b: int):
