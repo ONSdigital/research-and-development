@@ -1,7 +1,5 @@
 import time
 from src.utils.wrappers import time_logger_wrap, exception_wrap
-from utils.wrappers import time_logger_wrap, exception_wrap
-from src.utils.wrappers import time_logger_wrap, exception_wrap
 import time
 import numpy as np
 import pandas as pd
@@ -36,7 +34,7 @@ def takes_a_while(num):
 
 @time_logger_wrap
 @exception_wrap
-def test_add(a, b):
+def addition(a, b):
     """Testing multiple wrappers for one function"""
     c = a + b
     time.sleep(0.5)
