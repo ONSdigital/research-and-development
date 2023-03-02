@@ -80,7 +80,7 @@ def create_dummy_df(seed=42):
     """
     np.random.seed(seed=seed)
     df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
-    # LOGGER.info("Dummy dataframe has been created")
+    LOGGER.info("Dummy dataframe has been created")
     return df
 
 
@@ -96,10 +96,12 @@ class Manipulate_data():
     @time_logger_wrap
     @exception_wrap
     def manipulate_df(self):
-        df1 = self.vf_df
-        df2 = self.vf_df * 2
+        df1 = self.vf_df[0]
+        print(df1)
+        df2 = self.vf_df[0] * 2
+        print(df2)
         df = df1.append(df2)
-    
+        LOGGER.info("Dummy dataframe has been manipulated")
         return df
 
 

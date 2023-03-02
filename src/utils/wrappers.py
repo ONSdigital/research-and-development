@@ -149,7 +149,8 @@ def df_change_wrap(func):
         """Define the decorator itself."""
         self_ = args[0]
         pre_df = self_.vf_df
-        pre_rows, pre_cols = pre_df.shape[0], pre_df.shape[1]
+        print(pre_df[0])
+        pre_rows, pre_cols = pre_df[0].shape[0], pre_df[0].shape[1]
         table_config = self_.table_config
         post_df = func(*args, **kwargs)
         logger.info(f"{func.__name__} changed the df shape as follows:")
