@@ -8,6 +8,7 @@ from src.utils.helpers import Config_settings, csv_creator
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
+    # TODO: Save run_id to csv before run completion to preseve failed runs
     def __init__(self, config, version):
         self.config = config
         self.run_id = self._create_run_id()

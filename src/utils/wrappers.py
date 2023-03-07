@@ -129,19 +129,12 @@ def exception_wrap(func):
 
 
 def df_change_wrap(func):
-    """Define a decorator to log the difference between the input and output.
-
-    This wrapper calculates the differences between the input dataframe
-    and the output dataframe,
-    helping to keep a record of changes to the dataframe.
-    This wrapper should decorate the main
-    method of a class, e.g. for the `DuplicateWaves` class,
-    this decorate is applied to the
-    `duplicate_data()` method. The method this is applied to
-    must have must have `self` as an
-    argument and must operate on and then return self.vf_df.
-    The class as a whole also requires
-    the table_config attribute to be set.
+    """This wrapper logs the change in a dataframe's columns
+    and rows. It can only wrap around the main method of a class.
+    The class must have attribute self.vf_df which is the current state of
+    the dataframe. It must also have self.df which is the final state of
+    the dataframe. Finally it must also have self.table_config set as either
+    'Table' or 'SingleLine'
     """
 
     @wraps(func)
