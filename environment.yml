@@ -15,3 +15,4 @@ dependencies:
   - myst-parser
   - pre-commit==2.17.0
   - python-dotenv
+  - table_logger
