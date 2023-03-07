@@ -4,6 +4,7 @@ import os
 from src.utils.helpers import Config_settings, csv_creator
 
 
+
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
@@ -45,6 +46,23 @@ class RunLog:
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
         self.logs.append(lines)
+        # self.runids = {
+        #         "run_id": self.run_id
+        #     }
+        # for line in lines:
+        #     self.logs.append(line.split(" - "))
+        #     self.runids.update({
+        #         "run_id": self.run_id
+        #     })
+        # print(self.runids)
+        # self.runidf = pd.DataFrame(
+        #     [self.runids],columns=['run_id']
+        # )
+        # self.saved_logs = pd.DataFrame(
+        #     self.logs,columns=['timestamp','module','function','message']
+        # )
+        # self.df_merged = pd.concat([self.runidf, self.saved_logs]).reset_index()
+        # print(self.df_merged)
         return self
 
     def _generate_time(self):

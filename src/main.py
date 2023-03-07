@@ -6,7 +6,6 @@ from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
 import time
-import pandas as pd
 import logging
 
 
