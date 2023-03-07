@@ -67,39 +67,30 @@ def addition(a: int, b: int):
     return c
 
 
-@time_logger_wrap
-@exception_wrap
-def create_dummy_df(seed=42):
-    """Create a dataframe with headers using random integers
-
-    Args:
-        seed (int, optional): Seed value to repeat randomness. Defaults to 42.
-
-    Returns:
-        pd.Dataframe: Returns a 4*100 Pandas dataframe with column names
-    """
-    np.random.seed(seed=seed)
-    df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
-    LOGGER.info("Dummy dataframe has been created")
-    return df
 
 
 
 class Manipulate_data():
     
-    def __init__(self,df):
-        self.vf_df = df
+    def __init__(self):
+        self.vf_df = self.create_dummy_df()[0]
         self.table_config = "SingleLine"
         self.df = self.manipulate_df()[0]
+        
+    @time_logger_wrap
+    @exception_wrap
+    def create_dummy_df(self):
+        df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
+        LOGGER.info("Dummy dataframe has been created")
+        return df
+    
     
     @df_change_wrap
     @time_logger_wrap
     @exception_wrap
     def manipulate_df(self):
-        df1 = self.vf_df[0]
-        print(df1)
-        df2 = self.vf_df[0] * 2
-        print(df2)
+        df1 = self.vf_df
+        df2 = self.vf_df * 2
         df = df1.append(df2)
         LOGGER.info("Dummy dataframe has been manipulated")
         return df

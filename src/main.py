@@ -4,7 +4,7 @@ from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.utils.testfunctions import create_dummy_df, Manipulate_data
+from src.utils.testfunctions import Manipulate_data
 import time
 import pandas as pd
 import logging
@@ -31,10 +31,7 @@ def run_pipeline(start):
     logger = logger_creator(global_config, runlog_obj.run_id)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-    df = create_dummy_df()
-    obj = Manipulate_data(df)
-    obj.manipulate_df()
-    print(obj.df)
+    Manipulate_data()
     MainLogger.info("Finshing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
