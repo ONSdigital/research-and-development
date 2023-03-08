@@ -6,7 +6,7 @@ from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import create_dummy_df, manipulate_df
 import time
-import pandas as pd
+
 
 def run_pipeline(start):
 
@@ -21,7 +21,6 @@ def run_pipeline(start):
 
     df = create_dummy_df()
     df = manipulate_df(df)
-    time.sleep(5)
     print(df)
     logger.info("Finshing Pipeline .......................")
 

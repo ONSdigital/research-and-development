@@ -6,6 +6,10 @@ runlog_writer:
   write_sql: False # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
   log_path: "data/log"
+csv_filenames:
+  main: "main_runlog.csv"
+  configs: "configs_runlog.csv"
+  logs: "logs_runlog.csv"
 run_log_sql:
   log_db: "test_runlog"
   log_mode: "append"

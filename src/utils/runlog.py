@@ -1,6 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import os
+from src.utils.helpers import Config_settings, csv_creator
 
 
 class RunLog:
@@ -101,24 +102,24 @@ class RunLog:
         return write_csv, write_hdf5, write_sql
 
     def create_runlog_files(self):
+        """Creates csv files with column names
+        if they don't already exist.
+        """
+        conf_obj = Config_settings()
+        config = conf_obj.config_dict
+        csv_filenames = config["csv_filenames"]
 
         main_columns = ["run_id", "timestamp", "version", "duration"]
-        fn = "main_runlog.csv"
-        if not os.path.exists(fn):
-            with open(fn, mode="w", encoding="utf-8") as f:
-                f.write(",".join(main_columns) + "\n")
+        file_name = csv_filenames["main"]
+        csv_creator(file_name, main_columns)
 
         config_columns = ["run_id", "configs"]
-        fn = "configs_runlog.csv"
-        if not os.path.exists(fn):
-            with open(fn, mode="w", encoding="utf-8") as f:
-                f.write(",".join(config_columns) + "\n")
+        file_name = csv_filenames["configs"]
+        csv_creator(file_name, config_columns)
 
         log_columns = ["run_id", "logs"]
-        fn = "logs_runlog.csv"
-        if not os.path.exists(fn):
-            with open(fn, mode="w", encoding="utf-8") as f:
-                f.write(",".join(log_columns) + "\n")
+        file_name = csv_filenames["logs"]
+        csv_creator(file_name, log_columns)
 
         return None
 

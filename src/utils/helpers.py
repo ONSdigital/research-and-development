@@ -1,6 +1,7 @@
 """Define helper functions that wrap regularly-used functions."""
 
 import yaml
+import os
 
 
 class Config_settings:
@@ -15,3 +16,10 @@ class Config_settings:
         with open(self.config_file, "r") as file:
             config = yaml.safe_load(file)
         return config
+
+
+def csv_creator(filename, columns):
+    if not os.path.exists(filename):
+        with open(filename, mode="w", encoding="utf-8") as f:
+            f.write(",".join(columns) + "\n")
+    return None
