@@ -19,6 +19,12 @@ class Config_settings:
 
 
 def csv_creator(filename, columns):
+    """Creates a csv file with user
+    defined headers.
+    Args:
+        filename (string): Example: "name_of_file.csv"
+        columns (list): Example: ["a","b","c","d"]
+    """
     if not os.path.exists(filename):
         with open(filename, mode="w", encoding="utf-8") as f:
             f.write(",".join(columns) + "\n")
