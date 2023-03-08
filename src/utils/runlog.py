@@ -1,7 +1,7 @@
-import logging
 from datetime import datetime
 import pandas as pd
 import os
+
 
 class RunLog:
     """Creates a runlog instance for the pipeline."""
@@ -14,9 +14,7 @@ class RunLog:
         self.timestamp = self._generate_time()
 
     def _create_run_id(self):
-        """Create a unique run_id from the previous iteration
-
-        """
+        """Create a unique run_id from the previous iteration"""
         fp = "main_runlog.csv"
         if os.path.isfile(fp):
             files = pd.read_csv(fp)
@@ -46,28 +44,10 @@ class RunLog:
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
         self.logs.append(lines)
-        # self.runids = {
-        #         "run_id": self.run_id
-        #     }
-        # for line in lines:
-        #     self.logs.append(line.split(" - "))
-        #     self.runids.update({
-        #         "run_id": self.run_id
-        #     })
-        # print(self.runids)
-        # self.runidf = pd.DataFrame(
-        #     [self.runids],columns=['run_id']  
-        # )
-        # self.saved_logs = pd.DataFrame(
-        #     self.logs,columns=['timestamp','module','function','message']
-        # )
-        # self.df_merged = pd.concat([self.runidf, self.saved_logs]).reset_index()
-        # print(self.df_merged)
         return self
 
     def _generate_time(self):
-        """ Generate unqiue timestamp for when each run
-        """
+        """Generate unqiue timestamp for when each run"""
         timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
         return timestamp
 
@@ -86,7 +66,7 @@ class RunLog:
             "run_id": self.run_id,
             "configs": self.config,
         }
-        
+
         self.runlog_logs_dict = {
             "run_id": self.run_id,
             "logs": self.logs,
@@ -98,16 +78,15 @@ class RunLog:
         """Convert dictionaries to pandas dataframes."""
 
         self.runlog_main_df = pd.DataFrame(
-           [self.runlog_main_dict],columns=['run_id','timestamp','version','duration']
+            [self.runlog_main_dict],
+            columns=["run_id", "timestamp", "version", "duration"],
         )
         self.runlog_configs_df = pd.DataFrame(
-            [self.runlog_configs_dict],columns=['run_id','configs']
+            [self.runlog_configs_dict], columns=["run_id", "configs"]
         )
         self.runlog_logs_df = pd.DataFrame(
-            [self.runlog_logs_dict],columns=['run_id','logs']
+            [self.runlog_logs_dict], columns=["run_id", "logs"]
         )
-        
-        
 
         return self
 
