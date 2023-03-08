@@ -2,7 +2,6 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
-import datetime
 
 # from table_logger import TableLogger
 import logging.config
@@ -12,24 +11,18 @@ table_config = "SingleLine"
 logger = logging.getLogger(__name__)
 
 
-def logger_creator(global_config, run_id):
-    """Set up config for logging."""
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-    if global_config["log_to_file"]:
-        logging.basicConfig(
-            level="DEBUG",
-            format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
-            handlers=[
-                logging.FileHandler("logs/main.log", mode='w'),
-                logging.StreamHandler(),
-            ],
-        )
-        logger = logging.getLogger(__name__)
-    else:
-        logging.basicConfig(
-            level="DEBUG", format="%(asctime)s - %(levelname)s:%(message)s"
-        )
-        logger = logging.getLogger(__name__)
+def logger_creator(global_config):
+    """Set up config for logging. This method overwrites
+    the previously saved output."""
+    logging.basicConfig(
+        level=global_config["logging_level"],
+        format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
+        handlers=[
+            logging.FileHandler("logs/main.log", mode="w"),
+            logging.StreamHandler(),
+        ],
+    )
+    logger = logging.getLogger(__name__)
     return logger
 
 

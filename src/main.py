@@ -16,7 +16,7 @@ def run_pipeline(start):
 
     runlog_obj = runlog.RunLog(config, version)
 
-    logger = logger_creator(global_config, runlog_obj.run_id)
+    logger = logger_creator(global_config)
     logger.info("Launching Pipeline .......................")
 
     df = create_dummy_df()
