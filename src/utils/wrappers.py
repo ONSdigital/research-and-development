@@ -6,7 +6,6 @@ import traceback
 # from table_logger import TableLogger
 import logging.config
 
-table_config = "SingleLine"
 
 logger = logging.getLogger(__name__)
 
