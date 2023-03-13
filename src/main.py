@@ -22,10 +22,22 @@ def toml_parser():
     return toml.load("/home/cdsw/research-and-development/config/userconfig.toml")
 
 def period_select():
-    """Selects period defined by user in userconfig.toml"""
+    """Function returning the start and end date under consideration.
+
+    Returns:
+        Two datetime.date objects. The first is the start date of the period under
+        consideration, the second is the end date of that period. 
+        Example:
+    
+        (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
+    """    
     period_dict = toml_parser()["period"]
     return period_dict["start_period"], period_dict["end_period"]
 
 def run_pipeline():
     """Run the pipeline"""
     return add(1, 2)
+
+
+x = (2,3,4,5,6)
+print(type(x))
