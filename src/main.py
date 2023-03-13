@@ -3,7 +3,7 @@
 import toml
 from utils.testfunctions import add
 
-def toml_parser():
+def toml_parser() -> dict:
     """Function to parse the userconfig.toml file.
 
     Returns:
@@ -18,10 +18,10 @@ def toml_parser():
         'source_file': {'location': 'D:/Data', 'fileName': 'file.txt'}, 'output_location': 
         {'hive_db': 'hive.db', 'tableName': 'name.table'}, 'outlier_correction': 
         {'location': 'D:/', 'fileName': 'outliers.txt', 'bool': True}}
-    """    
+    """
     return toml.load("/home/cdsw/research-and-development/config/userconfig.toml")
 
-def period_select():
+def period_select() -> tuple:
     """Function returning the start and end date under consideration.
 
     Returns:
@@ -34,6 +34,15 @@ def period_select():
     """    
     period_dict = toml_parser()["period"]
     return period_dict["start_period"], period_dict["end_period"]
+
+def source_file():
+    """_summary_
+
+    Returns:
+        _description_
+    """    
+    source_dict = toml_parser()["source_file"]
+    return source_dict["location"], source_dict["fileName"]
 
 def run_pipeline():
     """Run the pipeline"""
