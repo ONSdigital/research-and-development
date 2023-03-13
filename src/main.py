@@ -61,6 +61,15 @@ def output_loc() -> tuple:
     output_dict = toml_parser()["output_location"]
     return output_dict["hive_db"], output_dict["tableName"]
 
+def outlier_correction():
+    """_summary_
+
+    Returns:
+        _description_
+    """    
+    outlier_dict = toml_parser()["outlier_correction"]
+    return outlier_dict["location"], outlier_dict["fileName"], outlier_dict["bool"]
+
 def run_pipeline():
     """Run the pipeline"""
     return add(1, 2)
