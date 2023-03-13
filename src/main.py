@@ -47,6 +47,15 @@ def source_file() -> tuple:
     source_dict = toml_parser()["source_file"]
     return source_dict["location"], source_dict["fileName"]
 
+def output_loc():
+    """_summary_
+
+    Returns:
+        _description_
+    """    
+    output_dict = toml_parser()["output_location"]
+    return output_dict["hive_db"], output_dict["tableName"]
+
 def run_pipeline():
     """Run the pipeline"""
     return add(1, 2)
