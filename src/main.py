@@ -31,7 +31,7 @@ def period_select() -> tuple:
         Example:
     
         (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
-    """    
+    """
     period_dict = toml_parser()["period"]
     return period_dict["start_period"], period_dict["end_period"]
 
@@ -44,7 +44,7 @@ def source_file() -> tuple:
         Example of return values:
 
         ('D:/Data', 'file.txt')
-    """    
+    """
     source_dict = toml_parser()["source_file"]
     return source_dict["location"], source_dict["fileName"]
 
@@ -57,19 +57,25 @@ def output_loc() -> tuple:
         Example of return values:
         
         ('hive.db', 'name.table')
-    """    
+    """
     output_dict = toml_parser()["output_location"]
     return output_dict["hive_db"], output_dict["tableName"]
 
-def outlier_correction():
-    """_summary_
+def outlier_correction() -> tuple:
+    """Function returns file path and file name of manual outlier correction file
 
     Returns:
-        _description_
-    """    
+        Tuple containing three elements. The first is the file path to where the manual
+        outlier correction file is stored, the second is the name of the outlier
+        correction file, and the third is a boolean value indicating whether to include
+        the manual correction file or not.
+        Example of return values:
+
+        ('D:/', 'outliers.txt', True)
+    """
     outlier_dict = toml_parser()["outlier_correction"]
     return outlier_dict["location"], outlier_dict["fileName"], outlier_dict["bool"]
 
-def run_pipeline():
+def run_pipeline() -> callable[[int,int], int]:
     """Run the pipeline"""
     return add(1, 2)
