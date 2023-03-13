@@ -22,7 +22,7 @@ def toml_parser() -> dict:
     return toml.load("/home/cdsw/research-and-development/config/userconfig.toml")
 
 def period_select() -> tuple:
-    """Function returning the start and end date under consideration.
+    """Function returns the start and end date under consideration.
 
     Returns:
         A tuple containing two datetime.date objects. The first is the
@@ -36,22 +36,27 @@ def period_select() -> tuple:
     return period_dict["start_period"], period_dict["end_period"]
 
 def source_file() -> tuple:
-    """Function returning the file path and file name of the source file
+    """Function returns the file path and file name of the source file
 
     Returns:
         A tuple containing two elements. The first is the file path to the source
         file, the second is the file name itself.
         Example of return values:
-            > ('D:/Data', 'file.txt')
+
+        ('D:/Data', 'file.txt')
     """    
     source_dict = toml_parser()["source_file"]
     return source_dict["location"], source_dict["fileName"]
 
-def output_loc():
-    """_summary_
+def output_loc() -> tuple:
+    """Function returns the output location and table name
 
     Returns:
-        _description_
+        A tuple containing two element. The first is the output location, the second
+        is the name of the output table.
+        Example of return values:
+        
+        ('hive.db', 'name.table')
     """    
     output_dict = toml_parser()["output_location"]
     return output_dict["hive_db"], output_dict["tableName"]
