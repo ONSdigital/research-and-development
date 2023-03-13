@@ -5,7 +5,7 @@ from utils.testfunctions import add
 
 def toml_parser():
     """Parse the toml config file"""
-    return print( toml.load("research-and-development/config/userconfig.toml") )
+    return toml.load("/home/cdsw/research-and-development/config/userconfig.toml")
 
 def run_pipeline():
     """Run the pipeline"""
