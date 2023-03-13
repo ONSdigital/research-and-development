@@ -124,7 +124,7 @@ class RunLog:
         return None
 
     def _write_runlog(self):
-        """Write the runlog to a file."""
+        """Write the runlog to a file specified in the config."""
 
         # Get the runlog settings from the config file
         write_csv, write_hdf5, write_sql = self._get_runlog_settings()

@@ -12,10 +12,15 @@ logger = logging.getLogger(__name__)
 
 def logger_creator(global_config):
     """Set up config for logging. This method overwrites
-    the previously saved output."""
+    the previously saved logs after moving them to csv format.
+    This function returns a custom logger that is called
+    in the main script before running the pipeline"""
     logging.basicConfig(
+        # logging level is obtained from user configs
         level=global_config["logging_level"],
+        # Define the detail and order of the written logs
         format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
+        # Log to both console and file
         handlers=[
             logging.FileHandler("logs/main.log", mode="w"),
             logging.StreamHandler(),
