@@ -35,11 +35,14 @@ def period_select() -> tuple:
     period_dict = toml_parser()["period"]
     return period_dict["start_period"], period_dict["end_period"]
 
-def source_file():
-    """_summary_
+def source_file() -> tuple:
+    """Function returning the file path and file name of the source file
 
     Returns:
-        _description_
+        A tuple containing two elements. The first is the file path to the source
+        file, the second is the file name itself.
+        Example of return values:
+            > ('D:/Data', 'file.txt')
     """    
     source_dict = toml_parser()["source_file"]
     return source_dict["location"], source_dict["fileName"]
