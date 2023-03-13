@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 
-
 @exception_wrap
 def divbyzero(num: int):
     """Define a testing function that will throw an exception.
@@ -79,7 +78,6 @@ class Manipulate_data:
         df = pd.DataFrame(
             np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD")
         )
-        LOGGER.info("Dummy dataframe has been created")
         return df
 
     @df_change_wrap
@@ -89,7 +87,6 @@ class Manipulate_data:
         df1 = self.vf_df
         df2 = self.vf_df * 2
         df = df1.append(df2)
-        LOGGER.info("Dummy dataframe has been manipulated")
         return df
 
 
@@ -106,7 +103,6 @@ def add(a: int, b: int):
     Returns:
         int: Sum of both inputs
     """
-    """Testing multiple wrappers for one function"""
     # Raise error if a or b is not an integer
     if not isinstance(a, int) or not isinstance(b, int):
         raise TypeError("a and b must be integers")
