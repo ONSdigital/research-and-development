@@ -2,9 +2,9 @@
 
 *Insert detailed bullet points about your changes here!*
 
-*Insert any instructions to help the reviewer, e.g. "install new requirements from `requirements.txt`"*
+*Insert any instructions to help the reviewer, e.g. "install new requirements from `environment.yml`"*
 
-*Let the reviewer know what data files are needed (to be grabbed from sync)
+*Let the reviewer know what data files are needed (and if applicable, where they are to be found)
 
 #### Closes or fixes
 
@@ -19,7 +19,7 @@ Closes #
 - [ ] **Dependencies** I have updated the environment yaml so it includes any new libraries I have used
 - [ ] **Clean Code**
     - [ ] Code is as [PEP 8]([url](https://peps.python.org/pep-0008/)) compliant as I can humanly make it
-    - [ ] Code has been linted (using [autopep8](https://marketplace.visualstudio.com/items?itemName=ms-python.autopep8))
+    - [ ] Code passess flake8 linting check
     - [ ] Code adheres to [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
 - [ ] **Type hints** All new functions have [type hints ](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html)
 
@@ -36,6 +36,8 @@ Any new code includes all the following forms of documentation:
 
 #### Data
 - [ ] All data needed to run this script is available in Dev/Test
+- [ ] All data is excluded from this pull request
+- [ ] Secrets checker pre-commit passes
 
 #### Testing
 - [ ] **Unit tests** Unit tests have been created and are passing _or a new ticket to create tests has been created_
