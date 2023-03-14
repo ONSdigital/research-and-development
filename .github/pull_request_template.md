@@ -1,34 +1,72 @@
-# Summary
+## Pull Request submission 
 
-Add your summary here - keep it brief, to the point, and in plain English. [For further
-information about pull requests, check out the GDS
-Way](https://gds-way.cloudapps.digital/standards/pull-requests.html).
+*Insert detailed bullet points about your changes here!*
 
-# Checklists
+*Insert any instructions to help the reviewer, e.g. "install new requirements from `requirements.txt`"*
 
-<!--
-These are do-confirm checklists; it confirms that you have DOne each item.
+*Let the reviewer know what data files are needed (to be grabbed from sync)
 
-Outstanding actions should be completed before reviewers are assigned; if actions are
-irrelevant, please try and add a comment stating why.
+#### Closes or fixes
 
-Incomplete pull/merge requests may be blocked until actions are resolved, or closed at
-the reviewers' discretion.
--->
+* Detail the ticket(s) you are closing with this PR
+Closes #
 
-This pull/merge request meets the following requirements:
 
-- [ ] code runs
-- [ ] [developments are ethical][data-ethics-framework] and secure
-- [ ] you have made proportionate checks that the code works correctly
-- [ ] test suite passes
-- [ ] developments adhere to AQA plan (see `docs/aqa/aqa_plan.md`)
-- [ ] data log updated (see `docs/aqa/data_log.md`), if necessary
-- [ ] assumptions, and caveats log updated (see `docs/aqa/assumptions_caveats.md`), if
-  necessary
-- [ ] [minimum usable documentation][agilemodeling] written in the `docs` folder
+#### Code
 
-Comments have been added below around the incomplete checks.
+- [ ] **Requirements** My/our code functions according to the requirements of the ticket
+- [ ] **Dependencies** I have updated the environment yaml so it includes any new libraries I have used
+- [ ] **Code runs** The code runs on my machine and/or CDSW
+- [ ] **Clean Code** 
+    - [ ] Code has been linted (using autopep8)
+    - [ ] Code adheres to [DRY]([url](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself))
+    - [ ] Code is as [PEP 8]([url](https://peps.python.org/pep-0008/)) compliant as I can humanly make it
 
-[agilemodeling]: http://agilemodeling.com/essays/documentLate.htm
-[data-ethics-framework]: https://www.gov.uk/government/publications/data-ethics-framework
+#### Documentation
+
+Any new code includes all the following forms of documentation:
+
+- [ ] **Function Documentation** Docstrings within the function(s')/methods have been created
+    - [ ] Includes `Args` and `returns` for all major functions 
+    - [ ] The docstring details data types
+- [ ] **Updated Documentation**: User and/or developer working doc has been updated
+
+#### Data
+- [ ] All data needed to run this script is available in Dev/Test
+
+#### Testing
+- [ ] **Unit tests** Unit tests have been created and are passing _or a new ticket to create tests has been created_
+
+---
+
+# Peer Review Section
+
+- [ ] All requirements install from (updated) `requirements.txt`
+- [ ] Documentation has been created and is clear - check the google Doc
+- [ ] Doctrings ([Google format](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)) have been created and accurately describe the function's functionality
+- [ ] Unit tests pass, or if not present _a new ticket to create tests has been created_
+- [ ] **Code runs** The code runs on reviewer's machine and/or CDSW
+
+#### Final approval (post-review)
+
+The author has responded to my review and made changes to my satisfaction.
+- [ ] **I recommend merging this request.**
+
+---
+
+### Review comments
+
+*Insert detailed comments here!*
+
+These might include, but not exclusively:
+
+- bugs that need fixing (does it work as expected? and does it work with other code
+  that it is likely to interact with?)
+- alternative methods (could it be written more efficiently or with more clarity?)
+- documentation improvements (does the documentation reflect how the code actually works?)
+- additional tests that should be implemented (do the tests effectively assure that it
+  works correctly?)
+- code style improvements (could the code be written more clearly?)
+
+Your suggestions should be tailored to the code that you are reviewing.
+Be critical and clear, but not mean. Ask questions and set actions.
