@@ -14,13 +14,16 @@ Closes #
 
 #### Code
 
+- [ ] **Code runs** The code runs on my machine and/or CDSW
 - [ ] **Requirements** My/our code functions according to the requirements of the ticket
 - [ ] **Dependencies** I have updated the environment yaml so it includes any new libraries I have used
-- [ ] **Code runs** The code runs on my machine and/or CDSW
-- [ ] **Clean Code** 
-    - [ ] Code has been linted (using autopep8)
-    - [ ] Code adheres to [DRY]([url](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself))
+- [ ] **Clean Code**
     - [ ] Code is as [PEP 8]([url](https://peps.python.org/pep-0008/)) compliant as I can humanly make it
+    - [ ] Code has been linted (using [autopep8](https://marketplace.visualstudio.com/items?itemName=ms-python.autopep8))
+    - [ ] Code adheres to [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
+- [ ] **Type hints** All new functions have [type hints ](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html)
+
+    
 
 #### Documentation
 
@@ -41,8 +44,8 @@ Any new code includes all the following forms of documentation:
 
 # Peer Review Section
 
-- [ ] All requirements install from (updated) `requirements.txt`
-- [ ] Documentation has been created and is clear - check the google Doc
+- [ ] All requirements install from (updated) `environment.yaml`
+- [ ] Documentation has been created and is clear - **check the working document**
 - [ ] Doctrings ([Google format](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)) have been created and accurately describe the function's functionality
 - [ ] Unit tests pass, or if not present _a new ticket to create tests has been created_
 - [ ] **Code runs** The code runs on reviewer's machine and/or CDSW
