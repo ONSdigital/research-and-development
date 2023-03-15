@@ -19,7 +19,7 @@ class Config_settings:
         return config
 
 
-def csv_creator(filename, columns):
+def csv_creator(filename, columns) -> None:
     """Creates a csv file with user
     defined headers.
     Args:
