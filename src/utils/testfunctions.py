@@ -1,6 +1,6 @@
 import time
 
-def add(a:int, b: int):
+def add(a:int, b: int) -> int:
     """Testing multiple wrappers for one function"""
     # Raise error if a or b is not an integer
     if not isinstance(a, int) or not isinstance(b, int):
