@@ -1,9 +1,10 @@
 name: resdev36
 dependencies:
+- python=3
 - coverage
 - pytest
 - pyyaml
-- pandas=1.1
+- pandas
 - numpy
 - requests
 - sphinx
