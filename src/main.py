@@ -3,8 +3,10 @@
 import toml
 from utils.testfunctions import add
 
+user_config_path = "config/userconfig.toml"
 
-def toml_parser():
+
+def toml_parser(configfile: str = user_config_path) -> dict:
     """Function to parse the userconfig.toml file.
 
     Returns:
@@ -17,8 +19,7 @@ def toml_parser():
         {'title': 'TOML Example config', 'period': {'start_period':
         datetime.date(1990, 10, 10), 'end_period': datetime.date(2000, 10, 5)}}
     """
-    toml_path = "config/userconfig.toml"
-    toml_dict = toml.load(toml_path)
+    toml_dict = toml.load(configfile)
 
     return toml_dict
 
