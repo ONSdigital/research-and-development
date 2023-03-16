@@ -17,7 +17,10 @@ def toml_parser():
         {'title': 'TOML Example config', 'period': {'start_period':
         datetime.date(1990, 10, 10), 'end_period': datetime.date(2000, 10, 5)}}
     """
-    return toml.load("config/userconfig.toml")
+    toml_path = "config/userconfig.toml"
+    toml_dict = toml.load(toml_path)
+
+    return toml_dict
 
 
 def run_pipeline():
