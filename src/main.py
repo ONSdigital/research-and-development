@@ -1,15 +1,11 @@
 """The main pipeline"""
 
 # Importing from typing allows type hinting like Callable[[x,y],z]
-import sys
-import typing
-
-from testfunctions import add
-
-# Adds folder with utility function to path for easy imports
-sys.path.append("/home/cdsw/research-and-development/src/utils")
+import utils  # noqa: F401
+from typing import Callable as FunctionType
+from utils.testfunctions import add
 
 
-def run_pipeline() -> typing.Callable[[int, int], int]:
+def run_pipeline() -> FunctionType[[int, int], int]:
     """Run the pipeline"""
     return add(1, 2)
