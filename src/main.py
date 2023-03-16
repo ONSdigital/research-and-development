@@ -8,7 +8,7 @@ def toml_parser():
     """Function to parse the userconfig.toml file.
 
     Returns:
-        A dictionary where the keys are section titles within the TOML file.
+        A nested dictionary where the keys are section titles within the TOML file.
         If only one variable under the section title in the TOML file is given
         then it is passed directly as a dictionary value. If more than one
         variable is defined then they are parsed as a dictionary themselves.
