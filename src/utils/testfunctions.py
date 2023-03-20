@@ -15,6 +15,7 @@ def divbyzero(num: int):
         Error: This function returns a zero division error
     """
     ans = num / 0
+
     return ans
 
 
@@ -29,6 +30,7 @@ def this_definitely_works(num: int):
         int: Returns the squared value of the integer input
     """
     ans = num**num
+
     return ans
 
 
@@ -46,6 +48,7 @@ def takes_a_while(num: int):
     for _ in range(num):
         ans += (num**2) ** 2
         time.sleep(5.5)
+
     return ans
 
 
@@ -63,6 +66,7 @@ def addition(a: int, b: int):
     """
     c = a + b
     time.sleep(0.5)
+
     return c
 
 
@@ -78,6 +82,7 @@ class Manipulate_data:
         df = pd.DataFrame(
             np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD")
         )
+
         return df
 
     @df_change_wrap
@@ -87,6 +92,7 @@ class Manipulate_data:
         df1 = self.vf_df
         df2 = self.vf_df * 2
         df = df1.append(df2)
+
         return df
 
 
@@ -106,4 +112,5 @@ def add(a: int, b: int):
     # Raise error if a or b is not an integer
     if not isinstance(a, int) or not isinstance(b, int):
         raise TypeError("a and b must be integers")
+
     return a + b

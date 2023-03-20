@@ -24,6 +24,7 @@ class RunLog:
         else:
             latest_id = 0
         run_id = latest_id + 1
+
         return run_id
 
     def _record_time_taken(self, time_taken):
@@ -46,11 +47,13 @@ class RunLog:
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
         self.logs.append(lines)
+
         return self
 
     def _generate_time(self):
         """Generate unqiue timestamp for when each run"""
         timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+
         return timestamp
 
     def _create_runlog_dicts(self):

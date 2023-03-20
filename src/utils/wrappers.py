@@ -27,6 +27,7 @@ def logger_creator(global_config):
         ],
     )
     logger = logging.getLogger(__name__)
+
     return logger
 
 
@@ -48,6 +49,7 @@ def time_logger_wrap(func):
 def starting_time():
     """Record the start time of a function."""
     enter_time = perf_counter()
+
     return enter_time
 
 
@@ -69,6 +71,7 @@ def start_finish_wrapper(func):
         log_start(func)
         result = func(*args, **kwargs)
         log_finish(func)
+
         return result
 
     return decorator
@@ -93,6 +96,7 @@ def method_start_finish_wrapper(func):
         meth_log_start(func)
         result = func(*args, **kwargs)
         meth_log_finish(func)
+
         return result
 
     return decorator
@@ -116,6 +120,7 @@ def exception_wrap(func):
         """Define the decorator itself."""
         try:
             result = func(*args, **kwargs)
+
             return result
         except Exception as e:
             # log the exception
@@ -147,6 +152,7 @@ def df_change_wrap(func):
         post_df = func(*args, **kwargs)
         logger.info(f"{func.__name__} changed the df shape as follows:")
         df_measure_change(post_df, pre_rows, pre_cols, table_config)
+
         return post_df
 
     return call
@@ -161,6 +167,7 @@ def df_measure_change(df, rows_before, cols_before, table_config):
         """Get the direction of the change."""
         # Evalutate the direction of change
         change = ["gained", "removed"][after < before]
+
         return change
 
     row_change = _change_direction(rows_before, rows_after)
