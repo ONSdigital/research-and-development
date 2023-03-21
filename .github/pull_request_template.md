@@ -15,15 +15,16 @@ Closes #
 #### Code
 
 - [ ] **Code runs** The code runs on my machine and/or CDSW
+- [ ] **Conflicts resolved** There are no conflicts (I have performed a rebase if necessary)
 - [ ] **Requirements** My/our code functions according to the requirements of the ticket
 - [ ] **Dependencies** I have updated the environment yaml so it includes any new libraries I have used
+- [ ] **Configuration file updated** any high level parameters that the user may interact with have been put into the config file (and imported to the script) 
 - [ ] **Clean Code**
     - [ ] Code is as [PEP 8]([url](https://peps.python.org/pep-0008/)) compliant as I can humanly make it
     - [ ] Code passess flake8 linting check
     - [ ] Code adheres to [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
 - [ ] **Type hints** All new functions have [type hints ](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html)
 
-    
 
 #### Documentation
 
@@ -72,6 +73,8 @@ These might include, but not exclusively:
 - additional tests that should be implemented (do the tests effectively assure that it
   works correctly?)
 - code style improvements (could the code be written more clearly?)
+- Do the changes represent a change in functionality so the version number should increase? Start a discussion if so.
+- As a review you can generates the same outputs from running the code
 
 Your suggestions should be tailored to the code that you are reviewing.
 Be critical and clear, but not mean. Ask questions and set actions.
