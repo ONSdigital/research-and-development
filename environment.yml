@@ -18,4 +18,3 @@ dependencies:
       - python-dotenv
       - table_logger
       - toml
-
