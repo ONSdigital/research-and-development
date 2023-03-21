@@ -1,6 +1,7 @@
 """Define helper functions that wrap regularly-used functions."""
 
 import yaml
+import toml
 import os
 
 
@@ -29,3 +30,24 @@ def csv_creator(filename, columns):
         with open(filename, mode="w", encoding="utf-8") as f:
             f.write(",".join(columns) + "\n")
     return None
+
+
+user_config_path = "config/userconfig.toml"
+
+
+def user_config_reader(configfile: str = user_config_path) -> dict:
+    """Function to parse the userconfig.toml file.
+
+    Returns:
+        A nested dictionary where the keys are section titles within the TOML file.
+        If only one variable under the section title in the TOML file is given
+        then it is passed directly as a dictionary value. If more than one
+        variable is defined then they are parsed as a dictionary themselves.
+        An example of what is returned is given below:
+
+        {'title': 'TOML Example config', 'period': {'start_period':
+        datetime.date(1990, 10, 10), 'end_period': datetime.date(2000, 10, 5)}}
+    """
+    toml_dict = toml.load(configfile)
+
+    return toml_dict
