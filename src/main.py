@@ -1,40 +1,44 @@
 """The main pipeline"""
 
-import toml
-from utils.testfunctions import add
+from src.utils import runlog
+from src._version import __version__ as version
+from src.utils.helpers import Config_settings
+from src.utils.wrappers import logger_creator
+from src.utils.testfunctions import Manipulate_data
+import time
+import logging
 
-def toml_parser():
-    """Function to parse the userconfig.toml file.
 
-    Returns:
-        A dictionary where the keys are section titles within the TOML file.
-        If only one variable under the section title in the TOML file is given
-        then it is passed directly as a dictionary value. If more than one
-        variable is defined then they are parsed as a dictionary themselves.
-        An example of what is returned is given below:
-        
-        {'title': 'TOML Example config', 'period': {'start_period': 
-        datetime.date(1990, 10, 10), 'end_period': datetime.date(2000, 10, 5)}, 
-        'source_file': {'location': 'D:/Data', 'fileName': 'file.txt'}, 'output_location': 
-        {'hive_db': 'hive.db', 'tableName': 'name.table'}, 'outlier_correction': 
-        {'location': 'D:/', 'fileName': 'outliers.txt', 'bool': True}}
-    """    
-    return toml.load("/home/cdsw/research-and-development/config/userconfig.toml")
+MainLogger = logging.getLogger(__name__)
+MainLogger.setLevel(logging.INFO)
 
-def period_select():
-    """Function returning the start and end date under consideration.
 
-    Returns:
-        A tuple containing two datetime.date objects. The first is the
-        start date of the period under consideration, the second is the
-        end date of that period. 
-        Example:
-    
-        (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
-    """    
-    period_dict = toml_parser()["period"]
-    return period_dict["start_period"], period_dict["end_period"]
+def run_pipeline(start):
+    """The main pipeline.
 
-def run_pipeline():
-    """Run the pipeline"""
-    return add(1, 2)
+    Args:
+        start (float): The time when the pipeline is launched
+        generated from the time module using time.time()
+    """
+
+    conf_obj = Config_settings()
+    config = conf_obj.config_dict
+    global_config = config["global"]
+
+    runlog_obj = runlog.RunLog(config, version)
+
+    logger = logger_creator(global_config)
+    MainLogger.info("Launching Pipeline .......................")
+    logger.info("Collecting logging parameters ..........")
+    Manipulate_data()
+    MainLogger.info("Finshing Pipeline .......................")
+
+    runlog_obj.retrieve_pipeline_logs()
+
+    run_time = round(time.time() - start, 5)
+    runlog_obj._record_time_taken(run_time)
+
+    runlog_obj._create_runlog_dicts()
+    runlog_obj._create_runlog_dfs()
+    runlog_obj.create_runlog_files()
+    runlog_obj._write_runlog()
