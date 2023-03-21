@@ -26,4 +26,3 @@ jobs:
       - name: Get coverage report
         shell: bash -l {0}
         run: coverage report -m
-
