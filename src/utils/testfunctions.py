@@ -1,5 +1,5 @@
 import time
-from src.utils.wrappers import time_logger_wrap, exception_wrap
+from src.utils.wrappers import time_logger_wrap, exception_wrap, df_change_wrap
 import numpy as np
 import pandas as pd
 
@@ -15,6 +15,7 @@ def divbyzero(num: int):
         Error: This function returns a zero division error
     """
     ans = num / 0
+
     return ans
 
 
@@ -29,6 +30,7 @@ def this_definitely_works(num: int):
         int: Returns the squared value of the integer input
     """
     ans = num**num
+
     return ans
 
 
@@ -46,6 +48,7 @@ def takes_a_while(num: int):
     for _ in range(num):
         ans += (num**2) ** 2
         time.sleep(5.5)
+
     return ans
 
 
@@ -63,38 +66,34 @@ def addition(a: int, b: int):
     """
     c = a + b
     time.sleep(0.5)
+
     return c
 
 
-@time_logger_wrap
-@exception_wrap
-def create_dummy_df(seed=42):
-    """Create a dataframe with headers using random integers
+class Manipulate_data:
+    def __init__(self):
+        self.vf_df = self.create_dummy_df()[0]
+        self.table_config = "SingleLine"
+        self.df = self.manipulate_df()[0]
 
-    Args:
-        seed (int, optional): Seed value to repeat randomness. Defaults to 42.
+    @time_logger_wrap
+    @exception_wrap
+    def create_dummy_df(self):
+        df = pd.DataFrame(
+            np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD")
+        )
 
-    Returns:
-        pd.Dataframe: Returns a 4*100 Pandas dataframe with column names
-    """
-    np.random.seed(seed=seed)
-    df = pd.DataFrame(np.random.randint(0, 100, size=(100, 4)), columns=list("ABCD"))
-    return df
+        return df
 
+    @df_change_wrap
+    @time_logger_wrap
+    @exception_wrap
+    def manipulate_df(self):
+        df1 = self.vf_df
+        df2 = self.vf_df * 2
+        df = df1.append(df2)
 
-@time_logger_wrap
-@exception_wrap
-def manipulate_df(df: pd.DataFrame):
-    """Change dataframe values using simple equation
-
-    Args:
-        df (pd.DataFrame): Pandas dataframe with integer values
-
-    Returns:
-        pd.Dataframe: Pandas dataframe with integer values
-    """
-    df = df * 2
-    return df
+        return df
 
 
 def add(a: int, b: int):
@@ -110,6 +109,8 @@ def add(a: int, b: int):
     Returns:
         int: Sum of both inputs
     """
+    # Raise error if a or b is not an integer
     if not isinstance(a, int) or not isinstance(b, int):
         raise TypeError("a and b must be integers")
+
     return a + b

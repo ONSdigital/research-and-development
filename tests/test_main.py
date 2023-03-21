@@ -2,14 +2,16 @@
 
 import pytest
 
+
 def test_add():
     """Test the add function."""
     # Arrange
     from src.utils.testfunctions import add
+
     # Act: use pytest to assert the result
     result_1_2 = add(1, 2)
-    result_10_222 = add(10, 222) 
-    
+    result_10_222 = add(10, 222)
+
     # Assert
     assert result_1_2 == 3
     assert result_10_222 == 232
@@ -20,4 +22,3 @@ def test_add():
     pytest.raises(TypeError, add, "1", "2")
     pytest.raises(TypeError, add, 1, "2")
     pytest.raises(TypeError, add, "Spam", "Eggs")
-    

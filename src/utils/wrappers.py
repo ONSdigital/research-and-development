@@ -3,7 +3,7 @@ from functools import wraps
 from time import perf_counter
 import traceback
 
-# from table_logger import TableLogger
+from table_logger import TableLogger
 import logging.config
 
 
@@ -27,6 +27,7 @@ def logger_creator(global_config):
         ],
     )
     logger = logging.getLogger(__name__)
+
     return logger
 
 
@@ -48,6 +49,7 @@ def time_logger_wrap(func):
 def starting_time():
     """Record the start time of a function."""
     enter_time = perf_counter()
+
     return enter_time
 
 
@@ -69,6 +71,7 @@ def start_finish_wrapper(func):
         log_start(func)
         result = func(*args, **kwargs)
         log_finish(func)
+
         return result
 
     return decorator
@@ -93,6 +96,7 @@ def method_start_finish_wrapper(func):
         meth_log_start(func)
         result = func(*args, **kwargs)
         meth_log_finish(func)
+
         return result
 
     return decorator
@@ -116,6 +120,7 @@ def exception_wrap(func):
         """Define the decorator itself."""
         try:
             result = func(*args, **kwargs)
+
             return result
         except Exception as e:
             # log the exception
@@ -126,3 +131,70 @@ def exception_wrap(func):
             raise
 
     return wrapper
+
+
+def df_change_wrap(func):
+    """This wrapper logs the change in a dataframe's columns
+    and rows. It can only wrap around the main method of a class.
+    The class must have attribute self.vf_df which is the current state of
+    the dataframe. It must also have self.df which is the final state of
+    the dataframe. Finally it must also have self.table_config set as either
+    'Table' or 'SingleLine'
+    """
+
+    @wraps(func)
+    def call(*args, **kwargs):
+        """Define the decorator itself."""
+        self_ = args[0]
+        pre_df = self_.vf_df
+        pre_rows, pre_cols = pre_df.shape[0], pre_df.shape[1]
+        table_config = self_.table_config
+        post_df = func(*args, **kwargs)
+        logger.info(f"{func.__name__} changed the df shape as follows:")
+        df_measure_change(post_df, pre_rows, pre_cols, table_config)
+
+        return post_df
+
+    return call
+
+
+def df_measure_change(df, rows_before, cols_before, table_config):
+    """Log the change in a dataframe caused by a function."""
+    shape = df[0].shape
+    rows_after, cols_after = shape[0], shape[1]
+
+    def _change_direction(before, after):
+        """Get the direction of the change."""
+        # Evalutate the direction of change
+        change = ["gained", "removed"][after < before]
+
+        return change
+
+    row_change = _change_direction(rows_before, rows_after)
+    col_change = _change_direction(cols_before, cols_after)
+
+    # Get absolute difference in change
+    row_diff = abs(rows_after - rows_before)
+    col_diff = abs(cols_after - cols_before)
+
+    if table_config == "Table":
+        # Make table to log the changes in df
+        tbl = TableLogger(
+            columns="df Changes,Rows,Columns",
+            float_format="{:,.2f}".format,
+            default_colwidth=15,
+        )
+
+        tbl("From", rows_before, cols_before)
+        tbl("To", rows_after, cols_after)
+        tbl("Change", f"{row_diff} ({row_change})", f"{col_diff} ({col_change})")
+    elif table_config == "SingleLine":
+        logger.info(
+            f"""Difference in rows: {row_diff} ({row_change}),
+                        Difference in columns {col_diff} ({col_change})"""
+        )
+    else:
+        logger.warning(
+            """Trouble at mill!!! Mistake in config.
+                          Either 'Table' or 'SingleLine' must be specified."""
+        )
