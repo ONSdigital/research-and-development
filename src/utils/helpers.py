@@ -16,6 +16,7 @@ class Config_settings:
         """Get the config settings from the config file."""
         with open(self.config_file, "r") as file:
             config = yaml.safe_load(file)
+
         return config
 
 
@@ -29,6 +30,7 @@ def csv_creator(filename, columns):
     if not os.path.exists(filename):
         with open(filename, mode="w", encoding="utf-8") as f:
             f.write(",".join(columns) + "\n")
+
     return None
 
 
@@ -65,4 +67,5 @@ def period_select() -> tuple:
         (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
     """
     period_dict = user_config_reader()["period"]
+
     return period_dict["start_period"], period_dict["end_period"]
