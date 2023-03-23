@@ -1,16 +1,16 @@
 name: Run pytest on pull request to develop
 
-# runs on every pull request to develop
-# on:
-#   pull_request:
-#     branches:
-#       - develop
-
-# runs on every push to 90-coverage-in-comments
+runs on every pull request to develop
 on:
-  push:
+  pull_request:
     branches:
-      - 90-coverage-in-comments
+      - develop
+
+# # runs on every push to 90-coverage-in-comments
+# on:
+#   push:
+#     branches:
+#       - 90-coverage-in-comments
 
 # runs on version 20.04 of ubuntu
 jobs:
@@ -46,3 +46,4 @@ jobs:
           title: Pytest coverage report
           badge-title: Pytest coverage
           # badge-color: green
+          create-new-comment: true
