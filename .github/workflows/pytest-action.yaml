@@ -21,19 +21,22 @@ jobs:
           python-version: 3.6
           environment-file: environment.yml
           activate-environment: resdev36
+  # 2) install pytest and coverage
+      - name: Install pytest and coverage
+        shell: bash -l {0}
+        run: |
+          conda pip install pytest-cov pytest-coverage-comment
 # 2) Run pytest to run all tests in the tests folder
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        # use coverage to run pytest and generate a coverage report in xml format
+        # use pytest to generate a coverage report in xml format
         run: |
-          coverage run -m pytest --junitxml=pytest.xml
-          coverage xml
-          coverage report -m > pytest-coverage.txt
-# 3) Display the coverage report in the terminal
-      - name: Display coverage report in terminal
-        shell: bash -l {0}
-        run: coverage report -m
+          pytest --cov-report xml:pytest.xml --cov=myproject/ --cov-exclude=tests/
+# # 3) Display the coverage report in the terminal
+#       - name: Display coverage report in terminal
+#         shell: bash -l {0}
+#         run: coverage report -m
 # 4) Get the coverage report in to the pull request comments
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
