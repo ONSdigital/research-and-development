@@ -1,6 +1,6 @@
 name: Run pytest on pull request to develop
 
-runs on every pull request to develop
+# runs on every pull request to develop
 on:
   pull_request:
     branches:
