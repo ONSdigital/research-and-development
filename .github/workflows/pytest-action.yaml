@@ -45,3 +45,4 @@ jobs:
           junitxml-path: ./pytest.xml
           title: Pytest coverage report
           badge-title: Pytest coverage
+          # badge-color: green
