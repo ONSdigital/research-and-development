@@ -22,11 +22,16 @@ jobs:
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: coverage run -m pytest tests/*.py xml:pytest.xml
-      - name: Get coverage report
+        # use coverage to run pytest and generate a coverage report in xml format
+        run: |
+          coverage run -m pytest --junitxml=pytest.xml
+          coverage xml
+          coverage report -m > pytest-coverage.txt
+# 3) Display the coverage report in the terminal
+      - name: Display coverage report in terminal
         shell: bash -l {0}
         run: coverage report -m
-# 3) Get the coverage report in to the pull request comments
+# 4) Get the coverage report in to the pull request comments
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
