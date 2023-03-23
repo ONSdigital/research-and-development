@@ -1,10 +1,16 @@
 name: Run pytest on pull request to develop
 
 # runs on every pull request to develop
+# on:
+#   pull_request:
+#     branches:
+#       - develop
+
+# runs on every push to 90-coverage-in-comments
 on:
-  pull_request:
+  push:
     branches:
-      - develop
+      - 90-coverage-in-comments
 
 # runs on version 20.04 of ubuntu
 jobs:
