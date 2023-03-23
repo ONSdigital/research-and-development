@@ -5,12 +5,9 @@ on:
   pull_request:
     branches:
       - develop
-
-# # runs on every push to 90-coverage-in-comments
-# on:
-#   push:
-#     branches:
-#       - 90-coverage-in-comments
+  push:
+    branches:
+      - 90-coverage-in-comments
 
 # runs on version 20.04 of ubuntu
 jobs:
