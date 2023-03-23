@@ -22,7 +22,7 @@ jobs:
       - name: Run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: coverage run -m pytest tests/*.py
+        run: coverage run -m pytest tests/*.py xml:pytest.xml
       - name: Get coverage report
         shell: bash -l {0}
         run: coverage report -m
