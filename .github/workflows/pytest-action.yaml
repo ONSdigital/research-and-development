@@ -26,9 +26,3 @@ jobs:
       - name: Get coverage report
         shell: bash -l {0}
         run: coverage report -m
-# 3) Get the coverage report in to the pull request comments
-      - name: Pytest coverage comment
-        uses: MishaKav/pytest-coverage-comment@main
-        with:
-          pytest-coverage-path: ./pytest-coverage.txt
-          junitxml-path: ./pytest.xml
