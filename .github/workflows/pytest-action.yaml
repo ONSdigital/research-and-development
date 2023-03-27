@@ -32,7 +32,8 @@ jobs:
         shell: bash -l {0}
         # use pytest to generate a coverage report in xml format
         run: |
-          pytest --cov-report xml:pytest.xml --cov=research-and-development/src/ --cov-exclude=tests/
+          # pytest --cov-report xml:pytest.xml --cov=research-and-development/src/ --cov-exclude=tests/
+          pytest --junitxml=pytest.xml 
 # # 3) Display the coverage report in the terminal
 #       - name: Display coverage report in terminal
 #         shell: bash -l {0}
@@ -42,8 +43,8 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
-          pytest-xml-coverage-path: ./pytest.xml
-          # junitxml-path: ./pytest.xml
+          # pytest-xml-coverage-path: ./pytest.xml
+          junitxml-path: ./pytest.xml
           title: Pytest coverage report
           badge-title: Pytest coverage
           create-new-comment: true
