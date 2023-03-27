@@ -3,6 +3,7 @@ dependencies:
   - python=3
   - coverage
   - pytest
+  - pytest-cov
   - pyyaml
   - pandas
   - numpy
