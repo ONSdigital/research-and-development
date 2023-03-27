@@ -55,7 +55,7 @@ pipeline {
 
                 checkout scm
 
-                //updateGitlabStatus_temp('Jenkins', 'pending')
+                updateGitlabStatus_temp('Jenkins', 'pending')
 
                 script {
                     buildInfo.name = "resdev"
