@@ -33,7 +33,7 @@ jobs:
         # use pytest to generate a coverage report in xml format
         run: |
           # pytest --cov-report xml:pytest.xml --cov=research-and-development/src/ --cov-exclude=tests/
-          pytest --junitxml=pytest.xml 
+          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered
 # # 3) Display the coverage report in the terminal
 #       - name: Display coverage report in terminal
 #         shell: bash -l {0}
