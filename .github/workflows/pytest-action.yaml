@@ -21,11 +21,7 @@ jobs:
           python-version: 3.6
           environment-file: environment.yml
           activate-environment: resdev36
-  # 2) install pytest and coverage
-      - name: Install pytest and coverage
-        shell: bash -l {0}
-        run: |
-          conda install pytest-cov 
+
 # 2) Run pytest to run all tests in the tests folder
       - name: Run pytest
       # Specify shell to run the command in
