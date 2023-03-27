@@ -1,29 +1,171 @@
+#!groovy
+
+// Global scope required for multi-stage persistence
+def artifactoryStr = 'art-p-01'
+artServer = Artifactory.server "${artifactoryStr}"
+buildInfo = Artifactory.newBuildInfo()
+def agentPython3Version = 'python_3.6.2'
+def artifactVersion
+
+// Define a function to push packaged code to Artifactory
+def pushToPyPiArtifactoryRepo_temp(String projectName, String version, String sourceDistLocation = 'python/dist/*', String artifactoryHost = 'art-p-01') {
+    withCredentials([usernamePassword(credentialsId: env.ARTIFACTORY_CREDS, usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_PASSWORD')]){
+        sh "curl -u ${ARTIFACTORY_USER}:\${ARTIFACTORY_PASSWORD} -T ${sourceDistLocation} 'http://${artifactoryHost}/artifactory/${env.ARTIFACTORY_PYPI_REPO}/${projectName}/'"
+    }
+}
+
+// Define a function to update the pipeline status on Gitlab
+def updateGitlabStatus_temp(String stage, String state, String gitlabHost = 'https://gitlab-app-l-01.ons.statistics.gov.uk') {
+    withCredentials([string(credentialsId: env.GITLAB_CREDS, variable: 'GITLAB_TOKEN')]) {
+        println("Updating GitLab pipeline status")
+        shortCommit = sh(returnStdout: true, script: "cd ${PROJECT_NAME} && git log -n 1 --pretty=format:'%h'").trim()
+        sh "curl --request POST --header \"PRIVATE-TOKEN: ${GITLAB_TOKEN}\" \"${gitlabHost}/api/v4/projects/${GITLAB_PROJECT_ID}/statuses/${shortCommit}?state=${state}&name=${stage}&target_url=${BUILD_URL}\""
+    }
+}
+
+// This section defines the Jenkins pipeline
 pipeline {
-
-  agent any
-
-  options {
-
-    buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')
-
-  }
-
-  stages {
-
-    stage('Hello World') {
-
-      steps {
-
-        sh '''
-
-          java -version
-
-        '''
-
-      }
-
+    libraries {
+        lib('jenkins-pipeline-shared@feature/dap-ci-scripts')
     }
 
-  }
+    environment {
+        ARTIFACTORY_CREDS       = 's_jenkins_epds'
+        ARTIFACTORY_PYPI_REPO   = 'LR_EPDS_pypi'
+        PROJECT_NAME            = 'projectname_placeholder'
+        BUILD_BRANCH            = 'build_branch'  // Any commits to this branch will create a build in artifactory
+        BUILD_TAG               = 'v*'  // Any commits tagged with this pattern will create a build in artifactory
+        MIN_COVERAGE_PC         = '0'
+        GITLAB_CREDS            = 'epds_gitlab_token'  // Credentials used for notifying GitLab of build status
+        GITLAB_PROJECT_ID       = 'gitlabid_placeholder'
+    }
 
+    options {
+        skipDefaultCheckout true
+    }
+
+    agent any
+
+    stages {
+        stage('Checkout') {
+            agent { label 'download.jenkins.slave' }
+            steps {
+                onStage()
+                colourText('info', "Checking out code from source control.")
+
+                checkout scm
+
+                updateGitlabStatus_temp('Jenkins', 'pending')
+
+                script {
+                    buildInfo.name = "${PROJECT_NAME}"
+                    buildInfo.number = "${BUILD_NUMBER}"
+                    buildInfo.env.collect()
+                }
+                colourText('info', "BuildInfo: ${buildInfo.name}-${buildInfo.number}")
+                stash name: 'Checkout', useDefaultExcludes: false
+            }
+        }
+
+        stage('Preparing virtual environment') {
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Create venv and install dependencies")
+                unstash name: 'Checkout'
+
+                sh '''
+                PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
+
+                python3 -m pip install -U pip
+                pip3 install virtualenv
+
+                if [ ! -d "venv" ]; then
+                    virtualenv venv
+                fi
+                . venv/bin/activate
+
+                python -m pip install -U pip
+                pip3 install pypandoc==1.7.5
+                pip3 install -r requirements-dev.txt
+                pip3 install pyspark==2.4.0
+                pip3 install -e .
+                pip3 freeze
+                '''
+            stash name: 'venv', useDefaultExcludes: false
+            }
+        }
+
+        stage('Unit Test and coverage') {
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Running unit tests and code coverage.")
+                unstash name: 'Checkout'
+                unstash name: 'venv'
+
+                // Compatibility for PyArrow with Spark 2.4-legacy IPC format.
+                sh 'export ARROW_PRE_0_15_IPC_FORMAT=1'
+
+                // Running coverage first runs the tests
+                sh '''
+                . venv/bin/activate
+
+                coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
+                coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
+                '''
+
+                cobertura autoUpdateHealth: false,
+                        autoUpdateStability: false,
+                        coberturaReportFile: 'python_coverage.xml',
+                        conditionalCoverageTargets: '70, 0, 0',
+                        failUnhealthy: false,
+                        failUnstable: false,
+                        lineCoverageTargets: '80, 0, 0',
+                        maxNumberOfBuilds: 0,
+                        methodCoverageTargets: '80, 0, 0',
+                        onlyStable: false,
+                        zoomCoverageChart: false
+            }
+        }
+
+        stage('Build and publish Python Package') {
+            when {
+                anyOf{
+                    branch BUILD_BRANCH
+                    tag BUILD_TAG
+                }
+                beforeAgent true
+            }
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Building Python package.")
+                unstash name: 'Checkout'
+                unstash name: 'venv'
+
+                sh '''
+                . venv/bin/activate
+                pip3 install wheel==0.29.0
+                python3 setup.py build bdist_wheel
+                '''
+
+                script {
+                    pushToPyPiArtifactoryRepo_temp("${buildInfo.name}", "", "dist/*")
+                }
+            }
+        }
+    }
+
+
+    post {
+        success {
+            unstash name: 'Checkout'
+            updateGitlabStatus_temp('Jenkins', 'success')
+        }
+        failure {
+            unstash name: 'Checkout'
+            updateGitlabStatus_temp('Jenkins', 'failed')
+        }
+    }
 }
