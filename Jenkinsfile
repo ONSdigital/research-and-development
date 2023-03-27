@@ -18,7 +18,7 @@ def pushToPyPiArtifactoryRepo_temp(String projectName, String version, String so
 def updateGitlabStatus_temp(String stage, String state, String gitlabHost = 'https://gitlab-app-l-01.ons.statistics.gov.uk') {
     withCredentials([string(credentialsId: env.GITLAB_CREDS, variable: 'GITLAB_TOKEN')]) {
         println("Updating GitLab pipeline status")
-        shortCommit = sh(returnStdout: true, script: "cd ${PROJECT_NAME} && git log -n 1 --pretty=format:'%h'").trim()
+        shortCommit = sh(returnStdout: true, script: "cd resdev && git log -n 1 --pretty=format:'%h'").trim()
         sh "curl --request POST --header \"PRIVATE-TOKEN: ${GITLAB_TOKEN}\" \"${gitlabHost}/api/v4/projects/${GITLAB_PROJECT_ID}/statuses/${shortCommit}?state=${state}&name=${stage}&target_url=${BUILD_URL}\""
     }
 }
@@ -66,95 +66,95 @@ pipeline {
                 stash name: 'Checkout', useDefaultExcludes: false
             }
         }
-
-        stage('Preparing virtual environment') {
-            agent { label "test.${agentPython3Version}" }
-            steps {
-                onStage()
-                colourText('info', "Create venv and install dependencies")
-                unstash name: 'Checkout'
-
-                sh '''
-                PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
-
-                python3 -m pip install -U pip
-                pip3 install virtualenv
-
-                if [ ! -d "venv" ]; then
-                    virtualenv venv
-                fi
-                . venv/bin/activate
-
-                python -m pip install -U pip
-                pip3 install pypandoc==1.7.5
-                pip3 install -r requirements-dev.txt
-                pip3 install pyspark==2.4.0
-                pip3 install -e .
-                pip3 freeze
-                '''
-            stash name: 'venv', useDefaultExcludes: false
-            }
-        }
-
-        stage('Unit Test and coverage') {
-            agent { label "test.${agentPython3Version}" }
-            steps {
-                onStage()
-                colourText('info', "Running unit tests and code coverage.")
-                unstash name: 'Checkout'
-                unstash name: 'venv'
-
-                // Compatibility for PyArrow with Spark 2.4-legacy IPC format.
-                sh 'export ARROW_PRE_0_15_IPC_FORMAT=1'
-
-                // Running coverage first runs the tests
-                sh '''
-                . venv/bin/activate
-
-                coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
-                coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
-                '''
-
-                cobertura autoUpdateHealth: false,
-                        autoUpdateStability: false,
-                        coberturaReportFile: 'python_coverage.xml',
-                        conditionalCoverageTargets: '70, 0, 0',
-                        failUnhealthy: false,
-                        failUnstable: false,
-                        lineCoverageTargets: '80, 0, 0',
-                        maxNumberOfBuilds: 0,
-                        methodCoverageTargets: '80, 0, 0',
-                        onlyStable: false,
-                        zoomCoverageChart: false
-            }
-        }
-
-        stage('Build and publish Python Package') {
-            when {
-                anyOf{
-                    branch BUILD_BRANCH
-                    tag BUILD_TAG
-                }
-                beforeAgent true
-            }
-            agent { label "test.${agentPython3Version}" }
-            steps {
-                onStage()
-                colourText('info', "Building Python package.")
-                unstash name: 'Checkout'
-                unstash name: 'venv'
-
-                sh '''
-                . venv/bin/activate
-                pip3 install wheel==0.29.0
-                python3 setup.py build bdist_wheel
-                '''
-
-                script {
-                    pushToPyPiArtifactoryRepo_temp("${buildInfo.name}", "", "dist/*")
-                }
-            }
-        }
+//
+        //stage('Preparing virtual environment') {
+        //    agent { label "test.${agentPython3Version}" }
+        //    steps {
+        //        onStage()
+        //        colourText('info', "Create venv and install dependencies")
+        //        unstash name: 'Checkout'
+//
+        //        sh '''
+        //        PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
+//
+        //        python3 -m pip install -U pip
+        //        pip3 install virtualenv
+//
+        //        if [ ! -d "venv" ]; then
+        //            virtualenv venv
+        //        fi
+        //        . venv/bin/activate
+//
+        //        python -m pip install -U pip
+        //        pip3 install pypandoc==1.7.5
+        //        pip3 install -r requirements-dev.txt
+        //        pip3 install pyspark==2.4.0
+        //        pip3 install -e .
+        //        pip3 freeze
+        //        '''
+        //    stash name: 'venv', useDefaultExcludes: false
+        //    }
+        //}
+//
+        //stage('Unit Test and coverage') {
+        //    agent { label "test.${agentPython3Version}" }
+        //    steps {
+        //        onStage()
+        //        colourText('info', "Running unit tests and code coverage.")
+        //        unstash name: 'Checkout'
+        //        unstash name: 'venv'
+//
+        //        // Compatibility for PyArrow with Spark 2.4-legacy IPC format.
+        //        sh 'export ARROW_PRE_0_15_IPC_FORMAT=1'
+//
+        //        // Running coverage first runs the tests
+        //        sh '''
+        //        . venv/bin/activate
+//
+        //        coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
+        //        coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
+        //        '''
+//
+        //        cobertura autoUpdateHealth: false,
+        //                autoUpdateStability: false,
+        //                coberturaReportFile: 'python_coverage.xml',
+        //                conditionalCoverageTargets: '70, 0, 0',
+        //                failUnhealthy: false,
+        //                failUnstable: false,
+        //                lineCoverageTargets: '80, 0, 0',
+        //                maxNumberOfBuilds: 0,
+        //                methodCoverageTargets: '80, 0, 0',
+        //                onlyStable: false,
+        //                zoomCoverageChart: false
+        //    }
+        //}
+//
+        //stage('Build and publish Python Package') {
+        //    when {
+        //        anyOf{
+        //            branch BUILD_BRANCH
+        //            tag BUILD_TAG
+        //        }
+        //        beforeAgent true
+        //    }
+        //    agent { label "test.${agentPython3Version}" }
+        //    steps {
+        //        onStage()
+        //        colourText('info', "Building Python package.")
+        //        unstash name: 'Checkout'
+        //        unstash name: 'venv'
+//
+        //        sh '''
+        //        . venv/bin/activate
+        //        pip3 install wheel==0.29.0
+        //        python3 setup.py build bdist_wheel
+        //        '''
+//
+        //        script {
+        //            pushToPyPiArtifactoryRepo_temp("${buildInfo.name}", "", "dist/*")
+        //        }
+        //    }
+        //}
     }
 
 
