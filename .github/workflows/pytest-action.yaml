@@ -23,13 +23,11 @@ jobs:
           activate-environment: resdev36
 
 # 2) Run pytest to run all tests in the tests folder
-      - name: Run pytest
+      - name: Use coverage to run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        # use pytest to generate a coverage report in xml format
         run: |
-          # pytest --cov-report xml:pytest.xml --cov=research-and-development/src/ --cov-exclude=tests/
-          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee ./pytest-coverage.txt
+          coverage run --branch --source=./src -m pytest -ra ./tests && coverage xml -o python_coverage.xml && coverage report -m --fail-under=0
 # # 3) Display the coverage report in the terminal
 #       - name: Display coverage report in terminal
 #         shell: bash -l {0}
@@ -39,13 +37,4 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
-          junitxml-path: ./pytest.xml
-      # - name: Pytest coverage comment
-      #   uses: MishaKav/pytest-coverage-comment@main
-      #   with:
-      #     pytest-coverage-path: ./pytest-coverage.txt
-      #     # pytest-xml-coverage-path: ./pytest.xml
-      #     junitxml-path: ./pytest.xml
-      #     title: Pytest coverage report
-      #     badge-title: Pytest coverage
-      #     create-new-comment: true
+          junitxml-path: ./python_coverage.xml
