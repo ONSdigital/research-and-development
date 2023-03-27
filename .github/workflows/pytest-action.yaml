@@ -43,9 +43,13 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
-          # pytest-xml-coverage-path: ./pytest.xml
           junitxml-path: ./pytest.xml
-          title: Pytest coverage report
-          badge-title: Pytest coverage
-          create-new-comment: true
-          coverage-badge: true
+      # - name: Pytest coverage comment
+      #   uses: MishaKav/pytest-coverage-comment@main
+      #   with:
+      #     pytest-coverage-path: ./pytest-coverage.txt
+      #     # pytest-xml-coverage-path: ./pytest.xml
+      #     junitxml-path: ./pytest.xml
+      #     title: Pytest coverage report
+      #     badge-title: Pytest coverage
+      #     create-new-comment: true
