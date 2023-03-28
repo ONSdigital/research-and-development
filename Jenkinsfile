@@ -18,7 +18,7 @@ def pushToPyPiArtifactoryRepo_temp(String projectName, String version, String so
 def updateGitlabStatus_temp(String stage, String state, String gitlabHost = 'https://gitlab-app-l-01.ons.statistics.gov.uk') {
     withCredentials([string(credentialsId: env.GITLAB_CREDS, variable: 'GITLAB_TOKEN')]) {
         println("Updating GitLab pipeline status")
-        shortCommit = sh(returnStdout: true, script: "cd resdev && git log -n 1 --pretty=format:'%h'").trim()
+        shortCommit = sh(returnStdout: true, script: "cd ${PROJECT_NAME} && git log -n 1 --pretty=format:'%h'").trim()
         sh "curl --request POST --header \"PRIVATE-TOKEN: ${GITLAB_TOKEN}\" \"${gitlabHost}/api/v4/projects/${GITLAB_PROJECT_ID}/statuses/${shortCommit}?state=${state}&name=${stage}&target_url=${BUILD_URL}\""
     }
 }
@@ -32,8 +32,8 @@ pipeline {
     environment {
         ARTIFACTORY_CREDS       = 's_jenkins_epds'
         ARTIFACTORY_PYPI_REPO   = 'LR_EPDS_pypi'
-        PROJECT_NAME            = 'projectname_placeholder'
-        BUILD_BRANCH            = 'build_branch'  // Any commits to this branch will create a build in artifactory
+        PROJECT_NAME            = 'resdev'
+        BUILD_BRANCH            = '142_jenkinsFile_RAP'  // Any commits to this branch will create a build in artifactory
         BUILD_TAG               = 'v*'  // Any commits tagged with this pattern will create a build in artifactory
         MIN_COVERAGE_PC         = '0'
         GITLAB_CREDS            = 'epds_gitlab_token'  // Credentials used for notifying GitLab of build status
