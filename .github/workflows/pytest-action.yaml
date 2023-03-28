@@ -5,33 +5,27 @@ on:
   pull_request:
     branches:
       - develop
-  push:
-    branches:
-      - 90-coverage-in-comments
 
 # runs on version 20.04 of ubuntu
 jobs:
-  pytest:
+  pytest-coverage-comment:
     runs-on: ubuntu-20.04
     steps:
+# 1) Checkout the code
       - uses: actions/checkout@v3
-# 1) Use Setup Miniconda github action
+# 2) Use Setup Miniconda github action to setup environment
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: 3.6
           environment-file: environment.yml
           activate-environment: resdev36
 
-# 2) Run pytest to run all tests in the tests folder
+# 3) Run pytest to run all tests in the tests folder
       - name: Use coverage to run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
         run: |
-          coverage run --branch --source=./src -m pytest -ra ./tests && coverage xml -o python_coverage.xml && coverage report -m --fail-under=0
-# # 3) Display the coverage report in the terminal
-#       - name: Display coverage report in terminal
-#         shell: bash -l {0}
-#         run: coverage report -m
+          coverage run --branch --source=./src -m pytest -ra ./tests && coverage xml -o python_coverage.xml && coverage report -m --fail-under=80
 # 4) Get the coverage report in to the pull request comments
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
