@@ -1,7 +1,13 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings, csv_creator
+from src.utils.helpers import Config_settings, hdfs_csv_creator
+import pydoop.hdfs as hdfs  # noqa
+import csv  # noqa
+
+context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
+project = "alii3_rdbe"  # Put your project name here
+main_path = f"/user/{context}/{project}"
 
 
 class RunLog:
@@ -115,15 +121,18 @@ class RunLog:
 
         main_columns = ["run_id", "timestamp", "version", "duration"]
         file_name = csv_filenames["main"]
-        csv_creator(file_name, main_columns)
+        file_path = f"{main_path}/{file_name}"
+        hdfs_csv_creator(file_path, main_columns)
 
         config_columns = ["run_id", "configs"]
         file_name = csv_filenames["configs"]
-        csv_creator(file_name, config_columns)
+        file_path = f"{main_path}/{file_name}"
+        hdfs_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "logs"]
         file_name = csv_filenames["logs"]
-        csv_creator(file_name, log_columns)
+        file_path = f"{main_path}/{file_name}"
+        hdfs_csv_creator(file_path, log_columns)
 
         return None
 
