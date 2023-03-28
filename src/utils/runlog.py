@@ -1,18 +1,13 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings, hdfs_csv_creator, hdfs_append
-import pydoop.hdfs as hdfs
-
-
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-csv_filenames = config["csv_filenames"]
+from src.utils.helpers import Config_settings, hdfs_csv_creator
+import pydoop.hdfs as hdfs  # noqa
+import csv  # noqa
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = config["logs_foldername"]  # Taken from config file
+project = "alii3_rdbe"  # Put your project name here
 main_path = f"/user/{context}/{project}"
-hdfs.mkdir(main_path)
 
 
 class RunLog:
