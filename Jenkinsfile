@@ -14,15 +14,6 @@ def pushToPyPiArtifactoryRepo_temp(String projectName, String version, String so
     }
 }
 
-// Define a function to update the pipeline status on Gitlab
-def updateGitlabStatus_temp(String stage, String state, String gitlabHost = 'https://gitlab-app-l-01.ons.statistics.gov.uk') {
-    withCredentials([string(credentialsId: env.GITLAB_CREDS, variable: 'GITLAB_TOKEN')]) {
-        println("Updating GitLab pipeline status")
-        shortCommit = sh(returnStdout: true, script: "cd ${PROJECT_NAME} && git log -n 1 --pretty=format:'%h'").trim()
-        sh "curl --request POST --header \"PRIVATE-TOKEN: ${GITLAB_TOKEN}\" \"${gitlabHost}/api/v4/projects/${GITLAB_PROJECT_ID}/statuses/${shortCommit}?state=${state}&name=${stage}&target_url=${BUILD_URL}\""
-    }
-}
-
 // This section defines the Jenkins pipeline
 pipeline {
     libraries {
