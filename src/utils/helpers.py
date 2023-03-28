@@ -2,21 +2,25 @@
 
 import toml
 import os
+import pydoop.hdfs as hdfs
+import csv
 
 # Define paths
 user_config_path = "config/userconfig.toml"
 
 
-def csv_creator(filename, columns):
+def hdfs_csv_creator(filepath, columns):
     """Creates a csv file with user
     defined headers.
     Args:
         filename (string): Example: "name_of_file.csv"
         columns (list): Example: ["a","b","c","d"]
     """
-    if not os.path.exists(filename):
-        with open(filename, mode="w", encoding="utf-8") as f:
-            f.write(",".join(columns) + "\n")
+    if not hdfs.path.isfile(filepath):
+        with hdfs.open(filepath, "wt") as file:
+            writer = csv.writer(file)
+            writer.writerow(columns)
+    return None
 
     return None
 
