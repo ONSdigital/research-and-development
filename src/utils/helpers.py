@@ -4,6 +4,9 @@ import yaml
 import toml
 import os
 
+# Define paths
+user_config_path = "config/userconfig.toml"
+
 
 class Config_settings:
     """Get the config settings from the config file."""
@@ -34,11 +37,8 @@ def csv_creator(filename, columns):
     return None
 
 
-user_config_path = "config/userconfig.toml"
-
-
 def user_config_reader(configfile: str = user_config_path) -> dict:
-    """ Function to parse the userconfig.toml file.
+    """Function to parse the userconfig.toml file
 
     Args:
         configfile (str, optional): _description_. Defaults to user_config_path.
@@ -61,14 +61,15 @@ def user_config_reader(configfile: str = user_config_path) -> dict:
 def period_select() -> tuple:
     """Function returning the start and end date under consideration.
 
+            
     Returns:
-        A tuple containing two datetime.date objects. The first is the
+        tuple: A tuple containing two datetime.date objects. The first is the
         start date of the period under consideration, the second is the
         end date of that period.
         Example:
-
-        (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
-    """
+            (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
+    """    
+    
     period_dict = user_config_reader()["period"]
 
     return period_dict["start_period"], period_dict["end_period"]
