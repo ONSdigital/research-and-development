@@ -10,7 +10,7 @@ config = conf_obj.config_dict
 csv_filenames = config["csv_filenames"]
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = config["logs_foldername"]  # Put your project name here
+project = config["logs_foldername"]  # Taken from config file
 main_path = f"/user/{context}/{project}"
 hdfs.mkdir(main_path)
 
@@ -27,10 +27,14 @@ class RunLog:
 
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
-
-        mainfile = f"{main_path}/main_runlog.csv"
+        # Import name of main log file
+        runid_path = csv_filenames["main"]
+        mainfile = f"{main_path}/{runid_path}"
+        # Check if it exists in Hadoop context
         if hdfs.path.isfile(mainfile):
+            # Open in read mode
             with hdfs.open(mainfile, "r") as file:
+                # Find the latest run_id from Dataframe
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
         else:
