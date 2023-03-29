@@ -66,7 +66,9 @@ pipeline {
                 PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
 
                 python3 -m pip install -U pip
-                pip install conda
+                pip3 install wheel
+                pip3 install conda
+
                 conda -V
 
                 if [ ! -d "resdev36" ]; then
