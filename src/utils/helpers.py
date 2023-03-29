@@ -22,7 +22,7 @@ class Config_settings:
         return config
 
 
-def hdfs_csv_creator(filepath, columns):
+def hdfs_csv_creator(filepath: str, columns: list):
     """Creates a csv file in DAP with user
     defined headers if it doesn't exist.
     Args:
@@ -42,7 +42,7 @@ def hdfs_csv_creator(filepath, columns):
     return None
 
 
-def hdfs_append(filepath, last_run):
+def hdfs_append(filepath: str, last_run: pd.DataFrame):
     """Function to append latest log metadata to csv in DAP
 
     Args:
