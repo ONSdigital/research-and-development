@@ -2,7 +2,6 @@
 
 import yaml
 import toml
-import os
 import pydoop.hdfs as hdfs
 import csv
 import pandas as pd
