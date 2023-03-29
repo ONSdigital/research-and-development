@@ -1,7 +1,6 @@
 """Define helper functions that wrap regularly-used functions."""
 
 import toml
-import os
 import pydoop.hdfs as hdfs
 import csv
 import pandas as pd
