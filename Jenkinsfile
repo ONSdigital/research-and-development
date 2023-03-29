@@ -4,7 +4,7 @@
 def artifactoryStr = 'art-p-01'
 artServer = Artifactory.server "${artifactoryStr}"
 buildInfo = Artifactory.newBuildInfo()
-def agentPython3Version = 'python_3.6.2'
+def agentPython3Version = 'python_3.6.1'
 def artifactVersion
 
 // Define a function to push packaged code to Artifactory
@@ -71,7 +71,6 @@ pipeline {
                 if [ ! -d "resdev36" ]; then
                     conda create -n resdev36 python=3.6.2
                 fi
-                . venv/bin/activate
                 source activate resdev36
 
                 '''
