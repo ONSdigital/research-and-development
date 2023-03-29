@@ -1,13 +1,16 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings, hdfs_csv_creator
-import pydoop.hdfs as hdfs  # noqa
-import csv  # noqa
+from src.utils.helpers import Config_settings, hdfs_csv_creator, hdfs_append
+import pydoop.hdfs as hdfs
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = "alii3_rdbe"  # Put your project name here
+project = "testing_pydoop"  # Put your project name here
 main_path = f"/user/{context}/{project}"
+
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+csv_filenames = config["csv_filenames"]
 
 
 class RunLog:
@@ -22,14 +25,10 @@ class RunLog:
 
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
-        # Import name of main log file
-        runid_path = csv_filenames["main"]
-        mainfile = f"{main_path}/{runid_path}"
-        # Check if it exists in Hadoop context
+
+        mainfile = f"{main_path}/main_runlog.csv"
         if hdfs.path.isfile(mainfile):
-            # Open in read mode
             with hdfs.open(mainfile, "r") as file:
-                # Find the latest run_id from Dataframe
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
         else:
