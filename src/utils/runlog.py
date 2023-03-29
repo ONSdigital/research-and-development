@@ -4,13 +4,15 @@ import os
 from src.utils.helpers import Config_settings, hdfs_csv_creator, hdfs_append
 import pydoop.hdfs as hdfs
 
-context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = "testing_pydoop"  # Put your project name here
-main_path = f"/user/{context}/{project}"
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 csv_filenames = config["csv_filenames"]
+
+context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
+project = config["logs_foldername"]  # Put your project name here
+main_path = f"/user/{context}/{project}"
+hdfs.mkdir(main_path)
 
 
 class RunLog:
