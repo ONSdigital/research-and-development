@@ -51,7 +51,7 @@ class RunLog:
 
         """
 
-        self.time_taken = str(time_taken)
+        self.time_taken = time_taken
 
         return self.time_taken
 
