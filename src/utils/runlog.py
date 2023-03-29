@@ -1,13 +1,16 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings, hdfs_csv_creator
-import pydoop.hdfs as hdfs  # noqa
-import csv  # noqa
+from src.utils.helpers import Config_settings, hdfs_csv_creator, hdfs_append
+import pydoop.hdfs as hdfs
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = "alii3_rdbe"  # Put your project name here
+project = "testing_pydoop"  # Put your project name here
 main_path = f"/user/{context}/{project}"
+
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+csv_filenames = config["csv_filenames"]
 
 
 class RunLog:
@@ -23,10 +26,12 @@ class RunLog:
 
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
-        fp = "main_runlog.csv"
-        if os.path.isfile(fp):
-            files = pd.read_csv(fp)
-            latest_id = max(files.run_id)
+
+        mainfile = f"{main_path}/main_runlog.csv"
+        if hdfs.path.isfile(mainfile):
+            with hdfs.open(mainfile, "r") as file:
+                runfile = pd.read_csv(file)
+                latest_id = max(runfile.run_id)
         else:
             latest_id = 0
         run_id = latest_id + 1
@@ -115,9 +120,6 @@ class RunLog:
         """Creates csv files with column names
         if they don't already exist.
         """
-        conf_obj = Config_settings()
-        config = conf_obj.config_dict
-        csv_filenames = config["csv_filenames"]
 
         main_columns = ["run_id", "timestamp", "version", "duration"]
         file_name = csv_filenames["main"]
@@ -144,15 +146,19 @@ class RunLog:
 
         if write_csv:
             # write the runlog to a csv file
-            self.runlog_main_df.to_csv(
-                "main_runlog.csv", mode="a", index=False, header=False
-            )
-            self.runlog_configs_df.to_csv(
-                "configs_runlog.csv", mode="a", index=False, header=False
-            )
-            self.runlog_logs_df.to_csv(
-                "logs_runlog.csv", mode="a", index=False, header=False
-            )
+
+            file_name = csv_filenames["main"]
+            file_path = f"{main_path}/{file_name}"
+            hdfs_append(file_path, self.runlog_main_df)
+
+            file_name = csv_filenames["configs"]
+            file_path = f"{main_path}/{file_name}"
+            hdfs_append(file_path, self.runlog_configs_df)
+
+            file_name = csv_filenames["logs"]
+            file_path = f"{main_path}/{file_name}"
+            hdfs_append(file_path, self.runlog_logs_df)
+
         if write_hdf5:
             # write the runlog to a hdf5 file
             self.runlog_main_df.to_hdf(
