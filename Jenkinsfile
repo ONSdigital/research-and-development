@@ -55,5 +55,30 @@ pipeline {
             }
         }
 
+        stage('Preparing virtual environment') {
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Create venv and install dependencies")
+                unstash name: 'Checkout'
+
+                sh '''
+                PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
+
+                python3 -m pip install -U pip
+                pip3 install conda
+
+                if [ ! -d "resdev36" ]; then
+                    conda create -n resdev36 python=3.6.2
+                fi
+                . venv/bin/activate
+                source activate resdev36
+
+                '''
+            stash name: 'resdev36', useDefaultExcludes: false
+            }
+        }
+
     }
+
 }
