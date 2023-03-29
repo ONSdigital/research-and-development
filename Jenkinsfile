@@ -66,11 +66,13 @@ pipeline {
                 PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
 
                 python3 -m pip install -U pip
-                pip3 install conda
+                pip install conda
+                conda -V
 
                 if [ ! -d "resdev36" ]; then
                     conda create -n resdev36 python=3.6.2
                 fi
+
                 source activate resdev36
 
                 '''
