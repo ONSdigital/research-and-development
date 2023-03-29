@@ -4,14 +4,29 @@ import toml
 import os
 import pydoop.hdfs as hdfs
 import csv
+import pandas as pd
 
 # Define paths
 user_config_path = "config/userconfig.toml"
 
+class Config_settings:
+    """Get the config settings from the config file."""
+
+    def __init__(self):
+        self.config_file = "src/developer_config.yaml"
+        self.config_dict = self._get_config_settings()
+
+    def _get_config_settings(self):
+        """Get the config settings from the config file."""
+        with open(self.config_file, "r") as file:
+            config = yaml.safe_load(file)
+
+        return config
+
 
 def hdfs_csv_creator(filepath, columns):
-    """Creates a csv file with user
-    defined headers.
+    """Creates a csv file in DAP with user
+    defined headers if it doesn't exist.
     Args:
         filename (string): Example: "name_of_file.csv"
         columns (list): Example: ["a","b","c","d"]
@@ -20,6 +35,24 @@ def hdfs_csv_creator(filepath, columns):
         with hdfs.open(filepath, "wt") as file:
             writer = csv.writer(file)
             writer.writerow(columns)
+
+    return None
+
+
+def hdfs_append(filepath, last_run):
+    """Function to append latest log metadata to csv in DAP
+
+    Args:
+        filepath (string): The filepath in Hue
+        last_run (Dataframe): Dataframe of latest run data
+    """
+    with hdfs.open(filepath, "r") as file:
+        df_imported_from_hdfs = pd.read_csv(file)
+        last_run_data = df_imported_from_hdfs.append(last_run)
+
+    with hdfs.open(filepath, "wt") as file:
+        last_run_data.to_csv(file, index=False)
+
     return None
 
     return None
