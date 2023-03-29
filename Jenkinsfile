@@ -34,7 +34,7 @@ pipeline {
         skipDefaultCheckout true
     }
 
-    agent JEN-BDA-10
+    agent {JEN-BDA-10}
 
     stages {
         stage('Checkout') {
