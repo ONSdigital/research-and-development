@@ -68,9 +68,11 @@ pipeline {
                 python3 -m pip install -U pip
                 pip3 install wheel
 
-                yum install wget
+                curl install wget
 
+                wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -nv -O miniconda.sh
 
+                bash miniconda.sh -b -p $WORKSPACE/miniconda
 
                 if [ ! -d "resdev36" ]; then
                     conda create -n resdev36 python=3.6.2
