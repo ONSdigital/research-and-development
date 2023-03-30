@@ -32,10 +32,10 @@ def test_user_config_reader():
     # Act: use pytest to assert the result
     result_1 = type(user_config_reader())
     # Assert
-    assert isinstance(dict, result_1)
+    assert isinstance(result_1, dict)
     # Assert: Negative test. Should fails when the answer is wrong
     with pytest.raises(AssertionError):
-        assert not isinstance(dict, result_1)
+        assert not isinstance(result_1, dict)
 
 
 def test_period_select():
@@ -46,7 +46,7 @@ def test_period_select():
     # Act: use pytest to assert the result
     result_1 = type(period_select())
     # Assert
-    assert isinstance(tuple, result_1)
+    assert isinstance(result_1, tuple)
     # Assert: Negative test. Should fails when the answer is wrong
     with pytest.raises(AssertionError):
-        assert not isinstance(tuple, result_1)
+        assert not isinstance(result_1, tuple)
