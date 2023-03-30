@@ -68,8 +68,6 @@ pipeline {
                 python3 -m pip install -U pip
                 pip3 install wheel
 
-                cat /etc/*-release
-
                 yum install wget
 
 
