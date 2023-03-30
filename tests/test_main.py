@@ -30,7 +30,7 @@ def test_user_config_reader():
     from src.utils.helpers import user_config_reader
 
     # Act: use pytest to assert the result
-    result_1 = type(user_config_reader())
+    result_1 = user_config_reader()
     # Assert
     assert isinstance(result_1, dict)
     # Assert: Negative test. Should fails when the answer is wrong
