@@ -44,7 +44,7 @@ def test_period_select():
     from src.utils.helpers import period_select
 
     # Act: use pytest to assert the result
-    result_1 = type(period_select())
+    result_1 = period_select()
     # Assert
     assert isinstance(result_1, tuple)
     # Assert: Negative test. Should fails when the answer is wrong
