@@ -22,5 +22,5 @@ tableName = "name.table"
 # correction file if needed
 [outlier_correction]
 location = "D:/"
-fileName = "outliers.txt"
+filename = "outliers.txt"
 bool = true
