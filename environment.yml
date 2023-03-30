@@ -17,4 +17,3 @@ dependencies:
   - python-dotenv
   - table_logger
   - pandas==1.1.5
-  - pydoop==2.0.0
