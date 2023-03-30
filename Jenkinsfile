@@ -66,22 +66,19 @@ pipeline {
                 PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
 
                 python3 -m pip install -U pip
-                pip3 install wheel
+                pip3 install virtualenv
 
-                curl install wget
-
-                wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -nv -O miniconda.sh
-
-                bash miniconda.sh -b -p $WORKSPACE/miniconda
-
-                if [ ! -d "resdev36" ]; then
-                    conda create -n resdev36 python=3.6.2
+                if [ ! -d "venv" ]; then
+                    virtualenv venv
                 fi
+                . venv/bin/activate
 
-                source activate resdev36
+                python -m pip install -U pip
+                pip3 install -r requirements.txt
+                pip3 freeze
 
                 '''
-            stash name: 'resdev36', useDefaultExcludes: false
+            stash name: 'venv', useDefaultExcludes: false
             }
         }
 
