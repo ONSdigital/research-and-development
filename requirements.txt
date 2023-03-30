@@ -19,4 +19,4 @@ typing
 readme-coverage-badger
 postcodes_uk
 toml
-sqlite
+pysqlite3
