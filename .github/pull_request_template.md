@@ -1,4 +1,4 @@
-## Pull Request submission 
+## Pull Request submission
 
 *Insert detailed bullet points about your changes here!*
 
@@ -18,7 +18,7 @@ Closes #
 - [ ] **Conflicts resolved** There are no conflicts (I have performed a rebase if necessary)
 - [ ] **Requirements** My/our code functions according to the requirements of the ticket
 - [ ] **Dependencies** I have updated the environment yaml so it includes any new libraries I have used
-- [ ] **Configuration file updated** any high level parameters that the user may interact with have been put into the config file (and imported to the script) 
+- [ ] **Configuration file updated** any high level parameters that the user may interact with have been put into the config file (and imported to the script)
 - [ ] **Clean Code**
     - [ ] Code is as [PEP 8]([url](https://peps.python.org/pep-0008/)) compliant as I can humanly make it
     - [ ] Code passess flake8 linting check
@@ -31,7 +31,7 @@ Closes #
 Any new code includes all the following forms of documentation:
 
 - [ ] **Function Documentation** Docstrings within the function(s')/methods have been created
-    - [ ] Includes `Args` and `returns` for all major functions 
+    - [ ] Includes `Args` and `returns` for all major functions
     - [ ] The docstring details data types
 - [ ] **Updated Documentation**: User and/or developer working doc has been updated
 
