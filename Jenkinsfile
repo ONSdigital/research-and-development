@@ -75,7 +75,7 @@ pipeline {
 
                 python -m pip install -U pip
                 pip3 install pypandoc==1.7.5
-                pip3 install -r requirements-dev.txt
+                pip3 install -r requirements.txt
                 pip3 install pyspark==2.4.0
 
                 pip3 freeze
