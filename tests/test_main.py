@@ -34,7 +34,8 @@ def test_user_config_reader():
     # Assert
     assert isinstance(dict, result_1)
     # Assert: Negative test. Should fails when the answer is wrong
-    assert not isinstance(dict, result_1)
+    with pytest.raises(AssertionError):
+        assert not isinstance(dict, result_1)
 
 
 def test_period_select():
@@ -47,4 +48,5 @@ def test_period_select():
     # Assert
     assert isinstance(tuple, result_1)
     # Assert: Negative test. Should fails when the answer is wrong
-    assert not isinstance(tuple, result_1)
+    with pytest.raises(AssertionError):
+        assert not isinstance(tuple, result_1)
