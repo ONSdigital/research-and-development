@@ -8,7 +8,6 @@ dependencies:
 - requests
 - sphinx
 - pip
-- setuptools
 - pip:
   - arrow
   - cookiecutter
@@ -19,3 +18,4 @@ dependencies:
   - table_logger
   - pandas==1.1.5
   - pydoop
+  - setuptools
