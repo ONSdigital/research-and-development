@@ -82,6 +82,41 @@ pipeline {
             }
         }
 
+
+        stage('Unit Test and coverage') {
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Running unit tests and code coverage.")
+                unstash name: 'Checkout'
+                unstash name: 'venv'
+
+                // Compatibility for PyArrow with Spark 2.4-legacy IPC format.
+                sh 'export ARROW_PRE_0_15_IPC_FORMAT=1'
+
+                // Running coverage first runs the tests
+                sh '''
+                . venv/bin/activate
+
+                coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
+                coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
+                '''
+
+                cobertura autoUpdateHealth: false,
+                        autoUpdateStability: false,
+                        coberturaReportFile: 'python_coverage.xml',
+                        conditionalCoverageTargets: '70, 0, 0',
+                        failUnhealthy: false,
+                        failUnstable: false,
+                        lineCoverageTargets: '80, 0, 0',
+                        maxNumberOfBuilds: 0,
+                        methodCoverageTargets: '80, 0, 0',
+                        onlyStable: false,
+                        zoomCoverageChart: false
+            }
+        }
+
+
     }
 
 }
