@@ -22,7 +22,7 @@ pipeline {
 
     environment {
         ARTIFACTORY_CREDS       = 's_jenkins_epds'
-        ARTIFACTORY_PYPI_REPO   = 'LR_EPDS_pypi'
+        ARTIFACTORY_PYPI_REPO   = 'yr-python'
         PROJECT_NAME            = 'resdev'
         BUILD_BRANCH            = '142_jenkinsFile_RAP'  // Any commits to this branch will create a build in artifactory
         BUILD_TAG               = 'v*'  // Any commits tagged with this pattern will create a build in artifactory
