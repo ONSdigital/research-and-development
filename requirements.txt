@@ -1,4 +1,12 @@
 # python==3.6
+coverage==4.5.4
+pytest
+pyyaml
+pandas
+numpy
+requests
+sphinx
+pip
 arrow
 cookiecutter
 detect-secrets
