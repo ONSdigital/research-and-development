@@ -106,7 +106,7 @@ pipeline {
                 //coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
 
 
-                /*cobertura autoUpdateHealth: false,
+                cobertura autoUpdateHealth: false,
                         autoUpdateStability: false,
                         coberturaReportFile: 'python_coverage.xml',
                         conditionalCoverageTargets: '70, 0, 0',
@@ -116,9 +116,37 @@ pipeline {
                         maxNumberOfBuilds: 0,
                         methodCoverageTargets: '80, 0, 0',
                         onlyStable: false,
-                        zoomCoverageChart: false */
+                        zoomCoverageChart: false
             }
         }
+
+        stage('Build and publish Python Package') {
+            when {
+                anyOf{
+                    branch BUILD_BRANCH
+                    //tag BUILD_TAG
+                }
+                beforeAgent true
+            }
+            agent { label "test.${agentPython3Version}" }
+            steps {
+                onStage()
+                colourText('info', "Building Python package.")
+                unstash name: 'Checkout'
+                unstash name: 'venv'
+
+                sh '''
+                . venv/bin/activate
+                pip3 install wheel==0.29.0
+                python3 setup.py build bdist_wheel
+                '''
+
+                script {
+                    pushToPyPiArtifactoryRepo_temp("${buildInfo.name}", "", "dist/*")
+                }
+            }
+        }
+
 
 
     }
