@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import re
 
 # Specify and open the version file
-VERSION_FILE = "pub_sec/_version.py"
+VERSION_FILE = "src/_version.py"
 verstrline = open(VERSION_FILE, "rt").read()
 print(verstrline)
 
