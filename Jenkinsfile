@@ -101,10 +101,7 @@ pipeline {
                 sh '''
                 . venv/bin/activate
 
-                pwd
-                ls -lhrta
-                echo ""
-                grep -r sqlite /tmp/
+                grep -r "_sqlite3" /tmp/
 
                 coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
                 coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
