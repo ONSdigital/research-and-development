@@ -46,7 +46,7 @@ pipeline {
                 checkout scm
 
                 script {
-                    buildInfo.name = "resdev"
+                    buildInfo.name = "${PROJECT_NAME}"
                     buildInfo.number = "${BUILD_NUMBER}"
                     buildInfo.env.collect()
                 }
