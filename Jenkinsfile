@@ -103,10 +103,14 @@ pipeline {
 
                 coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
                 '''
-                //coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
+                /*
+                // Lines below create a coverage report for on Jenkins. Currently commented out
+                // as it gives errors when no imports are used in unit tests. import src.main
+                // causes pre-commit to complain. Easier to leave out for now.
+                coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
 
 
-                /*cobertura autoUpdateHealth: false,
+                cobertura autoUpdateHealth: false,
                         autoUpdateStability: false,
                         coberturaReportFile: 'python_coverage.xml',
                         conditionalCoverageTargets: '70, 0, 0',
