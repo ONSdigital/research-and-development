@@ -19,10 +19,10 @@ with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setup(
-    name="pub_sec",
+    name="research-and-development",
     version=version_string,
     description="Public Sector local Python downloads and preprocessing package",
-    url="https://gitlab-app-l-01/EPDS/pub_sec",
+    url="https://github.com/ONSdigital/research-and-development",
     packages=find_packages(),
     package_data={"": ["*.toml", "*.r", "*.R", "*.pem"]},
     include_package_data=True,
