@@ -17,10 +17,7 @@ jobs:
       - name: Remove pydoop dependency
         shell: bash -l {0}
         run: |
-          echo pwd
-          ls
           awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
-          cat environment.yml
 # 3) Use Setup Miniconda github action to setup environment
       - uses: conda-incubator/setup-miniconda@v2
         with:
