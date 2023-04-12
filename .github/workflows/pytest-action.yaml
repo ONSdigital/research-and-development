@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
 # 1) Setup environment variables
-      - name: Define environment path variables
+      - name: Define environment PATH variables
         shell: bash -l {0}
-        run:  export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64" && export PATH="/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}"
+        run: >
+          echo "/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}" >> $GITHUB_PATH
+          echo "/usr/lib/jvm/java-8-openjdk-amd64" >> $JAVA_HOME
 # 2) Checkout the code
       - uses: actions/checkout@v3
 # 3) Use Setup Miniconda github action to setup environment
