@@ -24,13 +24,13 @@ jobs:
           python-version: 3.6
           environment-file: environment.yml
           activate-environment: resdev36
-# 4) Run pytest to run all tests in the tests folder
+# 3) Run pytest to run all tests in the tests folder
       - name: Use coverage to run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
         run: |
           coverage run --branch --source=./src -m pytest -ra ./tests --junitxml=junit_result.xml && coverage xml -o python_coverage.xml && coverage report -m --fail-under=10
-# 5) Get the coverage report in to the pull request comments
+# 4) Get the coverage report in to the pull request comments
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
