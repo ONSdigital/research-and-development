@@ -12,7 +12,8 @@ jobs:
     steps:
 # 1) Removing PyDoop from the environment yaml
       - name: Remove pydoop dependency
-      - run |
+        shell: bash -l {0}
+        run: |
           awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
 # 2) Checkout the code
       - uses: actions/checkout@v3
