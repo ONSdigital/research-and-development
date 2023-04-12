@@ -4,7 +4,7 @@ from unittest import mock
 import pandas as pd
 
 # Import module to test
-from src.utils.helpers import hdfs_append
+from src.utils.hdfs_mods import hdfs_append
 
 
 class Test_hdfs_append:
