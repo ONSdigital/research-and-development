@@ -31,5 +31,6 @@ jobs:
           title: Detailed Coverage Report
           badge-title: Percentage Coverage for this PR
           pytest-xml-coverage-path: ./python_coverage.xml
+          coverage-path-prefix: src/
           junitxml-title: Summary of tests
           junitxml-path: ./junit_result.xml
