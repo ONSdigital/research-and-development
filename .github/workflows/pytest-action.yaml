@@ -10,15 +10,16 @@ jobs:
   pytest-coverage-comment:
     runs-on: ubuntu-20.04
     steps:
-# 1) Removing PyDoop from the environment yaml
+
+# 1) Checkout the code
+      - uses: actions/checkout@v3
+# 2) Removing PyDoop from the environment yaml
       - name: Remove pydoop dependency
         shell: bash -l {0}
         run: |
           echo pwd
-          echo ls
+          ls
           awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
-# 2) Checkout the code
-      - uses: actions/checkout@v3
 # 3) Use Setup Miniconda github action to setup environment
       - uses: conda-incubator/setup-miniconda@v2
         with:
