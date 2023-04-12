@@ -16,6 +16,7 @@ jobs:
         run: |
           echo pwd
           pwd
+          ls
           awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
 # 2) Checkout the code
       - uses: actions/checkout@v3
