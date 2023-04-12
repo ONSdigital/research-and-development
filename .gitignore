@@ -903,4 +903,4 @@ docs/_linkcheck/
 # logs files
 logs/*
 !logs/.gitkeep
-!logs/README.md
+!logs/logs.md
