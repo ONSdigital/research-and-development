@@ -27,31 +27,24 @@ def hdfs_csv_creator(filepath: str, columns: list):
     return None
 
 
-def read_hdfs_csv(filepath: str) -> pd.DataFrame:
-    """Reads a csv from DAP into a Pandas Dataframe
-    Args:
-        filepath (str): Filepath (Specified in config)
+def hdfs_append(filepath: str, last_run: pd.DataFrame):
+    """Function to append latest log metadata to csv in DAP
 
-    Returns:
-        pd.DataFrame: Dataframe created from csv
+    Args:
+        filepath (string): The filepath in Hue
+        last_run (Dataframe): Dataframe of latest run data
     """
+
     # Open the file in read mode inside Hadoop context
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         df_imported_from_hdfs = pd.read_csv(file)
+        # Append new data
+        last_run_data = df_imported_from_hdfs.append(last_run)
 
-    return df_imported_from_hdfs
-
-
-def write_hdfs_csv(filepath: str, data: pd.DataFrame):
-    """Writes A Pandas Dataframe to csv in DAP
-
-    Args:
-        filepath (str): Filepath (Specified in config)
-        data (pd.DataFrame): Data to be stored
-    """
-    # Open the file in write mode
+    # Open the same file in write mode
     with hdfs.open(filepath, "wt") as file:
-        # Write dataframe to DAP context
-        data.to_csv(file, index=False)
+        # Write new updated dataframe to DAP context
+        last_run_data.to_csv(file, index=False)
+
     return None
