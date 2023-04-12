@@ -1,7 +1,6 @@
 """Create a test suite for the main module."""
 
 import pytest
-import src.main
 
 
 def test_add():
