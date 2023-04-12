@@ -43,8 +43,8 @@ class Test_hdfs_append:
 
         return pd.DataFrame(data)
 
-    @mock.patch("src.utils.helpers.pd")
-    @mock.patch("src.utils.helpers.hdfs")
+    @mock.patch("src.utils.hdfs_mods.pd")
+    @mock.patch("src.utils.hdfs_mods.hdfs")
     def test_expected(self, mock_hdfs, mock_pd_csv):
         """Test the expected functionality."""
 
