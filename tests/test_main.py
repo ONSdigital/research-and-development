@@ -1,13 +1,12 @@
 """Create a test suite for the main module."""
 
 import pytest
+from src.utils.testfunctions import add
 
 
 def test_add():
     """Test the add function."""
     # Arrange
-    from src.utils.testfunctions import add
-
     # Act: use pytest to assert the result
     result_1_2 = add(1, 2)
     result_10_222 = add(10, 222)
