@@ -10,12 +10,10 @@ jobs:
   pytest-coverage-comment:
     runs-on: ubuntu-20.04
     steps:
-# 1) Setup environment variables
-      - name: Define environment PATH variables
-        shell: bash -l {0}
-        run: |
-          echo "/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}" >> $PATH
-          # echo "/usr/lib/jvm/java-8-openjdk-amd64" >> $JAVA_HOME
+# 1) Removing PyDoop from the environment yaml
+      - name: Remove pydoop dependency
+      - run |
+          awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
 # 2) Checkout the code
       - uses: actions/checkout@v3
 # 3) Use Setup Miniconda github action to setup environment
