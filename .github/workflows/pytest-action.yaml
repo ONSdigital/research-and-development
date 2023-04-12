@@ -14,8 +14,9 @@ jobs:
       - name: Define environment PATH variables
         shell: bash -l {0}
         run: |
-          echo "/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}" >> $PATH
-          # echo "/usr/lib/jvm/java-8-openjdk-amd64" >> $JAVA_HOME
+          awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
+          # echo "/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}" >> $PATH
+          # # echo "/usr/lib/jvm/java-8-openjdk-amd64" >> $JAVA_HOME
 # 2) Checkout the code
       - uses: actions/checkout@v3
 # 3) Use Setup Miniconda github action to setup environment
