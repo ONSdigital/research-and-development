@@ -5,24 +5,37 @@ on:
   pull_request:
     branches:
       - develop
-
 # runs on version 20.04 of ubuntu
 jobs:
-  pytest:
+  pytest-coverage-comment:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
-# 1) Use Setup Miniconda github action
+# 1) Setup environment variables
+      - name: Define environment PATH variables
+        shell: bash -l {0}
+        run: |
+          echo "/opt/hadoop/bin:/opt/hadoop/sbin:${PATH}" >> $PATH
+          # echo "/usr/lib/jvm/java-8-openjdk-amd64" >> $JAVA_HOME
+# 2) Checkout the code
+      - uses: actions/checkout@v3
+# 3) Use Setup Miniconda github action to setup environment
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: 3.6
           environment-file: environment.yml
           activate-environment: resdev36
-# 2) Run pytest to run all tests in the tests folder
-      - name: Run pytest
+# 4) Run pytest to run all tests in the tests folder
+      - name: Use coverage to run pytest
       # Specify shell to run the command in
         shell: bash -l {0}
-        run: coverage run -m pytest tests/*.py
-      - name: Get coverage report
-        shell: bash -l {0}
-        run: coverage report -m
+        run: |
+          coverage run --branch --source=./src -m pytest -ra ./tests --junitxml=junit_result.xml && coverage xml -o python_coverage.xml && coverage report -m --fail-under=10
+# 5) Get the coverage report in to the pull request comments
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          title: Detailed Coverage Report
+          badge-title: Percentage Coverage for this PR
+          pytest-xml-coverage-path: ./python_coverage.xml
+          junitxml-title: Summary of tests
+          junitxml-path: ./junit_result.xml
