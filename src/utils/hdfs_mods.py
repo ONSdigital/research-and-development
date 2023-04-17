@@ -67,11 +67,6 @@ def read_hdfs_csv(filepath: str) -> pd.DataFrame:
     return df_imported_from_hdfs
 
 
-# Looks something like this
-# df = read_hdfs_csv(filepath)
-# newdf = df.append(newdata)
-
-
 def write_hdfs_csv(filepath: str, data: pd.DataFrame):
     """Writes A Pandas Dataframe to csv in DAP
 
@@ -84,3 +79,9 @@ def write_hdfs_csv(filepath: str, data: pd.DataFrame):
         # Write dataframe to DAP context
         data.to_csv(file, index=False)
     return None
+
+
+# Looks something like this
+# df = read_hdfs_csv(filepath)
+# newdf = df.append(newdata)
+# write_hdfs_csv(filepath,newdf)
