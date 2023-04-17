@@ -1,7 +1,8 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings, hdfs_csv_creator, hdfs_append
+from src.utils.helpers import Config_settings
+from src.utils.hdfs_mods import hdfs_csv_creator, read_hdfs_csv, write_hdfs_csv
 import pydoop.hdfs as hdfs
 
 
@@ -155,15 +156,21 @@ class RunLog:
 
             file_name = csv_filenames["main"]
             file_path = f"{main_path}/{file_name}"
-            hdfs_append(file_path, self.runlog_main_df)
+            df = read_hdfs_csv(file_path)
+            newdf = df.append(self.runlog_main_df)
+            write_hdfs_csv(file_path, newdf)
 
             file_name = csv_filenames["configs"]
             file_path = f"{main_path}/{file_name}"
-            hdfs_append(file_path, self.runlog_configs_df)
+            df = read_hdfs_csv(file_path)
+            newdf = df.append(self.runlog_configs_df)
+            write_hdfs_csv(file_path, newdf)
 
             file_name = csv_filenames["logs"]
             file_path = f"{main_path}/{file_name}"
-            hdfs_append(file_path, self.runlog_logs_df)
+            df = read_hdfs_csv(file_path)
+            newdf = df.append(self.runlog_logs_df)
+            write_hdfs_csv(file_path, newdf)
 
         if write_hdf5:
             # write the runlog to a hdf5 file
