@@ -4,10 +4,10 @@ from unittest import mock
 import pandas as pd
 
 # Import module to test
-from src.utils.hdfs_mods import hdfs_append
+from src.utils.hdfs_mods import read_hdfs_csv
 
 
-class Test_hdfs_append:
+class Test_read_hdfs_csv:
     """Tests for hdfs_append function."""
 
     def input_data(self):
@@ -21,24 +21,13 @@ class Test_hdfs_append:
 
         return pd.DataFrame(data)
 
-    def new_data(self):
-
-        data = {
-            "run_id": [3],
-            "timestamp": ["Time:3"],
-            "version": ["0.0.2"],
-            "duration": [7.0],
-        }
-
-        return pd.DataFrame(data)
-
     def expout_data(self):
 
         data = {
-            "run_id": [1, 2, 3],
-            "timestamp": ["Time:1", "Time:2", "Time:3"],
-            "version": ["0.0.0", "0.0.1", "0.0.2"],
-            "duration": [5.0, 6.0, 7.0],
+            "run_id": [1, 2],
+            "timestamp": ["Time:1", "Time:2"],
+            "version": ["0.0.0", "0.0.1"],
+            "duration": [5.0, 6.0],
         }
 
         return pd.DataFrame(data)
@@ -51,11 +40,9 @@ class Test_hdfs_append:
         mock_f = mock.Mock()
         mock_hdfs.open.return_value.__enter__.return_value = mock_f
 
-        mock_csv = mock.Mock()
-        mock_pd_csv.read_csv.return_value = mock_csv
-        mock_csv.to_pandas.return_value = self.input_data()
+        mock_pd_csv.read_csv.return_value = self.input_data()
 
-        df_result = hdfs_append("file/path/filename.csv", self.new_data())
+        df_result = read_hdfs_csv("file/path/filename.csv")
 
         mock_pd_csv.read_csv.assert_called_with(mock_f)
 
