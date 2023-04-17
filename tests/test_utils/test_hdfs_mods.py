@@ -4,10 +4,10 @@ from unittest import mock
 import pandas as pd
 
 # Import module to test
-from src.utils.hdfs_mods import read_hdfs_csv
+from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
 
 
-class Test_read_hdfs_csv:
+class TestReadCsv:
     """Tests for hdfs_append function."""
 
     def input_data(self):
@@ -34,7 +34,7 @@ class Test_read_hdfs_csv:
 
     @mock.patch("src.utils.hdfs_mods.pd")
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_expected(self, mock_hdfs, mock_pd_csv):
+    def test_read_hdfs_csv(self, mock_hdfs, mock_pd_csv):
         """Test the expected functionality."""
 
         mock_f = mock.Mock()
@@ -48,3 +48,17 @@ class Test_read_hdfs_csv:
 
         df_expout = self.expout_data()
         pd.testing.assert_frame_equal(df_result, df_expout)
+
+
+class TestWriteCsv:
+    @mock.patch("src.utils.hdfs_mods.hdfs")
+    def test_write_hdfs_csv(self, mock_hdfs):
+
+        mock_f = mock.Mock()
+        mock_hdfs.open.return_value.__enter__.return_value = mock_f
+
+        test_df = pd.DataFrame({"col": ["data"]})
+
+        with mock.patch.object(test_df, "to_csv") as to_csv_mock:
+            write_hdfs_csv("file/path/filename.csv", test_df)
+            to_csv_mock.assert_called_with(mock_f, index=False)
