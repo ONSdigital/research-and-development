@@ -1,9 +1,11 @@
 """Define helper functions that wrap regularly-used functions."""
 
 import toml
+import yaml
 
 # Define paths
 user_config_path = "config/userconfig.toml"
+
 
 class Config_settings:
     """Get the config settings from the config file."""
