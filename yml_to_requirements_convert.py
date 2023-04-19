@@ -19,6 +19,6 @@ for dep in data["dependencies"]:
             requirements.append(preq)
     print(requirements)
 
-with open("/home/cdsw/research-and-development/requirements.txt", "w") as fp:
+with open("./requirements.txt", "w") as fp:
     for requirement in requirements:
         print(requirement, file=fp)
