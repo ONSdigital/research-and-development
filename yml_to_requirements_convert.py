@@ -1,10 +1,10 @@
 import yaml
 
 # yaml = ruamel.yaml.YAML()
-data = yaml.safe_load(open("./environment.yml"))
+yml_env = yaml.safe_load(open("./environment.yml"))
 
 requirements = []
-for dep in data["dependencies"]:
+for dep in yml_env["dependencies"]:
     if isinstance(dep, str):
         if "=" in dep:
             package, package_version = dep.split("=")
