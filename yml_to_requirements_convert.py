@@ -1,7 +1,7 @@
 import yaml
 
 # yaml = ruamel.yaml.YAML()
-data = yaml.safe_load(open("/home/cdsw/research-and-development/environment.yml"))
+data = yaml.safe_load(open("./environment.yml"))
 
 requirements = []
 for dep in data["dependencies"]:
