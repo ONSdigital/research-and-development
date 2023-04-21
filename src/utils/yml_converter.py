@@ -72,13 +72,14 @@ def deps_combnd(conda_deps, pip_deps) -> list:
 
 
 def req_check(req="../../requirements.txt") -> bool:
-    """_summary_
+    """Checks if the requirements.txt file already exists or not.
 
     Keyword Arguments:
-        req -- _description_ (default: {"../../requirements.txt"})
+        req -- relative path to the requirements.txt file.
+        (default: {"../../requirements.txt"})
 
     Returns:
-        _description_
+        A bool: boolean value indicating if file exists or not.
     """
     isFile = os.path.isfile(req)
     return isFile
