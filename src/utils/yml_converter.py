@@ -105,14 +105,18 @@ def req_create(req="../../requirements.txt") -> bool:
 
 
 def req_compare(dep_file, dep_list) -> list:
-    """_summary_
+    """Function to compare dependencies from environment.yml and
+    existing requirements.txt files. If there are differences in the
+    environment.yml file then the requirements.txt is updated accordingly
 
     Arguments:
-        dep_file -- _description_
-        dep_list -- _description_
+        dep_file -- relative path to the requirements.txt file.
+        (default: {"../../requirements.txt"})
+        dep_list -- full list of dependencies from the environment.yml file.
 
     Returns:
-        _description_
+        A list: list of differences between the environment.yml dependencies
+        and those in requirements.txt.
     """
     f = open(dep_file, "w+")
     req_existing = f.read()
