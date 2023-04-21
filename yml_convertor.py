@@ -1,8 +1,6 @@
 import yaml
 import os
 
-yml_file = "./environment.yml"
-
 
 def yml_dependencies(yml="./environment.yml") -> list:
     """_summary_
@@ -16,9 +14,6 @@ def yml_dependencies(yml="./environment.yml") -> list:
     yml_env = yaml.safe_load(open(yml))
     yml_dep = yml_env["dependencies"]
     return yml_dep
-
-
-ydep = yml_dependencies()
 
 
 def yml_conda_dependencies(dep_list) -> list:
@@ -35,9 +30,6 @@ def yml_conda_dependencies(dep_list) -> list:
     return yml_conda
 
 
-y_condadep = yml_conda_dependencies(ydep)
-
-
 def yml_pip_dependencies(dep_list) -> list:
     """_summary_
 
@@ -50,9 +42,6 @@ def yml_pip_dependencies(dep_list) -> list:
     yml_pip = dep_list[-1]["pip"]
     yml_pip.sort()
     return yml_pip
-
-
-y_pipdep = yml_pip_dependencies(ydep)
 
 
 def deps_combnd(conda_deps, pip_deps) -> list:
@@ -70,11 +59,6 @@ def deps_combnd(conda_deps, pip_deps) -> list:
     return full_deps
 
 
-dependencies = deps_combnd(y_condadep, y_pipdep)
-
-req_file = "./requirements.txt"
-
-
 def req_check(req="./requirements.txt") -> bool:
     """_summary_
 
@@ -86,9 +70,6 @@ def req_check(req="./requirements.txt") -> bool:
     """
     isFile = os.path.isfile(req)
     return isFile
-
-
-req_exist = req_check(req_file)
 
 
 def req_create(req) -> bool:
@@ -106,9 +87,6 @@ def req_create(req) -> bool:
         return True
     else:
         return False
-
-
-check = req_create(req_file)
 
 
 def req_compare(dep_file, dep_list) -> list:
@@ -136,4 +114,12 @@ def req_compare(dep_file, dep_list) -> list:
     return unique_deps
 
 
+yml_file = "./environment.yml"
+ydep = yml_dependencies()
+y_condadep = yml_conda_dependencies(ydep)
+y_pipdep = yml_pip_dependencies(ydep)
+dependencies = deps_combnd(y_condadep, y_pipdep)
+req_file = "./requirements.txt"
+req_exist = req_check(req_file)
+check = req_create(req_file)
 test = req_compare(req_file, dependencies)
