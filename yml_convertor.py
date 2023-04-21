@@ -72,3 +72,23 @@ def req_check(req="./requirements.txt") -> bool:
 
 
 req_exist = req_check(req_file)
+
+
+def req_create(req) -> bool:
+    """_summary_
+
+    Arguments:
+        req -- _description_
+
+    Returns:
+        _description_
+    """
+    if not req:
+        f = open(req, "x")
+        f.close()
+        return True
+    else:
+        return False
+
+
+check = req_create()
