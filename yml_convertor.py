@@ -71,7 +71,6 @@ def deps_combnd(conda_deps, pip_deps) -> list:
 
 
 dependencies = deps_combnd(y_condadep, y_pipdep)
-print(dependencies)
 
 req_file = "./requirements.txt"
 
@@ -107,3 +106,37 @@ def req_create(req) -> bool:
         return True
     else:
         return False
+
+
+check = req_create(req_file)
+
+
+def req_compare(dep_file, dep_list) -> list:
+    """_summary_
+
+    Arguments:
+        dep_file -- _description_
+        dep_list -- _description_
+
+    Returns:
+        _description_
+    """
+    f = open(dep_file, "w+")
+    req_existing = f.read()
+    req_list = req_existing.split("\n")
+    req_list.sort()
+
+    unique_deps = list(set(dep_list) - set(req_list))
+    unique_deps.sort()
+
+    # full_deps = req_list + unique_deps
+    # full_deps.sort()
+
+    for line in unique_deps:
+        f.write(f"{line}\n")
+    f.close()
+
+    return unique_deps
+
+
+test = req_compare(req_file, dependencies)
