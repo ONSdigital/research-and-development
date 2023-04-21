@@ -56,14 +56,15 @@ def yml_pip_dependencies(dep_list) -> list:
 
 
 def deps_combnd(conda_deps, pip_deps) -> list:
-    """_summary_
+    """Combines the conda and pip dependencies lists into a single sorted
+    list.
 
     Arguments:
-        conda_deps -- _description_
-        pip_deps -- _description_
+        conda_deps -- list containing dependencies unique to conda
+        pip_deps -- list containing dependencies unique to pip
 
     Returns:
-        _description_
+        A list: sorted list containing all dependencies from environment.yml
     """
     full_deps = conda_deps + pip_deps
     full_deps.sort()
