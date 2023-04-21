@@ -55,6 +55,24 @@ y_pipdep = yml_pip_dependencies(ydep)
 y_pipdep.sort()
 
 
+def deps_combnd(conda_deps, pip_deps) -> list:
+    """_summary_
+
+    Arguments:
+        conda_deps -- _description_
+        pip_deps -- _description_
+
+    Returns:
+        _description_
+    """
+    full_deps = conda_deps + pip_deps
+    full_deps.sort()
+    return full_deps
+
+
+dependencies = deps_combnd(y_condadep, y_pipdep)
+print(dependencies)
+
 req_file = "./requirements.txt"
 
 
@@ -89,6 +107,3 @@ def req_create(req) -> bool:
         return True
     else:
         return False
-
-
-check = req_create()
