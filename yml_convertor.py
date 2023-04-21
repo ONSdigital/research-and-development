@@ -31,11 +31,11 @@ def yml_conda_dependencies(dep_list) -> list:
         _description_
     """
     yml_conda = dep_list[:-1]
+    yml_conda.sort()
     return yml_conda
 
 
 y_condadep = yml_conda_dependencies(ydep)
-y_condadep.sort()
 
 
 def yml_pip_dependencies(dep_list) -> list:
@@ -48,11 +48,11 @@ def yml_pip_dependencies(dep_list) -> list:
         _description_
     """
     yml_pip = dep_list[-1]["pip"]
+    yml_pip.sort()
     return yml_pip
 
 
 y_pipdep = yml_pip_dependencies(ydep)
-y_pipdep.sort()
 
 
 def deps_combnd(conda_deps, pip_deps) -> list:
@@ -128,9 +128,6 @@ def req_compare(dep_file, dep_list) -> list:
 
     unique_deps = list(set(dep_list) - set(req_list))
     unique_deps.sort()
-
-    # full_deps = req_list + unique_deps
-    # full_deps.sort()
 
     for line in unique_deps:
         f.write(f"{line}\n")
