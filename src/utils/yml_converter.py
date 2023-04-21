@@ -22,13 +22,16 @@ def yml_dependencies(yml="../../environment.yml") -> list:
 
 
 def yml_conda_dependencies(dep_list) -> list:
-    """_summary_
+    """Takes the total list of dependencies from the environment.yml
+    file (returned by yml_dependecies()) and returns only those that
+    are conda specific.
 
     Arguments:
-        dep_list -- _description_
+        dep_list -- return value of yml_dependencies(). Total list
+        of dependencies from the environment.yml file.
 
     Returns:
-        _description_
+        A list: sorted list containing dependencies unique to conda.
     """
     yml_conda = dep_list[:-1]
     yml_conda.sort()
