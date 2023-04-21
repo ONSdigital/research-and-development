@@ -36,3 +36,20 @@ def yml_conda_dependencies(dep_list) -> list:
 
 y_condadep = yml_conda_dependencies(ydep)
 y_condadep.sort()
+
+
+def yml_pip_dependencies(dep_list) -> list:
+    """_summary_
+
+    Arguments:
+        dep_list -- _description_
+
+    Returns:
+        _description_
+    """
+    yml_pip = dep_list[-1]["pip"]
+    return yml_pip
+
+
+y_pipdep = yml_pip_dependencies(ydep)
+y_pipdep.sort()
