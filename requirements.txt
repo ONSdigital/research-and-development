@@ -1,18 +1,18 @@
-# python==3.6
-coverage==4.5.4
-pytest
-pyyaml
-pandas
-numpy
-requests
-sphinx
-pip
 arrow
 cookiecutter
+coverage
 detect-secrets
 myst-parser
+numpy
+pandas
+pip
 pre-commit==2.17.0
+pytest
 python-dotenv
+python=3
+pyyaml
+requests
+sphinx
 table_logger
 pandas==1.1.5
 numpy
