@@ -1,5 +1,5 @@
 import yaml
-
+import os
 
 yml_file = "./environment.yml"
 
@@ -53,3 +53,22 @@ def yml_pip_dependencies(dep_list) -> list:
 
 y_pipdep = yml_pip_dependencies(ydep)
 y_pipdep.sort()
+
+
+req_file = "./requirements.txt"
+
+
+def req_check(req="./requirements.txt") -> bool:
+    """_summary_
+
+    Keyword Arguments:
+        req -- _description_ (default: {"./requirements.txt"})
+
+    Returns:
+        _description_
+    """
+    isFile = os.path.isfile(req)
+    return isFile
+
+
+req_exist = req_check(req_file)
