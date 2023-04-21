@@ -19,3 +19,20 @@ def yml_dependencies(yml="./environment.yml") -> list:
 
 
 ydep = yml_dependencies()
+
+
+def yml_conda_dependencies(dep_list) -> list:
+    """_summary_
+
+    Arguments:
+        dep_list -- _description_
+
+    Returns:
+        _description_
+    """
+    yml_conda = dep_list[:-1]
+    return yml_conda
+
+
+y_condadep = yml_conda_dependencies(ydep)
+y_condadep.sort()
