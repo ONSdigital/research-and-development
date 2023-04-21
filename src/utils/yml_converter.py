@@ -85,14 +85,16 @@ def req_check(req="../../requirements.txt") -> bool:
     return isFile
 
 
-def req_create(req) -> bool:
-    """_summary_
+def req_create(req="../../requirements.txt") -> bool:
+    """Create a requirements.txt file if one doesn't exist, otherwise
+    do nothing.
 
     Arguments:
-        req -- _description_
+        req -- relative path to the requirements.txt file.
+        (default: {"../../requirements.txt"})
 
     Returns:
-        _description_
+        A bool: boolean value, if True then file has been created, else False.
     """
     if not req:
         f = open(req, "x")
