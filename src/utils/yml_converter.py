@@ -3,13 +3,18 @@ import os
 
 
 def yml_dependencies(yml="../../environment.yml") -> list:
-    """_summary_
+    """Loads an environment.yml file into a list. The values
+    of the 'dependencies' dictionary, an entry in the safe_load
+    list, are separated into their own list and returned by the
+    function.
 
     Keyword Arguments:
-        yml -- _description_ (default: {"../../environment.yml"})
+        yml -- .yml environment file to be passed to function
+        (default: {"../../environment.yml"})
 
     Returns:
-        _description_
+        A list: list containing the values of the 'dependencies'
+        dictionary.
     """
     yml_env = yaml.safe_load(open(yml))
     yml_dep = yml_env["dependencies"]
