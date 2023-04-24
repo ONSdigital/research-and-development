@@ -1,6 +1,6 @@
 name: resdev36
 dependencies:
-    - python=3
+    - python
     - coverage
     - pyyaml
     - requests

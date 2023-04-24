@@ -8,8 +8,8 @@ pandas
 pip
 pre-commit==2.17.0
 pytest
+python
 python-dotenv
-python=3
 pyyaml
 requests
 sphinx
