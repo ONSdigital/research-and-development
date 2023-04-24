@@ -104,35 +104,80 @@ def req_create(req="../../requirements.txt") -> bool:
         return False
 
 
-def req_compare(dep_file, dep_list) -> list:
+def req_compare(dep_list, dep_file="../../requirements.txt") -> tuple:
+    """Function to compare dependencies from environment.yml and
+    existing requirements.txt files. The differences in dependencies
+    between the two files is returned.
+
+    Arguments:
+        dep_list -- full list of dependencies from the environment.yml file.
+        dep_file -- relative path to the requirements.txt file.
+        (default: {"../../requirements.txt"})
+
+
+    Returns:
+        A tuple: tuple containing two lists. The first list contains the
+        differences between the environment.yml dependencies and those in
+        requirements.txt. List two contains the reverse.
+    """
+    f = open(dep_file, "r")
+    req_existing = f.read()
+    req_list = req_existing.split("\n")
+    req_list.sort()
+    f.close()
+
+    unique_deps_1 = list(set(dep_list) - set(req_list))
+    unique_deps_1.sort()
+    unique_deps_2 = list(set(req_list) - set(dep_list))
+    unique_deps_2.sort()
+
+    return unique_deps_1, unique_deps_2
+
+
+def req_write(dep_list, dep_file="../../requirements.txt") -> list:
     """Function to compare dependencies from environment.yml and
     existing requirements.txt files. If there are differences in the
     environment.yml file then the requirements.txt is updated accordingly
 
     Arguments:
+        dep_list -- full list of dependencies from the environment.yml file.
         dep_file -- relative path to the requirements.txt file.
         (default: {"../../requirements.txt"})
-        dep_list -- full list of dependencies from the environment.yml file.
+
 
     Returns:
         A list: list of differences between the environment.yml dependencies
         and those in requirements.txt.
     """
-    f = open(dep_file, "w+")
-    req_existing = f.read()
-    req_list = req_existing.split("\n")
-    req_list.sort()
 
-    unique_deps = list(set(dep_list) - set(req_list))
-    unique_deps.sort()
+    diff = req_compare(dep_list, dep_file)
 
-    for line in unique_deps:
-        f.write(f"{line}\n")
-    f.close()
+    if not diff[0]:
+        msg = "No unique dependencies in environment.yml compared to requirements.txt."
+        return msg
+    else:
+        f = open(dep_file, "r+")
+        req_existing = f.read()
+        req_list = req_existing.split("\n")
+        sorted_req_list = sorted(req_list, key=str.casefold)
+        print(f"Req list = {sorted_req_list} \n")
 
-    return unique_deps
+        unique_deps = list(set(dep_list) - set(req_list))
+
+        total_deps = sorted_req_list[1:] + unique_deps
+        sorted_total_deps = sorted(total_deps, key=str.casefold)
+
+        f.seek(0)
+
+        for line in sorted_total_deps:
+            f.write(f"{line}\n")
+        f.close()
+
+        msg = f"Difference in environment.yml and requirements.txt is {unique_deps}."
+        return msg
 
 
+# Lines for testing the above code
 yml_file = "../../environment.yml"
 ydep = yml_dependencies()
 y_condadep = yml_conda_dependencies(ydep)
@@ -141,4 +186,4 @@ dependencies = deps_combnd(y_condadep, y_pipdep)
 req_file = "../../requirements.txt"
 req_exist = req_check(req_file)
 check = req_create(req_file)
-test = req_compare(req_file, dependencies)
+test = req_write(dependencies, req_file)
