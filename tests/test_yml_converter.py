@@ -87,3 +87,15 @@ def test_req_compare():
 
     # Assert
     assert type(test) == list
+
+
+def test_req_write():
+
+    # Arrange
+    from src.utils.yml_converter import req_write
+
+    # Act: use pytest to assert the result
+    test = req_write()
+
+    # Assert
+    assert type(test) == str
