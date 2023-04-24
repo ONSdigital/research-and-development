@@ -160,7 +160,6 @@ def req_write(dep_list, dep_file="../../requirements.txt") -> list:
         req_existing = f.read()
         req_list = req_existing.split("\n")
         sorted_req_list = sorted(req_list, key=str.casefold)
-        print(f"Req list = {sorted_req_list} \n")
 
         unique_deps = list(set(dep_list) - set(req_list))
 
