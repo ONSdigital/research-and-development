@@ -7,7 +7,7 @@ import os
 def test_check_file_exists():
     """Test the check_file_exists function."""
     # Arrange
-    from src.data_validation import check_file_exists
+    from src.data_validation.validation import check_file_exists
 
     # Act: use pytest to assert the result
     empty_file = open("emptyfile.py", "a").close()
