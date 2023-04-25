@@ -14,9 +14,9 @@ def test_check_file_exists():
 
     result_1 = check_file_exists()
     result_2 = check_file_exists("Non_existant_file.txt")
-    result_3 = check_file_exists(empty_file)
+    result_3 = check_file_exists(empty_file.name)
 
-    os.remove(empty_file)
+    os.remove(empty_file.name)
 
     # Assert
     assert isinstance(result_1, bool)
