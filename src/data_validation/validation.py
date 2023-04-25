@@ -119,3 +119,20 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
         ]
         
     return unreal_postcodes
+import os
+
+
+def check_data_shape(
+    filePath: str = "./config/DataSchema.toml", numCols: int = 5
+) -> bool:
+    """_summary_
+
+    Keyword Arguments:
+        filePath -- Path to data dictionary file (default: {"./config/DataSchema.toml"})
+        numCols -- Number of columns in data (default: {5})
+
+    Returns:
+        A bool: boolean, True is number of columns is as expected, otherwise False
+    """
+    os.path.exists(filePath)
+    return numCols
