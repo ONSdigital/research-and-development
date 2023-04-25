@@ -10,7 +10,7 @@ def test_check_file_exists():
     from src.data_validation.validation import check_file_exists
 
     # Act: use pytest to assert the result
-    empty_file = open("emptyfile.py", "a").close()
+    empty_file = open("emptyfile.py", "a")
 
     result_1 = check_file_exists()
     result_2 = check_file_exists("Non_existant_file.txt")
