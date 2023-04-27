@@ -3,28 +3,7 @@
 """
 
 import pydoop.hdfs as hdfs
-import csv
 import pandas as pd
-
-
-def hdfs_csv_creator(filepath: str, columns: list):
-    """Creates a csv file in DAP with user
-    defined headers if it doesn't exist.
-    Args:
-        filename (string): Example: "name_of_file.csv"
-        columns (list): Example: ["a","b","c","d"]
-    """
-
-    # Check if the file exists
-    if not hdfs.path.isfile(filepath):
-        # open the file in write mode inside Hadoop context
-        with hdfs.open(filepath, "wt") as file:
-            # Create new csv file in specified folder
-            writer = csv.writer(file)
-            # Add the headers to the new csv
-            writer.writerow(columns)
-
-    return None
 
 
 def read_hdfs_csv(filepath: str) -> pd.DataFrame:

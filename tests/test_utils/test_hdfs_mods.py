@@ -3,7 +3,7 @@
 from unittest import mock
 import pandas as pd
 
-# Import module to test
+# Import modules to test
 from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
 
 

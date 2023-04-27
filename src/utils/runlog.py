@@ -2,8 +2,9 @@ from datetime import datetime
 import pandas as pd
 import os
 from src.utils.helpers import Config_settings
-from src.utils.hdfs_mods import hdfs_csv_creator, read_hdfs_csv, write_hdfs_csv
+from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
 import pydoop.hdfs as hdfs
+import csv
 
 
 conf_obj = Config_settings()
@@ -123,6 +124,25 @@ class RunLog:
 
         return write_csv, write_hdf5, write_sql
 
+    def hdfs_csv_creator(self, filepath: str, columns: list):
+        """Creates a csv file in DAP with user
+        defined headers if it doesn't exist.
+        Args:
+            filename (string): Example: "name_of_file.csv"
+            columns (list): Example: ["a","b","c","d"]
+        """
+
+        # Check if the file exists
+        if not hdfs.path.isfile(filepath):
+            # open the file in write mode inside Hadoop context
+            with hdfs.open(filepath, "wt") as file:
+                # Create new csv file in specified folder
+                writer = csv.writer(file)
+                # Add the headers to the new csv
+                writer.writerow(columns)
+
+        return None
+
     def create_runlog_files(self):
         """Creates csv files with column names
         if they don't already exist.
@@ -131,17 +151,17 @@ class RunLog:
         main_columns = ["run_id", "timestamp", "version", "duration"]
         file_name = csv_filenames["main"]
         file_path = f"{main_path}/{file_name}"
-        hdfs_csv_creator(file_path, main_columns)
+        self.hdfs_csv_creator(file_path, main_columns)
 
         config_columns = ["run_id", "configs"]
         file_name = csv_filenames["configs"]
         file_path = f"{main_path}/{file_name}"
-        hdfs_csv_creator(file_path, config_columns)
+        self.hdfs_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "logs"]
         file_name = csv_filenames["logs"]
         file_path = f"{main_path}/{file_name}"
-        hdfs_csv_creator(file_path, log_columns)
+        self.hdfs_csv_creator(file_path, log_columns)
 
         return None
 
