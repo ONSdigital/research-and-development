@@ -120,10 +120,22 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
         
     return unreal_postcodes
 import os
+import toml
+from loading import hdfs_load_json
+import sys
+
+sys.path.insert(0, "./src/data_ingest/")
+
+
+snapshot_path = (
+    "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+)
 
 
 def check_data_shape(
-    filePath: str = "./config/DataSchema.toml", numCols: int = 5
+    dataFile: str = snapshot_path,
+    filePath: str = "./config/DataSchema.toml",
+    numCols: int = 5,
 ) -> bool:
     """_summary_
 
@@ -134,5 +146,21 @@ def check_data_shape(
     Returns:
         A bool: boolean, True is number of columns is as expected, otherwise False
     """
-    os.path.exists(filePath)
-    return numCols
+    # Check if DataSchema.toml exists
+    file_exists = os.path.exists(filePath)
+    snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+
+    if not file_exists:
+        return file_exists
+    else:
+        toml_string = toml.load(filePath)
+        shared_items = {
+            k: toml_string[k]
+            for k in toml_string
+            if k in contributerdict and toml_string[k] == contributerdict[k]
+        }
+
+        data_rows, data_columns = len(contributerdict), 1
+        schema_rows, schamea_columns = len(toml_string), 1
+
+    return len(shared_items), data_rows, data_columns, schema_rows, schamea_columns
