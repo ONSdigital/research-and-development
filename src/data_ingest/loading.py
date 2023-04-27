@@ -27,14 +27,14 @@ def hdfs_load_json(filepath: str):
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         datadict = json.load(file)
-        # contributerdict = datadict["contributors"][0]
-        # responsesdict = datadict["responses"][0]
+        contributerdict = datadict["contributors"][0]
+        responsesdict = datadict["responses"][0]
 
     datadf = pd.DataFrame.from_dict(datadict, orient="index")
 
-    return datadf
+    return datadf, contributerdict, responsesdict
 
 
-snapdata = hdfs_load_json(file_path)
+snapdata, contributerdict, responsesdict = hdfs_load_json(file_path)
 
-print(snapdata.shape)
+print(contributerdict, responsesdict)
