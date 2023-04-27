@@ -2,6 +2,7 @@
 
 from src.utils import runlog
 from src._version import __version__ as version
+
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
@@ -32,9 +33,9 @@ def run_pipeline(start):
     global_config = config["global"]
     runlog_obj = runlog.RunLog(config, version)
 
-    logger = logger_creator(global_config)
+    #    logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
-    logger.info("Collecting logging parameters ..........")
+    #    logger.info("Collecting logging parameters ..........")
     Manipulate_data()
 
     # Data Ingest
@@ -78,10 +79,10 @@ def run_pipeline(start):
 
     MainLogger.info("Finishing Pipeline .......................")
 
-    runlog_obj.retrieve_pipeline_logs()
+    # runlog_obj.retrieve_pipeline_logs()
 
-    run_time = round(time.time() - start, 5)
-    runlog_obj._record_time_taken(run_time)
+    # run_time = round(time.time() - start, 5)
+    # runlog_obj._record_time_taken(run_time)
 
     runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
