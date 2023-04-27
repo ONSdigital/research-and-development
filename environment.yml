@@ -23,5 +23,8 @@ dependencies:
           - readme-coverage-badger
           - setuptools
           - table_logger
-          - toml
-          - xlrd
+          - pandas==1.1.5
+          - numpy
+          - pydoop
+          - setuptools
+          - pytest
