@@ -121,8 +121,8 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
-from loading import hdfs_load_json
 import sys
+from loading import hdfs_load_json
 
 sys.path.insert(0, "./src/data_ingest/")
 
@@ -137,10 +137,14 @@ def check_data_shape(
     filePath: str = "./config/DataSchema.toml",
     numCols: int = 5,
 ) -> bool:
-    """_summary_
+    """Compares the shape of the data and compares it to the shape of the toml
+    file based off the data schema. Returns true if there is a match and false
+    otherwise.
 
     Keyword Arguments:
-        filePath -- Path to data dictionary file (default: {"./config/DataSchema.toml"})
+        dataFile -- Path to data file to compare (default: {snapshot_path})
+        filePath -- Path to schema dictionary file
+        (default: {"./config/DataSchema.toml"})
         numCols -- Number of columns in data (default: {5})
 
     Returns:
@@ -154,13 +158,21 @@ def check_data_shape(
         return file_exists
     else:
         toml_string = toml.load(filePath)
+
         shared_items = {
             k: toml_string[k]
             for k in toml_string
             if k in contributerdict and toml_string[k] == contributerdict[k]
         }
 
-        data_rows, data_columns = len(contributerdict), 1
-        schema_rows, schamea_columns = len(toml_string), 1
+        # data_key1 = list(contributerdict.keys())[0]
+        # schema_key1 = list(toml_string.keys())[0]
 
-    return len(shared_items), data_rows, data_columns, schema_rows, schamea_columns
+        # data_rows, data_columns = len(contributerdict), contributerdict[data_key1]
+        # schema_rows, schema_columns = len(toml_string), len(toml_string[schema_key1])
+
+    return len(shared_items), shared_items
+
+
+test = check_data_shape()
+print(test)
