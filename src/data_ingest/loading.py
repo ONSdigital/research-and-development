@@ -59,6 +59,6 @@ def hdfs_load_json(filepath: str):
 
 snapdata, contributerdict, responsesdict = hdfs_load_json(file_path)
 
-print(contributerdict)
-print("\n")
-print(responsesdict)
+# print(contributerdict)
+# print("\n")
+# print(responsesdict)
