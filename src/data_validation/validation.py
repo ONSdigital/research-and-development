@@ -121,6 +121,7 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
+import pandas as pd
 
 from src.data_ingest.loading import hdfs_load_json
 
@@ -160,7 +161,8 @@ def check_data_shape(
         shared_items = {
             k: toml_string[k]
             for k in toml_string
-            if k in contributerdict and toml_string[k] == contributerdict[k]
+            if k in responsesdict
+            # if k in responsesdict and toml_string[k] == responsesdict[k]
         }
 
         data_key1 = list(contributerdict.keys())[0]
@@ -185,7 +187,35 @@ def check_data_shape(
             cols_match = False
 
     return cols_match, len(shared_items), shared_items, outString
+    # return snapdata
 
 
 test = check_data_shape()
-print(test)
+
+
+def check_var_names(
+    dataFile: str = snapshot_path,
+    filePath: str = "./config/DataSchema.toml",
+) -> bool:
+    """_summary_
+
+    Keyword Arguments:
+        dataFile -- _description_ (default: {snapshot_path})
+        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+
+    Returns:
+        _description_
+    """
+    snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+
+    contributerDF = pd.DataFrame.from_dict(contributerdict, orient="index")
+    responsesDF = pd.DataFrame.from_dict(responsesdict, orient="index")
+
+    toml_dict = toml.load(filePath)
+    schemaDF = pd.DataFrame.from_dict(toml_dict, orient="index")
+
+    return schemaDF, contributerDF, responsesDF
+
+
+test2 = check_var_names()
+print(test2)
