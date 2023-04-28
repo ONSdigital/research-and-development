@@ -121,11 +121,8 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
-import sys
-from loading import hdfs_load_json
 
-sys.path.insert(0, "./src/data_ingest/")
-
+from src.data_ingest.loading import hdfs_load_json
 
 snapshot_path = (
     "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
@@ -165,13 +162,23 @@ def check_data_shape(
             if k in contributerdict and toml_string[k] == contributerdict[k]
         }
 
-        # data_key1 = list(contributerdict.keys())[0]
-        # schema_key1 = list(toml_string.keys())[0]
+        data_key1 = list(contributerdict.keys())[0]
+        schema_key1 = list(toml_string.keys())[0]
 
-        # data_rows, data_columns = len(contributerdict), contributerdict[data_key1]
-        # schema_rows, schema_columns = len(toml_string), len(toml_string[schema_key1])
+        data_rows, data_columns = len(contributerdict), contributerdict[data_key1]
+        schema_rows, schema_columns = len(toml_string), len(toml_string[schema_key1])
 
-    return len(shared_items), shared_items
+        # Check if data dictionary value is of a dict or list type
+        # If it isn't then set column number equal to 1, else length of value
+        if not type(data_columns) == dict or not type(data_columns) == list:
+            data_columns = 1
+        else:
+            data_columns = len(data_columns)
+
+        outString = f"""Data has {data_rows} rows and {data_columns} columns.
+        It should have {schema_rows} rows and {schema_columns} columns."""
+
+    return len(shared_items), shared_items, outString
 
 
 test = check_data_shape()
