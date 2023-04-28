@@ -1,13 +1,13 @@
 """The main pipeline"""
 
-# from src.utils import runlog
-# from src._version import __version__ as version
+from src.utils import runlog
+from src._version import __version__ as version
 
-# from src.utils.helpers import Config_settings
-# from src.utils.wrappers import logger_creator
+from src.utils.helpers import Config_settings
+from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
 
-# import time
+import time
 import logging
 
 
@@ -23,22 +23,22 @@ def run_pipeline(start):
         generated from the time module using time.time()
     """
 
-    #    conf_obj = Config_settings()
-    #    config = conf_obj.config_dict
-    #    global_config = config["global"]
+    conf_obj = Config_settings()
+    config = conf_obj.config_dict
+    global_config = config["global"]
 
-    # runlog_obj = runlog.RunLog(config, version)
+    runlog_obj = runlog.RunLog(config, version)
 
-    #    logger = logger_creator(global_config)
+    logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
-    #    logger.info("Collecting logging parameters ..........")
+    logger.info("Collecting logging parameters ..........")
     Manipulate_data()
     MainLogger.info("Finishing Pipeline .......................")
 
-    # runlog_obj.retrieve_pipeline_logs()
+    runlog_obj.retrieve_pipeline_logs()
 
-    # run_time = round(time.time() - start, 5)
-    # runlog_obj._record_time_taken(run_time)
+    run_time = round(time.time() - start, 5)
+    runlog_obj._record_time_taken(run_time)
 
     runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
