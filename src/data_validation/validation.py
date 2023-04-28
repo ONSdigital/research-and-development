@@ -150,6 +150,7 @@ def check_data_shape(
     # Check if DataSchema.toml exists
     file_exists = os.path.exists(filePath)
     snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+    cols_match = False
 
     if not file_exists:
         return file_exists
@@ -178,7 +179,12 @@ def check_data_shape(
         outString = f"""Data has {data_rows} rows and {data_columns} columns.
         It should have {schema_rows} rows and {schema_columns} columns."""
 
-    return len(shared_items), shared_items, outString
+        if data_columns == schema_columns:
+            cols_match = True
+        else:
+            cols_match = False
+
+    return cols_match, len(shared_items), shared_items, outString
 
 
 test = check_data_shape()
