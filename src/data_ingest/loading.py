@@ -45,6 +45,3 @@ def hdfs_load_json(filepath: str):
     datadf = pd.DataFrame.from_dict(datadict, orient="index")
 
     return datadf, contributerdict, responsesdict
-
-
-snapdata, contributerdict, responsesdict = hdfs_load_json(file_path)
