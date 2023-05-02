@@ -206,15 +206,17 @@ def check_var_names(
     Returns:
         _description_
     """
-    snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+    # snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
 
-    contributerDF = pd.DataFrame.from_dict(contributerdict, orient="index")
-    responsesDF = pd.DataFrame.from_dict(responsesdict, orient="index")
+    # contributerDF = pd.DataFrame.from_dict(contributerdict, orient="index")
+    # responsesDF = pd.DataFrame.from_dict(responsesdict, orient="index")
 
     toml_dict = toml.load(filePath)
     schemaDF = pd.DataFrame.from_dict(toml_dict, orient="index")
 
-    return schemaDF, contributerDF, responsesDF
+    # merged_DF = schemaDF.merge(contributerDF, how='left')
+
+    return schemaDF
 
 
 test2 = check_var_names()
