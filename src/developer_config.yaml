@@ -9,6 +9,7 @@ runlog_writer:
   display: False # Display the runlog in the terminal
   log_path: "data/log"
 logs_foldername: "testing_pydoop"
+snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
 csv_filenames:
   main: "main_runlog.csv"
   configs: "configs_runlog.csv"
