@@ -19,7 +19,7 @@ class TestLoadJson:
             "duration": [5.0, 6.0],
         }
 
-        return data
+        return pd.DataFrame(data)
 
     def expout_data(self):
 
@@ -30,7 +30,7 @@ class TestLoadJson:
             "duration": [5.0, 6.0],
         }
 
-        return data
+        return pd.DataFrame(data)
 
     @mock.patch("src.data_ingest.loading.json")
     @mock.patch("src.data_ingest.loading.hdfs")
@@ -42,7 +42,7 @@ class TestLoadJson:
 
         mock_json.load.return_value = self.input_data()
 
-        json_result = hdfs_load_json("file/path/filename.csv")
+        json_result = hdfs_load_json("file/path/filename.json")
 
         mock_json.load.assert_called_with(mock_f)
 
