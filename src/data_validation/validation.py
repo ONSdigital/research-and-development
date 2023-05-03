@@ -124,6 +124,7 @@ import toml
 import pandas as pd
 import pydoop.hdfs as hdfs
 
+
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 
 
@@ -222,18 +223,18 @@ def check_var_names(
     Returns:
         _description_
     """
-    # snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+    # Read data file
+    data = read_data(dataFile)
 
-    # contributerDF = pd.DataFrame.from_dict(contributerdict, orient="index")
-    # responsesDF = pd.DataFrame.from_dict(responsesdict, orient="index")
+    # Convert it to dictionary
+    data_dict = data.to_dict()
 
-    toml_dict = toml.load(filePath)
-    schemaDF = pd.DataFrame.from_dict(toml_dict, orient="index")
+    # Load toml data schema into dictionary
+    toml_string = load_schema(filePath)
 
-    # merged_DF = schemaDF.merge(contributerDF, how='left')
+    if data_dict.keys() == toml_string.keys():
+        dict_match = True
+    else:
+        dict_match = False
 
-    return schemaDF
-
-
-test2 = check_var_names()
-print(test2)
+    return dict_match
