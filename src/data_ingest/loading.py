@@ -30,21 +30,7 @@ contributerdict = snapdata["contributors"][0]
 responsesdict = snapdata["responses"][0]
 
 
-def dict_to_pd(dict: dict) -> pd.DataFrame:
-    """Converts Dict object to Pandas Dataframe
-
-    Args:
-        dict (dict): Dict to be converted
-
-    Returns:
-        pd.DataFrame: Dataframe with correct orientation
-    """
-    datadf = pd.DataFrame.from_dict(dict, orient="index")
-
-    return datadf
-
-
-datadf = dict_to_pd(snapdata)
+datadf = pd.DataFrame.from_dict(snapdata, orient="index")
 
 print(contributerdict)
 print("\n")
