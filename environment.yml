@@ -9,6 +9,7 @@ dependencies:
     - pip:
           - arrow
           - cookiecutter
+          - deepdiff
           - detect-secrets
           - myst-parser
           - more-itertools==5.0.0
