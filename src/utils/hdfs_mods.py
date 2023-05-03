@@ -1,5 +1,5 @@
 """All general functions for the hdfs file system which uses PyDoop.
-    These functions will need to be tested seperately, using mocking.
+    These functions will need to be tested separately, using mocking.
 """
 
 import pydoop.hdfs as hdfs
