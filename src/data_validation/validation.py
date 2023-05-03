@@ -121,71 +121,73 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
+import pandas as pd
+import pydoop.hdfs as hdfs
 
-from src.data_ingest.loading import hdfs_load_json
+datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 
-snapshot_path = (
-    "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
-)
+
+def read_data(excel_file) -> pd.DataFrame:
+    """Read an excel file and convert it into a
+    pandas dataframe, dropping any 'Unnamed:' columns.
+
+
+    Arguments:
+        excel_file -- the excel file to be converted
+
+    Returns:
+        A pd.DataFrame: a pandas dataframe object.
+    """
+    with hdfs.open(excel_file, "r") as file:
+
+        # Import csv file and convert to Dataframe
+        sheet = pd.read_csv(file)
+
+    return sheet
 
 
 def check_data_shape(
-    dataFile: str = snapshot_path,
+    dataFile: str = datafilepath,
     filePath: str = "./config/DataSchema.toml",
-    numCols: int = 5,
+    numCols: int = 93,
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        dataFile -- Path to data file to compare (default: {snapshot_path})
+        dataFile -- Path to data file to compare (default: {datafilepath})
         filePath -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
-        numCols -- Number of columns in data (default: {5})
+        numCols -- Number of columns in data (default: {93})
 
     Returns:
-        A bool: boolean, True is number of columns is as expected, otherwise False
+        A bool: boolean, True if number of columns is as expected, otherwise False
     """
     # Check if DataSchema.toml exists
     file_exists = os.path.exists(filePath)
-    snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+
     cols_match = False
 
     if not file_exists:
         return file_exists
     else:
+        # Read data file
+        data = read_data(dataFile)
+
+        # Convert it to dictionary
+        data_dict = data.to_dict()
+
+        # Load toml data schema into dictionary
         toml_string = toml.load(filePath)
 
-        shared_items = {
-            k: toml_string[k]
-            for k in toml_string
-            if k in contributerdict and toml_string[k] == contributerdict[k]
-        }
+        # Create a 'shared key' dictionary
+        shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
 
-        data_key1 = list(contributerdict.keys())[0]
-        schema_key1 = list(toml_string.keys())[0]
+    # Compare number of 'columns' in data to data schema
+    if len(shared_items) == len(toml_string):
+        cols_match = True
+    else:
+        cols_match = False
 
-        data_rows, data_columns = len(contributerdict), contributerdict[data_key1]
-        schema_rows, schema_columns = len(toml_string), len(toml_string[schema_key1])
-
-        # Check if data dictionary value is of a dict or list type
-        # If it isn't then set column number equal to 1, else length of value
-        if not type(data_columns) == dict or not type(data_columns) == list:
-            data_columns = 1
-        else:
-            data_columns = len(data_columns)
-
-        outString = f"""Data has {data_rows} rows and {data_columns} columns.
-        It should have {schema_rows} rows and {schema_columns} columns."""
-
-        if data_columns == schema_columns:
-            cols_match = True
-        else:
-            cols_match = False
-
-    return cols_match, len(shared_items), shared_items, outString
-
-
-test = check_data_shape()
-print(test)
+    return cols_match
