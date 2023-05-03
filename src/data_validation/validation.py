@@ -146,6 +146,27 @@ def read_data(excel_file) -> pd.DataFrame:
     return sheet
 
 
+def load_schema(filePath: str = "./config/DataSchema.toml"):
+    """Load the data schema from toml file into a dictionary
+
+    Keyword Arguments:
+        filePath -- Path to data schema toml file
+        (default: {"./config/DataSchema.toml"})
+
+    Returns:
+        A dict: dictionary containing parsed schema toml file
+    """
+    file_exists = os.path.exists(filePath)
+
+    # Check if DataSchema.toml exists
+    if not file_exists:
+        return file_exists
+    else:
+        # Load toml data schema into dictionary
+        toml_string = toml.load(filePath)
+    return toml_string
+
+
 def check_data_shape(
     dataFile: str = datafilepath,
     filePath: str = "./config/DataSchema.toml",
@@ -164,25 +185,20 @@ def check_data_shape(
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
     """
-    # Check if DataSchema.toml exists
-    file_exists = os.path.exists(filePath)
 
     cols_match = False
 
-    if not file_exists:
-        return file_exists
-    else:
-        # Read data file
-        data = read_data(dataFile)
+    # Read data file
+    data = read_data(dataFile)
 
-        # Convert it to dictionary
-        data_dict = data.to_dict()
+    # Convert it to dictionary
+    data_dict = data.to_dict()
 
-        # Load toml data schema into dictionary
-        toml_string = toml.load(filePath)
+    # Load toml data schema into dictionary
+    toml_string = load_schema(filePath)
 
-        # Create a 'shared key' dictionary
-        shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
+    # Create a 'shared key' dictionary
+    shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
 
     # Compare number of 'columns' in data to data schema
     if len(shared_items) == len(toml_string):
