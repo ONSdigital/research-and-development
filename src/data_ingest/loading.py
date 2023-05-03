@@ -20,16 +20,34 @@ def hdfs_load_json(filepath: str):
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         datadict = json.load(file)
-        contributerdict = datadict["contributors"][0]
-        responsesdict = datadict["responses"][0]
 
-    datadf = pd.DataFrame.from_dict(datadict, orient="index")
-
-    return datadf, contributerdict, responsesdict
+    return datadict
 
 
-snapdata, contributerdict, responsesdict = hdfs_load_json(snapshot_path)
+snapdata = hdfs_load_json(snapshot_path)
+
+contributerdict = snapdata["contributors"][0]
+responsesdict = snapdata["responses"][0]
+
+
+def dict_to_pd(dict: dict) -> pd.DataFrame:
+    """Converts Dict object to Pandas Dataframe
+
+    Args:
+        dict (dict): Dict to be converted
+
+    Returns:
+        pd.DataFrame: Dataframe with correct orientation
+    """
+    datadf = pd.DataFrame.from_dict(dict, orient="index")
+
+    return datadf
+
+
+datadf = dict_to_pd(snapdata)
 
 print(contributerdict)
 print("\n")
 print(responsesdict)
+print("\n")
+print(datadf[0][1][0])
