@@ -124,6 +124,8 @@ import toml
 import pandas as pd
 import pydoop.hdfs as hdfs
 
+from deepdiff import DeepDiff
+
 
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 
@@ -238,3 +240,25 @@ def check_var_names(
         dict_match = False
 
     return dict_match
+
+
+def data_key_diffs(
+    dataFile: str = datafilepath,
+    filePath: str = "./config/DataSchema.toml",
+):
+    # Read data file
+    data = read_data(dataFile)
+
+    # Convert it to dictionary
+    data_dict = data.to_dict()
+
+    # Load toml data schema into dictionary
+    toml_string = load_schema(filePath)
+
+    # Create dictionary only containing keys of toml dictionary
+    empty_toml = {k: {} for k in toml_string}
+
+    # Does a case-sensitive comparison of the keys of two dictionaries
+    diff = DeepDiff(empty_toml, data_dict, ignore_string_case=True)
+
+    return diff
