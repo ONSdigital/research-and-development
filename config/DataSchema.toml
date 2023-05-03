@@ -230,7 +230,7 @@ min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q208]
-description = "Land & Build CapEx                "
+description = "Land & Build CapEx"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
@@ -251,7 +251,7 @@ min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q211]
-description = "Total Inhouse Expenditure                         "
+description = "Total Inhouse Expenditure"
 data_type = "Numeric Integer"
 nullable = "No"
 min_acceptable_value = 0
@@ -279,28 +279,28 @@ min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q215]
-description = "Funding - Organisations outside the Uk                       "
+description = "Funding - Organisations outside the Uk"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q216]
-description = "Funding - Other UK Private Bus/Public Orgs                 "
+description = "Funding - Other UK Private Bus/Public Orgs"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q217]
-description = "Funding - Any Other UK                                         "
+description = "Funding - Any Other UK"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q218]
-description = "Total Funding                                     "
+description = "Total Funding"
 data_type = "Numeric Integer"
 nullable = "No"
 min_acceptable_value = 0
@@ -594,14 +594,14 @@ min_acceptable_value = "nan"
 max_acceptable_value = "nan"
 
 [q303]
-description = "Purchased Outside UK (Govt Funded)                "
+description = "Purchased Outside UK (Govt Funded)"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
 max_acceptable_value = 1000000
 
 [q304]
-description = "Purchased Outside UK (Other)                "
+description = "Purchased Outside UK (Other)"
 data_type = "Numeric Integer"
 nullable = "Yes"
 min_acceptable_value = 0
