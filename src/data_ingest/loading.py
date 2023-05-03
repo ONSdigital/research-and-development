@@ -10,7 +10,7 @@ config = conf_obj.config_dict
 snapshot_path = config["snapshot_path"]  # Taken from config file
 
 
-def hdfs_load_json(filepath: str):
+def hdfs_load_json(filepath: str) -> dict:
     """Function to load JSON data from DAP
     Args:
         filepath (string): The filepath in Hue
