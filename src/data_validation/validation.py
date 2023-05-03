@@ -246,6 +246,23 @@ def data_key_diffs(
     dataFile: str = datafilepath,
     filePath: str = "./config/DataSchema.toml",
 ):
+    """Compare differences between data dictionary and the toml data
+    schema dictionary. Outputs a dictionary with 'dictionary_items_added'
+    and 'dictionary_items_removed' as keys, with values as the items
+    added or removed. Added items show differences in data file dictionary,
+    i.e. difference in column names. Items removed shows columns that
+    are not present in the data file.
+
+    Keyword Arguments:
+        dataFile -- _description_ (default: {datafilepath})
+        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+
+    Returns:
+        A dict: dictionary containing items added to and items removed
+        from the data schema dictionary. Added items show differences
+        in data file column names, items removed show columns missing
+        from the data file.
+    """
     # Read data file
     data = read_data(dataFile)
 
