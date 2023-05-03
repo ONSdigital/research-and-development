@@ -1,4 +1,4 @@
-"""All genergal functions for the hdfs file system which uses PyDoop.
+"""All general functions for the hdfs file system which uses PyDoop.
     These functions will need to be tested seperately, using mocking.
 """
 
@@ -23,7 +23,7 @@ def read_hdfs_csv(filepath: str) -> pd.DataFrame:
 
 
 def write_hdfs_csv(filepath: str, data: pd.DataFrame):
-    """Writes A Pandas Dataframe to csv in DAP
+    """Writes a Pandas Dataframe to csv in DAP
 
     Args:
         filepath (str): Filepath (Specified in config)
