@@ -2,6 +2,7 @@ import os
 import toml
 import postcodes_uk
 import pandas as pd
+import pydoop.hdfs as hdfs
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -56,7 +57,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
         df (pd.DataFrame): The DataFrame containing the postcodes.
 
     Returns:
-        A bool: boolean, True is number of columns is as expected, otherwise False
+        A bool: boolean, True if number of columns is as expected, otherwise False
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
