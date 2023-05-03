@@ -35,7 +35,7 @@ class TestReadCsv:
     @mock.patch("src.utils.hdfs_mods.pd")
     @mock.patch("src.utils.hdfs_mods.hdfs")
     def test_read_hdfs_csv(self, mock_hdfs, mock_pd_csv):
-        """Test the expected functionality."""
+        """Test the expected functionality of read_hdfs_csv."""
 
         mock_f = mock.Mock()
         mock_hdfs.open.return_value.__enter__.return_value = mock_f
@@ -53,6 +53,7 @@ class TestReadCsv:
 class TestWriteCsv:
     @mock.patch("src.utils.hdfs_mods.hdfs")
     def test_write_hdfs_csv(self, mock_hdfs):
+        """Test the expected functionality of write_hdfs_csv."""
 
         mock_f = mock.Mock()
         mock_hdfs.open.return_value.__enter__.return_value = mock_f
