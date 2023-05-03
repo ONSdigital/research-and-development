@@ -12,10 +12,10 @@ class TestLoadJson:
     def input_data(self):
 
         data = {
-            "run_id": [1, 2],
-            "timestamp": ["Time:1", "Time:2"],
-            "version": ["0.0.0", "0.0.1"],
-            "duration": [5.0, 6.0],
+            "Col1": [1, 2, 3],
+            "Col2": [4, 5, 6],
+            "Col3": [7, 8, 9],
+            "Col4": [10, 11, 12],
         }
 
         return data
@@ -23,10 +23,10 @@ class TestLoadJson:
     def expout_data(self):
 
         data = {
-            "run_id": [1, 2],
-            "timestamp": ["Time:1", "Time:2"],
-            "version": ["0.0.0", "0.0.1"],
-            "duration": [5.0, 6.0],
+            "Col1": [1, 2, 3],
+            "Col2": [4, 5, 6],
+            "Col3": [7, 8, 9],
+            "Col4": [10, 11, 12],
         }
 
         return data
