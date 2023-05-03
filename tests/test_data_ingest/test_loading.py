@@ -1,7 +1,6 @@
 """Unit testing module."""
 # Import testing packages
 from unittest import mock
-import pandas as pd
 
 # Import modules to test
 from src.data_ingest.loading import hdfs_load_json
@@ -19,7 +18,7 @@ class TestLoadJson:
             "duration": [5.0, 6.0],
         }
 
-        return pd.DataFrame(data)
+        return data
 
     def expout_data(self):
 
@@ -30,7 +29,7 @@ class TestLoadJson:
             "duration": [5.0, 6.0],
         }
 
-        return pd.DataFrame(data)
+        return data
 
     @mock.patch("src.data_ingest.loading.json")
     @mock.patch("src.data_ingest.loading.hdfs")
@@ -47,4 +46,5 @@ class TestLoadJson:
         mock_json.load.assert_called_with(mock_f)
 
         json_expout = self.expout_data()
-        pd.testing.assert_frame_equal(json_result, json_expout)
+
+        assert json_result == json_expout
