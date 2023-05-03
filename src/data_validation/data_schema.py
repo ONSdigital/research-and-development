@@ -9,7 +9,6 @@ def read_xlsx(excel_file) -> pd.DataFrame:
     """Read an excel file and convert it into a
     pandas dataframe, dropping any 'Unnamed:' columns.
 
-
     Arguments:
         excel_file -- the excel file to be converted
 
@@ -134,9 +133,3 @@ def create_toml(pdDict: dict) -> IO[str]:
         toml.dump(pdDict, toml_file)
 
     return pdDict
-
-
-test = read_xlsx("C:\\Users\\macrar\\Downloads\\Data Dictionary - BERD.xlsx")
-test2 = convert_dataFrame(test)
-test3 = reformat_tomlDict(test2)
-test4 = create_toml(test3)
