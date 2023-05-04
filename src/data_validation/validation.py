@@ -325,40 +325,102 @@ def data_types(
             if nest_key == "data_type":
                 schema_type_dict[toml_key] = nest_val
 
+    for type_key, type_val in schema_type_dict.items():
+
+        if type_val == "Categorical":
+            schema_type_dict[type_key] = [type(1), type("")]
+        elif type_val == "Numerical flat (or decimal)":
+            schema_type_dict[type_key] = [type(1.0)]
+        elif type_val == "Numeric Integer":
+            schema_type_dict[type_key] = [type(1)]
+        elif type_val == "Boolean (True or False, 0 or 1)":
+            schema_type_dict[type_key] = [bool]
+        else:
+            schema_type_dict[type_key] = None
+
     return schema_type_dict
 
 
-def check_data_types(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-) -> bool:
-
-    # Create data dictionary containing all values in each column
-    data_dict = create_data_dict()
-
-    # Create dictionary containing 'column - type' key - value pairs
-    type_dict = data_types()
-
-    for type_key, type_val in type_dict.items():
-
-        if type_val == "Categorical":
-            type_dict[type_key] = [type(1), type("")]
-        elif type_val == "Numerical flat (or decimal)":
-            type_dict[type_key] = [type(1.0)]
-        elif type_val == "Numeric Integer":
-            type_dict[type_key] = [type(1)]
-        elif type_val == "Boolean (True or False, 0 or 1)":
-            type_dict[type_key] = [bool]
-        else:
-            type_dict[type_key] = None
-
-    # for k in type_dict:
-    #    if k in data_dict:
-    #        print(f"{data_dict[k]} is of type {type( (data_dict[k])[0] )}.
-    # It should be of type {type_dict[k]}")
-    # assert isinstance(data_dict[k], (type_dict[k])[0])
-
-    # Create a 'shared key' dictionary
-    # shared_items = {k:data_dict[k] for k in type_dict if k in data_dict}
-
-    return type_dict, data_dict
+# def check_data_types(
+#    dataFile: str = datafilepath,
+#    filePath: str = "./config/DataSchema.toml",
+# ) -> bool:
+#    """_summary_
+#
+#    Keyword Arguments:
+#        dataFile -- _description_ (default: {datafilepath})
+#        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+#
+#    Returns:
+#        _description_
+#    """
+#    # Create data dictionary containing all values in each column
+#    data_dict = create_data_dict()
+#
+#    # Create dictionary containing 'column - type' key - value pairs
+#    type_dict = data_types()
+#    data_list = []
+#    data_list.append( [','.join([*type_dict]) ] )
+#    print(data_list[0])
+#
+#    for type_key, type_val in type_dict.items():
+#
+#        if type_val == "Categorical":
+#            type_dict[type_key] = [type(1), type("")]
+#        elif type_val == "Numerical flat (or decimal)":
+#            type_dict[type_key] = [type(1.0)]
+#        elif type_val == "Numeric Integer":
+#            type_dict[type_key] = [type(1)]
+#        elif type_val == "Boolean (True or False, 0 or 1)":
+#            type_dict[type_key] = [bool]
+#        else:
+#            type_dict[type_key] = None
+#
+#    for dKey, dVal in data_dict.items():
+#        if dKey in type_dict.keys():
+#
+#            row = 0
+#
+#            for items in dVal:
+#
+#                # Ignore None types here. None types should be amended
+#                # to their relevant types in data
+#                if type_dict[dKey] is not None:
+#
+#                    # If column is of the 'Categorical' type and the data
+#                    # is not either an int or a str
+#                    if (
+#                        len(type_dict[dKey]) > 1
+#                        and type(items) is not (type_dict[dKey])[0]
+#                        and len(type_dict[dKey]) > 1
+#                        and type(items) is not (type_dict[dKey])[1]
+#                    ):
+#                        print(
+#                            f"""In row {row}, {dKey} is of type {type(items)}.
+#                            It should either be of type { (type_dict[dKey])[0] } or
+#                            { (type_dict[dKey])[1] }"""
+#                        )
+#                    # Else if column is of a singular type, and the data
+#                    # does not match that type
+#                    elif (len(type_dict[dKey]) == 1) and type(items) is not (
+#                        type_dict[dKey]
+#                    )[0]:
+#                        print(
+#                            f"""In row {row}, {dKey} is of type {type(items)}.
+#                            It should be of type { (type_dict[dKey])[0] }"""
+#                        )
+#                    # Pass values which match their respective schema types
+#                    else:
+#                        pass
+#                # Signal which values are of None type
+#                else:
+#                    print(
+#                        (
+#                            f"Row {row}, column {dKey} is of type {type_dict[dKey]}.\n"
+#                            f"Please amend!"
+#                        )
+#                    )
+#                row += 1
+#
+#    return "End"
+#
