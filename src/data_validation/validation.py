@@ -326,3 +326,39 @@ def data_types(
                 schema_type_dict[toml_key] = nest_val
 
     return schema_type_dict
+
+
+def check_data_types(
+    dataFile: str = datafilepath,
+    filePath: str = "./config/DataSchema.toml",
+) -> bool:
+
+    # Create data dictionary containing all values in each column
+    data_dict = create_data_dict()
+
+    # Create dictionary containing 'column - type' key - value pairs
+    type_dict = data_types()
+
+    for type_key, type_val in type_dict.items():
+
+        if type_val == "Categorical":
+            type_dict[type_key] = [type(1), type("")]
+        elif type_val == "Numerical flat (or decimal)":
+            type_dict[type_key] = [type(1.0)]
+        elif type_val == "Numeric Integer":
+            type_dict[type_key] = [type(1)]
+        elif type_val == "Boolean (True or False, 0 or 1)":
+            type_dict[type_key] = [bool]
+        else:
+            type_dict[type_key] = None
+
+    # for k in type_dict:
+    #    if k in data_dict:
+    #        print(f"{data_dict[k]} is of type {type( (data_dict[k])[0] )}.
+    # It should be of type {type_dict[k]}")
+    # assert isinstance(data_dict[k], (type_dict[k])[0])
+
+    # Create a 'shared key' dictionary
+    # shared_items = {k:data_dict[k] for k in type_dict if k in data_dict}
+
+    return type_dict, data_dict
