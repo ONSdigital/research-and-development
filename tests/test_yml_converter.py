@@ -86,7 +86,7 @@ def test_req_compare():
     test = req_compare()
 
     # Assert
-    assert type(test) == list
+    assert type(test) == tuple
 
 
 def test_req_write():
