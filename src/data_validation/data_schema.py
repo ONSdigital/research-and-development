@@ -22,24 +22,6 @@ def read_DAP_csv(excel_file) -> pd.DataFrame:
     return sheet
 
 
-def read_xlsx(excel_file) -> pd.DataFrame:
-    """Read an excel file and convert it into a
-    pandas dataframe, dropping any 'Unnamed:' columns.
-
-    Arguments:
-        excel_file -- the excel file to be converted
-
-    Returns:
-        A pd.DataFrame: a pandas dataframe object.
-    """
-    xl_dataframe = pd.read_excel(excel_file, nrows=93, engine="openpyxl")
-    xl_dataframe = xl_dataframe[
-        xl_dataframe.columns.drop(list(xl_dataframe.filter(regex="Unnamed:")))
-    ]
-
-    return xl_dataframe
-
-
 def convert_dataFrame(pdFrame: pd.DataFrame) -> dict:
     """Convert a pandas dataframe into a dictionary oriented by
     index. This makes the keys in the dictionary the row index
