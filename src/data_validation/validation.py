@@ -304,3 +304,25 @@ def create_data_dict(dataFile: str = dummydatapath):
             print("{0} : {1}".format(k, v))
 
     return dummyDict
+
+
+def data_types(
+    dataFile: str = datafilepath,
+    filePath: str = "./config/DataSchema.toml",
+) -> dict:
+    # Load toml data schema into dictionary
+    toml_string = load_schema(filePath)
+    schema_type_dict = {}
+
+    # Loop over initial tomls schema dictionary keys:values
+    for toml_key, toml_val in toml_string.items():
+
+        # Loop over nest dictionary key:value pairs for each main key
+        for nest_key, nest_val in toml_val.items():
+
+            # Create a new dictionary only containing the data_type value
+            # for each main key for comparison
+            if nest_key == "data_type":
+                schema_type_dict[toml_key] = nest_val
+
+    return schema_type_dict
