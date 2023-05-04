@@ -78,16 +78,15 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
         tomlDict[var] = subDict1
 
+    data_type_substr1 = "Data Type (Numeric integer/Numeric float (or decimal)"
+    data_type_substr2 = "/Text/Categorical/Boolean (True or False, 1 or 0))"
     # Loop over each key in sub-dictionary and reformat values for usability
     for key in tomlDict:
 
         subDict2 = tomlDict[key]
 
         subDict2["description"] = subDict2.pop("Description")
-        subDict2["data_type"] = subDict2.pop(
-            """Data Type (Numeric integer/Numeric float (or decimal)
-            /Text/Categorical/Boolean (True or False, 1 or 0))"""
-        )
+        subDict2["data_type"] = subDict2.pop(f"{data_type_substr1}{data_type_substr2}")
         subDict2["nullable"] = subDict2.pop(
             "Nullable (is it acceptable to have a null value? Acceptable = Yes)"
         )
@@ -110,7 +109,10 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
         subDict2.pop("Acceptable Values (>0 or 0 – 1,000,000)")
 
-        tomlDict[key] = subDict2
+        if isinstance(type(tomlDict[key]), str) and key == "description":
+            tomlDict[key] = tomlDict[key].strip()
+        else:
+            tomlDict[key] = subDict2
 
     return tomlDict
 
@@ -134,7 +136,7 @@ def create_toml(pdDict: dict) -> IO[str]:
     return toml_file
 
 
-test = read_DAP_csv("Data Dictionary - BERD.csv")
+test = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
 test2 = convert_dataFrame(test)
 test3 = reformat_tomlDict(test2)
 test4 = create_toml(test3)
