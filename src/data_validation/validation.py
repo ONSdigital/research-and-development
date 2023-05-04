@@ -424,3 +424,52 @@ def data_types(
 #
 #    return "End"
 #
+
+
+def test_data_types(
+    dataFile: str = datafilepath,
+    filePath: str = "./config/DataSchema.toml",
+) -> bool:
+    """_summary_
+
+    Keyword Arguments:
+        dataFile -- _description_ (default: {datafilepath})
+        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+
+    Returns:
+        _description_
+    """
+    # Create data dictionary containing all values in each column
+    # data_dict = create_data_dict()
+
+    # Create dictionary containing 'column - type' key - value pairs
+    type_dict = data_types()
+    data_list = []
+    data_list.append(",".join([*type_dict]))
+
+    vals = read_data(dummydatapath)
+    for i, row in vals.iterrows():
+        val_list = vals.iloc[0].tolist()
+
+        data_list.append(",".join(map(str, val_list)))
+
+    return type_dict
+
+
+# Turns a dictionary into a class
+class Dict2Class(object):
+    def __init__(self, my_dict):
+
+        for key in my_dict:
+            setattr(self, key, my_dict[key])
+
+
+# Class to define possible types of 'Categorical' value
+# class CategoricalType(Enum):
+#    str = "str"
+#    int = "int"
+
+
+test2 = test_data_types()
+result = Dict2Class(test2)
+print(f"cell_id: {result.cell_id}")
