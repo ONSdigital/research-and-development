@@ -85,7 +85,10 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
         subDict2 = tomlDict[key]
 
-        subDict2["description"] = subDict2.pop("Description")
+        if isinstance(subDict2["Description"], str):
+            subDict2["description"] = (subDict2.pop("Description")).strip()
+        else:
+            subDict2["description"] = subDict2.pop("Description")
         subDict2["data_type"] = subDict2.pop(f"{data_type_substr1}{data_type_substr2}")
         subDict2["nullable"] = subDict2.pop(
             "Nullable (is it acceptable to have a null value? Acceptable = Yes)"
@@ -109,10 +112,7 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
         subDict2.pop("Acceptable Values (>0 or 0 – 1,000,000)")
 
-        if isinstance(type(tomlDict[key]), str) and key == "description":
-            tomlDict[key] = tomlDict[key].strip()
-        else:
-            tomlDict[key] = subDict2
+        tomlDict[key] = subDict2
 
     return tomlDict
 
