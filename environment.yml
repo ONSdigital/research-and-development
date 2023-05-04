@@ -16,6 +16,7 @@ dependencies:
           - detect-secrets
           - myst-parser
           - pre-commit==2.17.0
+          - pydoop
           - python-dotenv
           - table_logger
           - toml
