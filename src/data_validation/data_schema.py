@@ -1,8 +1,25 @@
 import math
 import toml
 import pandas as pd
+import pydoop.hdfs as hdfs
 
 from typing import IO
+
+
+def read_DAP_csv(excel_file) -> pd.DataFrame:
+    """Read an excel file from DAP and convert it into a
+    pandas dataframe, dropping any 'Unnamed:' columns.
+    Arguments:
+        excel_file -- the excel file to be converted
+    Returns:
+        A pd.DataFrame: a pandas dataframe object.
+    """
+    with hdfs.open(excel_file, "r") as file:
+
+        # Import csv file and convert to Dataframe
+        sheet = pd.read_csv(file)
+
+    return sheet
 
 
 def read_xlsx(excel_file) -> pd.DataFrame:
@@ -132,4 +149,4 @@ def create_toml(pdDict: dict) -> IO[str]:
     with open(output_file_name, "w") as toml_file:
         toml.dump(pdDict, toml_file)
 
-    return pdDict
+    return toml_file
