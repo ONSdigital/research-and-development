@@ -132,3 +132,9 @@ def create_toml(pdDict: dict) -> IO[str]:
         toml.dump(pdDict, toml_file)
 
     return toml_file
+
+
+test = read_DAP_csv("Data Dictionary - BERD.csv")
+test2 = convert_dataFrame(test)
+test3 = reformat_tomlDict(test2)
+test4 = create_toml(test3)
