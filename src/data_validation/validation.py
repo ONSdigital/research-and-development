@@ -121,32 +121,13 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
-import pandas as pd
-import pydoop.hdfs as hdfs
+
+from src.utils.hdfs_mods import read_hdfs_csv as read_data
 
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 
 
-def read_data(excel_file) -> pd.DataFrame:
-    """Read an excel file and convert it into a
-    pandas dataframe, dropping any 'Unnamed:' columns.
-
-
-    Arguments:
-        excel_file -- the excel file to be converted
-
-    Returns:
-        A pd.DataFrame: a pandas dataframe object.
-    """
-    with hdfs.open(excel_file, "r") as file:
-
-        # Import csv file and convert to Dataframe
-        sheet = pd.read_csv(file)
-
-    return sheet
-
-
-def load_schema(filePath: str = "./config/DataSchema.toml"):
+def load_schema(filePath: str = "./config/DataSchema.toml") -> dict:
     """Load the data schema from toml file into a dictionary
 
     Keyword Arguments:
@@ -207,3 +188,7 @@ def check_data_shape(
         cols_match = False
 
     return cols_match
+
+
+test = check_data_shape()
+print(test)
