@@ -2,7 +2,7 @@ import yaml
 import os
 
 
-def yml_dependencies(yml="./environment.yml") -> list:
+def yml_dependencies(yml: str = "./environment.yml") -> list:
     """Loads an environment.yml file into a list. The values
     of the 'dependencies' dictionary, an entry in the safe_load
     list, are separated into their own list and returned by the
@@ -21,7 +21,7 @@ def yml_dependencies(yml="./environment.yml") -> list:
     return yml_dep
 
 
-def yml_conda_dependencies(dep_list) -> list:
+def yml_conda_dependencies(dep_list=yml_dependencies()) -> list:
     """Takes the total list of dependencies from the environment.yml
     file (returned by yml_dependecies()) and returns only those that
     are conda specific.
@@ -38,7 +38,7 @@ def yml_conda_dependencies(dep_list) -> list:
     return yml_conda
 
 
-def yml_pip_dependencies(dep_list) -> list:
+def yml_pip_dependencies(dep_list=yml_dependencies()) -> list:
     """akes the total list of dependencies from the environment.yml
     file (returned by yml_dependecies()) and returns only those that
     are pip specific.
@@ -55,7 +55,9 @@ def yml_pip_dependencies(dep_list) -> list:
     return yml_pip
 
 
-def deps_combnd(conda_deps, pip_deps) -> list:
+def deps_combnd(
+    conda_deps=yml_conda_dependencies(), pip_deps=yml_pip_dependencies()
+) -> list:
     """Combines the conda and pip dependencies lists into a single sorted
     list.
 
@@ -71,7 +73,7 @@ def deps_combnd(conda_deps, pip_deps) -> list:
     return full_deps
 
 
-def req_check(req="./requirements.txt") -> bool:
+def req_check(req: str = "./requirements.txt") -> bool:
     """Checks if the requirements.txt file already exists or not.
 
     Keyword Arguments:
@@ -85,7 +87,7 @@ def req_check(req="./requirements.txt") -> bool:
     return isFile
 
 
-def req_create(req="./requirements.txt") -> bool:
+def req_create(req: str = "./requirements.txt") -> bool:
     """Create a requirements.txt file if one doesn't exist, otherwise
     do nothing.
 
@@ -104,7 +106,9 @@ def req_create(req="./requirements.txt") -> bool:
         return False
 
 
-def req_compare(dep_list, dep_file="./requirements.txt") -> tuple:
+def req_compare(
+    dep_list: str = "./environment.yml", dep_file: str = "./requirements.txt"
+) -> tuple:
     """Function to compare dependencies from environment.yml and
     existing requirements.txt files. The differences in dependencies
     between the two files is returned.
@@ -134,7 +138,9 @@ def req_compare(dep_list, dep_file="./requirements.txt") -> tuple:
     return unique_deps_1, unique_deps_2
 
 
-def req_write(dep_list, dep_file="./requirements.txt") -> list:
+def req_write(
+    dep_list: str = "./environment.yml", dep_file="./requirements.txt"
+) -> list:
     """Function to compare dependencies from environment.yml and
     existing requirements.txt files. If there are differences in the
     environment.yml file then the requirements.txt is updated accordingly
