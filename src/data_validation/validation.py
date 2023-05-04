@@ -128,6 +128,7 @@ from deepdiff import DeepDiff
 
 
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
+dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row.csv"
 
 
 def read_data(excel_file) -> pd.DataFrame:
@@ -279,3 +280,27 @@ def data_key_diffs(
     diff = DeepDiff(empty_toml, data_dict, ignore_string_case=True)
 
     return diff
+
+
+def create_data_dict(dataFile: str = dummydatapath):
+    # Read data file
+    data = read_data(dataFile)
+
+    dummyDict = {}
+
+    # Convert it to dictionary
+    data_dict = data.to_dict(orient="index")
+    for k, v in data_dict.items():
+        if isinstance(v, dict):
+
+            for sub_key, sub_val in v.items():
+
+                # Initialise dictionary with first index
+                if k == 0:
+                    dummyDict[sub_key] = [sub_val]
+                else:
+                    dummyDict[sub_key] += [sub_val]
+        else:
+            print("{0} : {1}".format(k, v))
+
+    return dummyDict
