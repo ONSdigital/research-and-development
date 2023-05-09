@@ -12,8 +12,9 @@ snapdata = hdfs_load_json(snapshot_path)
 contributerdict = snapdata["contributors"]
 responsesdict = snapdata["responses"]
 
-datadf = pd.DataFrame.from_dict(snapdata, orient="index")
+contributers = pd.DataFrame(contributerdict)
+responses = pd.DataFrame(responsesdict)
 
-print(contributerdict[0])
+print(contributers.head())
 print("\n")
-print(responsesdict[0])
+print(responses.head())
