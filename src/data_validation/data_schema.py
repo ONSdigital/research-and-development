@@ -57,7 +57,6 @@ def reformat_tomlDict(pdDict: dict) -> dict:
     """Creates a dictionary suitable to be converted
     into a toml file. Takes an index oriented
     dictionary as input and creates a new dictionary
-    at as
 
     Arguments:
         pdDict -- a dictionary
@@ -80,6 +79,7 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
     data_type_substr1 = "Data Type (Numeric integer/Numeric float (or decimal)"
     data_type_substr2 = "/Text/Categorical/Boolean (True or False, 1 or 0))"
+
     # Loop over each key in sub-dictionary and reformat values for usability
     for key in tomlDict:
 
@@ -89,6 +89,7 @@ def reformat_tomlDict(pdDict: dict) -> dict:
             subDict2["description"] = (subDict2.pop("Description")).strip()
         else:
             subDict2["description"] = subDict2.pop("Description")
+
         subDict2["data_type"] = subDict2.pop(f"{data_type_substr1}{data_type_substr2}")
         subDict2["nullable"] = subDict2.pop(
             "Nullable (is it acceptable to have a null value? Acceptable = Yes)"
@@ -136,7 +137,7 @@ def create_toml(pdDict: dict) -> IO[str]:
     return toml_file
 
 
-test = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
-test2 = convert_dataFrame(test)
-test3 = reformat_tomlDict(test2)
-test4 = create_toml(test3)
+csv_dataframe = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
+csv_dataDict = convert_dataFrame(csv_dataframe)
+reformated_Dict = reformat_tomlDict(csv_dataDict)
+tomlFile = create_toml(reformated_Dict)
