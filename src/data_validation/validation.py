@@ -123,12 +123,18 @@ import os
 import toml
 import pandas as pd
 import pydoop.hdfs as hdfs
+import json
+import logging
 
+from pydantic import ValidationError
+from pydantic.dataclasses import dataclass
+from pydantic.json import pydantic_encoder
 from deepdiff import DeepDiff
 
 
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
-dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row.csv"
+# dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row.csv"
+dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv"
 
 
 def read_data(excel_file) -> pd.DataFrame:
@@ -453,10 +459,11 @@ def test_data_types(
 
         data_list.append(",".join(map(str, val_list)))
 
-    return type_dict
+    return data_list
 
 
 # Turns a dictionary into a class
+@dataclass
 class Dict2Class(object):
     def __init__(self, my_dict):
 
@@ -464,12 +471,23 @@ class Dict2Class(object):
             setattr(self, key, my_dict[key])
 
 
-# Class to define possible types of 'Categorical' value
-# class CategoricalType(Enum):
-#    str = "str"
-#    int = "int"
-
-
-test2 = test_data_types()
+test = test_data_types()
+test2 = data_types()
 result = Dict2Class(test2)
-print(f"cell_id: {result.cell_id}")
+print(f"headcount_total: {result.headcount_total}")
+# print(result.__dict__)
+
+print(result.__dict__)
+error_count = 0
+output_data = []
+
+for idx, d in enumerate(test[1:]):
+    try:
+        market_data = Dict2Class(*d.split(","))
+        output_data.append(json.dumps(market_data, default=pydantic_encoder))
+    except ValidationError as ve:
+        logging.error(f"row number: {idx + 1}, row: {d}, error: {ve}")
+        error_count += 1
+
+print(f"Error count: {error_count}")
+print(output_data)
