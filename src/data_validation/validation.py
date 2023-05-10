@@ -123,12 +123,13 @@ import os
 import toml
 import pandas as pd
 import pydoop.hdfs as hdfs
-import json
-import logging
 
-from pydantic import ValidationError
+# import json
+# import logging
+
+# from pydantic import ValidationError
+# from pydantic.json import pydantic_encoder
 from pydantic.dataclasses import dataclass
-from pydantic.json import pydantic_encoder
 from deepdiff import DeepDiff
 
 
@@ -474,20 +475,20 @@ class Dict2Class(object):
 test = test_data_types()
 test2 = data_types()
 result = Dict2Class(test2)
-print(f"headcount_total: {result.headcount_total}")
+# print(f"headcount_total: {result.headcount_total}")
 # print(result.__dict__)
 
-print(result.__dict__)
+# print(result.__dict__)
 error_count = 0
 output_data = []
 
-for idx, d in enumerate(test[1:]):
-    try:
-        market_data = Dict2Class(*d.split(","))
-        output_data.append(json.dumps(market_data, default=pydantic_encoder))
-    except ValidationError as ve:
-        logging.error(f"row number: {idx + 1}, row: {d}, error: {ve}")
-        error_count += 1
+# for idx, d in enumerate(test[1:]):
+#    try:
+#        market_data = Dict2Class(*d.split(","))
+#        output_data.append(json.dumps(market_data, default=pydantic_encoder))
+#    except ValidationError as ve:
+#        logging.error(f"row number: {idx + 1}, row: {d}, error: {ve}")
+#        error_count += 1
 
-print(f"Error count: {error_count}")
-print(output_data)
+# print(f"Error count: {error_count}")
+# print(output_data)
