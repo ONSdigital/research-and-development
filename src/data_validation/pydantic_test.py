@@ -111,7 +111,28 @@ class DataTypes(BaseModel):
 def check_data_types(
     dataFile: str = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv",
 ):
+    """Takes the data from a csv file, parses that into a dictionary with
+    key: value pairs for each variable. The values for each key should be
+    a list, each element corresponding to a row in the csv file. A
+    TypeError is raise if a value from the key: value pairs is not of the
+    <class 'list'> type. An instance of the user defined 'DataTypes' class
+    is returned with attributes populated by the data. Validation errors
+    are raised if data does match the allows types given in the 'DataTypes'
+    class. Validation errors are also raised if data passed to the function
+    contains column headers not defined in the 'DataTypes' class.
 
+    Keyword Arguments:
+        dataFile -- path to data file
+        (default: {"/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv"})
+
+    Raises:
+        TypeError: If the value in the 'data_dict' is not of <class 'list'> type
+        the a TypeError is raised. To check data the values must be passed as
+        lists in the data_dict object.
+
+    Returns:
+        An object of user-defined <class 'DataTypes'>.
+    """
     data_dict = create_data_dict(dataFile)
 
     for dKey, dVal in data_dict.items():
