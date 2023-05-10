@@ -1,6 +1,6 @@
 arrow
 cookiecutter
-coverage
+coverage==4.5.4
 detect-secrets
 myst-parser
 numpy
