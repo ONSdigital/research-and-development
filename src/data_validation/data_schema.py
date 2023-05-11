@@ -137,7 +137,7 @@ def create_toml(pdDict: dict) -> IO[str]:
     return toml_file
 
 
-csv_dataframe = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
-csv_dataDict = convert_dataFrame(csv_dataframe)
-reformated_Dict = reformat_tomlDict(csv_dataDict)
-tomlFile = create_toml(reformated_Dict)
+berd_schema_df = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
+berd_schema_dict = convert_dataFrame(berd_schema_df)
+reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
+tomlfile = create_toml(reshaped_schema_dict)
