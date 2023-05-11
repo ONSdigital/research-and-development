@@ -7,16 +7,24 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 snapshot_path = config["paths"]["snapshot_path"]  # Taken from config file
 
-snapdata = hdfs_load_json(snapshot_path)
 
-contributerdict = snapdata["contributors"]
-responsesdict = snapdata["responses"]
+def load_snapshot_data(snapshot_path, data_type):
 
-contributers = pd.DataFrame(contributerdict)
-responses = pd.DataFrame(responsesdict)
+    """Load data from SPP Snapshot file in HUE and return two DataFrames containing
+    contributor and response data respectively.
 
-print(contributers.head())
-print("\n")
-print(responses.head())
-print("\n")
-print([responses["questioncode"].unique()])
+    Arguments:
+        snapshot_path -- Filepath
+        data_type -- String with value either "contributors" or "responses".
+                     Determines which part of the snapshot file should be loaded.
+
+    Returns:
+        data -- DataFrame containing either contributor or response data for BERD
+                from SPP Snapshot file
+    """
+
+    snapshot_data = hdfs_load_json(snapshot_path)
+
+    data = pd.DataFrame(snapshot_data[data_type])
+
+    return data
