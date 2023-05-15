@@ -1,469 +1,469 @@
 [snapshot_id]
 Description = nan
-Deduced Data Type = nan
+Deduced_Data_Type = nan
 Nullable = nan
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [reference]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = 11001603625.0
-Max values = 19891309165.0
-Possible Categorical Values = nan
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625.0
+Max_values = 19891309165.0
+Possible_Categorical_Values = nan
 
 [period]
 Description = nan
-Deduced Data Type = Category(int)
+Deduced_Data_Type = "Category(int)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = 6
-Min values = nan
-Max values = nan
-Possible Categorical Values = 202012
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = 202012
 
 [survey]
-Description = All values are 002
-Deduced Data Type = Category(str)
+Description = "All values are 002"
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = nan
-Max values = nan
-Possible Categorical Values = 002
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "002"
 
 [formid]
 Description = nan
-Deduced Data Type = Category(int)
+Deduced_Data_Type = "Category(int)"
 Nullable = 0.0
-Current Data Type = int
+Current_Data_Type = "int"
 Length = 2
-Min values = nan
-Max values = nan
-Possible Categorical Values = 20, 21
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = [20, 21]
 
 [status]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = nan
-Max values = nan
-Possible Categorical Values = Clear, Clear - overridden, Form saved, Clear - overridden SE, Form sent out, Check needed, Combined child (NIL2), Out of scope (NIL3), Ceased trading (NIL4), Dormant (NIL5), Part year return (NIL8), No UK activity (NIL9)
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Clear - overridden SE", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
 
 [statusencoded]
 Description = nan
-Deduced Data Type = Category(int)
+Deduced_Data_Type = "Category(int)"
 Nullable = 0.0
-Current Data Type = int
+Current_Data_Type = "int"
 Length = 3
-Min values = nan
-Max values = nan
-Possible Categorical Values = 100, 200, 201, 210, 211, 301, 302, 303, 304, 305, 308, 309
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305, 308, 309]
 
 [receiptdate]
-Description = Datetime format = %Y-%m-%d %H:%M:%S.%f+00
-Deduced Data Type = Datetime
+Description = "Datetime_format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "Datetime"
 Nullable = 0.0
-Current Data Type = None/str
+Current_Data_Type = "None/str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [lockedby]
-Description = All empty strings
-Deduced Data Type = ?
+Description = "All empty strings"
+Deduced_Data_Type = "?"
 Nullable = 1.0
-Current Data Type = None/str
+Current_Data_Type = "None/str"
 Length = 0
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [lockeddate]
-Description = All None type
-Deduced Data Type = ?
+Description = "All None type"
+Deduced_Data_Type = "?"
 Nullable = 1.0
-Current Data Type = None/str
+Current_Data_Type = "None/str"
 Length = 0
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [formtype]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = 0001, 0006
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["0001", "0006"]
 
 [checkletter]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = 1
-Min values = nan
-Max values = nan
-Possible Categorical Values = T, H, F, J, D, A, K, C, B, L, S
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L", "S"]
 
 [frozensicoutdated]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1120.0
-Max values = 93059.0
-Possible Categorical Values = nan
+Min_values = 1120.0
+Max_values = 93059.0
+Possible_Categorical_Values = nan
 
 [rusicoutdated]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1120.0
-Max values = 93059.0
-Possible Categorical Values = nan
+Min_values = 1120.0
+Max_values = 93059.0
+Possible_Categorical_Values = nan
 
 [frozensic]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1300.0
-Max values = 96090.0
-Possible Categorical Values = nan
+Min_values = 1300.0
+Max_values = 96090.0
+Possible_Categorical_Values = nan
 
 [rusic]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1300.0
-Max values = 96090.0
-Possible Categorical Values = nan
+Min_values = 1300.0
+Max_values = 96090.0
+Possible_Categorical_Values = nan
 
 [frozenemployees]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 272527.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 272527.0
+Possible_Categorical_Values = nan
 
 [employees]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 272528.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 272528.0
+Possible_Categorical_Values = nan
 
 [frozenemployment]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1.0
-Max values = 272527.0
-Possible Categorical Values = nan
+Min_values = 1.0
+Max_values = 272527.0
+Possible_Categorical_Values = nan
 
 [employment]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1.0
-Max values = 272528.0
-Possible Categorical Values = nan
+Min_values = 1.0
+Max_values = 272528.0
+Possible_Categorical_Values = nan
 
 [frozenfteemployment]
 Description = nan
-Deduced Data Type = float
+Deduced_Data_Type =  "float"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 177699.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 177699.0
+Possible_Categorical_Values = nan
 
 [fteemployment]
 Description = nan
-Deduced Data Type = float
+Deduced_Data_Type =  "float"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 177699.5
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 177699.5
+Possible_Categorical_Values = nan
 
 [frozenturnover]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 55277352.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 55277352.0
+Possible_Categorical_Values = nan
 
 [turnover]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 55277352.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 55277352.0
+Possible_Categorical_Values = nan
 
 [enterprisereference]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = 1001603625.0
-Max values = 9891309165.0
-Possible Categorical Values = nan
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 1001603625.0
+Max_values = 9891309165.0
+Possible_Categorical_Values = nan
 
 [wowenterprisereference]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = 1001603625.0
-Max values = 9891309165.0
-Possible Categorical Values = nan
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 1001603625.0
+Max_values = 9891309165.0
+Possible_Categorical_Values = nan
 
 [cellnumber]
 Description = nan
-Deduced Data Type = Category(int)
+Deduced_Data_Type = "Category(int)"
 Nullable = 0.0
-Current Data Type = int
+Current_Data_Type = "int"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = 0
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = 0
 
 [currency]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = S, E
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["S", "E"]
 
 [vatreference]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = VATREF
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "VATREF"
 
 [payereference]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = PAYEREF
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "PAYEREF"
 
 [companyregistrationnumber]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = CRN
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "CRN"
 
 [numberlivelocalunits]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 6063.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 6063.0
+Possible_Categorical_Values = nan
 
 [numberlivevat]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 255.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 255.0
+Possible_Categorical_Values = nan
 
 [numberlivepaye]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 0.0
-Max values = 24.0
-Possible Categorical Values = nan
+Min_values = 0.0
+Max_values = 24.0
+Possible_Categorical_Values = nan
 
 [legalstatus]
 Description = nan
-Deduced Data Type = int
+Deduced_Data_Type = "int"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = 1.0
-Max values = 4.0
-Possible Categorical Values = 1, 2, 3, 4
+Min_values = 1.0
+Max_values = 4.0
+Possible_Categorical_Values = [1, 2, 3, 4]
 
 [reportingunitmarker]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = L, E
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["L", "E"]
 
 [region]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = WW, BB, FE, GG, JG, HH, ED, KJ, XX, AA, DC, GF, BA
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "XX", "AA", "DC", "GF", "BA"]
 
 [birthdate]
-Description = Datetime format = format=%d/%m/%Y
-Deduced Data Type = Datetime
+Description = "Datetime_format = format=%d/%m/%Y"
+Deduced_Data_Type = "Datetime"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [referencename]
 Description = nan
-Deduced Data Type = str
+Deduced_Data_Type = "str"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [referencepostcode]
 Description = nan
-Deduced Data Type = str
+Deduced_Data_Type = "str"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [tradingstyle]
 Description = nan
-Deduced Data Type = str
+Deduced_Data_Type = "str"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [selectiontype]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
+Current_Data_Type = "str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = L
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "L"
 
 [inclusionexclusion]
-Description = All values are
-Deduced Data Type = ?
+Description = "All values are \" \""
+Deduced_Data_Type = "?"
 Nullable = 0.0
-Current Data Type = str
-Length = nanread_
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Current_Data_Type = "str"
+Length = "nanread_"
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [createdby]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = nan
-Max values = nan
-Possible Categorical Values = ingestion
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = "ingestion"
 
 [createddate]
-Description = Datetime format = %Y-%m-%d %H:%M:%S.%f+00
-Deduced Data Type = Datetime
+Description = "Datetime_format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "Datetime"
 Nullable = 0.0
-Current Data Type = str
-Length >=1
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
 
 [lastupdatedby]
 Description = nan
-Deduced Data Type = Category(str)
+Deduced_Data_Type = "Category(str)"
 Nullable = 0.0
-Current Data Type = None/str
+Current_Data_Type = "None/str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = data_migration, Cheri, Adela, David
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
 
 [lastupdateddate]
-Description = Datetime format = %Y-%m-%d %H:%M:%S.%f+00
-Deduced Data Type = Datetime
+Description = "Datetime_format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "Datetime"
 Nullable = 0.0
-Current Data Type = None/str
+Current_Data_Type = "None/str"
 Length = nan
-Min values = nan
-Max values = nan
-Possible Categorical Values = nan
+Min_values = nan
+Max_values = nan
+Possible_Categorical_Values = nan
