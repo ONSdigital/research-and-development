@@ -127,41 +127,44 @@ from src.utils.hdfs_mods import read_hdfs_csv as read_data
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 
 
-def load_schema(filePath: str = "./config/DataSchema.toml") -> dict:
+def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
     """Load the data schema from toml file into a dictionary
 
     Keyword Arguments:
-        filePath -- Path to data schema toml file
-        (default: {"./config/DataSchema.toml"})
+        file_path -- Path to data schema toml file
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A dict: dictionary containing parsed schema toml file
     """
-    file_exists = os.path.exists(filePath)
+    # Create bool variable for checking if file exists
+    file_exists = os.path.exists(file_path)
 
-    # Check if DataSchema.toml exists
-    if not file_exists:
-        return file_exists
+    # Check if Data_Schema.toml exists
+    if file_exists:
+        # Load toml data schema into dictionary if toml file exists
+        toml_string = toml.load(file_path)
     else:
-        # Load toml data schema into dictionary
-        toml_string = toml.load(filePath)
+        # Return False if file does not exist
+        return file_exists
+
     return toml_string
 
 
 def check_data_shape(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-    numCols: int = 93,
+    data_file: str = datafilepath,
+    schema_path: str = "./config/DataSchema.toml",
+    num_cols: int = 93,
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        dataFile -- Path to data file to compare (default: {datafilepath})
-        filePath -- Path to schema dictionary file
+        data_file -- Path to data file to compare (default: {datafilepath})
+        schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
-        numCols -- Number of columns in data (default: {93})
+        num_cols -- Number of columns in data (default: {93})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
@@ -170,13 +173,13 @@ def check_data_shape(
     cols_match = False
 
     # Read data file
-    data = read_data(dataFile)
+    data = read_data(data_file)
 
     # Convert it to dictionary
     data_dict = data.to_dict()
 
     # Load toml data schema into dictionary
-    toml_string = load_schema(filePath)
+    toml_string = load_schema(schema_path)
 
     # Create a 'shared key' dictionary
     shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
