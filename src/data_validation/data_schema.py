@@ -6,23 +6,22 @@ import pydoop.hdfs as hdfs
 from typing import IO
 
 
-def read_xlsx(excel_file) -> pd.DataFrame:
-    """Read an excel file and convert it into a
-    pandas dataframe, dropping any 'Unnamed:' columns.
-
+def read_SPP_snapshot(excel_file, excel_sheet) -> pd.DataFrame:
+    """Read the updated SPP Snapshot Schema, specifying the name
+    of the sheet to read. Convert it into a pandas dataframe,
+    dropping any rows which include NaN values in the 'Field Name'
+    column.
 
     Arguments:
         excel_file -- the excel file to be converted
-
+        excel_sheet -- the name of the excel sheet to be converted
     Returns:
         A pd.DataFrame: a pandas dataframe object.
     """
-    xl_dataframe = pd.read_excel(
-        excel_file, sheet_name="contributors", engine="openpyxl"
-    )
-    # xl_dataframe = xl_dataframe[
-    #    xl_dataframe.columns.drop(list(xl_dataframe.filter(regex="Unnamed:")))
-    # ]
+    xl_dataframe = pd.read_excel(excel_file, sheet_name=excel_sheet, engine="openpyxl")
+
+    # Drop rows with NaN values in the 'Field Name' column
+    xl_dataframe = xl_dataframe.dropna(subset=["Field Name"])
 
     return xl_dataframe
 
@@ -94,53 +93,16 @@ def reformat_tomlDict(pdDict: dict) -> dict:
         newDict[str(key)] = pdDict[key]
 
         subDict1 = newDict[str(key)]
-        var = subDict1.pop("Field Name (as it appears in dataset)")
+        var = subDict1.pop("Field Name")
+        var = var.replace('"', "")
 
         tomlDict[var] = subDict1
 
-    data_type_substr1 = "Data Type (Numeric integer/Numeric float (or decimal)"
-    data_type_substr2 = "/Text/Categorical/Boolean (True or False, 1 or 0))"
-
-    # Loop over each key in sub-dictionary and reformat values for usability
-    for key in tomlDict:
-
-        subDict2 = tomlDict[key]
-
-        if isinstance(subDict2["Description"], str):
-            subDict2["description"] = (subDict2.pop("Description")).strip()
-        else:
-            subDict2["description"] = subDict2.pop("Description")
-
-        subDict2["data_type"] = subDict2.pop(f"{data_type_substr1}{data_type_substr2}")
-        subDict2["nullable"] = subDict2.pop(
-            "Nullable (is it acceptable to have a null value? Acceptable = Yes)"
-        )
-
-        acceptable_values_str = str(subDict2["Acceptable Values (>0 or 0 – 1,000,000)"])
-        acceptable_values_list = acceptable_values_str.split()
-
-        subDict2["min_acceptable_value"] = acceptable_values_list[0]
-        subDict2["max_acceptable_value"] = acceptable_values_list[-1].replace(",", "")
-
-        if is_nan(subDict2["min_acceptable_value"]):
-            subDict2["min_acceptable_value"] = acceptable_values_list[0]
-        elif is_nan(subDict2["max_acceptable_value"]):
-            subDict2["max_acceptable_value"] = acceptable_values_list[-1]
-        else:
-            subDict2["min_acceptable_value"] = int(acceptable_values_list[0])
-            subDict2["max_acceptable_value"] = int(
-                acceptable_values_list[-1].replace(",", "")
-            )
-
-        subDict2.pop("Acceptable Values (>0 or 0 – 1,000,000)")
-
-        tomlDict[key] = subDict2
-
-    return tomlDict
+        return tomlDict
 
 
 def create_toml(
-    pd_dict: dict, output_toml_file: str = "./config/DataSchema.toml"
+    pd_dict: dict, output_toml_file: str = "./config/Data_Schema.toml"
 ) -> IO[str]:
     """Write a toml file from a dictionary.
 
@@ -160,10 +122,7 @@ def create_toml(
     return toml_file
 
 
-# berd_schema_df = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
-berd_schema_df = read_xlsx("C:\\Users\\macrar\\Downloads\\SPP Snapshot Schema.xlsx")
-print(berd_schema_df)
-
-# berd_schema_dict = convert_dataFrame(berd_schema_df)
-# reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
-# tomlfile = create_toml(reshaped_schema_dict, "./config/Data_Schema_New.toml")
+berd_schema_df = read_SPP_snapshot("./config/SPP Snapshot Schema.xlsx", "contributors")
+berd_schema_dict = convert_dataFrame(berd_schema_df)
+reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
+tomlfile = create_toml(reshaped_schema_dict, "./config/Data_Schema.toml")
