@@ -153,7 +153,7 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
 
 def check_data_shape(
     data_file: str = datafilepath,
-    schema_path: str = "./config/DataSchema.toml",
+    schema_path: str = "./config/Data_Schema.toml",
     num_cols: int = 93,
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
@@ -193,5 +193,7 @@ def check_data_shape(
     return cols_match
 
 
-shape_matches = check_data_shape()
-print(shape_matches)
+schema_dict = load_schema()
+
+# Check if data and schema shapes match
+shapes_match = check_data_shape()
