@@ -18,11 +18,9 @@ def run_pipeline(start):
 
     conf_obj = Config_settings()
     config = conf_obj.config_dict
-    global_config = config["global"]
-
     runlog_obj = runlog.RunLog(config, version)
 
-    logger = logger_creator(global_config)
+    logger = logger_creator(config)
     logger.info("Launching Pipeline .......................")
     # Pipeline functions are located here:
     df = create_dummy_df()
@@ -35,6 +33,7 @@ def run_pipeline(start):
     run_time = round(time.time() - start, 5)
     runlog_obj._record_time_taken(run_time)
 
+    runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
     runlog_obj._create_runlog_dfs()
     runlog_obj.create_runlog_files()

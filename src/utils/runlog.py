@@ -2,6 +2,7 @@ from datetime import datetime
 import pandas as pd
 import os
 from src.utils.helpers import Config_settings, csv_creator
+import yaml
 
 
 class RunLog:
@@ -19,7 +20,7 @@ class RunLog:
         fp = "main_runlog.csv"
         if os.path.isfile(fp):
             files = pd.read_csv(fp)
-            latest_id = max(files.run_id)
+            latest_id = int(max(files.run_id))
         else:
             latest_id = 0
         run_id = latest_id + 1
@@ -32,7 +33,7 @@ class RunLog:
 
         """
 
-        self.time_taken = str(time_taken)
+        self.time_taken = time_taken
 
         return self.time_taken
 
@@ -44,7 +45,23 @@ class RunLog:
         """
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
-        self.logs.append(lines)
+        self.runids = {"run_id": self.run_id}
+        for line in lines:
+            self.logs.append(line.split(" - "))
+            self.runids.update({"run_id": self.run_id})
+        self.saved_logs = pd.DataFrame(
+            self.logs, columns=["timestamp", "module", "function", "message"]
+        )
+        self.saved_logs.insert(0, "run_id", self.runids["run_id"])
+        return self
+
+    def retrieve_configs(self):
+        with open("src/developer_config.yaml", "r") as file:
+            self.configdata = yaml.load(file, Loader=yaml.FullLoader)
+        # Convert the YAML data to a Pandas DataFrame
+        dct = {k: [v] for k, v in self.configdata.items()}
+        self.configdf = pd.DataFrame(dct)
+        self.configdf.insert(0, "run_id", self.runids["run_id"])
         return self
 
     def _generate_time(self):
@@ -60,44 +77,30 @@ class RunLog:
             "run_id": self.run_id,
             "timestamp": self.timestamp,
             "version": self.version,
-            "duration": self.time_taken,
-        }
-
-        self.runlog_configs_dict = {
-            "run_id": self.run_id,
-            "configs": self.config,
-        }
-
-        self.runlog_logs_dict = {
-            "run_id": self.run_id,
-            "logs": self.logs,
+            "time_taken": self.time_taken,
         }
 
         return self
 
     def _create_runlog_dfs(self):
         """Convert dictionaries to pandas dataframes."""
-
         self.runlog_main_df = pd.DataFrame(
             [self.runlog_main_dict],
-            columns=["run_id", "timestamp", "version", "duration"],
+            columns=["run_id", "timestamp", "version", "time_taken"],
         )
-        self.runlog_configs_df = pd.DataFrame(
-            [self.runlog_configs_dict], columns=["run_id", "configs"]
-        )
-        self.runlog_logs_df = pd.DataFrame(
-            [self.runlog_logs_dict], columns=["run_id", "logs"]
-        )
+
+        self.runlog_configs_df = self.configdf
+
+        self.runlog_logs_df = self.saved_logs
 
         return self
 
     def _get_runlog_settings(self):
 
         """Get the runlog settings from the config file."""
-        runlog_settings = self.config["runlog_writer"]
-        write_csv = runlog_settings["write_csv"]
-        write_hdf5 = runlog_settings["write_hdf5"]
-        write_sql = runlog_settings["write_sql"]
+        write_csv = self.config["write_csv"]
+        write_hdf5 = self.config["write_hdf5"]
+        write_sql = self.config["write_sql"]
 
         return write_csv, write_hdf5, write_sql
 
@@ -107,18 +110,17 @@ class RunLog:
         """
         conf_obj = Config_settings()
         config = conf_obj.config_dict
-        csv_filenames = config["csv_filenames"]
 
         main_columns = ["run_id", "timestamp", "version", "duration"]
-        file_name = csv_filenames["main"]
+        file_name = config["main_filename"]
         csv_creator(file_name, main_columns)
 
-        config_columns = ["run_id", "configs"]
-        file_name = csv_filenames["configs"]
+        config_columns = list(self.configdf.columns.values)
+        file_name = config["configs_filename"]
         csv_creator(file_name, config_columns)
 
-        log_columns = ["run_id", "logs"]
-        file_name = csv_filenames["logs"]
+        log_columns = ["run_id", "timestamp", "module", "function", "message"]
+        file_name = config["logs_filename"]
         csv_creator(file_name, log_columns)
 
         return None

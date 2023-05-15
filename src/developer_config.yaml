@@ -1,17 +1,14 @@
-global:
-  log_to_file: True # Write logs to .log file
-  logging_level: "DEBUG"
-  table_config: "SingleLine"
-runlog_writer:
-  write_csv: True # Write the runlog to a CSV file
-  write_hdf5: False # Write the runlog to an HDF5 file
-  write_sql: False # Write the runlog to a SQL database
-  display: False # Display the runlog in the terminal
-  log_path: "data/log"
-csv_filenames:
-  main: "main_runlog.csv"
-  configs: "configs_runlog.csv"
-  logs: "logs_runlog.csv"
-run_log_sql:
-  log_db: "test_runlog"
-  log_mode: "append"
+
+log_to_file: True # Write logs to .log file
+logging_level: "DEBUG"
+table_config: "SingleLine"
+write_csv: True # Write the runlog to a CSV file
+write_hdf5: False # Write the runlog to an HDF5 file
+write_sql: False # Write the runlog to a SQL database
+display: False # Display the runlog in the terminal
+log_path: "data/log"
+main_filename: "main_runlog.csv"
+configs_filename: "configs_runlog.csv"
+logs_filename: "logs_runlog.csv"
+log_db: "test_runlog"
+log_mode: "append"
