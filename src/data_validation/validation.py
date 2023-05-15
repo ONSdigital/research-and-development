@@ -193,5 +193,5 @@ def check_data_shape(
     return cols_match
 
 
-test = check_data_shape()
-print(test)
+shape_matches = check_data_shape()
+print(shape_matches)
