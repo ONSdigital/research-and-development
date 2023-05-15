@@ -6,6 +6,27 @@ import pydoop.hdfs as hdfs
 from typing import IO
 
 
+def read_xlsx(excel_file) -> pd.DataFrame:
+    """Read an excel file and convert it into a
+    pandas dataframe, dropping any 'Unnamed:' columns.
+
+
+    Arguments:
+        excel_file -- the excel file to be converted
+
+    Returns:
+        A pd.DataFrame: a pandas dataframe object.
+    """
+    xl_dataframe = pd.read_excel(
+        excel_file, sheet_name="contributors", engine="openpyxl"
+    )
+    # xl_dataframe = xl_dataframe[
+    #    xl_dataframe.columns.drop(list(xl_dataframe.filter(regex="Unnamed:")))
+    # ]
+
+    return xl_dataframe
+
+
 def read_DAP_csv(excel_file) -> pd.DataFrame:
     """Read an excel file from DAP and convert it into a
     pandas dataframe, dropping any 'Unnamed:' columns.
@@ -139,7 +160,10 @@ def create_toml(
     return toml_file
 
 
-berd_schema_df = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
-berd_schema_dict = convert_dataFrame(berd_schema_df)
-reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
-tomlfile = create_toml(reshaped_schema_dict, "./config/Data_Schema_New.toml")
+# berd_schema_df = read_DAP_csv("/ons/rdbe_dev/data_dictionary_berd.csv")
+berd_schema_df = read_xlsx("C:\\Users\\macrar\\Downloads\\SPP Snapshot Schema.xlsx")
+print(berd_schema_df)
+
+# berd_schema_dict = convert_dataFrame(berd_schema_df)
+# reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
+# tomlfile = create_toml(reshaped_schema_dict, "./config/Data_Schema_New.toml")
