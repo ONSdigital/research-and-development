@@ -118,21 +118,23 @@ def reformat_tomlDict(pdDict: dict) -> dict:
     return tomlDict
 
 
-def create_toml(pdDict: dict) -> IO[str]:
+def create_toml(
+    pd_dict: dict, output_toml_file: str = "./config/DataSchema.toml"
+) -> IO[str]:
     """Write a toml file from a dictionary.
 
     Arguments:
-        pdDict -- A dictionary containing a dictionary as
+        pd_dict -- A dictionary containing a dictionary as
         its values.
-
+        output_toml_file -- Path to the output toml file.
+        (default: {"./config/DataSchema.toml"})
     Returns:
         A toml file - IO[str] type indicates a text based file
         (.toml) will be returned.
     """
 
-    output_file_name = "./config/DataSchema.toml"
-    with open(output_file_name, "w") as toml_file:
-        toml.dump(pdDict, toml_file)
+    with open(output_toml_file, "w") as toml_file:
+        toml.dump(pd_dict, toml_file)
 
     return toml_file
 
