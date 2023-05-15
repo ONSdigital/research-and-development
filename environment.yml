@@ -12,12 +12,13 @@ dependencies:
           - detect-secrets
           - myst-parser
           - numpy
-          - pandas
+          - pandas==1.1.5
           - pre-commit==2.17.0
           - pydoop
           - pytest
           - pytest-cov
           - python-dotenv
+          - setuptools
           - table_logger
           - toml
           - xlrd
