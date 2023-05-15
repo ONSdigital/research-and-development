@@ -94,7 +94,6 @@ def reformat_tomlDict(pdDict: dict) -> dict:
 
         subDict1 = newDict[str(key)]
         var = subDict1.pop("Field Name")
-        var = var.replace('"', "")
 
         tomlDict[var] = subDict1
 
