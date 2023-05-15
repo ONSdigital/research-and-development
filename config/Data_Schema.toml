@@ -1,5 +1,5 @@
 [snapshot_id]
-Description = nannan
+Description = nan
 Deduced Data Type = nan
 Nullable = nan
 Current Data Type = str
@@ -423,7 +423,7 @@ Description = All values are
 Deduced Data Type = ?
 Nullable = 0.0
 Current Data Type = str
-Length = nan
+Length = nanread_
 Min values = nan
 Max values = nan
 Possible Categorical Values = nan
