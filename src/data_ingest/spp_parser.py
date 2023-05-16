@@ -13,7 +13,7 @@ def parse_snap_data(snapdata: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: The contributers and responders dataframes
     """
-    # Load the dicts
+    # Load the dicts!
     contributordict = snapdata["contributors"]
     responsesdict = snapdata["responses"]
 
