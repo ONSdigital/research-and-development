@@ -60,8 +60,7 @@ class RunLog:
     def retrieve_pipeline_logs(self):
         """
         Get all of the logs from the pipeline run
-        and append them to self.logs list
-
+        and append them to self.saved_logs df.
         """
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
@@ -76,6 +75,10 @@ class RunLog:
         return self
 
     def retrieve_configs(self):
+        """Retrieve the config settings for each run
+        whilst ignoring the top level keys. This can then be saved
+        in a column readable format.
+        """
         with open("src/developer_config.yaml", "r") as file:
             self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
