@@ -70,7 +70,7 @@ def run_pipeline(start):
 
     # Data output: File Outputs
 
-    MainLogger.info("Finishing Pipeline .......................")
+    MainLogger.info("Finshing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
 
