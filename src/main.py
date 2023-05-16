@@ -58,6 +58,7 @@ def run_pipeline(start):
     )
 
     # Data validation
+    validation.validate_postcode
 
     # Check the postcode column
     validation.validate_post_col(contributors_df, masterlist_path)
