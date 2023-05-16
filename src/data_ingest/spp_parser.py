@@ -17,7 +17,7 @@ def parse_snap_data(snapdata: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     contributordict = snapdata["contributors"]
     responsesdict = snapdata["responses"]
 
-    # Make dataframes!
+    # Make dataframes
     contributors_df = pd.DataFrame(contributordict)
     responses_df = pd.DataFrame(responsesdict)
 
