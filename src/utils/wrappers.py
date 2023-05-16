@@ -17,7 +17,7 @@ def logger_creator(config):
     in the main script before running the pipeline"""
     logging.basicConfig(
         # logging level is obtained from user configs
-        level=config["logging_level"],
+        level=config["global"]["logging_level"],
         # Define the detail and order of the written logs
         format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
         # Log to both console and file

@@ -60,7 +60,11 @@ class RunLog:
             self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
         dct = {k: [v] for k, v in self.configdata.items()}
-        self.configdf = pd.DataFrame(dct)
+        self.ndct = {}
+        for i in dct.keys():
+            nrow = {k: [v] for k, v in dct[i][0].items()}
+            self.ndct.update(nrow)
+        self.configdf = pd.DataFrame(self.ndct)
         self.configdf.insert(0, "run_id", self.runids["run_id"])
         return self
 
@@ -98,9 +102,9 @@ class RunLog:
     def _get_runlog_settings(self):
 
         """Get the runlog settings from the config file."""
-        write_csv = self.config["write_csv"]
-        write_hdf5 = self.config["write_hdf5"]
-        write_sql = self.config["write_sql"]
+        write_csv = self.config["runlog_writer"]["write_csv"]
+        write_hdf5 = self.config["runlog_writer"]["write_hdf5"]
+        write_sql = self.config["runlog_writer"]["write_sql"]
 
         return write_csv, write_hdf5, write_sql
 
@@ -112,15 +116,15 @@ class RunLog:
         config = conf_obj.config_dict
 
         main_columns = ["run_id", "timestamp", "version", "duration"]
-        file_name = config["main_filename"]
+        file_name = config["csv_filenames"]["main"]
         csv_creator(file_name, main_columns)
 
         config_columns = list(self.configdf.columns.values)
-        file_name = config["configs_filename"]
+        file_name = config["csv_filenames"]["configs"]
         csv_creator(file_name, config_columns)
 
         log_columns = ["run_id", "timestamp", "module", "function", "message"]
-        file_name = config["logs_filename"]
+        file_name = config["csv_filenames"]["logs"]
         csv_creator(file_name, log_columns)
 
         return None
