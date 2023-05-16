@@ -13,6 +13,7 @@ dependencies:
           - myst-parser
           - numpy
           - pandas==1.1.5
+          - postcodes_uk
           - pre-commit==2.17.0
           - pydoop
           - pytest
