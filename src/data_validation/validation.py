@@ -5,10 +5,12 @@ def validate_postcode(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the
 
     Args:
-        pcode (str): _description_
+        pcode (str): The postcode to validate
 
     Returns:
-        bool: _description_
+        bool: True or False depending on if it is valid or not
     """
-    validation = postcodes_uk.validate(pcode)
-    return validation
+    # Validation step
+    valid_bool = postcodes_uk.validate(pcode)
+
+    return valid_bool
