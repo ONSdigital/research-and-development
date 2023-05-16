@@ -8,6 +8,7 @@ from src.utils.testfunctions import Manipulate_data
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
+from src.data_validation import validation
 import time
 import logging
 
@@ -51,6 +52,7 @@ def run_pipeline(start):
     )
 
     # Data validation
+    validation.validate_postcode
 
     # Outlier detection
 
