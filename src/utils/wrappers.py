@@ -189,10 +189,8 @@ def df_measure_change(df, rows_before, cols_before, table_config):
         tbl("To", rows_after, cols_after)
         tbl("Change", f"{row_diff} ({row_change})", f"{col_diff} ({col_change})")
     elif table_config == "SingleLine":
-        logger.info(
-            f"""Difference in rows: {row_diff} ({row_change}),
-                        Difference in columns {col_diff} ({col_change})"""
-        )
+        logger.info(f"""Difference in rows: {row_diff} ({row_change})""")
+        logger.info(f"""Difference in columns {col_diff} ({col_change})""")
     else:
         logger.warning(
             """Trouble at mill!!! Mistake in config.

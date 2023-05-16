@@ -38,6 +38,7 @@ def run_pipeline(start):
     run_time = round(time.time() - start, 5)
     runlog_obj._record_time_taken(run_time)
 
+    runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
     runlog_obj._create_runlog_dfs()
     runlog_obj.create_runlog_files()

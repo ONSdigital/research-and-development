@@ -5,7 +5,7 @@ from src.utils.hdfs_mods import hdfs_load_json
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
-snapshot_path = config["snapshot_path"]  # Taken from config file
+snapshot_path = config["paths"]["snapshot_path"]  # Taken from config file
 
 snapdata = hdfs_load_json(snapshot_path)
 
