@@ -52,7 +52,7 @@ def run_pipeline(start):
     )
 
     # Data validation
-    validation.validate_postcode
+    validation.validate_post_col(contributers_df)
 
     # Outlier detection
 
