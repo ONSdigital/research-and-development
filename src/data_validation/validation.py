@@ -1,5 +1,7 @@
 import postcodes_uk
 
+# import pandera
+
 
 def validate_postcode(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the
