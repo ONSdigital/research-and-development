@@ -75,10 +75,6 @@ class RunLog:
         return self
 
     def retrieve_configs(self):
-        """Retrieve the config settings for each run
-        whilst ignoring the top level keys. This can then be saved
-        in a column readable format.
-        """
         with open("src/developer_config.yaml", "r") as file:
             self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
