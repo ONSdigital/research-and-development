@@ -22,4 +22,3 @@ dependencies:
           - table_logger
           - toml
           - xlrd
-          
