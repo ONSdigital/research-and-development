@@ -17,6 +17,12 @@ MainLogger = logging.getLogger(__name__)
 MainLogger.setLevel(logging.INFO)
 
 
+# load config
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+masterlist_path = config["masterlist_path"]
+
+
 def run_pipeline(start):
     """The main pipeline.
 
@@ -52,7 +58,10 @@ def run_pipeline(start):
     )
 
     # Data validation
-    validation.validate_post_col(contributers_df)
+    
+    
+    # Check the postcode column
+    validation.validate_post_col(contributers_df , postcode_master_list) 
 
     # Outlier detection
 

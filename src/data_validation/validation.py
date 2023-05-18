@@ -1,7 +1,18 @@
 import postcodes_uk
 import pandas as pd
 
-# import pandera
+from src.utils.wrappers import logger_creator
+from src.utils.helpers import Config_settings
+
+
+# Get the config 
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+global_config = config["global"]
+
+# Set up logging 
+logger = logger_creator(global_config)
+
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -18,7 +29,22 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
     return valid_bool
 
-def validate_post_col(df: pd.DataFrame) -> bool:
+def get_masterlist(masterlist_path) -> pd.Series:
+    """This function loads the masterlist of postcodes from a csv file
+
+    Returns:
+        pd.Series: The dataframe of postcodes
+    """
+    
+    masterlist = (pd.Series
+                  (pd.read_csv
+                   (masterlist_path, 
+                    usecols=["pcd"])))
+    
+    return masterlist
+
+
+def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column 
         are valid UK postcodes. It uses the `validate_postcode` function to 
         perform the validation.
@@ -38,9 +64,26 @@ def validate_post_col(df: pd.DataFrame) -> bool:
         >>> validate_post_col(df)
         ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
     """
-    invalid_postcodes = df.loc[~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"]
+    master_series = get_masterlist(masterlist_path)
+    
+    # Check if postcode are real    
+    unreal_postcodes = df.loc[~df["referencepostcode"].isin(master_series), "referencepostcode"]
+    
+    # Log the unreal postcodes
+    if not unreal_postcodes.empty:
+        logger.warning(f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}")
+    
+    # Check if postcodes match pattern
+    invalid_pattern_postcodes = df.loc[~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"]
 
-    if not invalid_postcodes.empty:
-        raise ValueError(f"Invalid postcodes found: {invalid_postcodes.to_list()}")
+    # Log the invalid postcodes
+    if not invalid_pattern_postcodes.empty:
+        logger.warning(f"Invalid postcodes found: {invalid_pattern_postcodes.to_list()}")
+
+    # Combine the two lists
+    combined_invalid_postcodes = pd.concat([unreal_postcodes, invalid_pattern_postcodes])
+
+    if not combined_invalid_postcodes.empty:
+        raise ValueError(f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}")
     
     return True
