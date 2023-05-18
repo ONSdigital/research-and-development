@@ -4,7 +4,7 @@ import pandas as pd
 # import pandera
 
 
-def validate_postcode(pcode: str) -> bool:
+def validate_postcode_pattern(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the
 
     Args:
@@ -18,8 +18,7 @@ def validate_postcode(pcode: str) -> bool:
 
     return valid_bool
 
-
-def validate_post_col(df: pd.Dataframe) -> bool:
+def validate_post_col(df: pd.DataFrame) -> bool:
     """This function checks if all postcodes in the specified DataFrame column 
         are valid UK postcodes. It uses the `validate_postcode` function to 
         perform the validation.
@@ -39,7 +38,7 @@ def validate_post_col(df: pd.Dataframe) -> bool:
         >>> validate_post_col(df)
         ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
     """
-    invalid_postcodes = df.loc[~df["referencepostcode"].apply(validate_postcode), "referencepostcode"]
+    invalid_postcodes = df.loc[~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"]
 
     if not invalid_postcodes.empty:
         raise ValueError(f"Invalid postcodes found: {invalid_postcodes.to_list()}")
