@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.data_validation import validate_postcode, validate_post_col
+from src.data_validation.validation import validate_postcode, validate_post_col
 
 
 def test_validate_post_col():
@@ -45,7 +45,8 @@ def test_validate_post_col():
 
     # Edge cases: empty reference postcode column
     df_no_postcodes = pd.DataFrame({"referencepostcode": [""]})
-    assert validate_post_col(df_no_postcodes) is False  # Empty postcode
+    with pytest.raises(ValueError):
+        validate_post_col(df_no_postcodes)  # Empty postcode column
 
 
 def test_validate_postcode():
