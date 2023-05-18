@@ -30,13 +30,8 @@ def run_pipeline(start):
         start (float): The time when the pipeline is launched
         generated from the time module using time.time()
     """
-
-    # Get the config seetings
-    conf_obj = Config_settings()
-    config = conf_obj.config_dict
-    global_config = config["global"]
-
     # Set up the run logger
+    global_config = config["global"]
     runlog_obj = runlog.RunLog(config, version)
 
     logger = logger_creator(global_config)
@@ -58,6 +53,7 @@ def run_pipeline(start):
     )
 
     # Data validation
+    MainLogger.info("Starting Data Validation...")
 
     # Check the postcode column
     validation.validate_post_col(contributors_df, masterlist_path)
