@@ -154,7 +154,6 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
 def check_data_shape(
     data_file: str = datafilepath,
     schema_path: str = "./config/Data_Schema.toml",
-    num_cols: int = 93,
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
@@ -164,7 +163,6 @@ def check_data_shape(
         data_file -- Path to data file to compare (default: {datafilepath})
         schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
-        num_cols -- Number of columns in data (default: {93})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
