@@ -31,7 +31,6 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
     return valid_bool
 
-
 def get_masterlist(masterlist_path) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
