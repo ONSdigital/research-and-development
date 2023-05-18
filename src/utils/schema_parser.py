@@ -6,7 +6,7 @@ import pydoop.hdfs as hdfs
 from typing import IO
 
 
-def read_SPP_snapshot(excel_file, excel_sheet) -> pd.DataFrame:
+def read_SPP_schema(excel_file, excel_sheet) -> pd.DataFrame:
     """Read the updated SPP Snapshot Schema, specifying the name
     of the sheet to read. Convert it into a pandas dataframe,
     dropping any rows which include NaN values in the 'Field Name'
@@ -121,7 +121,7 @@ def create_toml(
     return toml_file
 
 
-berd_schema_df = read_SPP_snapshot("./config/SPP Snapshot Schema.xlsx", "contributors")
+berd_schema_df = read_SPP_schema("./config/SPP Snapshot Schema.xlsx", "contributors")
 berd_schema_dict = convert_dataFrame(berd_schema_df)
 reshaped_schema_dict = reformat_tomlDict(berd_schema_dict)
 tomlfile = create_toml(reshaped_schema_dict, "./config/Data_Schema.toml")
