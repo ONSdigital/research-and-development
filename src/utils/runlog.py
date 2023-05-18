@@ -5,14 +5,14 @@ from src.utils.helpers import Config_settings
 from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
 import pydoop.hdfs as hdfs
 import csv
-
+import yaml
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 csv_filenames = config["csv_filenames"]
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = config["logs_foldername"]  # Taken from config file
+project = config["paths"]["logs_foldername"]  # Taken from config file
 main_path = f"/user/{context}/{project}"
 hdfs.mkdir(main_path)
 
@@ -60,13 +60,35 @@ class RunLog:
     def retrieve_pipeline_logs(self):
         """
         Get all of the logs from the pipeline run
-        and append them to self.logs list
-
+        and append them to self.saved_logs df.
         """
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
-        self.logs.append(lines)
+        self.runids = {"run_id": self.run_id}
+        for line in lines:
+            self.logs.append(line.split(" - "))
+            self.runids.update({"run_id": self.run_id})
+        self.saved_logs = pd.DataFrame(
+            self.logs, columns=["timestamp", "module", "function", "message"]
+        )
+        self.saved_logs.insert(0, "run_id", self.runids["run_id"])
+        return self
 
+    def retrieve_configs(self):
+        """Retrieve the config settings for each run
+        whilst ignoring the top level keys. This can then be saved
+        in a column readable format.
+        """
+        with open("src/developer_config.yaml", "r") as file:
+            self.configdata = yaml.load(file, Loader=yaml.FullLoader)
+        # Convert the YAML data to a Pandas DataFrame
+        dct = {k: [v] for k, v in self.configdata.items()}
+        self.ndct = {}
+        for i in dct.keys():
+            nrow = {k: [v] for k, v in dct[i][0].items()}
+            self.ndct.update(nrow)
+        self.configdf = pd.DataFrame(self.ndct)
+        self.configdf.insert(0, "run_id", self.runids["run_id"])
         return self
 
     def _generate_time(self):
@@ -83,34 +105,21 @@ class RunLog:
             "run_id": self.run_id,
             "timestamp": self.timestamp,
             "version": self.version,
-            "duration": self.time_taken,
-        }
-
-        self.runlog_configs_dict = {
-            "run_id": self.run_id,
-            "configs": self.config,
-        }
-
-        self.runlog_logs_dict = {
-            "run_id": self.run_id,
-            "logs": self.logs,
+            "time_taken": self.time_taken,
         }
 
         return self
 
     def _create_runlog_dfs(self):
         """Convert dictionaries to pandas dataframes."""
-
         self.runlog_main_df = pd.DataFrame(
             [self.runlog_main_dict],
-            columns=["run_id", "timestamp", "version", "duration"],
+            columns=["run_id", "timestamp", "version", "time_taken"],
         )
-        self.runlog_configs_df = pd.DataFrame(
-            [self.runlog_configs_dict], columns=["run_id", "configs"]
-        )
-        self.runlog_logs_df = pd.DataFrame(
-            [self.runlog_logs_dict], columns=["run_id", "logs"]
-        )
+
+        self.runlog_configs_df = self.configdf
+
+        self.runlog_logs_df = self.saved_logs
 
         return self
 
@@ -148,17 +157,17 @@ class RunLog:
         if they don't already exist.
         """
 
-        main_columns = ["run_id", "timestamp", "version", "duration"]
+        main_columns = ["run_id", "timestamp", "version", "time_taken"]
         file_name = csv_filenames["main"]
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, main_columns)
 
-        config_columns = ["run_id", "configs"]
+        config_columns = list(self.configdf.columns.values)
         file_name = csv_filenames["configs"]
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, config_columns)
 
-        log_columns = ["run_id", "logs"]
+        log_columns = ["run_id", "timestamp", "module", "function", "message"]
         file_name = csv_filenames["logs"]
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, log_columns)
