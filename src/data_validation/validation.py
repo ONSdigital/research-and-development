@@ -188,7 +188,3 @@ def check_data_shape(
         cols_match = False
 
     return cols_match
-
-
-# Check if data and schema shapes match
-shapes_match = check_data_shape()
