@@ -15,18 +15,14 @@ responsesdict = snapdata["responses"]
 contributers = pd.DataFrame(contributerdict)
 responses = pd.DataFrame(responsesdict)
 
-    # Open the file in read mode inside Hadoop context
-    with hdfs.open(filepath, "r") as file:
-        # Import csv file and convert to Dataframe
-        datadict = json.load(file)
-        contributerdict = datadict["contributors"][0]
-        responsesdict = datadict["responses"][0]
+contributerdict = snapdata["contributors"]
+responsesdict = snapdata["responses"]
 
-    datadf = pd.DataFrame.from_dict(datadict, orient="index")
+contributers = pd.DataFrame(contributerdict)
+responses = pd.DataFrame(responsesdict)
 
-    return datadf, contributerdict, responsesdict
-
-
-snapdata, contributerdict, responsesdict = hdfs_load_json(file_path)
-
-# test commit
+print(contributers.head())
+print("\n")
+print(responses.head())
+print("\n")
+print([responses["questioncode"].unique()])
