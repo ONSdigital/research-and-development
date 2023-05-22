@@ -121,10 +121,11 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
+from src.utils.hdfs_mods import hdfs_load_json as read_data
 
-from src.utils.hdfs_mods import read_hdfs_csv as read_data
-
-datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
+datafilepath = (
+    "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+)
 
 
 def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
@@ -170,28 +171,24 @@ def check_data_shape(
 
     cols_match = False
 
-    # Read data file
-    data = read_data(data_file)
+    # Read data file from json file
+    snapdata = read_data(data_file)
 
-    # Convert it to dictionary
-    data_dict = data.to_dict()
+    # Specify which key in snapshot data dictionary to get correct data
+    # List, with each element containing a dictionary for each row of data
+    contributerdict = snapdata["contributors"]
 
     # Load toml data schema into dictionary
     toml_string = load_schema(schema_path)
 
-    # Create a 'shared key' dictionary
-    shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
-
-    # Compare number of 'columns' in data to data schema
-    if len(shared_items) == len(toml_string):
+    # Compare length of data dictionary to the data schema
+    if len(contributerdict[0]) == len(toml_string):
         cols_match = True
     else:
         cols_match = False
 
     return cols_match
 
-
-schema_dict = load_schema()
 
 # Check if data and schema shapes match
 shapes_match = check_data_shape()
