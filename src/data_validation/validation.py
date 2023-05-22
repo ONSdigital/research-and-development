@@ -151,7 +151,7 @@ def check_data_shape(
 
     Keyword Arguments:
         schema_path -- Path to schema dictionary file
-        (default: {"./config/DataSchema.toml"})
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
