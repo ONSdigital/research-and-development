@@ -122,10 +122,13 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
 import os
 import toml
 from src.utils.hdfs_mods import hdfs_load_json as read_data
+from src.utils.helpers import Config_settings
 
-datafilepath = (
-    "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
-)
+
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+config_paths = config["paths"]
+snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
 
 def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
@@ -153,7 +156,7 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
 
 
 def check_data_shape(
-    data_file: str = datafilepath,
+    data_file: str = snapshot_path,
     schema_path: str = "./config/Data_Schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
