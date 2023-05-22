@@ -298,7 +298,7 @@ Min_values = "nan"
 Max_values = "nan"
 Possible_Categorical_Values = ["PAYEREF"]
 
-[companyregi"str"ationnumber]
+[companyregistrationnumber]
 Description = "nan"
 Deduced_Data_Type = "str"
 Nullable = 0.0
