@@ -14,7 +14,7 @@ def test_check_file_exists():
     empty_file = open("./emptyfile.py", "x")
 
     # developer_config.yaml should exist and be non-empty
-    result_1 = check_file_exists("./src/developer_config.yaml")
+    result_1 = check_file_exists("developer_config.yaml", "./src/")
     result_2 = check_file_exists("Non_existant_file.txt")
     result_3 = check_file_exists(empty_file.name)
 
