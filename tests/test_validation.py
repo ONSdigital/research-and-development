@@ -10,12 +10,15 @@ def test_check_file_exists():
     from src.data_validation.validation import check_file_exists
 
     # Act: use pytest to assert the result
+    # Create emptyfile.py if it doesn't already exist
     empty_file = open("./emptyfile.py", "x")
 
-    result_1 = check_file_exists()
+    # developer_config.yaml should exist and be non-empty
+    result_1 = check_file_exists("./src/developer_config.yaml")
     result_2 = check_file_exists("Non_existant_file.txt")
     result_3 = check_file_exists(empty_file.name)
 
+    # Delete emptyfile.py after testing
     os.remove(empty_file.name)
 
     # Assert
