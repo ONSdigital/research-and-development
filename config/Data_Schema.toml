@@ -70,7 +70,7 @@ Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305,
 
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = Datetime
+Deduced_Data_Type = "Datetime"
 Nullable = 0.0
 Current_Data_Type = ["None","str"]
 Length = "nan"
@@ -80,7 +80,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockedby]
 Description = "All empty strings"
-Deduced_Data_Type = ?
+Deduced_Data_Type = "?"
 Nullable = 1.0
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -90,7 +90,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockeddate]
 Description = "All None type"
-Deduced_Data_Type = ?
+Deduced_Data_Type = "?"
 Nullable = 1.0
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -416,7 +416,7 @@ Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_Categorical_Values = [L]
+Possible_Categorical_Values = ["L"]
 
 [inclusionexclusion]
 Description = 'All values are " "'
