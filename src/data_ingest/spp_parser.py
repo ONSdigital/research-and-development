@@ -5,7 +5,6 @@ from src.utils.wrappers import exception_wrap, time_logger_wrap
 import logging
 
 LoadingLogger = logging.getLogger(__name__)
-LoadingLogger.setLevel(logging.INFO)
 
 @exception_wrap
 @time_logger_wrap

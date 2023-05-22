@@ -14,7 +14,6 @@ import logging
 
 
 MainLogger = logging.getLogger(__name__)
-MainLogger.setLevel(logging.INFO)
 
 
 # load config

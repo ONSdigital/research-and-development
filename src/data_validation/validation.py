@@ -12,7 +12,6 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 
 ValidationLogger = logging.getLogger(__name__)
-ValidationLogger.setLevel(logging.INFO)
 
 
 @time_logger_wrap
