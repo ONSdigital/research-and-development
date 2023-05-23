@@ -30,6 +30,7 @@ jobs:
 # 3) Run pytest to run all tests in the tests folder
       - name: Use coverage to run pytest
       # Specify shell to run the command in
+        working-directory: ${{ github.workspace }}
         shell: bash -l {0}
         run: |
           coverage run --branch --source=./src --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/main.py \
