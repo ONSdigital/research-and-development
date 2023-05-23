@@ -5,8 +5,8 @@ spp_processing_logger = logging.getLogger(__name__)
 
 def full_responses(contributors, responses):
 
-    """Merges contributor and response data together into a dataframe that is in a
-    format allowing for easier manipulation later in pipeline - notably through
+    """Merges contributor and response data together into a dataframe that is in a 
+    format allowing for easier manipulation later in pipeline - notably through 
     having each questioncode as its own column.
 
     Arguments:
@@ -25,24 +25,25 @@ def full_responses(contributors, responses):
     contributors_dropped = contributors.drop(drop_cols, axis=1)
     responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
 
-    merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols)
+    merged_df = contributors_dropped.merge(responses_dropped, 
+                                           on = unique_id_cols)
 
-    contextual_df = merged_df.drop(
-        ["questioncode", "response"], axis=1
-    ).drop_duplicates()
+    contextual_df = merged_df.drop(["questioncode", "response"], 
+                                   axis=1).drop_duplicates()
 
-    response_df = merged_df.pivot_table(
-        index=unique_id_cols, columns="questioncode", values="response", aggfunc="first"
-    ).reset_index()
+    response_df = merged_df.pivot_table(index = unique_id_cols,
+                                        columns='questioncode',
+                                        values='response', 
+                                        aggfunc='first').reset_index()
 
-    full_responses = response_df.merge(contextual_df, on=unique_id_cols)
+    full_responses = response_df.merge(contextual_df, on = unique_id_cols)
 
     return full_responses
 
 
 def response_rate(contributors, responses):
 
-    """Generates a response rate based on the contributor and response data
+    """Generates a response rate based on the contributor and response data 
     from the SPP Snapshot file.
 
     Arguments:
@@ -62,3 +63,4 @@ def response_rate(contributors, responses):
     spp_processing_logger.info(f"The SPP response rate is {round(response_rate,2)}%")
 
     return response_rate
+
