@@ -7,8 +7,6 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 snapshot_path = config["snapshot_path"]  # Taken from config file
 
-from src.data_ingest.loading import load_snapshot_data
-
 
 def full_responses(contributors, responses):
 
@@ -41,7 +39,7 @@ def full_responses(contributors, responses):
     response_df = merged_df.pivot_table(index = unique_id_cols,
                                         columns='questioncode',
                                         values='response', 
-                                        aggfunc=','.join).reset_index()
+                                        aggfunc='first').reset_index()
 
     full_responses = response_df.merge(contextual_df, on = unique_id_cols)
 
@@ -69,9 +67,3 @@ def response_rate(contributors, responses):
 
     return response_rate
 
-contributors = load_snapshot_data(snapshot_path, data_type = "contributors")
-responses = load_snapshot_data(snapshot_path, data_type = "responses")
-
-full_responses = full_responses(contributors, responses)
-
-print("\nThe response rate is", "{0:.1%}".format(response_rate(contributors, responses)))

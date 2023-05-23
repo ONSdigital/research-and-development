@@ -5,6 +5,8 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
+from src.data_ingest import loading
+from src.data_processing import spp_snapshot_processing as processing
 import time
 import logging
 
@@ -21,17 +23,47 @@ def run_pipeline(start):
         generated from the time module using time.time()
     """
 
+    # Get the config seetings
     conf_obj = Config_settings()
     config = conf_obj.config_dict
     global_config = config["global"]
 
+    # Set up the run logger
     runlog_obj = runlog.RunLog(config, version)
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     Manipulate_data()
-    MainLogger.info("Finishing Pipeline .........................")
+
+    # Data Ingest
+    contributors_df, responses_df = loading.parse_snap_data()
+    full_responses = processing.full_responses(contributors_df, responses_df)
+
+    logger.info("The response rate is %.3%", processing.response_rate(contributors_df, responses_df))
+
+
+    # Data validation
+
+    # Outlier detection
+
+    # Data cleaning
+
+    # Data processing: Imputation
+
+    # Data processing: Estimation
+
+    # Data processing: Regional Apportionment
+
+    # Data processing: Aggregation
+
+    # Data display: Visualisations
+
+    # Data output: Disclosure Control
+
+    # Data output: File Outputs
+
+    MainLogger.info("Finishing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
 
