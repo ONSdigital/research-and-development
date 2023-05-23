@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.data_validation.validation import validate_postcode, validate_post_col
+from src.data_validation.validation import validate_postcode_pattern, validate_post_col
 
 
 # Define test data
