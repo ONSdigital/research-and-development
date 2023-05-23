@@ -13,7 +13,7 @@ jobs:
 
 # 1) Checkout the code
       - uses: actions/checkout@v3
-# 2) Removing PyDoop from the environment yaml
+# 2) Removing PyDoop from the requirements.txt
       - name: Remove pydoop requirements.txt
         shell: bash -l {0}
         run: |
