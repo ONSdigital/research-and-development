@@ -17,7 +17,7 @@ dependencies:
           - postcodes_uk
           - pre-commit==2.17.0
           - pydoop
-          - pytest
+          - pytest #using version 5 which is compatible with postcodes_uk
           - pytest-cov
           - python-dotenv
           - readme-coverage-badger
