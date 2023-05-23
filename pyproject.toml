@@ -18,7 +18,6 @@ profile = "black"
 addopts = [
     "-vv",
     "--doctest-modules",
-
 ]
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 testpaths = [
