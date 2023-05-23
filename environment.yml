@@ -11,6 +11,7 @@ dependencies:
           - cookiecutter
           - detect-secrets
           - myst-parser
+          - more-itertools==5.0.0
           - numpy
           - pandas==1.1.5
           - postcodes_uk
