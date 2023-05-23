@@ -61,7 +61,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     Example:
         >>> df = pd.DataFrame({"referencepostcode": ["AB12 3CD", "EFG 456", "HIJ 789", "KL1M 2NO"]})
-        >>> validate_post_col(df)
+        >>> validate_post_col(df, "example-path/to/masterlist.csv"")
         ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
     """
     master_series = get_masterlist(masterlist_path)
