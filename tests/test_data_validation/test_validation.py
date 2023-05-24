@@ -7,6 +7,10 @@ from src.data_validation.validation import validate_post_col
 
 @pytest.fixture  # noqa
 def test_data():
+    """'NP10 8XG', 'SW1P 4DF' are valid and real postcodes. 'HIJ 789' is neither valid nor real
+     and 'KL1M 2NO' is a valid pattern but not real
+
+    """
     return pd.DataFrame(
         {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
     )
