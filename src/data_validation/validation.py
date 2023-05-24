@@ -64,6 +64,9 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         >>> validate_post_col(df, "example-path/to/masterlist.csv"")
         ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
     """
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
+    
     master_series = get_masterlist(masterlist_path)
     
     # Check if postcode are real    
