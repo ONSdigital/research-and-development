@@ -1,8 +1,6 @@
 import pandas as pd
 import pytest
-from src.data_validation.validation import validate_post_col
-
-# import validate_postcode_pattern,  # noqa
+from src.data_validation.validation import validate_post_col, validate_postcode_pattern  # noqa
 
 
 @pytest.fixture  # noqa
@@ -82,22 +80,22 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
         validate_post_col(df_no_postcodes, fake_path)  # Empty postcode column
 
 
-# def test_validate_postcode():
-#     # Valid postcodes
-#     assert validate_postcode("AB12 3CD") is True
-#     assert validate_postcode("DE34 5FG") is False
-#     assert validate_postcode("HI67 8JK") is True
+def test_validate_postcode():
+    # Valid postcodes
+    assert validate_postcode_pattern("AB12 3CD") is True
+    assert validate_postcode_pattern("DE34 5FG") is False
+    assert validate_postcode_pattern("HI67 8JK") is True
 
-#     # Invalid postcodes
-#     assert validate_postcode("EFG 456") is False
-#     assert validate_postcode("HIJ 789") is False
-#     assert validate_postcode("KL1M 2NO") is False
-#     assert validate_postcode("B27 OAG") is False  # Zero is actually an "O"
+    # Invalid postcodes
+    assert validate_postcode_pattern("EFG 456") is False
+    assert validate_postcode_pattern("HIJ 789") is False
+    assert validate_postcode_pattern("KL1M 2NO") is False
+    assert validate_postcode_pattern("B27 OAG") is False  # Zero is actually an "O"
 
-#     # Edge cases
-#     assert validate_postcode(None) is False  # None value should fail
-#     assert validate_postcode("") is False  # Empty string
-#     assert validate_postcode(" ") is False  # Whitespace
-#     assert validate_postcode("AB123CD") is False  # Missing space - othewise valid
-#     assert validate_postcode("ABC XYZ") is False  # All letters but right length
-#     assert validate_postcode("123 456") is False  # All numbers but right length
+    # Edge cases
+    assert validate_postcode_pattern(None) is False  # None value should fail
+    assert validate_postcode_pattern("") is False  # Empty string
+    assert validate_postcode_pattern(" ") is False  # Whitespace
+    assert validate_postcode_pattern("AB123CD") is False  # Missing space - othewise valid
+    assert validate_postcode_pattern("ABC XYZ") is False  # All letters but right length
+    assert validate_postcode_pattern("123 456") is False  # All numbers but right length
