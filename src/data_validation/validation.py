@@ -1,6 +1,5 @@
 import postcodes_uk
 import pandas as pd
-
 from src.utils.wrappers import time_logger_wrap, exception_wrap
 import logging
 
@@ -14,7 +13,6 @@ config = conf_obj.config_dict
 ValidationLogger = logging.getLogger(__name__)
 
 
-@time_logger_wrap
 def validate_postcode_pattern(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the
 

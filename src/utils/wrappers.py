@@ -2,7 +2,6 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
-
 from table_logger import TableLogger
 import logging.config
 
@@ -40,8 +39,8 @@ def time_logger_wrap(func):
         """Define the decorator itself."""
         enter_time = starting_time()
         result = func(*args, **kwargs)
-        time_taken = finishing_time(func, enter_time)
-        return result, time_taken
+        finishing_time(func, enter_time)
+        return result
 
     return decorator
 
@@ -160,7 +159,7 @@ def df_change_wrap(func):
 
 def df_measure_change(df, rows_before, cols_before, table_config):
     """Log the change in a dataframe caused by a function."""
-    shape = df[0].shape
+    shape = df.shape
     rows_after, cols_after = shape[0], shape[1]
 
     def _change_direction(before, after):
