@@ -83,7 +83,7 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
 def test_validate_postcode():
     # Valid postcodes
     assert validate_postcode_pattern("AB12 3CD") is True
-    assert validate_postcode_pattern("DE34 5FG") is False
+    assert validate_postcode_pattern("DE34 5FG") is True
     assert validate_postcode_pattern("HI67 8JK") is True
 
     # Invalid postcodes
