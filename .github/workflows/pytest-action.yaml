@@ -24,10 +24,10 @@ jobs:
         with:
           python-version: '3.6'
 
-# install dependencies from requirements.txt
+# 4) Install dependencies from requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
-# 3) Run pytest to run all tests in the tests folder!
+# 5) Run pytest to run all tests in the tests folder!
       - name: Use coverage to run pytest
       # Specify shell to run the command in
         working-directory: ${{ github.workspace }}
@@ -36,7 +36,7 @@ jobs:
           coverage run --branch --source=./src --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/main.py \
               -m pytest -ra ./tests --junitxml=junit_result.xml --ignore=tests/test_utils/test_hdfs_mods.py && coverage xml \
               -o python_coverage.xml && coverage report -m --fail-under=10
-# 4) Get the coverage report in to the pull request comments
+# 6) Get the coverage report in to the pull request comments
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
