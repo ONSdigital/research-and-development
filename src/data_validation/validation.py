@@ -24,6 +24,9 @@ def validate_postcode_pattern(pcode: str) -> bool:
     Returns:
         bool: True or False depending on if it is valid or not
     """
+    if pcode is None:
+        return False
+    
     # Validation step
     valid_bool = postcodes_uk.validate(pcode)
 
