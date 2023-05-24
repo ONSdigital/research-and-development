@@ -27,7 +27,7 @@ jobs:
 # install dependencies from requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
-# 3) Run pytest to run all tests in the tests folder
+# 3) Run pytest to run all tests in the tests folder!
       - name: Use coverage to run pytest
       # Specify shell to run the command in
         working-directory: ${{ github.workspace }}
