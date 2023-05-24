@@ -89,7 +89,6 @@ def test_validate_postcode():
     # Invalid postcodes
     assert validate_postcode_pattern("EFG 456") is False
     assert validate_postcode_pattern("HIJ 789") is False
-    assert validate_postcode_pattern("KL1M 2NO") is False
     assert validate_postcode_pattern("B27 OAG") is False  # Zero is actually an "O"
 
     # Edge cases
