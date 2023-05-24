@@ -78,7 +78,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        logger.warning(f"Invalid postcodes found: {invalid_pattern_postcodes.to_list()}")
+        logger.warning(f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}")
 
     # Combine the two lists
     combined_invalid_postcodes = pd.concat([unreal_postcodes, invalid_pattern_postcodes])
