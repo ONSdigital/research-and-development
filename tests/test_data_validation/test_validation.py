@@ -83,6 +83,7 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
 def test_validate_postcode():
     # Valid postcodes
     assert validate_postcode_pattern("AB12 3CD") is True
+    assert validate_postcode_pattern("AB123CD") is True  # Missing space - othewise valid
     assert validate_postcode_pattern("DE34 5FG") is True
     assert validate_postcode_pattern("HI67 8JK") is True
 
@@ -95,6 +96,5 @@ def test_validate_postcode():
     assert validate_postcode_pattern(None) is False  # None value should fail
     assert validate_postcode_pattern("") is False  # Empty string
     assert validate_postcode_pattern(" ") is False  # Whitespace
-    assert validate_postcode_pattern("AB123CD") is False  # Missing space - othewise valid
     assert validate_postcode_pattern("ABC XYZ") is False  # All letters but right length
     assert validate_postcode_pattern("123 456") is False  # All numbers but right length
