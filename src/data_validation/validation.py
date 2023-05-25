@@ -121,16 +121,10 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 import os
 import toml
-import pandas as pd
-import pydoop.hdfs as hdfs
-
-# import json
-# import logging
-
-# from pydantic import ValidationError
-# from pydantic.json import pydantic_encoder
-from pydantic.dataclasses import dataclass
 from deepdiff import DeepDiff
+from pydantic.dataclasses import dataclass
+from src.utils.helpers import Config_settings
+from src.utils.hdfs_mods import hdfs_load_json as read_data
 
 
 datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
@@ -138,60 +132,49 @@ datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
 dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv"
 
 
-def read_data(excel_file) -> pd.DataFrame:
-    """Read an excel file and convert it into a
-    pandas dataframe, dropping any 'Unnamed:' columns.
+# Get config settings from developer_config.yaml
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+config_paths = config["paths"]
+snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
 
-    Arguments:
-        excel_file -- the excel file to be converted
-
-    Returns:
-        A pd.DataFrame: a pandas dataframe object.
-    """
-    with hdfs.open(excel_file, "r") as file:
-
-        # Import csv file and convert to Dataframe
-        sheet = pd.read_csv(file)
-
-    return sheet
-
-
-def load_schema(filePath: str = "./config/DataSchema.toml"):
+def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
     """Load the data schema from toml file into a dictionary
 
     Keyword Arguments:
-        filePath -- Path to data schema toml file
-        (default: {"./config/DataSchema.toml"})
+        file_path -- Path to data schema toml file
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A dict: dictionary containing parsed schema toml file
     """
-    file_exists = os.path.exists(filePath)
+    # Create bool variable for checking if file exists
+    file_exists = os.path.exists(file_path)
 
-    # Check if DataSchema.toml exists
-    if not file_exists:
-        return file_exists
+    # Check if Data_Schema.toml exists
+    if file_exists:
+        # Load toml data schema into dictionary if toml file exists
+        toml_string = toml.load(file_path)
     else:
-        # Load toml data schema into dictionary
-        toml_string = toml.load(filePath)
+        # Return False if file does not exist
+        return file_exists
+
     return toml_string
 
 
 def check_data_shape(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-    numCols: int = 93,
+    data_file: str = snapshot_path,
+    schema_path: str = "./config/Data_Schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        dataFile -- Path to data file to compare (default: {datafilepath})
-        filePath -- Path to schema dictionary file
-        (default: {"./config/DataSchema.toml"})
-        numCols -- Number of columns in data (default: {93})
+        data_file -- Path to data file to compare (default: {snapshot_path})
+        schema_path -- Path to schema dictionary file
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
@@ -199,20 +182,18 @@ def check_data_shape(
 
     cols_match = False
 
-    # Read data file
-    data = read_data(dataFile)
+    # Read data file from json file
+    snapdata = read_data(data_file)
 
-    # Convert it to dictionary
-    data_dict = data.to_dict()
+    # Specify which key in snapshot data dictionary to get correct data
+    # List, with each element containing a dictionary for each row of data
+    contributerdict = snapdata["contributors"]
 
     # Load toml data schema into dictionary
-    toml_string = load_schema(filePath)
+    toml_string = load_schema(schema_path)
 
-    # Create a 'shared key' dictionary
-    shared_items = {k: toml_string[k] for k in toml_string if k in data_dict}
-
-    # Compare number of 'columns' in data to data schema
-    if len(shared_items) == len(toml_string):
+    # Compare length of data dictionary to the data schema
+    if len(contributerdict[0]) == len(toml_string):
         cols_match = True
     else:
         cols_match = False
@@ -221,28 +202,32 @@ def check_data_shape(
 
 
 def check_var_names(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
+    dataFile: str = snapshot_path,
+    filePath: str = "./config/Data_Schema.toml",
 ) -> bool:
-    """_summary_
+    """Compare the keys of the ingested data file and the data schema
+    dictionaries. If they match then returns True, if not then returns
+    False
 
     Keyword Arguments:
         dataFile -- _description_ (default: {snapshot_path})
-        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+        filePath -- _description_ (default: {"./config/Data_Schema.toml"})
 
     Returns:
-        _description_
+        A bool: boolean value indicating whether data file dictionary
+        keys match the data schema dictionary keys.
     """
     # Read data file
-    data = read_data(dataFile)
+    snapdata = read_data(dataFile)
 
-    # Convert it to dictionary
-    data_dict = data.to_dict()
+    # Specify which key in snapshot data dictionary to get correct data
+    # List, with each element containing a dictionary for each row of data
+    contributerdict = snapdata["contributors"][0]
 
     # Load toml data schema into dictionary
     toml_string = load_schema(filePath)
 
-    if data_dict.keys() == toml_string.keys():
+    if contributerdict.keys() == toml_string.keys():
         dict_match = True
     else:
         dict_match = False
@@ -251,9 +236,9 @@ def check_var_names(
 
 
 def data_key_diffs(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-):
+    dataFile: str = snapshot_path,
+    filePath: str = "./config/Data_Schema.toml",
+) -> dict:
     """Compare differences between data dictionary and the toml data
     schema dictionary. Outputs a dictionary with 'dictionary_items_added'
     and 'dictionary_items_removed' as keys, with values as the items
@@ -262,8 +247,8 @@ def data_key_diffs(
     are not present in the data file.
 
     Keyword Arguments:
-        dataFile -- _description_ (default: {datafilepath})
-        filePath -- _description_ (default: {"./config/DataSchema.toml"})
+        dataFile -- _description_ (default: {snapshot_path})
+        filePath -- _description_ (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A dict: dictionary containing items added to and items removed
@@ -275,16 +260,18 @@ def data_key_diffs(
     data = read_data(dataFile)
 
     # Convert it to dictionary
-    data_dict = data.to_dict()
+    # data_dict = data.to_dict()
+    data_dict = data["contributors"][0]
 
     # Load toml data schema into dictionary
     toml_string = load_schema(filePath)
 
-    # Create dictionary only containing keys of toml dictionary
-    empty_toml = {k: {} for k in toml_string}
+    # Create dictionaries only containing keys of data and schema
+    toml_keys_dict = {k: {} for k in toml_string}
+    data_keys_dict = {k: {} for k in data_dict}
 
     # Does a case-sensitive comparison of the keys of two dictionaries
-    diff = DeepDiff(empty_toml, data_dict, ignore_string_case=True)
+    diff = DeepDiff(toml_keys_dict, data_keys_dict, ignore_string_case=True)
 
     return diff
 
