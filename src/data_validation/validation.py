@@ -74,7 +74,10 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             ~df["referencepostcode"].isin(master_series), "referencepostcode"
         ]
     else:
-        unreal_postcodes = pd.DataFrame([])
+        emptydf = pd.DataFrame(columns=["referencepostcode"])
+        unreal_postcodes = emptydf.loc[
+            ~emptydf["referencepostcode"], "referencepostcode"
+        ]
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
