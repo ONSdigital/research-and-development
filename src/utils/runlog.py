@@ -21,11 +21,18 @@ class RunLog:
     """Creates a runlog instance for the pipeline."""
 
     def __init__(self, config, version):
+        self.user = self._generate_username()
         self.config = config
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
         self.timestamp = self._generate_time()
+
+    def _generate_username(self):
+        """Record the username of the user running the pipeline"""
+        self.context = os.getenv("HADOOP_USER_NAME")
+
+        return self.context
 
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
@@ -65,13 +72,17 @@ class RunLog:
         f = open("logs/main.log", "r")
         lines = f.read().splitlines()
         self.runids = {"run_id": self.run_id}
+        self.users = {"user": self.user}
         for line in lines:
             self.logs.append(line.split(" - "))
             self.runids.update({"run_id": self.run_id})
+            self.users.update({"user": self.user})
         self.saved_logs = pd.DataFrame(
             self.logs, columns=["timestamp", "module", "function", "message"]
         )
         self.saved_logs.insert(0, "run_id", self.runids["run_id"])
+        self.saved_logs.insert(1, "user", self.users["user"])
+
         return self
 
     def retrieve_configs(self):
@@ -85,6 +96,8 @@ class RunLog:
             self.ndct.update(nrow)
         self.configdf = pd.DataFrame(self.ndct)
         self.configdf.insert(0, "run_id", self.runids["run_id"])
+        self.configdf.insert(1, "user", self.users["user"])
+
         return self
 
     def _generate_time(self):
@@ -99,6 +112,7 @@ class RunLog:
 
         self.runlog_main_dict = {
             "run_id": self.run_id,
+            "user": self.user,
             "timestamp": self.timestamp,
             "version": self.version,
             "time_taken": self.time_taken,
@@ -110,7 +124,7 @@ class RunLog:
         """Convert dictionaries to pandas dataframes."""
         self.runlog_main_df = pd.DataFrame(
             [self.runlog_main_dict],
-            columns=["run_id", "timestamp", "version", "time_taken"],
+            columns=["run_id", "user", "timestamp", "version", "time_taken"],
         )
 
         self.runlog_configs_df = self.configdf
@@ -153,7 +167,7 @@ class RunLog:
         if they don't already exist.
         """
 
-        main_columns = ["run_id", "timestamp", "version", "time_taken"]
+        main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
         file_name = csv_filenames["main"]
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, main_columns)
@@ -163,7 +177,7 @@ class RunLog:
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, config_columns)
 
-        log_columns = ["run_id", "timestamp", "module", "function", "message"]
+        log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
         file_name = csv_filenames["logs"]
         file_path = f"{main_path}/{file_name}"
         self.hdfs_csv_creator(file_path, log_columns)
