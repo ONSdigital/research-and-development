@@ -1,469 +1,650 @@
-[snapshot_id]
-Description = "nan"
-Deduced_Data_Type = "nan"
-Nullable = "nan"
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
+[cell_id]
+description = "Cell ID"
+data_type = "Categorical"
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[reference]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = 11001603625
-Max_values = 19891309165
-Possible_Categorical_Values = ["nan"]
+[civ_or_def]
+description = "Business type: Civil or Defence"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[current_sic]
+description = "Sic - Standard Industry Classification"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[data_source]
+description = "Constructed"
+data_type = "Categorical"
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[emp_other]
+description = "emp_other (Full Time Equivalent)"
+data_type = "Numeric float (or decimal)"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[emp_researcher]
+description = "emp_researcher (Full Time Equivalent)"
+data_type = "Numeric float (or decimal)"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[emp_technician]
+description = "emp_technician (Full Time Equivalent)"
+data_type = "Numeric float (or decimal)"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[emp_total]
+description = "emp_total (Full Time Equivalent)"
+data_type = "Numeric float (or decimal)"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[employee_count]
+description = "Employee Count (IDBR)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[foreign_owner]
+description = "Foreign Owner"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[form_status]
+description = "Status"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[form_type]
+description = "Form Type"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[freeze_id]
+description = "Freeze ID - bespoke to openroad"
+data_type = "Categorical"
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[headcount_oth_f]
+description = "Other Female (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_oth_m]
+description = "Other Male (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_res_f]
+description = "Researchers Females (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_res_m]
+description = "Researchers Male (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_tec_f]
+description = "Technicians Female (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_tec_m]
+description = "Technicians Male (Headcount)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[headcount_total]
+description = "Total Headcount"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
 [period]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = 6
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [202012]
+description = "Openroad Specific"
+data_type = "Categorical"
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[survey]
-Description = "All values are 002"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["002"]
+[period_contributor_id]
+description = "Openroad Specific"
+data_type = "Categorical"
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[formid]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "int"
-Length = 2
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [20, 21]
+[period_year]
+description = "Period"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[status]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Clear - overridden SE", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
+[product_group]
+description = "Published Product Group"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[statusencoded]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "int"
-Length = 3
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305, 308, 309]
+[ru_ref]
+description = "Reference"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[receiptdate]
-Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
-Nullable = False
-Current_Data_Type = ["None","str"]
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
+[sizeband]
+description = "SizeBand"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[lockedby]
-Description = "All empty strings"
-Deduced_Data_Type = "pandas.NA"
-Nullable = True
-Current_Data_Type = ["None","str"]
-Length = 0
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
+[wowentref]
+description = "Wowentref"
+data_type = "Categorical"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[lockeddate]
-Description = "All None type"
-Deduced_Data_Type = "pandas.NA"
-Nullable = True
-Current_Data_Type = ["None","str"]
-Length = 0
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
+[q202]
+description = "Salaries & Wages"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[formtype]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["0001", "0006"]
+[q203]
+description = "Other current expenditure"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[checkletter]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = 1
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L", "S"]
+[q204]
+description = "Total Current Expenditure"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozensicoutdated]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1120
-Max_values = 93059
-Possible_Categorical_Values = ["nan"]
+[q205]
+description = "Basic Research"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[rusicoutdated]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1120
-Max_values = 93059
-Possible_Categorical_Values = ["nan"]
+[q206]
+description = "Applied Research"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozensic]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1300
-Max_values = 96090
-Possible_Categorical_Values = ["nan"]
+[q207]
+description = "Experimental Development"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[rusic]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1300
-Max_values = 96090
-Possible_Categorical_Values = ["nan"]
+[q208]
+description = "Land & Build CapEx                "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozenemployees]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 272527
-Possible_Categorical_Values = ["nan"]
+[q209]
+description = "Equipment & Machinery CapEx"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[employees]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 272528
-Possible_Categorical_Values = ["nan"]
+[q210]
+description = "Total Capex."
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozenemployment]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1
-Max_values = 272527
-Possible_Categorical_Values = ["nan"]
+[q211]
+description = "Total Inhouse Expenditure                         "
+data_type = "Numeric Integer"
+nullable = "No"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[employment]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1
-Max_values = 272528
-Possible_Categorical_Values = ["nan"]
+[q212]
+description = "Own Funds"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozenfteemployment]
-Description = "nan"
-Deduced_Data_Type = "float"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0.0
-Max_values = 177699.0
-Possible_Categorical_Values = ["nan"]
+[q213]
+description = "Funding - Commission of the EU"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[fteemployment]
-Description = "nan"
-Deduced_Data_Type = "float"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0.0
-Max_values = 177699.5
-Possible_Categorical_Values = ["nan"]
+[q214]
+description = "Funding - UK government"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[frozenturnover]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 55277352
-Possible_Categorical_Values = ["nan"]
+[q215]
+description = "Funding - Organisations outside the Uk                       "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[turnover]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 55277352
-Possible_Categorical_Values = ["nan"]
+[q216]
+description = "Funding - Other UK Private Bus/Public Orgs                 "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[enterprisereference]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = 1001603625
-Max_values = 9891309165
-Possible_categorical_Values = ["nan"]
+[q217]
+description = "Funding - Any Other UK                                         "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[wowenterprisereference]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = 1001603625
-Max_values = 9891309165
-Possible_categorical_Values = ["nan"]
+[q218]
+description = "Total Funding                                     "
+data_type = "Numeric Integer"
+nullable = "No"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[cellnumber]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "int"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [0]
+[q219]
+description = "Land Acquired for R&D (Split of Land & Build CapEx)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[currency]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["S", "E"]
+[q220]
+description = "Buildings acquired/constructed for R&D (Split of Land & Build CapEx)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[vatreference]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["VATREF"]
+[q221]
+description = "Expenditure on computer software only (of which from Equipment & Machinery CapEx)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[payereference]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["PAYEREF"]
+[q222]
+description = "Purchase of Materials (Split of Other current)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[companyregistrationnumber]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["CRN"]
+[q223]
+description = "Purchase of Services (Split of Other current)"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[numberlivelocalunits]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 6063
-Possible_categorical_Values = ["nan"]
+[q224]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[numberlivevat]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 255
-Possible_categorical_Values = ["nan"]
+[q225]
+description = "Ownership - Own Business"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[numberlivepaye]
-Description = "nan"
-Deduced_Data_Type = "int"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 0
-Max_values = 24
-Possible_categorical_Values = ["nan"]
+[q226]
+description = "Ownership - UK Government"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[legalstatus]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = 1
-Max_values = 4
-Possible_Categorical_Values = [1, 2, 3, 4]
+[q227]
+description = "Ownership - Other UK Priv Bus"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[reportingunitmarker]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["L", "E"]
+[q228]
+description = "Ownership - Other UK Orgs"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[region]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "XX", "AA", "DC", "GF", "BA"]
+[q229]
+description = "Ownership - Bus Enterprises in Group Outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[birthdate]
-Description = "Datetime format = format=%d/%m/%Y"
-Deduced_Data_Type = "Datetime"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q230]
+description = "Ownership - Other Bus Enterprises outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[referencename]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q231]
+description = "Ownership - Other Governments outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[referencepostcode]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q232]
+description = "Ownership - Higher Education Establishments outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[tradingstyle]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q233]
+description = "Ownership - Non-profit Orgs outside the UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[selectiontype]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["L"]
+[q234]
+description = "Ownership - Commission of EU"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[inclusionexclusion]
-Description = 'All values are " "'
-Deduced_Data_Type = "pandas.NA"
-Nullable = False
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q235]
+description = "Ownership - International Orgs"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[createdby]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["ingestion"]
+[q236]
+description = "Ownership - Any other Orgs outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[createddate]
-Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
-Nullable = False
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q237]
+description = "Ownership - not owned freely available"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
 
-[lastupdatedby]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = False
-Current_Data_Type = ["None","str"]
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
+[q238]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
 
-[lastupdateddate]
-Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
-Nullable = False
-Current_Data_Type = ["None","str"]
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
+[q239]
+description = "Life Length - Basic Research"
+data_type = "Numeric Integer"
+nullable = "Not Asked"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q240]
+description = "Life Length - Applied Research"
+data_type = "Numeric Integer"
+nullable = "Not Asked"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q241]
+description = "Life Length - Experimental Res"
+data_type = "Numeric Integer"
+nullable = "Not Asked"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q242]
+description = "Funding - Any other UK organisations"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q243]
+description = "Funding - Business Enterprises in group outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q244]
+description = "Funding - Other Business Enterprises outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q245]
+description = "Funding - Other Governments outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q246]
+description = "Funding - Higher Education Est Outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q247]
+description = "Funding - Non-profit Orgs outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q248]
+description = "Funding - International Orgs"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q249]
+description = "Funding - Any other orgs outside UK"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q250]
+description = "Funding - UK Higher Education Establishments"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q251]
+description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) LONG FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q252]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q253]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q254]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q255]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q256]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q257]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q258]
+description = nan
+data_type = nan
+nullable = nan
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q302]
+description = "Purchased/funded R&D in the UK (Yes or No)"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q303]
+description = "Purchased Outside UK (Govt Funded)                "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q304]
+description = "Purchased Outside UK (Other)                "
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q305]
+description = "Total Purchased"
+data_type = "Numeric Integer"
+nullable = "Yes"
+min_acceptable_value = 0
+max_acceptable_value = 1000000
+
+[q307]
+description = "Tax credit claim submitted or intended for purchased work commissioned in UK (Y/N) LONG FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q308]
+description = "Tax credit claim submitted/intended for purchased work outside Ukorig. Funded by UK gov (Y/N) LONG FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q309]
+description = "Tax credit claim submitted or intended for all other purchased work outside the UK (Y/N) LONG FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q713]
+description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
+
+[q714]
+description = "Tax credit claim submitted or intended for purchased R&D (Y/N) SHORT FORM"
+data_type = "Boolean (True or False, 0 or 1)"
+nullable = "No"
+min_acceptable_value = "nan"
+max_acceptable_value = "nan"
