@@ -40,7 +40,7 @@ Possible_Categorical_Values = ["002"]
 
 [formid]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "int"
 Length = 2
@@ -50,7 +50,7 @@ Possible_Categorical_Values = [20, 21]
 
 [status]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = ">=1"
@@ -60,7 +60,7 @@ Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Cle
 
 [statusencoded]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "int"
 Length = 3
@@ -80,7 +80,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockedby]
 Description = "All empty strings"
-Deduced_Data_Type = "?"
+Deduced_Data_Type = "pandas.NA"
 Nullable = True
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -90,7 +90,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockeddate]
 Description = "All None type"
-Deduced_Data_Type = "?"
+Deduced_Data_Type = "pandas.NA"
 Nullable = True
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -100,7 +100,7 @@ Possible_Categorical_Values = ["nan"]
 
 [formtype]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -110,7 +110,7 @@ Possible_Categorical_Values = ["0001", "0006"]
 
 [checkletter]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = 1
@@ -204,8 +204,8 @@ Deduced_Data_Type = "float"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
-Min_values = 0
-Max_values = 177699
+Min_values = 0.0
+Max_values = 177699.0
 Possible_Categorical_Values = ["nan"]
 
 [fteemployment]
@@ -214,7 +214,7 @@ Deduced_Data_Type = "float"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
-Min_values = 0
+Min_values = 0.0
 Max_values = 177699.5
 Possible_Categorical_Values = ["nan"]
 
@@ -270,7 +270,7 @@ Possible_Categorical_Values = [0]
 
 [currency]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -340,7 +340,7 @@ Possible_categorical_Values = ["nan"]
 
 [legalstatus]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -350,7 +350,7 @@ Possible_Categorical_Values = [1, 2, 3, 4]
 
 [reportingunitmarker]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -360,7 +360,7 @@ Possible_Categorical_Values = ["L", "E"]
 
 [region]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -420,7 +420,7 @@ Possible_Categorical_Values = ["L"]
 
 [inclusionexclusion]
 Description = 'All values are " "'
-Deduced_Data_Type = "?"
+Deduced_Data_Type = "pandas.NA"
 Nullable = False
 Current_Data_Type = "str"
 Length = "nan"
@@ -450,7 +450,7 @@ Possible_categorical_Values = ["nan"]
 
 [lastupdatedby]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "category"
 Nullable = False
 Current_Data_Type = ["None","str"]
 Length = "nan"
