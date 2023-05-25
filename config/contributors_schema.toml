@@ -1,142 +1,22 @@
-[cell_id]
-description = "Cell ID"
-data_type = "Categorical"
-nullable = nan
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
+[snapshot_id]
+Description = "nan"
+Deduced_Data_Type = "nan"
+Nullable = "nan"
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
 
-[civ_or_def]
-description = "Business type: Civil or Defence"
-data_type = "Categorical"
-nullable = "No"
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[current_sic]
-description = "Sic - Standard Industry Classification"
-data_type = "Categorical"
-nullable = "No"
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[data_source]
-description = "Constructed"
-data_type = "Categorical"
-nullable = nan
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[emp_other]
-description = "emp_other (Full Time Equivalent)"
-data_type = "Numeric float (or decimal)"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[emp_researcher]
-description = "emp_researcher (Full Time Equivalent)"
-data_type = "Numeric float (or decimal)"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[emp_technician]
-description = "emp_technician (Full Time Equivalent)"
-data_type = "Numeric float (or decimal)"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[emp_total]
-description = "emp_total (Full Time Equivalent)"
-data_type = "Numeric float (or decimal)"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[employee_count]
-description = "Employee Count (IDBR)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[foreign_owner]
-description = "Foreign Owner"
-data_type = "Categorical"
-nullable = "No"
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[form_status]
-description = "Status"
-data_type = "Categorical"
-nullable = "No"
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[form_type]
-description = "Form Type"
-data_type = "Categorical"
-nullable = "No"
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[freeze_id]
-description = "Freeze ID - bespoke to openroad"
-data_type = "Categorical"
-nullable = nan
-min_acceptable_value = "nan"
-max_acceptable_value = "nan"
-
-[headcount_oth_f]
-description = "Other Female (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_oth_m]
-description = "Other Male (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_res_f]
-description = "Researchers Females (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_res_m]
-description = "Researchers Male (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_tec_f]
-description = "Technicians Female (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_tec_m]
-description = "Technicians Male (Headcount)"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
-
-[headcount_total]
-description = "Total Headcount"
-data_type = "Numeric Integer"
-nullable = "Yes"
-min_acceptable_value = 0
-max_acceptable_value = 1000000
+[reference]
+Description = "nan"
+Deduced_Data_Type = "int"
+Nullable = False
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
 
 [period]
 description = "Openroad Specific"
