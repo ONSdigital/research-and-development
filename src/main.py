@@ -20,7 +20,7 @@ MainLogger.setLevel(logging.INFO)
 # load config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
-masterlist_path = config["masterlist_path"]
+masterlist_path = config["paths"]["masterlist_path"]
 
 
 def run_pipeline(start):
@@ -58,10 +58,9 @@ def run_pipeline(start):
     )
 
     # Data validation
-    
-    
+
     # Check the postcode column
-    validation.validate_post_col(contributers_df , postcode_master_list) 
+    validation.validate_post_col(contributors_df, masterlist_path)
 
     # Outlier detection
 
