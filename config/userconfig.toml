@@ -1,25 +1,17 @@
-# This is the TOML config file for users to set
-# the parameters before running the pipeline.
-
 title = "TOML Example config"
 
-# Period to be considered (must be in YYYY-MM-DD format)
 [period]
-start_period = 1990-10-10
-end_period = 2000-10-05
+start_period = "1990-10-10"
+end_period = "2000-10-05"
 
-# Source file set up
 [source_file]
-location = "D:/Data"
+location = "D:/"
 fileName = "file.txt"
 
-# Output location including Hive Database and Table Name
 [output_location]
 hive_db = "hive.db"
 tableName = "name.table"
 
-# Location, file name and true/false flag for an outlier
-# correction file if needed
 [outlier_correction]
 location = "D:/"
 filename = "outliers.txt"
