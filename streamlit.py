@@ -1,3 +1,13 @@
+"""
+To run:
+1) Go to Anaconda Prompt
+2) Set CD to be root directory of project 
+3) Type in: streamlit run streamlit.py
+    - Will need streamlit installed
+    - Other dependencies might be needed
+    
+"""
+
 import streamlit as st
 import subprocess
 import sys
