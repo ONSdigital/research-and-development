@@ -6,7 +6,7 @@ from src.utils.helpers import Config_settings
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
-snapshot_path = config["snapshot_path"]  # Taken from config file
+snapshot_path = config["paths"]["snapshot_path"]  # Taken from config file
 
 
 def full_responses(contributors, responses):
