@@ -13,30 +13,16 @@ jobs:
 
 # 1) Checkout the code
       - uses: actions/checkout@v3
-# # 2) Removing PyDoop from the environment yaml
-#       - name: Remove pydoop dependency
-#         shell: bash -l {0}
-#         run: |
-#           awk '!/pydoop.*/' environment.yml > temp && mv temp environment.yml
-# # 3) Use Setup Miniconda github action to setup environment
-#       - uses: conda-incubator/setup-miniconda@v2
-#         with:
-#           python-version: 3.6
-#           environment-file: environment.yml
-#           activate-environment: resdev36
-# install dependencies for pydoop
-      - name: Install pydoop dependencies
+# 2) Removing PyDoop from the environment yaml
+      - name: Remove pydoop requirements.txt
+        shell: bash -l {0}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-8-jdk
-          export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-          export PATH=$JAVA_HOME/bin:$PATH
-          wget https://archive.apache.org/dist/hadoop/common/hadoop-3.2.1/hadoop-3.2.1.tar.gz
-          tar -xzf hadoop-3.2.1.tar.gz
-          export HADOOP_HOME=$PWD/hadoop-3.2.1
-          export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
-          export CLASSPATH=$(hadoop classpath --glob):$CLASSPATH
-
+          awk '!/pydoop.*/' requirements.txt> temp && mv temp requirements.txt
+# 3) Set up Python
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.6'
 
 # install dependencies from requirements.txt
       - name: Install dependencies
