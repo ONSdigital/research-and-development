@@ -1,8 +1,4 @@
-# import pandas as pd
-
 from src.utils.helpers import Config_settings
-
-# from src.utils.hdfs_mods import hdfs_load_json
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
