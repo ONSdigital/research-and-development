@@ -1,5 +1,11 @@
 """Mocking the import of Pydoop"""
 import sys
 
-module = type(sys)("pydoop")
-sys.modules["pydoop"] = module
+
+def hdfs_fake():
+    pass
+
+
+pydoop_fake = type(sys)("pydoop")
+pydoop_fake.hdfs = hdfs_fake
+sys.modules["pydoop"] = pydoop_fake
