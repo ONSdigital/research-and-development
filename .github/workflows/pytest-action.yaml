@@ -24,6 +24,12 @@ jobs:
 #           python-version: 3.6
 #           environment-file: environment.yml
 #           activate-environment: resdev36
+# install dependencies for pydoop
+      - name: Install pydoop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhdfs3 libhdfspp-dev
+
 # install dependencies from requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
