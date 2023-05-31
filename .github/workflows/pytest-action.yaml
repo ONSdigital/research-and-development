@@ -29,10 +29,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-8-jdk
+          export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          wget https://archive.apache.org/dist/hadoop/common/hadoop-3.2.1/hadoop-3.2.1.tar.gz
+          tar -xzf hadoop-3.2.1.tar.gz
+          export HADOOP_HOME=$PWD/hadoop-3.2.1
+          export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+          export CLASSPATH=$(hadoop classpath --glob):$CLASSPATH
 
-# # install dependencies from requirements.txt
-#       - name: Install dependencies
-#         run: pip install -r requirements.txt
+
+# install dependencies from requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 # # 3) Run pytest to run all tests in the tests folder
 #       - name: Use coverage to run pytest
 #       # Specify shell to run the command in
