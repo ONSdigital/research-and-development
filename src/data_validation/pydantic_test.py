@@ -1,9 +1,10 @@
 from src.data_validation.validation import create_data_dict
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel  # , ValidationError
 from pydantic.types import StrictStr, StrictInt, StrictFloat
 from typing import List
 from datetime import datetime
-import pandas as pd
+
+# import pandas as pd
 
 
 class DataTypes(BaseModel):
@@ -16,8 +17,8 @@ class DataTypes(BaseModel):
     status: List[StrictStr] = []
     statusencoded: List[StrictInt] = []
     receiptdata: List[datetime] = []
-    lockedby: List[pd.NA] = []
-    lockeddate: List[pd.NA] = []
+    lockedby: List[None] = []
+    lockeddate: List[None] = []
     formtype: List[StrictStr] = []
     checkletter: List[StrictStr] = []
     frozensicoutdated: List[StrictInt] = []
@@ -50,7 +51,7 @@ class DataTypes(BaseModel):
     referencepostcode: List[StrictStr] = []
     tradingstyle: List[StrictStr] = []
     selectiontype: List[StrictStr] = []
-    inclusionexclusion: List[pd.NA] = []
+    inclusionexclusion: List[None] = []
     createdby: List[StrictStr] = []
     createddate: List[datetime] = []
     lastupdatedby: List[StrictStr] = []
@@ -87,17 +88,18 @@ def check_data_types(
     """
     data_dict = create_data_dict(dataFile)
 
-    for dKey, dVal in data_dict.items():
-        if isinstance(dVal, list):
-            try:
-                DataType_obj = DataTypes(**dict({dKey: dVal}))
-                # print(f"First value: {dVal[0]}. Second value: {dVal[1]}.")
-            except ValidationError as e:
-                print(f"{e} \n")
-        else:
-            raise TypeError(f"Value for {dKey} is not of <class 'list'> type.")
-
-    return DataType_obj
+    #   for dKey, dVal in data_dict.items():
+    #       if isinstance(dVal, list):
+    #           try:
+    #               DataType_obj = DataTypes(**dict({dKey: dVal}))
+    #               # print(f"First value: {dVal[0]}. Second value: {dVal[1]}.")
+    #           except ValidationError as e:
+    #               print(f"{e} \n")
+    #       else:
+    #           raise TypeError(f"Value for {dKey} is not of <class 'list'> type.")
+    #
+    #   return DataType_obj
+    return data_dict
 
 
 check = check_data_types()
