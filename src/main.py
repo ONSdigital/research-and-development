@@ -5,8 +5,6 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
-from src.data_validation.validation import check_file_exists
-
 import time
 import logging
 
@@ -32,7 +30,6 @@ def run_pipeline(start):
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-    check_file_exists()
     Manipulate_data()
     MainLogger.info("Finishing Pipeline .......................")
 
