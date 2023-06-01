@@ -4,13 +4,15 @@ coverage==4.5.4
 detect-secrets
 myst-parser
 numpy
-pandas
+pandas==1.1.5
 pip
 pre-commit==2.17.0
+pydoop
 pytest
 python-dotenv
 pyyaml
 requests
+setuptools
 sphinx
 table_logger
 pandas==1.1.5
