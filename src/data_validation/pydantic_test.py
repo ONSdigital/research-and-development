@@ -1,69 +1,71 @@
 from src.data_validation.validation import create_data_dict
-from pydantic import BaseModel  # , ValidationError
+from pydantic import BaseModel, ValidationError, field_validator
 from pydantic.types import StrictStr, StrictInt, StrictFloat
-from typing import List
-from datetime import datetime
+from datetime import date
 
 # import pandas as pd
 
 
 class DataTypes(BaseModel):
 
-    snapshot_id: List[None] = []
-    reference: List[StrictInt] = []
-    period: List[StrictInt] = []
-    survey: List[StrictStr] = []
-    formid: List[StrictInt] = []
-    status: List[StrictStr] = []
-    statusencoded: List[StrictInt] = []
-    receiptdata: List[datetime] = []
-    lockedby: List[None] = []
-    lockeddate: List[None] = []
-    formtype: List[StrictStr] = []
-    checkletter: List[StrictStr] = []
-    frozensicoutdated: List[StrictInt] = []
-    rusicoutdated: List[StrictInt] = []
-    frozensic: List[StrictInt] = []
-    rusic: List[StrictInt] = []
-    frozenemployees: List[StrictInt] = []
-    employees: List[StrictInt] = []
-    frozenemployment: List[StrictInt] = []
-    employment: List[StrictInt] = []
-    frozenfteemployment: List[StrictFloat] = []
-    fteemployment: List[StrictFloat] = []
-    frozenturnover: List[StrictInt] = []
-    turnover: List[StrictInt] = []
-    enterprisereference: List[StrictInt] = []
-    wowenterprisereference: List[StrictInt] = []
-    cellnumber: List[StrictInt] = []
-    currency: List[StrictStr] = []
-    vatreference: List[StrictStr] = []
-    payereference: List[StrictStr] = []
-    companyregistrationnumber: List[StrictStr] = []
-    numberlivelocalunits: List[StrictInt] = []
-    numberlivevat: List[StrictInt] = []
-    numberlivepaye: List[StrictInt] = []
-    legalstatus: List[StrictInt] = []
-    reportingunitmarker: List[StrictStr] = []
-    region: List[StrictStr] = []
-    birthdate: List[datetime] = []
-    referencename: List[StrictStr] = []
-    referencepostcode: List[StrictStr] = []
-    tradingstyle: List[StrictStr] = []
-    selectiontype: List[StrictStr] = []
-    inclusionexclusion: List[None] = []
-    createdby: List[StrictStr] = []
-    createddate: List[datetime] = []
-    lastupdatedby: List[StrictStr] = []
-    lastupdateddate: List[datetime] = []
+    snapshot_id: None = []
+    reference: StrictInt = []
+    period: StrictInt = []
+    survey: StrictStr = []
+    formid: StrictInt = []
+    status: StrictStr = []
+    statusencoded: StrictInt = []
+    receiptdata: date = []
+    lockedby: None = []
+    lockeddate: None = []
+    formtype: StrictStr = []
+    checkletter: StrictStr = []
+    frozensicoutdated: StrictInt = []
+    rusicoutdated: StrictInt = []
+    frozensic: StrictInt = []
+    rusic: StrictInt = []
+    frozenemployees: StrictInt = []
+    employees: StrictInt = []
+    frozenemployment: StrictInt = []
+    employment: StrictInt = []
+    frozenfteemployment: StrictFloat = []
+    fteemployment: StrictFloat = []
+    frozenturnover: StrictInt = []
+    turnover: StrictInt = []
+    enterprisereference: StrictInt = []
+    wowenterprisereference: StrictInt = []
+    cellnumber: StrictInt = []
+    currency: StrictStr = []
+    vatreference: StrictStr = []
+    payereference: StrictStr = []
+    companyregistrationnumber: StrictStr = []
+    numberlivelocalunits: StrictInt = []
+    numberlivevat: StrictInt = []
+    numberlivepaye: StrictInt = []
+    legalstatus: StrictInt = []
+    reportingunitmarker: StrictStr = []
+    region: StrictStr = []
+    birthdate: date = []
+    referencename: StrictStr = []
+    referencepostcode: StrictStr = []
+    tradingstyle: StrictStr = []
+    selectiontype: StrictStr = []
+    inclusionexclusion: None = []
+    createdby: StrictStr = []
+    createddate: date = []
+    lastupdatedby: StrictStr = []
+    lastupdateddate: date = []
 
     class Config:
         extra = "forbid"
 
+    @field_validator("survey", "status", "formtype")
+    def value_must_be_str(cls, v):
+        if not isinstance(v, str):
+            raise TypeError("Value must be a valid String.")
 
-def check_data_types(
-    dataFile: str = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv",
-):
+
+def check_data_types():
     """Takes the data from a csv file, parses that into a dictionary with
     key: value pairs for each variable. The values for each key should be
     a list, each element corresponding to a row in the csv file. A
@@ -75,8 +77,6 @@ def check_data_types(
     contains column headers not defined in the 'DataTypes' class.
 
     Keyword Arguments:
-        dataFile -- path to data file
-        (default: {"/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv"})
 
     Raises:
         TypeError: If the value in the 'data_dict' is not of <class 'list'> type
@@ -86,20 +86,32 @@ def check_data_types(
     Returns:
         An object of user-defined <class 'DataTypes'>.
     """
-    data_dict = create_data_dict(dataFile)
+    # Fetch the data. Returns a list with each element containing a dictionary
+    # Each dictionary represents a 'row' in the data.
+    data_list = create_data_dict()
 
-    #   for dKey, dVal in data_dict.items():
-    #       if isinstance(dVal, list):
-    #           try:
-    #               DataType_obj = DataTypes(**dict({dKey: dVal}))
-    #               # print(f"First value: {dVal[0]}. Second value: {dVal[1]}.")
-    #           except ValidationError as e:
-    #               print(f"{e} \n")
-    #       else:
-    #           raise TypeError(f"Value for {dKey} is not of <class 'list'> type.")
-    #
-    #   return DataType_obj
-    return data_dict
+    # Initialise an index to iterate over
+    index = 0
+    error_count = 0
+
+    # Loop over the list containing the data
+    while index < len(data_list):
+
+        # Iterate through dictionary at each element in list
+        for k, v in data_list[index].items():
+            try:
+                # Attempt to instantiate an object of the BaseModel type above
+                DataType_obj = DataTypes(**dict({k: v}))
+            except ValidationError as e:
+                # Errors are caught when a type from the data doesn't match the
+                # type specified in the BaseModel
+                print(f"Error on row {index}: {e} \n")
+                error_count += 1
+
+        index += 1
+
+    return error_count, DataType_obj
 
 
 check = check_data_types()
+print(check)
