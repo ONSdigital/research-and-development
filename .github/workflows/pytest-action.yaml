@@ -2,14 +2,26 @@ name: Run pytest on pull request to develop
 
 # runs on every pull request to develop
 on:
-  pull_request:
-    branches:
-      - develop
+    pull_request:
+        branches:
+            - develop
 # runs on version 20.04 of ubuntu
 jobs:
-  pytest-coverage-comment:
-    runs-on: ubuntu-20.04
-    steps:
+    pytest-coverage-comment:
+        runs-on: ubuntu-20.04
+        steps:
+            # 1) Checkout the code
+            - uses: actions/checkout@v3
+            # 2) Removing PyDoop from the environment yaml
+            - name: Remove pydoop requirements.txt
+              shell: bash -l {0}
+              run: |
+                  awk '!/pydoop.*/' requirements.txt> temp && mv temp requirements.txt
+            # 3) Set up Python
+            - name: Set up Python 3.6
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.6"
 
 # 1) Checkout the code
       - uses: actions/checkout@v3
