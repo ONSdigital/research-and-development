@@ -2,11 +2,27 @@ from src.data_validation.validation import create_data_dict
 from pydantic import BaseModel, ValidationError
 from pydantic.types import StrictStr, StrictInt, StrictBool
 from typing import Union, List
+from datetime import datetime
+import pandas as pd
 
 
 class DataTypes(BaseModel):
 
-    cell_id: List[Union[StrictInt, StrictStr]] = []
+    snapshot_id: List[None] = []
+    reference: List[StrictInt] = []
+    period: List[StrictInt] = []
+    survey: List[StrictStr] = []
+    formid: List[StrictInt] = []
+    status: List[StrictStr] = []
+    statusencoded: List[StrictInt] = []
+    receiptdata: List[datetime] = []
+    lockedby: List[pd.NA] = []
+    lockeddate: List[pd.NA] = []
+    formtype: List[StrictStr] = []
+    checkletter: List[StrictStr] = []
+    frozensicoutdated: List[StrictInt] = []
+    rusicoutdated: List[StrictInt] = []
+
     civ_or_def: List[Union[StrictInt, StrictStr]] = []
     current_sic: List[Union[StrictInt, StrictStr]] = []
     data_source: List[Union[StrictInt, StrictStr]] = []
@@ -104,10 +120,6 @@ class DataTypes(BaseModel):
         extra = "forbid"
 
 
-# type_dict = data_types()
-# data_dict = create_data_dict("/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv")
-
-
 def check_data_types(
     dataFile: str = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv",
 ):
@@ -149,6 +161,3 @@ def check_data_types(
 
 
 check = check_data_types()
-
-# print(type_dict)
-# test = DataTypes(**data_dict)
