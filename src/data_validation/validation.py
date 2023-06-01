@@ -459,15 +459,15 @@ class Dict2Class(object):
             setattr(self, key, my_dict[key])
 
 
-test = test_data_types()
-test2 = data_types()
-result = Dict2Class(test2)
+# test = test_data_types()
+# test2 = data_types()
+# result = Dict2Class(test2)
 # print(f"headcount_total: {result.headcount_total}")
 # print(result.__dict__)
 
 # print(result.__dict__)
-error_count = 0
-output_data = []
+# error_count = 0
+# output_data = []
 
 # for idx, d in enumerate(test[1:]):
 #    try:
