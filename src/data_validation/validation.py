@@ -276,28 +276,30 @@ def data_key_diffs(
     return diff
 
 
-def create_data_dict(dataFile: str = dummydatapath):
+def create_data_dict(dataFile: str = snapshot_path):
     # Read data file
     data = read_data(dataFile)
 
-    dummyDict = {}
-
     # Convert it to dictionary
-    data_dict = data.to_dict(orient="index")
-    for k, v in data_dict.items():
-        if isinstance(v, dict):
+    # data_dict = data.to_dict(orient="index")
+    # for k, v in data_dict.items():
+    #    if isinstance(v, dict):
+    #
+    #        for sub_key, sub_val in v.items():
+    #
+    #            # Initialise dictionary with first index
+    #            if k == 0:
+    #                dummyDict[sub_key] = [sub_val]
+    #            else:
+    #                dummyDict[sub_key] += [sub_val]
+    #    else:
+    #        print("{0} : {1}".format(k, v))
 
-            for sub_key, sub_val in v.items():
+    return data["contributors"]
 
-                # Initialise dictionary with first index
-                if k == 0:
-                    dummyDict[sub_key] = [sub_val]
-                else:
-                    dummyDict[sub_key] += [sub_val]
-        else:
-            print("{0} : {1}".format(k, v))
 
-    return dummyDict
+# test = create_data_dict()
+# print(type(test))
 
 
 def data_types(
