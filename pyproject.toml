@@ -1,5 +1,8 @@
 # `coverage` configurations
 [tool.coverage.run]
+omit =
+    # omit this single file
+    src/utils/hdfs_mods.py
 source = [
     "./src"
 ]
