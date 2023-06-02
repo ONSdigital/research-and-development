@@ -2,8 +2,6 @@
 # Import testing packages
 import pandas as pd
 
-import conftest  # noqa
-
 
 class TestFullResponses:
     """Tests for full_responses function."""
