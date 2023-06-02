@@ -17,8 +17,7 @@ profile = "black"
 [tool.pytest.ini_options]
 addopts = [
     "-vv",
-    "--doctest-modules",
-    "--ignore=tests/test_utils/test_hdfs_mods.py"
+    "--doctest-modules"
 ]
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 testpaths = [
