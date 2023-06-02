@@ -35,6 +35,7 @@ def dummy_data():
     )
     return contributor_data, responses_data
 
+
 @pytest.fixture
 def expected_output():
     expected_output = pd.DataFrame(
@@ -47,28 +48,30 @@ def expected_output():
             202: [100, 65],
         }
     )
-    
+
     return expected_output
 
-def test_full_responses(dummy_data):
+
+def test_full_responses(dummy_data, expected_output):
     """Tests for full_responses function."""
     # Import modules to test
     from src.data_processing.spp_snapshot_processing import full_responses
 
     contributor_data, responses_data = dummy_data
     expected_output_data = expected_output
-    
+
     df_result = full_responses(contributor_data, responses_data)
 
     pd.testing.assert_frame_equal(df_result, expected_output_data)
+
 
 def test_response_rate(dummy_data):
     # Import the module to test
     from src.data_processing.spp_snapshot_processing import response_rate
 
-    contributor_data, responses_data, _ = dummy_data
+    contributor_data, responses_data = dummy_data
 
     response_rate_value = response_rate(contributor_data, responses_data)
 
-    expected_response_rate = 2/3  # 2 respondents out of 3 contributors
+    expected_response_rate = 2 / 3  # 2 respondents out of 3 contributors
     assert expected_response_rate == response_rate_value
