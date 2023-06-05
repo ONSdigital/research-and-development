@@ -66,18 +66,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    if config["global"]["postcode_csv_check"]:
-        master_series = get_masterlist(masterlist_path)
-
-        # Check if postcode are real
-        unreal_postcodes = df.loc[
-            ~df["referencepostcode"].isin(master_series), "referencepostcode"
-        ]
-    else:
-        emptydf = pd.DataFrame(columns=["referencepostcode"])
-        unreal_postcodes = emptydf.loc[
-            ~emptydf["referencepostcode"], "referencepostcode"
-        ]
+    unreal_postcodes = check_pcs_real(df, masterlist_path)
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
@@ -108,3 +97,21 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         )
 
     return True
+
+def check_pcs_real(df, masterlist_path):
+    """Checks if the postcodes are real against a masterlist of actual postcodes
+    """
+    if config["global"]["postcode_csv_check"]:
+        master_series = get_masterlist(masterlist_path)
+
+        # Check if postcode are real
+        unreal_postcodes = df.loc[
+            ~df["referencepostcode"].isin(master_series), "referencepostcode"
+        ]
+    else:
+        emptydf = pd.DataFrame(columns=["referencepostcode"])
+        unreal_postcodes = emptydf.loc[
+            ~emptydf["referencepostcode"], "referencepostcode"
+        ]
+        
+    return unreal_postcodes
