@@ -467,3 +467,353 @@ Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
 Possible_categorical_Values = ["nan"]
+
+[cell_id]
+Description = Cell ID
+Deduced_Data_Type = Categorical
+Nullable = nan
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[civ_or_def]
+Description = Business type: Civil or Defence
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[current_sic]
+Description = Sic - Standard Industry Classification
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[data_source]
+Description = Constructed
+Deduced_Data_Type = Categorical
+Nullable = nan
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[emp_other]
+Description = emp_other (Full Time Equivalent)
+Deduced_Data_Type = Numeric float (or decimal)
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[emp_researcher]
+Description = emp_researcher (Full Time Equivalent)
+Deduced_Data_Type = Numeric float (or decimal)
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[emp_technician]
+Description = emp_technician (Full Time Equivalent)
+Deduced_Data_Type = Numeric float (or decimal)
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[emp_total]
+Description = emp_total (Full Time Equivalent)
+Deduced_Data_Type = Numeric float (or decimal)
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[employee_count]
+Description = Employee Count (IDBR)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[foreign_owner]
+Description = Foreign Owner
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[form_status]
+Description = Status
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[form_type]
+Description = Form Type
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[freeze_id]
+Description = Freeze ID - bespoke to openroad
+Deduced_Data_Type = Categorical
+Nullable = nan
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_oth_f]
+Description = Other Female (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_oth_m]
+Description = Other Male (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_res_f]
+Description = Researchers Females (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_res_m]
+Description = Researchers Male (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_tec_f]
+Description = Technicians Female (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_tec_m]
+Description = Technicians Male (Headcount)
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[headcount_total]
+Description = Total Headcount
+Deduced_Data_Type = Numeric Integer
+Nullable = Yes
+Length =  # an integer of the length, or N/A
+Min_values =  0
+Max_values = 1000000
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[period]
+Description = Openroad Specific
+Deduced_Data_Type = Categorical
+Nullable = nan
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[period_contributor_id]
+Description = Openroad Specific
+Deduced_Data_Type = Categorical
+Nullable = nan
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[period_year]
+Description = Period
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[product_group]
+Description = Published Product Group
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[ru_ref]
+Description = Reference
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[sizeband]
+Description = SizeBand
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
+
+
+[wowentref]
+Description = Wowentref
+Deduced_Data_Type = Categorical
+Nullable = No
+Length =  # an integer of the length, or N/A
+Min_values =  None
+Max_values = None
+Possible_categorical_Values = []
+    [q_code]
+    civ =
+    def =
