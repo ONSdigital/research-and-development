@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from src.data_validation.validation import validate_post_col, validate_postcode_pattern  # noqa
+from src.data_validation.validation import validate_post_col, validate_postcode_pattern, check_pcs_real# noqa
 
 
 @pytest.fixture  # noqa
@@ -98,3 +98,16 @@ def test_validate_postcode():
     assert validate_postcode_pattern(" ") is False  # Whitespace
     assert validate_postcode_pattern("ABC XYZ") is False  # All letters but right length
     assert validate_postcode_pattern("123 456") is False  # All numbers but right length
+
+
+def test_check_pcs_real_with_invalid_postcodes(test_data):
+    masterlist_path = "path/to/masterlist.csv"
+    unreal_postcodes = check_pcs_real(test_data, masterlist_path)
+    expected_unreal_postcodes = pd.DataFrame({"referencepostcode": ["HIJ 789", "KL1M 2NO"]})
+    pd.testing.assert_frame_equal(unreal_postcodes, expected_unreal_postcodes)  # Assert that the unreal postcodes match the expected ones
+
+
+def test_check_pcs_real_with_valid_postcodes(test_data):
+    masterlist_path = "path/to/masterlist.csv"
+    unreal_postcodes = check_pcs_real(test_data, masterlist_path)
+    assert unreal_postcodes.str.contains(["NP10 8XG", "SW1P 4DF"]).any() is False  # Assert that the real postcodes are not in the unreal postcodes
