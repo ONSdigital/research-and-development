@@ -31,7 +31,7 @@ def run_pipeline(start):
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     Manipulate_data()
-    MainLogger.info("Finishing Pipeline .......................")
+    MainLogger.info("Finishing Pipeline .........................")
 
     runlog_obj.retrieve_pipeline_logs()
 
