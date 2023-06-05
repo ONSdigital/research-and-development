@@ -1,5 +1,7 @@
 # Research and Development Project
 
+![Code Coverage](https://img.shields.io/badge/Coverage-23%25-red.svg)
+
 Calculating national and regional research and development expenditure as part of [national accounts](https://www.ons.gov.uk/economy/nationalaccounts).
 
 Additional information about the aims and objectives of the project will go here when it is available. The project is currently in pre-discovery.

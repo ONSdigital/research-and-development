@@ -18,6 +18,7 @@ dependencies:
           - pytest
           - pytest-cov
           - python-dotenv
+          - readme-coverage-badger
           - setuptools
           - table_logger
           - toml
