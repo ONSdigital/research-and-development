@@ -129,6 +129,7 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 config_paths = config["paths"]
 snapshot_path = config_paths["snapshot_path"]  # Taken from config file
+snapdata = read_data(snapshot_path)  # Read data file from json file
 
 
 def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
@@ -156,7 +157,6 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
 
 
 def check_data_shape(
-    data_file: str = snapshot_path,
     schema_path: str = "./config/Data_Schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
@@ -164,7 +164,6 @@ def check_data_shape(
     otherwise.
 
     Keyword Arguments:
-        data_file -- Path to data file to compare (default: {datafilepath})
         schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
 
@@ -173,9 +172,6 @@ def check_data_shape(
     """
 
     cols_match = False
-
-    # Read data file from json file
-    snapdata = read_data(data_file)
 
     # Specify which key in snapshot data dictionary to get correct data
     # List, with each element containing a dictionary for each row of data
