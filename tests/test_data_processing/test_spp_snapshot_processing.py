@@ -2,10 +2,11 @@
 # Import testing packages
 import pandas as pd
 import pytest
+from typing import Tuple
 
 
 @pytest.fixture
-def dummy_data():
+def dummy_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Set up the dummy data
     contributor_data = pd.DataFrame(
         {
