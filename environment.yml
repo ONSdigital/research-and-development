@@ -1,21 +1,24 @@
 name: resdev36
 dependencies:
-- python=3
-- coverage
-- pyyaml
-- requests
-- sphinx
-- pip
-- pip:
-  - arrow
-  - cookiecutter
-  - detect-secrets
-  - myst-parser
-  - pre-commit==2.17.0
-  - python-dotenv
-  - table_logger
-  - pandas==1.1.5
-  - numpy
-  - pydoop
-  - setuptools
-  - pytest
+    - python=3
+    - coverage
+    - pyyaml
+    - requests
+    - sphinx
+    - pip
+    - pip:
+          - arrow
+          - cookiecutter
+          - detect-secrets
+          - myst-parser
+          - numpy
+          - pandas==1.1.5
+          - pre-commit==2.17.0
+          - pydoop
+          - pytest
+          - pytest-cov
+          - python-dotenv
+          - setuptools
+          - table_logger
+          - toml
+          - xlrd
