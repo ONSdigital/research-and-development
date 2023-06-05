@@ -98,7 +98,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     return True
 
-def check_pcs_real(df, masterlist_path):
+def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     """Checks if the postcodes are real against a masterlist of actual postcodes
     """
     if config["global"]["postcode_csv_check"]:
