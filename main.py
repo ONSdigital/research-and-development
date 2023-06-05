@@ -1,7 +1,7 @@
 from importlib import reload
 import time
 
-import src.main as src
+import src.pipeline as src
 
 # reload the pipeline module to implement any changes
 reload(src)
