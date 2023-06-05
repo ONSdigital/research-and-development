@@ -476,10 +476,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [civ_or_def]
 Description = Business type: Civil or Defence
@@ -489,10 +486,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [current_sic]
 Description = Sic - Standard Industry Classification
@@ -502,10 +496,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [data_source]
 Description = Constructed
@@ -515,10 +506,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [emp_other]
 Description = emp_other (Full Time Equivalent)
@@ -528,10 +516,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [emp_researcher]
 Description = emp_researcher (Full Time Equivalent)
@@ -541,10 +526,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [emp_technician]
 Description = emp_technician (Full Time Equivalent)
@@ -554,10 +536,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [emp_total]
 Description = emp_total (Full Time Equivalent)
@@ -567,10 +546,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [employee_count]
 Description = Employee Count (IDBR)
@@ -580,10 +556,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [foreign_owner]
 Description = Foreign Owner
@@ -593,10 +566,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [form_status]
 Description = Status
@@ -606,10 +576,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [form_type]
 Description = Form Type
@@ -619,10 +586,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [freeze_id]
 Description = Freeze ID - bespoke to openroad
@@ -632,10 +596,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_oth_f]
 Description = Other Female (Headcount)
@@ -645,10 +606,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_oth_m]
 Description = Other Male (Headcount)
@@ -658,10 +616,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_res_f]
 Description = Researchers Females (Headcount)
@@ -671,10 +626,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_res_m]
 Description = Researchers Male (Headcount)
@@ -684,10 +636,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_tec_f]
 Description = Technicians Female (Headcount)
@@ -697,10 +646,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_tec_m]
 Description = Technicians Male (Headcount)
@@ -710,10 +656,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [headcount_total]
 Description = Total Headcount
@@ -723,10 +666,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [period]
 Description = Openroad Specific
@@ -736,10 +676,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [period_contributor_id]
 Description = Openroad Specific
@@ -749,10 +686,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [period_year]
 Description = Period
@@ -762,10 +696,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [product_group]
 Description = Published Product Group
@@ -775,10 +706,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [ru_ref]
 Description = Reference
@@ -788,10 +716,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [sizeband]
 Description = SizeBand
@@ -801,10 +726,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
-
+q_code =
 
 [wowentref]
 Description = Wowentref
@@ -814,6 +736,4 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-    [q_code]
-    civ =
-    def =
+q_code =
