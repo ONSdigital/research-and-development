@@ -139,5 +139,5 @@ def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
     unreal_postcodes = check_pcs_real(test_data, masterlist_path)
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
-        unreal_postcodes.str.contains("NP10 8XG|SW1P 4DF").any() is False
+        bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False
     )  # Assert that the real postcodes are not in the unreal postcodes
