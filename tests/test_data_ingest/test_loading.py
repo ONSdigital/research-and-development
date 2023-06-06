@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Tuple
 
 # Import modules to test
-from src.data_ingest.loading import parse_snap_data
+from data_ingest.spp_parser import parse_snap_data
 
 
 class TestParseSPP:

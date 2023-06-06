@@ -5,7 +5,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
-from src.data_ingest import loading
+from data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
 import time
@@ -41,7 +41,7 @@ def run_pipeline(start):
     # Load SPP data from DAP
     snapshot_path = config["paths"]["snapshot_path"]
     snapdata = hdfs_load_json(snapshot_path)
-    contributors_df, responses_df = loading.parse_snap_data(snapdata)
+    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     # Data Transmutation
     full_responses = processing.full_responses(contributors_df, responses_df)
     print(full_responses.sample(5))
