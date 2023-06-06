@@ -7,6 +7,7 @@ from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
 from src.data_ingest import loading
 from src.data_processing import spp_snapshot_processing as processing
+from src.utils.hdfs_mods import hdfs_load_json
 import time
 import logging
 
@@ -37,11 +38,17 @@ def run_pipeline(start):
     Manipulate_data()
 
     # Data Ingest
-    contributors_df, responses_df = loading.parse_snap_data()
+    # Load SPP data from DAP
+    snapshot_path = config["paths"]["snapshot_path"]
+    snapdata = hdfs_load_json(snapshot_path)
+    contributors_df, responses_df = loading.parse_snap_data(snapdata)
+    # Data Transmutation
     full_responses = processing.full_responses(contributors_df, responses_df)
-
-    logger.info("The response rate is %.3%", processing.response_rate(contributors_df, responses_df))
-
+    print(full_responses.sample(5))
+    logger.info(
+        "The response rate is %.3%",
+        processing.response_rate(contributors_df, responses_df),
+    )
 
     # Data validation
 

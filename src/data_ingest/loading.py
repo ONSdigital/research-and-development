@@ -1,17 +1,8 @@
 import pandas as pd
 from typing import Tuple
 
-from src.utils.helpers import Config_settings
-from src.utils.hdfs_mods import hdfs_load_json
 
-
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-snapshot_path = config["paths"]["snapshot_path"]  # Taken from config file
-snapdata = hdfs_load_json(snapshot_path)
-
-
-def parse_snap_data(snapdata: dict = snapdata) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def parse_snap_data(snapdata: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Loads the data from the survey via the SPP snapshot. The data is supplied as dict
         and is parsed into dataframes, one for survey contributers (company details)
         and another one for their responses.

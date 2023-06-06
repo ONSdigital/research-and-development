@@ -1,6 +1,9 @@
 import pandas as pd
 from typing import Tuple
 
+# Import modules to test
+from src.data_ingest.loading import parse_snap_data
+
 
 class TestParseSPP:
     """Test for Parse Snap data function"""
@@ -30,9 +33,6 @@ class TestParseSPP:
 
     def test_parse_snap_data(self):
         """Tests for full_responses function."""
-
-        # Import modules to test
-        from src.data_ingest.loading import parse_snap_data
 
         inputdata = self.input_data()
         df_result1, df_result2 = parse_snap_data(inputdata)
