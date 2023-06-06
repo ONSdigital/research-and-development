@@ -116,12 +116,12 @@ def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
 
     # Call the function under test
     unreal_postcodes = check_pcs_real(test_data, masterlist_path)
-
-    expected_unreal_postcodes = pd.DataFrame(
-        {"referencepostcode": ["HIJ 789", "KL1M 2NO"]}
+    unreal_postcodes = unreal_postcodes.reset_index(drop=True)
+    expected_unreal_postcodes = pd.Series(
+        ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
     )
 
-    pd.testing.assert_frame_equal(
+    pd.testing.assert_series_equal(
         unreal_postcodes, expected_unreal_postcodes
     )  # Assert that the unreal postcodes match the expected ones
 
