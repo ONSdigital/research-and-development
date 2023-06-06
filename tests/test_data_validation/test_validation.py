@@ -1,14 +1,17 @@
 import pandas as pd
 import pytest
-from src.data_validation.validation import validate_post_col, validate_postcode_pattern, check_pcs_real# noqa
+from src.data_validation.validation import (
+    validate_post_col,
+    validate_postcode_pattern,
+    check_pcs_real,
+)  # noqa
 
 
 @pytest.fixture  # noqa
 def test_data():
-    """'NP10 8XG', 'SW1P 4DF' are valid and real postcodes. 'HIJ 789' is neither valid nor real
-     and 'KL1M 2NO' is a valid pattern but not real
-
-    """
+    """'NP10 8XG', 'SW1P 4DF' are valid and real postcodes.
+    'HIJ 789' is neither valid nor real
+    and 'KL1M 2NO' is a valid pattern but not real"""
     return pd.DataFrame(
         {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
     )
@@ -83,7 +86,9 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
 def test_validate_postcode():
     # Valid postcodes
     assert validate_postcode_pattern("AB12 3CD") is True
-    assert validate_postcode_pattern("AB123CD") is True  # Missing space - othewise valid
+    assert (
+        validate_postcode_pattern("AB123CD") is True
+    )  # Missing space - othewise valid
     assert validate_postcode_pattern("DE34 5FG") is True
     assert validate_postcode_pattern("HI67 8JK") is True
 
@@ -102,26 +107,37 @@ def test_validate_postcode():
 
 def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr("src.data_validation.validation.get_masterlist", mock_get_masterlist)
+    monkeypatch.setattr(
+        "src.data_validation.validation.get_masterlist", mock_get_masterlist
+    )
 
     # Use the fake path
     masterlist_path = "path/to/mock_masterlist.csv"
-    
+
     # Call the function under test
     unreal_postcodes = check_pcs_real(test_data, masterlist_path)
 
-    expected_unreal_postcodes = pd.DataFrame({"referencepostcode": ["HIJ 789", "KL1M 2NO"]})
-    
-    pd.testing.assert_frame_equal(unreal_postcodes, expected_unreal_postcodes)  # Assert that the unreal postcodes match the expected ones
+    expected_unreal_postcodes = pd.DataFrame(
+        {"referencepostcode": ["HIJ 789", "KL1M 2NO"]}
+    )
+
+    pd.testing.assert_frame_equal(
+        unreal_postcodes, expected_unreal_postcodes
+    )  # Assert that the unreal postcodes match the expected ones
 
 
 def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr("src.data_validation.validation.get_masterlist", mock_get_masterlist)
-    
+    monkeypatch.setattr(
+        "src.data_validation.validation.get_masterlist", mock_get_masterlist
+    )
+
     # Use the fake path
     masterlist_path = "path/to/masterlist.csv"
-    
+
     # Call the function under test
     unreal_postcodes = check_pcs_real(test_data, masterlist_path)
-    assert unreal_postcodes.str.contains(["NP10 8XG", "SW1P 4DF"]).any() is False  # Assert that the real postcodes are not in the unreal postcodes
+    # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
+    assert (
+        unreal_postcodes.str.contains("NP10 8XG|SW1P 4DF").any() is False
+    )  # Assert that the real postcodes are not in the unreal postcodes
