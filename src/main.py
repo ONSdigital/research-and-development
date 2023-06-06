@@ -8,12 +8,19 @@ from src.utils.testfunctions import Manipulate_data
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
+from src.data_validation import validation
 import time
 import logging
 
 
 MainLogger = logging.getLogger(__name__)
 MainLogger.setLevel(logging.INFO)
+
+
+# load config
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+masterlist_path = config["paths"]["masterlist_path"]
 
 
 def run_pipeline(start):
@@ -52,6 +59,9 @@ def run_pipeline(start):
 
     # Data validation
 
+    # Check the postcode column
+    validation.validate_post_col(contributors_df, masterlist_path)
+
     # Outlier detection
 
     # Data cleaning
@@ -70,7 +80,7 @@ def run_pipeline(start):
 
     # Data output: File Outputs
 
-    MainLogger.info("Finishing Pipeline .......................")
+    MainLogger.info("Finshing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
 

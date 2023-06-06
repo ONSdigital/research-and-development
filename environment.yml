@@ -11,11 +11,13 @@ dependencies:
           - cookiecutter
           - detect-secrets
           - myst-parser
+          - more-itertools==5.0.0
           - numpy
           - pandas==1.1.5
+          - postcodes_uk
           - pre-commit==2.17.0
           - pydoop
-          - pytest
+          - pytest #default version 5 which is compatible with postcodes_uk
           - pytest-cov
           - python-dotenv
           - readme-coverage-badger
