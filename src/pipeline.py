@@ -52,7 +52,7 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Transmutation...")
 
     # Data validation
-    validation.check_data_shape(contributors_df)
+    validation.check_data_shape(full_responses)
 
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
