@@ -1,19 +1,19 @@
-# python==3.6
 arrow
 cookiecutter
+coverage==4.5.4
 detect-secrets
 myst-parser
-pre-commit==2.17.0
-python-dotenv
-table_logger
-pandas==1.1.5
 numpy
+pandas==1.1.5
+pip
+postcodes_uk
+pre-commit==2.17.0
 pydoop
-setuptools
 pytest
-coverage
+python-dotenv
 pyyaml
 requests
+setuptools
 sphinx
 postcodes_uk # remove this later - use regex
 typing
