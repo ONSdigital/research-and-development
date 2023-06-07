@@ -3,9 +3,8 @@ import toml
 import logging
 import postcodes_uk
 import pandas as pd
-from src.utils.wrappers import time_logger_wrap, exception_wrap
-import logging
 
+from src.utils.wrappers import exception_wrap
 from src.utils.helpers import Config_settings
 
 
@@ -152,7 +151,6 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
     return toml_string
 
 
-@time_logger_wrap
 @exception_wrap
 def check_data_shape(
     data_df: pd.DataFrame,
