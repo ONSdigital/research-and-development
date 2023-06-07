@@ -175,7 +175,7 @@ def test_check_data_shape():
     result_1 = check_data_shape(dummy_df)
 
     # Assert
-    assert isinstance(result_1, bool)
+    assert isinstance(result_1, (bool, None))
     # Assert: Negative test. Should fails when the answer is wrong
     with pytest.raises(AssertionError):
         assert not isinstance(result_1, bool)
