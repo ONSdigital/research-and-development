@@ -1,3 +1,5 @@
+import os
+import toml
 import postcodes_uk
 import pandas as pd
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -102,9 +104,9 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     return True
 
+
 def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
-    """Checks if the postcodes are real against a masterlist of actual postcodes
-    """
+    """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(masterlist_path)
 
@@ -117,19 +119,8 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
         unreal_postcodes = emptydf.loc[
             ~emptydf["referencepostcode"], "referencepostcode"
         ]
-        
+
     return unreal_postcodes
-import os
-import toml
-from src.utils.hdfs_mods import hdfs_load_json as read_data
-from src.utils.helpers import Config_settings
-
-
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-config_paths = config["paths"]
-snapshot_path = config_paths["snapshot_path"]  # Taken from config file
-snapdata = read_data(snapshot_path)  # Read data file from json file
 
 
 def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
