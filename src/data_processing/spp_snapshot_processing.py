@@ -1,10 +1,11 @@
 from src.utils.wrappers import validate_dataframe_not_empty
-
+from typing import List
+import pandas as pd
 import logging
 
 spp_processing_logger = logging.getLogger(__name__)
 
-def create_response_dataframe(df, unique_id_cols):
+def create_response_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> pd.DataFrame:
     """Create a response dataframe using pivot_table to reshape the data.
 
     Arguments:
@@ -20,7 +21,7 @@ def create_response_dataframe(df, unique_id_cols):
     return response_df
 
 
-def create_contextual_dataframe(df, unique_id_cols):
+def create_contextual_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> pd.DataFrame:
     """Create a contextual dataframe by dropping 'questioncode' and 'response' columns
     and removing duplicates.
 
@@ -37,7 +38,7 @@ def create_contextual_dataframe(df, unique_id_cols):
 
 
 @validate_dataframe_not_empty
-def full_responses(contributors, responses):
+def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.DataFrame:
 
     """Merges contributor and response data together into a dataframe that is in a 
     format allowing for easier manipulation later in pipeline - notably through 
@@ -71,7 +72,7 @@ def full_responses(contributors, responses):
     return full_responses
 
 @validate_dataframe_not_empty
-def response_rate(contributors, responses):
+def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
 
     """Generates a response rate based on the contributor and response data 
     from the SPP Snapshot file.
