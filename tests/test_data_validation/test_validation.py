@@ -168,7 +168,8 @@ def test_check_data_shape():
     from src.data_validation.validation import check_data_shape
 
     # Dataframe for test function to use
-    dummy_df = {"col1": [1, 2], "col2": [3, 4]}
+    dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
+    dummy_df = pd.DataFrame(data=dummy_dict)
 
     # Act: use pytest to assert the result
     result_1 = check_data_shape(dummy_df)
