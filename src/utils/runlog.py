@@ -13,8 +13,10 @@ csv_filenames = config["csv_filenames"]
 
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
 project = config["paths"]["logs_foldername"]  # Taken from config file
-main_path = f"/user/{context}/{project}"
-hdfs.mkdir(main_path)
+main_path = (
+    f"/user/{context}/{project}"  # stored in the personal space of the user for now
+)
+hdfs.mkdir(main_path)  # creates the folder if it doesn't exist
 
 
 class RunLog:
@@ -29,7 +31,9 @@ class RunLog:
         self.timestamp = self._generate_time()
 
     def _generate_username(self):
-        """Record the username of the user running the pipeline"""
+        """Record the username of the user running the pipeline
+        using os package"""
+        # Use the Hadoop Username to record user
         self.context = os.getenv("HADOOP_USER_NAME")
 
         return self.context
@@ -59,7 +63,6 @@ class RunLog:
         This is for the total pipeline run time, not the time taken for each step.
 
         """
-
         self.time_taken = time_taken
 
         return self.time_taken
@@ -70,9 +73,11 @@ class RunLog:
         and append them to self.saved_logs df.
         """
         f = open("logs/main.log", "r")
+        # Split logs by line
         lines = f.read().splitlines()
         self.runids = {"run_id": self.run_id}
         self.users = {"user": self.user}
+        # Add run_id and user to logs
         for line in lines:
             self.logs.append(line.split(" - "))
             self.runids.update({"run_id": self.run_id})
@@ -86,15 +91,18 @@ class RunLog:
         return self
 
     def retrieve_configs(self):
+        """Gets the configs settings for each run of the pipeline"""
         with open("src/developer_config.yaml", "r") as file:
             self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
         dct = {k: [v] for k, v in self.configdata.items()}
         self.ndct = {}
+        # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
             nrow = {k: [v] for k, v in dct[i][0].items()}
             self.ndct.update(nrow)
         self.configdf = pd.DataFrame(self.ndct)
+        # Add run_id and user to configs
         self.configdf.insert(0, "run_id", self.runids["run_id"])
         self.configdf.insert(1, "user", self.users["user"])
 
@@ -126,7 +134,7 @@ class RunLog:
             [self.runlog_main_dict],
             columns=["run_id", "user", "timestamp", "version", "time_taken"],
         )
-
+        # These dfs were created earlier. Renaming for continuity
         self.runlog_configs_df = self.configdf
 
         self.runlog_logs_df = self.saved_logs

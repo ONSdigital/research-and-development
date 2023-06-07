@@ -118,6 +118,7 @@ def exception_wrap(func):
     def wrapper(*args, **kwargs):
         """Define the decorator itself."""
         try:
+            # run the function as is.
             result = func(*args, **kwargs)
 
             return result
