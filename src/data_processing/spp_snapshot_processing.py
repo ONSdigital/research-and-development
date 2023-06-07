@@ -1,8 +1,6 @@
-from src.utils.helpers import Config_settings
+import logging
 
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-snapshot_path = config["paths"]["snapshot_path"]  # Taken from config file
+spp_processing_logger = logging.getLogger(__name__)
 
 
 def full_responses(contributors, responses):
@@ -60,5 +58,7 @@ def response_rate(contributors, responses):
     no_contributors = len(contributors["reference"].unique())
 
     response_rate = no_responses / no_contributors
+
+    spp_processing_logger.info(f"The SPP response rate is {round(response_rate,2)}%")
 
     return response_rate
