@@ -5,6 +5,11 @@ from src.data_validation.validation import (
     validate_postcode_pattern,
     check_pcs_real,
 )  # noqa
+from src.utils.helpers import Config_settings
+
+# Get the config
+conf_obj = Config_settings()
+config = conf_obj.config_dict
 
 
 @pytest.fixture  # noqa
@@ -38,11 +43,15 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
         validate_post_col(test_data, fake_path)
 
     # Using caplog to check the logged warning messages
-    assert (
-        "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
-        in caplog.text
-    )
-    assert "Invalid pattern postcodes found: ['HIJ 789']" in caplog.text
+    if config["global"]["postcode_csv_check"]:
+
+        assert (
+            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
+            in caplog.text
+        )
+
+    else:
+        assert "Invalid pattern postcodes found: ['HIJ 789']" in caplog.text
 
     # Valid AND real postcodes
     df_valid = pd.DataFrame({"referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"]})
@@ -57,7 +66,10 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
     # Mixed valid and invalid postcodes - as is in the test_data
     with pytest.raises(ValueError) as error:
         validate_post_col(test_data, fake_path)
-    assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+    if config["global"]["postcode_csv_check"]:
+        assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+    else:
+        assert str(error.value) == "Invalid postcodes found: ['HIJ 789']"
 
     # Edge cases: invalid column names
     df_invalid_column_name = test_data.rename(columns={"referencepostcode": "postcode"})
@@ -106,6 +118,7 @@ def test_validate_postcode():
 
 
 def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
+
     # Monkeypatch the get_masterlist function to use the mock implementation
     monkeypatch.setattr(
         "src.data_validation.validation.get_masterlist", mock_get_masterlist
@@ -117,9 +130,15 @@ def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
     # Call the function under test
     unreal_postcodes = check_pcs_real(test_data, masterlist_path)
     unreal_postcodes = unreal_postcodes.reset_index(drop=True)
-    expected_unreal_postcodes = pd.Series(
-        ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
-    )
+    if config["global"]["postcode_csv_check"]:
+
+        expected_unreal_postcodes = pd.Series(
+            ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
+        )
+    else:
+        expected_unreal_postcodes = pd.Series(
+            [], name="referencepostcode", dtype=object
+        )
 
     pd.testing.assert_series_equal(
         unreal_postcodes, expected_unreal_postcodes
