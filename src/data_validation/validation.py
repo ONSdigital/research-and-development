@@ -1,5 +1,6 @@
 import os
 import toml
+import logging
 import postcodes_uk
 import pandas as pd
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -11,8 +12,12 @@ from src.utils.helpers import Config_settings
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
+global_config = config["global"]
+config_paths = config["paths"]
+snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
-ValidationLogger = logging.getLogger(__name__)
+# Set up logging
+validationlogger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -74,7 +79,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        ValidationLogger.warning(
+        validationlogger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -85,7 +90,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        ValidationLogger.warning(
+        validationlogger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -147,7 +152,10 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
     return toml_string
 
 
+@time_logger_wrap
+@exception_wrap
 def check_data_shape(
+    data_df: pd.DataFrame,
     schema_path: str = "./config/Data_Schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
@@ -164,17 +172,17 @@ def check_data_shape(
 
     cols_match = False
 
-    # Specify which key in snapshot data dictionary to get correct data
-    # List, with each element containing a dictionary for each row of data
-    contributerdict = snapdata["contributors"]
+    data_dict = data_df.to_dict()
 
     # Load toml data schema into dictionary
     toml_string = load_schema(schema_path)
 
     # Compare length of data dictionary to the data schema
-    if len(contributerdict[0]) == len(toml_string):
+    if len(data_dict) == len(toml_string):
         cols_match = True
     else:
         cols_match = False
+
+    validationlogger.info(f"Data columns match schema: {cols_match}.")
 
     return cols_match
