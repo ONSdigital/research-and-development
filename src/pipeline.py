@@ -9,7 +9,6 @@ from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
 from src.data_validation import validation
-from src.data_validation.validation import check_data_shape
 
 import time
 import logging
