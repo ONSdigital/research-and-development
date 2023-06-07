@@ -19,7 +19,6 @@ MainLogger = logging.getLogger(__name__)
 # load config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
-masterlist_path = config["paths"]["masterlist_path"]
 
 
 def run_pipeline(start):
@@ -39,22 +38,24 @@ def run_pipeline(start):
     Manipulate_data()
 
     # Data Ingest
+    MainLogger.info("Starting Data Ingest...")
     # Load SPP data from DAP
     snapshot_path = config["paths"]["snapshot_path"]
     snapdata = hdfs_load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    MainLogger.info("Finished Data Ingest...")
+
     # Data Transmutation
+    MainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
     print(full_responses.sample(5))
-    logger.info(
-        "The response rate is %.3%",
-        processing.response_rate(contributors_df, responses_df),
-    )
+    processing.response_rate(contributors_df, responses_df)
+    MainLogger.info("Finished Data Transmutation...")
 
     # Data validation
     MainLogger.info("Starting Data Validation...")
-
     # Check the postcode column
+    masterlist_path = config["paths"]["masterlist_path"]
     validation.validate_post_col(contributors_df, masterlist_path)
 
     # Outlier detection
