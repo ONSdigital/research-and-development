@@ -12,6 +12,10 @@ from src.utils.helpers import Config_settings
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 
+# Create a dummy dictionary and pandas dataframe
+dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
+dummy_df = pd.DataFrame(data=dummy_dict)
+
 
 @pytest.fixture  # noqa
 def test_data():
