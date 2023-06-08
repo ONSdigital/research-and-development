@@ -4,7 +4,7 @@ import logging
 import postcodes_uk
 import pandas as pd
 
-from src.utils.wrappers import exception_wrap
+from src.utils.wrappers import exception_wrap, time_logger_wrap
 from src.utils.helpers import Config_settings
 
 
@@ -104,7 +104,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
 
-    ValidationLogger.info("All postcodes validated....")
+    validationlogger.info("All postcodes validated....")
 
     return True
 
@@ -154,7 +154,7 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
 @exception_wrap
 def check_data_shape(
     data_df: pd.DataFrame,
-    schema_path: str = "./config/Data_Schema.toml",
+    schema_path: str = "./config/contributors_schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
