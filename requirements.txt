@@ -12,9 +12,9 @@ pydoop
 pytest
 python-dotenv
 pyyaml
+readme-coverage-badger
 requests
 setuptools
 sphinx
-postcodes_uk # remove this later - use regex
+table-logger
 typing
-readme-coverage-badger
