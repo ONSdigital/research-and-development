@@ -1,6 +1,7 @@
 arrow
 # cookiecutter
 coverage==4.5.4
+deepdiff
 detect-secrets
 # myst-parser
 numpy
