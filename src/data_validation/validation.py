@@ -261,6 +261,7 @@ def check_data_shape(
     otherwise.
 
     Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
         schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
 
