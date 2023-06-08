@@ -127,12 +127,13 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     return unreal_postcodes
 
 
-def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
+@exception_wrap
+def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
     """Load the data schema from toml file into a dictionary
 
     Keyword Arguments:
         file_path -- Path to data schema toml file
-        (default: {"./config/Data_Schema.toml"})
+        (default: {"./config/contributors_schema.toml"})
 
     Returns:
         A dict: dictionary containing parsed schema toml file
