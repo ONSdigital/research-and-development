@@ -97,6 +97,8 @@ def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
 
     response_rate = response_count / contributor_count
 
-    spp_processing_logger.info(f"The SPP response rate is {round(response_rate,2)}%")
+    rounded_resp_rate = round(response_rate, 2)
+
+    spp_processing_logger.info(f"The response rate is {rounded_resp_rate}%")
 
     return response_rate
