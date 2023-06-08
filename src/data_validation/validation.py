@@ -97,7 +97,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     return True
 
 # Set up logging
-logger = logger_creator(global_config)
+validationlogger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -118,6 +118,7 @@ def validate_postcode_pattern(pcode: str) -> bool:
     return valid_bool
 
 
+@exception_wrap
 def get_masterlist(masterlist_path) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
@@ -128,6 +129,8 @@ def get_masterlist(masterlist_path) -> pd.Series:
     return masterlist
 
 
+@time_logger_wrap
+@exception_wrap
 def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
@@ -156,7 +159,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        logger.warning(
+        validationlogger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -167,7 +170,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        logger.warning(
+        validationlogger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -181,6 +184,8 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         raise ValueError(
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
+
+    validationlogger.info("All postcodes validated....")
 
     return True
 
@@ -257,7 +262,7 @@ def check_data_shape(
 
     Keyword Arguments:
         schema_path -- Path to schema dictionary file
-        (default: {"./config/Data_Schema.toml"})
+        (default: {"./config/DataSchema.toml"})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
