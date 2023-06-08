@@ -72,9 +72,9 @@ def addition(a: int, b: int):
 
 class Manipulate_data:
     def __init__(self):
-        self.vf_df = self.create_dummy_df()[0]
+        self.vf_df = self.create_dummy_df()
         self.table_config = "SingleLine"
-        self.df = self.manipulate_df()[0]
+        self.df = self.manipulate_df()
 
     @time_logger_wrap
     @exception_wrap

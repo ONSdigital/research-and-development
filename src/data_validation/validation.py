@@ -1,17 +1,16 @@
 import postcodes_uk
 import pandas as pd
+from src.utils.wrappers import time_logger_wrap, exception_wrap
+import logging
 
-from src.utils.wrappers import logger_creator
 from src.utils.helpers import Config_settings
 
 
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
-global_config = config["global"]
 
-# Set up logging
-logger = logger_creator(global_config)
+ValidationLogger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -32,6 +31,7 @@ def validate_postcode_pattern(pcode: str) -> bool:
     return valid_bool
 
 
+@exception_wrap
 def get_masterlist(masterlist_path) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
@@ -42,6 +42,8 @@ def get_masterlist(masterlist_path) -> pd.Series:
     return masterlist
 
 
+@time_logger_wrap
+@exception_wrap
 def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
@@ -70,7 +72,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        logger.warning(
+        ValidationLogger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -81,7 +83,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        logger.warning(
+        ValidationLogger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -95,6 +97,8 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         raise ValueError(
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
+
+    ValidationLogger.info("All postcodes validated....")
 
     return True
 
