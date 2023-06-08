@@ -167,6 +167,10 @@ def check_data_shape(
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
     """
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
 
     cols_match = False
 
