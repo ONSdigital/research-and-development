@@ -1,5 +1,4 @@
-import subprocess
+from subprocess import run
 
-
-subprocess.run(["python", "-m", "coverage", "run", "-m", "pytest"])
-subprocess.run(["python", "-m", "readme-cov"])
+run(["python", "-m", "coverage", "run", "-m", "pytest"])
+run(["readme-cov"])
