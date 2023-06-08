@@ -5,6 +5,7 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     """Checks if file exists and is non-empty
 
     Keyword Arguments:
+        filename -- Name of file to check
         filePath -- Relative path to file
         (default: {"./src/data_validation/validation.py"})
 
