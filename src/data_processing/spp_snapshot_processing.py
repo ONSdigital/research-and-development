@@ -5,7 +5,9 @@ import logging
 
 spp_processing_logger = logging.getLogger(__name__)
 
-def create_response_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> pd.DataFrame:
+def create_response_dataframe(
+    df: pd.DataFrame, unique_id_cols: List[str]
+) -> pd.DataFrame:
     """Create a response dataframe using pivot_table to reshape the data.
 
     Arguments:
@@ -21,7 +23,9 @@ def create_response_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> pd
     return response_df
 
 
-def create_contextual_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> pd.DataFrame:
+def create_contextual_dataframe(
+    df: pd.DataFrame, unique_id_cols: List[str]
+) -> pd.DataFrame:
     """Create a contextual dataframe by dropping 'questioncode' and 'response' columns
     and removing duplicates.
 
@@ -40,8 +44,8 @@ def create_contextual_dataframe(df: pd.DataFrame, unique_id_cols: List[str]) -> 
 @validate_dataframe_not_empty
 def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.DataFrame:
 
-    """Merges contributor and response data together into a dataframe that is in a 
-    format allowing for easier manipulation later in pipeline - notably through 
+    """Merges contributor and response data together into a dataframe that is in a
+    format allowing for easier manipulation later in pipeline - notably through
     having each questioncode as its own column.
 
     Arguments:
@@ -61,20 +65,21 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
     responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
 
     merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols)
-    # Create a contextual df by dropping "questioncode" and "response" cols. Remove dupes
+    # Create contextual df by dropping "questioncode" and "response" cols. Remove dupes
     contextual_df = create_contextual_dataframe(merged_df, unique_id_cols)
 
     # Create a response dataframe using pivot_table to reshape the data
     response_df = create_response_dataframe(merged_df, unique_id_cols)
 
-    full_responses = response_df.merge(contextual_df, on = unique_id_cols)
+    full_responses = response_df.merge(contextual_df, on=unique_id_cols)
 
     return full_responses
+
 
 @validate_dataframe_not_empty
 def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
 
-    """Generates a response rate based on the contributor and response data 
+    """Generates a response rate based on the contributor and response data
     from the SPP Snapshot file.
 
     Arguments:
@@ -95,4 +100,3 @@ def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
     spp_processing_logger.info(f"The SPP response rate is {round(response_rate,2)}%")
 
     return response_rate
-

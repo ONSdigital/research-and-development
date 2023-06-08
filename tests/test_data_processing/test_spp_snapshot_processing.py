@@ -5,6 +5,14 @@ import pytest
 from typing import Tuple
 
 
+from src.data_processing.spp_snapshot_processing import (
+    create_response_dataframe,
+    full_responses,
+    response_rate,
+    create_contextual_dataframe,
+)
+
+
 @pytest.fixture
 def dummy_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Set up the dummy data
@@ -56,7 +64,6 @@ def expected_output():
 def test_full_responses(dummy_data, expected_output):
     """Tests for full_responses function."""
     # Import modules to test
-    from src.data_processing.spp_snapshot_processing import full_responses
 
     contributor_data, responses_data = dummy_data
     expected_output_data = expected_output
@@ -68,7 +75,6 @@ def test_full_responses(dummy_data, expected_output):
 
 def test_response_rate(dummy_data):
     # Import the module to test
-    from src.data_processing.spp_snapshot_processing import response_rate
 
     contributor_data, responses_data = dummy_data
 
@@ -79,9 +85,7 @@ def test_response_rate(dummy_data):
 
 
 def test_create_response_dataframe(dummy_data):
-    
-    from src.data_processing.spp_snapshot_processing import create_response_dataframe
-    
+
     contributor_data, responses_data = dummy_data
     unique_id_cols = ["reference", "period", "survey"]
     expected_columns = ["reference", "period", "survey", 200, 201, 202]
@@ -97,7 +101,8 @@ def test_create_response_dataframe(dummy_data):
 
     # Assert the data
     assert response_df.values.tolist() == expected_data
-    
+
+
 def test_create_contextual_dataframe(dummy_data):
     contributor_data, responses_data = dummy_data
     unique_id_cols = ["reference", "period", "survey"]
@@ -109,14 +114,14 @@ def test_create_contextual_dataframe(dummy_data):
         "createddate",
         "lastupdatedby",
         "lastupdateddate",
+        "adjustedresponse",
     ]
     expected_data = [
-        [101, 202012, 1, "James", 2020, "Vondy", 2020],
-        [102, 202012, 1, "Ilyas", 2020, "Charl", 2020],
-        [103, 202012, 1, "Roddy", 2020, "Gareth", 2020],
+        [101, 202012, 1, "A", 2020, "A", 2020, ""],
+        [102, 202012, 1, "A", 2020, "A", 2020, ""],
     ]
 
-    contextual_df = create_contextual_dataframe(contributor_data, unique_id_cols)
+    contextual_df = create_contextual_dataframe(responses_data, unique_id_cols)
 
     # Assert the columns
     assert contextual_df.columns.tolist() == expected_columns
