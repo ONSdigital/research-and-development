@@ -186,9 +186,12 @@ def check_data_shape(
     else:
         cols_match = False
 
-    validationlogger.warning(f"Data columns match schema: {cols_match}.")
+    if cols_match is False:
+        validationlogger.warning(f"Data columns match schema: {cols_match}.")
+    else:
+        validationlogger.info(f"Data columns match schema: {cols_match}.")
+
     validationlogger.info(
         f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
     )
-
     return cols_match
