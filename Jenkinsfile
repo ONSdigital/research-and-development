@@ -75,6 +75,10 @@ pipeline {
 
                 python -m pip install -U pip
                 pip3 install pypandoc==1.7.5
+
+                # Remove pydoop from requirements before it's installed.
+                awk '!/pydoop.*/' requirements.txt > temp && mv temp requirements.txt
+
                 pip3 install -r requirements.txt
                 pip3 install pyspark==2.4.0
 
