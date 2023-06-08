@@ -180,8 +180,7 @@ def test_check_data_shape():
     with pytest.raises(AssertionError):
         assert not isinstance(result_1, bool)
     # Assert: test that add fails when the arguments are wrong type
-    pytest.raises(TypeError, check_data_shape, 1, "2")
-    pytest.raises(TypeError, check_data_shape, "1", 2)
+    pytest.raises(ValueError, check_data_shape, 1)
 
 
 def test_load_schema():
