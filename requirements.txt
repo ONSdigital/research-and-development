@@ -15,4 +15,6 @@ coverage
 pyyaml
 requests
 sphinx
-postcodes_uk
+postcodes_uk # remove this later - use regex
+typing
+readme-coverage-badger

@@ -67,3 +67,9 @@ repos:
       entry: These file extensions are restricted. Data should be removed from the commit
       language: fail
       files: .*\.(csv|feather|xlsx|zip|hdf5|h5|json|xml|hd|parquet)
+  - repo: local
+    hooks:
+    - id: coverage-badge
+      name: Update the coverage badge in the readme
+      entry: python /home/cdsw/research-and-development/cov_reports/update_readme.py
+      language: python

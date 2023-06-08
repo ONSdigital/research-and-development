@@ -904,3 +904,6 @@ docs/_linkcheck/
 logs/*
 !logs/.gitkeep
 !logs/logs.md
+
+# Utility bat file for ssh key
+add_ssh_key.bat

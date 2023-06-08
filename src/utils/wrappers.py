@@ -196,3 +196,13 @@ def df_measure_change(df, rows_before, cols_before, table_config):
             """Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified."""
         )
+
+
+def validate_dataframe_not_empty(func):
+    def wrapper(df, *args, **kwargs):
+        if df.empty:
+            logger.warning("Input dataframe is empty.")
+            raise ValueError("Input dataframe is empty.")
+        return func(df, *args, **kwargs)
+
+    return wrapper

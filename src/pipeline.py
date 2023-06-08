@@ -2,9 +2,9 @@
 
 from src.utils import runlog
 from src._version import __version__ as version
+
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.utils.testfunctions import Manipulate_data
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
@@ -35,8 +35,6 @@ def run_pipeline(start):
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-    Manipulate_data()
-
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
     # Load SPP data from DAP
