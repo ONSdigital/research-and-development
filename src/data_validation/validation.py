@@ -1,16 +1,23 @@
+import os
+import toml
+import logging
 import postcodes_uk
 import pandas as pd
-from src.utils.wrappers import time_logger_wrap, exception_wrap
-import logging
 
+from deepdiff import DeepDiff
+from src.utils.wrappers import exception_wrap, time_logger_wrap
 from src.utils.helpers import Config_settings
 
 
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
+global_config = config["global"]
+config_paths = config["paths"]
+snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
-ValidationLogger = logging.getLogger(__name__)
+# Set up logging
+validationlogger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -72,7 +79,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        ValidationLogger.warning(
+        validationlogger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -83,7 +90,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        ValidationLogger.warning(
+        validationlogger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -98,13 +105,13 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
 
-    ValidationLogger.info("All postcodes validated....")
+    validationlogger.info("All postcodes validated....")
 
     return True
 
+
 def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
-    """Checks if the postcodes are real against a masterlist of actual postcodes
-    """
+    """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(masterlist_path)
 
@@ -117,34 +124,17 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
         unreal_postcodes = emptydf.loc[
             ~emptydf["referencepostcode"], "referencepostcode"
         ]
-        
+
     return unreal_postcodes
-import os
-import toml
-from deepdiff import DeepDiff
-from pydantic.dataclasses import dataclass
-from src.utils.helpers import Config_settings
-from src.utils.hdfs_mods import hdfs_load_json as read_data
 
 
-datafilepath = "/ons/rdbe_dev/Frozen_Group_Data2021_244_Headers.csv"
-# dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row.csv"
-dummydatapath = "/ons/rdbe_dev/Frozen_Test_Data_multi-row_Matching.csv"
-
-
-# Get config settings from developer_config.yaml
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-config_paths = config["paths"]
-snapshot_path = config_paths["snapshot_path"]  # Taken from config file
-
-
-def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
+@exception_wrap
+def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
     """Load the data schema from toml file into a dictionary
 
     Keyword Arguments:
         file_path -- Path to data schema toml file
-        (default: {"./config/Data_Schema.toml"})
+        (default: {"./config/contributors_schema.toml"})
 
     Returns:
         A dict: dictionary containing parsed schema toml file
@@ -163,81 +153,102 @@ def load_schema(file_path: str = "./config/Data_Schema.toml") -> dict:
     return toml_string
 
 
+@exception_wrap
 def check_data_shape(
-    data_file: str = snapshot_path,
-    schema_path: str = "./config/Data_Schema.toml",
+    data_df: pd.DataFrame,
+    schema_path: str = "./config/contributors_schema.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        data_file -- Path to data file to compare (default: {snapshot_path})
+        data_df -- Pandas dataframe containing data to be checked.
         schema_path -- Path to schema dictionary file
-        (default: {"./config/Data_Schema.toml"})
+        (default: {"./config/DataSchema.toml"})
 
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
     """
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
 
     cols_match = False
 
-    # Read data file from json file
-    snapdata = read_data(data_file)
-
-    # Specify which key in snapshot data dictionary to get correct data
-    # List, with each element containing a dictionary for each row of data
-    contributerdict = snapdata["contributors"]
+    data_dict = data_df.to_dict()
 
     # Load toml data schema into dictionary
     toml_string = load_schema(schema_path)
 
     # Compare length of data dictionary to the data schema
-    if len(contributerdict[0]) == len(toml_string):
+    if len(data_dict) == len(toml_string):
         cols_match = True
     else:
         cols_match = False
 
+    if cols_match is False:
+        validationlogger.warning(f"Data columns match schema: {cols_match}.")
+    else:
+        validationlogger.info(f"Data columns match schema: {cols_match}.")
+
+    validationlogger.info(
+        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
+    )
+
     return cols_match
 
 
+@exception_wrap
 def check_var_names(
-    dataFile: str = snapshot_path,
-    filePath: str = "./config/Data_Schema.toml",
+    data_df: pd.DataFrame,
+    filePath: str = "./config/contributors_schema.toml",
 ) -> bool:
     """Compare the keys of the ingested data file and the data schema
     dictionaries. If they match then returns True, if not then returns
     False
 
     Keyword Arguments:
-        dataFile -- _description_ (default: {snapshot_path})
-        filePath -- _description_ (default: {"./config/Data_Schema.toml"})
+        data_df -- Pandas dataframe containing data to be checked.
+        filePath -- Path to schema TOML file
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A bool: boolean value indicating whether data file dictionary
         keys match the data schema dictionary keys.
     """
-    # Read data file
-    snapdata = read_data(dataFile)
+
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
 
     # Specify which key in snapshot data dictionary to get correct data
     # List, with each element containing a dictionary for each row of data
-    contributerdict = snapdata["contributors"][0]
+    data_dict = data_df.to_dict()
+    data_keys = data_dict.keys()
 
     # Load toml data schema into dictionary
     toml_string = load_schema(filePath)
 
-    if contributerdict.keys() == toml_string.keys():
+    if data_keys == toml_string.keys():
         dict_match = True
     else:
         dict_match = False
 
+    if dict_match is False:
+        validationlogger.warning(f"Data columns names match schema: {dict_match}.")
+    else:
+        validationlogger.info(f"Data columns names match schema: {dict_match}.")
+
     return dict_match
 
 
+@exception_wrap
 def data_key_diffs(
-    dataFile: str = snapshot_path,
-    filePath: str = "./config/Data_Schema.toml",
+    data_df: pd.DataFrame,
+    filePath: str = "./config/contributors_schema.toml",
 ) -> dict:
     """Compare differences between data dictionary and the toml data
     schema dictionary. Outputs a dictionary with 'dictionary_items_added'
@@ -247,8 +258,9 @@ def data_key_diffs(
     are not present in the data file.
 
     Keyword Arguments:
-        dataFile -- _description_ (default: {snapshot_path})
-        filePath -- _description_ (default: {"./config/Data_Schema.toml"})
+        data_df -- Pandas dataframe containing data to be checked.
+        filePath -- Path to schema TOML file
+        (default: {"./config/Data_Schema.toml"})
 
     Returns:
         A dict: dictionary containing items added to and items removed
@@ -256,12 +268,15 @@ def data_key_diffs(
         in data file column names, items removed show columns missing
         from the data file.
     """
-    # Read data file
-    data = read_data(dataFile)
+
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
 
     # Convert it to dictionary
     # data_dict = data.to_dict()
-    data_dict = data["contributors"][0]
+    data_dict = data_df.to_dict()
 
     # Load toml data schema into dictionary
     toml_string = load_schema(filePath)
@@ -272,212 +287,20 @@ def data_key_diffs(
 
     # Does a case-sensitive comparison of the keys of two dictionaries
     diff = DeepDiff(toml_keys_dict, data_keys_dict, ignore_string_case=True)
+    added = diff["dictionary_item_added"]
+    removed = diff["dictionary_item_removed"]
+
+    if len(toml_string) != len(data_keys_dict):
+        validationlogger.warning(
+            f"""Differences detected in data compared to schema: \n
+                                 \n Additional columns: {added}
+                                 \n Removed columns: {removed} \n"""
+        )
+    else:
+        validationlogger.info(
+            f"""Data and schema columns match. \n
+                                 \n Additional columns: {added}
+                                 \n Removed columns: {removed} \n"""
+        )
 
     return diff
-
-
-def create_data_dict(dataFile: str = snapshot_path):
-    # Read data file
-    data = read_data(dataFile)
-
-    # Convert it to dictionary
-    # data_dict = data.to_dict(orient="index")
-    # for k, v in data_dict.items():
-    #    if isinstance(v, dict):
-    #
-    #        for sub_key, sub_val in v.items():
-    #
-    #            # Initialise dictionary with first index
-    #            if k == 0:
-    #                dummyDict[sub_key] = [sub_val]
-    #            else:
-    #                dummyDict[sub_key] += [sub_val]
-    #    else:
-    #        print("{0} : {1}".format(k, v))
-
-    return data["contributors"]
-
-
-# test = create_data_dict()
-# print(type(test))
-
-
-def data_types(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-) -> dict:
-    # Load toml data schema into dictionary
-    toml_string = load_schema(filePath)
-    schema_type_dict = {}
-
-    # Loop over initial tomls schema dictionary keys:values
-    for toml_key, toml_val in toml_string.items():
-
-        # Loop over nest dictionary key:value pairs for each main key
-        for nest_key, nest_val in toml_val.items():
-
-            # Create a new dictionary only containing the data_type value
-            # for each main key for comparison
-            if nest_key == "data_type":
-                schema_type_dict[toml_key] = nest_val
-
-    for type_key, type_val in schema_type_dict.items():
-
-        if type_val == "Categorical":
-            schema_type_dict[type_key] = [type(1), type("")]
-        elif type_val == "Numerical flat (or decimal)":
-            schema_type_dict[type_key] = [type(1.0)]
-        elif type_val == "Numeric Integer":
-            schema_type_dict[type_key] = [type(1)]
-        elif type_val == "Boolean (True or False, 0 or 1)":
-            schema_type_dict[type_key] = [bool]
-        else:
-            schema_type_dict[type_key] = None
-
-    return schema_type_dict
-
-
-# def check_data_types(
-#    dataFile: str = datafilepath,
-#    filePath: str = "./config/DataSchema.toml",
-# ) -> bool:
-#    """_summary_
-#
-#    Keyword Arguments:
-#        dataFile -- _description_ (default: {datafilepath})
-#        filePath -- _description_ (default: {"./config/DataSchema.toml"})
-#
-#    Returns:
-#        _description_
-#    """
-#    # Create data dictionary containing all values in each column
-#    data_dict = create_data_dict()
-#
-#    # Create dictionary containing 'column - type' key - value pairs
-#    type_dict = data_types()
-#    data_list = []
-#    data_list.append( [','.join([*type_dict]) ] )
-#    print(data_list[0])
-#
-#    for type_key, type_val in type_dict.items():
-#
-#        if type_val == "Categorical":
-#            type_dict[type_key] = [type(1), type("")]
-#        elif type_val == "Numerical flat (or decimal)":
-#            type_dict[type_key] = [type(1.0)]
-#        elif type_val == "Numeric Integer":
-#            type_dict[type_key] = [type(1)]
-#        elif type_val == "Boolean (True or False, 0 or 1)":
-#            type_dict[type_key] = [bool]
-#        else:
-#            type_dict[type_key] = None
-#
-#    for dKey, dVal in data_dict.items():
-#        if dKey in type_dict.keys():
-#
-#            row = 0
-#
-#            for items in dVal:
-#
-#                # Ignore None types here. None types should be amended
-#                # to their relevant types in data
-#                if type_dict[dKey] is not None:
-#
-#                    # If column is of the 'Categorical' type and the data
-#                    # is not either an int or a str
-#                    if (
-#                        len(type_dict[dKey]) > 1
-#                        and type(items) is not (type_dict[dKey])[0]
-#                        and len(type_dict[dKey]) > 1
-#                        and type(items) is not (type_dict[dKey])[1]
-#                    ):
-#                        print(
-#                            f"""In row {row}, {dKey} is of type {type(items)}.
-#                            It should either be of type { (type_dict[dKey])[0] } or
-#                            { (type_dict[dKey])[1] }"""
-#                        )
-#                    # Else if column is of a singular type, and the data
-#                    # does not match that type
-#                    elif (len(type_dict[dKey]) == 1) and type(items) is not (
-#                        type_dict[dKey]
-#                    )[0]:
-#                        print(
-#                            f"""In row {row}, {dKey} is of type {type(items)}.
-#                            It should be of type { (type_dict[dKey])[0] }"""
-#                        )
-#                    # Pass values which match their respective schema types
-#                    else:
-#                        pass
-#                # Signal which values are of None type
-#                else:
-#                    print(
-#                        (
-#                            f"Row {row}, column {dKey} is of type {type_dict[dKey]}.\n"
-#                            f"Please amend!"
-#                        )
-#                    )
-#                row += 1
-#
-#    return "End"
-#
-
-
-def test_data_types(
-    dataFile: str = datafilepath,
-    filePath: str = "./config/DataSchema.toml",
-) -> bool:
-    """_summary_
-
-    Keyword Arguments:
-        dataFile -- _description_ (default: {datafilepath})
-        filePath -- _description_ (default: {"./config/DataSchema.toml"})
-
-    Returns:
-        _description_
-    """
-    # Create data dictionary containing all values in each column
-    # data_dict = create_data_dict()
-
-    # Create dictionary containing 'column - type' key - value pairs
-    type_dict = data_types()
-    data_list = []
-    data_list.append(",".join([*type_dict]))
-
-    vals = read_data(dummydatapath)
-    for i, row in vals.iterrows():
-        val_list = vals.iloc[0].tolist()
-
-        data_list.append(",".join(map(str, val_list)))
-
-    return data_list
-
-
-# Turns a dictionary into a class
-@dataclass
-class Dict2Class(object):
-    def __init__(self, my_dict):
-
-        for key in my_dict:
-            setattr(self, key, my_dict[key])
-
-
-# test = test_data_types()
-# test2 = data_types()
-# result = Dict2Class(test2)
-# print(f"headcount_total: {result.headcount_total}")
-# print(result.__dict__)
-
-# print(result.__dict__)
-# error_count = 0
-# output_data = []
-
-# for idx, d in enumerate(test[1:]):
-#    try:
-#        market_data = Dict2Class(*d.split(","))
-#        output_data.append(json.dumps(market_data, default=pydantic_encoder))
-#    except ValidationError as ve:
-#        logging.error(f"row number: {idx + 1}, row: {d}, error: {ve}")
-#        error_count += 1
-
-# print(f"Error count: {error_count}")
-# print(output_data)
