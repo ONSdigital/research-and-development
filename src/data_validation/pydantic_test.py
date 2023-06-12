@@ -1,9 +1,10 @@
+import pandas as pd
+
 from datetime import date
 from pydantic import BaseModel, ValidationError
 from pydantic.types import StrictStr, StrictInt, StrictFloat
-
-from src.data_validation.validation import create_data_dict
 from src.utils.wrappers import exception_wrap
+from src.data_validation.validation import validationlogger
 
 
 class DataTypes(BaseModel):
@@ -61,7 +62,7 @@ class DataTypes(BaseModel):
 
 
 @exception_wrap
-def check_data_types():
+def check_data_types(data_df: pd.DataFrame):
     """Takes the data from a csv file, parses that into a dictionary with
     key: value pairs for each variable. The values for each key should be
     a list, each element corresponding to a row in the csv file. A
@@ -73,6 +74,7 @@ def check_data_types():
     contains column headers not defined in the 'DataTypes' class.
 
     Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
 
     Raises:
         TypeError: If the value in the 'data_dict' is not of <class 'list'> type
@@ -84,13 +86,14 @@ def check_data_types():
     """
     # Fetch the data. Returns a list with each element containing a dictionary
     # Each dictionary represents a 'row' in the data.
-    data_list = create_data_dict()
+    data_list = data_df.to_dict("index")
 
     # Initialise an index to iterate over
     index = 0
     error_count = 0
 
     # Loop over the list containing the data
+
     while index < len(data_list):
 
         # Iterate through dictionary at each element in list
@@ -101,13 +104,11 @@ def check_data_types():
             except ValidationError as e:
                 # Errors are caught when a type from the data doesn't match the
                 # type specified in the BaseModel
-                ValidationLogger.warning(f"Error on row: {index}: {e} \n")  # noqa
+                validationlogger.warning(f"Error on row: {index}: {e} \n")  # noqa
                 error_count += 1
 
         index += 1
 
+    validationlogger.info(f"Total number of data type validation errors: {error_count}")
+
     return error_count, DataType_obj
-
-
-check = check_data_types()
-print(check)
