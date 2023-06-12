@@ -1,9 +1,7 @@
 from src.data_validation.validation import create_data_dict
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError
 from pydantic.types import StrictStr, StrictInt, StrictFloat
 from datetime import date
-
-# import pandas as pd
 
 
 class DataTypes(BaseModel):
@@ -58,11 +56,6 @@ class DataTypes(BaseModel):
 
     class Config:
         extra = "forbid"
-
-    @field_validator("survey", "status", "formtype")
-    def value_must_be_str(cls, v):
-        if not isinstance(v, str):
-            raise TypeError("Value must be a valid String.")
 
 
 def check_data_types():
