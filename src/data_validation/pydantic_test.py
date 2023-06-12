@@ -1,7 +1,9 @@
-from src.data_validation.validation import create_data_dict
+from datetime import date
 from pydantic import BaseModel, ValidationError
 from pydantic.types import StrictStr, StrictInt, StrictFloat
-from datetime import date
+
+from src.data_validation.validation import create_data_dict
+from src.utils.wrappers import exception_wrap
 
 
 class DataTypes(BaseModel):
@@ -58,6 +60,7 @@ class DataTypes(BaseModel):
         extra = "forbid"
 
 
+@exception_wrap
 def check_data_types():
     """Takes the data from a csv file, parses that into a dictionary with
     key: value pairs for each variable. The values for each key should be
@@ -98,7 +101,7 @@ def check_data_types():
             except ValidationError as e:
                 # Errors are caught when a type from the data doesn't match the
                 # type specified in the BaseModel
-                print(f"Error on row {index}: {e} \n")
+                ValidationLogger.warning(f"Error on row: {index}: {e} \n")  # noqa
                 error_count += 1
 
         index += 1
