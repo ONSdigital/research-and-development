@@ -52,7 +52,7 @@ def run_pipeline(start):
 
     # Data validation
     MainLogger.info("Starting Data Validation...")
-    pydantic_test.check_data_types()
+    pydantic_test.check_data_types(contributors_df)
 
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
