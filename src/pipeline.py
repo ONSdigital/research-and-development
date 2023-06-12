@@ -8,7 +8,7 @@ from src.utils.wrappers import logger_creator
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
-from src.data_validation import validation
+from src.data_validation import validation, pydantic_test
 import time
 import logging
 
@@ -52,6 +52,8 @@ def run_pipeline(start):
 
     # Data validation
     MainLogger.info("Starting Data Validation...")
+    pydantic_test.check_data_types()
+
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
     validation.validate_post_col(contributors_df, masterlist_path)
