@@ -107,7 +107,7 @@ pipeline {
 
                 coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
               -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py && coverage xml \
-              -o python_coverage.xml && coverage report -m --fail-under=10
+              coverage report -m --fail-under=10
                 '''
                 // coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
                 /*
