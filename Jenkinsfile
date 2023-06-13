@@ -106,8 +106,7 @@ pipeline {
                 . venv/bin/activate
 
                 coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
-              -m pytest -ra ./tests --junitxml=junit_result.xml --ignore=tests/test_utils/test_hdfs_mods.py && coverage xml \
-              -o python_coverage.xml
+              -m pytest -ra ./tests --junitxml=junit_result.xml --ignore=tests/test_utils/test_hdfs_mods.py && coverage xml
                 '''
                 // coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
                 /*
