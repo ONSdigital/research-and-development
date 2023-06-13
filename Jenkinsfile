@@ -108,7 +108,6 @@ pipeline {
                 coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
               -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py
                 '''
-                // coverage run --branch --source=./${PROJECT_NAME} -m pytest -ra ./tests
                 /*
                 // Lines below create a coverage report for on Jenkins. Currently commented out
                 // as it gives errors when no imports are used in unit tests. import src.main
