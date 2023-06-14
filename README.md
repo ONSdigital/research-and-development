@@ -1,6 +1,6 @@
 # Research and Development Project
 
-![Code Coverage](https://img.shields.io/badge/Coverage-81%25-yellowgreen.svg) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+![Code Coverage](https://img.shields.io/badge/Coverage-86%25-yellowgreen.svg) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 
 Calculating national and regional research and development expenditure as part of [national accounts](https://www.ons.gov.uk/economy/nationalaccounts).
