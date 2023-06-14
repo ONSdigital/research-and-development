@@ -71,5 +71,5 @@ repos:
     hooks:
     - id: coverage-badge
       name: Update the coverage badge in the readme
-      entry: python /home/cdsw/research-and-development/cov_reports/update_readme.py
+      entry: python /home/cdsw/research-and-development/src/utils/update_readme.py
       language: python
