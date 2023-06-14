@@ -6,7 +6,7 @@ src/utils/wrappers.py,src/utils/runlog.py,
 src/_version.py,src/pipeline.py,
 /home/cdsw/.local/lib/python3.6/site-packages/*.py"""
 
-# Run the tests and generate the coverage report
+# Run the tests & generate the coverage report
 command = ["coverage", "report", f"{omit_files}"]  # no qa
 
 # Define cover report file
