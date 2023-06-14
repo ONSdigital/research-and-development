@@ -15,9 +15,11 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     """
     output = False
 
-    fileExists = os.path.exists(filepath + filename)
+    file_loc = os.path.join(filepath, filename)
+    fileExists = os.path.exists(file_loc)
+
     if fileExists:
-        fileSize = os.path.getsize(filepath + filename)
+        fileSize = os.path.getsize(file_loc)
 
     if fileExists and fileSize > 0:
         output = True
