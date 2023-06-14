@@ -45,7 +45,7 @@ def hdfs_load_json(filepath: str) -> dict:
 
     # Open the file in read mode inside Hadoop context
     with hdfs.open(filepath, "r") as file:
-        # Import csv file and convert to Dataframe
+        # Import csv file and convert to dataframe
         datadict = json.load(file)
 
     return datadict
