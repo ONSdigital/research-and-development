@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+import os
 from src.data_validation.validation import (
     validate_post_col,
     validate_postcode_pattern,
@@ -10,6 +11,33 @@ from src.utils.helpers import Config_settings
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
+
+
+def test_check_file_exists():
+    """Test the check_file_exists function."""
+    # Arrange
+    from src.data_validation.validation import check_file_exists
+
+    # Act: use pytest to assert the result
+    # Create emptyfile.py if it doesn't already exist
+    empty_file = open("./emptyfile.py", "w")
+
+    # developer_config.yaml should exist and be non-empty
+    result_1 = check_file_exists("developer_config.yaml", "./src/")
+    result_2 = check_file_exists("Non_existant_file.txt")
+    result_3 = check_file_exists(empty_file.name)
+
+    # Delete emptyfile.py after testing
+    os.remove(empty_file.name)
+
+    # Assert
+    assert isinstance(result_1, bool)
+    assert result_1
+    assert not result_2
+    assert not result_3
+    # Assert: Negative test. Should fails when the answer is wrong
+    with pytest.raises(AssertionError):
+        assert not isinstance(result_1, bool)
 
 
 @pytest.fixture  # noqa
