@@ -57,7 +57,6 @@ def run_pipeline(start):
     processing.response_rate(contributors_df, responses_df)
 
     # Data validation
-    validation.check_file_exists(snapshot_path)
 
     # Check the postcode column
     val.validate_post_col(contributors_df, masterlist_path)
