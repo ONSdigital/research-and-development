@@ -1,4 +1,19 @@
 import os
+import postcodes_uk
+import pandas as pd
+import pydoop.hdfs as hdfs
+
+from src.utils.wrappers import logger_creator
+from src.utils.helpers import Config_settings
+
+
+# Get the config
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+global_config = config["global"]
+
+# Set up logging
+logger = logger_creator(global_config)
 
 
 def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
@@ -16,7 +31,7 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     output = False
 
     file_loc = os.path.join(filepath, filename)
-    fileExists = os.path.exists(file_loc)
+    fileExists = hdfs.path.exists(file_loc)
 
     if fileExists:
         fileSize = os.path.getsize(file_loc)
