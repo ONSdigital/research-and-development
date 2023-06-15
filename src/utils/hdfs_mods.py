@@ -49,3 +49,37 @@ def hdfs_load_json(filepath: str) -> dict:
         datadict = json.load(file)
 
     return datadict
+
+
+def hdfs_file_exists(filepath: str) -> bool:
+    """Function to check file exists
+
+    Args:
+        filepath (string) -- The filepath in Hue
+
+    Returns:
+        Bool - A boolean value indicating whether a file
+        exists or not
+    """
+    # Open the file in read mode inside Hadoop context
+    with hdfs.open(filepath, "r") as file:
+        file_exists = hdfs.path.exists(file)
+
+    return file_exists
+
+
+def hdfs_file_size(filepath: str) -> int:
+    """Function to check file exists
+
+    Args:
+        filepath (string) -- The filepath in Hue
+
+    Returns:
+        Int - an integer value indicating the size
+        of the file in bytes
+    """
+    # Open the file in read mode inside Hadoop context
+    with hdfs.open(filepath, "r") as file:
+        file_size = hdfs.path.getsize(file)
+
+    return file_size
