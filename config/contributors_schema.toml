@@ -11,7 +11,7 @@ Possible_Categorical_Values = ["nan"]
 [reference]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = 11001603625
@@ -21,7 +21,7 @@ Possible_Categorical_Values = ["nan"]
 [period]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = 6
 Min_values = "nan"
@@ -31,7 +31,7 @@ Possible_Categorical_Values = [202012]
 [survey]
 Description = "All values are 002"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = "nan"
@@ -41,7 +41,7 @@ Possible_Categorical_Values = ["002"]
 [formid]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "int"
 Length = 2
 Min_values = "nan"
@@ -51,7 +51,7 @@ Possible_Categorical_Values = [20, 21]
 [status]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = "nan"
@@ -61,7 +61,7 @@ Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Cle
 [statusencoded]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "int"
 Length = 3
 Min_values = "nan"
@@ -71,7 +71,7 @@ Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305,
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
 Deduced_Data_Type = "Datetime"
-Nullable = False
+Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
 Min_values = "nan"
@@ -81,7 +81,7 @@ Possible_Categorical_Values = ["nan"]
 [lockedby]
 Description = "All empty strings"
 Deduced_Data_Type = "pandas.NA"
-Nullable = True
+Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
 Min_values = "nan"
@@ -91,7 +91,7 @@ Possible_Categorical_Values = ["nan"]
 [lockeddate]
 Description = "All None type"
 Deduced_Data_Type = "pandas.NA"
-Nullable = True
+Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
 Min_values = "nan"
@@ -101,7 +101,7 @@ Possible_Categorical_Values = ["nan"]
 [formtype]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -111,7 +111,7 @@ Possible_Categorical_Values = ["0001", "0006"]
 [checkletter]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = 1
 Min_values = "nan"
@@ -121,7 +121,7 @@ Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L",
 [frozensicoutdated]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1120
@@ -131,7 +131,7 @@ Possible_Categorical_Values = ["nan"]
 [rusicoutdated]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1120
@@ -141,7 +141,7 @@ Possible_Categorical_Values = ["nan"]
 [frozensic]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1300
@@ -151,7 +151,7 @@ Possible_Categorical_Values = ["nan"]
 [rusic]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1300
@@ -161,7 +161,7 @@ Possible_Categorical_Values = ["nan"]
 [frozenemployees]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -171,7 +171,7 @@ Possible_Categorical_Values = ["nan"]
 [employees]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -181,7 +181,7 @@ Possible_Categorical_Values = ["nan"]
 [frozenemployment]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1
@@ -191,7 +191,7 @@ Possible_Categorical_Values = ["nan"]
 [employment]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1
@@ -201,7 +201,7 @@ Possible_Categorical_Values = ["nan"]
 [frozenfteemployment]
 Description = "nan"
 Deduced_Data_Type = "float"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0.0
@@ -211,7 +211,7 @@ Possible_Categorical_Values = ["nan"]
 [fteemployment]
 Description = "nan"
 Deduced_Data_Type = "float"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0.0
@@ -221,7 +221,7 @@ Possible_Categorical_Values = ["nan"]
 [frozenturnover]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -231,7 +231,7 @@ Possible_Categorical_Values = ["nan"]
 [turnover]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -241,7 +241,7 @@ Possible_Categorical_Values = ["nan"]
 [enterprisereference]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = 1001603625
@@ -251,7 +251,7 @@ Possible_categorical_Values = ["nan"]
 [wowenterprisereference]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = 1001603625
@@ -261,7 +261,7 @@ Possible_categorical_Values = ["nan"]
 [cellnumber]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "int"
 Length = "nan"
 Min_values = "nan"
@@ -271,7 +271,7 @@ Possible_Categorical_Values = [0]
 [currency]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -281,7 +281,7 @@ Possible_Categorical_Values = ["S", "E"]
 [vatreference]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -291,7 +291,7 @@ Possible_Categorical_Values = ["VATREF"]
 [payereference]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -301,7 +301,7 @@ Possible_Categorical_Values = ["PAYEREF"]
 [companyregistrationnumber]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -311,7 +311,7 @@ Possible_Categorical_Values = ["CRN"]
 [numberlivelocalunits]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -321,7 +321,7 @@ Possible_categorical_Values = ["nan"]
 [numberlivevat]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -331,7 +331,7 @@ Possible_categorical_Values = ["nan"]
 [numberlivepaye]
 Description = "nan"
 Deduced_Data_Type = "int"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 0
@@ -341,7 +341,7 @@ Possible_categorical_Values = ["nan"]
 [legalstatus]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = 1
@@ -351,7 +351,7 @@ Possible_Categorical_Values = [1, 2, 3, 4]
 [reportingunitmarker]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -361,7 +361,7 @@ Possible_Categorical_Values = ["L", "E"]
 [region]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -371,7 +371,7 @@ Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "
 [birthdate]
 Description = "Datetime format = format=%d/%m/%Y"
 Deduced_Data_Type = "Datetime"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -381,7 +381,7 @@ Possible_categorical_Values = ["nan"]
 [referencename]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -391,7 +391,7 @@ Possible_categorical_Values = ["nan"]
 [referencepostcode]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -401,7 +401,7 @@ Possible_categorical_Values = ["nan"]
 [tradingstyle]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -411,7 +411,7 @@ Possible_categorical_Values = ["nan"]
 [selectiontype]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -421,7 +421,7 @@ Possible_Categorical_Values = ["L"]
 [inclusionexclusion]
 Description = 'All values are " "'
 Deduced_Data_Type = "pandas.NA"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
@@ -431,7 +431,7 @@ Possible_categorical_Values = ["nan"]
 [createdby]
 Description = "nan"
 Deduced_Data_Type = "str"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = "nan"
@@ -441,7 +441,7 @@ Possible_Categorical_Values = ["ingestion"]
 [createddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
 Deduced_Data_Type = "Datetime"
-Nullable = False
+Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
 Min_values = "nan"
@@ -451,7 +451,7 @@ Possible_categorical_Values = ["nan"]
 [lastupdatedby]
 Description = "nan"
 Deduced_Data_Type = "category"
-Nullable = False
+Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
 Min_values = "nan"
@@ -461,7 +461,7 @@ Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
 Deduced_Data_Type = "Datetime"
-Nullable = False
+Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
 Min_values = "nan"

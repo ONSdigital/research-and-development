@@ -16,6 +16,6 @@ readme-coverage-badger
 requests
 setuptools
 sphinx
-table_logger
+table-logger
 toml
 typing
