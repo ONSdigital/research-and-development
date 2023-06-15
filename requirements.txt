@@ -17,4 +17,5 @@ requests
 setuptools
 sphinx
 table-logger
+toml
 typing

@@ -93,7 +93,7 @@ doc/_build/
 target/
 
 # Jupyter Notebook
-notebooks/*
+# notebooks/*
 !notebooks/.gitkeep
 !notebooks/.README.md
 .ipynb_checkpoints
@@ -883,6 +883,7 @@ data/processed/*
 *.json
 *.parquet
 *.txt
+!requirements.txt
 *.xlsx
 *.xml
 *.zip
