@@ -20,12 +20,15 @@ def test_check_file_exists():
 
     # Act: use pytest to assert the result
     # Create emptyfile.py if it doesn't already exist
-    empty_file = open("./emptyfile.py", "w")
+    empty_file = open("emptyfile.py", "w")
 
     # developer_config.yaml should exist and be non-empty
-    result_1 = check_file_exists("developer_config.yaml", "./src/")
-    result_2 = check_file_exists("Non_existant_file.txt")
-    result_3 = check_file_exists(empty_file.name)
+    result_1 = check_file_exists(
+        "developer_config.yaml", "/home/cdsw/research-and-development/src/"
+    )
+    result_3 = check_file_exists(
+        empty_file.name, "/home/cdsw/research-and-development/"
+    )
 
     # Delete emptyfile.py after testing
     os.remove(empty_file.name)
@@ -33,11 +36,13 @@ def test_check_file_exists():
     # Assert
     assert isinstance(result_1, bool)
     assert result_1
-    assert not result_2
     assert not result_3
-    # Assert: Negative test. Should fails when the answer is wrong
+
+    # Assert: Negative test. Should fail when the answer is wrong
     with pytest.raises(AssertionError):
         assert not isinstance(result_1, bool)
+    with pytest.raises(FileNotFoundError):
+        assert not check_file_exists("Non_existant_file.txt")
 
 
 @pytest.fixture  # noqa
