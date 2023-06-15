@@ -61,9 +61,7 @@ def hdfs_file_exists(filepath: str) -> bool:
         Bool - A boolean value indicating whether a file
         exists or not
     """
-    # Open the file in read mode inside Hadoop context
-    with hdfs.open(filepath, "r") as file:
-        file_exists = hdfs.path.exists(file)
+    file_exists = hdfs.path.exists(filepath)
 
     return file_exists
 
@@ -78,8 +76,6 @@ def hdfs_file_size(filepath: str) -> int:
         Int - an integer value indicating the size
         of the file in bytes
     """
-    # Open the file in read mode inside Hadoop context
-    with hdfs.open(filepath, "r") as file:
-        file_size = hdfs.path.getsize(file)
+    file_size = hdfs.path.getsize(filepath)
 
     return file_size
