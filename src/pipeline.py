@@ -9,6 +9,7 @@ from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json
 from src.data_validation import validation as val
+
 import time
 import logging
 
@@ -55,7 +56,8 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Transmutation...")
 
     # Data validation
-    MainLogger.info("Starting Data Validation...")
+    validation.check_data_shape(full_responses)
+
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
     val.validate_post_col(contributors_df, masterlist_path)
