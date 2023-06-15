@@ -5,12 +5,23 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.utils.testfunctions import Manipulate_data
+from src.data_ingest import spp_parser
+from src.data_processing import spp_snapshot_processing as processing
+from src.utils.hdfs_mods import hdfs_load_json
+from src.data_validation import validation as val
 import time
 import logging
 
 
 MainLogger = logging.getLogger(__name__)
 MainLogger.setLevel(logging.INFO)
+
+
+# load config
+conf_obj = Config_settings()
+config = conf_obj.config_dict
+masterlist_path = config["paths"]["masterlist_path"]
+snapshot_path = config["paths"]["snapshot_path"]
 
 
 def run_pipeline(start):
@@ -32,9 +43,12 @@ def run_pipeline(start):
     logger.info("Collecting logging parameters ..........")
     Manipulate_data()
 
+    # Check data files exist
+    val.check_file_exists(snapshot_path)
+    
     # Data Ingest
     # Load SPP data from DAP
-    snapshot_path = config["paths"]["snapshot_path"]
+    
     snapdata = hdfs_load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     # Data Transmutation
@@ -49,7 +63,7 @@ def run_pipeline(start):
     validation.check_file_exists(snapshot_path)
 
     # Check the postcode column
-    validation.validate_post_col(contributors_df, masterlist_path)
+    val.validate_post_col(contributors_df, masterlist_path)
 
     # Outlier detection
 
