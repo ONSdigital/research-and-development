@@ -34,7 +34,7 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     fileExists = hdfs.path.exists(file_loc)
 
     if fileExists:
-        fileSize = os.path.getsize(file_loc)
+        fileSize = hdfs.path.getsize(file_loc)
 
     if fileExists and fileSize > 0:
         output = True
