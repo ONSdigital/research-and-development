@@ -31,14 +31,39 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     output = False
 
     file_loc = os.path.join(filepath, filename)
-    fileExists = hdfs.path.exists(file_loc)
+    hdfs_file_exists = hdfs.path.exists(file_loc)
+    local_file_exists = os.path.exists(file_loc)
 
-    if fileExists:
-        fileSize = hdfs.path.getsize(file_loc)
+    # If the hdfs file exists check the size of it.
+    # If it doesn't exists on hdfs check locally.
+    if hdfs_file_exists:
+        hdfs_file_size = hdfs.path.getsize(file_loc)
 
-    if fileExists and fileSize > 0:
+    # If the file exists locally, check the size of it.
+    if local_file_exists:
+        local_file_size = os.path.getsize(file_loc)
+
+    # If hdfs file exists and is non-empty
+    if hdfs_file_exists and hdfs_file_size > 0:
+        output = True
+        logger.info(f"File {filename} exists on HDFS and is non-empty")
+
+    # If hdfs file exists and is empty
+    elif hdfs_file_exists and hdfs_file_size == 0:
+        output = False
+        logger.warning(f"File {filename} exists on HDFS but is empty")
+
+    # If file is not on hdfs but is local, and non-empty
+    elif local_file_exists and local_file_size > 0 and not hdfs_file_exists:
         output = True
         logger.info(f"File {filename} exists and is non-empty")
+
+    # If file is empty, is not on hdfs but does exist locally
+    elif local_file_exists and local_file_size == 0 and not hdfs_file_exists:
+        output = False
+        logger.warning(f"File {filename} exists but is empty")
+
+    # Raise error if file does not exist
     else:
         raise FileNotFoundError(f"File {filename} does not exist or is empty")
 
