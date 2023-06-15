@@ -1,11 +1,10 @@
 import os
 import postcodes_uk
 import pandas as pd
-import pydoop.hdfs as hdfs
 
 from src.utils.wrappers import logger_creator
 from src.utils.helpers import Config_settings
-
+from src.utils.hdfs_mods import hdfs_file_exists, hdfs_file_size
 
 # Get the config
 conf_obj = Config_settings()
@@ -31,37 +30,40 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     output = False
 
     file_loc = os.path.join(filepath, filename)
-    hdfs_file_exists = hdfs.path.exists(file_loc)
-    local_file_exists = os.path.exists(file_loc)
 
-    # If the hdfs file exists check the size of it.
-    # If it doesn't exists on hdfs check locally.
-    if hdfs_file_exists:
-        hdfs_file_size = hdfs.path.getsize(file_loc)
+    local_file = os.path.exists(file_loc)
 
     # If the file exists locally, check the size of it.
-    if local_file_exists:
-        local_file_size = os.path.getsize(file_loc)
+    if local_file:
+        file_size = os.path.getsize(file_loc)
 
-    # If hdfs file exists and is non-empty
-    if hdfs_file_exists and hdfs_file_size > 0:
-        output = True
-        logger.info(f"File {filename} exists on HDFS and is non-empty")
+    # If file does not exists locally, check hdfs
+    if not local_file:
+        hdfs_file = hdfs_file_exists(file_loc)
 
-    # If hdfs file exists and is empty
-    elif hdfs_file_exists and hdfs_file_size == 0:
-        output = False
-        logger.warning(f"File {filename} exists on HDFS but is empty")
+        # If hdfs file exists, check its size
+        if hdfs_file:
+            file_size = hdfs_file_size(file_loc)
 
     # If file is not on hdfs but is local, and non-empty
-    elif local_file_exists and local_file_size > 0 and not hdfs_file_exists:
+    if local_file and file_size > 0:
         output = True
         logger.info(f"File {filename} exists and is non-empty")
 
     # If file is empty, is not on hdfs but does exist locally
-    elif local_file_exists and local_file_size == 0 and not hdfs_file_exists:
+    elif local_file and file_size == 0:
         output = False
         logger.warning(f"File {filename} exists but is empty")
+
+    # If hdfs file exists and is non-empty
+    elif hdfs_file and file_size > 0:
+        output = True
+        logger.info(f"File {filename} exists on HDFS and is non-empty")
+
+    # If hdfs file exists and is empty
+    elif hdfs_file and file_size == 0:
+        output = False
+        logger.warning(f"File {filename} exists on HDFS but is empty")
 
     # Raise error if file does not exist
     else:
