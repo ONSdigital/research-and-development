@@ -193,3 +193,42 @@ def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False
     )  # Assert that the real postcodes are not in the unreal postcodes
+
+
+def test_check_data_shape():
+    """Test the check_data_shape function."""
+    # Arrange
+    from src.data_validation.validation import check_data_shape
+
+    # Dataframe for test function to use
+    dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
+    dummy_df = pd.DataFrame(data=dummy_dict)
+
+    # Act: use pytest to assert the result
+    result_1 = check_data_shape(dummy_df)
+
+    # Assert
+    assert isinstance(result_1, bool)
+    # Assert: Negative test. Should fails when the answer is wrong
+    with pytest.raises(AssertionError):
+        assert not isinstance(result_1, bool)
+    # Assert: test that add fails when the arguments are wrong type
+    pytest.raises(ValueError, check_data_shape, 1)
+
+
+def test_load_schema():
+    """Test the load_schema function."""
+    # Arrange
+    from src.data_validation.validation import load_schema
+
+    # Act: use pytest to assert the result
+    result_1 = load_schema()
+
+    # Assert
+    assert isinstance(result_1, dict)
+    # Assert: Negative test. Should fails when the answer is wrong
+    with pytest.raises(AssertionError):
+        assert not isinstance(result_1, dict)
+    # Assert: test that add fails when the arguments are wrong type
+    pytest.raises(TypeError, load_schema, 2)
+    pytest.raises(TypeError, load_schema, True)

@@ -173,3 +173,73 @@ def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
         ]
 
     return unreal_postcodes
+
+
+@exception_wrap
+def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
+    """Load the data schema from toml file into a dictionary
+
+    Keyword Arguments:
+        file_path -- Path to data schema toml file
+        (default: {"./config/contributors_schema.toml"})
+
+    Returns:
+        A dict: dictionary containing parsed schema toml file
+    """
+    # Create bool variable for checking if file exists
+    file_exists = os.path.exists(file_path)
+
+    # Check if Data_Schema.toml exists
+    if file_exists:
+        # Load toml data schema into dictionary if toml file exists
+        toml_string = toml.load(file_path)
+    else:
+        # Return False if file does not exist
+        return file_exists
+
+    return toml_string
+
+
+@exception_wrap
+def check_data_shape(
+    data_df: pd.DataFrame,
+    schema_path: str = "./config/contributors_schema.toml",
+) -> bool:
+    """Compares the shape of the data and compares it to the shape of the toml
+    file based off the data schema. Returns true if there is a match and false
+    otherwise.
+
+    Keyword Arguments:
+        schema_path -- Path to schema dictionary file
+        (default: {"./config/DataSchema.toml"})
+
+    Returns:
+        A bool: boolean, True if number of columns is as expected, otherwise False
+    """
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
+
+    cols_match = False
+
+    data_dict = data_df.to_dict()
+
+    # Load toml data schema into dictionary
+    toml_string = load_schema(schema_path)
+
+    # Compare length of data dictionary to the data schema
+    if len(data_dict) == len(toml_string):
+        cols_match = True
+    else:
+        cols_match = False
+
+    if cols_match is False:
+        validationlogger.warning(f"Data columns match schema: {cols_match}.")
+    else:
+        validationlogger.info(f"Data columns match schema: {cols_match}.")
+
+    validationlogger.info(
+        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
+    )
+    return cols_match
