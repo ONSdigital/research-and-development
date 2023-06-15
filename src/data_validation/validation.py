@@ -23,6 +23,7 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
 
     if fileExists and fileSize > 0:
         output = True
+        logger.info(f"File {filename} exists and is non-empty")
     else:
         raise FileNotFoundError(f"File {filename} does not exist or is empty")
 
