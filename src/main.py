@@ -31,7 +31,45 @@ def run_pipeline(start):
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     Manipulate_data()
-    MainLogger.info("Finishing Pipeline .......................")
+
+    # Data Ingest
+    # Load SPP data from DAP
+    snapshot_path = config["paths"]["snapshot_path"]
+    snapdata = hdfs_load_json(snapshot_path)
+    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    # Data Transmutation
+    full_responses = processing.full_responses(contributors_df, responses_df)
+    print(full_responses.sample(5))
+    logger.info(
+        "The response rate is %.3%",
+        processing.response_rate(contributors_df, responses_df),
+    )
+
+    # Data validation
+    validation.check_file_exists(snapshot_path)
+
+    # Check the postcode column
+    validation.validate_post_col(contributors_df, masterlist_path)
+
+    # Outlier detection
+
+    # Data cleaning
+
+    # Data processing: Imputation
+
+    # Data processing: Estimation
+
+    # Data processing: Regional Apportionment
+
+    # Data processing: Aggregation
+
+    # Data display: Visualisations
+
+    # Data output: Disclosure Control
+
+    # Data output: File Outputs
+
+    MainLogger.info("Finshing Pipeline .......................")
 
     runlog_obj.retrieve_pipeline_logs()
 
