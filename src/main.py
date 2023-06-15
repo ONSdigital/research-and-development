@@ -54,10 +54,7 @@ def run_pipeline(start):
     # Data Transmutation
     full_responses = processing.full_responses(contributors_df, responses_df)
     print(full_responses.sample(5))
-    logger.info(
-        "The response rate is %.3%",
-        processing.response_rate(contributors_df, responses_df),
-    )
+    processing.response_rate(contributors_df, responses_df)
 
     # Data validation
     validation.check_file_exists(snapshot_path)
