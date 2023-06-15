@@ -16,7 +16,8 @@ logger = logger_creator(global_config)
 
 
 def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
-    """Checks if file exists and is non-empty
+    """Checks if file exists on hdfs or locally and is non-empty.
+    Raises an FileNotFoundError if the file doesn't exist.
 
     Keyword Arguments:
         filename -- Name of file to check
