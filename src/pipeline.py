@@ -7,7 +7,7 @@ from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
-from src.utils.hdfs_mods import hdfs_load_json
+from src.utils.hdfs_mods import hdfs_load_json, check_file_exists
 from src.data_validation import validation as val
 
 import time
@@ -42,7 +42,7 @@ def run_pipeline(start):
     snapshot_path = config["paths"]["snapshot_path"]
 
     # Check data file exists
-    val.check_file_exists(snapshot_path)
+    check_file_exists(snapshot_path)
 
     snapdata = hdfs_load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
