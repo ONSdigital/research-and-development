@@ -5,7 +5,6 @@ import pandas as pd
 
 from src.utils.wrappers import logger_creator, exception_wrap
 from src.utils.helpers import Config_settings
-from src.utils.hdfs_mods import hdfs_file_exists, hdfs_file_size
 
 # Get the config
 conf_obj = Config_settings()
@@ -14,64 +13,6 @@ global_config = config["global"]
 
 # Set up logging
 validationlogger = logger_creator(global_config)
-
-
-def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
-    """Checks if file exists on hdfs or locally and is non-empty.
-    Raises an FileNotFoundError if the file doesn't exist.
-
-    Keyword Arguments:
-        filename -- Name of file to check
-        filePath -- Relative path to file
-        (default: {"./src/data_validation/validation.py"})
-
-    Returns:
-        A bool: boolean value is True if file exists and is non-empty,
-        False otherwise.
-    """
-    output = False
-
-    file_loc = os.path.join(filepath, filename)
-
-    local_file = os.path.exists(file_loc)
-
-    # If the file exists locally, check the size of it.
-    if local_file:
-        file_size = os.path.getsize(file_loc)
-
-    # If file does not exists locally, check hdfs
-    if not local_file:
-        hdfs_file = hdfs_file_exists(file_loc)
-
-        # If hdfs file exists, check its size
-        if hdfs_file:
-            file_size = hdfs_file_size(file_loc)
-
-    # If file is not on hdfs but is local, and non-empty
-    if local_file and file_size > 0:
-        output = True
-        validationlogger.info(f"File {filename} exists and is non-empty")
-
-    # If file is empty, is not on hdfs but does exist locally
-    elif local_file and file_size == 0:
-        output = False
-        validationlogger.warning(f"File {filename} exists but is empty")
-
-    # If hdfs file exists and is non-empty
-    elif hdfs_file and file_size > 0:
-        output = True
-        validationlogger.info(f"File {filename} exists on HDFS and is non-empty")
-
-    # If hdfs file exists and is empty
-    elif hdfs_file and file_size == 0:
-        output = False
-        validationlogger.warning(f"File {filename} exists on HDFS but is empty")
-
-    # Raise error if file does not exist
-    else:
-        raise FileNotFoundError(f"File {filename} does not exist or is empty")
-
-    return output
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
