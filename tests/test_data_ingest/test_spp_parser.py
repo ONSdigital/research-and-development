@@ -32,7 +32,7 @@ class TestParseSPP:
         return contributor_df, responses_df
 
     def test_parse_snap_data(self):
-        """Tests for full_responses function."""
+        """Unit Tests for full responses function."""
 
         inputdata = self.input_data()
         df_result1, df_result2 = parse_snap_data(inputdata)
