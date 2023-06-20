@@ -7,8 +7,8 @@ from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
-from src.utils.hdfs_mods import hdfs_load_json
-from src.data_validation import validation
+from src.utils.hdfs_mods import hdfs_load_json, check_file_exists
+from src.data_validation import validation as val
 
 import time
 import logging
@@ -40,6 +40,10 @@ def run_pipeline(start):
     MainLogger.info("Starting Data Ingest...")
     # Load SPP data from DAP
     snapshot_path = config["paths"]["snapshot_path"]
+
+    # Check data file exists
+    check_file_exists(snapshot_path)
+
     snapdata = hdfs_load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     MainLogger.info("Finished Data Ingest...")
@@ -52,11 +56,11 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Transmutation...")
 
     # Data validation
-    validation.check_data_shape(full_responses)
+    val.check_data_shape(full_responses)
 
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
-    validation.validate_post_col(contributors_df, masterlist_path)
+    val.validate_post_col(contributors_df, masterlist_path)
 
     # Outlier detection
 
