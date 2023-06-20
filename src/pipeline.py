@@ -1,15 +1,19 @@
 """The main pipeline"""
-
-import logging
+# Core Python modules
 import time
+import logging
+import os
+
+# Our local modules
+from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.data_ingest import spp_parser, history_loader
 from src.data_processing import spp_snapshot_processing as processing
 from src.data_validation import validation as val
-from src.utils import runlog
 from src.staging.staging_main import run_staging
+
 
 MainLogger = logging.getLogger(__name__)
 
@@ -70,10 +74,20 @@ def run_pipeline(start):
     curent_year = config["year"]["current_year"]
     years_to_load = config["year"]["years_to_load"]
     years_gen = history_loader.history_years(curent_year, years_to_load)
-    if years_gen:
-        for year in years_gen:
-            history_loader.load_historic_data(year)
     
+    if years_gen is None:
+        MainLogger.info("No historic data to load for this run.")
+    else:
+        MainLogger.info("Loading historic data...")
+        hist_folder = config["paths"]["hist_folder"]
+        hist_paths_to_load = history_loader.hist_paths_to_load(hist_folder, years_gen)
+        # Load each historic csv into a dataframe
+        dfs_dict = {}
+        for path in hist_paths_to_load:
+            df = read_csv(path)
+            key = os.path.basename(path)
+            dfs_dict[key] = df
+        MainLogger.info("Historic data loaded.")
     
     # Load SPP data from DAP
 

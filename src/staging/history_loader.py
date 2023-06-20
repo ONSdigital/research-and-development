@@ -14,4 +14,13 @@ def history_years(current, back_history):
         return None
 
 
-example_path = "hdfs://dnt01/ons/rdbe_dev/BERD_V7_Anonymised/cp_BERD_202012_cp3.csv"
+def hist_paths_to_load(hist_folder, history_years):
+    """Creates a list of paths to load historic data from"""
+
+    # create a list of paths to load
+    hist_paths = []
+    for year in history_years:
+        hist_path = hist_folder + "cp_BERD_" + str(year) + "12_cp3.csv"
+        hist_paths.append(hist_path)
+
+    return hist_paths
