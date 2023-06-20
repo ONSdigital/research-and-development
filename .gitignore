@@ -908,3 +908,6 @@ logs/*
 
 # Utility bat file for ssh key
 add_ssh_key.bat
+
+# Head files
+*~HEAD
