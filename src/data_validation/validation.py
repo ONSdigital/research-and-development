@@ -3,7 +3,7 @@ import toml
 import postcodes_uk
 import pandas as pd
 
-from src.utils.wrappers import logger_creator, exception_wrap
+from src.utils.wrappers import logger_creator, time_logger_wrap, exception_wrap
 from src.utils.helpers import Config_settings
 
 # Get the config
@@ -33,6 +33,7 @@ def validate_postcode_pattern(pcode: str) -> bool:
     return valid_bool
 
 
+@exception_wrap
 def get_masterlist(masterlist_path) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
@@ -43,6 +44,8 @@ def get_masterlist(masterlist_path) -> pd.Series:
     return masterlist
 
 
+@time_logger_wrap
+@exception_wrap
 def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
@@ -96,6 +99,8 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         raise ValueError(
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
+
+        validationlogger.info("All postcodes validated....")
 
     return True
 
