@@ -2,12 +2,13 @@
 
 import logging
 import time
-
 from src._version import __version__ as version
-
-from src.utils import runlog
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
+from src.data_ingest import spp_parser, history_loader
+from src.data_processing import spp_snapshot_processing as processing
+from src.data_validation import validation as val
+from src.utils import runlog
 from src.staging.staging_main import run_staging
 
 MainLogger = logging.getLogger(__name__)
@@ -62,6 +63,19 @@ def run_pipeline(start):
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+    # Data Ingest
+    MainLogger.info("Starting Data Ingest...")
+    
+    # Load historic data
+    curent_year = config["year"]["current_year"]
+    years_to_load = config["year"]["years_to_load"]
+    years_gen = history_loader.history_years(curent_year, years_to_load)
+    if years_gen:
+        for year in years_gen:
+            history_loader.load_historic_data(year)
+    
+    
+    # Load SPP data from DAP
 
     # Staging and validatation
     MainLogger.info("Starting Staging and Validation...")
