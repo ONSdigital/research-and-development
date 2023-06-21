@@ -1,5 +1,5 @@
 import pandas as pd
-import math
+import numpy as np
 
 # TODO almost each could be further generalised in terms of
 # variable and function names
@@ -180,8 +180,8 @@ def trim(
     df.reset_index(drop=True, inplace=True)
 
     # define the bounds for trimming
-    remove_lower = math.ceil(len(df) * (lower_perc / 100))
-    remove_upper = math.ceil(len(df) * (1 - upper_perc / 100))
+    remove_lower = np.ceil(len(df) * (lower_perc / 100))
+    remove_upper = np.ceil(len(df) * (1 - upper_perc / 100))
 
     # create trim tag (distinct from trim_check)
     # to mark which to trim for mean growth ratio
