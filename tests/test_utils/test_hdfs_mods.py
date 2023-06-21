@@ -4,10 +4,17 @@ from unittest import mock
 import pandas as pd
 
 # Import modules to test
+import os
 import sys
 
+from src.utils.hdfs_mods import (
+    read_hdfs_csv,
+    write_hdfs_csv,
+    hdfs_load_json,
+    check_file_exists,
+)  # noqa
+
 sys.modules["mock_f"] = mock.Mock()
-from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv, hdfs_load_json  # noqa
 
 
 class TestReadCsv:
@@ -107,3 +114,31 @@ class TestLoadJson:
         json_expout = self.expout_data()
 
         assert json_result == json_expout
+
+
+class TestCheckFileExists:
+    @mock.patch("src.utils.hdfs_mods.hdfs")
+    def test_check_file_exists(self, mock_hdfs):
+        """Test the check_file_exists function."""
+
+        mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
+
+        # Act: use pytest to assert the result
+        # Create emptyfile.py if it doesn't already exist
+        empty_file = open("emptyfile.py", "w")
+
+        # developer_config.yaml should exist and be non-empty
+        result_1 = check_file_exists(
+            "developer_config.yaml", "/home/cdsw/research-and-development/src/"
+        )
+        result_3 = check_file_exists(
+            empty_file.name, "/home/cdsw/research-and-development/"
+        )
+
+        # Delete emptyfile.py after testing
+        os.remove(empty_file.name)
+
+        # Assert
+        assert isinstance(result_1, bool)
+        assert result_1
+        assert not result_3

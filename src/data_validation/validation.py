@@ -1,22 +1,18 @@
 import os
 import toml
-import logging
 import postcodes_uk
 import pandas as pd
 
-from src.utils.wrappers import exception_wrap, time_logger_wrap
+from src.utils.wrappers import logger_creator, time_logger_wrap, exception_wrap
 from src.utils.helpers import Config_settings
-
 
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 global_config = config["global"]
-config_paths = config["paths"]
-snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
 # Set up logging
-validationlogger = logging.getLogger(__name__)
+validationlogger = logger_creator(global_config)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -104,7 +100,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
 
-    validationlogger.info("All postcodes validated....")
+        validationlogger.info("All postcodes validated....")
 
     return True
 
