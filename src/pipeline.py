@@ -3,6 +3,7 @@
 import time
 import logging
 import os
+import re
 
 # Our local modules
 from src.utils import runlog
@@ -69,12 +70,12 @@ def run_pipeline(start):
     logger.info("Collecting logging parameters ..........")
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
-    
+
     # Load historic data
-    curent_year = config["year"]["current_year"]
-    years_to_load = config["year"]["years_to_load"]
+    curent_year = config["years"]["current_year"]
+    years_to_load = config["years"]["previous_years_to_load"]
     years_gen = history_loader.history_years(curent_year, years_to_load)
-    
+
     if years_gen is None:
         MainLogger.info("No historic data to load for this run.")
     else:
@@ -85,10 +86,14 @@ def run_pipeline(start):
         dfs_dict = {}
         for path in hist_paths_to_load:
             df = read_csv(path)
-            key = os.path.basename(path)
+            # Use regex to extract the BERD survey addition
+            key = re.search(r"(BERD_202\d+)", path).group(1)
+            if key is None:
+                # If regex didn't work use basename
+                key = os.path.basename(path)
             dfs_dict[key] = df
         MainLogger.info("Historic data loaded.")
-    
+
     # Load SPP data from DAP
 
     # Staging and validatation
