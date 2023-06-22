@@ -148,3 +148,23 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
         raise FileNotFoundError(f"File {filename} does not exist or is empty")
 
     return output
+
+
+def hdfs_mkdir(path):
+    """Function to create a directory in HDFS
+
+    Args:
+        path (string) -- The path to create
+    """
+    hdfs.mkdir(path)
+    return None
+
+def hdfs_open(filepath, mode):
+    """Function to open a file in HDFS
+
+    Args:
+        filepath (string) -- The filepath in Hue
+        mode (string) -- The mode to open the file in
+    """
+    file = hdfs.open(filepath, mode)
+    return file

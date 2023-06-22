@@ -1,6 +1,5 @@
 """Functions to read and write files on a local network drive"""
 
-
 import json
 import os
 import pandas as pd
@@ -119,3 +118,22 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
         lfmod_logger.warning(f"File {filename} exists but is empty")
 
     return output
+
+def local_mkdir(path):
+    """Creates a directory on a local network drive
+    
+    Args:
+        path (string) -- The path to create
+    """
+    os.mkdir(path)
+    return None
+
+def local_open(filepath, mode):
+    """Opens a file on a local network drive
+    
+    Args:
+        filepath (string) -- The filepath
+        mode (string) -- The mode to open the file in
+    """
+    file = open(filepath, mode)
+    return file
