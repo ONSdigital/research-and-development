@@ -38,19 +38,20 @@ class RunLog:
         self.mkdir_func = mkdir_func
         self.read_func = read_func
         self.write_func = write_func
+        self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
         self.main_path = self._make_main_path()
         self.run_id = self._create_run_id()
         self.version = version
-        # self.project =
-        self.environment = config[{["network", "hdfs"][1 if HDFS_AVAILABLE else 0]}][
-            "logs_foldername"
-        ]
+        self.environment = config["global"]["network_or_hdfs"]
+
         self.logs = []
         self.timestamp = self._generate_time()
 
     def _make_main_path(self):
         """Creating a local runlog folder if it doesn't exist"""
-        self.main_path = "logs/runlogs/"  # Change this to HDFS or Network drive
+        self.main_path = (
+            f"logs/runlogs/{self.logs_folder}/"  # Change this to HDFS or Network drive
+        )
         return self.main_path
 
     def _create_folder(self):
