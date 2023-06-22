@@ -2,13 +2,19 @@
     These functions will need to be tested separately, using mocking.
 """
 
-import pydoop.hdfs as hdfs
 import pandas as pd
 import json
 import os
 import logging
 
 hdfs_logger = logging.getLogger(__name__)
+
+try:
+    import pydoop.hdfs as hdfs
+    from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+    HDFS_AVAILABLE = True
+except ImportError:
+    HDFS_AVAILABLE = False
 
 
 def read_hdfs_csv(filepath: str) -> pd.DataFrame:
