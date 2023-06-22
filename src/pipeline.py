@@ -21,6 +21,30 @@ MainLogger = logging.getLogger(__name__)
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 
+# Check the environment switch
+network_or_hdfs = config["global"]["network_or_hdfs"]
+
+
+# Define which file utility functions to use
+if network_or_hdfs == 'network':
+    HDFS_AVAILABLE = False
+    # Use network drive
+    def open_file(path, mode):
+        return open(path, mode)
+
+    def check_path_exists(path):
+        return os.path.exists(path)
+else:
+    HDFS_AVAILABLE = True
+    # Use HDFS
+    import pydoop.hdfs as hdfs
+
+    def open_file(path, mode):
+        return hdfs.open(path, mode)
+
+    def check_path_exists(path):
+        return hdfs.path.exists(path)
+
 
 def run_pipeline(start):
     """The main pipeline.
@@ -31,7 +55,7 @@ def run_pipeline(start):
     """
     # Set up the run logger
     global_config = config["global"]
-    runlog_obj = runlog.RunLog(config, version)
+    runlog_obj = runlog.RunLog(config, version, open_file, check_path_exists)
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
