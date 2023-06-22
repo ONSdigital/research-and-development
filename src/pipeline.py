@@ -24,29 +24,26 @@ config = conf_obj.config_dict
 network_or_hdfs = config["global"]["network_or_hdfs"]
 
 
-if network_or_hdfs == 'network':
+if network_or_hdfs == "network":
     HDFS_AVAILABLE = False
-    
+
     from src.utils.local_file_mods import (
-        read_local_csv as read_csv,
-        write_local_csv as write_csv,
         load_local_json as load_json,
         local_file_exists as check_file_exists,
         local_mkdir as mkdir,
-        local_open as open_file
+        local_open as open_file,
     )
-    
+
 else:
     HDFS_AVAILABLE = True
-    
+
     from src.utils.hdfs_mods import (
-        read_hdfs_csv as read_csv,
-        write_hdfs_csv as write_csv,
         hdfs_load_json as load_json,
         hdfs_file_exists as check_file_exists,
         hdfs_mkdir as mkdir,
-        hdfs_open as open_file
+        hdfs_open as open_file,
     )
+
 
 def run_pipeline(start):
     """The main pipeline.
@@ -85,8 +82,8 @@ def run_pipeline(start):
     val.check_data_shape(full_responses)
 
     # Check the postcode column
-    masterlist_path = config["paths"]["masterlist_path"]
-    val.validate_post_col(contributors_df, masterlist_path)
+    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
+    val.validate_post_col(contributors_df, postcode_masterlist)
 
     # Outlier detection
 

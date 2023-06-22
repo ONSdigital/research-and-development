@@ -24,7 +24,7 @@ def test_data():
 
 
 # Mock the get_masterlist function
-def mock_get_masterlist(masterlist_path):
+def mock_get_masterlist(postcode_masterlist):
     # Return a mock masterlist series - actual postcodes of ONS offices
     return pd.Series(["NP10 8XG", "SW1P 4DF", "PO15 5RR"])
 
@@ -126,10 +126,10 @@ def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
     )
 
     # Use the fake path
-    masterlist_path = "path/to/mock_masterlist.csv"
+    postcode_masterlist = "path/to/mock_masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data, masterlist_path)
+    unreal_postcodes = check_pcs_real(test_data, postcode_masterlist)
     unreal_postcodes = unreal_postcodes.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
@@ -153,10 +153,10 @@ def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
     )
 
     # Use the fake path
-    masterlist_path = "path/to/masterlist.csv"
+    postcode_masterlist = "path/to/masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data, masterlist_path)
+    unreal_postcodes = check_pcs_real(test_data, postcode_masterlist)
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False

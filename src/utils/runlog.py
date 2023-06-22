@@ -6,8 +6,9 @@ import csv
 import yaml
 
 try:
-    import pydoop.hdfs as hdfs
+    import pydoop.hdfs as hdfs  # noqa
     from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+
     HDFS_AVAILABLE = True
 except ImportError:
     HDFS_AVAILABLE = False
@@ -28,26 +29,26 @@ class RunLog:
         self.mkdir_func = mkdir_func
         self.run_id = self._create_run_id()
         self.version = version
-        self.project = config["paths"]["logs_foldername"] 
+        self.project = config["paths"]["logs_foldername"]
         self.logs = []
         self.timestamp = self._generate_time()
         self._create_folder()
 
     def _create_folder(self):
         """Create the folder for the runlog if it doesn't exist."""
-         # Taken from config file
+        # Taken from config file
         self.main_path = f"logs/{self.run_id}"
         # create the folder if it doesn't exist
         if not self.file_exists_func(self.main_path):
-            self.mkdir(self.main_path) 
+            self.mkdir(self.main_path)
 
     def _generate_username(self):
         """Record the username of the user running the pipeline
         using os package"""
         # Use the Hadoop Username to record user
-        try:
-            self.context = os.getenv("HADOOP_USER_NAME")
-        except:
+        self.context = os.getenv("HADOOP_USER_NAME")
+
+        if self.context is None:  # Running local Python yields None here
             self.context = "local_dev_run"
         return self.context
 
