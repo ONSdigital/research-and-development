@@ -1,17 +1,15 @@
 """The main pipeline"""
 
-from src.utils import runlog
-from src._version import __version__ as version
+import logging
+import time
 
-from src.utils.helpers import Config_settings
-from src.utils.wrappers import logger_creator
+from src._version import __version__ as version
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.data_validation import validation as val
-
-import time
-import logging
-
+from src.utils import runlog
+from src.utils.helpers import Config_settings
+from src.utils.wrappers import logger_creator
 
 MainLogger = logging.getLogger(__name__)
 
@@ -27,26 +25,22 @@ network_or_hdfs = config["global"]["network_or_hdfs"]
 if network_or_hdfs == "network":
     HDFS_AVAILABLE = False
 
-    from src.utils.local_file_mods import (
-        load_local_json as load_json,
-        local_file_exists as check_file_exists,
-        local_mkdir as mkdir,
-        local_open as open_file,
-        read_local_csv as read_csv,
-        write_local_csv as write_csv,
-    )
+    from src.utils.local_file_mods import load_local_json as load_json
+    from src.utils.local_file_mods import local_file_exists as check_file_exists
+    from src.utils.local_file_mods import local_mkdir as mkdir
+    from src.utils.local_file_mods import local_open as open_file
+    from src.utils.local_file_mods import read_local_csv as read_csv
+    from src.utils.local_file_mods import write_local_csv as write_csv
 
 else:
     HDFS_AVAILABLE = True
 
-    from src.utils.hdfs_mods import (
-        hdfs_load_json as load_json,
-        hdfs_file_exists as check_file_exists,
-        hdfs_mkdir as mkdir,
-        hdfs_open as open_file,
-        read_hdfs_csv as read_csv,
-        write_hdfs_csv as write_csv,
-    )
+    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
+    from src.utils.hdfs_mods import hdfs_load_json as load_json
+    from src.utils.hdfs_mods import hdfs_mkdir as mkdir
+    from src.utils.hdfs_mods import hdfs_open as open_file
+    from src.utils.hdfs_mods import read_hdfs_csv as read_csv
+    from src.utils.hdfs_mods import write_hdfs_csv as write_csv
 
 
 def run_pipeline(start):
