@@ -3,9 +3,15 @@ import pandas as pd
 import os
 from src.utils.helpers import Config_settings
 from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
-import pydoop.hdfs as hdfs
 import csv
 import yaml
+
+try:
+    import pydoop.hdfs as hdfs
+    from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+    HDFS_AVAILABLE = True
+except ImportError:
+    HDFS_AVAILABLE = False
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
