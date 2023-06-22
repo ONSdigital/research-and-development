@@ -7,7 +7,6 @@ from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
-from src.utils.hdfs_mods import hdfs_load_json, check_file_exists
 from src.data_validation import validation as val
 
 import time
@@ -25,31 +24,29 @@ config = conf_obj.config_dict
 network_or_hdfs = config["global"]["network_or_hdfs"]
 
 
-# Define which file utility functions to use
 if network_or_hdfs == 'network':
     HDFS_AVAILABLE = False
-    # Use network drive
-    def open_file(path, mode):
-        return open(path, mode)
-
-    def check_path_exists(path):
-        return os.path.exists(path)
     
-    def mkdir(path):
-        return os.mkdir(path)
+    from src.utils.local_file_mods import (
+        read_local_csv as read_csv,
+        write_local_csv as write_csv,
+        load_local_json as load_json,
+        local_file_exists as check_file_exists,
+        local_mkdir as mkdir,
+        local_open as open_file
+    )
+    
 else:
     HDFS_AVAILABLE = True
-    # Use HDFS
-    import pydoop.hdfs as hdfs
-
-    def open_file(path, mode):
-        return hdfs.open(path, mode)
-
-    def check_path_exists(path):
-        return hdfs.path.exists(path)
-
-    def mkdir(path):
-        return hdfs.mkdir(path)
+    
+    from src.utils.hdfs_mods import (
+        read_hdfs_csv as read_csv,
+        write_hdfs_csv as write_csv,
+        hdfs_load_json as load_json,
+        hdfs_file_exists as check_file_exists,
+        hdfs_mkdir as mkdir,
+        hdfs_open as open_file
+    )
 
 def run_pipeline(start):
     """The main pipeline.
@@ -60,7 +57,7 @@ def run_pipeline(start):
     """
     # Set up the run logger
     global_config = config["global"]
-    runlog_obj = runlog.RunLog(config, version, open_file, check_path_exists, mkdir)
+    runlog_obj = runlog.RunLog(config, version, open_file, check_file_exists, mkdir)
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
@@ -73,7 +70,7 @@ def run_pipeline(start):
     # Check data file exists
     check_file_exists(snapshot_path)
 
-    snapdata = hdfs_load_json(snapshot_path)
+    snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     MainLogger.info("Finished Data Ingest...")
 
