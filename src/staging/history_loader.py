@@ -20,7 +20,7 @@ def hist_paths_to_load(hist_folder, history_years):
     # create a list of paths to load
     hist_paths = []
     for year in history_years:
-        hist_path = hist_folder + "cp_BERD_" + str(year) + "12_cp3.csv"
+        hist_path = hist_folder + "qv_BERD_" + str(year) + "12_qv6_reformatted.csv"
         hist_paths.append(hist_path)
 
     return hist_paths
