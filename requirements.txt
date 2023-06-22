@@ -1,21 +1,21 @@
 arrow
-cookiecutter
+# cookiecutter
 coverage==4.5.4
 detect-secrets
-myst-parser
+# myst-parser
 numpy
 pandas==1.1.5
 pip
 postcodes_uk
 pre-commit==2.17.0
-pydoop
+# pydoop # Needed in dev/test and DAP but not in local
 pytest
 python-dotenv
 pyyaml
 readme-coverage-badger
 requests
 setuptools
-sphinx
+# sphinx
 table-logger
 toml
 typing
