@@ -22,23 +22,25 @@ class RunLog:
     """Creates a runlog instance for the pipeline."""
 
     def __init__(self, config, version, file_open_func, file_exists_func, mkdir_func):
-        self.user = self._generate_username()
         self.config = config
+        self.user = self._generate_username()
         self.file_open_func = file_open_func
         self.file_exists_func = file_exists_func
         self.mkdir_func = mkdir_func
+        self.main_path = self._make_main_path()
         self.run_id = self._create_run_id()
         self.version = version
         self.project = config["paths"]["logs_foldername"]
         self.logs = []
         self.timestamp = self._generate_time()
-        self._create_folder()
+
+    def _make_main_path(self):
+        """Creating a local runlog folder if it doesn't exist"""
+        self.main_path = f"logs/runlogs/{self.run_id}"
+        return self.main_path
 
     def _create_folder(self):
         """Create the folder for the runlog if it doesn't exist."""
-        # Taken from config file
-        self.main_path = f"logs/{self.run_id}"
-        # create the folder if it doesn't exist
         if not self.file_exists_func(self.main_path):
             self.mkdir(self.main_path)
 
