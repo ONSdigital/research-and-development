@@ -128,6 +128,7 @@ def local_mkdir(path):
     os.mkdir(path)
     return None
 
+
 def local_open(filepath, mode):
     """Opens a file on a local network drive
     
@@ -137,3 +138,14 @@ def local_open(filepath, mode):
     """
     file = open(filepath, mode)
     return file
+
+
+def local_file_write_feather(filepath, df):
+    """Writes a Pandas Dataframe to a feather file on a local network drive
+    
+    Args:
+        filepath (string) -- The filepath
+        df (pd.DataFrame) -- The data to write
+    """
+    df.to_feather(filepath)
+    return True

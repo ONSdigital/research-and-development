@@ -168,3 +168,12 @@ def hdfs_open(filepath, mode):
     """
     file = hdfs.open(filepath, mode)
     return file
+
+def hdfs_write_feather(filepath, df):
+    """Function to write dataframe as feather file in HDFS"""
+    with hdfs.open(filepath, "wb") as file:
+        df.to_feather(file)
+    # Check log written to feather
+    hdfs_logger.info(f"Dataframe written to {filepath} as feather file")
+    
+    return True
