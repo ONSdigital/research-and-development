@@ -44,21 +44,20 @@ class RunLog:
 
         return self.context
 
-    def _create_run_id(self):
+    def _create_run_id(self, file_open_func):
         """Create a unique run_id from the previous iteration"""
         # Import name of main log file
         runid_path = csv_filenames["main"]
         mainfile = f"{main_path}/{runid_path}"
-        # Check if it exists in Hadoop context
-        if hdfs.path.isfile(mainfile):
-            # Open in read mode
-            with hdfs.open(mainfile, "r") as file:
-                # Find the latest run_id from Dataframe
+        latest_id = 0
+
+        # Check if file exists using the open function provided
+        if file_open_func and os.path.isfile(mainfile):
+            with file_open_func(mainfile, "r") as file:
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
-        else:
-            # If no run_id is present then start from 1
-            latest_id = 0
+
+        # increment the latest id by 1
         run_id = latest_id + 1
 
         return run_id
