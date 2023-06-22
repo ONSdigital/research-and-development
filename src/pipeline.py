@@ -42,6 +42,8 @@ else:
         hdfs_file_exists as check_file_exists,
         hdfs_mkdir as mkdir,
         hdfs_open as open_file,
+        read_hdfs_csv as read_csv,
+        write_hdfs_csv as write_csv,
     )
 
 
@@ -54,7 +56,9 @@ def run_pipeline(start):
     """
     # Set up the run logger
     global_config = config["global"]
-    runlog_obj = runlog.RunLog(config, version, open_file, check_file_exists, mkdir)
+    runlog_obj = runlog.RunLog(
+        config, version, open_file, check_file_exists, mkdir, read_csv, write_csv
+    )
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
