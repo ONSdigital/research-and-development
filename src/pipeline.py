@@ -34,6 +34,9 @@ if network_or_hdfs == 'network':
 
     def check_path_exists(path):
         return os.path.exists(path)
+    
+    def mkdir(path):
+        return os.mkdir(path)
 else:
     HDFS_AVAILABLE = True
     # Use HDFS
@@ -45,6 +48,8 @@ else:
     def check_path_exists(path):
         return hdfs.path.exists(path)
 
+    def mkdir(path):
+        return hdfs.mkdir(path)
 
 def run_pipeline(start):
     """The main pipeline.
@@ -55,7 +60,7 @@ def run_pipeline(start):
     """
     # Set up the run logger
     global_config = config["global"]
-    runlog_obj = runlog.RunLog(config, version, open_file, check_path_exists)
+    runlog_obj = runlog.RunLog(config, version, open_file, check_path_exists, mkdir)
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")

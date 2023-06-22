@@ -2,7 +2,6 @@ from datetime import datetime
 import pandas as pd
 import os
 from src.utils.helpers import Config_settings
-from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
 import csv
 import yaml
 
@@ -17,26 +16,30 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 csv_filenames = config["csv_filenames"]
 
+
 context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
 project = config["paths"]["logs_foldername"]  # Taken from config file
 main_path = (
     f"/user/{context}/{project}"  # stored in the personal space of the user for now
 )
-hdfs.mkdir(main_path)  # creates the folder if it doesn't exist
+
 
 
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
-    def __init__(self, config, version, file_open_func, file_exists_func):
+    def __init__(self, config, version, file_open_func, file_exists_func, mkdir_func):
         self.user = self._generate_username()
         self.config = config
         self.file_open_func = file_open_func
         self.file_exists_func = file_exists_func
+        self.mkdir_func = mkdir_func
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
         self.timestamp = self._generate_time()
+        # create the folder if it doesn't exist
+        self.mkdir(main_path) 
 
     def _generate_username(self):
         """Record the username of the user running the pipeline
