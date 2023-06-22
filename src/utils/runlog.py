@@ -17,14 +17,6 @@ config = conf_obj.config_dict
 csv_filenames = config["csv_filenames"]
 
 
-context = os.getenv("HADOOP_USER_NAME")  # Put your context name here
-project = config["paths"]["logs_foldername"]  # Taken from config file
-main_path = (
-    f"/user/{context}/{project}"  # stored in the personal space of the user for now
-)
-
-
-
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
@@ -36,10 +28,18 @@ class RunLog:
         self.mkdir_func = mkdir_func
         self.run_id = self._create_run_id()
         self.version = version
+        self.project = config["paths"]["logs_foldername"] 
         self.logs = []
         self.timestamp = self._generate_time()
+        self._create_folder()
+
+    def _create_folder(self):
+        """Create the folder for the runlog if it doesn't exist."""
+         # Taken from config file
+        self.main_path = f"logs/{self.run_id}"
         # create the folder if it doesn't exist
-        self.mkdir(main_path) 
+        if not self.file_exists_func(self.main_path):
+            self.mkdir(self.main_path) 
 
     def _generate_username(self):
         """Record the username of the user running the pipeline
@@ -55,7 +55,7 @@ class RunLog:
         """Create a unique run_id from the previous iteration"""
         # Import name of main log file
         runid_path = csv_filenames["main"]
-        mainfile = f"{main_path}/{runid_path}"
+        mainfile = f"{self.main_path}/{runid_path}"
         latest_id = 0
 
         # Check if file exists using the open function provided
@@ -189,17 +189,17 @@ class RunLog:
 
         main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
         file_name = csv_filenames["main"]
-        file_path = f"{main_path}/{file_name}"
+        file_path = f"{self.main_path}/{file_name}"
         self.log_csv_creator(file_path, main_columns)
 
         config_columns = list(self.configdf.columns.values)
         file_name = csv_filenames["configs"]
-        file_path = f"{main_path}/{file_name}"
+        file_path = f"{self.main_path}/{file_name}"
         self.log_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
         file_name = csv_filenames["logs"]
-        file_path = f"{main_path}/{file_name}"
+        file_path = f"{self.main_path}/{file_name}"
         self.log_csv_creator(file_path, log_columns)
 
         return None
@@ -214,19 +214,19 @@ class RunLog:
             # write the runlog to a csv file
 
             file_name = csv_filenames["main"]
-            file_path = f"{main_path}/{file_name}"
+            file_path = f"{self.main_path}/{file_name}"
             df = read_hdfs_csv(file_path)
             newdf = df.append(self.runlog_main_df)
             write_hdfs_csv(file_path, newdf)
 
             file_name = csv_filenames["configs"]
-            file_path = f"{main_path}/{file_name}"
+            file_path = f"{self.main_path}/{file_name}"
             df = read_hdfs_csv(file_path)
             newdf = df.append(self.runlog_configs_df)
             write_hdfs_csv(file_path, newdf)
 
             file_name = csv_filenames["logs"]
-            file_path = f"{main_path}/{file_name}"
+            file_path = f"{self.main_path}/{file_name}"
             df = read_hdfs_csv(file_path)
             newdf = df.append(self.runlog_logs_df)
             write_hdfs_csv(file_path, newdf)
