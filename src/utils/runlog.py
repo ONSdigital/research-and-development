@@ -21,22 +21,36 @@ csv_filenames = config["csv_filenames"]
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
-    def __init__(self, config, version, file_open_func, file_exists_func, mkdir_func):
+    def __init__(
+        self,
+        config,
+        version,
+        file_open_func,
+        file_exists_func,
+        mkdir_func,
+        read_func,
+        write_func,
+    ):
         self.config = config
         self.user = self._generate_username()
         self.file_open_func = file_open_func
         self.file_exists_func = file_exists_func
         self.mkdir_func = mkdir_func
+        self.read_func = read_func
+        self.write_func = write_func
         self.main_path = self._make_main_path()
         self.run_id = self._create_run_id()
         self.version = version
-        self.project = config["paths"]["logs_foldername"]
+        # self.project =
+        self.environment = config[{["network", "hdfs"][1 if HDFS_AVAILABLE else 0]}][
+            "logs_foldername"
+        ]
         self.logs = []
         self.timestamp = self._generate_time()
 
     def _make_main_path(self):
         """Creating a local runlog folder if it doesn't exist"""
-        self.main_path = f"logs/runlogs/{self.run_id}"
+        self.main_path = "logs/runlogs/"  # Change this to HDFS or Network drive
         return self.main_path
 
     def _create_folder(self):
@@ -218,13 +232,13 @@ class RunLog:
 
             file_name = csv_filenames["main"]
             file_path = f"{self.main_path}/{file_name}"
-            df = read_hdfs_csv(file_path)
+            df = self.read_func(file_path)
             newdf = df.append(self.runlog_main_df)
-            write_hdfs_csv(file_path, newdf)
+            self.write_func(file_path, newdf)
 
             file_name = csv_filenames["configs"]
             file_path = f"{self.main_path}/{file_name}"
-            df = read_hdfs_csv(file_path)
+            df = self.read_func(file_path)
             newdf = df.append(self.runlog_configs_df)
             write_hdfs_csv(file_path, newdf)
 
