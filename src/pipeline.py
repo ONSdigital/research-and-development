@@ -32,6 +32,8 @@ if network_or_hdfs == "network":
         local_file_exists as check_file_exists,
         local_mkdir as mkdir,
         local_open as open_file,
+        read_local_csv as read_csv,
+        write_local_csv as write_csv,
     )
 
 else:
