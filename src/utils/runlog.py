@@ -28,9 +28,11 @@ hdfs.mkdir(main_path)  # creates the folder if it doesn't exist
 class RunLog:
     """Creates a runlog instance for the pipeline."""
 
-    def __init__(self, config, version):
+    def __init__(self, config, version, file_open_func, file_exists_func):
         self.user = self._generate_username()
         self.config = config
+        self.file_open_func = file_open_func
+        self.file_exists_func = file_exists_func
         self.run_id = self._create_run_id()
         self.version = version
         self.logs = []
@@ -40,11 +42,13 @@ class RunLog:
         """Record the username of the user running the pipeline
         using os package"""
         # Use the Hadoop Username to record user
-        self.context = os.getenv("HADOOP_USER_NAME")
-
+        try:
+            self.context = os.getenv("HADOOP_USER_NAME")
+        except:
+            self.context = "local_dev_run"
         return self.context
 
-    def _create_run_id(self, file_open_func):
+    def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
         # Import name of main log file
         runid_path = csv_filenames["main"]
@@ -52,8 +56,8 @@ class RunLog:
         latest_id = 0
 
         # Check if file exists using the open function provided
-        if file_open_func and os.path.isfile(mainfile):
-            with file_open_func(mainfile, "r") as file:
+        if self.file_open_func and os.path.isfile(mainfile):
+            with self.file_open_func(mainfile, "r") as file:
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
 
@@ -156,7 +160,7 @@ class RunLog:
 
         return write_csv, write_hdf5, write_sql
 
-    def hdfs_csv_creator(self, filepath: str, columns: list):
+    def log_csv_creator(self, filepath: str, columns: list):
         """Creates a csv file in DAP with user
         defined headers if it doesn't exist.
         Args:
@@ -165,9 +169,9 @@ class RunLog:
         """
 
         # Check if the file exists
-        if not hdfs.path.isfile(filepath):
+        if not self.file_exists_func(filepath):
             # open the file in write mode inside Hadoop context
-            with hdfs.open(filepath, "wt") as file:
+            with self.file_open_func(filepath, "wt") as file:
                 # Create new csv file in specified folder
                 writer = csv.writer(file)
                 # Add the headers to the new csv
@@ -183,17 +187,17 @@ class RunLog:
         main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
         file_name = csv_filenames["main"]
         file_path = f"{main_path}/{file_name}"
-        self.hdfs_csv_creator(file_path, main_columns)
+        self.log_csv_creator(file_path, main_columns)
 
         config_columns = list(self.configdf.columns.values)
         file_name = csv_filenames["configs"]
         file_path = f"{main_path}/{file_name}"
-        self.hdfs_csv_creator(file_path, config_columns)
+        self.log_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
         file_name = csv_filenames["logs"]
         file_path = f"{main_path}/{file_name}"
-        self.hdfs_csv_creator(file_path, log_columns)
+        self.log_csv_creator(file_path, log_columns)
 
         return None
 
