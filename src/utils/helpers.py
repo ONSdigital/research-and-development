@@ -22,9 +22,6 @@ class Config_settings:
         return config
 
 
-user_config_path = "config/userconfig.toml"
-
-
 def user_config_reader(configfile: str = user_config_path) -> dict:
     """Function to parse the userconfig.toml file
 
