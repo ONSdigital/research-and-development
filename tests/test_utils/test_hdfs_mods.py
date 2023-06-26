@@ -12,6 +12,7 @@ from src.utils.hdfs_mods import (
     write_hdfs_csv,
     hdfs_load_json,
     hdfs_file_exists,
+    hdfs_file_size,
     check_file_exists,
 )
 
@@ -124,12 +125,12 @@ class TestLoadJson:
         assert json_result == json_expout
 
 
-class Testhdfsfileexists:
+class TestHdfsFileExists:
     """Tests for function to check a file exists in HDFS."""
 
     @mock.patch("src.utils.hdfs_mods.hdfs.path.exists")
     def test_hdfs_file_exists(self, mock_hdfs_is_file):
-        """Test hdfs_file_exists function in True and False cases."""
+        """Mock tests for hdfs_file_exists function in True and False cases."""
         # check True is returned if file exists
         mock_hdfs_is_file.return_value = True
         result1 = hdfs_file_exists("file/truepath/filename.csv")
@@ -139,6 +140,17 @@ class Testhdfsfileexists:
         mock_hdfs_is_file.return_value = False
         result2 = hdfs_file_exists("file/falsepath/filename.csv")
         assert not result2
+
+
+class TestHdfsFileSize:
+    """Tests for function to return size of file in HDFS."""
+
+    @mock.patch("src.utils.hdfs_mods.hdfs.path.getsize")
+    def test_hdfs_file_size(self, mock_hdfs_getsize):
+        """Mock test for hdfs_file_size to return size of file in hdfs."""
+        mock_hdfs_getsize.return_value = 300
+        result = hdfs_file_size("filepath/filename.csv")
+        assert result == 300
 
 
 class TestCheckFileExists:
