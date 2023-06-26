@@ -13,7 +13,7 @@ from src.utils.hdfs_mods import (
     hdfs_load_json,
     hdfs_file_exists,
     check_file_exists,
-)  # noqa
+)
 
 sys.modules["mock_f"] = mock.Mock()
 
