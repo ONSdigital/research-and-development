@@ -3,7 +3,8 @@ import toml
 import postcodes_uk
 import pandas as pd
 
-from src.utils.wrappers import logger_creator, time_logger_wrap, exception_wrap
+import logging
+from src.utils.wrappers import time_logger_wrap, exception_wrap
 from src.utils.helpers import Config_settings
 
 # Get the config
@@ -12,7 +13,7 @@ config = conf_obj.config_dict
 global_config = config["global"]
 
 # Set up logging
-validationlogger = logger_creator(global_config)
+validation_logger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -74,7 +75,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        validationlogger.warning(
+        validation_logger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -85,7 +86,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        validationlogger.warning(
+        validation_logger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -100,14 +101,14 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
 
-        validationlogger.info("All postcodes validated....")
+    validation_logger.info("All postcodes validated....")
 
     return True
 
 
 def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
-    if config["global"]["postcode_csv_check"]:
+    if global_config["postcode_csv_check"]:
         master_series = get_masterlist(masterlist_path)
 
         # Check if postcode are real
@@ -183,11 +184,11 @@ def check_data_shape(
         cols_match = False
 
     if cols_match is False:
-        validationlogger.warning(f"Data columns match schema: {cols_match}.")
+        validation_logger.warning(f"Data columns match schema: {cols_match}.")
     else:
-        validationlogger.info(f"Data columns match schema: {cols_match}.")
+        validation_logger.info(f"Data columns match schema: {cols_match}.")
 
-    validationlogger.info(
+    validation_logger.info(
         f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
     )
     return cols_match
