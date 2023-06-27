@@ -1,5 +1,9 @@
 """Functions relating to loading historic data"""
 
+import logging
+
+history_loader_logger = logging.getLogger(__name__)
+
 
 def history_years(current, back_history):
     """Gets the year or years to load historic data for"""
