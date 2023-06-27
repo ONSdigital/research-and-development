@@ -2,9 +2,9 @@
 # Import testing packages
 from unittest import mock
 import pandas as pd
+import pytest
 
 # Import modules to test
-import os
 import sys
 
 from src.utils.hdfs_mods import (
@@ -154,24 +154,23 @@ class TestHdfsFileSize:
 
 
 class TestCheckFileExists:
-    def test_check_file_exists(self):
-        """Test the check_file_exists function."""
-        # Act: use pytest to assert the result
-        # Create emptyfile.py if it doesn't already exist
-        empty_file = open("emptyfile.py", "w")
+    """Tests for function to check a file exists in HDFS."""
 
-        # developer_config.yaml should exist and be non-empty
-        result_1 = check_file_exists(
-            "developer_config.yaml", "/home/cdsw/research-and-development/src/"
-        )
-        result_3 = check_file_exists(
-            empty_file.name, "/home/cdsw/research-and-development/"
-        )
+    @mock.patch("src.utils.hdfs_mods.hdfs.path.getsize")
+    @mock.patch("src.utils.hdfs_mods.hdfs.path.exists")
+    def test_check_hdfs_file_exists(self, mock_hdfs_is_file, mock_get_filesize):
+        """Mock tests for check_hdfs_file_exists function in True and False cases."""
+        # check True is returned if file exists and is non-empty
+        mock_hdfs_is_file.return_value = True
+        mock_get_filesize.return_value = 300
+        result1 = check_file_exists("file/truepath/filename.csv")
+        assert result1
 
-        # Delete emptyfile.py after testing
-        os.remove(empty_file.name)
+        mock_get_filesize.return_value = 0
+        result2 = check_file_exists("file/truepath/filename.csv")
+        assert not result2
 
-        # Assert
-        assert isinstance(result_1, bool)
-        assert result_1
-        assert not result_3
+        # check error raised if file doesn't exist
+        with pytest.raises(FileNotFoundError):
+            mock_hdfs_is_file.return_value = False
+            check_file_exists("file/truepath/filename.csv")
