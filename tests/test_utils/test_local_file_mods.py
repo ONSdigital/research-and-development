@@ -1,6 +1,10 @@
 import pytest
 import pandas as pd
 import os
+import json
+import io
+import pyarrow as pa
+
 from src.utils.local_file_mods import (
     read_local_csv,
     write_local_csv,
@@ -64,9 +68,12 @@ def test_write_local_csv(tmp_path, input_data):
 def test_load_local_json(tmp_path):
     data = {"key1": "value1", "key2": "value2"}
     filepath = tmp_path / "test.json"
+    
+    # Dump the test data to json
     with open(filepath, "w") as file:
         file.write(json.dumps(data))
 
+    # Load the json file and compare the content
     loaded_data = load_local_json(str(filepath))
     assert loaded_data == data
 
@@ -114,12 +121,12 @@ def test_local_open(tmp_path):
     assert os.path.exists(filepath)
 
 
-def test_local_file_write_feather(tmp_path, test_data):
+def test_local_file_write_feather(tmp_path, expout_data):
     filepath = tmp_path / "test.feather"
-    local_file_write_feather(str(filepath), test_data)
+    local_file_write_feather(str(filepath), expout_data)
 
     assert os.path.exists(filepath)
 
     # Read the written feather file and compare the content
     df = pd.read_feather(filepath)
-    pd.testing.assert_frame_equal(df, test_data)
+    pd.testing.assert_frame_equal(df, expout_data)
