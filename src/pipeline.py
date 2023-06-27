@@ -1,5 +1,4 @@
 """The main pipeline"""
-
 from src.utils import runlog
 from src._version import __version__ as version
 
@@ -9,8 +8,10 @@ from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
 from src.utils.hdfs_mods import hdfs_load_json, check_file_exists
 from src.data_validation import validation as val
+from src.imputation.imputation import run_imputation
 
 import time
+
 import logging
 
 
@@ -61,6 +62,12 @@ def run_pipeline(start):
     # Check the postcode column
     masterlist_path = config["paths"]["masterlist_path"]
     val.validate_post_col(contributors_df, masterlist_path)
+
+    forward_df, backwards_df = run_imputation(
+        ["201", "202"],
+        "202012",
+        "202009",
+    )
 
     # Outlier detection
 
