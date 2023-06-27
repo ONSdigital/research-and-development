@@ -6,8 +6,9 @@ import pydoop.hdfs as hdfs
 import pandas as pd
 import json
 import os
+import logging
 
-from src.data_validation.validation import validationlogger
+hdfs_logger = logging.getLogger(__name__)
 
 
 def read_hdfs_csv(filepath: str) -> pd.DataFrame:
@@ -118,22 +119,22 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     # If file is not on hdfs but is local, and non-empty
     if local_file and file_size > 0:
         output = True
-        validationlogger.info(f"File {filename} exists and is non-empty")
+        hdfs_logger.info(f"File {filename} exists and is non-empty")
 
     # If file is empty, is not on hdfs but does exist locally
     elif local_file and file_size == 0:
         output = False
-        validationlogger.warning(f"File {filename} exists but is empty")
+        hdfs_logger.warning(f"File {filename} exists but is empty")
 
     # If hdfs file exists and is non-empty
     elif hdfs_file and file_size > 0:
         output = True
-        validationlogger.info(f"File {filename} exists on HDFS and is non-empty")
+        hdfs_logger.info(f"File {filename} exists on HDFS and is non-empty")
 
     # If hdfs file exists and is empty
     elif hdfs_file and file_size == 0:
         output = False
-        validationlogger.warning(f"File {filename} exists on HDFS but is empty")
+        hdfs_logger.warning(f"File {filename} exists on HDFS but is empty")
 
     # Raise error if file does not exist
     else:
