@@ -1026,7 +1026,7 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_for = [
-            [11439155007, "2", "A", 67182, "missing", 1, 10, "1", "2A", 10.0, "NaN"],
+            [12, "2", "A", 100, "missing", 1, 10, "1", "2A", 10.0, "NaN"],
         ]  # (more than 10 rows per class)
 
         # TODO check data types and update headers
@@ -1050,7 +1050,7 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_back = [
-            [11581999495, "2", "B", 78452, "11", 1, 10, "missing", "2B", "NaN", 1.0],
+            [24, "2", "B", 100, "11", 1, 10, "missing", "2B", "NaN", 1.0],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
