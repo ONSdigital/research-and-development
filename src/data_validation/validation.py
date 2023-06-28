@@ -243,12 +243,12 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
     # Check if Data_Schema.toml exists
     if file_exists:
         # Load toml data schema into dictionary if toml file exists
-        toml_string = toml.load(file_path)
+        toml_dict = toml.load(file_path)
     else:
         # Return False if file does not exist
         return file_exists
 
-    return toml_string
+    return toml_dict
 
 
 @exception_wrap
