@@ -133,7 +133,7 @@ pipeline {
             when {
                 anyOf{
                     branch BUILD_BRANCH
-                    //tag BUILD_TAG
+                    tag BUILD_TAG
                 }
                 beforeAgent true
             }
