@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import json
 import io
-import pyarrow as pa
+from pathlib import Path
 
 from src.utils.local_file_mods import (
     read_local_csv,
@@ -42,33 +42,39 @@ def expout_data():
 
 @pytest.fixture
 def test_csv_file(tmp_path, input_data):
+    # Write the input data to a csv for testing
     filepath = tmp_path / "test.csv"
     input_data.to_csv(filepath, index=False)
     return filepath
 
 
 def test_read_local_csv(test_csv_file, expout_data):
+    # Creating df using the function and test csv
     df = read_local_csv(str(test_csv_file))
+    # Make sure the reader function has returned a df
     assert isinstance(df, pd.DataFrame)
+    # Check that the df is the same as the expected data
     pd.testing.assert_frame_equal(df, expout_data)
 
 
 def test_write_local_csv(tmp_path, input_data):
     filepath = tmp_path / "test.csv"
-    
+
     write_local_csv(str(filepath), input_data)
 
+    # Use os and pathlib to check that the written file exists
     assert os.path.exists(filepath)
+    assert Path.exists(filepath)
 
     # Read the written CSV file and compare the content
     df = pd.read_csv(filepath)
     pd.testing.assert_frame_equal(df, input_data)
-    
+
 
 def test_load_local_json(tmp_path):
     data = {"key1": "value1", "key2": "value2"}
     filepath = tmp_path / "test.json"
-    
+
     # Dump the test data to json
     with open(filepath, "w") as file:
         file.write(json.dumps(data))
@@ -80,20 +86,24 @@ def test_load_local_json(tmp_path):
 
 def test_local_file_exists(tmp_path):
     filepath = tmp_path / "test_file.txt"
+    # Checking that it doesn't give a false positive
     assert not local_file_exists(str(filepath))
 
     with open(filepath, "w") as file:
         file.write("Test content")
-
+    # Checking for (correct) positive
     assert local_file_exists(str(filepath))
 
 
 def test_local_file_size(tmp_path):
     filepath = tmp_path / "test_file.txt"
+    # Create the file with a tiny bit of content
     with open(filepath, "w") as file:
         file.write("Test content")
 
+    # Check the file size is correct using both os and pathlib
     assert local_file_size(str(filepath)) == os.path.getsize(filepath)
+    assert local_file_size(str(filepath)) == Path(filepath).stat().st_size
 
 
 def test_check_file_exists(tmp_path):
