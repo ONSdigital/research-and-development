@@ -2,8 +2,8 @@
 # Core Python modules
 import time
 import logging
-import os
 import re
+import os
 
 # Our local modules
 from src.utils import runlog
