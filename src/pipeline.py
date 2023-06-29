@@ -62,7 +62,8 @@ def run_pipeline(start):
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
     # Load SPP data from DAP
-    snapshot_path = config["paths"]["snapshot_path"]
+
+    snapshot_path = config[f"{network_or_hdfs}_paths"]["snapshot_path"]
 
     # Check data file exists
     check_file_exists(snapshot_path)
