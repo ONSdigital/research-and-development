@@ -9,7 +9,8 @@ import logging
 
 try:
     import pydoop.hdfs as hdfs
-    from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+
+    # from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
     HDFS_AVAILABLE = True
 except ImportError:
     HDFS_AVAILABLE = False
@@ -72,6 +73,7 @@ def hdfs_file_exists(filepath: str) -> bool:
         Bool - A boolean value indicating whether a file
         exists or not
     """
+
     file_exists = hdfs.path.exists(filepath)
 
     return file_exists
@@ -107,7 +109,7 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
     """
     output = False
 
-    file_loc = os.path.join(filepath, filename)
+    file_loc = hdfs.path.join(filepath, filename)
 
     local_file = os.path.exists(file_loc)
 
@@ -159,6 +161,7 @@ def hdfs_mkdir(path):
     hdfs.mkdir(path)
     return None
 
+
 def hdfs_open(filepath, mode):
     """Function to open a file in HDFS
 
@@ -169,11 +172,12 @@ def hdfs_open(filepath, mode):
     file = hdfs.open(filepath, mode)
     return file
 
+
 def hdfs_write_feather(filepath, df):
     """Function to write dataframe as feather file in HDFS"""
     with hdfs.open(filepath, "wb") as file:
         df.to_feather(file)
     # Check log written to feather
     hdfs_logger.info(f"Dataframe written to {filepath} as feather file")
-    
+
     return True

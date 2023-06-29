@@ -4,7 +4,6 @@ import os
 from src.utils.helpers import Config_settings
 import csv
 import yaml
-from pathlib import Path
 
 # Get config
 conf_obj = Config_settings()
@@ -56,9 +55,10 @@ class RunLog:
 
     def _make_main_path(self):
         """Creating a local runlog folder if it doesn't exist"""
-        logs_folder = Path("logs")
-        self.main_path = logs_folder.joinpath("runlogs", self.logs_folder)
-        return self.main_path
+        # logs_folder = Path("logs")
+        # self.main_path = logs_folder.joinpath("runlogs", self.logs_folder)
+        logs_folder = f"/user/{self.user}/{self.logs_folder}"
+        return logs_folder
 
     def _create_folder(self):
         """Create the folder for the runlog if it doesn't exist."""
@@ -213,17 +213,17 @@ class RunLog:
 
         main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
         file_name = csv_filenames["main"]
-        file_path = Path.joinpath(self.main_path, file_name)
+        file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, main_columns)
 
         config_columns = list(self.configdf.columns.values)
         file_name = csv_filenames["configs"]
-        file_path = Path.joinpath(self.main_path, file_name)
+        file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
         file_name = csv_filenames["logs"]
-        file_path = Path.joinpath(self.main_path, file_name)
+        file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, log_columns)
 
         return None
@@ -238,19 +238,19 @@ class RunLog:
             # write the runlog to a csv file
 
             file_name = csv_filenames["main"]
-            file_path = Path.joinpath(self.main_path, file_name)
+            file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_main_df)
             self.write_func(file_path, newdf)
 
             file_name = csv_filenames["configs"]
-            file_path = Path.joinpath(self.main_path, file_name)
+            file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_configs_df)
             self.write_func(file_path, newdf)
 
             file_name = csv_filenames["logs"]
-            file_path = Path.joinpath(self.main_path, file_name)
+            file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_logs_df)
             self.write_func(file_path, newdf)
