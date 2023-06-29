@@ -1,5 +1,5 @@
 """Functions relating to loading historic data"""
-
+from typing import Generator, List
 import logging
 import re
 import os
@@ -7,9 +7,8 @@ import os
 history_loader_logger = logging.getLogger(__name__)
 
 
-def history_years(current, back_history):
+def history_years(current: int, back_history: int) -> Generator[int, None, None]:
     """Gets the year or years to load historic data for"""
-
     if back_history > 0:
         # create a generator to yield the years to load
         for i in range(back_history):
@@ -20,19 +19,17 @@ def history_years(current, back_history):
         return None
 
 
-def hist_paths_to_load(hist_folder, history_years):
+def hist_paths_to_load(hist_folder: str, history_years: Generator[int, None, None]) -> List[str]:
     """Creates a list of paths to load historic data from"""
-
     # Create a list of paths to load
     hist_paths = []
     for year in history_years:
         hist_path = hist_folder + "qv_BERD_" + str(year) + "12_qv6_reformatted.csv"
         hist_paths.append(hist_path)
-
     return hist_paths
 
 
-def load_history(year_generator, hist_folder_path, read_csv_func):
+def load_history(year_generator: Generator[int, None, None], hist_folder_path: str, read_csv_func: callable) -> None:
     if year_generator is None:
         history_loader_logger.info("No historic data to load for this run.")
     else:
@@ -49,7 +46,3 @@ def load_history(year_generator, hist_folder_path, read_csv_func):
                 key = str(os.path.basename(path))
             dfs_dict[key] = df
         history_loader_logger.info("Historic data loaded.")
-
-
-if __name__ == "__main__":
-    pass
