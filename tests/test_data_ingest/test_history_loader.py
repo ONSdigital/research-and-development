@@ -1,5 +1,6 @@
 import pytest
-from typing import Generator, List
+from _pytest.monkeypatch import MonkeyPatch
+from unittest.mock import MagicMock
 
 from src.data_ingest.history_loader import history_years, hist_paths_to_load, load_history
 
@@ -49,15 +50,14 @@ def test_hist_paths_to_load(hist_folder_path):
     result = hist_paths_to_load(hist_folder_path, history_years)
     assert result == expected_result
 
-def test_load_history(hist_folder_path, read_csv_func, monkeypatch):
+def test_load_history(hist_folder_path, read_csv_func: MagicMock, monkeypatch: MonkeyPatch):
+    
     year_generator = history_years(2023, 3)
 
-    def mock_info(message):
+    def mock_info(message: str) -> None:
         pass
-    
-    # mock_info function that serves as a replacement for the .info method.
-    monkeypatch.setattr("src.data_ingest.history_loader.history_loader_logger.info", mock_info)
 
+    monkeypatch.setattr("src.data_ingest.history_loader.history_loader_logger.info", mock_info)
 
     expected_paths_load_list = [
         "/path/to/hist_folder/qv_BERD_202212_qv6_reformatted.csv",
