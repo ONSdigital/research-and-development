@@ -56,7 +56,7 @@ def test_load_history(hist_folder_path, read_csv_func, monkeypatch):
         pass
     
     # mock_info function that serves as a replacement for the .info method.
-    monkeypatch.setattr("src.history_loader.history_loader_logger.info", mock_info)
+    monkeypatch.setattr("src.data_ingest.history_loader.history_loader_logger.info", mock_info)
 
 
     expected_paths_load_list = [
