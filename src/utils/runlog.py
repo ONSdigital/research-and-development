@@ -58,7 +58,7 @@ class RunLog:
         if self.environment == "hdfs":
             logs_folder = f"/user/{self.user}/{self.logs_folder}"
         elif self.environment == "network":
-            logs_folder = f"logs.{self.logs_folder}"
+            logs_folder = self.logs_folder
         return logs_folder
 
     def _create_folder(self):
