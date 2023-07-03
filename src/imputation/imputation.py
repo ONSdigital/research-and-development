@@ -114,10 +114,10 @@ def calc_growth_ratio(
     # change from string to int
     df[f"{current_quarter}_{target_variable}"] = df[
         f"{current_quarter}_{target_variable}"
-    ].astype("int64")
+    ]
     df[f"{previous_quarter}_{target_variable}"] = df[
         f"{previous_quarter}_{target_variable}"
-    ].astype("int64")
+    ]
 
     df[f"{target_variable}_growth_ratio"] = (
         df[f"{current_quarter}_{target_variable}"]
@@ -316,7 +316,8 @@ def forward_imputation(
         _type_: _description_
     """
 
-    df_growth_ratio = df[~df.isin(["missing"]).any(axis=1)].copy()
+    #   df_growth_ratio = df[~df.isin(["missing"]).any(axis=1)].copy()
+    df_growth_ratio = df[~df.isin([np.nan]).any(axis=1)].copy()
     # df_growth_ratio = df[
     #     df[f"{current_quarter}_var1"] != "missing"
     # ].copy()  # TODO add f string
@@ -337,7 +338,7 @@ def forward_imputation(
                 df_final[f"{current_quarter}_class"] == class_name
             ].copy()
             df_other = df_other[
-                df_other[f"{current_quarter}_{var}"] == "missing"
+                df_other[f"{current_quarter}_{var}"].isnull()
             ].copy()  # change the name of df_final and df_other
             df_other[f"{class_name}_{var}_growth_ratio"] = int(
                 dict_mean_growth_ratio[
@@ -373,7 +374,7 @@ def backwards_imputation(
         _type_: _description_
     """
 
-    df_growth_ratio = df[~df.isin(["missing"]).any(axis=1)].copy()
+    df_growth_ratio = df[~df.isin([np.nan]).any(axis=1)].copy()
     # df_growth_ratio = df[
     #     df[f"{previous_quarter}_var1"] != "missing"
     # ].copy()  # TODO add f string
@@ -394,7 +395,7 @@ def backwards_imputation(
                 df_final[f"{current_quarter}_class"] == class_name
             ].copy()
             df_other = df_other[
-                df_other[f"{previous_quarter}_{var}"] == "missing"
+                df_other[f"{previous_quarter}_{var}"].isnull()
             ].copy()  # TODO change the name of df_final and df_other
             # TODO add f string to previous_quarter_var1
             df_other[f"{class_name}_{var}_growth_ratio"] = int(
@@ -420,6 +421,7 @@ def backwards_imputation(
 def run_imputation(
     # full_responses: pd.DataFrame,  # df = full_responses.copy()
     # column: str,
+    test_df,
     target_variables_list: list,
     current_quarter: str,
     previous_quarter: str,
@@ -432,8 +434,6 @@ def run_imputation(
     Returns:
         _type_: _description_
     """
-
-    test_df = pd.read_csv(r"test_data_imp.csv")
 
     current_quarter = "202012"
     previous_quarter = "202009"

@@ -1,3 +1,4 @@
+import numpy as np
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
@@ -787,7 +788,7 @@ class TestForwardImputation:
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, "missing", 1, 1, 1, "dont trim"],
+            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
@@ -799,7 +800,7 @@ class TestForwardImputation:
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, "missing", 1, 1, 1, "dont trim"],
+            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -825,8 +826,8 @@ class TestForwardImputation:
 
         # data in the column order above
         output_data = [
-            ["class1", 1, 1, "missing", 1, 1, 1, "dont trim", 4],
-            ["class2", 1, 1, "missing", 1, 1, 1, "dont trim", 6],
+            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4],
+            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -883,7 +884,7 @@ class TestBackwardsImputation:
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, "missing", 1, 1, "dont trim"],
+            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
@@ -895,7 +896,7 @@ class TestBackwardsImputation:
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
             ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, "missing", 1, 1, "dont trim"],
+            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -921,8 +922,8 @@ class TestBackwardsImputation:
 
         # data in the column order above
         output_data = [
-            ["class1", 1, 1, 4, "missing", 1, 1, "dont trim", 1.0],
-            ["class2", 1, 1, 6, "missing", 1, 1, "dont trim", 1.0],
+            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim", 1.0],
+            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim", 1.0],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -982,7 +983,7 @@ class TestRunImputation:
             [9, "2", "A", 100, 11, 1, 10, 1],
             [10, "2", "A", 100, 11, 1, 10, 1],
             [11, "2", "A", 100, 110, 1, 100, 1],
-            [12, "2", "A", 100, "missing", 1, 10, 1],
+            [12, "2", "A", 100, np.nan, 1, 10, 1],
             [13, "2", "B", 100, 1, 1, 1, 1],
             [14, "2", "B", 100, 11, 1, 10, 1],
             [15, "2", "B", 100, 11, 1, 10, 1],
@@ -994,7 +995,7 @@ class TestRunImputation:
             [21, "2", "B", 100, 11, 1, 10, 1],
             [22, "2", "B", 100, 11, 1, 10, 1],
             [23, "2", "B", 100, 110, 1, 100, 1],
-            [24, "2", "B", 100, 11, 1, 10, "missing"],
+            [24, "2", "B", 100, 11, 1, 10, np.nan],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -1026,7 +1027,8 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_for = [
-            [12, "2", "A", 100, "missing", 1, 10, "1", "2A", 10.0, "NaN"],
+            # [12, "2", "A", 100, np.nan, 1, 10, "1", "2A", 10.0, "NaN"],
+            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 10.0, np.nan],
         ]  # (more than 10 rows per class)
 
         # TODO check data types and update headers
@@ -1050,7 +1052,8 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_back = [
-            [24, "2", "B", 100, "11", 1, 10, "missing", "2B", "NaN", 1.0],
+            #  [24, "2", "B", 100, "11", 1, 10, np.nan, "2B", "NaN", 1.0],
+            [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1.0],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -1058,40 +1061,40 @@ class TestRunImputation:
             data=output_data_for, columns=output_cols_f, index=[11]
         )
         output_df_for["survey"] = output_df_for["survey"].astype(object)
-        output_df_for["202009_202"] = output_df_for["202009_202"].astype(object)
-        output_df_for["forwards_imputed_202"] = output_df_for[
-            "forwards_imputed_202"
-        ].astype(object)
+        # output_df_for["202009_202"] = output_df_for["202009_202"].astype(object)
+        # output_df_for["forwards_imputed_202"] = output_df_for[
+        #     "forwards_imputed_202"
+        # ].astype(object)
 
         output_df_back = pandasDF(
             data=output_data_back, columns=output_cols_b, index=[23]
         )
-        output_df_back["survey"] = output_df_back["survey"].astype(object)
-        output_df_back["202012_201"] = output_df_back["202012_201"].astype(object)
+        # output_df_back["survey"] = output_df_back["survey"].astype(object)
+        # output_df_back["202012_201"] = output_df_back["202012_201"].astype(object)
 
         # adding this as cant work out why nan != nan
         # without fillna
-        output_df_for = output_df_for.fillna("NaN")
-        output_df_back = output_df_back.fillna("NaN")
+        # output_df_for = output_df_for.fillna("NaN")
+        # output_df_back = output_df_back.fillna("NaN")
 
         return output_df_for, output_df_back
 
     def test_run_imputation(self):
         """Test the expected functionality"""
 
-        # input_df = self.input_data_run_imputation()
+        input_df = self.input_data_run_imputation()
         expout_df_for, expout_df_back = self.output_data_run_imputation()
 
         target_variables_list = ["201", "202"]
         current_quarter = "current_quarter"
         previous_quarter = "previous_quarter"
         result_for, result_back = run_imputation(
-            target_variables_list, current_quarter, previous_quarter
+            input_df, target_variables_list, current_quarter, previous_quarter
         )
 
         # TODO investigate: adding this as cant work out why nan != nan
-        result_for = result_for.fillna("NaN")
-        result_back = result_back.fillna("NaN")
+        # result_for = result_for.fillna("NaN")
+        # result_back = result_back.fillna("NaN")
 
         assert_frame_equal(result_for, expout_df_for)
         assert_frame_equal(result_back, expout_df_back)
