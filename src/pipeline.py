@@ -42,6 +42,10 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
 
+else:
+    MainLogger.error("The network_or_hdfs configuration is wrong")
+    raise ImportError
+
 
 def run_pipeline(start):
     """The main pipeline.
