@@ -72,16 +72,19 @@ def test_write_local_csv(tmp_path, input_data):
 
 
 def test_load_local_json(tmp_path):
-    data = {"key1": "value1", "key2": "value2"}
-    filepath = tmp_path / "test.json"
+    # Create a test dictionary to write to json
+    test_data_dict = {"key1": "value1", "key2": "value2"}
+    json_filepath = tmp_path / "test.json"
 
     # Dump the test data to json
-    with open(filepath, "w") as file:
-        file.write(json.dumps(data))
+    with open(json_filepath, "w") as file:
+        file.write(json.dumps(test_data_dict))
 
     # Load the json file and compare the content
-    loaded_data = load_local_json(str(filepath))
-    assert loaded_data == data
+    loaded_data = load_local_json(str(json_filepath))
+
+    # Test that the loaded json exactly equals the test_data_dict
+    assert loaded_data == test_data_dict
 
 
 def test_local_file_exists(tmp_path):
@@ -111,8 +114,10 @@ def test_check_file_exists(tmp_path):
     with open(filepath, "w") as file:
         file.write("Test content")
 
+    # Check that the file just created exists
     assert check_file_exists("test_file.txt", str(tmp_path))
 
+    # Test that the correct error is raised when file not present
     with pytest.raises(FileNotFoundError):
         check_file_exists("nonexistent_file.txt", str(tmp_path))
 
@@ -120,6 +125,8 @@ def test_check_file_exists(tmp_path):
 def test_local_mkdir(tmp_path):
     folderpath = tmp_path / "test_folder"
     local_mkdir(str(folderpath))
+
+    # Check that the folder we just created exists
     assert os.path.exists(folderpath)
 
 
@@ -127,14 +134,18 @@ def test_local_open(tmp_path):
     filepath = tmp_path / "test_file.txt"
     mode = "w"
     file = local_open(str(filepath), mode)
+
+    # Check that it opens as a "BufferedIOBase object, buffer"
     assert isinstance(file, io.TextIOWrapper)
     assert os.path.exists(filepath)
 
 
-def test_local_file_write_feather(tmp_path, expout_data):
+def test_local_file_write_feather(tmp_path, input_data, expout_data):
+    # Set up path and write data to feather
     filepath = tmp_path / "test.feather"
-    local_file_write_feather(str(filepath), expout_data)
+    local_file_write_feather(str(filepath), input_data)
 
+    # Make sure the file has been created
     assert os.path.exists(filepath)
 
     # Read the written feather file and compare the content
