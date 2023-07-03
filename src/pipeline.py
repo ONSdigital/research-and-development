@@ -32,11 +32,11 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
 
-else:
+elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
-    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
     from src.utils.hdfs_mods import hdfs_load_json as load_json
+    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
     from src.utils.hdfs_mods import hdfs_mkdir as mkdir
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
