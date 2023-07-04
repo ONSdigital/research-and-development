@@ -111,14 +111,6 @@ def calc_growth_ratio(
     """
     # for every target variable a growth ratio is calcualted
 
-    # change from string to int
-    df[f"{current_quarter}_{target_variable}"] = df[
-        f"{current_quarter}_{target_variable}"
-    ]
-    df[f"{previous_quarter}_{target_variable}"] = df[
-        f"{previous_quarter}_{target_variable}"
-    ]
-
     df[f"{target_variable}_growth_ratio"] = (
         df[f"{current_quarter}_{target_variable}"]
         / df[f"{previous_quarter}_{target_variable}"]
@@ -316,7 +308,6 @@ def forward_imputation(
         _type_: _description_
     """
 
-    #   df_growth_ratio = df[~df.isin(["missing"]).any(axis=1)].copy()
     df_growth_ratio = df[~df.isin([np.nan]).any(axis=1)].copy()
     # df_growth_ratio = df[
     #     df[f"{current_quarter}_var1"] != "missing"

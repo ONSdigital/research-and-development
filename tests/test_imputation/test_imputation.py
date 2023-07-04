@@ -1027,7 +1027,6 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_for = [
-            # [12, "2", "A", 100, np.nan, 1, 10, "1", "2A", 10.0, "NaN"],
             [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 10.0, np.nan],
         ]  # (more than 10 rows per class)
 
@@ -1052,7 +1051,6 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_back = [
-            #  [24, "2", "B", 100, "11", 1, 10, np.nan, "2B", "NaN", 1.0],
             [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1.0],
         ]  # (more than 10 rows per class)
 
@@ -1060,22 +1058,10 @@ class TestRunImputation:
         output_df_for = pandasDF(
             data=output_data_for, columns=output_cols_f, index=[11]
         )
-        output_df_for["survey"] = output_df_for["survey"].astype(object)
-        # output_df_for["202009_202"] = output_df_for["202009_202"].astype(object)
-        # output_df_for["forwards_imputed_202"] = output_df_for[
-        #     "forwards_imputed_202"
-        # ].astype(object)
 
         output_df_back = pandasDF(
             data=output_data_back, columns=output_cols_b, index=[23]
         )
-        # output_df_back["survey"] = output_df_back["survey"].astype(object)
-        # output_df_back["202012_201"] = output_df_back["202012_201"].astype(object)
-
-        # adding this as cant work out why nan != nan
-        # without fillna
-        # output_df_for = output_df_for.fillna("NaN")
-        # output_df_back = output_df_back.fillna("NaN")
 
         return output_df_for, output_df_back
 
@@ -1091,10 +1077,6 @@ class TestRunImputation:
         result_for, result_back = run_imputation(
             input_df, target_variables_list, current_quarter, previous_quarter
         )
-
-        # TODO investigate: adding this as cant work out why nan != nan
-        # result_for = result_for.fillna("NaN")
-        # result_back = result_back.fillna("NaN")
 
         assert_frame_equal(result_for, expout_df_for)
         assert_frame_equal(result_back, expout_df_back)
