@@ -1,18 +1,15 @@
 """The main pipeline"""
 
-from src.utils import runlog
-from src._version import __version__ as version
+import logging
+import time
 
-from src.utils.helpers import Config_settings
-from src.utils.wrappers import logger_creator
+from src._version import __version__ as version
 from src.data_ingest import spp_parser
 from src.data_processing import spp_snapshot_processing as processing
-from src.utils.hdfs_mods import hdfs_load_json, check_file_exists
 from src.data_validation import validation as val
-
-import time
-import logging
-
+from src.utils import runlog
+from src.utils.helpers import Config_settings
+from src.utils.wrappers import logger_creator
 
 MainLogger = logging.getLogger(__name__)
 
@@ -20,6 +17,34 @@ MainLogger = logging.getLogger(__name__)
 # load config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
+
+# Check the environment switch
+network_or_hdfs = config["global"]["network_or_hdfs"]
+
+
+if network_or_hdfs == "network":
+    HDFS_AVAILABLE = False
+
+    from src.utils.local_file_mods import load_local_json as load_json
+    from src.utils.local_file_mods import local_file_exists as check_file_exists
+    from src.utils.local_file_mods import local_mkdir as mkdir
+    from src.utils.local_file_mods import local_open as open_file
+    from src.utils.local_file_mods import read_local_csv as read_csv
+    from src.utils.local_file_mods import write_local_csv as write_csv
+
+elif network_or_hdfs == "hdfs":
+    HDFS_AVAILABLE = True
+
+    from src.utils.hdfs_mods import hdfs_load_json as load_json
+    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
+    from src.utils.hdfs_mods import hdfs_mkdir as mkdir
+    from src.utils.hdfs_mods import hdfs_open as open_file
+    from src.utils.hdfs_mods import read_hdfs_csv as read_csv
+    from src.utils.hdfs_mods import write_hdfs_csv as write_csv
+
+else:
+    MainLogger.error("The network_or_hdfs configuration is wrong")
+    raise ImportError
 
 
 def run_pipeline(start):
@@ -31,7 +56,9 @@ def run_pipeline(start):
     """
     # Set up the run logger
     global_config = config["global"]
-    runlog_obj = runlog.RunLog(config, version)
+    runlog_obj = runlog.RunLog(
+        config, version, open_file, check_file_exists, mkdir, read_csv, write_csv
+    )
 
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
@@ -39,12 +66,13 @@ def run_pipeline(start):
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
     # Load SPP data from DAP
-    snapshot_path = config["paths"]["snapshot_path"]
+
+    snapshot_path = config[f"{network_or_hdfs}_paths"]["snapshot_path"]
 
     # Check data file exists
     check_file_exists(snapshot_path)
 
-    snapdata = hdfs_load_json(snapshot_path)
+    snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     MainLogger.info("Finished Data Ingest...")
 
@@ -59,8 +87,8 @@ def run_pipeline(start):
     val.check_data_shape(full_responses)
 
     # Check the postcode column
-    masterlist_path = config["paths"]["masterlist_path"]
-    val.validate_post_col(contributors_df, masterlist_path)
+    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
+    val.validate_post_col(contributors_df, postcode_masterlist)
 
     # Outlier detection
 
