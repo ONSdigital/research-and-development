@@ -52,12 +52,7 @@ else:
     raise ImportError
 
 # Conditionally load paths
-if HDFS_AVAILABLE:
-    print("no history available")
-elif not HDFS_AVAILABLE:
-    history_path = (
-        r"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
-    )
+paths = config[f"{network_or_hdfs}_paths"]
 
 
 def run_pipeline(start):
