@@ -95,6 +95,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [foreign_owner]
 Description = Foreign Owner
@@ -105,6 +106,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = f_owner
 
 [form_status]
 Description = Status
@@ -115,6 +117,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [form_type]
 Description = Form Type
@@ -125,6 +128,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = form
 
 [freeze_id]
 Description = Freeze ID - bespoke to openroad
@@ -135,6 +139,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_oth_f]
 Description = Other Female (Headcount)
@@ -145,6 +150,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_oth_m]
 Description = Other Male (Headcount)
@@ -155,6 +161,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_res_f]
 Description = Researchers Females (Headcount)
@@ -165,6 +172,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_res_m]
 Description = Researchers Male (Headcount)
@@ -175,6 +183,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_tec_f]
 Description = Technicians Female (Headcount)
@@ -185,6 +194,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_tec_m]
 Description = Technicians Male (Headcount)
@@ -195,6 +205,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [headcount_total]
 Description = Total Headcount
@@ -205,6 +216,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [period]
 Description = Openroad Specific
@@ -215,6 +227,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = period
 
 [period_contributor_id]
 Description = Openroad Specific
@@ -225,6 +238,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [period_year]
 Description = Period
@@ -235,6 +249,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = None
 
 [product_group]
 Description = Published Product Group
@@ -245,6 +260,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = selgrpno # BAU needs to check maybe = (rtngrpno)
 
 [ru_ref]
 Description = Reference
@@ -255,6 +271,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = ref # BAU need to check (ref or entref)
 
 [sizeband]
 Description = SizeBand
@@ -265,6 +282,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = sizebd
 
 [wowentref]
 Description = Wowentref
@@ -275,6 +293,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code =
+old_ref = wow
 
 [sal_wages]
 Description = Salaries & Wages
@@ -285,6 +304,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q202
+old_ref = slries
 
 [othr_expend]
 Description = Other current expenditure
@@ -295,6 +315,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q203
+old_ref = curr_oth # BAU need to check this
 
 [total_expend]
 Description = Total Current Expenditure
@@ -305,6 +326,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q204
+old_ref = curr_tot
 
 [basic_res]
 Description = Basic Research
@@ -315,6 +337,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q205
+old_ref = res_bas
 
 [applied_res]
 Description = Applied Research
@@ -325,6 +348,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q206
+old_ref = res_app
 
 [exp_dev]
 Description = Experimental Development
@@ -335,6 +359,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q207
+old_ref = experm
 
 [land_build_capex]
 Description = Land & Build CapEx
@@ -345,6 +370,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q208
+old_ref = c_lnd_bl
 
 [equip_mach_capex]
 Description = Equipment & Machinery CapEx
@@ -355,6 +381,8 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q209
+old_ref = cxplm
+
 
 [total_capex]
 Description = Total Capex.
@@ -365,6 +393,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q210
+old_ref = None
 
 [total_inhouse_expend]
 Description = Total Inhouse Expenditure
@@ -375,6 +404,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q211
+old_ref = intram
 
 [own_funds]
 Description = Own Funds
@@ -385,6 +415,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q212
+old_ref = own_f
 
 [fund_eu_commission]
 Description = Funding - Commission of the EU
@@ -395,6 +426,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q213
+old_ref = ovss_ec
 
 [fund_uk_govt]
 Description = Funding - UK government
@@ -405,6 +437,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q214
+old_ref = ex_uk_gv
 
 [fund_orgs_outside_uk]
 Description = Funding - Organisations outside the UK
@@ -415,6 +448,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q215
+old_ref = ex_uk_b
 
 [fund_oth_uk_private_bus_orgs]
 Description = Funding - Other UK Private Bus/Public Orgs
@@ -425,6 +459,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q216
+old_ref = ex_uk # BAU to check this
 
 [fund_oth_uk]
 Description = Funding - Any Other UK
@@ -435,6 +470,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q217
+old_ref = None # BAU to check this
 
 [total_funding]
 Description = Total Funding
@@ -445,6 +481,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q218
+old_ref = f_tot
 
 [land_acq_rnd]
 Description = Land Acquired for R&D (Split of Land & Build CapEx)
@@ -455,6 +492,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q219
+old_ref = None
 
 [bldgs_acq_rnd]
 Description = Buildings acquired/constructed for R&D (Split of Land & Build CapEx)
@@ -465,6 +503,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q220
+old_ref = None
 
 [exp_computer_software]
 Description = Expenditure on computer software only (of which from Equipment & Machinery CapEx)
@@ -475,6 +514,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q221
+old_ref = None
 
 [purchase_materials]
 Description = Purchase of Materials (Split of Other current)
@@ -485,6 +525,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q222
+old_ref = None
 
 [purchase_services]
 Description = Purchase of Services (Split of Other current)
@@ -495,6 +536,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q223
+old_ref = None
 
 [own_business]
 Description = Ownership - Own Business
@@ -505,6 +547,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q225
+old_ref = None
 
 [own_uk_govt]
 Description = Ownership - UK Government
@@ -515,6 +558,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q226
+old_ref = None
 
 [own_oth_uk_priv_bus]
 Description = Ownership - Other UK Priv Bus
@@ -525,6 +569,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q227
+old_ref = None
 
 [own_oth_uk_orgs]
 Description = Ownership - Other UK Orgs
@@ -535,6 +580,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q228
+old_ref = None
 
 [own_bus_enterp_outside_uk]
 Description = Ownership - Bus Enterprises in Group Outside UK
@@ -545,6 +591,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q229
+old_ref = None
 
 [own_oth_bus_enterp_outside_uk]
 Description = Ownership - Other Bus Enterprises outside UK
@@ -555,6 +602,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q230
+old_ref = None
 
 [own_oth_govts_outside_uk]
 Description = Ownership - Other Governments outside UK
@@ -565,6 +613,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q231
+old_ref = None
 
 [own_high_edu_est_outside_uk]
 Description = Ownership - Higher Education Establishments outside UK
@@ -575,6 +624,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q232
+old_ref = None
 
 [own_non_profit_orgs_outside_uk]
 Description = Ownership - Non-profit Orgs outside the UK
@@ -585,6 +635,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q233
+old_ref = None
 
 [own_eu_commission]
 Description = Ownership - Commission of EU
@@ -595,6 +646,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q234
+old_ref = None
 
 [own_intl_orgs]
 Description = Ownership - International Orgs
@@ -605,6 +657,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q235
+old_ref = None
 
 [own_oth_orgs_outside_uk]
 Description = Ownership - Any other Orgs outside UK
@@ -615,6 +668,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q236
+old_ref = None
 
 [own_not_owned_free_avail]
 Description = Ownership - not owned freely available
@@ -625,6 +679,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q237
+old_ref = None
 
 [life_len_basic_res]
 Description = Life Length - Basic Research
@@ -635,6 +690,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q239
+old_ref = None
 
 [life_len_applied_res]
 Description = Life Length - Applied Research
@@ -645,6 +701,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q240
+old_ref = None
 
 [life_len_exp_res]
 Description = Life Length - Experimental Res
@@ -655,6 +712,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q241
+old_ref = None
 
 [fund_oth_uk_orgs]
 Description = Funding - Any other UK organisations
@@ -665,6 +723,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q242
+old_ref = None # BAU to check if this clashes with 216 & 217
 
 [fund_bus_enterp_group_outside_uk]
 Description = Funding - Business Enterprises in group outside UK
@@ -675,6 +734,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q243
+old_ref = None # BAU to check if this clashes with 216 & 217
 
 [fund_oth_bus_enterp_outside_uk]
 Description = Funding - Other Business Enterprises outside UK
@@ -685,6 +745,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q244
+old_ref = None # BAU to check if this clashes with 214
 
 [fund_oth_govts_outside_uk]
 Description = Funding - Other Governments outside UK
@@ -695,6 +756,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q245
+old_ref = None
 
 [fund_high_edu_est_outside_uk]
 Description = Funding - Higher Education Est Outside UK
@@ -705,6 +767,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q246
+old_ref = None
 
 [fund_non_profit_orgs_outside_uk]
 Description = Funding - Non-profit Orgs outside UK
@@ -715,6 +778,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q247
+old_ref = None
 
 [fund_intl_orgs]
 Description = Funding - International Orgs
@@ -725,6 +789,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q248
+old_ref = None
 
 [fund_oth_orgs_outside_uk]
 Description = Funding - Any other orgs outside UK
@@ -735,6 +800,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q249
+old_ref = None
 
 [fund_uk_high_edu_est]
 Description = Funding - UK Higher Education Establishments
@@ -745,6 +811,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q250
+old_ref = None
 
 [tax_cred_inhouse_expend_long]
 Description = Tax credit claim submitted or intended for In-house expenditure (Y/N) LONG FORM
@@ -755,6 +822,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q251
+old_ref = None
 
 [purchd_rnd_uk_yesno]
 Description = Purchased/funded R&D in the UK (Yes or No)
@@ -765,6 +833,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q302
+old_ref = None
 
 [purchd_outside_uk_govt_fund]
 Description = Purchased Outside UK (Govt Funded)
@@ -775,6 +844,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q303
+old_ref = None
 
 [purchd_outside_uk_oth]
 Description = Purchased Outside UK (Other)
@@ -785,6 +855,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q304
+old_ref = None
 
 [total_purchased]
 Description = Total Purchased
@@ -795,6 +866,7 @@ Min_values =  0
 Max_values = 1000000
 Possible_categorical_Values = []
 q_code = q305
+old_ref = None
 
 [tax_cred_purchd_work_uk_long]
 Description = Tax credit claim submitted or intended for purchased work commissioned in UK (Y/N) LONG FORM
@@ -805,6 +877,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q307
+old_ref = None
 
 [tax_cred_purchd_work_outside_uk_gov_fund_long]
 Description = Tax credit claim submitted/intended for purchased work outside Ukorig. Funded by UK gov (Y/N) LONG FORM
@@ -815,6 +888,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q308
+old_ref = None
 
 [tax_cred_purchd_work_outside_uk_oth_long]
 Description = Tax credit claim submitted or intended for all other purchased work outside the UK (Y/N) LONG FORM
@@ -825,6 +899,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q309
+old_ref = None
 
 [tax_cred_inhouse_expend_short]
 Description = Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM
@@ -835,6 +910,7 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q713
+old_ref = None
 
 [tax_cred_purchd_rnd_short]
 Description = Tax credit claim submitted or intended for purchased R&D (Y/N) SHORT FORM
@@ -845,3 +921,4 @@ Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
 q_code = q714
+old_ref = None
