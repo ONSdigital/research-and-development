@@ -2,11 +2,19 @@
     These functions will need to be tested separately, using mocking.
 """
 
-import pydoop.hdfs as hdfs
 import pandas as pd
 import json
 import logging
 
+try:
+    import pydoop.hdfs as hdfs
+
+    # from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+    HDFS_AVAILABLE = True
+except ImportError:
+    HDFS_AVAILABLE = False
+
+# set up logging
 hdfs_logger = logging.getLogger(__name__)
 
 
@@ -64,6 +72,7 @@ def hdfs_file_exists(filepath: str) -> bool:
             Bool - A boolean value which is true if file exists
     .
     """
+
     file_exists = hdfs.path.exists(filepath)
 
     return file_exists
@@ -117,3 +126,34 @@ def check_file_exists(filepath) -> bool:
         hdfs_logger.warning(f"File {filepath} exists on HDFS but is empty")
 
     return output
+
+
+def hdfs_mkdir(path):
+    """Function to create a directory in HDFS
+
+    Args:
+        path (string) -- The path to create
+    """
+    hdfs.mkdir(path)
+    return None
+
+
+def hdfs_open(filepath, mode):
+    """Function to open a file in HDFS
+
+    Args:
+        filepath (string) -- The filepath in Hue
+        mode (string) -- The mode to open the file in
+    """
+    file = hdfs.open(filepath, mode)
+    return file
+
+
+def hdfs_write_feather(filepath, df):
+    """Function to write dataframe as feather file in HDFS"""
+    with hdfs.open(filepath, "wb") as file:
+        df.to_feather(file)
+    # Check log written to feather
+    hdfs_logger.info(f"Dataframe written to {filepath} as feather file")
+
+    return True
