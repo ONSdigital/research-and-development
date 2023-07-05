@@ -51,6 +51,14 @@ else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
 
+# Conditionally load paths
+if HDFS_AVAILABLE:
+    print("no history available")
+elif not HDFS_AVAILABLE:
+    history_path = (
+        r"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
+    )
+
 
 def run_pipeline(start):
     """The main pipeline.
