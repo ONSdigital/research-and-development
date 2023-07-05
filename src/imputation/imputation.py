@@ -174,6 +174,34 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     return sorted_df
 
 
+def flag_nulls_and_zeros(
+    target_variables_list: list,
+    df: pd.DataFrame,
+    curr_q: str,
+    prev_q: str,
+):
+    """Flag target variables containing nulls or zreos.
+
+    A new column {var}_valid is created for each var in the target variables.
+    This is flagged with 1 if either the current period or previous period
+    contains either a null or a zero. Otherwise, the flag is 0.
+    
+    Args:
+        target_variables (list of str): the target variables
+        df (pd.DataFrame): dataframe with current and previous periods
+        curr_q (str): the current period
+        prev_q (str): the previous period
+
+    Returns:
+        pd.DataFrame - a dataframe indicating nulls and zeros in target cols.
+    """
+    for var in target_variables_list:
+        cond1 = (df[f"{curr_q}_{var}"].isnull()) | (df[f"{prev_q}_{var}"].isnull())
+        cond2 = (df[f"{curr_q}_{var}"] == 0) | (df[f"{prev_q}_{var}"] == 0)
+        df[f"{var}_valid"] = np.where(cond1 | cond2, 1,0)
+            
+    return df
+
 def trim_check(
     df: pd.DataFrame, check_value=10
 ) -> pd.DataFrame:  # TODO add check_value to a cofig
@@ -291,6 +319,7 @@ def loop_unique(
     for unique_item in df[column].unique():
         unique_item_df = df[df[column] == unique_item].copy()
         for target_variable in target_variables_list:
+
             growth_ratio_df = calc_growth_ratio(
                 target_variable, unique_item_df, current_period, previous_period
             )
@@ -452,6 +481,13 @@ def run_imputation(
     # q201 is Product Group
     clean_df = create_imp_class_col(test_df, "200", "201", f"{current_period}_class")
     clean_df.reset_index(drop=True, inplace=True)
+
+    flagged_df = flag_nulls_and_zeros(
+        target_variables_list,
+        clean_df,
+        current_quarter,
+        previous_quarter
+    )
 
     forward_df = forward_imputation(
         clean_df,

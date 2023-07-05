@@ -16,6 +16,7 @@ from src.imputation.imputation import (
     create_imp_class_col,
     filter_same_class,
     filter_pairs,
+    flag_nulls_and_zeros
 )
 
 
@@ -201,6 +202,60 @@ class TestFilterPairs:
             df_input, target_variable, current_period, previous_period
         )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
+
+class TestFlagNullsZeros:
+    """Unit tests for flag_nulls_zeros."""
+    def input_data(self):
+        """Create dataframe for input data."""
+        input_cols = ["ref", "curr_var1", "prev_var1", "curr_var2", "prev_var2"]
+        
+        input_data = [
+            [1, 100,    np.nan, 0,   201],
+            [2, 100,    101,    200, 201],
+            [3, np.nan, 101,    200, 201],
+            [4, 100,    101,    200, 201],
+            [5, 100, np.nan,    200, 201],
+            [6, 100,    101,    200, 201],
+            [7, 100,    101,    0,   201],
+            [8, 100,    101,    200, 0],
+        ]
+
+        input_df = pandasDF(data=input_data, columns=input_cols)
+
+        return input_df
+    
+    def output_data(self):
+        """Create dataframe for output data."""
+        out_cols = ["ref", "curr_var1", "prev_var1", "curr_var2", "prev_var2", "var1_valid", "var2_valid"]
+        
+        output_data = [
+            [1, 100,    np.nan, 0,   201, 1, 1],
+            [2, 100,    101,    200, 201, 0, 0],
+            [3, np.nan, 101,    200, 201, 1, 0],
+            [4, 100,    101,    200, 201, 0, 0],
+            [5, 100, np.nan,    200, 201, 1, 0],
+            [6, 100,    101,    200, 201, 0, 0],
+            [7, 100,    101,    0,   201, 0, 1],
+            [8, 100,    101,    200, 0,   0, 1]
+        ]
+
+        output_df = pandasDF(data=output_data, columns=out_cols)
+        output_df = output_df.astype({'var1_valid':int, 'var2_valid':int})
+        
+        return output_df
+    
+    def test_flag_nulls_and_zeros(self):
+        """Unit test for flag_nulls_and_zeros."""
+        df_expout = self.output_data()
+        input_df = self.input_data()
+        df_result = flag_nulls_and_zeros(
+            ["var1", "var2"],
+            input_df,
+            "curr",
+            "prev"
+        )
+        assert_frame_equal(df_result, df_expout)
+
 
 
 class TestCalcGrowthRatio:
