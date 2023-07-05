@@ -102,15 +102,24 @@ def run_pipeline(start):
     # Staging and validatation
     MainLogger.info("Starting Staging and Validation...")
     full_responses = run_staging(config, check_file_exists, load_json)
+    # Check data file exists
+    snapshot_path = paths["snapshot_path"]
+    check_file_exists(snapshot_path)
+
+    snapdata = load_json(snapshot_path)
+    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    MainLogger.info("Finished Data Ingest...")
+
+    # Data Transmutation
+    MainLogger.info("Starting Data Transmutation...")
+    full_responses = processing.full_responses(contributors_df, responses_df)
     print(full_responses.sample(5))
 
     # Load SPP data from
 
-    # forward_df, backwards_df = run_imputation(
-    #    ["201", "202"],
-    #    "202012",
-    #    "202009",
-    # )
+    # Check the postcode column
+    postcode_masterlist = paths["postcode_masterlist"]
+    val.validate_post_col(contributors_df, postcode_masterlist)
 
     # Outlier detection
 
