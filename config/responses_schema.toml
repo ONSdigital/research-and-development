@@ -16,7 +16,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-q_code =
+q_code = 200
 
 [current_sic]
 Description = Sic - Standard Industry Classification
@@ -236,7 +236,7 @@ Length =  # an integer of the length, or N/A
 Min_values =  None
 Max_values = None
 Possible_categorical_Values = []
-q_code =
+q_code = 201
 
 [ru_ref]
 Description = Reference
