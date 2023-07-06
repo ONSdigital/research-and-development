@@ -11,7 +11,7 @@ from src.imputation.imputation import (
     trim_bounds,
     trim_check,
     calc_growth_ratio,
-    sort,
+    sort_df,
     filter_by_column_content,
     create_imp_class_col,
     filter_same_class,
@@ -59,7 +59,7 @@ class TestCleanData:  # usetag
         column_content = "clean"
         df_result = filter_by_column_content(
             df_input, column, column_content
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -106,7 +106,7 @@ class TestCreateClassCol:
 
         df_result = create_imp_class_col(
             df_input, col_first_half, col_second_half, class_name
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -151,10 +151,10 @@ class TestFilterSameClass:
         df_input = self.input_data_filter_same_class()
         df_expout = self.output_data_filter_same_class()
 
-        current_quarter = "190012"
-        previous_quarter = "190009"
+        current_period = "190012"
+        previous_period = "190009"
 
-        df_result = filter_same_class(df_input, current_quarter, previous_quarter)
+        df_result = filter_same_class(df_input, current_period, previous_period)
         assert_frame_equal(df_result, df_expout)
 
 
@@ -200,12 +200,12 @@ class TestFilterPairs:
         df_expout = self.output_data_filter_pairs()
 
         target_variable = "target"
-        current_quarter = "190012"
-        previous_quarter = "190009"
+        current_period = "190012"
+        previous_period = "190009"
 
         df_result = filter_pairs(
-            df_input, target_variable, current_quarter, previous_quarter
-        )  # add quarter filter functionality
+            df_input, target_variable, current_period, previous_period
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -254,20 +254,20 @@ class TestCalcGrowthRatio:
         target_variable = "var1"
         input_df = self.input_data_calc_growth_ratio()
         df_expout = self.output_data_calc_growth_ratio()
-        current_quarter = "current"
-        previous_quarter = "previous"
+        current_period = "current"
+        previous_period = "previous"
 
         df_result = calc_growth_ratio(
-            target_variable, input_df, current_quarter, previous_quarter
-        )  # add quarter filter functionality
+            target_variable, input_df, current_period, previous_period
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
-class TestSort:
-    """Unit test for sort"""
+class TestSortDf:
+    """Unit test for sort_df"""
 
-    def input_data_sort(self):
-        """Create input data for the sort function"""
+    def input_data_sort_df(self):
+        """Create input data for the sort_df function"""
 
         # columns for the dataframe
         input_cols = [
@@ -293,8 +293,8 @@ class TestSort:
 
         return input_df
 
-    def output_data_sort(self):
-        """Create output data for the sort function"""
+    def output_data_sort_df(self):
+        """Create output data for the sort_df function"""
 
         # columns for the dataframe
         output_cols = [
@@ -320,14 +320,14 @@ class TestSort:
 
         return df_expout
 
-    def test_sort(self):
+    def test_sort_df(self):
         """Test the expected functionality"""
 
-        df_input = self.input_data_sort()
-        df_expout = self.output_data_sort()
+        df_input = self.input_data_sort_df()
+        df_expout = self.output_data_sort_df()
         target_variable = "var1"
 
-        df_result = sort(target_variable, df_input)
+        df_result = sort_df(target_variable, df_input)
         assert_frame_equal(df_result, df_expout)
 
 
@@ -553,7 +553,7 @@ class TestTrimBounds:
         input_df = self.input_data_trim_bounds()
         expout_df = self.output_data_trim_bounds()
 
-        df_result = trim_bounds(input_df)  # add quarter filter functionality
+        df_result = trim_bounds(input_df)  # add period filter functionality
         assert_frame_equal(df_result, expout_df)
 
 
@@ -597,7 +597,7 @@ class TestGetMeanGrowthRatio:
 
         result_dict = get_mean_growth_ratio(
             input_df, {}, "class1", "var1"
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert result_dict == expout_dict
         # assert_frame_equal(results_df, expout_df)
 
@@ -631,13 +631,13 @@ class TestLoopUnique:  # testing for loops run as expected
 
         # columns for the dataframe
         input_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "survey",
             "checkletter",
-            "current_quarter_var1",
-            "current_quarter_var2",
-            "previous_quarter_var1",
-            "previous_quarter_var2",
+            "current_period_var1",
+            "current_period_var2",
+            "previous_period_var1",
+            "previous_period_var2",
             "employees",
             "reference",
             "trim",
@@ -694,17 +694,17 @@ class TestLoopUnique:  # testing for loops run as expected
         expout_dict = self.output_data_loop_unique()
         # expout_df = self.output_data_loop_unique_df()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1", "var2"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         result_dict = loop_unique(
             input_df,  # removed , result_df
             column,
             target_variables_list,
-            current_quarter,
-            previous_quarter,
+            current_period,
+            previous_period,
         )
         assert result_dict == expout_dict
         # assert_frame_equal(result_df, expout_df)
@@ -715,16 +715,16 @@ class TestLoopUnique:  # testing for loops run as expected
         """Create output data for the loop_unique function"""
 
         # columns for the dataframe
-        output_cols = ["current_quarter_class","product_group",
+        output_cols = ["current_period_class","product_group",
     "civ_or_def",
-    "current_quarter_var1",
-    "current_quarter_var2",
-    "previous_quarter_var1",
-    "previous_quarter_var2",
+    "current_period_var1",
+    "current_period_var2",
+    "previous_period_var1",
+    "previous_period_var2",
     "employee_count",
     "ru_ref",
-    "current_quarter_var1_mean_growth_ratio",
-    "current_quarter_var2_mean_growth_ratio", "trim"]
+    "current_period_var1_mean_growth_ratio",
+    "current_period_var2_mean_growth_ratio", "trim"]
 
         # data in the column order above
         output_data = [["class1", 1, 1, 1, 2, 0.5, 0.5, 1, 1, 2.0, 4.0, 'dont trim'],
@@ -765,11 +765,11 @@ class TestForwardImputation:
 
         # columns for the dataframe
         input_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "survey",
             "checkletter",
-            "current_quarter_var1",
-            "previous_quarter_var1",
+            "current_period_var1",
+            "previous_period_var1",
             "employees",
             "reference",
             "trim",
@@ -813,11 +813,11 @@ class TestForwardImputation:
 
         # columns for the dataframe
         output_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "survey",
             "checkletter",
-            "current_quarter_var1",
-            "previous_quarter_var1",
+            "current_period_var1",
+            "previous_period_var1",
             "employees",
             "reference",
             "trim",
@@ -826,8 +826,8 @@ class TestForwardImputation:
 
         # data in the column order above
         output_data = [
-            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4],
-            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6],
+            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4.0],
+            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6.0],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -841,13 +841,13 @@ class TestForwardImputation:
         input_df = self.input_data_forward_imputation()
         expout_dict = self.output_data_forward_imputation()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         df_result = forward_imputation(
-            input_df, column, target_variables_list, current_quarter, previous_quarter
+            input_df, column, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(df_result, expout_dict)
@@ -861,11 +861,11 @@ class TestBackwardsImputation:
 
         # columns for the dataframe
         input_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "survey",
             "checkletter",
-            "current_quarter_var1",
-            "previous_quarter_var1",
+            "current_period_var1",
+            "previous_period_var1",
             "employees",
             "reference",
             "trim",
@@ -909,11 +909,11 @@ class TestBackwardsImputation:
 
         # columns for the dataframe
         output_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "survey",
             "checkletter",
-            "current_quarter_var1",
-            "previous_quarter_var1",
+            "current_period_var1",
+            "previous_period_var1",
             "employees",
             "reference",
             "trim",
@@ -937,13 +937,13 @@ class TestBackwardsImputation:
         input_df = self.input_data_backwards_imputation()
         expout_df = self.output_data_backwards_imputation()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         df_result = backwards_imputation(
-            input_df, column, target_variables_list, current_quarter, previous_quarter
+            input_df, column, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(df_result, expout_df)
@@ -1020,14 +1020,14 @@ class TestRunImputation:
             "202009_202",  # object
             "202012_class",
             "forwards_imputed_201",
-            "forwards_imputed_202",  # object
+            "forwards_imputed_202",
         ]
 
         # TODO check data types and update headers
         # when using real data
         # data in the column order above
         output_data_for = [
-            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 10.0, np.nan],
+            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 11.0, np.nan],
         ]  # (more than 10 rows per class)
 
         # TODO check data types and update headers
@@ -1071,11 +1071,11 @@ class TestRunImputation:
         input_df = self.input_data_run_imputation()
         expout_df_for, expout_df_back = self.output_data_run_imputation()
 
-        target_variables_list = ["201", "202"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        target_variables_list = ["var1", "var2"]
+        current_period = "current_period"
+        previous_period = "previous_period"
         result_for, result_back = run_imputation(
-            input_df, target_variables_list, current_quarter, previous_quarter
+            input_df, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(result_for, expout_df_for)
