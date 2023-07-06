@@ -78,24 +78,20 @@ def run_pipeline(start):
     curent_year = config["years"]["current_year"]
     years_to_load = config["years"]["previous_years_to_load"]
     years_gen = history_loader.history_years(curent_year, years_to_load)
-
+    
     if years_gen is None:
         MainLogger.info("No historic data to load for this run.")
     else:
         MainLogger.info("Loading historic data...")
-        hist_folder = config["paths"]["hist_folder"]
-        hist_paths_to_load = history_loader.hist_paths_to_load(hist_folder, years_gen)
-        # Load each historic csv into a dataframe
-        dfs_dict = {}
-        for path in hist_paths_to_load:
-            df = read_csv(path)
-            # Use regex to extract the BERD survey addition
-            key = re.search(r"(BERD_202\d+)", path).group(1)
-            if key is None:
-                # If regex didn't work use basename
-                key = os.path.basename(path)
-            dfs_dict[key] = df
-        MainLogger.info("Historic data loaded.")
+        history_path = paths["history_path"]
+        dict_of_hist_dfs = history_loader.load_history(years_gen, history_path, read_csv)
+        if isinstance(dict_of_hist_dfs, dict):
+            MainLogger.info(
+                "Dictionary of history data: %s loaded into pipeline",
+                ", ".join(dict_of_hist_dfs),
+            )
+            MainLogger.info("Historic data loaded.")
+    
 
     # Load SPP data from DAP
 
