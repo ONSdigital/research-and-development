@@ -4,7 +4,6 @@
 
 import pandas as pd
 import json
-import os
 import logging
 
 try:
@@ -64,14 +63,14 @@ def hdfs_load_json(filepath: str) -> dict:
 
 
 def hdfs_file_exists(filepath: str) -> bool:
-    """Function to check file exists
+    """Function to check file exists in hdfs.
 
-    Args:
-        filepath (string) -- The filepath in Hue
+        Args:
+            filepath (string) -- The filepath in Hue
 
-    Returns:
-        Bool - A boolean value indicating whether a file
-        exists or not
+        Returns:
+            Bool - A boolean value which is true if file exists
+    .
     """
 
     file_exists = hdfs.path.exists(filepath)
@@ -80,7 +79,7 @@ def hdfs_file_exists(filepath: str) -> bool:
 
 
 def hdfs_file_size(filepath: str) -> int:
-    """Function to check file exists
+    """Function to check the size of a file on hdfs.
 
     Args:
         filepath (string) -- The filepath in Hue
@@ -94,60 +93,37 @@ def hdfs_file_size(filepath: str) -> int:
     return file_size
 
 
-def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
-    """Checks if file exists on hdfs or locally and is non-empty.
-    Raises an FileNotFoundError if the file doesn't exist.
+def check_file_exists(filepath) -> bool:
+    """Checks if file exists in hdfs and is non-empty.
 
-    Keyword Arguments:
-        filename -- Name of file to check
-        filePath -- Relative path to file
-        (default: {"./src/data_validation/validation.py"})
+    If the file exists but is empty, a warning is logged.
+
+    Args:
+        filepath (str): The filepath of the file to check.
 
     Returns:
-        A bool: boolean value is True if file exists and is non-empty,
-        False otherwise.
+        bool: True if the file exists and is non-empty, False otherwise.
+
+    Raises: a FileNotFoundError if the file doesn't exist.
     """
     output = False
 
-    file_loc = hdfs.path.join(filepath, filename)
+    file_exists = hdfs_file_exists(filepath)
 
-    local_file = os.path.exists(file_loc)
+    # If the file exists on hdfs, check the size of it.
+    if file_exists:
+        file_size = hdfs_file_size(filepath)
 
-    # If the file exists locally, check the size of it.
-    if local_file:
-        file_size = os.path.getsize(file_loc)
+    if not file_exists:
+        raise FileNotFoundError(f"File {filepath} does not exist.")
 
-    # If file does not exists locally, check hdfs
-    if not local_file:
-        hdfs_file = hdfs_file_exists(file_loc)
-
-        # If hdfs file exists, check its size
-        if hdfs_file:
-            file_size = hdfs_file_size(file_loc)
-
-    # If file is not on hdfs but is local, and non-empty
-    if local_file and file_size > 0:
+    if file_exists and file_size > 0:
         output = True
-        hdfs_logger.info(f"File {filename} exists and is non-empty")
+        hdfs_logger.info(f"File {filepath} exists and is non-empty")
 
-    # If file is empty, is not on hdfs but does exist locally
-    elif local_file and file_size == 0:
+    elif file_exists and file_size == 0:
         output = False
-        hdfs_logger.warning(f"File {filename} exists but is empty")
-
-    # If hdfs file exists and is non-empty
-    elif hdfs_file and file_size > 0:
-        output = True
-        hdfs_logger.info(f"File {filename} exists on HDFS and is non-empty")
-
-    # If hdfs file exists and is empty
-    elif hdfs_file and file_size == 0:
-        output = False
-        hdfs_logger.warning(f"File {filename} exists on HDFS but is empty")
-
-    # Raise error if file does not exist
-    else:
-        raise FileNotFoundError(f"File {filename} does not exist or is empty")
+        hdfs_logger.warning(f"File {filepath} exists on HDFS but is empty")
 
     return output
 
