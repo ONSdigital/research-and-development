@@ -69,7 +69,7 @@ def test_load_history(hist_folder_path: str, monkeypatch: MonkeyPatch) -> None:
     # Patch read_csv_func with MagicMock
     read_csv_func = MagicMock()
 
-    expected_names = [f"BERD_{year}12" for year in range(2023, 2020)]
+    expected_names = [f"BERD_{year}12" for year in range(2020, 2023)]
 
     # set the attribute for .info message to the mock
     monkeypatch.setattr(
