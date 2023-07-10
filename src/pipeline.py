@@ -87,8 +87,8 @@ def run_pipeline(start):
     val.check_data_shape(full_responses)
 
     # Check the postcode column
-    masterlist_path = config["paths"]["masterlist_path"]
-    val.validate_post_col(contributors_df, masterlist_path)
+    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
+    val.validate_post_col(contributors_df, postcode_masterlist)
 
     # forward_df, backwards_df = run_imputation(
     #    ["201", "202"],
