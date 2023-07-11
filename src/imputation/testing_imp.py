@@ -1,5 +1,7 @@
 import pandas as pd
 from src.utils.helpers import Config_settings
+import math
+import numpy as np
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
@@ -48,14 +50,20 @@ elif network_or_hdfs == "hdfs":
         # Import csv file and convert to Dataframe
         pre_df = pd.read_csv(
             file,
-            na_values="                                                                ",  # noqa
+            na_values=[
+                "                                                                ",
+                math.nan,
+            ],  # noqa
         )
 
     with hdfs.open(cur_path, "r") as file:
         # Import csv file and convert to Dataframe
         cur_df = pd.read_csv(
             file,
-            na_values="                                                                ",  # noqa
+            na_values=[
+                "                                                                ",
+                math.nan,
+            ],  # noqa
         )
 
     with hdfs.open(map_path, "r") as file:
@@ -113,7 +121,6 @@ key_cols = [
     405,
     406,
     407,
-    407,
     408,
     409,
     410,
@@ -128,15 +135,51 @@ key_cols = [
 pre_cleandf = pre_responsedf.loc[:, pre_responsedf.columns.intersection(key_cols)]
 cur_cleandf = cur_responsedf.loc[:, cur_responsedf.columns.intersection(key_cols)]
 
+# Casting Data Types
+datatypes = {201: "Int64", 211: "Int64", 305: "Int64"}
+
+dtypes2 = {
+    405: "float",
+    406: "float",
+    407: "float",
+    408: "float",
+    409: "float",
+    410: "float",
+    501: "float",
+    502: "float",
+    503: "float",
+    504: "float",
+    505: "float",
+    506: "float",
+}
+pre_cleandf[200] = pre_cleandf[200].astype("str")
+pre_cleandf[200] = pre_cleandf[200].apply(
+    lambda v: str(v) if str(v) != "nan" else np.nan
+)
+pre_cleandf[list(datatypes.keys())] = (
+    pre_cleandf[datatypes.keys()].astype(float).astype(datatypes)
+)
+pre_cleandf[list(dtypes2.keys())] = pre_cleandf[dtypes2.keys()].astype(dtypes2)
+
+cur_cleandf[200] = cur_cleandf[200].astype("str")
+cur_cleandf[200] = cur_cleandf[200].apply(
+    lambda v: str(v) if str(v) != "nan" else np.nan
+)
+cur_cleandf[list(datatypes.keys())] = (
+    cur_cleandf[datatypes.keys()].astype(float).astype(datatypes)
+)
+cur_cleandf[list(dtypes2.keys())] = cur_cleandf[dtypes2.keys()].astype(dtypes2)
+
+
 # PG mapping
 map_dict = dict(zip(mapper["2016 > Form PG"], mapper["2016 > Pub PG"]))
-map_dict = {float(i): j for i, j in map_dict.items()}
+map_dict = {i: j for i, j in map_dict.items()}
 
 pre_cleandf[201] = pd.to_numeric(pre_cleandf[201], errors="coerce")
 cur_cleandf[201] = pd.to_numeric(cur_cleandf[201], errors="coerce")
 
-pre_cleandf[201].replace(0.0, float("NaN"))
-cur_cleandf[201].replace(0.0, float("NaN"))
+pre_cleandf[201].replace(0, float("NaN"))
+cur_cleandf[201].replace(0, float("NaN"))
 
 pre_cleandf.replace({201: map_dict}, inplace=True)
 cur_cleandf.replace({201: map_dict}, inplace=True)
