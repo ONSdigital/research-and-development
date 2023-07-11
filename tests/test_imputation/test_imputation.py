@@ -763,19 +763,17 @@ class TestForwardImputation:
     def input_data_forward_imputation(self):
         """Create input data for the forward_imputation function"""
 
-        # columns for the dataframe
-        input_cols = [
-            "current_period_class",
-            "survey",
-            "checkletter",
-            "current_period_var1",
-            "previous_period_var1",
-            "employees",
-            "reference",
-            "trim",
-        ]
+        input_cols = {
+            "current_period_class" : "str",
+            "survey" : "Int64",
+            "checkletter" : "Int64",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str"
+        }
 
-        # data in the column order above
         input_data = [
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
             ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
@@ -803,35 +801,33 @@ class TestForwardImputation:
             ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
-
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols) 
+        
         return input_df
 
     def output_data_forward_imputation(self):
         """Create output data for the forward_imputation function"""
 
-        # columns for the dataframe
-        output_cols = [
-            "current_period_class",
-            "survey",
-            "checkletter",
-            "current_period_var1",
-            "previous_period_var1",
-            "employees",
-            "reference",
-            "trim",
-            "forwards_imputed_var1",
-        ]
+        output_cols = {
+            "current_period_class" : "str",
+            "survey" : "Int64",
+            "checkletter" : "Int64",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str",
+            "forwards_imputed_var1" : "Int64"
+        }
 
-        # data in the column order above
         output_data = [
-            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4.0],
-            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6.0],
+            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4],
+            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        output_df = pandasDF(data=output_data, columns=output_cols, index=[11, 23])
+        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = output_df.astype(output_cols)
 
         return output_df
 
@@ -860,16 +856,16 @@ class TestBackwardsImputation:
         """Create input data for the backwards_imputation function"""
 
         # columns for the dataframe
-        input_cols = [
-            "current_period_class",
-            "survey",
-            "checkletter",
-            "current_period_var1",
-            "previous_period_var1",
-            "employees",
-            "reference",
-            "trim",
-        ]
+        input_cols = {
+            "current_period_class" : "str",
+            "survey" : "Int64",
+            "checkletter" : "Int64",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str"
+        }
 
         # data in the column order above
         input_data = [
@@ -900,34 +896,36 @@ class TestBackwardsImputation:
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
-
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols)
+        
         return input_df
 
     def output_data_backwards_imputation(self):
         """Create output data for the backwards_imputation function"""
 
         # columns for the dataframe
-        output_cols = [
-            "current_period_class",
-            "survey",
-            "checkletter",
-            "current_period_var1",
-            "previous_period_var1",
-            "employees",
-            "reference",
-            "trim",
-            "backwards_imputed_var1",
-        ]
+        output_cols = {
+            "current_period_class" : "str",
+            "survey" : "Int64",
+            "checkletter" : "Int64",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str",
+            "backwards_imputed_var1" : "Int64"
+        }
 
         # data in the column order above
         output_data = [
-            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim", 1.0],
-            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim", 1.0],
+            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim", 1],
+            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim", 1],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        output_df = pandasDF(data=output_data, columns=output_cols, index=[11, 23])
+        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = output_df.astype(output_cols)
 
         return output_df
 
@@ -959,16 +957,16 @@ class TestRunImputation:
         # function until ingest is firmed down
 
         # columns for the dataframe
-        input_cols = [
-            "reference",
-            "survey",
-            "checkletter",
-            "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",
-        ]
+        input_cols = {
+            "reference" : "Int64",
+            "survey" : "str",
+            "checkletter" : "str",
+            "employees" : "Int64",
+            "202012_201" : "Int64",
+            "202012_202" : "Int64",
+            "202009_201" : "Int64",
+            "202009_202" : "Int64",
+        }
 
         # data in the column order above
         input_data = [
@@ -999,69 +997,64 @@ class TestRunImputation:
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols)
 
         return input_df
 
     def output_data_run_imputation(self):
         """Create output data for the run_imputation function"""
+        output_cols_f = {
+            "reference" : "Int64",
+            "survey" : "str",
+            "checkletter" : "str",
+            "employees" : "Int64",
+            "202012_201" : "Int64",
+            "202012_202" : "Int64",
+            "202009_201" : "Int64",
+            "202009_202" : "Int64",
+            "202012_class" : "str",
+            "forwards_imputed_201" : "Int64",
+            "forwards_imputed_202" : "Int64",
+        }
 
-        # TODO check data types and update headers
-        # when using real data
-        # columns for the dataframe
-        output_cols_f = [
-            "reference",
-            "survey",  # object
-            "checkletter",
-            "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",  # object
-            "202012_class",
-            "forwards_imputed_201",
-            "forwards_imputed_202",
-        ]
-
-        # TODO check data types and update headers
-        # when using real data
-        # data in the column order above
         output_data_for = [
-            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 11.0, np.nan],
+            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 11, np.nan],
         ]  # (more than 10 rows per class)
 
+        output_df_for = pandasDF(
+            data=output_data_for, columns=output_cols_f.keys(), index=[11]
+        ).astype(output_cols_f)
+
+
         # TODO check data types and update headers
         # when using real data
         # columns for the dataframe
-        output_cols_b = [
-            "reference",
-            "survey",  # object
-            "checkletter",
-            "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",  # object
-            "202012_class",
-            "backwards_imputed_201",
-            "backwards_imputed_202",  # object
-        ]
+        output_cols_b = {
+            "reference" : "Int64",
+            "survey" : "str",
+            "checkletter" : "str",
+            "employees" : "Int64",
+            "202012_201" : "Int64",
+            "202012_202" : "Int64",
+            "202009_201" : "Int64",
+            "202009_202" : "Int64",
+            "202012_class" : "str",
+            "backwards_imputed_201" : "Int64",
+            "backwards_imputed_202" : "Int64",
+        }
 
         # TODO check data types and update headers
         # when using real data
         # data in the column order above
         output_data_back = [
-            [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1.0],
+            [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        output_df_for = pandasDF(
-            data=output_data_for, columns=output_cols_f, index=[11]
-        )
 
         output_df_back = pandasDF(
-            data=output_data_back, columns=output_cols_b, index=[23]
-        )
+            data=output_data_back, columns=output_cols_b.keys(), index=[23]
+        ).astype(output_cols_b)
 
         return output_df_for, output_df_back
 
@@ -1071,9 +1064,9 @@ class TestRunImputation:
         input_df = self.input_data_run_imputation()
         expout_df_for, expout_df_back = self.output_data_run_imputation()
 
-        target_variables_list = ["var1", "var2"]
-        current_period = "current_period"
-        previous_period = "previous_period"
+        target_variables_list = ["201", "202"]
+        current_period = "202012"
+        previous_period = "202009"
         result_for, result_back = run_imputation(
             input_df, target_variables_list, current_period, previous_period
         )

@@ -332,16 +332,14 @@ def forward_imputation(
             df_other = df_other[
                 df_other[f"{current_period}_{var}"].isnull()
             ].copy()  # change the name of df_final and df_other
-            # df_other[f"{class_name}_{var}_growth_ratio"] = int(
+
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][
-                0
-            ]  # why doesn't float work?
-            df_other[f"forwards_imputed_{var}"] = (
-                df_other[f"{class_name}_{var}_growth_ratio"]
-                * df_other[f"{previous_period}_{var}"]
-            )
+            ][0] 
+            df_other[f"forwards_imputed_{var}"] = round(
+                df_other[f"{class_name}_{var}_growth_ratio"]* df_other[f"{previous_period}_{var}"]
+            ).astype("Int64")
+
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])
             dfs_list.append(df_other)
 
@@ -391,20 +389,13 @@ def backwards_imputation(
                 df_other[f"{previous_period}_{var}"].isnull()
             ].copy()  # TODO change the name of df_final and df_other
             # TODO add f string to previous_period_var1
-            # df_other[f"{class_name}_{var}_growth_ratio"] = int(
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][
-                0
-            ]  # why doesn't float work?
-            df_other[f"{current_period}_{var}"] = df_other[
-                f"{current_period}_{var}"
-                # ].astype("int64")
-            ]
-            df_other[f"backwards_imputed_{var}"] = (
+            ][0]  
+            df_other[f"backwards_imputed_{var}"] = round(
                 df_other[f"{current_period}_{var}"]
                 / df_other[f"{class_name}_{var}_growth_ratio"]
-            )
+            ).astype("Int64")
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])
             dfs_list.append(df_other)
 
@@ -416,7 +407,7 @@ def backwards_imputation(
 def run_imputation(
     # full_responses: pd.DataFrame,  # df = full_responses.copy()
     # column: str,
-    test_df,
+    df,
     target_variables_list: list,
     current_period: str,
     previous_period: str,
@@ -430,13 +421,9 @@ def run_imputation(
         _type_: _description_
     """
 
-    current_period = "202012"
-    previous_period = "202009"
-    target_variables_list = ["var1", "var2"]
-
     # TODO CANT FIND REAL COLS YET SO CHOOSING RANDOM
     clean_df = create_imp_class_col(
-        test_df, "survey", "checkletter", f"{current_period}_class"
+        df, "survey", "checkletter", f"{current_period}_class"
     )
     clean_df.reset_index(drop=True, inplace=True)
 
