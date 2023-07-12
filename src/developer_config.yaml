@@ -17,10 +17,9 @@ hdfs_paths:
   root: None
   logs_foldername: "resdev/logs/run_logs"
   snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
-  hist_folder: "ons/rdbe_dev/BERD_V7_Anonymised"
   masterlist_path: "data/external/ONSPD_NOV_2022_UK.csv"
   postcode_masterlist: "data/external/ONSPD_NOV_2022_UK.csv"
-  history_path: None
+  history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
 network_paths:
   root: None
   logs_foldername: "logs/run_logs"
