@@ -90,6 +90,12 @@ def run_pipeline(start):
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
 
+    # forward_df, backwards_df = run_imputation(
+    #    ["201", "202"],
+    #    "202012",
+    #    "202009",
+    # )
+
     # Outlier detection
 
     # Data cleaning

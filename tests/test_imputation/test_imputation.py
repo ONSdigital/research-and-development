@@ -271,8 +271,8 @@ class TestSort:
 
         # columns for the dataframe
         input_cols = [
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "var1_growth_ratio",
             "employees",
             "reference",
@@ -298,8 +298,8 @@ class TestSort:
 
         # columns for the dataframe
         output_cols = [
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "var1_growth_ratio",
             "employees",
             "reference",
@@ -632,8 +632,8 @@ class TestLoopUnique:  # testing for loops run as expected
         # columns for the dataframe
         input_cols = [
             "current_quarter_class",
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "current_quarter_var1",
             "current_quarter_var2",
             "previous_quarter_var1",
@@ -766,8 +766,8 @@ class TestForwardImputation:
         # columns for the dataframe
         input_cols = [
             "current_quarter_class",
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "current_quarter_var1",
             "previous_quarter_var1",
             "employees",
@@ -814,8 +814,8 @@ class TestForwardImputation:
         # columns for the dataframe
         output_cols = [
             "current_quarter_class",
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "current_quarter_var1",
             "previous_quarter_var1",
             "employees",
@@ -862,8 +862,8 @@ class TestBackwardsImputation:
         # columns for the dataframe
         input_cols = [
             "current_quarter_class",
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "current_quarter_var1",
             "previous_quarter_var1",
             "employees",
@@ -910,8 +910,8 @@ class TestBackwardsImputation:
         # columns for the dataframe
         output_cols = [
             "current_quarter_class",
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             "current_quarter_var1",
             "previous_quarter_var1",
             "employees",
@@ -961,41 +961,41 @@ class TestRunImputation:
         # columns for the dataframe
         input_cols = [
             "reference",
-            "survey",
-            "checkletter",
+            "civ_or_def",
+            "Product_group",
             "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",
+            "202012_var1",
+            "202012_var2",
+            "202009_var1",
+            "202009_var2",
         ]
 
         # data in the column order above
         input_data = [
-            [1, "2", "A", 100, 1, 1, 1, 1],
-            [2, "2", "A", 100, 11, 1, 10, 1],
-            [3, "2", "A", 100, 11, 1, 10, 1],
-            [4, "2", "A", 100, 11, 1, 10, 1],
-            [5, "2", "A", 100, 11, 1, 10, 1],
-            [6, "2", "A", 100, 11, 1, 10, 1],
-            [7, "2", "A", 100, 11, 1, 10, 1],
-            [8, "2", "A", 100, 11, 1, 10, 1],
-            [9, "2", "A", 100, 11, 1, 10, 1],
-            [10, "2", "A", 100, 11, 1, 10, 1],
-            [11, "2", "A", 100, 110, 1, 100, 1],
-            [12, "2", "A", 100, np.nan, 1, 10, 1],
-            [13, "2", "B", 100, 1, 1, 1, 1],
-            [14, "2", "B", 100, 11, 1, 10, 1],
-            [15, "2", "B", 100, 11, 1, 10, 1],
-            [16, "2", "B", 100, 11, 1, 10, 1],
-            [17, "2", "B", 100, 11, 1, 10, 1],
-            [18, "2", "B", 100, 11, 1, 10, 1],
-            [19, "2", "B", 100, 11, 1, 10, 1],
-            [20, "2", "B", 100, 11, 1, 10, 1],
-            [21, "2", "B", 100, 11, 1, 10, 1],
-            [22, "2", "B", 100, 11, 1, 10, 1],
-            [23, "2", "B", 100, 110, 1, 100, 1],
-            [24, "2", "B", 100, 11, 1, 10, np.nan],
+            [1, "A", "2", 100, 1, 1, 1, 1],
+            [2, "A", "2", 100, 11, 1, 10, 1],
+            [3, "A", "2", 100, 11, 1, 10, 1],
+            [4, "A", "2", 100, 11, 1, 10, 1],
+            [5, "A", "2", 100, 11, 1, 10, 1],
+            [6, "A", "2", 100, 11, 1, 10, 1],
+            [7, "A", "2", 100, 11, 1, 10, 1],
+            [8, "A", "2", 100, 11, 1, 10, 1],
+            [9, "A", "2", 100, 11, 1, 10, 1],
+            [10, "A", "2", 100, 11, 1, 10, 1],
+            [11, "A", "2", 100, 110, 1, 100, 1],
+            [12, "A", "2", 100, np.nan, 1, 10, 1],
+            [13, "B", "2", 100, 1, 1, 1, 1],
+            [14, "B", "2", 100, 11, 1, 10, 1],
+            [15, "B", "2", 100, 11, 1, 10, 1],
+            [16, "B", "2", 100, 11, 1, 10, 1],
+            [17, "B", "2", 100, 11, 1, 10, 1],
+            [18, "B", "2", 100, 11, 1, 10, 1],
+            [19, "B", "2", 100, 11, 1, 10, 1],
+            [20, "B", "2", 100, 11, 1, 10, 1],
+            [21, "B", "2", 100, 11, 1, 10, 1],
+            [22, "B", "2", 100, 11, 1, 10, 1],
+            [23, "B", "2", 100, 110, 1, 100, 1],
+            [24, "B", "2", 100, 11, 1, 10, np.nan],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -1011,23 +1011,24 @@ class TestRunImputation:
         # columns for the dataframe
         output_cols_f = [
             "reference",
-            "survey",  # object
-            "checkletter",
+            "200",  # object
+            "201",
             "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",  # object
+            "202012_var1",
+            "202012_var2",
+            "202009_var1",
+            "202009_var2",  # object
             "202012_class",
-            "forwards_imputed_201",
-            "forwards_imputed_202",  # object
+            "forwards_imputed_var1",
+            "forwards_imputed_var2",  # object
         ]
 
         # TODO check data types and update headers
         # when using real data
         # data in the column order above
         output_data_for = [
-            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 10.0, np.nan],
+            # [12, "2", "A", 100, np.nan, 1, 10, "1", "2A", 10.0, "NaN"],
+            [12, "A", "2", 100, np.nan, 1, 10, 1.0, "A2", 10.0, np.nan],
         ]  # (more than 10 rows per class)
 
         # TODO check data types and update headers
@@ -1035,33 +1036,46 @@ class TestRunImputation:
         # columns for the dataframe
         output_cols_b = [
             "reference",
-            "survey",  # object
-            "checkletter",
+            "200",  # object
+            "201",
             "employees",
-            "202012_201",
-            "202012_202",
-            "202009_201",
-            "202009_202",  # object
+            "202012_var1",
+            "202012_var2",
+            "202009_var1",
+            "202009_var2",  # object
             "202012_class",
-            "backwards_imputed_201",
-            "backwards_imputed_202",  # object
+            "backwards_imputed_var1",
+            "backwards_imputed_var2",  # object
         ]
 
         # TODO check data types and update headers
         # when using real data
         # data in the column order above
         output_data_back = [
-            [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1.0],
+            #  [24, "2", "B", 100, "11", 1, 10, np.nan, "2B", "NaN", 1.0],
+            [24, "B", "2", 100, 11.0, 1, 10, np.nan, "B2", np.nan, 1.0],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
         output_df_for = pandasDF(
             data=output_data_for, columns=output_cols_f, index=[11]
         )
+        output_df_for["201"] = output_df_for["201"].astype(object)
+        # output_df_for["202009_202"] = output_df_for["202009_202"].astype(object)
+        # output_df_for["forwards_imputed_202"] = output_df_for[
+        #     "forwards_imputed_202"
+        # ].astype(object)
 
         output_df_back = pandasDF(
             data=output_data_back, columns=output_cols_b, index=[23]
         )
+        # output_df_back["200"] = output_df_back["200"].astype(object)
+        # output_df_back["202012_201"] = output_df_back["202012_201"].astype(object)
+
+        # adding this as cant work out why nan != nan
+        # without fillna
+        # output_df_for = output_df_for.fillna("NaN")
+        # output_df_back = output_df_back.fillna("NaN")
 
         return output_df_for, output_df_back
 
@@ -1071,7 +1085,7 @@ class TestRunImputation:
         input_df = self.input_data_run_imputation()
         expout_df_for, expout_df_back = self.output_data_run_imputation()
 
-        target_variables_list = ["201", "202"]
+        target_variables_list = ["var1", "var2"]
         current_quarter = "current_quarter"
         previous_quarter = "previous_quarter"
         result_for, result_back = run_imputation(
