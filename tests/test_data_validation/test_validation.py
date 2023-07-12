@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+import toml
 
 from src.data_validation.validation import (
     validate_post_col,
@@ -12,15 +13,30 @@ from src.utils.helpers import Config_settings
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 
+# Create a dummy dictionary and pandas dataframe
+dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
+dummy_df = pd.DataFrame(data=dummy_dict)
+
+
+@pytest.fixture
+def test_data_dict():
+    return {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
+
+
+def write_dict_to_toml(tmp_path, test_data_dict):
+    # Write test data dict to toml
+    file_path = tmp_path / "test.toml"
+    with open(file_path, "w") as tom:
+        toml.dump(test_data_dict, tom)
+    return file_path
+
 
 @pytest.fixture  # noqa
-def test_data():
+def test_data_df(test_data_dict):
     """'NP10 8XG', 'SW1P 4DF' are valid and real postcodes.
     'HIJ 789' is neither valid nor real
     and 'KL1M 2NO' is a valid pattern but not real"""
-    return pd.DataFrame(
-        {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
-    )
+    return pd.DataFrame(test_data_dict)
 
 
 # Mock the get_masterlist function
@@ -30,7 +46,7 @@ def mock_get_masterlist(postcode_masterlist):
 
 
 # Test case for validate_post_col
-def test_validate_post_col(test_data, monkeypatch, caplog):
+def test_validate_post_col(test_data_df, monkeypatch, caplog):
     # Monkeypatch the get_masterlist function to use the mock implementation
     monkeypatch.setattr(
         "src.data_validation.validation.get_masterlist", mock_get_masterlist
@@ -41,7 +57,7 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
 
     # Call the function under test
     with pytest.raises(ValueError):
-        validate_post_col(test_data, fake_path)
+        validate_post_col(test_data_df, fake_path)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
@@ -66,20 +82,22 @@ def test_validate_post_col(test_data, monkeypatch, caplog):
 
     # Mixed valid and invalid postcodes - as is in the test_data
     with pytest.raises(ValueError) as error:
-        validate_post_col(test_data, fake_path)
+        validate_post_col(test_data_df, fake_path)
     if config["global"]["postcode_csv_check"]:
         assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
     else:
         assert str(error.value) == "Invalid postcodes found: ['HIJ 789']"
 
     # Edge cases: invalid column names
-    df_invalid_column_name = test_data.rename(columns={"referencepostcode": "postcode"})
+    df_invalid_column_name = test_data_df.rename(
+        columns={"referencepostcode": "postcode"}
+    )
     with pytest.raises(KeyError) as error:
         validate_post_col(df_invalid_column_name, fake_path)
     assert str(error.value) == "'referencepostcode'"  # Invalid column name
 
     # Edge cases: missing column
-    df_missing_column = test_data.drop("referencepostcode", axis=1)
+    df_missing_column = test_data_df.drop("referencepostcode", axis=1)
     df_missing_column["anothercolumn"] = ["val1", "val2", "val3", "val4"]
     with pytest.raises(KeyError) as error:
         validate_post_col(df_missing_column, fake_path)
@@ -118,7 +136,7 @@ def test_validate_postcode():
     assert validate_postcode_pattern("123 456") is False  # All numbers but right length
 
 
-def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
+def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     # Monkeypatch the get_masterlist function to use the mock implementation
     monkeypatch.setattr(
@@ -129,7 +147,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
     unreal_postcodes = unreal_postcodes.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
@@ -146,7 +164,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data, monkeypatch):
     )  # Assert that the unreal postcodes match the expected ones
 
 
-def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
+def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Monkeypatch the get_masterlist function to use the mock implementation
     monkeypatch.setattr(
         "src.data_validation.validation.get_masterlist", mock_get_masterlist
@@ -156,7 +174,7 @@ def test_check_pcs_real_with_valid_postcodes(test_data, monkeypatch):
     postcode_masterlist = "path/to/masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False

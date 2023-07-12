@@ -24,6 +24,26 @@ def filter_by_column_content(
     return clean_df
 
 
+def rename_imp_col(clean_df: pd.DataFrame):
+    """
+    This function renames columns in dataframe, replacing civ_or_def with 200
+    and Product_group with 201 if they are present.
+
+    Args:
+        clean_df (pd.DataFrame): Input Dataframe to rename columns.
+
+    Returns:
+        pd.Dataframe: returns dataframe with renamed columns.
+    """
+    if "civ_or_def" in clean_df.columns:
+        clean_df = clean_df.rename(columns={"civ_or_def": "200"})
+
+    if "Product_group" in clean_df.columns:
+        clean_df = clean_df.rename(columns={"Product_group": "201"})
+
+    return clean_df
+
+
 def create_imp_class_col(
     clean_df: pd.DataFrame, col_first_half: str, col_second_half: str, class_name: str
 ) -> pd.DataFrame:
@@ -37,7 +57,7 @@ def create_imp_class_col(
     """
 
     # TODO remove when using real data
-    clean_df[f"{col_first_half}"] = clean_df[f"{col_first_half}"].astype(str)
+    clean_df[f"{col_second_half}"] = clean_df[f"{col_second_half}"].astype(str)
 
     # Create class col with concatenation
     clean_df[f"{class_name}"] = (
@@ -51,7 +71,6 @@ def filter_same_class(
     clean_df: pd.DataFrame, current_period: str, previous_period: str
 ) -> pd.DataFrame:
     """_summary_
-
     Args:
         clean_df (_type_): _description_
 
@@ -142,8 +161,8 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
         #     "ru_ref",
         # ],
         by=[
-            "survey",
-            "checkletter",
+            "200",
+            "201",
             f"{target_variable}_growth_ratio",
             "employees",
             "reference",
@@ -408,7 +427,7 @@ def backwards_imputation(
 def run_imputation(
     # full_responses: pd.DataFrame,  # df = full_responses.copy()
     # column: str,
-    df,
+    test_df,
     target_variables_list: list,
     current_period: str,
     previous_period: str,
@@ -422,10 +441,16 @@ def run_imputation(
         _type_: _description_
     """
 
-    # TODO CANT FIND REAL COLS YET SO CHOOSING RANDOM
-    clean_df = create_imp_class_col(
-        df, "survey", "checkletter", f"{current_period}_class"
-    )
+    current_period = "202012"
+    previous_period = "202009"
+    target_variables_list = ["var1", "var2"]
+
+    # replacing civ_or_def with 200 and Product_group with 201
+    test_df = rename_imp_col(test_df)
+
+    # q200 is Business or business R&D type
+    # q201 is Product Group
+    clean_df = create_imp_class_col(test_df, "200", "201", f"{current_period}_class")
     clean_df.reset_index(drop=True, inplace=True)
 
     forward_df = forward_imputation(
