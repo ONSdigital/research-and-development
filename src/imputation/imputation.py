@@ -41,7 +41,7 @@ def create_imp_class_col(
 
     # Create class col with concatenation
     clean_df[f"{class_name}"] = (
-        clean_df[f"{col_first_half}"] + clean_df[f"{col_second_half}"]
+        clean_df[f"{col_first_half}"] + "_" + clean_df[f"{col_second_half}"]
     )
 
     return clean_df
@@ -337,7 +337,8 @@ def forward_imputation(
                 f"{class_name}_{var}_mean_growth_ratio and count"
             ][0] 
             df_other[f"forwards_imputed_{var}"] = round(
-                df_other[f"{class_name}_{var}_growth_ratio"]* df_other[f"{previous_period}_{var}"]
+                df_other[f"{class_name}_{var}_growth_ratio"]
+                * df_other[f"{previous_period}_{var}"]
             ).astype("Int64")
 
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])

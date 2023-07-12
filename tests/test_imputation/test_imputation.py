@@ -69,13 +69,10 @@ class TestCreateClassCol:
     def input_data_create_imp_class_col(self):
         """Create input data for the create_imp_class_col function"""
 
-        # columns for the dataframe
-        input_cols = ["col1", "col2"]
+        input_cols = ["200", "201"]
 
-        # data in the column order above
-        input_data = [["contents_1", "contents_2"]]
+        input_data = [["C", "AG"]]
 
-        # Create a pandas dataframe
         input_df = pandasDF(data=input_data, columns=input_cols)
 
         return input_df
@@ -83,13 +80,10 @@ class TestCreateClassCol:
     def output_data_create_imp_class_col(self):
         """Create output data for the create_imp_class_col function"""
 
-        # columns for the dataframe
-        output_cols = ["col1", "col2", "class"]
+        output_cols = ["200", "201", "class"]
 
-        # data in the column order above
-        output_data = [["contents_1", "contents_2", "contents_1contents_2"]]
+        output_data = [["C", "AG", "C_AG"]]
 
-        # Create a pandas dataframe
         df_expout = pandasDF(data=output_data, columns=output_cols)
 
         return df_expout
@@ -100,8 +94,8 @@ class TestCreateClassCol:
         df_input = self.input_data_create_imp_class_col()
         df_expout = self.output_data_create_imp_class_col()
 
-        col_first_half = "col1"
-        col_second_half = "col2"
+        col_first_half = "200"
+        col_second_half = "201"
         class_name = "class"
 
         df_result = create_imp_class_col(
@@ -970,29 +964,29 @@ class TestRunImputation:
 
         # data in the column order above
         input_data = [
-            [1, "2", "A", 100, 1, 1, 1, 1],
-            [2, "2", "A", 100, 11, 1, 10, 1],
-            [3, "2", "A", 100, 11, 1, 10, 1],
-            [4, "2", "A", 100, 11, 1, 10, 1],
-            [5, "2", "A", 100, 11, 1, 10, 1],
-            [6, "2", "A", 100, 11, 1, 10, 1],
-            [7, "2", "A", 100, 11, 1, 10, 1],
-            [8, "2", "A", 100, 11, 1, 10, 1],
-            [9, "2", "A", 100, 11, 1, 10, 1],
-            [10, "2", "A", 100, 11, 1, 10, 1],
-            [11, "2", "A", 100, 110, 1, 100, 1],
-            [12, "2", "A", 100, np.nan, 1, 10, 1],
-            [13, "2", "B", 100, 1, 1, 1, 1],
-            [14, "2", "B", 100, 11, 1, 10, 1],
-            [15, "2", "B", 100, 11, 1, 10, 1],
-            [16, "2", "B", 100, 11, 1, 10, 1],
-            [17, "2", "B", 100, 11, 1, 10, 1],
-            [18, "2", "B", 100, 11, 1, 10, 1],
-            [19, "2", "B", 100, 11, 1, 10, 1],
-            [20, "2", "B", 100, 11, 1, 10, 1],
-            [21, "2", "B", 100, 11, 1, 10, 1],
-            [22, "2", "B", 100, 11, 1, 10, 1],
-            [23, "2", "B", 100, 110, 1, 100, 1],
+            [1, "2", "A", 100, 1, 1, 1, 3],
+            [2, "2", "A", 100, 11, 1, 10, 3],
+            [3, "2", "A", 100, 11, 1, 10, 3],
+            [4, "2", "A", 100, 11, 1, 10, 3],
+            [5, "2", "A", 100, 11, 1, 10, 3],
+            [6, "2", "A", 100, 11, 1, 10, 3],
+            [7, "2", "A", 100, 11, 1, 10, 3],
+            [8, "2", "A", 100, 11, 1, 10, 3],
+            [9, "2", "A", 100, 11, 1, 10, 3],
+            [10, "2", "A", 100, 11, 1, 10, 3],
+            [11, "2", "A", 100, 110, 1, 100, 3],
+            [12, "2", "A", 100, np.nan, 1, 10, 3],
+            [13, "2", "B", 100, 1, 1, 1, 3],
+            [14, "2", "B", 100, 11, 1, 10, 3],
+            [15, "2", "B", 100, 11, 1, 10, 3],
+            [16, "2", "B", 100, 11, 1, 10, 3],
+            [17, "2", "B", 100, 11, 1, 10, 3],
+            [18, "2", "B", 100, 11, 1, 10, 3],
+            [19, "2", "B", 100, 11, 1, 10, 3],
+            [20, "2", "B", 100, 11, 1, 10, 3],
+            [21, "2", "B", 100, 11, 1, 10, 3],
+            [22, "2", "B", 100, 11, 1, 10, 3],
+            [23, "2", "B", 100, 110, 1, 100, 3],
             [24, "2", "B", 100, 11, 1, 10, np.nan],
         ]  # (more than 10 rows per class)
 
@@ -1019,7 +1013,7 @@ class TestRunImputation:
         }
 
         output_data_for = [
-            [12, "2", "A", 100, np.nan, 1, 10, 1.0, "2A", 11, np.nan],
+            [12, "2", "A", 100, np.nan, 1, 10, 3, "2_A", 11, np.nan],
         ]  # (more than 10 rows per class)
 
         output_df_for = pandasDF(
@@ -1048,7 +1042,7 @@ class TestRunImputation:
         # when using real data
         # data in the column order above
         output_data_back = [
-            [24, "2", "B", 100, 11.0, 1, 10, np.nan, "2B", np.nan, 1],
+            [24, "2", "B", 100, 11, 1, 10, np.nan, "2_B", np.nan, 3],
         ]  # (more than 10 rows per class)
 
 
