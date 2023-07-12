@@ -11,7 +11,7 @@ from src.imputation.imputation import (
     trim_bounds,
     trim_check,
     calc_growth_ratio,
-    sort,
+    sort_df,
     filter_by_column_content,
     create_imp_class_col,
     filter_same_class,
@@ -59,7 +59,7 @@ class TestCleanData:  # usetag
         column_content = "clean"
         df_result = filter_by_column_content(
             df_input, column, column_content
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -69,13 +69,10 @@ class TestCreateClassCol:
     def input_data_create_imp_class_col(self):
         """Create input data for the create_imp_class_col function"""
 
-        # columns for the dataframe
-        input_cols = ["col1", "col2"]
+        input_cols = ["200", "201"]
 
-        # data in the column order above
-        input_data = [["contents_1", "contents_2"]]
+        input_data = [["C", "AG"]]
 
-        # Create a pandas dataframe
         input_df = pandasDF(data=input_data, columns=input_cols)
 
         return input_df
@@ -83,13 +80,10 @@ class TestCreateClassCol:
     def output_data_create_imp_class_col(self):
         """Create output data for the create_imp_class_col function"""
 
-        # columns for the dataframe
-        output_cols = ["col1", "col2", "class"]
+        output_cols = ["200", "201", "class"]
 
-        # data in the column order above
-        output_data = [["contents_1", "contents_2", "contents_1contents_2"]]
+        output_data = [["C", "AG", "C_AG"]]
 
-        # Create a pandas dataframe
         df_expout = pandasDF(data=output_data, columns=output_cols)
 
         return df_expout
@@ -100,13 +94,13 @@ class TestCreateClassCol:
         df_input = self.input_data_create_imp_class_col()
         df_expout = self.output_data_create_imp_class_col()
 
-        col_first_half = "col1"
-        col_second_half = "col2"
+        col_first_half = "200"
+        col_second_half = "201"
         class_name = "class"
 
         df_result = create_imp_class_col(
             df_input, col_first_half, col_second_half, class_name
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -151,10 +145,10 @@ class TestFilterSameClass:
         df_input = self.input_data_filter_same_class()
         df_expout = self.output_data_filter_same_class()
 
-        current_quarter = "190012"
-        previous_quarter = "190009"
+        current_period = "190012"
+        previous_period = "190009"
 
-        df_result = filter_same_class(df_input, current_quarter, previous_quarter)
+        df_result = filter_same_class(df_input, current_period, previous_period)
         assert_frame_equal(df_result, df_expout)
 
 
@@ -200,12 +194,12 @@ class TestFilterPairs:
         df_expout = self.output_data_filter_pairs()
 
         target_variable = "target"
-        current_quarter = "190012"
-        previous_quarter = "190009"
+        current_period = "190012"
+        previous_period = "190009"
 
         df_result = filter_pairs(
-            df_input, target_variable, current_quarter, previous_quarter
-        )  # add quarter filter functionality
+            df_input, target_variable, current_period, previous_period
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
@@ -254,20 +248,20 @@ class TestCalcGrowthRatio:
         target_variable = "var1"
         input_df = self.input_data_calc_growth_ratio()
         df_expout = self.output_data_calc_growth_ratio()
-        current_quarter = "current"
-        previous_quarter = "previous"
+        current_period = "current"
+        previous_period = "previous"
 
         df_result = calc_growth_ratio(
-            target_variable, input_df, current_quarter, previous_quarter
-        )  # add quarter filter functionality
+            target_variable, input_df, current_period, previous_period
+        )  # add period filter functionality
         assert_frame_equal(df_result, df_expout)
 
 
-class TestSort:
-    """Unit test for sort"""
+class TestSortDf:
+    """Unit test for sort_df"""
 
-    def input_data_sort(self):
-        """Create input data for the sort function"""
+    def input_data_sort_df(self):
+        """Create input data for the sort_df function"""
 
         # columns for the dataframe
         input_cols = [
@@ -293,8 +287,8 @@ class TestSort:
 
         return input_df
 
-    def output_data_sort(self):
-        """Create output data for the sort function"""
+    def output_data_sort_df(self):
+        """Create output data for the sort_df function"""
 
         # columns for the dataframe
         output_cols = [
@@ -320,14 +314,14 @@ class TestSort:
 
         return df_expout
 
-    def test_sort(self):
+    def test_sort_df(self):
         """Test the expected functionality"""
 
-        df_input = self.input_data_sort()
-        df_expout = self.output_data_sort()
+        df_input = self.input_data_sort_df()
+        df_expout = self.output_data_sort_df()
         target_variable = "var1"
 
-        df_result = sort(target_variable, df_input)
+        df_result = sort_df(target_variable, df_input)
         assert_frame_equal(df_result, df_expout)
 
 
@@ -553,7 +547,7 @@ class TestTrimBounds:
         input_df = self.input_data_trim_bounds()
         expout_df = self.output_data_trim_bounds()
 
-        df_result = trim_bounds(input_df)  # add quarter filter functionality
+        df_result = trim_bounds(input_df)  # add period filter functionality
         assert_frame_equal(df_result, expout_df)
 
 
@@ -597,7 +591,7 @@ class TestGetMeanGrowthRatio:
 
         result_dict = get_mean_growth_ratio(
             input_df, {}, "class1", "var1"
-        )  # add quarter filter functionality
+        )  # add period filter functionality
         assert result_dict == expout_dict
         # assert_frame_equal(results_df, expout_df)
 
@@ -631,13 +625,13 @@ class TestLoopUnique:  # testing for loops run as expected
 
         # columns for the dataframe
         input_cols = [
-            "current_quarter_class",
+            "current_period_class",
             "200",
             "201",
-            "current_quarter_var1",
-            "current_quarter_var2",
-            "previous_quarter_var1",
-            "previous_quarter_var2",
+            "current_period_var1",
+            "current_period_var2",
+            "previous_period_var1",
+            "previous_period_var2",
             "employees",
             "reference",
             "trim",
@@ -645,28 +639,28 @@ class TestLoopUnique:  # testing for loops run as expected
 
         # data in the column order above
         input_data = [
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class1", 1, 1, 2, 4, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
@@ -694,17 +688,17 @@ class TestLoopUnique:  # testing for loops run as expected
         expout_dict = self.output_data_loop_unique()
         # expout_df = self.output_data_loop_unique_df()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1", "var2"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         result_dict = loop_unique(
             input_df,  # removed , result_df
             column,
             target_variables_list,
-            current_quarter,
-            previous_quarter,
+            current_period,
+            previous_period,
         )
         assert result_dict == expout_dict
         # assert_frame_equal(result_df, expout_df)
@@ -715,16 +709,16 @@ class TestLoopUnique:  # testing for loops run as expected
         """Create output data for the loop_unique function"""
 
         # columns for the dataframe
-        output_cols = ["current_quarter_class","product_group",
+        output_cols = ["current_period_class","product_group",
     "civ_or_def",
-    "current_quarter_var1",
-    "current_quarter_var2",
-    "previous_quarter_var1",
-    "previous_quarter_var2",
+    "current_period_var1",
+    "current_period_var2",
+    "previous_period_var1",
+    "previous_period_var2",
     "employee_count",
     "ru_ref",
-    "current_quarter_var1_mean_growth_ratio",
-    "current_quarter_var2_mean_growth_ratio", "trim"]
+    "current_period_var1_mean_growth_ratio",
+    "current_period_var2_mean_growth_ratio", "trim"]
 
         # data in the column order above
         output_data = [["class1", 1, 1, 1, 2, 0.5, 0.5, 1, 1, 2.0, 4.0, 'dont trim'],
@@ -763,75 +757,71 @@ class TestForwardImputation:
     def input_data_forward_imputation(self):
         """Create input data for the forward_imputation function"""
 
-        # columns for the dataframe
-        input_cols = [
-            "current_quarter_class",
-            "200",
-            "201",
-            "current_quarter_var1",
-            "previous_quarter_var1",
-            "employees",
-            "reference",
-            "trim",
-        ]
+        input_cols = {
+            "current_period_class" : "str",
+            "200" : "str",
+            "201" : "str",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str"
+        }
 
-        # data in the column order above
         input_data = [
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", np.nan, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", np.nan, 1, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
-
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols) 
+        
         return input_df
 
     def output_data_forward_imputation(self):
         """Create output data for the forward_imputation function"""
 
-        # columns for the dataframe
-        output_cols = [
-            "current_quarter_class",
-            "200",
-            "201",
-            "current_quarter_var1",
-            "previous_quarter_var1",
-            "employees",
-            "reference",
-            "trim",
-            "forwards_imputed_var1",
-        ]
+        output_cols = {
+            "current_period_class" : "str",
+            "200" : "str",
+            "201" : "str",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str",
+            "forwards_imputed_var1" : "Int64"
+        }
 
-        # data in the column order above
         output_data = [
-            ["class1", 1, 1, np.nan, 1, 1, 1, "dont trim", 4],
-            ["class2", 1, 1, np.nan, 1, 1, 1, "dont trim", 6],
+            ["class1", "C", "G", np.nan, 1, 1, 1, "dont trim", 4],
+            ["class2", "D", "G", np.nan, 1, 1, 1, "dont trim", 6],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        output_df = pandasDF(data=output_data, columns=output_cols, index=[11, 23])
+        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = output_df.astype(output_cols)
 
         return output_df
 
@@ -841,13 +831,13 @@ class TestForwardImputation:
         input_df = self.input_data_forward_imputation()
         expout_dict = self.output_data_forward_imputation()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         df_result = forward_imputation(
-            input_df, column, target_variables_list, current_quarter, previous_quarter
+            input_df, column, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(df_result, expout_dict)
@@ -860,74 +850,76 @@ class TestBackwardsImputation:
         """Create input data for the backwards_imputation function"""
 
         # columns for the dataframe
-        input_cols = [
-            "current_quarter_class",
-            "200",
-            "201",
-            "current_quarter_var1",
-            "previous_quarter_var1",
-            "employees",
-            "reference",
-            "trim",
-        ]
+        input_cols = {
+            "current_period_class" : "str",
+            "200" : "str",
+            "201" : "str",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str"
+        }
 
         # data in the column order above
         input_data = [
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, 1, 1, 1, "dont trim"],
-            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, 1, 1, 1, "dont trim"],
-            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, 1, 1, 1, "dont trim"],
+            ["class1", "C", "G", 4, np.nan, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, 1, 1, 1, "dont trim"],
+            ["class2", "D", "G", 6, np.nan, 1, 1, "dont trim"],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
-
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols)
+        
         return input_df
 
     def output_data_backwards_imputation(self):
         """Create output data for the backwards_imputation function"""
 
         # columns for the dataframe
-        output_cols = [
-            "current_quarter_class",
-            "200",
-            "201",
-            "current_quarter_var1",
-            "previous_quarter_var1",
-            "employees",
-            "reference",
-            "trim",
-            "backwards_imputed_var1",
-        ]
+        output_cols = {
+            "current_period_class" : "str",
+            "200" : "str",
+            "201" : "str",
+            "current_period_var1" :  "Int64",
+            "previous_period_var1" : "Int64",
+            "employees" : "Int64",
+            "reference" : "Int64",
+            "trim" : "str",
+            "backwards_imputed_var1" : "Int64"
+        }
 
         # data in the column order above
         output_data = [
-            ["class1", 1, 1, 4, np.nan, 1, 1, "dont trim", 1.0],
-            ["class2", 1, 1, 6, np.nan, 1, 1, "dont trim", 1.0],
+            ["class1", "C", "G",4, np.nan, 1, 1, "dont trim", 1],
+            ["class2", "D", "G", 6, np.nan, 1, 1, "dont trim", 1],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        output_df = pandasDF(data=output_data, columns=output_cols, index=[11, 23])
+        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = output_df.astype(output_cols)
 
         return output_df
 
@@ -937,13 +929,13 @@ class TestBackwardsImputation:
         input_df = self.input_data_backwards_imputation()
         expout_df = self.output_data_backwards_imputation()
 
-        column = "current_quarter_class"
+        column = "current_period_class"
         target_variables_list = ["var1"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "current_period"
+        previous_period = "previous_period"
 
         df_result = backwards_imputation(
-            input_df, column, target_variables_list, current_quarter, previous_quarter
+            input_df, column, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(df_result, expout_df)
@@ -959,123 +951,104 @@ class TestRunImputation:
         # function until ingest is firmed down
 
         # columns for the dataframe
-        input_cols = [
-            "reference",
-            "civ_or_def",
-            "Product_group",
-            "employees",
-            "202012_var1",
-            "202012_var2",
-            "202009_var1",
-            "202009_var2",
-        ]
+        input_cols = {
+            "reference" : "Int64",
+            "civ_or_def" : "str",
+            "Product_group" : "str",
+            "employees" : "Int64",
+            "202012_var1" : "Int64",
+            "202012_var2" : "Int64",
+            "202009_var1" : "Int64",
+            "202009_var2" : "Int64",
+        }
 
         # data in the column order above
         input_data = [
-            [1, "A", "2", 100, 1, 1, 1, 1],
-            [2, "A", "2", 100, 11, 1, 10, 1],
-            [3, "A", "2", 100, 11, 1, 10, 1],
-            [4, "A", "2", 100, 11, 1, 10, 1],
-            [5, "A", "2", 100, 11, 1, 10, 1],
-            [6, "A", "2", 100, 11, 1, 10, 1],
-            [7, "A", "2", 100, 11, 1, 10, 1],
-            [8, "A", "2", 100, 11, 1, 10, 1],
-            [9, "A", "2", 100, 11, 1, 10, 1],
-            [10, "A", "2", 100, 11, 1, 10, 1],
-            [11, "A", "2", 100, 110, 1, 100, 1],
-            [12, "A", "2", 100, np.nan, 1, 10, 1],
-            [13, "B", "2", 100, 1, 1, 1, 1],
-            [14, "B", "2", 100, 11, 1, 10, 1],
-            [15, "B", "2", 100, 11, 1, 10, 1],
-            [16, "B", "2", 100, 11, 1, 10, 1],
-            [17, "B", "2", 100, 11, 1, 10, 1],
-            [18, "B", "2", 100, 11, 1, 10, 1],
-            [19, "B", "2", 100, 11, 1, 10, 1],
-            [20, "B", "2", 100, 11, 1, 10, 1],
-            [21, "B", "2", 100, 11, 1, 10, 1],
-            [22, "B", "2", 100, 11, 1, 10, 1],
-            [23, "B", "2", 100, 110, 1, 100, 1],
-            [24, "B", "2", 100, 11, 1, 10, np.nan],
+            [1, "2", "A", 100, 1, 1, 1, 3],
+            [2, "2", "A", 100, 11, 1, 10, 3],
+            [3, "2", "A", 100, 11, 1, 10, 3],
+            [4, "2", "A", 100, 11, 1, 10, 3],
+            [5, "2", "A", 100, 11, 1, 10, 3],
+            [6, "2", "A", 100, 11, 1, 10, 3],
+            [7, "2", "A", 100, 11, 1, 10, 3],
+            [8, "2", "A", 100, 11, 1, 10, 3],
+            [9, "2", "A", 100, 11, 1, 10, 3],
+            [10, "2", "A", 100, 11, 1, 10, 3],
+            [11, "2", "A", 100, 110, 1, 100, 3],
+            [12, "2", "A", 100, np.nan, 1, 10, 3],
+            [13, "2", "B", 100, 1, 1, 1, 3],
+            [14, "2", "B", 100, 11, 1, 10, 3],
+            [15, "2", "B", 100, 11, 1, 10, 3],
+            [16, "2", "B", 100, 11, 1, 10, 3],
+            [17, "2", "B", 100, 11, 1, 10, 3],
+            [18, "2", "B", 100, 11, 1, 10, 3],
+            [19, "2", "B", 100, 11, 1, 10, 3],
+            [20, "2", "B", 100, 11, 1, 10, 3],
+            [21, "2", "B", 100, 11, 1, 10, 3],
+            [22, "2", "B", 100, 11, 1, 10, 3],
+            [23, "2", "B", 100, 110, 1, 100, 3],
+            [24, "2", "B", 100, 11, 1, 10, np.nan],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        input_df = pandasDF(data=input_data, columns=input_cols)
+        input_df = pandasDF(data=input_data, columns=input_cols.keys())
+        input_df = input_df.astype(input_cols)
 
         return input_df
 
     def output_data_run_imputation(self):
         """Create output data for the run_imputation function"""
+        output_cols_f = {
+            "reference" : "Int64",
+            "200" : "str",
+            "201" : "str",
+            "employees" : "Int64",
+            "202012_var1" : "Int64",
+            "202012_var2" : "Int64",
+            "202009_var1" : "Int64",
+            "202009_var2" : "Int64",
+            "202012_class" : "str",
+            "forwards_imputed_var1" : "Int64",
+            "forwards_imputed_var2" : "Int64",
+        }
 
-        # TODO check data types and update headers
-        # when using real data
-        # columns for the dataframe
-        output_cols_f = [
-            "reference",
-            "200",  # object
-            "201",
-            "employees",
-            "202012_var1",
-            "202012_var2",
-            "202009_var1",
-            "202009_var2",  # object
-            "202012_class",
-            "forwards_imputed_var1",
-            "forwards_imputed_var2",  # object
-        ]
-
-        # TODO check data types and update headers
-        # when using real data
-        # data in the column order above
         output_data_for = [
-            # [12, "2", "A", 100, np.nan, 1, 10, "1", "2A", 10.0, "NaN"],
-            [12, "A", "2", 100, np.nan, 1, 10, 1.0, "A2", 10.0, np.nan],
+            [12, "2", "A", 100, np.nan, 1, 10, 3, "2_A", 11, np.nan],
         ]  # (more than 10 rows per class)
 
+        output_df_for = pandasDF(
+            data=output_data_for, columns=output_cols_f.keys(), index=[11]
+        ).astype(output_cols_f)
+
+
         # TODO check data types and update headers
         # when using real data
         # columns for the dataframe
-        output_cols_b = [
-            "reference",
-            "200",  # object
-            "201",
-            "employees",
-            "202012_var1",
-            "202012_var2",
-            "202009_var1",
-            "202009_var2",  # object
-            "202012_class",
-            "backwards_imputed_var1",
-            "backwards_imputed_var2",  # object
-        ]
+        output_cols_b = {
+            "reference" : "Int64",
+            "200" : "str",
+            "201" : "str",
+            "employees" : "Int64",
+            "202012_var1" : "Int64",
+            "202012_var2" : "Int64",
+            "202009_var1" : "Int64",
+            "202009_var2" : "Int64",
+            "202012_class" : "str",
+            "backwards_imputed_var1" : "Int64",
+            "backwards_imputed_var2" : "Int64",
+        }
 
         # TODO check data types and update headers
         # when using real data
         # data in the column order above
         output_data_back = [
-            #  [24, "2", "B", 100, "11", 1, 10, np.nan, "2B", "NaN", 1.0],
-            [24, "B", "2", 100, 11.0, 1, 10, np.nan, "B2", np.nan, 1.0],
+            [24, "2", "B", 100, 11, 1, 10, np.nan, "2_B", np.nan, 3],
         ]  # (more than 10 rows per class)
 
-        # Create a pandas dataframe
-        output_df_for = pandasDF(
-            data=output_data_for, columns=output_cols_f, index=[11]
-        )
-        output_df_for["201"] = output_df_for["201"].astype(object)
-        # output_df_for["202009_202"] = output_df_for["202009_202"].astype(object)
-        # output_df_for["forwards_imputed_202"] = output_df_for[
-        #     "forwards_imputed_202"
-        # ].astype(object)
 
         output_df_back = pandasDF(
-            data=output_data_back, columns=output_cols_b, index=[23]
-        )
-        # output_df_back["200"] = output_df_back["200"].astype(object)
-        # output_df_back["202012_201"] = output_df_back["202012_201"].astype(object)
-
-        # adding this as cant work out why nan != nan
-        # without fillna
-        # output_df_for = output_df_for.fillna("NaN")
-        # output_df_back = output_df_back.fillna("NaN")
+            data=output_data_back, columns=output_cols_b.keys(), index=[23]
+        ).astype(output_cols_b)
 
         return output_df_for, output_df_back
 
@@ -1086,10 +1059,10 @@ class TestRunImputation:
         expout_df_for, expout_df_back = self.output_data_run_imputation()
 
         target_variables_list = ["var1", "var2"]
-        current_quarter = "current_quarter"
-        previous_quarter = "previous_quarter"
+        current_period = "202012"
+        previous_period = "202009"
         result_for, result_back = run_imputation(
-            input_df, target_variables_list, current_quarter, previous_quarter
+            input_df, target_variables_list, current_period, previous_period
         )
 
         assert_frame_equal(result_for, expout_df_for)
