@@ -132,6 +132,13 @@ key_cols = [
     506,
 ]
 
+# # Identify long and short form formats for filtering and filter
+pre_shortform_df = pre_responsedf.loc[~pre_responsedf[705].isnull()]
+cur_shortform_df = cur_responsedf.loc[~cur_responsedf[705].isnull()]
+
+pre_responsedf = pre_responsedf.loc[pre_responsedf[705].isnull()]
+cur_responsedf = cur_responsedf.loc[cur_responsedf[705].isnull()]
+
 pre_cleandf = pre_responsedf.loc[:, pre_responsedf.columns.intersection(key_cols)]
 cur_cleandf = cur_responsedf.loc[:, cur_responsedf.columns.intersection(key_cols)]
 
@@ -152,19 +159,28 @@ dtypes2 = {
     505: "float",
     506: "float",
 }
-pre_cleandf[200] = pre_cleandf[200].astype("str")
+
+# 200 cleaning
 pre_cleandf[200] = pre_cleandf[200].apply(
     lambda v: str(v) if str(v) != "nan" else np.nan
 )
+pre_cleandf[200] = pre_cleandf[200].replace({"0": np.nan, "0.0": np.nan})
+pre_cleandf[200] = pre_cleandf[200].astype("category")
+
+# Casting datatypes
 pre_cleandf[list(datatypes.keys())] = (
     pre_cleandf[datatypes.keys()].astype(float).astype(datatypes)
 )
 pre_cleandf[list(dtypes2.keys())] = pre_cleandf[dtypes2.keys()].astype(dtypes2)
 
-cur_cleandf[200] = cur_cleandf[200].astype("str")
+# 200 cleaning
 cur_cleandf[200] = cur_cleandf[200].apply(
     lambda v: str(v) if str(v) != "nan" else np.nan
 )
+cur_cleandf[200] = cur_cleandf[200].replace({"0": np.nan, "0.0": np.nan})
+cur_cleandf[200] = cur_cleandf[200].astype("category")
+
+# Casting datatypes
 cur_cleandf[list(datatypes.keys())] = (
     cur_cleandf[datatypes.keys()].astype(float).astype(datatypes)
 )
@@ -178,13 +194,14 @@ map_dict = {i: j for i, j in map_dict.items()}
 pre_cleandf[201] = pd.to_numeric(pre_cleandf[201], errors="coerce")
 cur_cleandf[201] = pd.to_numeric(cur_cleandf[201], errors="coerce")
 
-pre_cleandf[201].replace(0, float("NaN"))
-cur_cleandf[201].replace(0, float("NaN"))
+pre_cleandf[201] = pre_cleandf[201].replace({0: np.nan})
+cur_cleandf[201] = cur_cleandf[201].replace({0: np.nan})
 
 pre_cleandf.replace({201: map_dict}, inplace=True)
 cur_cleandf.replace({201: map_dict}, inplace=True)
 
-# Identify long and short form formats for filtering
+pre_cleandf[201] = pre_cleandf[201].astype("category")
+cur_cleandf[201] = cur_cleandf[201].astype("category")
 
 
 # Remove rows of data for imputation
