@@ -65,14 +65,14 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
     contributors_dropped = contributors.drop(drop_cols, axis=1)
     responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
 
-    merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols)
+    merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols, how="outer")
     # Create contextual df by dropping "questioncode" and "response" cols. Remove dupes
     contextual_df = create_contextual_dataframe(merged_df, unique_id_cols)
 
     # Create a response dataframe using pivot_table to reshape the data
     response_df = create_response_dataframe(merged_df, unique_id_cols)
 
-    full_responses = response_df.merge(contextual_df, on=unique_id_cols)
+    full_responses = response_df.merge(contextual_df, on=unique_id_cols, how="outer")
 
     return full_responses
 
