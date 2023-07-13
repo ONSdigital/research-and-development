@@ -113,6 +113,36 @@ def filter_pairs(
     return matched_pairs_df
 
 
+def flag_nulls_and_zeros(
+    target_variables_list: list,
+    df: pd.DataFrame,
+    curr_q: str,
+    prev_q: str,
+):
+    """Flag target variables containing nulls or zreos.
+
+    A new column {var}_valid is created for each var in the target variables.
+    This is flagged with 1 if either the current period or previous period
+    contains either a null or a zero. Otherwise, the flag is 0.
+
+    Args:
+        target_variables (list of str): the target variables
+        df (pd.DataFrame): dataframe with current and previous periods
+        curr_q (str): the current period
+        prev_q (str): the previous period
+
+    Returns:
+        pd.DataFrame - a dataframe indicating nulls and zeros in target cols.
+    """
+    df = df.copy()
+    for var in target_variables_list:
+        cond1 = (df[f"{curr_q}_{var}"].isnull()) | (df[f"{prev_q}_{var}"].isnull())
+        cond2 = (df[f"{curr_q}_{var}"] == 0) | (df[f"{prev_q}_{var}"] == 0)
+        df[f"{var}_valid"] = np.where(cond1 | cond2, False, True)
+
+    return df
+
+
 def calc_growth_ratio(
     target_variable: str,
     df: pd.DataFrame,
@@ -121,20 +151,39 @@ def calc_growth_ratio(
 ) -> pd.DataFrame:
     """Calculate the growth ratio for imputation.
 
+    For the current target_variable, a growth_ratio column is created.
+    A growth rate is calculated for those rows where the "target_value_valid"
+    is true, meaning that there are no nulls or zeros in the previous or
+    current periods, TODO and the status is a 'responder' status.
+
+    If this condition is not met, the row has a null value in this column.
+
     Args:
         target_variable (str): The column name of the target variable.
         df (pd.DataFrame): The dataframe containing the target variables.
         current_period
 
     Returns:
-        _type_: _description_
+        pd.DataFrame
     """
-    # for every target variable a growth ratio is calcualted
-
-    df[f"{target_variable}_growth_ratio"] = (
-        df[f"{current_period}_{target_variable}"]
-        / df[f"{previous_period}_{target_variable}"]
+    flagged_df = flag_nulls_and_zeros(
+        [target_variable], df, current_period, previous_period
     )
+
+    responder_statuses = ["Clear", "Clear - overridden", "Clear - overridden SE"]
+
+    cond1 = flagged_df[f"{target_variable}_valid"]
+    cond2 = flagged_df["status"].isin(responder_statuses)
+
+    flagged_df[f"{target_variable}_growth_ratio"] = np.where(
+        cond1 & cond2,
+        (
+            df[f"{current_period}_{target_variable}"]
+            / df[f"{previous_period}_{target_variable}"]
+        ),
+        np.nan,
+    )
+    df = flagged_df.drop(columns=[f"{target_variable}_valid"])
 
     return df
 
@@ -153,13 +202,6 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     # ipdb.set_trace()
     # sorted based on hard coded list (in arg by=)
     sorted_df = df.sort_values(
-        # by=[
-        #     "product_group",
-        #     "civ_or_def",
-        #     f"{target_variable}_growth_ratio",
-        #     "employee_count",
-        #     "ru_ref",
-        # ],
         by=[
             "200",
             "201",
@@ -173,34 +215,6 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 
     return sorted_df
 
-
-def flag_nulls_and_zeros(
-    target_variables_list: list,
-    df: pd.DataFrame,
-    curr_q: str,
-    prev_q: str,
-):
-    """Flag target variables containing nulls or zreos.
-
-    A new column {var}_valid is created for each var in the target variables.
-    This is flagged with 1 if either the current period or previous period
-    contains either a null or a zero. Otherwise, the flag is 0.
-    
-    Args:
-        target_variables (list of str): the target variables
-        df (pd.DataFrame): dataframe with current and previous periods
-        curr_q (str): the current period
-        prev_q (str): the previous period
-
-    Returns:
-        pd.DataFrame - a dataframe indicating nulls and zeros in target cols.
-    """
-    for var in target_variables_list:
-        cond1 = (df[f"{curr_q}_{var}"].isnull()) | (df[f"{prev_q}_{var}"].isnull())
-        cond2 = (df[f"{curr_q}_{var}"] == 0) | (df[f"{prev_q}_{var}"] == 0)
-        df[f"{var}_valid"] = np.where(cond1 | cond2, 1,0)
-            
-    return df
 
 def trim_check(
     df: pd.DataFrame, check_value=10
@@ -319,7 +333,6 @@ def loop_unique(
     for unique_item in df[column].unique():
         unique_item_df = df[df[column] == unique_item].copy()
         for target_variable in target_variables_list:
-
             growth_ratio_df = calc_growth_ratio(
                 target_variable, unique_item_df, current_period, previous_period
             )
@@ -383,7 +396,7 @@ def forward_imputation(
 
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0] 
+            ][0]
             df_other[f"forwards_imputed_{var}"] = round(
                 df_other[f"{class_name}_{var}_growth_ratio"]
                 * df_other[f"{previous_period}_{var}"]
@@ -440,7 +453,7 @@ def backwards_imputation(
             # TODO add f string to previous_period_var1
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0]  
+            ][0]
             df_other[f"backwards_imputed_{var}"] = round(
                 df_other[f"{current_period}_{var}"]
                 / df_other[f"{class_name}_{var}_growth_ratio"]
@@ -470,10 +483,6 @@ def run_imputation(
         _type_: _description_
     """
 
-    current_period = "202012"
-    previous_period = "202009"
-    target_variables_list = ["var1", "var2"]
-
     # replacing civ_or_def with 200 and Product_group with 201
     test_df = rename_imp_col(test_df)
 
@@ -482,12 +491,11 @@ def run_imputation(
     clean_df = create_imp_class_col(test_df, "200", "201", f"{current_period}_class")
     clean_df.reset_index(drop=True, inplace=True)
 
-    flagged_df = flag_nulls_and_zeros(
-        target_variables_list,
-        clean_df,
-        current_quarter,
-        previous_quarter
-    )
+    # TODO:flag_nulls_and_zeros() could can optionally be run to output a QA csv
+    # indicating where there are nulls and zeros in the target variables
+    # flagged_df = flag_nulls_and_zeros(
+    #     target_variables_list, clean_df, current_period, previous_period
+    # )
 
     forward_df = forward_imputation(
         clean_df,
