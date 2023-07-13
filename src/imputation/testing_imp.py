@@ -204,12 +204,39 @@ pre_cleandf[201] = pre_cleandf[201].astype("category")
 cur_cleandf[201] = cur_cleandf[201].astype("category")
 
 
-# Remove rows of data for imputation
-pre_sample = pre_cleandf.sample(frac=0.2)
-cur_sample = cur_cleandf.sample(frac=0.2)
+# Remove rows that need imputing (Status emulation)
+vars = [211, 305, 405, 406, 407, 408, 409, 410, 501, 502, 503, 504, 505, 506]
+cur_sample10 = cur_cleandf.sample(frac=0.1, random_state=42)
+cur_cleandf.loc[cur_sample10.index, vars] = [np.nan for i in range(len(vars))]
+
+# Add missing BType and PG for current period
+kvars = [200, 201]
+cur_sample5 = cur_cleandf.sample(frac=0.05, random_state=42)
+cur_cleandf.loc[cur_sample5.index, kvars] = [np.nan for i in range(len(kvars))]
+
+# Convert columns to strings
+pre_cleandf.columns = pre_cleandf.columns.astype("str")
+cur_cleandf.columns = cur_cleandf.columns.astype("str")
 
 # Dataset joining
-# joined_df = pd.merge(pre_cleandf,
-# cur_cleandf, on=['reference','period',200,201], how='outer')
+joined_df = pd.merge(
+    pre_cleandf,
+    cur_cleandf,
+    on=["reference", "200", "201"],
+    how="outer",
+    suffixes=(
+        f"_{str(pre_cleandf['period'][0])[:4]}",
+        f"_{str(cur_cleandf['period'][0])[:4]}",
+    ),
+)
+
+# IMPUTATION MVP
+
+# Carry forward 200 and 201
+missing_rows = joined_df.loc[
+    (joined_df["200"].isnull())
+    & (joined_df["201"].isnull())
+    & (joined_df["period_2020"].isnull())
+]
 
 print("Ended debug")
