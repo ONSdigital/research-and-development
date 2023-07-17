@@ -267,7 +267,8 @@ quality of the imputed value. """
 
 def loop_unique(
     df: pd.DataFrame,  # TODO think of a better name for function
-    column: str,
+    class_col: str,
+    class_name: str,
     target_variables_list: list,
     current_period: str,
     previous_period: str,
@@ -288,21 +289,21 @@ def loop_unique(
     # growht ratio in calculated, data is sorted, trim check done,
     # trim bounds calculated and labelled then mean growth ratio
     # calculated and stored in a dictionary
-    for unique_item in df[column].unique():
-        unique_item_df = df[df[column] == unique_item].copy()
-        for target_variable in target_variables_list:
-            growth_ratio_df = calc_growth_ratio(
-                target_variable, unique_item_df, current_period, previous_period
-            )
-            sorted_df = sort_df(target_variable, growth_ratio_df)
-            trim_check_df = trim_check(sorted_df)
-            trimmed_df = trim_bounds(trim_check_df)
 
-            dict_mean_growth_ratio = get_mean_growth_ratio(
-                trimmed_df, dict_mean_growth_ratio, unique_item, target_variable
-            )
-            # growth_ratio_dfs_list.append(growth_ratio_df)
-            # could also store in a df?
+    unique_item_df = df[df[class_col] == class_name].copy()
+    for target_variable in target_variables_list:
+        growth_ratio_df = calc_growth_ratio(
+            target_variable, unique_item_df, current_period, previous_period
+        )
+        sorted_df = sort_df(target_variable, growth_ratio_df)
+        trim_check_df = trim_check(sorted_df)
+        trimmed_df = trim_bounds(trim_check_df)
+        print(trimmed_df)
+        # dict_mean_growth_ratio = get_mean_growth_ratio(
+        #     trimmed_df, dict_mean_growth_ratio, unique_item, target_variable
+        # )
+        # growth_ratio_dfs_list.append(growth_ratio_df)
+        # could also store in a df?
 
     # growth_ratio_df = pd.concat(growth_ratio_dfs_list)
     # could also store ina dataframe
@@ -314,7 +315,7 @@ def loop_unique(
 # TODO break this function into smaller functions
 def forward_imputation(
     df: pd.DataFrame,
-    column: str,
+    class_column: str,
     target_variables_list: list,
     current_period: str,
     previous_period: str,
@@ -333,13 +334,15 @@ def forward_imputation(
     #     df[f"{current_period}_var1"] != "missing"
     # ].copy()  # TODO add f string
 
-    dict_mean_growth_ratio = loop_unique(
-        df_growth_ratio,
-        column,
-        target_variables_list,
-        current_period,
-        previous_period,
-    )
+    for class_nm in class_column:
+        dict_mean_growth_ratio = loop_unique(
+            df_growth_ratio,
+            class_column,
+            class_nm,
+            target_variables_list,
+            current_period,
+            previous_period,
+        )
 
     dfs_list = []
     df_final = df.copy()
@@ -354,7 +357,7 @@ def forward_imputation(
 
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0] 
+            ][0]
             df_other[f"forwards_imputed_{var}"] = round(
                 df_other[f"{class_name}_{var}_growth_ratio"]
                 * df_other[f"{previous_period}_{var}"]
@@ -411,7 +414,7 @@ def backwards_imputation(
             # TODO add f string to previous_period_var1
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0]  
+            ][0]
             df_other[f"backwards_imputed_{var}"] = round(
                 df_other[f"{current_period}_{var}"]
                 / df_other[f"{class_name}_{var}_growth_ratio"]
