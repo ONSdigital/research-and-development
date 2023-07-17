@@ -2,6 +2,8 @@ import pandas as pd
 from src.utils.helpers import Config_settings
 import math
 import numpy as np
+from src.imputation import imputation as imp
+from src.data_processing import spp_snapshot_processing as spp
 
 conf_obj = Config_settings()
 config = conf_obj.config_dict
@@ -45,6 +47,8 @@ elif network_or_hdfs == "hdfs":
     pre_path = "/ons/rdbe_dev/BERD_V7_Anonymised/qv_BERD_202012_qv6_reformatted.csv"
     cur_path = "/ons/rdbe_dev/BERD_V7_Anonymised/qv_BERD_202112_qv6_reformatted.csv"
     map_path = "/ons/rdbe_dev/BERD_Mappers/SIC07_to_PG_Conversion-From_2016_Data.csv"
+    cur_con_path = "/ons/rdbe_dev/BERD_V7_Anonymised/cp_BERD_202112_cp3.csv"
+    pre_con_path = "/ons/rdbe_dev/BERD_V7_Anonymised/cp_BERD_202012_cp3.csv"
 
     with hdfs.open(pre_path, "r") as file:
         # Import csv file and convert to Dataframe
@@ -72,6 +76,25 @@ elif network_or_hdfs == "hdfs":
             file, usecols=["2016 > Form PG", "2016 > Pub PG"]
         ).squeeze()
 
+    with hdfs.open(pre_con_path, "r") as file:
+        # Import csv file and convert to Dataframe
+        pre_con_df = pd.read_csv(
+            file,
+            na_values=[
+                "                                                                ",
+                math.nan,
+            ],  # noqa
+        )
+
+    with hdfs.open(cur_con_path, "r") as file:
+        # Import csv file and convert to Dataframe
+        cur_con_df = pd.read_csv(
+            file,
+            na_values=[
+                "                                                                ",
+                math.nan,
+            ],  # noqa
+        )
 else:
     raise ImportError
 
@@ -95,19 +118,24 @@ pre_df.drop(["adjusted_value", "instance "], axis=1, inplace=True)
 cur_df.drop(["adjusted_value", "instance"], axis=1, inplace=True)
 
 # Data transmutation
-pre_responsedf = pre_df.pivot_table(
-    index=["reference", "period"],
-    columns="question_no",
-    values="returned_value",
-    aggfunc="first",
-).reset_index()
 
-cur_responsedf = cur_df.pivot_table(
-    index=["reference", "period"],
-    columns="question_no",
-    values="returned_value",
-    aggfunc="first",
-).reset_index()
+pre_responsedf = spp.full_responses(pre_con_df, pre_df)
+cur_responsedf = spp.full_responses(cur_con_df, cur_df)
+
+
+# pre_responsedf = pre_df.pivot_table(
+#     index=["reference", "period"],
+#     columns="question_no",
+#     values="returned_value",
+#     aggfunc="first",
+# ).reset_index()
+
+# cur_responsedf = cur_df.pivot_table(
+#     index=["reference", "period"],
+#     columns="question_no",
+#     values="returned_value",
+#     aggfunc="first",
+# ).reset_index()
 
 
 # Drop all but key columns
@@ -209,11 +237,6 @@ vars = [211, 305, 405, 406, 407, 408, 409, 410, 501, 502, 503, 504, 505, 506]
 cur_sample10 = cur_cleandf.sample(frac=0.1, random_state=42)
 cur_cleandf.loc[cur_sample10.index, vars] = [np.nan for i in range(len(vars))]
 
-# Add missing BType and PG for current period
-kvars = [200, 201]
-cur_sample5 = cur_cleandf.sample(frac=0.05, random_state=42)
-cur_cleandf.loc[cur_sample5.index, kvars] = [np.nan for i in range(len(kvars))]
-
 # Convert columns to strings
 pre_cleandf.columns = pre_cleandf.columns.astype("str")
 cur_cleandf.columns = cur_cleandf.columns.astype("str")
@@ -222,7 +245,7 @@ cur_cleandf.columns = cur_cleandf.columns.astype("str")
 joined_df = pd.merge(
     pre_cleandf,
     cur_cleandf,
-    on=["reference", "200", "201"],
+    on=["reference"],
     how="outer",
     suffixes=(
         f"_{str(pre_cleandf['period'][0])[:4]}",
@@ -233,10 +256,34 @@ joined_df = pd.merge(
 # IMPUTATION MVP
 
 # Carry forward 200 and 201
-missing_rows = joined_df.loc[
-    (joined_df["200"].isnull())
-    & (joined_df["201"].isnull())
-    & (joined_df["period_2020"].isnull())
-]
 
+# Create Imputation Classes
+
+df = imp.create_imp_class_col(joined_df, "200_2020", "201_2020", "2020_class")
+df = imp.create_imp_class_col(joined_df, "200_2021", "201_2021", "2021_class")
+
+ind = df[df["2020_class"] == "nannan"].index
+df.drop(ind, inplace=True)
+ind = df[df["2021_class"] == "nannan"].index
+df.drop(ind, inplace=True)
+
+# Find matched pairs
+
+filtered_df = imp.filter_same_class(df, "2021", "2020")
+non_matches = df[df["2021_class"] != df["2020_class"]]
+
+vars = [str(i) for i in vars]
+matches = dict.fromkeys(vars)
+mp_counts = dict.fromkeys(vars)
+
+for i in vars:
+    matched_pairs_df = imp.filter_pairs(filtered_df, i, "2021", "2020")
+    matches.update({i: matched_pairs_df})
+    mp_counts.update({i: len(matched_pairs_df)})
+
+# Calculate growth ratio
+for i in vars:
+    imp.calc_growth_ratio(i, filtered_df, "2021", "2020")
+
+# Trimming
 print("Ended debug")

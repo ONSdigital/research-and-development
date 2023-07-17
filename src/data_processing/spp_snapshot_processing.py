@@ -19,7 +19,10 @@ def create_response_dataframe(
         response_df -- Response DataFrame
     """
     response_df = df.pivot_table(
-        index=unique_id_cols, columns="questioncode", values="response", aggfunc="first"
+        index=unique_id_cols,
+        columns="question_no",
+        values="returned_value",
+        aggfunc="first",
     ).reset_index()
     return response_df
 
@@ -37,7 +40,7 @@ def create_contextual_dataframe(
     Returns:
         contextual_df -- Contextual DataFrame
     """
-    cols_to_drop = ["questioncode", "response"]
+    cols_to_drop = ["question_no", "returned_value"]
     contextual_df = df.drop(cols_to_drop, axis=1).drop_duplicates()
     return contextual_df
 
@@ -58,21 +61,24 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
         full_responses -- DataFrame containing both response and contributor data
     """
 
-    drop_cols = ["createdby", "createddate", "lastupdatedby", "lastupdateddate"]
+    drop_cols = ["Form_type", "Sic92", "Status"]
 
-    unique_id_cols = ["reference", "period", "survey"]
+    unique_id_cols = ["reference", "period"]
 
     contributors_dropped = contributors.drop(drop_cols, axis=1)
-    responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
+    responses_dropped = responses
+    contributors_dropped.columns = contributors_dropped.columns.str.lower()
 
-    merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols)
+    merged_df = contributors_dropped.merge(
+        responses_dropped, on=unique_id_cols, how="outer"
+    )
     # Create contextual df by dropping "questioncode" and "response" cols. Remove dupes
     contextual_df = create_contextual_dataframe(merged_df, unique_id_cols)
 
     # Create a response dataframe using pivot_table to reshape the data
     response_df = create_response_dataframe(merged_df, unique_id_cols)
 
-    full_responses = response_df.merge(contextual_df, on=unique_id_cols)
+    full_responses = response_df.merge(contextual_df, on=unique_id_cols, how="outer")
 
     return full_responses
 

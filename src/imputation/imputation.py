@@ -36,7 +36,7 @@ def create_imp_class_col(
 
     # TODO remove when using real data
     clean_df[f"{col_first_half}"] = clean_df[f"{col_first_half}"].astype(str)
-
+    clean_df[f"{col_second_half}"] = clean_df[f"{col_second_half}"].astype(str)
     # Create class col with concatenation
     clean_df[f"{class_name}"] = (
         clean_df[f"{col_first_half}"] + clean_df[f"{col_second_half}"]
@@ -82,14 +82,8 @@ def filter_pairs(
     # TODO needs more tweeks but essentially same as
     # filter_same_class but for target var not class
     matched_pairs_df = clean_same_class_df[
-        (
-            clean_same_class_df[f"{current_quarter}_{target_variable}_status"]
-            == "Present"
-        )
-        & (
-            clean_same_class_df[f"{previous_quarter}_{target_variable}_status"]
-            == "Present"
-        )
+        (clean_same_class_df[f"{target_variable}_{current_quarter}"].notnull())
+        & (clean_same_class_df[f"{target_variable}_{previous_quarter}"].notnull())
     ].copy()
 
     return matched_pairs_df
@@ -112,8 +106,8 @@ def calc_growth_ratio(
     # for every target variable a growth ratio is calcualted
 
     df[f"{target_variable}_growth_ratio"] = (
-        df[f"{current_quarter}_{target_variable}"]
-        / df[f"{previous_quarter}_{target_variable}"]
+        df[f"{target_variable}_{current_quarter}"]
+        / df[f"{target_variable}_{previous_quarter}"]
     )
 
     return df
@@ -141,13 +135,10 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
         #     "ru_ref",
         # ],
         by=[
-            "survey",
-            "checkletter",
             f"{target_variable}_growth_ratio",
-            "employees",
             "reference",
         ],
-        ascending=[True, True, True, False, True],
+        ascending=[True, True],
     )
     sorted_df.reset_index(drop=True, inplace=True)
 
