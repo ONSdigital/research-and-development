@@ -281,9 +281,18 @@ for i in vars:
     matches.update({i: matched_pairs_df})
     mp_counts.update({i: len(matched_pairs_df)})
 
-# Calculate growth ratio
-for i in vars:
-    imp.calc_growth_ratio(i, filtered_df, "2021", "2020")
+    # Calculate growth ratio
 
-# Trimming
+    growth_df = imp.calc_growth_ratio(i, filtered_df, "2021", "2020")
+
+    # Trimming
+
+    sorted_df = imp.sort(i, growth_df)
+    trimcheck_df = imp.trim_check(sorted_df)
+    trimmed_df = imp.trim_bounds(trimcheck_df)
+
+    mean_df = imp.get_mean_growth_ratio(trimmed_df, {}, "2021_class", i)
+
+    fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
+
 print("Ended debug")

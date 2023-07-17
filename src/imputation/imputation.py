@@ -135,10 +135,12 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
         #     "ru_ref",
         # ],
         by=[
+            "201_2021",
+            "200_2021",
             f"{target_variable}_growth_ratio",
             "reference",
         ],
-        ascending=[True, True],
+        ascending=[True, True, True, True],
     )
     sorted_df.reset_index(drop=True, inplace=True)
 
@@ -320,16 +322,16 @@ def forward_imputation(
                 df_final[f"{current_quarter}_class"] == class_name
             ].copy()
             df_other = df_other[
-                df_other[f"{current_quarter}_{var}"].isnull()
+                df_other[f"{var}_{current_quarter}"].isnull()
             ].copy()  # change the name of df_final and df_other
-            df_other[f"{class_name}_{var}_growth_ratio"] = int(
+            df_other[f"{class_name}_{var}_growth_ratio"] = float(
                 dict_mean_growth_ratio[
                     f"{class_name}_{var}_mean_growth_ratio and count"
                 ][0]
             )  # why doesn't float work?
             df_other[f"forwards_imputed_{var}"] = (
                 df_other[f"{class_name}_{var}_growth_ratio"]
-                * df_other[f"{previous_quarter}_{var}"]
+                * df_other[f"{var}_{previous_quarter}"]
             )
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])
             dfs_list.append(df_other)
