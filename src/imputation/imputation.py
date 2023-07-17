@@ -312,6 +312,53 @@ def loop_unique(
     # aka "imputation links" - what naming is best?
 
 
+def groupby_unique(
+    df: pd.DataFrame,
+    column: str,
+    target_variables_list: list,
+    current_period: str,
+    previous_period: str,
+    dict_mean_growth_ratio={},
+) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    # group by the class column and target variable
+    grouped = df.groupby([column, *target_variables_list])
+
+    # apply the calc_growth_ratio function to each group
+    growth_ratio_df = grouped.apply(
+        lambda x: calc_growth_ratio(
+            x[target_variables_list[0]].iloc[0],
+            x,
+            current_period,
+            previous_period,
+        )
+    )
+
+    # sort, trim, and calculate mean growth ratio for each group
+    sorted_df = growth_ratio_df.groupby([column, *target_variables_list]).apply(
+        sort_df
+    )
+    trim_check_df = sorted_df.groupby([column, *target_variables_list]).apply(
+        trim_check
+    )
+    trimmed_df = trim_check_df.groupby([column, *target_variables_list]).apply(
+        trim_bounds
+    )
+    dict_mean_growth_ratio = trimmed_df.groupby([column, *target_variables_list]).apply(
+        lambda x: get_mean_growth_ratio(
+            x, dict_mean_growth_ratio, x.name[0], x.name[1]
+        )
+    )
+
+    return dict_mean_growth_ratio
+
 # TODO break this function into smaller functions
 def forward_imputation(
     df: pd.DataFrame,
