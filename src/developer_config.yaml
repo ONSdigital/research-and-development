@@ -26,3 +26,14 @@ csv_filenames:
 run_log_sql:
     log_db: "test_runlog"
     log_mode: "append"
+# imputation
+target_vars:
+  - q211
+  - q305
+  - emp_other
+  - emp_technician
+  - emp_researcher
+  - headcount_res_m
+  - headcount_res_f
+  - headcount_tec_m
+  - headcount_tec_f
