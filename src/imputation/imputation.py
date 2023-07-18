@@ -184,19 +184,23 @@ def trim_bounds(
         _type_: _description_
     """
     # trim only if more than 10
-    df = filter_by_column_content(df, "trim_check", "above_trim_threshold")
-    df.reset_index(drop=True, inplace=True)
+    if len(df) < 5:
+        df["trim"] = "dont trim"
+    else:
+        df = filter_by_column_content(df, "trim_check", "above_trim_threshold")
+        df.reset_index(drop=True, inplace=True)
 
-    # define the bounds for trimming
-    remove_lower = np.ceil(len(df) * (lower_perc / 100))
-    remove_upper = np.ceil(len(df) * (1 - upper_perc / 100))
+        # define the bounds for trimming
+        remove_lower = np.ceil(len(df) * (lower_perc / 100))
+        remove_upper = np.ceil(len(df) * (1 - upper_perc / 100))
 
-    # create trim tag (distinct from trim_check)
-    # to mark which to trim for mean growth ratio
-    df["trim"] = "do trim"
-    df.loc[
-        remove_lower : remove_upper - 2, "trim"
-    ] = "dont trim"  # TODO check if needs to be inclusive of exlusive
+        # create trim tag (distinct from trim_check)
+        # to mark which to trim for mean growth ratio
+
+        df["trim"] = "do trim"
+        df.loc[
+            remove_lower : remove_upper - 2, "trim"
+        ] = "dont trim"  # TODO check if needs to be inclusive of exlusive
 
     return df
 

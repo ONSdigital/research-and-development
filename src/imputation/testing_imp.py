@@ -276,7 +276,6 @@ non_matches = df[df["2021_class"] != df["2020_class"]]
 vars = [str(i) for i in vars]
 matches = dict.fromkeys(vars)
 mp_counts = dict.fromkeys(vars)
-grp = filtered_df.groupby("2021_class")
 
 # Attempt to use groupby instead of nested for loop
 for i in vars:
@@ -287,20 +286,27 @@ for i in vars:
 
     # Calculate growth ratio for each class (use groupby)
 
-    grp = matched_pairs_df.groupby("2021_class")
     # class_list = list(grp.groups.keys())
-    growth_df = grp.apply(lambda x: imp.calc_growth_ratio(i, x, "2021", "2020"))
+    growth_df = imp.calc_growth_ratio(i, matched_pairs_df, "2021", "2020")
+
     # Trimming
+    grp = growth_df.groupby("2021_class")
+    class_keys = list(grp.groups.keys())
+    for k in class_keys:
+        subgrp = grp.get_group(k)
+        sorted_df = imp.sort(i, subgrp)
+        trimcheck_df = imp.trim_check(sorted_df)
 
-    sorted_df = growth_df.apply(lambda x: imp.sort(i, x))
-    trimcheck_df = sorted_df.apply(lambda x: imp.trim_check(x))
-    trimmed_df = trimcheck_df.apply(lambda x: imp.trim_bounds(x))
+        # This only works for large classes
+        trimmed_df = imp.trim_bounds(trimcheck_df)
 
-    mean_df = trimmed_df.apply(
-        lambda x: imp.get_mean_growth_ratio(x, {}, "2021_class", i)
-    )
-    mp_counts.update({i: mean_df})
+        mean_df = imp.get_mean_growth_ratio(trimmed_df, {}, k, i)
 
-    # fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
+        if mp_counts[i]:
+            mp_counts[i].update(mean_df)
+        else:
+            mp_counts[i] = mean_df
+
+        fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
 
 print("Ended debug")
