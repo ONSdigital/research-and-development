@@ -514,3 +514,29 @@ def run_imputation(
     )
 
     return forward_df, backwards_df
+
+
+def update_imputed(
+    input_full, input_imputed, target_variables_list, direction, row_col="reference"
+) -> pd.DataFrame():
+    """_summary_
+
+    Args:
+        df (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    # As I'm doing this cell by cell
+    # I could start with rows or columns in the for loops
+    input_full["imputation_marker"] = "response"
+    for row in input_imputed[row_col]:
+        for col in target_variables_list:
+            input_full.loc[input_full[row_col] == row, col] = input_imputed.loc[
+                input_imputed[row_col] == row, f"{direction}_imputed_{col}"
+            ][0]
+            input_full.loc[
+                input_full[row_col] == row, "imputation_marker"
+            ] = f"{direction}_imputed"
+
+    return input_full

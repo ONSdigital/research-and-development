@@ -4,6 +4,7 @@ from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
 from src.imputation.imputation import (
+    update_imputed,
     run_imputation,
     backwards_imputation,
     forward_imputation,
@@ -1100,3 +1101,74 @@ class TestRunImputation:
         print(result_for)
         assert_frame_equal(result_for, expout_df_for)
         assert_frame_equal(result_back, expout_df_back)
+
+
+class TestUpdateImputed:  # testing for loops run as expected
+    """Unit test for update_imputed"""
+
+    def input_data_update_imputed(self):
+        """Create input data for the update_imputed function"""
+
+        # columns for the dataframe
+        input_cols_full = [
+            "col1",
+            "col2",
+        ]
+
+        # data in the column order above
+        input_data_full = [
+            [1.0, 1.0],
+            [2.0, np.nan],
+        ]
+
+        # Create a pandas dataframe
+        input_full = pandasDF(data=input_data_full, columns=input_cols_full)
+
+        # columns for the dataframe
+        input_cols_imputed = [
+            "col1",
+            "forwards_imputed_col2",
+        ]
+
+        # data in the column order above
+        input_data_imputed = [
+            [2.0, 1.0],
+        ]
+
+        # Create a pandas dataframe
+        input_imputed = pandasDF(data=input_data_imputed, columns=input_cols_imputed)
+
+        return input_full, input_imputed
+
+    def output_data_update_imputed(self):
+        """Create output data for the update_imputed function"""
+
+        # columns for the dataframe
+        output_cols = ["col1", "col2", "imputation_marker"]
+
+        # data in the column order above
+        output_data = [
+            [1.0, 1.0, "response"],
+            [2.0, 1.0, "forwards_imputed"],
+        ]  # (more than 10 rows per class)
+
+        # Create a pandas dataframe
+        output_df = pandasDF(data=output_data, columns=output_cols)
+
+        return output_df
+
+    def test_update_imputed(self):
+        """Test the expected functionality"""
+
+        input_full, input_imputed = self.input_data_update_imputed()
+        output_df = self.output_data_update_imputed()
+
+        row_col = "col1"
+        target_variables_list = ["col2"]
+        direction = "forwards"
+
+        df_result = update_imputed(
+            input_full, input_imputed, target_variables_list, direction, row_col
+        )
+
+        assert_frame_equal(df_result, output_df)
