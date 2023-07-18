@@ -314,7 +314,7 @@ def loop_unique(
 
 def groupby_unique(
     df: pd.DataFrame,
-    column: str,
+    class_col: str,
     target_variables_list: list,
     current_period: str,
     previous_period: str,
@@ -329,7 +329,7 @@ def groupby_unique(
         _type_: _description_
     """
     # group by the class column and target variable
-    grouped = df.groupby([column, *target_variables_list])
+    grouped = df.groupby([class_col, *target_variables_list])
 
     # apply the calc_growth_ratio function to each group
     growth_ratio_df = grouped.apply(
@@ -342,22 +342,26 @@ def groupby_unique(
     )
 
     # sort, trim, and calculate mean growth ratio for each group
-    sorted_df = growth_ratio_df.groupby([column, *target_variables_list]).apply(
+    sorted_df = growth_ratio_df.groupby([class_col, *target_variables_list]).apply(
         sort_df
     )
-    trim_check_df = sorted_df.groupby([column, *target_variables_list]).apply(
+
+    sorted_df = grouped.apply(sort_df)
+
+    trim_check_df = sorted_df.groupby([class_col, *target_variables_list]).apply(
         trim_check
     )
-    trimmed_df = trim_check_df.groupby([column, *target_variables_list]).apply(
+    trimmed_df = trim_check_df.groupby([class_col, *target_variables_list]).apply(
         trim_bounds
     )
-    dict_mean_growth_ratio = trimmed_df.groupby([column, *target_variables_list]).apply(
-        lambda x: get_mean_growth_ratio(
-            x, dict_mean_growth_ratio, x.name[0], x.name[1]
-        )
+    dict_mean_growth_ratio = trimmed_df.groupby(
+        [class_col, *target_variables_list]
+    ).apply(
+        lambda x: get_mean_growth_ratio(x, dict_mean_growth_ratio, x.name[0], x.name[1])
     )
 
     return dict_mean_growth_ratio
+
 
 # TODO break this function into smaller functions
 def forward_imputation(
@@ -520,3 +524,68 @@ def run_imputation(
     )
 
     return forward_df, backwards_df
+
+
+if __name__ == "__main__":
+    input_cols = [
+        "2023_class",
+        "200",
+        "201",
+        "2023_var1",
+        "2023_var2",
+        "2022_var1",
+        "2022_var2",
+        "employees",
+        "reference",
+        "trim",
+    ]
+
+    # data in the column order above
+    input_data = [
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class1", "C", "G", 2, 4, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+        ["class2", "D", "G", 6, 8, 2, 2, 1, 1, "dont trim"],
+    ]  # (more than 10 rows per class)
+
+    # Create a pandas dataframe
+    input_df = pd.DataFrame(data=input_data, columns=input_cols)
+
+    # Set up variables
+    current_period = "2023"
+    previous_period = "2022"
+
+    class_col = f"{current_period}_class"
+
+    target_variables_list = [
+        f"{current_period}_var1",
+        f"{current_period}_var2",
+        f"{previous_period}_var1",
+        f"{previous_period}_var2",
+    ]
+
+    groupby_unique(
+        input_df,
+        class_col=class_col,
+        target_variables_list=target_variables_list,
+        current_period=current_period,
+        previous_period=previous_period,
+    )
