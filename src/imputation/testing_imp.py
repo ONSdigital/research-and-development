@@ -270,29 +270,37 @@ df.drop(ind, inplace=True)
 # Find matched pairs
 
 filtered_df = imp.filter_same_class(df, "2021", "2020")
+# These have changed classes from last period
 non_matches = df[df["2021_class"] != df["2020_class"]]
 
 vars = [str(i) for i in vars]
 matches = dict.fromkeys(vars)
 mp_counts = dict.fromkeys(vars)
+grp = filtered_df.groupby("2021_class")
 
+# Attempt to use groupby instead of nested for loop
 for i in vars:
+    # Check that both periods have data (not null) TODO: Does zero count as null?
     matched_pairs_df = imp.filter_pairs(filtered_df, i, "2021", "2020")
+    # Save each dataset of clean matched pairs for each target variable
     matches.update({i: matched_pairs_df})
-    mp_counts.update({i: len(matched_pairs_df)})
 
-    # Calculate growth ratio
+    # Calculate growth ratio for each class (use groupby)
 
-    growth_df = imp.calc_growth_ratio(i, filtered_df, "2021", "2020")
-
+    grp = matched_pairs_df.groupby("2021_class")
+    # class_list = list(grp.groups.keys())
+    growth_df = grp.apply(lambda x: imp.calc_growth_ratio(i, x, "2021", "2020"))
     # Trimming
 
-    sorted_df = imp.sort(i, growth_df)
-    trimcheck_df = imp.trim_check(sorted_df)
-    trimmed_df = imp.trim_bounds(trimcheck_df)
+    sorted_df = growth_df.apply(lambda x: imp.sort(i, x))
+    trimcheck_df = sorted_df.apply(lambda x: imp.trim_check(x))
+    trimmed_df = trimcheck_df.apply(lambda x: imp.trim_bounds(x))
 
-    mean_df = imp.get_mean_growth_ratio(trimmed_df, {}, "2021_class", i)
+    mean_df = trimmed_df.apply(
+        lambda x: imp.get_mean_growth_ratio(x, {}, "2021_class", i)
+    )
+    mp_counts.update({i: mean_df})
 
-    fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
+    # fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
 
 print("Ended debug")
