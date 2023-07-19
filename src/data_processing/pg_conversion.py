@@ -19,11 +19,12 @@ except ImportError:
 
 def pg_mapper(
     df: pd.DataFrame,
-    mapper_path: str,
     target_col: str,
     from_col: str = "2016 > Form PG",
     to_col: str = "2016 > Pub PG",
 ):
+
+    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
     # PG mapping
     if network_or_hdfs == "network":
         # Load SIC to PG mapper

@@ -85,8 +85,7 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Transmutation...")
 
     # PG Mapping
-    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
-    pg_mapper(full_responses, mapper_path, "201")
+    pg_mapper(full_responses, "201")
     # Data validation
     val.check_data_shape(full_responses)
 
