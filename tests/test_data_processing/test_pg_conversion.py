@@ -9,7 +9,7 @@ from src.data_processing.pg_conversion import pg_mapper
 
 @pytest.fixture
 def dummy_data() -> pd.DataFrame:
-    # Set up the dummy data
+    # Set up the dummyinput  data
     data = pd.DataFrame(
         {
             "201": [0, 1, 2, 3, 4, 5],
@@ -21,7 +21,7 @@ def dummy_data() -> pd.DataFrame:
 
 @pytest.fixture
 def mapper() -> pd.DataFrame:
-    # Set up the dummy data
+    # Set up the dummy mapper data
     mapper = {
         "2016 > Form PG": [0, 1, 2, 3, 4, 5],
         "2016 > Pub PG": [np.nan, "A", "B", "C", "C", "D"],
@@ -31,7 +31,7 @@ def mapper() -> pd.DataFrame:
 
 @pytest.fixture
 def expected_output() -> pd.DataFrame:
-    # Set up the dummy data
+    # Set up the dummy output data
     expected_output = pd.DataFrame(
         {
             "201": [np.nan, "A", "B", "C", "C", "D"],
@@ -41,8 +41,7 @@ def expected_output() -> pd.DataFrame:
 
 
 def test_pg_mapper(dummy_data, expected_output, mapper):
-    """Tests for full_responses function."""
-    # Import modules to test
+    """Tests for pg mapper function."""
 
     target_col = dummy_data.columns[0]
     expected_output_data = expected_output.astype("category")

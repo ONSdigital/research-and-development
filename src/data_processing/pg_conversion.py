@@ -1,28 +1,9 @@
 import pandas as pd
-from src.utils.helpers import Config_settings
 import numpy as np
 
 import logging
 
 pg_logger = logging.getLogger(__name__)
-
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-
-# Check the environment switch
-# network_or_hdfs = config["global"]["network_or_hdfs"]
-
-# if network_or_hdfs == "network":
-#     HDFS_AVAILABLE = False
-#     from src.utils.local_file_mods import read_local_mapper_csv as read_csv
-
-# elif network_or_hdfs == "hdfs":
-#     HDFS_AVAILABLE = True
-#     from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_csv
-
-# else:
-#     pg_logger.error("The network_or_hdfs configuration is wrong")
-#     raise ImportError
 
 
 def pg_mapper(
@@ -32,6 +13,22 @@ def pg_mapper(
     from_col: str = "2016 > Form PG",
     to_col: str = "2016 > Pub PG",
 ):
+    """This function maps all values in one column to another column
+    using a mapper file.
+    The default this is used for is PG numeric to letter conversion.
+
+    Args:
+        df (pd.DataFrame): The dataset containing all the PG numbers
+        mapper (pd.DataFrame): The mapper dataframe loaded using custom function
+        target_col (str): The column we want to convert (product_group)
+        from_col (str, optional): The column in the mapper that is used to map from.
+        Defaults to "2016 > Form PG".
+        to_col (str, optional): The column in the mapper that is used to map to.
+        Defaults to "2016 > Pub PG".
+
+    Returns:
+        pd.DataFrame: A dataframe with all target column values mapped
+    """
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
 

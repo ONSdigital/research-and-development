@@ -27,7 +27,7 @@ def read_local_csv(filepath: str) -> pd.DataFrame:
 
 
 def read_local_mapper_csv(filepath: str, from_col: str, to_col: str) -> pd.DataFrame:
-    """Reads a csv from DAP into a Pandas Dataframe
+    """Reads a csv mapper file (only 2 columns) from local into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
 
