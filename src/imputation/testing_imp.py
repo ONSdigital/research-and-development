@@ -307,6 +307,7 @@ for i in vars:
         else:
             mp_counts[i] = mean_df
 
-        fwd_df = imp.forward_imputation(trimmed_df, "2021_class", vars, "2021", "2020")
+
+fwd_df = imp.forward_imputation(df, "2021_class", vars, "2021", "2020")
 
 print("Ended debug")
