@@ -10,6 +10,7 @@ from src.data_validation import validation as val
 from src.utils import runlog
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
+from src.data_processing.pg_conversion import pg_mapper
 
 MainLogger = logging.getLogger(__name__)
 
@@ -83,6 +84,9 @@ def run_pipeline(start):
     processing.response_rate(contributors_df, responses_df)
     MainLogger.info("Finished Data Transmutation...")
 
+    # PG Mapping
+    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
+    pg_mapper(full_responses, mapper_path, "201")
     # Data validation
     val.check_data_shape(full_responses)
 

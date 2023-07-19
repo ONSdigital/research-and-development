@@ -14,11 +14,12 @@ hdfs_paths:
   logs_foldername: "resdev/logs/run_logs"
   snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   postcode_masterlist: "data/external/ONSPD_NOV_2022_UK.csv"
+  mapper_path: "/ons/rdbe_dev/BERD_Mappers/SIC07_to_PG_Conversion-From_2016_Data.csv"
 network_paths:
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/ONSPD_NOV_2022_UK.csv"
-
+  mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC07 to PG Conversion - From 2016 Data .csv"
 csv_filenames:
     main: "main_runlog.csv"
     configs: "configs_runlog.csv"
