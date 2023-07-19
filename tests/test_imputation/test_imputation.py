@@ -1103,7 +1103,7 @@ class TestRunImputation:
         assert_frame_equal(result_back, expout_df_back)
 
 
-class TestUpdateImputed:  # testing for loops run as expected
+class TestUpdateImputed:
     """Unit test for update_imputed"""
 
     def input_data_update_imputed(self):
@@ -1111,7 +1111,7 @@ class TestUpdateImputed:  # testing for loops run as expected
 
         # columns for the dataframe
         input_cols_full = [
-            "col1",
+            "reference",
             "col2",
         ]
 
@@ -1126,7 +1126,7 @@ class TestUpdateImputed:  # testing for loops run as expected
 
         # columns for the dataframe
         input_cols_imputed = [
-            "col1",
+            "reference",
             "forwards_imputed_col2",
         ]
 
@@ -1144,7 +1144,7 @@ class TestUpdateImputed:  # testing for loops run as expected
         """Create output data for the update_imputed function"""
 
         # columns for the dataframe
-        output_cols = ["col1", "col2", "imputation_marker"]
+        output_cols = ["reference", "col2", "imputation_marker"]
 
         # data in the column order above
         output_data = [
@@ -1163,12 +1163,11 @@ class TestUpdateImputed:  # testing for loops run as expected
         input_full, input_imputed = self.input_data_update_imputed()
         output_df = self.output_data_update_imputed()
 
-        row_col = "col1"
         target_variables_list = ["col2"]
         direction = "forwards"
 
         df_result = update_imputed(
-            input_full, input_imputed, target_variables_list, direction, row_col
+            input_full, input_imputed, target_variables_list, direction
         )
 
         assert_frame_equal(df_result, output_df)

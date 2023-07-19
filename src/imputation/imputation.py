@@ -517,26 +517,43 @@ def run_imputation(
 
 
 def update_imputed(
-    input_full, input_imputed, target_variables_list, direction, row_col="reference"
+    input_full, input_imputed, target_variables_list, direction, ref_col="reference"
 ) -> pd.DataFrame():
-    """_summary_
+    """Updates missing response data with imputed values for target variables
 
-    Args:
-        df (_type_): _description_
+    Keyword Arguments:
+        input_full -- DataFrame of the response data
+        input_imputed -- DataFrame contining imputed values calculated in
+        imputation module
+        target_variables_list -- list of variable that need imputed if no
+        response
+        direciton -- can be either "forwards" or "backwards" depending on
+        whether current or previous period has no response
 
     Returns:
-        _type_: _description_
+        input_full: DataFrame with missing exchanged for imputed values
+        for target variables
     """
-    # As I'm doing this cell by cell
-    # I could start with rows or columns in the for loops
+
+    # add imputed tag column
     input_full["imputation_marker"] = "response"
-    for row in input_imputed[row_col]:
-        for col in target_variables_list:
-            input_full.loc[input_full[row_col] == row, col] = input_imputed.loc[
-                input_imputed[row_col] == row, f"{direction}_imputed_{col}"
-            ][0]
-            input_full.loc[
-                input_full[row_col] == row, "imputation_marker"
-            ] = f"{direction}_imputed"
+    input_imputed["imputation_marker"] = f"{direction}_imputed"
+
+    # exchange reference col for index
+    # in preparation for update function
+    input_full.index = input_full[ref_col]
+    input_imputed.index = input_imputed[ref_col]
+
+    # rename cols in preparation for update function
+    for col in target_variables_list:
+        input_imputed = input_imputed.rename(
+            columns={f"{direction}_imputed_{col}": col}
+        )
+
+    # apply update - changes input_full inplace
+    input_full.update(input_imputed)
+
+    # change index back to normal
+    input_full = input_full.reset_index(drop=True)
 
     return input_full
