@@ -1,22 +1,19 @@
 import os
 import toml
-import logging
 import postcodes_uk
 import pandas as pd
 
-from src.utils.wrappers import exception_wrap, time_logger_wrap
+import logging
+from src.utils.wrappers import time_logger_wrap, exception_wrap
 from src.utils.helpers import Config_settings
-
 
 # Get the config
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 global_config = config["global"]
-config_paths = config["paths"]
-snapshot_path = config_paths["snapshot_path"]  # Taken from config file
 
 # Set up logging
-validationlogger = logging.getLogger(__name__)
+validation_logger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -38,19 +35,19 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
 
 @exception_wrap
-def get_masterlist(masterlist_path) -> pd.Series:
+def get_masterlist(postcode_masterlist) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
     Returns:
         pd.Series: The dataframe of postcodes
     """
-    masterlist = pd.read_csv(masterlist_path, usecols=["pcd"]).squeeze()
+    masterlist = pd.read_csv(postcode_masterlist, usecols=["pcd"]).squeeze()
     return masterlist
 
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
+def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.
@@ -59,26 +56,16 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
         df (pd.DataFrame): The DataFrame containing the postcodes.
 
     Returns:
-        bool: True if all postcodes are valid, False otherwise.
-
-    Raises:
-        ValueError: If any invalid postcodes are found, a ValueError is raised.
-            The error message includes the list of invalid postcodes.
-
-    Example:
-        >>> df = pd.DataFrame(
-            {"referencepostcode": ["AB12 3CD", "EFG 456", "HIJ 789", "KL1M 2NO"]})
-        >>> validate_post_col(df, "example-path/to/masterlist.csv"")
-        ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
+        A bool: boolean, True if number of columns is as expected, otherwise False
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, masterlist_path)
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
-        validationlogger.warning(
+        validation_logger.warning(
             f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
@@ -89,7 +76,7 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
-        validationlogger.warning(
+        validation_logger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
@@ -104,15 +91,15 @@ def validate_post_col(df: pd.DataFrame, masterlist_path: str) -> bool:
             f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
         )
 
-    validationlogger.info("All postcodes validated....")
+    validation_logger.info("All postcodes validated....")
 
     return True
 
 
-def check_pcs_real(df: pd.DataFrame, masterlist_path: str):
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
-        master_series = get_masterlist(masterlist_path)
+        master_series = get_masterlist(postcode_masterlist)
 
         # Check if postcode are real
         unreal_postcodes = df.loc[
@@ -144,12 +131,12 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
     # Check if Data_Schema.toml exists
     if file_exists:
         # Load toml data schema into dictionary if toml file exists
-        toml_string = toml.load(file_path)
+        toml_dict = toml.load(file_path)
     else:
         # Return False if file does not exist
         return file_exists
 
-    return toml_string
+    return toml_dict
 
 
 @exception_wrap
@@ -162,6 +149,7 @@ def check_data_shape(
     otherwise.
 
     Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
         schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
 
@@ -187,11 +175,115 @@ def check_data_shape(
         cols_match = False
 
     if cols_match is False:
-        validationlogger.warning(f"Data columns match schema: {cols_match}.")
+        validation_logger.warning(f"Data columns match schema: {cols_match}.")
     else:
-        validationlogger.info(f"Data columns match schema: {cols_match}.")
+        validation_logger.info(f"Data columns match schema: {cols_match}.")
 
-    validationlogger.info(
+    validation_logger.info(
         f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
     )
     return cols_match
+
+
+@exception_wrap
+def check_var_names(
+    data_df: pd.DataFrame,
+    filePath: str = "./config/contributors_schema.toml",
+) -> bool:
+    """Compare the keys of the ingested data file and the data schema
+    dictionaries. If they match then returns True, if not then returns
+    False
+
+    Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
+        filePath -- Path to schema TOML file
+        (default: {"./config/Data_Schema.toml"})
+
+    Returns:
+        A bool: boolean value indicating whether data file dictionary
+        keys match the data schema dictionary keys.
+    """
+
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
+
+    # Specify which key in snapshot data dictionary to get correct data
+    # List, with each element containing a dictionary for each row of data
+    data_dict = data_df.to_dict()
+    data_keys = data_dict.keys()
+
+    # Load toml data schema into dictionary
+    toml_string = load_schema(filePath)
+
+    if data_keys == toml_string.keys():
+        dict_match = True
+    else:
+        dict_match = False
+
+    if dict_match is False:
+        validation_logger.warning(f"Data columns names match schema: {dict_match}.")
+    else:
+        validation_logger.info(f"Data columns names match schema: {dict_match}.")
+
+    return dict_match
+
+
+@exception_wrap
+def data_key_diffs(
+    data_df: pd.DataFrame,
+    filePath: str = "./config/contributors_schema.toml",
+) -> dict:
+    """Compare differences between data dictionary and the toml data
+    schema dictionary. Outputs a dictionary with 'dictionary_items_added'
+    and 'dictionary_items_removed' as keys, with values as the items
+    added or removed. Added items show differences in data file dictionary,
+    i.e. difference in column names. Items removed shows columns that
+    are not present in the data file.
+
+    Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
+        filePath -- Path to schema TOML file
+        (default: {"./config/Data_Schema.toml"})
+
+    Returns:
+        A dict: dictionary containing items added to and items removed
+        from the data schema dictionary. Added items show differences
+        in data file column names, items removed show columns missing
+        from the data file.
+    """
+
+    if not isinstance(data_df, pd.DataFrame):
+        raise ValueError(
+            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
+        )
+
+    # Convert it to dictionary
+    # data_dict = data.to_dict()
+    data_dict = data_df.to_dict()
+
+    # Load toml data schema into dictionary
+    schema_dict = load_schema(filePath)
+
+    # Check differences between the keys
+    missing_from_df = set(schema_dict.keys()) - set(data_dict.keys())
+    added_to_df = set(data_dict.keys()) - set(schema_dict.keys())
+
+    # Checks if the length of the key set is the same in the two dictionaries
+    if len(schema_dict.keys()) != len(data_dict.keys()):
+        validation_logger.warning(
+            f"""Differences detected in data compared to schema: \n
+                                 \n Additional columns: {added_to_df}
+                                 \n Removed columns: {missing_from_df} \n"""
+        )
+    else:
+        validation_logger.info(
+            f"""Data and schema columns match. \n
+                                 \n Additional columns: {added_to_df}
+                                 \n Removed columns: {missing_from_df} \n"""
+        )
+
+    diff_dict = {"Add_columns": added_to_df, "Remvd_columns": missing_from_df}
+
+    return diff_dict

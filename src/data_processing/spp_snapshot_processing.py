@@ -5,6 +5,7 @@ import logging
 
 spp_processing_logger = logging.getLogger(__name__)
 
+
 def create_response_dataframe(
     df: pd.DataFrame, unique_id_cols: List[str]
 ) -> pd.DataFrame:

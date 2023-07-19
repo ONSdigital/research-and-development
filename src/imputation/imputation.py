@@ -1,20 +1,22 @@
 import pandas as pd
-import math
+import numpy as np
 
 # TODO almost each could be further generalised in terms of
 # variable and function names
 
 
-def filter_data(
+def filter_by_column_content(
     raw_df: pd.DataFrame, column: str, column_content: str
-) -> pd.DataFrame():
-    """_summary_
+) -> pd.DataFrame:
+    """Filter a column for specific string content.
 
     Args:
-        raw_df (_type_): _description_
+        raw_df (pd.DataFrame): The dataframe to be filtered.
+        column (str): The name of the column to be filtered.
+        column_content (str): The content to be filtered on.
 
     Returns:
-        _type_: _description_
+        pd.DataFrame: The filtered dataframe.
     """
     # filter for rows with column_content
     clean_df = raw_df[raw_df[column] == column_content].copy()
@@ -22,9 +24,29 @@ def filter_data(
     return clean_df
 
 
-def create_class_col(
+def rename_imp_col(clean_df: pd.DataFrame):
+    """
+    This function renames columns in dataframe, replacing civ_or_def with 200
+    and Product_group with 201 if they are present.
+
+    Args:
+        clean_df (pd.DataFrame): Input Dataframe to rename columns.
+
+    Returns:
+        pd.Dataframe: returns dataframe with renamed columns.
+    """
+    if "civ_or_def" in clean_df.columns:
+        clean_df = clean_df.rename(columns={"civ_or_def": "200"})
+
+    if "Product_group" in clean_df.columns:
+        clean_df = clean_df.rename(columns={"Product_group": "201"})
+
+    return clean_df
+
+
+def create_imp_class_col(
     clean_df: pd.DataFrame, col_first_half: str, col_second_half: str, class_name: str
-) -> pd.DataFrame():
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -33,19 +55,22 @@ def create_class_col(
     Returns:
         _type_: _description_
     """
+
+    # TODO remove when using real data
+    clean_df[f"{col_second_half}"] = clean_df[f"{col_second_half}"].astype(str)
+
     # Create class col with concatenation
     clean_df[f"{class_name}"] = (
-        clean_df[f"{col_first_half}"] + clean_df[f"{col_second_half}"]
+        clean_df[f"{col_first_half}"] + "_" + clean_df[f"{col_second_half}"]
     )
 
     return clean_df
 
 
 def filter_same_class(
-    clean_df: pd.DataFrame, current_quarter: str, previous_quarter: str
-) -> pd.DataFrame():
+    clean_df: pd.DataFrame, current_period: str, previous_period: str
+) -> pd.DataFrame:
     """_summary_
-
     Args:
         clean_df (_type_): _description_
 
@@ -55,7 +80,7 @@ def filter_same_class(
 
     # Filter for cols with same contents
     clean_same_class_df = clean_df[
-        clean_df[f"{current_quarter}_class"] == clean_df[f"{previous_quarter}_class"]
+        clean_df[f"{current_period}_class"] == clean_df[f"{previous_period}_class"]
     ].copy()
 
     return clean_same_class_df
@@ -64,9 +89,9 @@ def filter_same_class(
 def filter_pairs(
     clean_same_class_df: pd.DataFrame,
     target_variable: str,
-    current_quarter: str,
-    previous_quarter: str,
-) -> pd.DataFrame():
+    current_period: str,
+    previous_period: str,
+) -> pd.DataFrame:
     """_summary_ Checks two columns have same contents
 
     Args:
@@ -78,12 +103,9 @@ def filter_pairs(
     # TODO needs more tweeks but essentially same as
     # filter_same_class but for target var not class
     matched_pairs_df = clean_same_class_df[
-        (
-            clean_same_class_df[f"{current_quarter}_{target_variable}_status"]
-            == "Present"
-        )
+        (clean_same_class_df[f"{current_period}_{target_variable}_status"] == "Present")
         & (
-            clean_same_class_df[f"{previous_quarter}_{target_variable}_status"]
+            clean_same_class_df[f"{previous_period}_{target_variable}_status"]
             == "Present"
         )
     ].copy()
@@ -94,27 +116,30 @@ def filter_pairs(
 def calc_growth_ratio(
     target_variable: str,
     df: pd.DataFrame,
-    current_quarter: str,
-    previous_quarter: str,
-) -> pd.DataFrame():
-    """_summary_
+    current_period: int,
+    previous_period: int,
+) -> pd.DataFrame:
+    """Calculate the growth ratio for imputation.
 
     Args:
-        target_variable (_type_): _description_
+        target_variable (str): The column name of the target variable.
+        df (pd.DataFrame): The dataframe containing the target variables.
+        current_period
 
     Returns:
         _type_: _description_
     """
     # for every target variable a growth ratio is calcualted
+
     df[f"{target_variable}_growth_ratio"] = (
-        df[f"{current_quarter}_{target_variable}"]
-        / df[f"{previous_quarter}_{target_variable}"]
+        df[f"{current_period}_{target_variable}"]
+        / df[f"{previous_period}_{target_variable}"]
     )
 
     return df
 
 
-def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame():
+def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -123,14 +148,24 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame():
     Returns:
         _type_: _description_
     """
+    # import ipdb
+
+    # ipdb.set_trace()
     # sorted based on hard coded list (in arg by=)
     sorted_df = df.sort_values(
+        # by=[
+        #     "product_group",
+        #     "civ_or_def",
+        #     f"{target_variable}_growth_ratio",
+        #     "employee_count",
+        #     "ru_ref",
+        # ],
         by=[
-            "product_group",
-            "civ_or_def",
+            "200",
+            "201",
             f"{target_variable}_growth_ratio",
-            "employee_count",
-            "ru_ref",
+            "employees",
+            "reference",
         ],
         ascending=[True, True, True, False, True],
     )
@@ -141,7 +176,7 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame():
 
 def trim_check(
     df: pd.DataFrame, check_value=10
-) -> pd.DataFrame():  # TODO add check_value to a cofig
+) -> pd.DataFrame:  # TODO add check_value to a cofig
     """_summary_
 
     Args:
@@ -160,12 +195,12 @@ def trim_check(
     return df
 
 
-def trim(
+def trim_bounds(
     df: pd.DataFrame,
     lower_perc=15,  # TODO add percentages to config -
     # check method inBERD_imputation_spec_V3
     upper_perc=15,
-) -> pd.DataFrame():
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -176,12 +211,12 @@ def trim(
         _type_: _description_
     """
     # trim only if more than 10
-    df = filter_data(df, "trim_check", "above_trim_threshold")
+    df = filter_by_column_content(df, "trim_check", "above_trim_threshold")
     df.reset_index(drop=True, inplace=True)
 
     # define the bounds for trimming
-    remove_lower = math.ceil(len(df) * (lower_perc / 100))
-    remove_upper = math.ceil(len(df) * (1 - upper_perc / 100))
+    remove_lower = np.ceil(len(df) * (lower_perc / 100))
+    remove_upper = np.ceil(len(df) * (1 - upper_perc / 100))
 
     # create trim tag (distinct from trim_check)
     # to mark which to trim for mean growth ratio
@@ -198,7 +233,7 @@ def get_mean_growth_ratio(
     dict_mean_growth_ratio: dict,  # TODO maybe rename to more decriptive name
     unique_item: str,
     target_variable: str,
-) -> pd.DataFrame():
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -214,7 +249,7 @@ the RAP team and MQD to determine the
 quality of the imputed value. """
 
     # remove the "trim" tagged rows
-    df_trimmed = filter_data(df, "trim", "dont trim")
+    df_trimmed = filter_by_column_content(df, "trim", "dont trim")
 
     dict_mean_growth_ratio[
         f"{unique_item}_{target_variable}_mean_growth_ratio and count"
@@ -225,6 +260,7 @@ quality of the imputed value. """
     # Also add to a dataframe:
     # df[f'{target_variable}_mean_growth_ratio'] = \
     # df[f'{target_variable}_growth_ratio'].mean()
+
     return dict_mean_growth_ratio  # TODO aka "imputation links"
     # what naming is best?
 
@@ -233,9 +269,10 @@ def loop_unique(
     df: pd.DataFrame,  # TODO think of a better name for function
     column: str,
     target_variables_list: list,
-    current_quarter: str,
-    previous_quarter: str,
-) -> pd.DataFrame():
+    current_period: str,
+    previous_period: str,
+    dict_mean_growth_ratio={},
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -245,7 +282,7 @@ def loop_unique(
         _type_: _description_
     """
     # will be looping over the class col
-    dict_mean_growth_ratio = {}  # TODO change to dict at the end
+    # dict_mean_growth_ratio = {}  # TODO change to dict at the end
     # growth_ratio_dfs_list = []
     # for subsets of class and then on target variable at a time
     # growht ratio in calculated, data is sorted, trim check done,
@@ -255,11 +292,11 @@ def loop_unique(
         unique_item_df = df[df[column] == unique_item].copy()
         for target_variable in target_variables_list:
             growth_ratio_df = calc_growth_ratio(
-                target_variable, unique_item_df, current_quarter, previous_quarter
+                target_variable, unique_item_df, current_period, previous_period
             )
-            sorted_df = sort(target_variable, growth_ratio_df)
+            sorted_df = sort_df(target_variable, growth_ratio_df)
             trim_check_df = trim_check(sorted_df)
-            trimmed_df = trim(trim_check_df)
+            trimmed_df = trim_bounds(trim_check_df)
 
             dict_mean_growth_ratio = get_mean_growth_ratio(
                 trimmed_df, dict_mean_growth_ratio, unique_item, target_variable
@@ -279,9 +316,9 @@ def forward_imputation(
     df: pd.DataFrame,
     column: str,
     target_variables_list: list,
-    current_quarter: str,
-    previous_quarter: str,
-) -> pd.DataFrame():
+    current_period: str,
+    previous_period: str,
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -291,39 +328,38 @@ def forward_imputation(
         _type_: _description_
     """
 
-    df_growth_ratio = df[
-        df["current_quarter_var1"] != "missing"
-    ].copy()  # TODO add f string
+    df_growth_ratio = df[~df.isin([np.nan]).any(axis=1)].copy()
+    # df_growth_ratio = df[
+    #     df[f"{current_period}_var1"] != "missing"
+    # ].copy()  # TODO add f string
 
     dict_mean_growth_ratio = loop_unique(
         df_growth_ratio,
         column,
         target_variables_list,
-        current_quarter,
-        previous_quarter,
+        current_period,
+        previous_period,
     )
 
-    # {'class1_var1_mean_growth_ratio and count':[0.5,11]}
     dfs_list = []
     df_final = df.copy()
-    for class_name in df_final[f"{current_quarter}_class"].unique():
+    for class_name in df_final[f"{current_period}_class"].unique():
         for var in target_variables_list:
-            print("dmklsd")
             df_other = df_final[
-                df_final[f"{current_quarter}_class"] == class_name
+                df_final[f"{current_period}_class"] == class_name
             ].copy()
             df_other = df_other[
-                df_other["current_quarter_var1"] == "missing"
+                df_other[f"{current_period}_{var}"].isnull()
             ].copy()  # change the name of df_final and df_other
-            df_other[f"{class_name}_{var}_growth_ratio"] = int(
-                dict_mean_growth_ratio[
-                    f"{class_name}_{var}_mean_growth_ratio and count"
-                ][0]
-            )  # why doesn't float work?
-            df_other[f"forwards_imputed_{var}"] = (
+
+            df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
+                f"{class_name}_{var}_mean_growth_ratio and count"
+            ][0] 
+            df_other[f"forwards_imputed_{var}"] = round(
                 df_other[f"{class_name}_{var}_growth_ratio"]
-                * df_other[f"{previous_quarter}_{var}"]
-            )
+                * df_other[f"{previous_period}_{var}"]
+            ).astype("Int64")
+
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])
             dfs_list.append(df_other)
 
@@ -337,9 +373,9 @@ def backwards_imputation(
     df: pd.DataFrame,
     column: str,
     target_variables_list: list,
-    current_quarter: str,
-    previous_quarter: str,
-) -> pd.DataFrame():
+    current_period: str,
+    previous_period: str,
+) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -349,43 +385,88 @@ def backwards_imputation(
         _type_: _description_
     """
 
-    df_growth_ratio = df[
-        df["previous_quarter_var1"] != "missing"
-    ].copy()  # TODO add f string
+    df_growth_ratio = df[~df.isin([np.nan]).any(axis=1)].copy()
+    # df_growth_ratio = df[
+    #     df[f"{previous_period}_var1"] != "missing"
+    # ].copy()  # TODO add f string
 
     dict_mean_growth_ratio = loop_unique(
         df_growth_ratio,
         column,
         target_variables_list,
-        current_quarter,
-        previous_quarter,
+        current_period,
+        previous_period,
     )
 
-    # {'class1_var1_mean_growth_ratio and count':[0.5,11]}
     dfs_list = []
     df_final = df.copy()
-    for class_name in df_final[f"{current_quarter}_class"].unique():
+    for class_name in df_final[f"{current_period}_class"].unique():
         for var in target_variables_list:
-            print("dmklsd")
             df_other = df_final[
-                df_final[f"{current_quarter}_class"] == class_name
+                df_final[f"{current_period}_class"] == class_name
             ].copy()
             df_other = df_other[
-                df_other["previous_quarter_var1"] == "missing"
+                df_other[f"{previous_period}_{var}"].isnull()
             ].copy()  # TODO change the name of df_final and df_other
-            # TODO add f string to previous_quarter_var1
-            df_other[f"{class_name}_{var}_growth_ratio"] = int(
-                dict_mean_growth_ratio[
-                    f"{class_name}_{var}_mean_growth_ratio and count"
-                ][0]
-            )  # why doesn't float work?
-            df_other[f"backwards_imputed_{var}"] = (
-                df_other[f"{current_quarter}_{var}"]
+            # TODO add f string to previous_period_var1
+            df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
+                f"{class_name}_{var}_mean_growth_ratio and count"
+            ][0]  
+            df_other[f"backwards_imputed_{var}"] = round(
+                df_other[f"{current_period}_{var}"]
                 / df_other[f"{class_name}_{var}_growth_ratio"]
-            )
+            ).astype("Int64")
             df_other = df_other.drop(columns=[f"{class_name}_{var}_growth_ratio"])
             dfs_list.append(df_other)
 
     df_out = pd.concat(dfs_list)
 
     return df_out
+
+
+def run_imputation(
+    # full_responses: pd.DataFrame,  # df = full_responses.copy()
+    # column: str,
+    test_df,
+    target_variables_list: list,
+    current_period: str,
+    previous_period: str,
+) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        df (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+    current_period = "202012"
+    previous_period = "202009"
+    target_variables_list = ["var1", "var2"]
+
+    # replacing civ_or_def with 200 and Product_group with 201
+    test_df = rename_imp_col(test_df)
+
+    # q200 is Business or business R&D type
+    # q201 is Product Group
+    clean_df = create_imp_class_col(test_df, "200", "201", f"{current_period}_class")
+    clean_df.reset_index(drop=True, inplace=True)
+
+    forward_df = forward_imputation(
+        clean_df,
+        f"{current_period}_class",
+        target_variables_list,
+        current_period,
+        previous_period,
+    )
+
+    backwards_df = backwards_imputation(
+        clean_df,
+        f"{current_period}_class",
+        target_variables_list,
+        current_period,
+        previous_period,
+    )
+
+    return forward_df, backwards_df
