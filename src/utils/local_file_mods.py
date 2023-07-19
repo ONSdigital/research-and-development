@@ -6,8 +6,9 @@ import pandas as pd
 import logging
 
 
-# Set up logger 
+# Set up logger
 lfmod_logger = logging.getLogger(__name__)
+
 
 def read_local_csv(filepath: str) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
@@ -21,6 +22,22 @@ def read_local_csv(filepath: str) -> pd.DataFrame:
     with open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         df = pd.read_csv(file)
+
+    return df
+
+
+def read_local_mapper_csv(filepath: str, from_col: str, to_col: str) -> pd.DataFrame:
+    """Reads a csv from DAP into a Pandas Dataframe
+    Args:
+        filepath (str): Filepath (Specified in config)
+
+    Returns:
+        pd.DataFrame: Dataframe created from csv
+    """
+    # Open the file in read mode inside Hadoop context
+    with open(filepath, "r") as file:
+        # Import csv file and convert to Dataframe
+        df = pd.read_csv(file, usecols=[from_col, to_col])
 
     return df
 
@@ -119,9 +136,10 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
 
     return output
 
+
 def local_mkdir(path):
     """Creates a directory on a local network drive
-    
+
     Args:
         path (string) -- The path to create
     """
@@ -131,7 +149,7 @@ def local_mkdir(path):
 
 def local_open(filepath, mode):
     """Opens a file on a local network drive
-    
+
     Args:
         filepath (string) -- The filepath
         mode (string) -- The mode to open the file in
@@ -142,7 +160,7 @@ def local_open(filepath, mode):
 
 def local_file_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
-    
+
     Args:
         filepath (string) -- The filepath
         df (pd.DataFrame) -- The data to write

@@ -15,6 +15,7 @@ from src.utils.local_file_mods import (
     local_mkdir,
     local_open,
     local_file_write_feather,
+    read_local_mapper_csv,
 )
 
 
@@ -55,6 +56,21 @@ def test_read_local_csv(test_csv_file, expout_data):
     assert isinstance(df, pd.DataFrame)
     # Check that the df is the same as the expected data
     pd.testing.assert_frame_equal(df, expout_data)
+
+
+@pytest.fixture
+def map_expout_data():
+    data = {"run_id": [1, 2], "timestamp": ["Time:1", "Time:2"]}
+    return pd.DataFrame(data)
+
+
+def test_read_local_mapper_csv(test_csv_file, map_expout_data):
+    # Creating df using the function and test csv
+    df = read_local_mapper_csv(str(test_csv_file), "run_id", "timestamp")
+    # Make sure the reader function has returned a df
+    assert isinstance(df, pd.DataFrame)
+    # Check that the df is the same as the expected data
+    pd.testing.assert_frame_equal(df, map_expout_data)
 
 
 def test_write_local_csv(tmp_path, input_data):

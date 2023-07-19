@@ -14,6 +14,7 @@ from src.utils.hdfs_mods import (
     hdfs_file_exists,
     hdfs_file_size,
     check_file_exists,
+    read_hdfs_mapper_csv,
 )
 
 sys.modules["mock_f"] = mock.Mock()
@@ -64,6 +65,31 @@ class TestReadCsv:
         mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
 
         df_expout = self.expout_data()
+        pd.testing.assert_frame_equal(df_result, df_expout)
+
+    @mock.patch("src.utils.hdfs_mods.pd")
+    @mock.patch("src.utils.hdfs_mods.hdfs")
+    def test_read_hdfs_mapper_csv(self, mock_hdfs, mock_pd_csv):
+
+        mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
+
+        data = {
+            "run_id": [1, 2],
+            "timestamp": ["Time:1", "Time:2"],
+        }
+
+        mock_pd_csv.read_csv.return_value = pd.DataFrame(data)
+
+        df_result = read_hdfs_mapper_csv(
+            "file/path/filename.csv", "run_id", "timestamp"
+        )
+
+        # make sure function was called with mocked parameter in 'with open'
+        mock_pd_csv.read_csv.assert_called_with(
+            sys.modules["mock_f"], usecols=["run_id", "timestamp"]
+        )
+
+        df_expout = pd.DataFrame(data)
         pd.testing.assert_frame_equal(df_result, df_expout)
 
 
