@@ -10,29 +10,28 @@ conf_obj = Config_settings()
 config = conf_obj.config_dict
 
 # Check the environment switch
-network_or_hdfs = config["global"]["network_or_hdfs"]
+# network_or_hdfs = config["global"]["network_or_hdfs"]
 
-if network_or_hdfs == "network":
-    HDFS_AVAILABLE = False
-    from src.utils.local_file_mods import read_local_mapper_csv as read_csv
+# if network_or_hdfs == "network":
+#     HDFS_AVAILABLE = False
+#     from src.utils.local_file_mods import read_local_mapper_csv as read_csv
 
-elif network_or_hdfs == "hdfs":
-    HDFS_AVAILABLE = True
-    from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_csv
+# elif network_or_hdfs == "hdfs":
+#     HDFS_AVAILABLE = True
+#     from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_csv
 
-else:
-    pg_logger.error("The network_or_hdfs configuration is wrong")
-    raise ImportError
+# else:
+#     pg_logger.error("The network_or_hdfs configuration is wrong")
+#     raise ImportError
 
 
 def pg_mapper(
     df: pd.DataFrame,
+    mapper: pd.DataFrame,
     target_col: str,
     from_col: str = "2016 > Form PG",
     to_col: str = "2016 > Pub PG",
 ):
-    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
-    mapper = read_csv(mapper_path, from_col, to_col).squeeze()
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
 

@@ -32,6 +32,7 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
+    from src.utils.local_file_mods import read_local_mapper_csv as read_mapper_csv
 
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
@@ -42,7 +43,7 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-
+    from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_mapper_csv
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -85,7 +86,11 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Transmutation...")
 
     # PG Mapping
-    pg_mapper(full_responses, "201")
+    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
+    from_col, to_col = "2016 > Form PG", "2016 > Pub PG"
+    mapper = read_mapper_csv(mapper_path, from_col, to_col).squeeze()
+    pg_mapper(full_responses, mapper, "201")
+
     # Data validation
     val.check_data_shape(full_responses)
 

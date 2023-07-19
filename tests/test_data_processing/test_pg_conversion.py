@@ -20,6 +20,16 @@ def dummy_data() -> pd.DataFrame:
 
 
 @pytest.fixture
+def mapper() -> pd.DataFrame:
+    # Set up the dummy data
+    mapper = {
+        "2016 > Form PG": [0, 1, 2, 3, 4, 5],
+        "2016 > Pub PG": [np.nan, "A", "B", "C", "C", "D"],
+    }
+    return pd.DataFrame(mapper)
+
+
+@pytest.fixture
 def expected_output() -> pd.DataFrame:
     # Set up the dummy data
     expected_output = pd.DataFrame(
@@ -30,13 +40,13 @@ def expected_output() -> pd.DataFrame:
     return expected_output
 
 
-def test_pg_mapper(dummy_data, expected_output):
+def test_pg_mapper(dummy_data, expected_output, mapper):
     """Tests for full_responses function."""
     # Import modules to test
 
     target_col = dummy_data.columns[0]
     expected_output_data = expected_output.astype("category")
 
-    df_result = pg_mapper(dummy_data, target_col)
+    df_result = pg_mapper(dummy_data, mapper, target_col)
 
     pd.testing.assert_frame_equal(df_result, expected_output_data)
