@@ -4,12 +4,11 @@ import logging
 import time
 
 from src._version import __version__ as version
-from src.data_ingest import spp_parser
-from src.data_processing import spp_snapshot_processing as processing
-from src.data_validation import validation as val
+
 from src.utils import runlog
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
+from src.staging.staging_main import run_staging
 
 MainLogger = logging.getLogger(__name__)
 
@@ -63,32 +62,13 @@ def run_pipeline(start):
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-    # Data Ingest
-    MainLogger.info("Starting Data Ingest...")
-    # Load SPP data from DAP
 
-    snapshot_path = config[f"{network_or_hdfs}_paths"]["snapshot_path"]
-
-    # Check data file exists
-    check_file_exists(snapshot_path)
-
-    snapdata = load_json(snapshot_path)
-    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
-    MainLogger.info("Finished Data Ingest...")
-
-    # Data Transmutation
-    MainLogger.info("Starting Data Transmutation...")
-    full_responses = processing.full_responses(contributors_df, responses_df)
+    # Staging and validatation
+    MainLogger.info("Starting Staging and Validation...")
+    full_responses = run_staging(config, check_file_exists, load_json)
     print(full_responses.sample(5))
-    processing.response_rate(contributors_df, responses_df)
-    MainLogger.info("Finished Data Transmutation...")
 
-    # Data validation
-    val.check_data_shape(full_responses)
-
-    # Check the postcode column
-    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
+    # Load SPP data from
 
     # forward_df, backwards_df = run_imputation(
     #    ["201", "202"],
