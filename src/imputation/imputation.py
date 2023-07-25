@@ -328,8 +328,16 @@ def groupby_unique(
     Returns:
         _type_: _description_
     """
+
+    # Create target var list as they will be in df
+    target_vars_with_years = [
+        f"{yr}_{var}"
+        for var in target_variables_list
+        for yr in [current_period, previous_period]
+    ]
+
     # group by the class column and target variable
-    grouped = df.groupby([class_col, *target_variables_list])
+    grouped = df.groupby([class_col, *target_vars_with_years])
 
     # apply the calc_growth_ratio function to each group
     growth_ratio_df = grouped.apply(
@@ -575,12 +583,7 @@ if __name__ == "__main__":
 
     class_col = f"{current_period}_class"
 
-    target_variables_list = [
-        f"{current_period}_var1",
-        f"{current_period}_var2",
-        f"{previous_period}_var1",
-        f"{previous_period}_var2",
-    ]
+    target_variables_list = ["var1", "var2"]
 
     groupby_unique(
         input_df,
