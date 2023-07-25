@@ -2,11 +2,11 @@ import pandas as pd
 import pytest
 import toml
 
-from src.data_validation.validation import (
+from src.staging.validation import (
     validate_post_col,
     validate_postcode_pattern,
     check_pcs_real,
-)  # noqa
+)
 from src.utils.helpers import Config_settings
 
 # Get the config
@@ -48,9 +48,7 @@ def mock_get_masterlist(postcode_masterlist):
 # Test case for validate_post_col
 def test_validate_post_col(test_data_df, monkeypatch, caplog):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr(
-        "src.data_validation.validation.get_masterlist", mock_get_masterlist
-    )
+    monkeypatch.setattr("src.staging.validation.get_masterlist", mock_get_masterlist)
 
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
@@ -139,9 +137,7 @@ def test_validate_postcode():
 def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr(
-        "src.data_validation.validation.get_masterlist", mock_get_masterlist
-    )
+    monkeypatch.setattr("src.staging.validation.get_masterlist", mock_get_masterlist)
 
     # Use the fake path
     postcode_masterlist = "path/to/mock_masterlist.csv"
@@ -166,9 +162,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
 def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr(
-        "src.data_validation.validation.get_masterlist", mock_get_masterlist
-    )
+    monkeypatch.setattr("src.staging.validation.get_masterlist", mock_get_masterlist)
 
     # Use the fake path
     postcode_masterlist = "path/to/masterlist.csv"
@@ -184,7 +178,7 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
 def test_check_data_shape():
     """Test the check_data_shape function."""
     # Arrange
-    from src.data_validation.validation import check_data_shape
+    from src.staging.validation import check_data_shape
 
     # Dataframe for test function to use
     dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
@@ -205,7 +199,7 @@ def test_check_data_shape():
 def test_load_schema():
     """Test the load_schema function."""
     # Arrange
-    from src.data_validation.validation import load_schema
+    from src.staging.validation import load_schema
 
     # Act: use pytest to assert the result
     result_1 = load_schema()
