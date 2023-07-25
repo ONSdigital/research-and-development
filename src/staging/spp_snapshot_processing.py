@@ -60,12 +60,14 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
 
     drop_cols = ["createdby", "createddate", "lastupdatedby", "lastupdateddate"]
 
-    unique_id_cols = ["reference", "period", "survey"]
+    unique_id_cols = ["reference", "instance"]
 
     contributors_dropped = contributors.drop(drop_cols, axis=1)
     responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
 
-    merged_df = contributors_dropped.merge(responses_dropped, on=unique_id_cols, how="outer")
+    merged_df = contributors_dropped.merge(
+        responses_dropped, on=["reference", "survey", "period"], how="outer"
+    )
     # Create contextual df by dropping "questioncode" and "response" cols. Remove dupes
     contextual_df = create_contextual_dataframe(merged_df, unique_id_cols)
 
