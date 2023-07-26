@@ -10,7 +10,7 @@ from src.data_validation import validation as val
 from src.utils import runlog
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.data_ingest.check_data_type import validate_json_shcema
+from src.data_validation.validation import validate_data_with_schema
 
 MainLogger = logging.getLogger(__name__)
 
@@ -80,8 +80,8 @@ def run_pipeline(start):
     # contributors_df['reference'] = contributors_df['reference'].astype(float)
     # print(contributors_df['period'].head(5))
 
-    validate_json_shcema(contributors_df, "./config/contributors_schema.toml")
-    validate_json_shcema(responses_df, "./config/responses_schema.toml")
+    validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+    validate_data_with_schema(responses_df, "./config/responses_schema.toml")
 
     # Data Transmutation
     MainLogger.info("Starting Data Transmutation...")
