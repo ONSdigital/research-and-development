@@ -1,13 +1,3 @@
-[snapshot_id]
-Description = "nan"
-Deduced_Data_Type = "nan"
-Nullable = "nan"
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
-
 [reference]
 Description = "nan"
 Deduced_Data_Type = "int"

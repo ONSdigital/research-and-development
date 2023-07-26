@@ -10,6 +10,7 @@ from src.data_validation import validation as val
 from src.utils import runlog
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
+from src.data_ingest.check_data_type import validate_json_shcema
 
 MainLogger = logging.getLogger(__name__)
 
@@ -75,6 +76,12 @@ def run_pipeline(start):
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
     MainLogger.info("Finished Data Ingest...")
+
+    # contributors_df['reference'] = contributors_df['reference'].astype(float)
+    # print(contributors_df['period'].head(5))
+
+    validate_json_shcema(contributors_df, "./config/contributors_schema.toml")
+    validate_json_shcema(responses_df, "./config/responses_schema.toml")
 
     # Data Transmutation
     MainLogger.info("Starting Data Transmutation...")

@@ -1,48 +1,67 @@
-import json
-import toml
-import jsonschema
-import pandas as pd
+# import toml
+# import pandas as pd
+# import logging
+
+# # from src.utils.wrappers import time_logger_wrap, exception_wrap
+
+# datatype_logger = logging.getLogger(__name__)
 
 
-def validate_json_shcema(file_path: str, schema: str):
-    """
-    This function contains  reads a json file into a pandas data frame,
-    validating it against a schema imported from toml files
-    (config/contributors_schema.toml and config/responses_schema.toml),
-    and casting column data types.
+# def validate_json_shcema(data: pd.DataFrame, schema: str):
 
-    Args:
-        file_path (str): The path to the Json file.
-        schema (str): The path to the schema file
+#     try:
 
-    Raises:
-        FileNotFoundError: If the file or schema does not exist
-        jsonschema.ValidationError: If the Json data fails schema validation
-    """
+#         with open(schema) as f:
+#             schema_dict = toml.load(f)
 
-    try:
-        # read json file
-        with open(file_path) as f:
-            json_df = json.load(f)
+#         print(data.dtypes)
+#         # print(data.info())
 
-        # load schema from toml
-        with open(schema) as f:
-            schema_dict = toml.load(f)
+#         for column, dtype in schema_dict.items():
+#             # print(f'column{column}:{dtype}')
+#             d_type = dtype.get("Deduced_Data_Type")
+#             print(d_type)
+#             if column not in data.columns:
+#                 raise ValueError(f"column{column} not in data frame")
 
-        jsonschema.validate(json_df, schema_dict)
+#             d_type = dtype.get("Deduced_Data_Type")
 
-        data = pd.DataFrame(json_df)
+#             if d_type == "None":
+#                 data[column] = data[column].replace({"None": pd.NA})
 
-        for column, dtype in schema_dict.items():
-            data[column] = data[column].astype(dtype)
+#             elif d_type == "Datetime":
+#                 data[column] = pd.to_datetime(data[column], errors="coerce")
 
-        return data
+#             elif d_type == "pandas.NA":
+#                 data[column] = data[column].replace({"pandas.NA": pd.NA})
 
-    except FileNotFoundError:
-        print(f"The file {file_path}  or {schema} does not exist")
-        raise SystemExit(1)
+#             elif d_type == "int":
+#                 data[column] = pd.to_numeric(data[column], errors="coerce").astype(
+#                     "Int64"
+#                 )
 
-    except jsonschema.ValidationError as e:
-        print(f"Schema validation failed for {file_path} ")
-        print(e)
-        raise SystemExit(1)
+#             elif d_type == "float":
+#                 data[column] = pd.to_numeric(data[column], errors="coerce")
+
+#             elif d_type == "category":
+#                 data[column] = data[column].astype(str)
+
+#             elif d_type == "str":
+#                 data[column] = data[column].astype(str)
+
+#             else:
+
+#                 raise ValueError(
+#                     f"Invalid data type {dtype}, specifed col {column}, in schema"
+#                 )
+
+#         return data
+
+#     except FileNotFoundError:
+#         print(f"The file  {schema} does not exist")
+#         raise SystemExit(1)
+
+#     except Exception as e:
+#         print("Schema validation failed for")
+#         print(e)
+#         raise SystemExit(1)
