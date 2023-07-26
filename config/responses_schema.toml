@@ -740,7 +740,7 @@ q_code = q250
 
 [tax_cred_inhouse_expend_long]
 Description = Tax credit claim submitted or intended for In-house expenditure (Y/N) LONG FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -750,7 +750,7 @@ q_code = q251
 
 [purchd_rnd_uk_yesno]
 Description = Purchased/funded R&D in the UK (Yes or No)
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -790,7 +790,7 @@ q_code = q305
 
 [tax_cred_purchd_work_uk_long]
 Description = Tax credit claim submitted or intended for purchased work commissioned in UK (Y/N) LONG FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -800,7 +800,7 @@ q_code = q307
 
 [tax_cred_purchd_work_outside_uk_gov_fund_long]
 Description = Tax credit claim submitted/intended for purchased work outside Ukorig. Funded by UK gov (Y/N) LONG FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -810,7 +810,7 @@ q_code = q308
 
 [tax_cred_purchd_work_outside_uk_oth_long]
 Description = Tax credit claim submitted or intended for all other purchased work outside the UK (Y/N) LONG FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -820,7 +820,7 @@ q_code = q309
 
 [tax_cred_inhouse_expend_short]
 Description = Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
@@ -830,7 +830,7 @@ q_code = q713
 
 [tax_cred_purchd_rnd_short]
 Description = Tax credit claim submitted or intended for purchased R&D (Y/N) SHORT FORM
-Deduced_Data_Type = Boolean (True or False, 0 or 1)
+Deduced_Data_Type = bool
 Nullable = No
 Length =  # an integer of the length, or N/A
 Min_values =  None
