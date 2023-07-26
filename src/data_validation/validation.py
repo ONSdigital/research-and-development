@@ -192,3 +192,33 @@ def check_data_shape(
         f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
     )
     return cols_match
+
+
+def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
+
+    try:
+        # load contributers schema from toml
+        dtypes_schema = load_schema(schema_path)
+
+        dtypes_dict = {
+            column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
+            for column_nm in dtypes_schema.keys()
+        }
+
+        # print(data.dtypes)
+        # print(data.info())
+    except FileNotFoundError:
+        print(f"The file  {schema_path} does not exist")
+        raise SystemExit(1)
+
+    except Exception as nested_exception:
+        print(f"Nested Exception: {nested_exception}")
+
+        # data.astype(data_types_dict)
+        for column in survey_df.columns:
+            try:
+                survey_df[column].astype(dtypes_dict[column])
+                print(survey_df.dtypes)
+
+            except toml.TomlDecodeError as e:
+                print(f"tomldecode error:{e}")
