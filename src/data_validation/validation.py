@@ -2,6 +2,7 @@ import os
 import toml
 import postcodes_uk
 import pandas as pd
+from numpy import nan
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -195,30 +196,34 @@ def check_data_shape(
 
 
 def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
+    """Takes the schema from the toml file and validates the survey data df.
 
-    try:
-        # load contributers schema from toml
-        dtypes_schema = load_schema(schema_path)
+    Args:
+        survey_df (pd.DataFrame): Survey data in a pd.df format
+        schema_path (str): path to the schema toml (should be in config folder)
+    """
 
-        dtypes_dict = {
-            column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
-            for column_nm in dtypes_schema.keys()
-        }
+    # Load schema from toml
+    dtypes_schema = load_schema(schema_path)
 
-        # print(data.dtypes)
-        # print(data.info())
-    except FileNotFoundError:
-        print(f"The file  {schema_path} does not exist")
-        raise SystemExit(1)
+    # Create a dict for dtypes only
+    dtypes_dict = {
+        column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
+        for column_nm in dtypes_schema.keys()
+    }
 
-    except Exception as nested_exception:
-        print(f"Nested Exception: {nested_exception}")
+    # Cast each column individually and catch any errors
+    for column in survey_df.columns:
 
-        # data.astype(data_types_dict)
-        for column in survey_df.columns:
-            try:
-                survey_df[column].astype(dtypes_dict[column])
-                print(survey_df.dtypes)
-
-            except toml.TomlDecodeError as e:
-                print(f"tomldecode error:{e}")
+        # Fix for the columns which contain empty strings. We want to cast as NaN
+        if dtypes_dict[column] == "pd.NA":
+            # Replace whatever is in that column with np.nan
+            survey_df[column] = nan
+            dtypes_dict[column] = "float64"
+        try:
+            # Try to cast each column to the required data type
+            validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
+            survey_df[column].astype(dtypes_dict[column])
+            validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
+        except Exception as e:
+            validation_logger.error(e)
