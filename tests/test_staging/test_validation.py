@@ -1,10 +1,9 @@
 import pandas as pd
+import numpy as np
 import pytest
 import toml
-from unittest import mock
 
 # from unittest.mock import MagicMock, patch
-from pandas.testing import assert_frame_equal
 from src.staging.validation import (
     validate_post_col,
     validate_postcode_pattern,
@@ -218,41 +217,44 @@ def test_load_schema():
     pytest.raises(TypeError, load_schema, True)
 
 
-class TestValidateDataSchema:
-    """Unite test the validate_data_schema"""
+# Mock the schema data
+def mock_load_data(filepath):
+    data_type_schema = {
+        "col1": {"Deduced_Data_Type": "int"},
+        "col2": {"Deduced_Data_Type": "str"},
+        "col3": {"Deduced_Data_Type": "float"},
+        "col4": {"Deduced_Data_Type": "datetime64[ns]"},
+    }
+    return data_type_schema
 
-    @mock.patch("src.data_ingest.check_data_type.open")
-    # @mock.patch("src.data_ingest.check_data_type.json.load")
-    @mock.patch("src.data_ingest.check_data_type.toml.load")
-    # @mock.patch("src.data_ingest.check_data_type.jsonschema.validate")
-    def test_validate_data_with_schema(self, mock_toml, mock_open):
-        """Test the validate_json_shcema  to data types are correct in
-        the source data
-        """
 
-        mock_open.return_value.read.return_value = mock.MagicMock()
+@pytest.fixture
+def mock_load_schema(monkeypatch):
 
-        dumy_data = pd.DataFrame(
-            {
-                "col1": [2, 4, 6],
-                "col2": ["Z", "Y", "V"],
-                "col3": [2.6, 3.8, 4.9],
-            }
-        )
+    monkeypatch.setattr("src.staging.validation.load_schema", mock_load_data)
 
-        mock_toml_load = {"col1": "int", "col2": "str", "col3": "float"}
-        mock_toml.return_value = mock_toml_load
 
-        expected_data = pd.DataFrame(
-            {
-                "col1": [2, 4, 6],
-                "col2": ["Z", "Y", "V"],
-                "col3": [2.6, 3.8, 4.9],
-            }
-        )
+def test_validate_data_with_schema(mock_load_schema):
+    """Test the validate_data_with_shcema  to data types are correct in
+    the source data
+    """
+    # Dumy data for testing
+    dumy_data = pd.DataFrame(
+        {
+            "col1": [2, 4, 6],
+            "col2": ["Z", "Y", "V"],
+            "col3": [2.6, 3.8, 4.6],
+            "col4": ["2023-07-23", "2023-07-24", "2023-07-25"],
+        }
+    )
+    # convert col4 datetime type
+    dumy_data["col4"] = pd.to_datetime(dumy_data["col4"])
 
-        actual_data = validate_data_with_schema(dumy_data, "mock_toml_load.toml")
+    # Call the function to be tested
+    validate_data_with_schema(dumy_data, "mock_schema.toml")
 
-        assert_frame_equal(actual_data, expected_data)
-
-        # pd.testing.assert_frame_equal(actual_data, expected_data)
+    # Check data types after validation
+    assert dumy_data["col1"].dtypes == np.int64
+    assert dumy_data["col2"].dtypes == np.object
+    assert dumy_data["col3"].dtypes == np.float64
+    assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
