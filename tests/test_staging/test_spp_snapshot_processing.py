@@ -37,7 +37,7 @@ def dummy_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
 
     responses_schema = {
         "reference": "int64",
-        "instance": "float",
+        "instance": "Int64",
         "period": "int64",
         "survey": "int64",
         "createdby": "str",
@@ -71,7 +71,7 @@ def dummy_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
 def expected_output():
     expected_schema = {
         "reference": "int64",
-        "instance": "float",
+        "instance": "Int64",
         200: "Int64",
         201: "Int64",
         202: "Int64",
