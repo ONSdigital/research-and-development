@@ -5,7 +5,7 @@ import pytest
 from typing import Tuple
 
 
-from src.data_processing.spp_snapshot_processing import (
+from src.staging.spp_snapshot_processing import (
     create_response_dataframe,
     full_responses,
     response_rate,

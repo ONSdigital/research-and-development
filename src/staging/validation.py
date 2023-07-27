@@ -57,17 +57,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
         df (pd.DataFrame): The DataFrame containing the postcodes.
 
     Returns:
-        bool: True if all postcodes are valid, False otherwise.
-
-    Raises:
-        ValueError: If any invalid postcodes are found, a ValueError is raised.
-            The error message includes the list of invalid postcodes.
-
-    Example:
-        >>> df = pd.DataFrame(
-            {"referencepostcode": ["AB12 3CD", "EFG 456", "HIJ 789", "KL1M 2NO"]})
-        >>> validate_post_col(df, "example-path/to/masterlist.csv"")
-        ValueError: Invalid postcodes found: ['EFG 456', 'HIJ 789']
+        A bool: boolean, True if number of columns is as expected, otherwise False
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
@@ -142,12 +132,12 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
     # Check if Data_Schema.toml exists
     if file_exists:
         # Load toml data schema into dictionary if toml file exists
-        toml_string = toml.load(file_path)
+        toml_dict = toml.load(file_path)
     else:
         # Return False if file does not exist
         return file_exists
 
-    return toml_string
+    return toml_dict
 
 
 @exception_wrap
@@ -160,6 +150,7 @@ def check_data_shape(
     otherwise.
 
     Keyword Arguments:
+        data_df -- Pandas dataframe containing data to be checked.
         schema_path -- Path to schema dictionary file
         (default: {"./config/DataSchema.toml"})
 
