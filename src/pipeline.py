@@ -9,6 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+from src.outlier_detection.outlier_main import run_outliers
 
 
 MainLogger = logging.getLogger(__name__)
@@ -76,13 +77,14 @@ def run_pipeline(start):
     MainLogger.info("Finished Data Ingest...")
     print(full_responses.sample(10))
 
-    # Outlier detection
+    # Imputation module
 
-    # Data cleaning
+    # Outlier detection module
+    MainLogger.info("Starting Outlier Detection...")
+    outlier_config = config["outliers"]
+    full_responses = run_outliers(full_responses, outlier_config)
 
-    # Data processing: Imputation
-
-    # Data processing: Estimation
+    # Estimation
 
     # Data processing: Regional Apportionment
 
