@@ -2,17 +2,15 @@
 # Core Python modules
 import time
 import logging
-import re
-import os
 
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.data_ingest import spp_parser, history_loader
-from src.data_processing import spp_snapshot_processing as processing
-from src.data_validation import validation as val
+from src.staging import spp_parser, history_loader
+from src.staging import spp_snapshot_processing as processing
+from src.staging import validation as val
 from src.staging.staging_main import run_staging
 
 
@@ -78,20 +76,21 @@ def run_pipeline(start):
     curent_year = config["years"]["current_year"]
     years_to_load = config["years"]["previous_years_to_load"]
     years_gen = history_loader.history_years(curent_year, years_to_load)
-    
+
     if years_gen is None:
         MainLogger.info("No historic data to load for this run.")
     else:
         MainLogger.info("Loading historic data...")
         history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(years_gen, history_path, read_csv)
+        dict_of_hist_dfs = history_loader.load_history(
+            years_gen, history_path, read_csv
+        )
         if isinstance(dict_of_hist_dfs, dict):
             MainLogger.info(
                 "Dictionary of history data: %s loaded into pipeline",
                 ", ".join(dict_of_hist_dfs),
             )
             MainLogger.info("Historic data loaded.")
-    
 
     # Load SPP data from DAP
 
