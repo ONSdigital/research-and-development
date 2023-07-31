@@ -2,7 +2,7 @@ import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from unittest.mock import MagicMock
 
-from src.data_ingest.history_loader import (
+from src.staging.history_loader import (
     history_years,
     hist_paths_to_load,
     load_history,
@@ -73,7 +73,7 @@ def test_load_history(hist_folder_path: str, monkeypatch: MonkeyPatch) -> None:
 
     # set the attribute for .info message to the mock
     monkeypatch.setattr(
-        "src.data_ingest.history_loader.history_loader_logger.info", mock_info
+        "src.staging.history_loader.history_loader_logger.info", mock_info
     )
 
     result = load_history(year_generator, hist_folder_path, read_csv_func)
