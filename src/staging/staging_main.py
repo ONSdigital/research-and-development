@@ -11,20 +11,30 @@ StagingMainLogger = logging.getLogger(__name__)
 
 
 def run_staging(
-    config: dict, check_file_exists: Callable, load_json: Callable, read_csv: Callable
+    config: dict, 
+    check_file_exists: Callable, 
+    load_json: Callable, 
+    read_csv: Callable,
+    write_csv: Callable
 ) -> pd.DataFrame:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
     one for survey contributers and another for their responses. These are merged
     and transmuted so each question has its own column. The resulting dataframe
-    undergoes validation and then is returned to the pipeline.
+    undergoes validation.
+
+    When running on the local network, 
 
     Args:
         config (dict): The pipeline configuration
         check_file_exists (Callable): Function to check if file exists
             This will be the hdfs or network version depending on settings.
         load_json (Callable): Function to load a json file.
+            This will be the hdfs or network version depending on settings.
+        read_csv (Callable): Function to read a csv file.
+            This will be the hdfs or network version depending on settings.
+        write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
     Returns:
         pd.DataFrame: The staged and vaildated snapshot data.
@@ -68,6 +78,12 @@ def run_staging(
     # load and parse the snapshot data json file
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+
+    # the anonymised snapshot data we use in hdfs 
+    # does not include the instance column. This fix should be removed
+    # when new anonymised data is given.
+    if network_or_hdfs == "hdfs":
+        responses_df["instance"] = 0
     StagingMainLogger.info("Finished Data Ingest...")
 
     # Data Transmutation
@@ -83,5 +99,13 @@ def run_staging(
     # Check the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
+
+    # Output the staged BERD data for BaU testing when on local network.
+    if network_or_hdfs == "network":
+        StagingMainLogger.info("Starting output of staged BERD data...")
+        test_folder = config["network_paths"]["staging_test_foldername"]
+        staged_filename = "staged_BERD_full_responses.csv"
+        write_csv(f"{test_folder}/{staged_filename}", full_responses)
+        StagingMainLogger.info("Finished output of staged BERD data.")
 
     return full_responses

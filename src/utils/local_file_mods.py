@@ -33,7 +33,7 @@ def write_local_csv(filepath: str, data: pd.DataFrame):
         data (pd.DataFrame): Data to be stored
     """
     # Open the file in write mode
-    with open(filepath, "w") as file:
+    with open(filepath, "w", newline='\n', encoding='utf-8') as file:
         # Write dataframe to the file
         data.to_csv(file, index=False)
 
