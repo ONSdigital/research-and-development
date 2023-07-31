@@ -8,9 +8,6 @@ from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.staging import spp_parser, history_loader
-from src.staging import spp_snapshot_processing as processing
-from src.staging import validation as val
 from src.staging.staging_main import run_staging
 
 
@@ -49,9 +46,6 @@ else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
 
-# Conditionally load paths
-paths = config[f"{network_or_hdfs}_paths"]
-
 
 def run_pipeline(start):
     """The main pipeline.
@@ -72,49 +66,13 @@ def run_pipeline(start):
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
-    # Load historic data
-    curent_year = config["years"]["current_year"]
-    years_to_load = config["years"]["previous_years_to_load"]
-    years_gen = history_loader.history_years(curent_year, years_to_load)
-
-    if years_gen is None:
-        MainLogger.info("No historic data to load for this run.")
-    else:
-        MainLogger.info("Loading historic data...")
-        history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(
-            years_gen, history_path, read_csv
-        )
-        if isinstance(dict_of_hist_dfs, dict):
-            MainLogger.info(
-                "Dictionary of history data: %s loaded into pipeline",
-                ", ".join(dict_of_hist_dfs),
-            )
-            MainLogger.info("Historic data loaded.")
-
     # Load SPP data from DAP
 
-    # Staging and validatation
+    # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses = run_staging(config, check_file_exists, load_json)
-    # Check data file exists
-    snapshot_path = paths["snapshot_path"]
-    check_file_exists(snapshot_path)
-
-    snapdata = load_json(snapshot_path)
-    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    full_responses = run_staging(config, check_file_exists, load_json, read_csv)
     MainLogger.info("Finished Data Ingest...")
-
-    # Data Transmutation
-    MainLogger.info("Starting Data Transmutation...")
-    full_responses = processing.full_responses(contributors_df, responses_df)
-    print(full_responses.sample(5))
-
-    # Load SPP data from
-
-    # Check the postcode column
-    postcode_masterlist = paths["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
+    print(full_responses.sample(10))
 
     # Outlier detection
 

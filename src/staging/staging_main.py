@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable
 
-from src.staging import spp_parser
+from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 
@@ -11,7 +11,7 @@ StagingMainLogger = logging.getLogger(__name__)
 
 
 def run_staging(
-    config: dict, check_file_exists: Callable, load_json: Callable
+    config: dict, check_file_exists: Callable, load_json: Callable, read_csv: Callable
 ) -> pd.DataFrame:
     """Run the staging and validation module.
 
@@ -29,9 +29,38 @@ def run_staging(
     Returns:
         pd.DataFrame: The staged and vaildated snapshot data.
     """
-
+    # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
-    snapshot_path = config[f"{network_or_hdfs}_paths"]["snapshot_path"]
+
+    # Conditionally load paths
+    paths = config[f"{network_or_hdfs}_paths"]
+    snapshot_path = paths["snapshot_path"]
+
+    # Load historic data
+    curent_year = config["years"]["current_year"]
+    years_to_load = config["years"]["previous_years_to_load"]
+    years_gen = history_loader.history_years(curent_year, years_to_load)
+
+    if years_gen is None:
+        StagingMainLogger.info("No historic data to load for this run.")
+    else:
+        StagingMainLogger.info("Loading historic data...")
+        history_path = paths["history_path"]
+        dict_of_hist_dfs = history_loader.load_history(
+            years_gen, history_path, read_csv
+        )
+        # Check if it has loaded and is not empty
+        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
+            StagingMainLogger.info(
+                "Dictionary of history data: %s loaded into pipeline",
+                ", ".join(dict_of_hist_dfs),
+            )
+            StagingMainLogger.info("Historic data loaded.")
+        else:
+            StagingMainLogger.warning(
+                "Problem loading historic data. Dict may be empty or not present"
+            )
+            raise Exception("The historic data did not load")
 
     # Check data file exists, raise an error if it does not.
     check_file_exists(snapshot_path)
