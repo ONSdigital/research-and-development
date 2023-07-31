@@ -33,7 +33,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: bash -l {0}
         run: |
-          coverage run --branch --source=./src --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
+          coverage run --branch --source=./src --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py,src/*_main.py \
               -m pytest -ra ./tests --junitxml=junit_result.xml --ignore=tests/test_utils/test_hdfs_mods.py && coverage xml \
               -o python_coverage.xml && coverage report -m --fail-under=10
 # 6) Get the coverage report in to the pull request comments

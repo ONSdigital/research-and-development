@@ -1,14 +1,15 @@
 """The main pipeline"""
-
-import logging
+# Core Python modules
 import time
+import logging
 
-from src._version import __version__ as version
-
+# Our local modules
 from src.utils import runlog
+from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+
 
 MainLogger = logging.getLogger(__name__)
 
@@ -62,19 +63,16 @@ def run_pipeline(start):
     logger = logger_creator(global_config)
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+    # Data Ingest
+    MainLogger.info("Starting Data Ingest...")
 
-    # Staging and validatation
+    # Load SPP data from DAP
+
+    # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses = run_staging(config, check_file_exists, load_json)
-    print(full_responses.sample(5))
-
-    # Load SPP data from
-
-    # forward_df, backwards_df = run_imputation(
-    #    ["201", "202"],
-    #    "202012",
-    #    "202009",
-    # )
+    full_responses = run_staging(config, check_file_exists, load_json, read_csv)
+    MainLogger.info("Finished Data Ingest...")
+    print(full_responses.sample(10))
 
     # Outlier detection
 
