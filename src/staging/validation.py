@@ -214,7 +214,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
         try:
             # Try to cast each column to the required data type
             validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
-            survey_df[column].astype(dtypes_dict[column])
+            survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
             validation_logger.error(e)

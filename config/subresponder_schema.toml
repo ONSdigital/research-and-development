@@ -40,7 +40,7 @@ Possible_Categorical_Values = ["nan"]
 
 [response]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
