@@ -40,19 +40,24 @@ def outlier_flagging(
     """Create Boolean column to flag outliers.
 
     args:
-        df (pd.DataFrame): filtered dataframe containing only essential cols
-            and rows used for auto outliers
+        df (pd.DataFrame): The dataframe used for finding outliers
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
-
+        groupby_cols (list[str]): The columns to be grouped by
+        value_col (str): The name of the column outliers are calculated for
     returns:
         df (pd.DataFrame): The dataframe with a outlier flag column.
     """
     lower_band = 0 + lower_clip
     upper_band = 1 - upper_clip
 
+    # Note: selectiontype=='P' doesn't exist in anonymised data!
+    filtered_df = df[(df.selectiontype.isin({"P", "L"})) & (df[value_col] > 0)]
+    # filtered_df = df[(df.selectiontype=='P') & (df[value_col] > 0)]
+
     quantiles_up = (
-        df.groupby(groupby_cols)
+        filtered_df[groupby_cols + [value_col]]
+        .groupby(groupby_cols)
         .quantile([upper_band], interpolation="nearest")
         .reset_index()
     )
@@ -61,7 +66,8 @@ def outlier_flagging(
     ]
 
     quantiles_low = (
-        df.groupby(groupby_cols)
+        filtered_df[groupby_cols + [value_col]]
+        .groupby(groupby_cols)
         .quantile([lower_band], interpolation="nearest")
         .reset_index()
     )
@@ -71,9 +77,10 @@ def outlier_flagging(
     # quantiles_low.round({'value': 0})
     df = df.merge(quantiles_up, on=groupby_cols).merge(quantiles_low, on=groupby_cols)
 
-    df["auto_outlier"] = (df[value_col] > df.upper_band) | (
-        df[value_col] < df.lower_band
-    )
+    outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band)
+
+    df["auto_outlier"] = outlier_cond & df[value_col] > 0
+    df = df.drop(["upper_band", "lower_band"], axis=1)
     return df
 
 
@@ -110,13 +117,9 @@ def auto_clipping(df: pd.DataFrame, upper_clip: float = 0.1, lower_clip: float =
     df = df.astype({outlier_val_col: float})
     groupby_cols = ["period", "cellnumber"]
 
-    # Note: selectiontype=='P' doesn't exist in anonymised data!
-
-    # Filter dataframe and select cols needed for outlier flag
-    clipping_df = df[df.selectiontype == "P"][groupby_cols + [outlier_val_col]].copy()
-
+    # Calculate flags for auto outliers
     flagged_df = outlier_flagging(
-        clipping_df, upper_clip, lower_clip, groupby_cols, outlier_val_col
+        df, upper_clip, lower_clip, groupby_cols, outlier_val_col
     )
 
     return flagged_df

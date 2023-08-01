@@ -1,13 +1,14 @@
 """Main file for the Outlier Detection module."""
 import logging
 import pandas as pd
+from typing import Callable
 
 from src.outlier_detection import auto_outliers as auto
 
 OutlierMainLogger = logging.getLogger(__name__)
 
 
-def run_outliers(df: pd.DataFrame, outlier_config: dict):
+def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable):
     """
     Run the outliering module.
 
@@ -22,7 +23,9 @@ def run_outliers(df: pd.DataFrame, outlier_config: dict):
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated.
-        outlier_config (dict): The global configuration settings.
+        config (dict): The configuration settings.
+        write_csv (Callable): Function to write to a csv file.
+            This will be the hdfs or network version depending on settings.
 
     Returns:
         df_outliers_applied (pd.DataFrame): The main dataset with a flag column
@@ -30,8 +33,8 @@ def run_outliers(df: pd.DataFrame, outlier_config: dict):
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
 
-    upper_clip = outlier_config["upper_clip"]
-    lower_clip = outlier_config["lower_clip"]
+    upper_clip = config["outliers"]["upper_clip"]
+    lower_clip = config["outliers"]["lower_clip"]
     df_auto_flagged = auto.auto_clipping(df, upper_clip, lower_clip)
     print(df_auto_flagged.head())
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
