@@ -81,8 +81,7 @@ def run_pipeline(start):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outlier_config = config["outliers"]
-    full_responses = run_outliers(full_responses, outlier_config)
+    full_responses = run_outliers(full_responses, config, write_csv)
 
     # Estimation
 
