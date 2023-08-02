@@ -254,7 +254,7 @@ def test_validate_data_with_schema(mock_load_schema):
     validate_data_with_schema(dumy_data, "mock_schema.toml")
 
     # Check data types after validation
-    assert dumy_data["col1"].dtypes == np.int64
+    assert dumy_data["col1"].dtypes == np.int
     assert dumy_data["col2"].dtypes == np.object
-    assert dumy_data["col3"].dtypes == np.float64
+    assert dumy_data["col3"].dtypes == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
