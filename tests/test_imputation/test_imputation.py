@@ -287,35 +287,11 @@ class TestCalcGrowthRatio:
         }
 
         input_data = [
-            [
-                "Clear",
-                2,
-                8,
-                2,
-                4,
-            ],
+            ["Clear", 2, 8, 2, 4],
             ["Clear", 3, 6, 2, np.nan],
-            [
-                "Clear",
-                np.nan,
-                8,
-                np.nan,
-                4,
-            ],
-            [
-                "Clear",
-                2,
-                1,
-                2,
-                4,
-            ],
-            [
-                "Form sent out",
-                5,
-                3,
-                2,
-                4,
-            ],
+            ["Clear", np.nan, 8, np.nan, 4],
+            ["Clear", 2, 1, 2, 4],
+            ["Form sent out", 5, 3, 2, 4],
         ]
 
         input_df = pandasDF(data=input_data, columns=input_cols.keys()).astype(
