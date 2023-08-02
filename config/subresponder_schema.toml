@@ -1,0 +1,99 @@
+[reference]
+Description = "nan"
+Deduced_Data_Type = "int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
+
+[period]
+Description = "nan"
+Deduced_Data_Type = "int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = 6
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [202012]
+
+[survey]
+Description = "All values are 002"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["002"]
+
+[questioncode]
+Description = "nan"
+Deduced_Data_Type = "int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "101"
+Max_values = "714"
+Possible_Categorical_Values = ["nan"]
+
+[response]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[adjustedresponse]
+Description = "nan"
+Deduced_Data_Type = "pd.NA"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[createdby]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["ingestion"]
+
+[createddate]
+Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "datetime64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[lastupdatedby]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = ["None","str"]
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
+
+[lastupdateddate]
+Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "datetime64"
+Nullable = false
+Current_Data_Type = ["None","str"]
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]

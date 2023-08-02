@@ -1,16 +1,6 @@
-[snapshot_id]
-Description = "nan"
-Deduced_Data_Type = "nan"
-Nullable = "nan"
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
-
 [reference]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -20,7 +10,7 @@ Possible_Categorical_Values = ["nan"]
 
 [period]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = 6
@@ -42,7 +32,7 @@ Possible_Categorical_Values = ["002"]
 Description = "nan"
 Deduced_Data_Type = "category"
 Nullable = false
-Current_Data_Type = "int"
+Current_Data_Type = "int64"
 Length = 2
 Min_values = "nan"
 Max_values = "nan"
@@ -62,7 +52,7 @@ Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Cle
 Description = "nan"
 Deduced_Data_Type = "category"
 Nullable = false
-Current_Data_Type = "int"
+Current_Data_Type = "int64"
 Length = 3
 Min_values = "nan"
 Max_values = "nan"
@@ -70,7 +60,7 @@ Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305,
 
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
+Deduced_Data_Type = "datetime64"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
@@ -80,7 +70,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockedby]
 Description = "All empty strings"
-Deduced_Data_Type = "pandas.NA"
+Deduced_Data_Type = "pd.NA"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -90,7 +80,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockeddate]
 Description = "All None type"
-Deduced_Data_Type = "pandas.NA"
+Deduced_Data_Type = "pd.NA"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -120,7 +110,7 @@ Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L",
 
 [frozensicoutdated]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -130,7 +120,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusicoutdated]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -140,7 +130,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozensic]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -150,7 +140,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusic]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -160,7 +150,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenemployees]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -170,7 +160,7 @@ Possible_Categorical_Values = ["nan"]
 
 [employees]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -180,7 +170,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenemployment]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -190,7 +180,7 @@ Possible_Categorical_Values = ["nan"]
 
 [employment]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -200,7 +190,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenfteemployment]
 Description = "nan"
-Deduced_Data_Type = "float"
+Deduced_Data_Type = "float64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -210,7 +200,7 @@ Possible_Categorical_Values = ["nan"]
 
 [fteemployment]
 Description = "nan"
-Deduced_Data_Type = "float"
+Deduced_Data_Type = "float64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -220,7 +210,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenturnover]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -230,7 +220,7 @@ Possible_Categorical_Values = ["nan"]
 
 [turnover]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -240,7 +230,7 @@ Possible_Categorical_Values = ["nan"]
 
 [enterprisereference]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -250,7 +240,7 @@ Possible_categorical_Values = ["nan"]
 
 [wowenterprisereference]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -260,9 +250,9 @@ Possible_categorical_Values = ["nan"]
 
 [cellnumber]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
-Current_Data_Type = "int"
+Current_Data_Type = "int64"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
@@ -310,7 +300,7 @@ Possible_Categorical_Values = ["CRN"]
 
 [numberlivelocalunits]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -320,7 +310,7 @@ Possible_categorical_Values = ["nan"]
 
 [numberlivevat]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -330,7 +320,7 @@ Possible_categorical_Values = ["nan"]
 
 [numberlivepaye]
 Description = "nan"
-Deduced_Data_Type = "int"
+Deduced_Data_Type = "int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -370,7 +360,7 @@ Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "
 
 [birthdate]
 Description = "Datetime format = format=%d/%m/%Y"
-Deduced_Data_Type = "Datetime"
+Deduced_Data_Type = "datetime64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -420,7 +410,7 @@ Possible_Categorical_Values = ["L"]
 
 [inclusionexclusion]
 Description = 'All values are " "'
-Deduced_Data_Type = "pandas.NA"
+Deduced_Data_Type = "pd.NA"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -440,7 +430,7 @@ Possible_Categorical_Values = ["ingestion"]
 
 [createddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
+Deduced_Data_Type = "datetime64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -460,7 +450,7 @@ Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
 
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "Datetime"
+Deduced_Data_Type = "datetime64"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"

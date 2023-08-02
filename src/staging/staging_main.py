@@ -86,6 +86,9 @@ def run_staging(
         responses_df["instance"] = 0
     StagingMainLogger.info("Finished Data Ingest...")
 
+    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+    val.validate_data_with_schema(responses_df, "./config/subresponder_schema.toml")
+
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
