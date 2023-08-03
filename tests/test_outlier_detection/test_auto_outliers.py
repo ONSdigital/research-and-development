@@ -34,6 +34,7 @@ class TestOutlierFlagging:
             [20, "P", 2020, 20, 3.0],
             [21, "P", 2020, 20, 0.0],
             [22, "P", 2020, 20, 0.0],
+            [23, "C", 2020, 20, 4.0],         
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -73,6 +74,7 @@ class TestOutlierFlagging:
             [20, "P", 2020, 20, 3.0, True],
             [21, "P", 2020, 20, 0.0, False],
             [22, "P", 2020, 20, 0.0, False],
+            [23, "C", 2020, 20, 4.0, False],     
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
