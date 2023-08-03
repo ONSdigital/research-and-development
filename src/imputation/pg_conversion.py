@@ -7,7 +7,7 @@ pg_logger = logging.getLogger(__name__)
 def pg_to_pg_mapper(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
-    target_col: str,
+    target_col: str = "201",
     from_col: str = "2016 > Form PG",
     to_col: str = "2016 > Pub PG",
 ):

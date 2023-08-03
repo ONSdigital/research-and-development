@@ -34,7 +34,7 @@ def read_hdfs_csv(filepath: str) -> pd.DataFrame:
     return df_imported_from_hdfs
 
 
-def read_hdfs_mapper_csv(filepath: str, from_col: str, to_col: str) -> pd.DataFrame:
+def read_hdfs_mapper_csv(filepath: str) -> pd.DataFrame:
     """Reads a csv mapper file (only 2 columns) from DAP into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
@@ -45,7 +45,7 @@ def read_hdfs_mapper_csv(filepath: str, from_col: str, to_col: str) -> pd.DataFr
     # Open the file in read mode inside Hadoop context
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
-        df_imported_from_hdfs = pd.read_csv(file, usecols=[from_col, to_col])
+        df_imported_from_hdfs = pd.read_csv(file)
 
     return df_imported_from_hdfs
 

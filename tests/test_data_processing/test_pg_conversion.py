@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import numpy as np
 
-from src.data_processing.pg_conversion import pg_mapper
+from src.imputation.pg_conversion import pg_to_pg_mapper
 
 
 @pytest.fixture
@@ -46,6 +46,6 @@ def test_pg_mapper(dummy_data, expected_output, mapper):
     target_col = dummy_data.columns[0]
     expected_output_data = expected_output.astype("category")
 
-    df_result = pg_mapper(dummy_data, mapper, target_col)
+    df_result = pg_to_pg_mapper(dummy_data, mapper, target_col)
 
     pd.testing.assert_frame_equal(df_result, expected_output_data)
