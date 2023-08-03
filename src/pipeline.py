@@ -74,14 +74,15 @@ def run_pipeline(start):
     full_responses = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
-    MainLogger.info("Finished Data Ingest...")
-    print(full_responses.sample(10))
+    MainLogger.info("Finished Data Ingest.")
 
     # Imputation module
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    full_responses = run_outliers(full_responses, config, write_csv)
+    outliered_responses = run_outliers(full_responses, config, write_csv)
+    print(outliered_responses.sample(10))
+    MainLogger.info("Finished Outlier module.")
 
     # Estimation
 

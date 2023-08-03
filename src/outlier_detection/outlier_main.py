@@ -1,6 +1,7 @@
 """Main file for the Outlier Detection module."""
 import logging
 import pandas as pd
+from datetime import datetime
 from typing import Callable
 
 from src.outlier_detection import auto_outliers as auto
@@ -37,4 +38,20 @@ def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable):
     lower_clip = config["outliers"]["lower_clip"]
     df_auto_flagged = auto.auto_clipping(df, upper_clip, lower_clip)
     print(df_auto_flagged.head())
+
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
+
+    # output the outlier flags for QA
+    if config["global"]["network_or_hdfs"] == "network":
+        OutlierMainLogger.info("Starting output of Outlier QA data...")
+        folder = config["network_paths"]["outliers_path"]
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        filename = f"outliers_qa_{tdate}.csv"
+        write_csv(f"{folder}/outliers_qa/{filename}", df_auto_flagged)
+        OutlierMainLogger.info("Finished QA output of outliers data.")
+
+     # read in file for manual outliers
+
+     # update outlier flag column with manual outliers   
+
+    return df_auto_flagged
