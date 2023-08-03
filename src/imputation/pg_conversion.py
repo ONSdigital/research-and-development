@@ -57,8 +57,8 @@ def pg_to_pg_mapper(
 def sic_to_pg_mapper(
     df: pd.DataFrame,
     sicmapper: pd.DataFrame,
-    target_col: str,
-    sic_column: str,
+    target_col: str = "201",
+    sic_column: str = "rusic",
     from_col: str = "SIC 2007_CODE",
     to_col: str = "2016 > Pub PG",
 ):
