@@ -22,6 +22,37 @@ mapper = pd.read_csv(map_path, usecols=["2016 > Form PG", "2016 > Pub PG"]).sque
 
 sicmapper = pd.read_csv(map_path, usecols=["SIC 2007_CODE", "2016 > Pub PG"]).squeeze()
 
+
+def apply_to_original(filtered_df, original_df):
+    original_df.loc[filtered_df.index] = filtered_df
+    return original_df
+
+
+# Filter data by long forms only
+long_df = imp.filter_by_column_content(cur_df, "formtype", ["0001"])
+
+# Impute PG by SIC mapping TODO: STEP 1
+filtered_data = long_df.loc[
+    (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
+]
+
+map_dict = dict(zip(sicmapper["SIC 2007_CODE"], sicmapper["2016 > Pub PG"]))
+map_dict = {i: j for i, j in map_dict.items()}
+
+filtered_data["rusic"] = pd.to_numeric(filtered_data["rusic"], errors="coerce")
+filtered_data["201"] = filtered_data["rusic"].map(map_dict)
+# cur_df['201'] = cur_df['201'].replace({0: np.nan})
+# filtered_data['201'] = .replace({'201': map_dict}, inplace=True)
+filtered_data["201"] = filtered_data["201"].astype("category")
+
+cur_df = apply_to_original(filtered_data, cur_df)
+
+# Impute Business R&D type TODO: STEP 2
+filtered_data["200"] = np.random.choice(
+    ["C", "D"], size=len(filtered_data), p=[0.7, 0.3]
+)
+cur_df = apply_to_original(filtered_data, cur_df)
+
 # PRE-PROCESS DATA #RDRP-207
 
 map_dict = dict(zip(mapper["2016 > Form PG"], mapper["2016 > Pub PG"]))
@@ -92,11 +123,6 @@ def apply_filters(df):
 
 def fill_zeros(df: pd.DataFrame, column: str):
     return df[column].replace({math.nan: 0}).astype("float")
-
-
-def apply_to_original(filtered_df, original_df):
-    original_df.loc[filtered_df.index] = filtered_df
-    return original_df
 
 
 def clean_no_rd_data(filtered_df, og_df, target_variables: list):
@@ -175,6 +201,7 @@ def trim_check(
 
 def trim_bounds(
     df: pd.DataFrame,
+    variable: str,
     lower_perc=15,  # TODO add percentages to config -
     # check method inBERD_imputation_spec_V3
     upper_perc=15,
@@ -192,7 +219,7 @@ def trim_bounds(
     df["pre_index"] = df.index
 
     if len(df) <= 10:
-        df["trim"] = "dont trim"
+        df[f"{variable}_trim"] = "dont trim"
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
@@ -204,9 +231,9 @@ def trim_bounds(
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
 
-        df["trim"] = "do trim"
+        df[f"{variable}_trim"] = "do trim"
         df.loc[
-            remove_lower : remove_upper - 2, "trim"
+            remove_lower : remove_upper - 2, f"{variable}_trim"
         ] = "dont trim"  # TODO check if needs to be inclusive of exlusive
 
     return df
@@ -217,7 +244,7 @@ def get_mean_growth_ratio(
 ) -> pd.DataFrame:
 
     # remove the "trim" tagged rows
-    trimmed_df = filter_by_column_content(df, "trim", ["dont trim"])
+    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont trim"])
 
     # convert to floats for now TODO: Should be done in staging
     trimmed_df[f"{target_variable}"] = trimmed_df[f"{target_variable}"].astype("float")
@@ -235,11 +262,16 @@ def get_mean_growth_ratio(
 
 def calculate_means(df, target_variable_list):
 
+    dfs_list = []
+
     # Create an empty dict to store means
     mean_dict = dict.fromkeys(target_variable_list)
 
     copy_df = df.copy()
-    filtered_df = copy_df[~(copy_df["imp_class"].str.contains("nan"))]
+
+    filtered_df = apply_filters(copy_df)
+
+    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -256,14 +288,11 @@ def calculate_means(df, target_variable_list):
             trimcheck_df = trim_check(sorted_df)
 
             # Apply trimming marker
-            trimmed_df = trim_bounds(trimcheck_df)
+            trimmed_df = trim_bounds(trimcheck_df, var)
 
-            if var == "201" or "305":
-                if f"{var}_trimming" not in df:
-                    df[f"{var}_trimming"] = np.nan
-                df[f"{var}_trimming"].loc[trimmed_df["pre_index"]] = trimmed_df["trim"]
-            else:
-                continue
+            tr_df = trimmed_df.set_index("pre_index")
+
+            dfs_list.append(tr_df)
             # Calculate mean and count
             means = get_mean_growth_ratio(trimmed_df, k, var)
 
@@ -272,6 +301,10 @@ def calculate_means(df, target_variable_list):
                 mean_dict[var] = means
             else:
                 mean_dict[var].update(means)
+
+    df = pd.concat(dfs_list)
+    df["qa_index"] = df.index
+    df = df.groupby(["pre_index"], as_index=False).first()
 
     return mean_dict, df
 
@@ -298,10 +331,13 @@ def tmi_imputation(df, target_variables, mean_dict):
             # Find all nulls for target variable in subgroup
             subnulls = subgrp[subgrp[var].isnull()].copy()
 
-            # Replace nulls with means
-            subnulls[var] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
+            if f"{var}_{item}_mean and count" in mean_dict[var].keys():
+                # Replace nulls with means
+                subnulls[var] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
+                subnulls["imp_marker"] = "TMI"
 
-            subnulls["imp_marker"] = "TMI"
+            else:
+                subnulls["imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
             final_df = apply_to_original(subnulls, copy_df)
@@ -313,7 +349,7 @@ def run_tmi(df, target_variables):
 
     df = tmi_pre_processing(df, target_variables)
 
-    mean_dict, df = calculate_means(df, target_variables)
+    mean_dict, qa_df = calculate_means(df, target_variables)
 
     final_df = tmi_imputation(df, target_variables, mean_dict)
 
