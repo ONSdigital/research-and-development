@@ -1,16 +1,15 @@
 """The main pipeline"""
-
-import logging
+# Core Python modules
 import time
+import logging
 
-from src._version import __version__ as version
-from src.data_ingest import spp_parser
-from src.data_processing import spp_snapshot_processing as processing
-from src.data_validation import validation as val
+# Our local modules
 from src.utils import runlog
+from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
-from src.data_processing.pg_conversion import pg_mapper
+from src.staging.staging_main import run_staging
+
 
 MainLogger = logging.getLogger(__name__)
 
@@ -32,7 +31,6 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
-    from src.utils.local_file_mods import read_local_mapper_csv as read_mapper_csv
 
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
@@ -43,7 +41,6 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-    from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_mapper_csv
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -67,42 +64,16 @@ def run_pipeline(start):
     logger.info("Collecting logging parameters ..........")
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
+
     # Load SPP data from DAP
 
-    snapshot_path = config[f"{network_or_hdfs}_paths"]["snapshot_path"]
-
-    # Check data file exists
-    check_file_exists(snapshot_path)
-
-    snapdata = load_json(snapshot_path)
-    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    # Staging and validatation and Data Transmutation
+    MainLogger.info("Starting Staging and Validation...")
+    full_responses = run_staging(
+        config, check_file_exists, load_json, read_csv, write_csv
+    )
     MainLogger.info("Finished Data Ingest...")
-
-    # Data Transmutation
-    MainLogger.info("Starting Data Transmutation...")
-    full_responses = processing.full_responses(contributors_df, responses_df)
-    print(full_responses.sample(5))
-    processing.response_rate(contributors_df, responses_df)
-    MainLogger.info("Finished Data Transmutation...")
-
-    # PG Mapping
-    mapper_path = config[f"{network_or_hdfs}_paths"]["mapper_path"]
-    from_col, to_col = "2016 > Form PG", "2016 > Pub PG"
-    mapper = read_mapper_csv(mapper_path, from_col, to_col).squeeze()
-    pg_mapper(full_responses, mapper, "201")
-
-    # Data validation
-    val.check_data_shape(full_responses)
-
-    # Check the postcode column
-    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
-
-    # forward_df, backwards_df = run_imputation(
-    #    ["201", "202"],
-    #    "202012",
-    #    "202009",
-    # )
+    print(full_responses.sample(10))
 
     # Outlier detection
 

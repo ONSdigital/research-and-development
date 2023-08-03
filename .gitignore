@@ -9,7 +9,7 @@
 *.log
 *.pot
 *.pyc
-__pycache__/
+__pycache__
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -908,3 +908,6 @@ logs/*
 
 # Utility bat file for ssh key
 add_ssh_key.bat
+
+# ~HEAD filter
+*~HEAD
