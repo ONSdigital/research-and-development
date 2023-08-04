@@ -3,7 +3,7 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
-  network_or_hdfs: network #whether to load from hdfs or network (local Python)
+  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 2 # TODO: put this in the userconfig
@@ -27,7 +27,7 @@ network_paths:
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/ONSPD_NOV_2022_UK.csv"
   history_path: 'R:\BERD Results System Development 2023\DAP_emulation\BERD_V7_Anonymised' #'R:\BERD Results System Development 2023\DAP_emulation\backseries\v1'
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
-  
+
 csv_filenames:
     main: "main_runlog.csv"
     configs: "configs_runlog.csv"
