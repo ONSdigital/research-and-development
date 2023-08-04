@@ -64,6 +64,7 @@ def sic_to_pg_mapper(
 ):
     """This function maps all values in one column to another column
     using a mapper file.
+    
     The default this is used for is PG numeric to letter conversion.
 
     Args:
