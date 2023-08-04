@@ -140,7 +140,7 @@ def auto_clipping(df: pd.DataFrame,
     validate_config(upper_clip, lower_clip)
 
     # Specify the value column and the groupby columns for outliers
-    outlier_val_col = "701"
+    outlier_val_col = "709"
 
     df[outlier_val_col] = pd.to_numeric(df[outlier_val_col], errors='coerce')
     groupby_cols = ["period", "cellnumber"]

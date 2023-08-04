@@ -37,7 +37,6 @@ def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable):
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
     df_auto_flagged = auto.auto_clipping(df, upper_clip, lower_clip)
-    print(df_auto_flagged.head())
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
 
