@@ -354,7 +354,7 @@ def forward_imputation(
 
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0] 
+            ][0]
             df_other[f"forwards_imputed_{var}"] = round(
                 df_other[f"{class_name}_{var}_growth_ratio"]
                 * df_other[f"{previous_period}_{var}"]
@@ -411,7 +411,7 @@ def backwards_imputation(
             # TODO add f string to previous_period_var1
             df_other[f"{class_name}_{var}_growth_ratio"] = dict_mean_growth_ratio[
                 f"{class_name}_{var}_mean_growth_ratio and count"
-            ][0]  
+            ][0]
             df_other[f"backwards_imputed_{var}"] = round(
                 df_other[f"{current_period}_{var}"]
                 / df_other[f"{class_name}_{var}_growth_ratio"]
