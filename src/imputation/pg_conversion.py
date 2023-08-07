@@ -29,18 +29,17 @@ def pg_to_pg_mapper(
     """
 
     mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf["2016 > Form PG"][
-        mapdf["2016 > Form PG"].duplicated(keep=False)
+    map_errors = mapdf[from_col][
+        mapdf[from_col].duplicated(keep=False)
     ].unique()
-
-    print(map_errors)
-
-    pg_logger.error(
-        (
-            f"The following product groups are trying to map to multiple letters: "
-            f"{map_errors}"
+    
+    if map_errors:
+        pg_logger.error(
+            (
+                f"The following product groups are trying to map to multiple letters: "
+                f"{map_errors}"
+            )
         )
-    )
 
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
@@ -81,17 +80,16 @@ def sic_to_pg_mapper(
     """
 
     mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf["SIC 2007_CODE"][
-        mapdf["SIC 2007_CODE"].duplicated(keep=False)
+    map_errors = mapdf[from_col][
+        mapdf[from_col].duplicated(keep=False)
     ].unique()
+    
+    if map_errors:
+        pg_logger.error(
+            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"
+        )
 
-    print(map_errors)
-
-    pg_logger.error(
-        f"The following SIC numbers are trying to map to multiple letters: {map_errors}"
-    )
-
-    map_dict = dict(zip(sicmapper["SIC 2007_CODE"], sicmapper["2016 > Pub PG"]))
+    map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
 
     df[sic_column] = pd.to_numeric(df[sic_column], errors="coerce")
