@@ -29,10 +29,8 @@ def pg_to_pg_mapper(
     """
 
     mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf[from_col][
-        mapdf[from_col].duplicated(keep=False)
-    ].unique()
-    
+    map_errors = mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique()
+
     if map_errors:
         pg_logger.error(
             (
@@ -80,10 +78,8 @@ def sic_to_pg_mapper(
     """
 
     mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf[from_col][
-        mapdf[from_col].duplicated(keep=False)
-    ].unique()
-    
+    map_errors = mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique()
+
     if map_errors:
         pg_logger.error(
             f"The following SIC numbers are trying to map to multiple letters: {map_errors}"
