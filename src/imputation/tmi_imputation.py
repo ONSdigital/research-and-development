@@ -27,9 +27,16 @@ def apply_to_original(filtered_df, original_df):
     original_df.loc[filtered_df.index] = filtered_df
     return original_df
 
+def filter_by_column_content(
+    raw_df: pd.DataFrame, column: str, column_content: list
+) -> pd.DataFrame:
+
+    clean_df = raw_df[raw_df[column].isin(column_content)].copy()
+
+    return clean_df
 
 # Filter data by long forms only
-long_df = imp.filter_by_column_content(cur_df, "formtype", ["0001"])
+long_df = filter_by_column_content(cur_df, "formtype", ["0001"])
 
 # Impute PG by SIC mapping TODO: STEP 1
 filtered_data = long_df.loc[
@@ -104,19 +111,10 @@ def create_imp_class_col(
     return clean_df
 
 
-def filter_by_column_content(
-    raw_df: pd.DataFrame, column: str, column_content: list
-) -> pd.DataFrame:
-
-    clean_df = raw_df[raw_df[column].isin(column_content)].copy()
-
-    return clean_df
-
-
 def apply_filters(df):
 
     clean_statuses = ["Clear", "Clear - overridden", "Clear - overridden SE"]
-    filtered_df = imp.filter_by_column_content(df, "status", clean_statuses)
+    filtered_df = filter_by_column_content(df, "status", clean_statuses)
 
     return filtered_df
 
@@ -310,6 +308,8 @@ def calculate_means(df, target_variable_list):
 
 
 def tmi_imputation(df, target_variables, mean_dict):
+    
+    df['imp_marker'] = "N/A"
 
     copy_df = df.copy()
 
@@ -344,15 +344,20 @@ def tmi_imputation(df, target_variables, mean_dict):
 
     return final_df
 
-
 def run_tmi(df, target_variables):
 
     df = tmi_pre_processing(df, target_variables)
 
     mean_dict, qa_df = calculate_means(df, target_variables)
-
+    
+    qa_df.to_csv("data\interim\qa_df.csv")
+    qa_df.set_index('qa_index', drop=True, inplace=True)
+    
     final_df = tmi_imputation(df, target_variables, mean_dict)
-
+    
+    final_df.loc[qa_df.index, '211_trim'] = qa_df['211_trim']
+    final_df.loc[qa_df.index, '305_trim'] = qa_df['305_trim']
+    
     return final_df
 
 
