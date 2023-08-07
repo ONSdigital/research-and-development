@@ -1,6 +1,7 @@
 """The main file for the staging and validation module."""
 import logging
 import pandas as pd
+from datetime import datetime
 from typing import Callable
 
 from src.staging import spp_parser, history_loader
@@ -107,7 +108,8 @@ def run_staging(
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
         test_folder = config["network_paths"]["staging_test_foldername"]
-        staged_filename = "staged_BERD_full_responses.csv"
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        staged_filename = f"staged_BERD_full_responses_{tdate}.csv"
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
