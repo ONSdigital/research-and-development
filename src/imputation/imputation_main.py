@@ -22,7 +22,7 @@ def run_imputation(
     mapper_path = paths["mapper_path"]
 
     mapper = read_mapper(mapper_path)
-    pg_to_pg_mapper(df, mapper, target_col=201.0)
-    sic_to_pg_mapper(df, mapper, target_col=201.0)
+    pg_to_pg_mapper(df, mapper)
+    sic_to_pg_mapper(df, mapper)
 
     return df

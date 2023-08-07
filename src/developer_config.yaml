@@ -19,14 +19,14 @@ hdfs_paths:
   snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   masterlist_path: "data/external/ONSPD_NOV_2022_UK.csv"
   postcode_masterlist: "data/external/ONSPD_NOV_2022_UK.csv"
-  mapper_path: "/ons/rdbe_dev/BERD_Mappers/SIC07_to_PG_Conversion-From_2016_Data.csv"
+  mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
 network_paths:
   root: None
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/ONSPD_NOV_2022_UK.csv"
-  mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC07 to PG Conversion - From 2016 Data .csv"
+  mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG.csv"
   history_path: 'R:\BERD Results System Development 2023\DAP_emulation\BERD_V7_Anonymised' #'R:\BERD Results System Development 2023\DAP_emulation\backseries\v1'
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
 

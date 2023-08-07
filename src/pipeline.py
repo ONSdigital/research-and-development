@@ -87,7 +87,7 @@ def run_pipeline(start):
     imputed_df = run_imputation(full_responses, config, read_mapper)
     MainLogger.info("Finished  Imputation...")
 
-    print(imputed_df[201].sample(10))
+    print(imputed_df.sample(10))
 
     # Data processing: Estimation
 
