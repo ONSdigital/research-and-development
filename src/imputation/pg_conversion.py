@@ -65,7 +65,8 @@ def sic_to_pg_mapper(
     The default this is used for is PG numeric to letter conversion.
 
     Args:
-        df (pd.DataFrame): The dataset containing all the PG numbers mapper (pd.DataFrame): The mapper dataframe loaded using custom function
+        df (pd.DataFrame): The dataset containing all the PG numbers
+        mapper (pd.DataFrame): The mapper dataframe loaded using custom function
         target_col (str): The column we want to convert (product_group)
         from_col (str, optional): The column in the mapper that is used to map from.
         Defaults to "SIC 2007_CODE".
@@ -81,7 +82,7 @@ def sic_to_pg_mapper(
 
     if map_errors:
         pg_logger.error(
-            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"
+            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
         )
 
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
