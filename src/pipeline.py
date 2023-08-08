@@ -68,7 +68,7 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses, mapper = run_staging(
+    full_responses, pg_mapper = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
     MainLogger.info("Finished Data Ingest...")
@@ -81,7 +81,7 @@ def run_pipeline(start):
     # Data processing: Imputation
 
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, mapper)
+    imputed_df = run_imputation(full_responses, pg_mapper)
     MainLogger.info("Finished  Imputation...")
 
     print(imputed_df.sample(10))
