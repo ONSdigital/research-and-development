@@ -31,8 +31,6 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
-    from src.utils.local_file_mods import read_local_mapper_csv as read_mapper
-
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
@@ -42,7 +40,6 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-    from src.utils.hdfs_mods import read_hdfs_mapper_csv as read_mapper
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -71,7 +68,7 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses = run_staging(
+    full_responses, mapper = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
     MainLogger.info("Finished Data Ingest...")
@@ -84,7 +81,7 @@ def run_pipeline(start):
     # Data processing: Imputation
 
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, config, read_mapper)
+    imputed_df = run_imputation(full_responses, mapper)
     MainLogger.info("Finished  Imputation...")
 
     print(imputed_df.sample(10))

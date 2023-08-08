@@ -29,7 +29,9 @@ def pg_to_pg_mapper(
     """
 
     mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique()
+    map_errors = (
+        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
+    )
 
     if map_errors:
         pg_logger.error(
@@ -41,6 +43,15 @@ def pg_to_pg_mapper(
 
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
+
+    mapless_errors = []
+    for key, value in map_dict.items():
+        if str(value) == "nan":
+            mapless_errors.append(key)
+
+    pg_logger.error(
+        f"Mapping doesnt exist for the following product groups: {mapless_errors}"
+    )
 
     df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
     df[target_col] = df[target_col].map(map_dict)
@@ -78,7 +89,9 @@ def sic_to_pg_mapper(
     """
 
     mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique()
+    map_errors = (
+        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
+    )
 
     if map_errors:
         pg_logger.error(
@@ -87,6 +100,15 @@ def sic_to_pg_mapper(
 
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
     map_dict = {i: j for i, j in map_dict.items()}
+
+    mapless_errors = []
+    for key, value in map_dict.items():
+        if str(value) == "nan":
+            mapless_errors.append(key)
+
+    pg_logger.error(
+        f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
+    )
 
     df[sic_column] = pd.to_numeric(df[sic_column], errors="coerce")
     df[target_col] = df[sic_column].map(map_dict)
