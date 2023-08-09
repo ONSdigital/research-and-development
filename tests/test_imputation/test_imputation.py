@@ -758,14 +758,14 @@ class TestForwardImputation:
         """Create input data for the forward_imputation function"""
 
         input_cols = {
-            "current_period_class" : "str",
-            "200" : "str",
-            "201" : "str",
-            "current_period_var1" :  "Int64",
-            "previous_period_var1" : "Int64",
-            "employees" : "Int64",
-            "reference" : "Int64",
-            "trim" : "str"
+            "current_period_class": "str",
+            "200": "str",
+            "201": "str",
+            "current_period_var1": "Int64",
+            "previous_period_var1": "Int64",
+            "employees": "Int64",
+            "reference": "Int64",
+            "trim": "str",
         }
 
         input_data = [
@@ -796,23 +796,23 @@ class TestForwardImputation:
         ]  # (more than 10 rows per class)
 
         input_df = pandasDF(data=input_data, columns=input_cols.keys())
-        input_df = input_df.astype(input_cols) 
-        
+        input_df = input_df.astype(input_cols)
+
         return input_df
 
     def output_data_forward_imputation(self):
         """Create output data for the forward_imputation function"""
 
         output_cols = {
-            "current_period_class" : "str",
-            "200" : "str",
-            "201" : "str",
-            "current_period_var1" :  "Int64",
-            "previous_period_var1" : "Int64",
-            "employees" : "Int64",
-            "reference" : "Int64",
-            "trim" : "str",
-            "forwards_imputed_var1" : "Int64"
+            "current_period_class": "str",
+            "200": "str",
+            "201": "str",
+            "current_period_var1": "Int64",
+            "previous_period_var1": "Int64",
+            "employees": "Int64",
+            "reference": "Int64",
+            "trim": "str",
+            "forwards_imputed_var1": "Int64",
         }
 
         output_data = [
@@ -820,7 +820,9 @@ class TestForwardImputation:
             ["class2", "D", "G", np.nan, 1, 1, 1, "dont trim", 6],
         ]  # (more than 10 rows per class)
 
-        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = pandasDF(
+            data=output_data, columns=output_cols.keys(), index=[11, 23]
+        )
         output_df = output_df.astype(output_cols)
 
         return output_df
@@ -851,14 +853,14 @@ class TestBackwardsImputation:
 
         # columns for the dataframe
         input_cols = {
-            "current_period_class" : "str",
-            "200" : "str",
-            "201" : "str",
-            "current_period_var1" :  "Int64",
-            "previous_period_var1" : "Int64",
-            "employees" : "Int64",
-            "reference" : "Int64",
-            "trim" : "str"
+            "current_period_class": "str",
+            "200": "str",
+            "201": "str",
+            "current_period_var1": "Int64",
+            "previous_period_var1": "Int64",
+            "employees": "Int64",
+            "reference": "Int64",
+            "trim": "str",
         }
 
         # data in the column order above
@@ -892,7 +894,7 @@ class TestBackwardsImputation:
         # Create a pandas dataframe
         input_df = pandasDF(data=input_data, columns=input_cols.keys())
         input_df = input_df.astype(input_cols)
-        
+
         return input_df
 
     def output_data_backwards_imputation(self):
@@ -900,25 +902,27 @@ class TestBackwardsImputation:
 
         # columns for the dataframe
         output_cols = {
-            "current_period_class" : "str",
-            "200" : "str",
-            "201" : "str",
-            "current_period_var1" :  "Int64",
-            "previous_period_var1" : "Int64",
-            "employees" : "Int64",
-            "reference" : "Int64",
-            "trim" : "str",
-            "backwards_imputed_var1" : "Int64"
+            "current_period_class": "str",
+            "200": "str",
+            "201": "str",
+            "current_period_var1": "Int64",
+            "previous_period_var1": "Int64",
+            "employees": "Int64",
+            "reference": "Int64",
+            "trim": "str",
+            "backwards_imputed_var1": "Int64",
         }
 
         # data in the column order above
         output_data = [
-            ["class1", "C", "G",4, np.nan, 1, 1, "dont trim", 1],
+            ["class1", "C", "G", 4, np.nan, 1, 1, "dont trim", 1],
             ["class2", "D", "G", 6, np.nan, 1, 1, "dont trim", 1],
         ]  # (more than 10 rows per class)
 
         # Create a pandas dataframe
-        output_df = pandasDF(data=output_data, columns=output_cols.keys(), index=[11, 23])
+        output_df = pandasDF(
+            data=output_data, columns=output_cols.keys(), index=[11, 23]
+        )
         output_df = output_df.astype(output_cols)
 
         return output_df
@@ -952,14 +956,14 @@ class TestRunImputation:
 
         # columns for the dataframe
         input_cols = {
-            "reference" : "Int64",
-            "civ_or_def" : "str",
-            "Product_group" : "str",
-            "employees" : "Int64",
-            "202012_var1" : "Int64",
-            "202012_var2" : "Int64",
-            "202009_var1" : "Int64",
-            "202009_var2" : "Int64",
+            "reference": "Int64",
+            "civ_or_def": "str",
+            "Product_group": "str",
+            "employees": "Int64",
+            "202012_var1": "Int64",
+            "202012_var2": "Int64",
+            "202009_var1": "Int64",
+            "202009_var2": "Int64",
         }
 
         # data in the column order above
@@ -999,17 +1003,17 @@ class TestRunImputation:
     def output_data_run_imputation(self):
         """Create output data for the run_imputation function"""
         output_cols_f = {
-            "reference" : "Int64",
-            "200" : "str",
-            "201" : "str",
-            "employees" : "Int64",
-            "202012_var1" : "Int64",
-            "202012_var2" : "Int64",
-            "202009_var1" : "Int64",
-            "202009_var2" : "Int64",
-            "202012_class" : "str",
-            "forwards_imputed_var1" : "Int64",
-            "forwards_imputed_var2" : "Int64",
+            "reference": "Int64",
+            "200": "str",
+            "201": "str",
+            "employees": "Int64",
+            "202012_var1": "Int64",
+            "202012_var2": "Int64",
+            "202009_var1": "Int64",
+            "202009_var2": "Int64",
+            "202012_class": "str",
+            "forwards_imputed_var1": "Int64",
+            "forwards_imputed_var2": "Int64",
         }
 
         output_data_for = [
@@ -1020,22 +1024,21 @@ class TestRunImputation:
             data=output_data_for, columns=output_cols_f.keys(), index=[11]
         ).astype(output_cols_f)
 
-
         # TODO check data types and update headers
         # when using real data
         # columns for the dataframe
         output_cols_b = {
-            "reference" : "Int64",
-            "200" : "str",
-            "201" : "str",
-            "employees" : "Int64",
-            "202012_var1" : "Int64",
-            "202012_var2" : "Int64",
-            "202009_var1" : "Int64",
-            "202009_var2" : "Int64",
-            "202012_class" : "str",
-            "backwards_imputed_var1" : "Int64",
-            "backwards_imputed_var2" : "Int64",
+            "reference": "Int64",
+            "200": "str",
+            "201": "str",
+            "employees": "Int64",
+            "202012_var1": "Int64",
+            "202012_var2": "Int64",
+            "202009_var1": "Int64",
+            "202009_var2": "Int64",
+            "202012_class": "str",
+            "backwards_imputed_var1": "Int64",
+            "backwards_imputed_var2": "Int64",
         }
 
         # TODO check data types and update headers
@@ -1044,7 +1047,6 @@ class TestRunImputation:
         output_data_back = [
             [24, "2", "B", 100, 11, 1, 10, np.nan, "2_B", np.nan, 3],
         ]  # (more than 10 rows per class)
-
 
         output_df_back = pandasDF(
             data=output_data_back, columns=output_cols_b.keys(), index=[23]

@@ -2,6 +2,7 @@ import os
 import toml
 import postcodes_uk
 import pandas as pd
+from numpy import nan
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -185,105 +186,35 @@ def check_data_shape(
     return cols_match
 
 
-@exception_wrap
-def check_var_names(
-    data_df: pd.DataFrame,
-    filePath: str = "./config/contributors_schema.toml",
-) -> bool:
-    """Compare the keys of the ingested data file and the data schema
-    dictionaries. If they match then returns True, if not then returns
-    False
+def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
+    """Takes the schema from the toml file and validates the survey data df.
 
-    Keyword Arguments:
-        data_df -- Pandas dataframe containing data to be checked.
-        filePath -- Path to schema TOML file
-        (default: {"./config/Data_Schema.toml"})
-
-    Returns:
-        A bool: boolean value indicating whether data file dictionary
-        keys match the data schema dictionary keys.
+    Args:
+        survey_df (pd.DataFrame): Survey data in a pd.df format
+        schema_path (str): path to the schema toml (should be in config folder)
     """
 
-    if not isinstance(data_df, pd.DataFrame):
-        raise ValueError(
-            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
-        )
+    # Load schema from toml
+    dtypes_schema = load_schema(schema_path)
 
-    # Specify which key in snapshot data dictionary to get correct data
-    # List, with each element containing a dictionary for each row of data
-    data_dict = data_df.to_dict()
-    data_keys = data_dict.keys()
+    # Create a dict for dtypes only
+    dtypes_dict = {
+        column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
+        for column_nm in dtypes_schema.keys()
+    }
 
-    # Load toml data schema into dictionary
-    toml_string = load_schema(filePath)
+    # Cast each column individually and catch any errors
+    for column in survey_df.columns:
 
-    if data_keys == toml_string.keys():
-        dict_match = True
-    else:
-        dict_match = False
-
-    if dict_match is False:
-        validation_logger.warning(f"Data columns names match schema: {dict_match}.")
-    else:
-        validation_logger.info(f"Data columns names match schema: {dict_match}.")
-
-    return dict_match
-
-
-@exception_wrap
-def data_key_diffs(
-    data_df: pd.DataFrame,
-    filePath: str = "./config/contributors_schema.toml",
-) -> dict:
-    """Compare differences between data dictionary and the toml data
-    schema dictionary. Outputs a dictionary with 'dictionary_items_added'
-    and 'dictionary_items_removed' as keys, with values as the items
-    added or removed. Added items show differences in data file dictionary,
-    i.e. difference in column names. Items removed shows columns that
-    are not present in the data file.
-
-    Keyword Arguments:
-        data_df -- Pandas dataframe containing data to be checked.
-        filePath -- Path to schema TOML file
-        (default: {"./config/Data_Schema.toml"})
-
-    Returns:
-        A dict: dictionary containing items added to and items removed
-        from the data schema dictionary. Added items show differences
-        in data file column names, items removed show columns missing
-        from the data file.
-    """
-
-    if not isinstance(data_df, pd.DataFrame):
-        raise ValueError(
-            f"data_df must be a pandas dataframe, is currently {type(data_df)}."
-        )
-
-    # Convert it to dictionary
-    # data_dict = data.to_dict()
-    data_dict = data_df.to_dict()
-
-    # Load toml data schema into dictionary
-    schema_dict = load_schema(filePath)
-
-    # Check differences between the keys
-    missing_from_df = set(schema_dict.keys()) - set(data_dict.keys())
-    added_to_df = set(data_dict.keys()) - set(schema_dict.keys())
-
-    # Checks if the length of the key set is the same in the two dictionaries
-    if len(schema_dict.keys()) != len(data_dict.keys()):
-        validation_logger.warning(
-            f"""Differences detected in data compared to schema: \n
-                                 \n Additional columns: {added_to_df}
-                                 \n Removed columns: {missing_from_df} \n"""
-        )
-    else:
-        validation_logger.info(
-            f"""Data and schema columns match. \n
-                                 \n Additional columns: {added_to_df}
-                                 \n Removed columns: {missing_from_df} \n"""
-        )
-
-    diff_dict = {"Add_columns": added_to_df, "Remvd_columns": missing_from_df}
-
-    return diff_dict
+        # Fix for the columns which contain empty strings. We want to cast as NaN
+        if dtypes_dict[column] == "pd.NA":
+            # Replace whatever is in that column with np.nan
+            survey_df[column] = nan
+            dtypes_dict[column] = "float64"
+        try:
+            # Try to cast each column to the required data type
+            validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
+            survey_df[column] = survey_df[column].astype(dtypes_dict[column])
+            validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
+        except Exception as e:
+            validation_logger.error(e)
