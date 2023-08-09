@@ -1,6 +1,7 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
+from typing import Tuple
 
 OutlierMainLogger = logging.getLogger(__name__)
 
@@ -8,11 +9,11 @@ OutlierMainLogger = logging.getLogger(__name__)
 def validate_config(upper_clip: float, lower_clip: float):
     """Validate the outlier config settings.
 
-    args:
+    Args:
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
 
-    raises:
+    Raises:
         ImportError if upper_clip or lower_clip have invalid values
     """
     OutlierMainLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
@@ -25,28 +26,28 @@ def validate_config(upper_clip: float, lower_clip: float):
     elif (upper_clip < 0) | (lower_clip < 0):
         OutlierMainLogger.error("upper_clip and lower_clip cannot be negative")
         raise ImportError
-    elif upper_clip + lower_clip > 1.0:
+    elif upper_clip + lower_clip >= 1.0:
         OutlierMainLogger.error("upper_clip and lower_clip must sum to < 1")
         raise ImportError
 
 
-def outlier_flagging(
+def flag_outliers(
     df: pd.DataFrame,
     upper_clip: float,
     lower_clip: float,
     groupby_cols: list = ["period, cellnumber"],
-    value_col: str = "211",
-):
+    value_col: str = "209",
+) -> pd.DataFrame:
     """Create Boolean column to flag outliers.
 
-    args:
+    Args:
         df (pd.DataFrame): The dataframe used for finding outliers
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
         groupby_cols (list[str]): The columns to be grouped by
         value_col (str): The name of the column outliers are calculated for
-    returns:
-        df (pd.DataFrame): The dataframe with a outlier flag column.
+    Returns:
+        pd.DataFrame: The same dataframe with a outlier flag column.
     """
     lower_band = 0 + lower_clip
     upper_band = 1 - upper_clip
@@ -54,6 +55,11 @@ def outlier_flagging(
     # Note: selectiontype=='P' doesn't exist in anonymised data!
     filter_cond = (df[value_col] > 0) & (df.selectiontype=='P')
     filtered_df = df[filter_cond]
+    if filtered_df.empty:
+        OutlierMainLogger.error("This data does not contain value 'P' in "
+            "column 'selectiontype'. \n Note that outliering cannot be "
+            "performed on the current anonomysed spp snapshot data.")
+        raise ValueError
 
     quantiles_up = (
         filtered_df[groupby_cols + [value_col]]
@@ -86,17 +92,18 @@ def outlier_flagging(
     return df
 
 
-def calc_num_outliers(df: pd.DataFrame, outlier_val_col: str):
-    """Calculate and number of outliers flagged.
+def calc_num_outliers(df: pd.DataFrame, 
+                      outlier_val_col: str) -> Tuple[int, int]:
+    """Calculate the number of outliers flagged.
     
     Also calculate the total number of non-zero entries in the 
     outlier value column.
 
-    args:
+    Args:
         df (pd.DataFrame): The dataframe used for finding outliers
-        value_col (str): The name of the column outliers are calculated for
+        outlier_value_col (str): The name of the col outliers are calculated for
 
-    returns:
+    Returns:
         num_flagged (int): The number of flagged outliers
         tot_nonzero (int): The total number of nonzero entries in the 
             outlier value column.
@@ -109,9 +116,9 @@ def calc_num_outliers(df: pd.DataFrame, outlier_val_col: str):
     return num_flagged, tot_nonzero
 
 
-def auto_clipping(df: pd.DataFrame, 
-                  upper_clip: float = 0.5, 
-                  lower_clip: float = 0.0):
+def auto_flagging(df: pd.DataFrame, 
+                  upper_clip: float = 0.05, 
+                  lower_clip: float = 0.0) -> pd.DataFrame:
     """Flag outliers for quantiles specified in the config.
 
 
@@ -122,9 +129,8 @@ def auto_clipping(df: pd.DataFrame,
     clipping values.
 
     Notes:
-        - The value column for the detection of outliers is assumed to be '211'.
-        - Outliering is not applied to 'census' data, so flags are only created
-            where 'seclectiontype' = 'P'.
+        - Outliering is only done for randomly sampled (rather than 'census') 
+          data, so flags are only created where column 'seclectiontype' = 'P'.
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated
@@ -142,11 +148,14 @@ def auto_clipping(df: pd.DataFrame,
     # Specify the value column and the groupby columns for outliers
     outlier_val_col = "709"
 
+    # to_numeric was needed to convert strings however 'coerce' means values that
+    # can't be converted are represented by NaNs.
+    #TODO data validation and cleaning should replace this code.
     df[outlier_val_col] = pd.to_numeric(df[outlier_val_col], errors='coerce')
     groupby_cols = ["period", "cellnumber"]
 
-    # Calculate flags for auto outliers
-    flagged_df = outlier_flagging(
+    # Call function to flag for auto outliers
+    flagged_df = flag_outliers(
         df, upper_clip, lower_clip, groupby_cols, outlier_val_col
     )
 

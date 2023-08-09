@@ -1,11 +1,11 @@
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
-from src.outlier_detection.auto_outliers import outlier_flagging
+from src.outlier_detection.auto_outliers import flag_outliers
 
 
 class TestOutlierFlagging:
-    """Unit tests for outlier_flagging functtion."""
+    """Unit tests for flag_outliers functtion."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -80,8 +80,8 @@ class TestOutlierFlagging:
         expected_df = pandasDF(data=data, columns=exp_cols)
         return expected_df
 
-    def test_outlier_flagging(self):
-        """Test for outlier_flagging function."""
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
@@ -89,7 +89,7 @@ class TestOutlierFlagging:
         lower_clip = 0
         groupby_cols: list = ["period", "cellnumber"]
         value_col: str = "value"
-        result_df = outlier_flagging(
+        result_df = flag_outliers(
             input_df, upper_clip, lower_clip, groupby_cols, value_col
         )
 
