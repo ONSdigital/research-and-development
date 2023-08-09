@@ -49,9 +49,10 @@ def pg_to_pg_mapper(
         if str(value) == "nan":
             mapless_errors.append(key)
 
-    pg_logger.error(
-        f"Mapping doesnt exist for the following product groups: {mapless_errors}"
-    )
+    if mapless_errors:
+        pg_logger.error(
+            f"Mapping doesnt exist for the following product groups: {mapless_errors}"
+        )
 
     df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
     df[target_col] = df[target_col].map(map_dict)
@@ -106,9 +107,10 @@ def sic_to_pg_mapper(
         if str(value) == "nan":
             mapless_errors.append(key)
 
-    pg_logger.error(
-        f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
-    )
+    if mapless_errors:
+        pg_logger.error(
+            f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
+        )
 
     df[sic_column] = pd.to_numeric(df[sic_column], errors="coerce")
     df[target_col] = df[sic_column].map(map_dict)
