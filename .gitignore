@@ -902,7 +902,7 @@ docs/reference/api/*
 docs/_linkcheck/
 
 # logs files
-logs/*
+/logs/*
 !logs/.gitkeep
 !logs/logs.md
 

@@ -30,7 +30,7 @@ Possible_Categorical_Values = ["002"]
 
 [questioncode]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -97,3 +97,13 @@ Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
 Possible_categorical_Values = ["nan"]
+
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
