@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import numpy as np
 
 pg_logger = logging.getLogger(__name__)
 
@@ -56,6 +57,9 @@ def pg_to_pg_mapper(
 
     df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
     df[target_col] = df[target_col].map(map_dict)
+    df[target_col] = df[target_col].apply(
+        lambda v: str(v) if str(v) != "nan" else np.nan
+    )
     df[target_col] = df[target_col].astype("category")
 
     pg_logger.info("Product groups successfully mapped to letters")
@@ -114,6 +118,9 @@ def sic_to_pg_mapper(
 
     df[sic_column] = pd.to_numeric(df[sic_column], errors="coerce")
     df[target_col] = df[sic_column].map(map_dict)
+    df[target_col] = df[target_col].apply(
+        lambda v: str(v) if str(v) != "nan" else np.nan
+    )
     df[target_col] = df[target_col].astype("category")
 
     pg_logger.info("SIC numbers successfully mapped to PG letters")
