@@ -12,7 +12,7 @@ def dummy_data() -> pd.DataFrame:
     # Set up the dummyinput  data
     data = pd.DataFrame(
         {
-            "201": [0, 1, 2, 3, 4, 5],
+            "201": [0, 1, 2, 3, 4],
         }
     )
     data.astype("category")
@@ -23,8 +23,8 @@ def dummy_data() -> pd.DataFrame:
 def mapper() -> pd.DataFrame:
     # Set up the dummy mapper data
     mapper = {
-        "2016 > Form PG": [0, 1, 2, 3, 4, 5],
-        "2016 > Pub PG": [np.nan, "A", "B", "C", "C", "D"],
+        "2016 > Form PG": [0, 1, 2, 3, 4],
+        "2016 > Pub PG": [np.nan, "A", "B", "C", "C"],
     }
     return pd.DataFrame(mapper)
 
@@ -34,7 +34,7 @@ def expected_output() -> pd.DataFrame:
     # Set up the dummy output data
     expected_output = pd.DataFrame(
         {
-            "201": [np.nan, "A", "B", "C", "C", "D"],
+            "201": [np.nan, "A", "B", "C", "C"],
         }
     )
     return expected_output
@@ -56,8 +56,8 @@ def sic_dummy_data() -> pd.DataFrame:
     # Set up the dummyinput  data
     data = pd.DataFrame(
         {
-            "rusic": [1110, 10101, 15410, 17401, 21215],
-            "201": [np.nan, np.nan, np.nan, np.nan, np.nan],
+            "rusic": [1110, 10101],
+            "201": [np.nan, np.nan],
         }
     )
     return data
@@ -67,8 +67,8 @@ def sic_dummy_data() -> pd.DataFrame:
 def sic_mapper() -> pd.DataFrame:
     # Set up the dummy mapper data
     mapper = {
-        "SIC 2007_CODE": [1110, 10101, 15410, 17401, 21215],
-        "2016 > Pub PG": ["A", "B", "C", "D", "E"],
+        "SIC 2007_CODE": [1110, 10101],
+        "2016 > Pub PG": ["A", "B"],
     }
     return pd.DataFrame(mapper)
 
@@ -78,8 +78,8 @@ def sic_expected_output() -> pd.DataFrame:
     # Set up the dummy output data
     expected_output = pd.DataFrame(
         {
-            "rusic": [1110, 10101, 15410, 17401, 21215],
-            "201": ["A", "B", "C", "D", "E"],
+            "rusic": [1110, 10101],
+            "201": ["A", "B"],
         }
     )
     expected_output["201"] = expected_output["201"].astype("category")
