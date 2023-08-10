@@ -3,25 +3,6 @@ import math
 import numpy as np
 from src.imputation.pg_conversion import sic_to_pg_mapper
 
-# cur_path = "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"  # noqa
-# map_path = "R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC07 to PG Conversion - From 2016 Data .csv"  # noqa
-
-# with open(cur_path, "r") as file:
-#     # Load JSON data from the file
-#     data = json.load(file)
-
-# # Join contributers and responses
-# contributors_df, responses_df = parse_snap_data(data)
-
-# cur_df = spp.full_responses(contributors_df, responses_df)
-
-# mapper = pd.read_csv(
-# map_path, usecols=["2016 > Form PG", "2016 > Pub PG"]).squeeze()
-
-# sicmapper = pd.read_csv(
-# map_path, usecols=["SIC 2007_CODE", "2016 > Pub PG"]).squeeze()
-
-
 def apply_to_original(filtered_df, original_df):
     original_df.loc[filtered_df.index] = filtered_df
     return original_df
@@ -69,24 +50,9 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 # cur_df = apply_to_original(filtered_data, cur_df)
 
 
-# PRE-PROCESS DATA #RDRP-207
-# map_dict = dict(zip(mapper["2016 > Form PG"], mapper["2016 > Pub PG"]))
-# map_dict = {i: j for i, j in map_dict.items()}
-
-# cur_df["201"] = pd.to_numeric(cur_df["201"], errors="coerce")
-# cur_df["201"] = cur_df["201"].map(map_dict)
-# cur_df["201"] = cur_df["201"].astype("category")
-
-# cur_df["200"] = cur_df["200"].apply(lambda v: str(v) if str(v) != "nan" else np.nan)
-# cur_df["200"] = cur_df["200"].astype("category")
-
-
 def create_imp_class_col(
     clean_df: pd.DataFrame, col_first_half: str, col_second_half: str, class_name: str
 ) -> pd.DataFrame:
-
-    # clean_df[f"{col_first_half}"] = clean_df[f"{col_first_half}"].astype(str)
-    # clean_df[f"{col_second_half}"] = clean_df[f"{col_second_half}"].astype(str)
 
     # Create class col with concatenation
     clean_df[f"{class_name}"] = (
