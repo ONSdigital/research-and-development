@@ -38,7 +38,8 @@ def run_outliers(df: pd.DataFrame,
 
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
-    df_auto_flagged = auto.auto_flagging(df, upper_clip, lower_clip)
+    flag_cols = config["outliers"]["flag_cols"]
+    df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
 

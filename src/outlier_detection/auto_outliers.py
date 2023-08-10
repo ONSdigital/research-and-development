@@ -1,17 +1,18 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-from typing import Tuple
+from typing import Tuple, List
 
 OutlierMainLogger = logging.getLogger(__name__)
 
 
-def validate_config(upper_clip: float, lower_clip: float):
+def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
     """Validate the outlier config settings.
 
     Args:
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
+        flag_value_cols (list[str]): List of names of columns to flag.
 
     Raises:
         ImportError if upper_clip or lower_clip have invalid values
@@ -30,24 +31,27 @@ def validate_config(upper_clip: float, lower_clip: float):
         OutlierMainLogger.error("upper_clip and lower_clip must sum to < 1")
         raise ImportError
 
+    if not isinstance(flag_value_cols, list):
+        OutlierMainLogger.error("In config, flag_value_cols must be set in as a list.")
+        raise ImportError     
+
 
 def flag_outliers(
     df: pd.DataFrame,
     upper_clip: float,
     lower_clip: float,
-    groupby_cols: list = ["period, cellnumber"],
-    value_col: str = "209",
+    value_col: str
 ) -> pd.DataFrame:
-    """Create Boolean column to flag outliers.
+    """Create Boolean column to flag outliers in a given column.
 
     Args:
         df (pd.DataFrame): The dataframe used for finding outliers
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
-        groupby_cols (list[str]): The columns to be grouped by
         value_col (str): The name of the column outliers are calculated for
     Returns:
-        pd.DataFrame: The same dataframe with a outlier flag column.
+        pd.DataFrame: The same dataframe with a new boolean column indicating 
+                        whether the column 'value_col' is an outlier.
     """
     lower_band = 0 + lower_clip
     upper_band = 1 - upper_clip
@@ -60,6 +64,8 @@ def flag_outliers(
             "column 'selectiontype'. \n Note that outliering cannot be "
             "performed on the current anonomysed spp snapshot data.")
         raise ValueError
+
+    groupby_cols = ["period", "cellnumber"]
 
     quantiles_up = (
         filtered_df[groupby_cols + [value_col]]
@@ -87,38 +93,55 @@ def flag_outliers(
     outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band)
 
     # create boolean auto_outlier col based on conditional logic
-    df["auto_outlier"] = outlier_cond & filter_cond
+    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond
     df = df.drop(["upper_band", "lower_band"], axis=1)
     return df
 
 
-def calc_num_outliers(df: pd.DataFrame, 
-                      outlier_val_col: str) -> Tuple[int, int]:
-    """Calculate the number of outliers flagged.
+def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
+    """Determine whether a reference should be treated as an outlier.
+
+    If any of the colunns in the list flag_value_cols has been flagged as an
+    outlier, then the whole reference (ie, row) will be treated as an
+    outlier with a flag of 'True' in the auto_outlier column.
+
+    Args: 
+        df (pd.DataFrame): The main dataset where outliers are to be calculated
+        flag_value_cols: (List[str]): The names of the columns to flag for outliers
+
+    Returns:
+        df (pd.DataFrame): The full dataset with flag column indicating whether
+                            a reference should be considered an outlier.
+    """
+    flag_cols = [f"{col}_outlier_flag" for col in flag_value_cols]
+    df["auto_outlier"] = df[flag_cols].sum(axis=1) > 0
+    return df
+
+
+def log_outlier_info(df: pd.DataFrame, value_col: str):
+    """Log the number of outliers flagged.
     
     Also calculate the total number of non-zero entries in the 
     outlier value column.
 
     Args:
         df (pd.DataFrame): The dataframe used for finding outliers
-        outlier_value_col (str): The name of the col outliers are calculated for
-
-    Returns:
-        num_flagged (int): The number of flagged outliers
-        tot_nonzero (int): The total number of nonzero entries in the 
-            outlier value column.
+        value_col (str): The name of the col outliers are calculated for
     """
+    flag_col = f"{value_col}_outlier_flag"
+    num_flagged = df[df[flag_col]==True][flag_col].count()
 
-    num_flagged = df[df["auto_outlier"]==True]["auto_outlier"].count()
+    tot_nonzero = df[df[value_col]>0][value_col].count()
 
-    tot_nonzero = df[df[outlier_val_col]>0][outlier_val_col].count()
-    
-    return num_flagged, tot_nonzero
+    msg = (f"{num_flagged} outliers were detected out of a total of "
+           f"{tot_nonzero} non-zero entries in column {value_col}")
+    OutlierMainLogger.info(msg)
 
 
-def auto_flagging(df: pd.DataFrame, 
-                  upper_clip: float = 0.05, 
-                  lower_clip: float = 0.0) -> pd.DataFrame:
+def run_auto_flagging(df: pd.DataFrame, 
+                      upper_clip: float, 
+                      lower_clip: float,
+                      flag_value_cols: List[str]) -> pd.DataFrame:
     """Flag outliers for quantiles specified in the config.
 
 
@@ -136,35 +159,38 @@ def auto_flagging(df: pd.DataFrame,
         df (pd.DataFrame): The main dataset where outliers are to be calculated
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
+        flag_value_cols: (List[str]): The names of the columns to flag for outliers
 
     Returns:
-        df (pd.DataFrame): The full dataset with flag column for outliers.
+        df (pd.DataFrame): The full dataset with flag columns indicating outliers.
     """
     OutlierMainLogger.info("Starting outlier detection...")
 
     # Validate the outlier configuration settings
-    validate_config(upper_clip, lower_clip)
+    validate_config(upper_clip, lower_clip, flag_value_cols)
 
-    # Specify the value column and the groupby columns for outliers
-    outlier_val_col = "709"
+    # loop through all columns to be flagged for outliers
+    for value_col in flag_value_cols:
+        # to_numeric was needed to convert strings however 'coerce' means values that
+        # can't be converted are represented by NaNs.
+        #TODO data validation and cleaning should replace this code.
+        df[value_col] = pd.to_numeric(df[value_col], errors='coerce')
 
-    # to_numeric was needed to convert strings however 'coerce' means values that
-    # can't be converted are represented by NaNs.
-    #TODO data validation and cleaning should replace this code.
-    df[outlier_val_col] = pd.to_numeric(df[outlier_val_col], errors='coerce')
-    groupby_cols = ["period", "cellnumber"]
+        # Call function to flag for auto outliers in column value_col
+        df = flag_outliers(df, upper_clip, lower_clip, value_col)
 
-    # Call function to flag for auto outliers
-    flagged_df = flag_outliers(
-        df, upper_clip, lower_clip, groupby_cols, outlier_val_col
-    )
+        # Log infomation on the number of outliers in column value_col
+        log_outlier_info(df, value_col)
 
-    num_flagged, tot_nonzero = calc_num_outliers(flagged_df, outlier_val_col)
+    # create 'master' outlier column- which is True if any of the other flags is True
+    df = decide_outliers(df, flag_value_cols)
 
-    msg = (f"{num_flagged} outliers were detected out of a total of "
-           f"{tot_nonzero} non-zero entries in column {outlier_val_col}")
+    # log the number of True flags in the master outlier flag column
+    num_flagged = df[df["auto_outlier"]==True]["auto_outlier"].count()
 
-    OutlierMainLogger.info("Finishing automatic outlier detection.")  
+    msg = (f"Outlier flags have been created for {num_flagged} records in total.")
     OutlierMainLogger.info(msg)
 
-    return flagged_df
+    OutlierMainLogger.info("Finishing automatic outlier detection.")  
+
+    return df

@@ -1,7 +1,7 @@
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
-from src.outlier_detection.auto_outliers import flag_outliers
+from src.outlier_detection.auto_outliers import flag_outliers, decide_outliers
 
 
 class TestOutlierFlagging:
@@ -9,7 +9,7 @@ class TestOutlierFlagging:
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
-        input_cols = ["reference", "selectiontype", "period", "cellnumber", "value"]
+        input_cols = ["reference", "selectiontype", "period", "cellnumber", "701"]
 
         data = [
             [1, "P", 2020, 10, 1.1],
@@ -47,8 +47,8 @@ class TestOutlierFlagging:
             "selectiontype",
             "period",
             "cellnumber",
-            "value",
-            "auto_outlier",
+            "701",
+            "701_outlier_flag",
         ]
 
         data = [
@@ -87,10 +87,53 @@ class TestOutlierFlagging:
 
         upper_clip = 0.1
         lower_clip = 0
-        groupby_cols: list = ["period", "cellnumber"]
-        value_col: str = "value"
+        value_col = "701"
         result_df = flag_outliers(
-            input_df, upper_clip, lower_clip, groupby_cols, value_col
+            input_df, upper_clip, lower_clip, value_col
         )
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestDecideOutliers:
+    """Unit tests for decide_outliers functtion."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = ["reference", "701_outlier_flag", "702_outlier_flag", "703_outlier_flag"]
+
+        data = [
+            [1, True,  False, False],
+            [2, False, False, False],
+            [3, False, True,  False],
+            [4, True,  True,  False],
+            [5, True,  True,  True]
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create an input dataframe for the test."""
+        exp_cols = ["reference", "701_outlier_flag", "702_outlier_flag", "703_outlier_flag", "auto_outlier"]
+
+        data = [
+            [1, True,  False, False, True],
+            [2, False, False, False, False],
+            [3, False, True,  False, True],
+            [4, True,  True,  False, True],
+            [5, True,  True,  True, True]
+        ]
+
+        exp_df = pandasDF(data=data, columns=exp_cols)
+        return exp_df
+
+    def test_decide_outliers(self):
+        """Test for decide_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        flag_cols = ["701", "702", "703"]
+        result_df = decide_outliers(input_df, flag_cols)
 
         assert_frame_equal(result_df, expected_df)
