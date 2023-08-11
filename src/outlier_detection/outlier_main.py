@@ -16,7 +16,7 @@ def run_outliers(df: pd.DataFrame,
     Run the outliering module.
 
     The auto-outlier procedure is applied first, adding a flag column for
-    automatically detected outliers. This is output for the user.
+    automatically detected outliers. The data is then output for the user.
 
     If a manual outlier file has been supplied by the user, this is read in,
     and the manually specified outlier flags supercede auto ones.
