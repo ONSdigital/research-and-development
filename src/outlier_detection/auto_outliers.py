@@ -18,6 +18,7 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
         ImportError if upper_clip or lower_clip have invalid values
     """
     OutlierMainLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
+    OutlierMainLogger.info(f"The columns to be flagged for outliers: {flag_value_cols}")
 
     if (upper_clip == 0) and (lower_clip == 0):
         OutlierMainLogger.warning(
@@ -32,7 +33,8 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
         raise ImportError
 
     if not isinstance(flag_value_cols, list):
-        OutlierMainLogger.error("In config, flag_value_cols must be set in as a list.")
+        
+        OutlierMainLogger.error("In config, flag_value_cols must be specified as a list.")
         raise ImportError     
 
 
@@ -121,8 +123,8 @@ def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFram
 def log_outlier_info(df: pd.DataFrame, value_col: str):
     """Log the number of outliers flagged.
     
-    Also calculate the total number of non-zero entries in the 
-    outlier value column.
+    Also calculate the total number of non-zero entries in the specified
+    value_col column being flagged.
 
     Args:
         df (pd.DataFrame): The dataframe used for finding outliers
@@ -142,14 +144,16 @@ def run_auto_flagging(df: pd.DataFrame,
                       upper_clip: float, 
                       lower_clip: float,
                       flag_value_cols: List[str]) -> pd.DataFrame:
-    """Flag outliers for quantiles specified in the config.
+    """Flag outliers based on clipping values specified in the config.
 
+    For each of the 'flag_cols' columns specified in the developers config, a
+    boolean flag is created for the highest values in the in the column, based on
+    the upper_clip percentage, and the lowest non-zero values, based on the 
+    lower_clip percengage (usually the lower clip will be zero, so not effective.) 
+    Zero or null values are not included in the flagging process.
 
-    Calculate the automatic outlier flag (Boolean) in a column
-    called auto_outlier.
-
-    Use values specified in the config file for the upper and lower
-    clipping values.
+    A master outlier flag, 'auto_outlier', is created with a value True if any one
+    of the other outlier flags is True.
 
     Notes:
         - Outliering is only done for randomly sampled (rather than 'census') 
@@ -157,8 +161,8 @@ def run_auto_flagging(df: pd.DataFrame,
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated
-        upper_clip (float): The percentage for upper clipping as float
-        lower_clip (float): The percentage for lower clipping as float
+        upper_clip (float): The percentage for upper clipping
+        lower_clip (float): The percentage for lower clipping
         flag_value_cols: (List[str]): The names of the columns to flag for outliers
 
     Returns:
@@ -171,12 +175,12 @@ def run_auto_flagging(df: pd.DataFrame,
 
     # loop through all columns to be flagged for outliers
     for value_col in flag_value_cols:
-        # to_numeric was needed to convert strings however 'coerce' means values that
+        # to_numeric is needed to convert strings. However 'coerce' means values that
         # can't be converted are represented by NaNs.
-        #TODO data validation and cleaning should replace this code.
+        #TODO data validation and cleaning should replace the need for 'to_numeric'
         df[value_col] = pd.to_numeric(df[value_col], errors='coerce')
 
-        # Call function to flag for auto outliers in column value_col
+        # Call function to add a flag for auto outliers in column value_col
         df = flag_outliers(df, upper_clip, lower_clip, value_col)
 
         # Log infomation on the number of outliers in column value_col
