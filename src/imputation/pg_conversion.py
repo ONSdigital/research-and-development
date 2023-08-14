@@ -19,11 +19,8 @@ def pg_to_pg_mapper(
         df (pd.DataFrame): The dataset containing all the PG numbers
         mapper (pd.DataFrame): The mapper dataframe loaded using custom function
         target_col (str, optional): The column we want to convert (product_group).
-        Defaults to '201'.
         from_col (str, optional): The column in the mapper that is used to map from.
-        Defaults to "2016 > Form PG".
         to_col (str, optional): The column in the mapper that is used to map to.
-        Defaults to "2016 > Pub PG".
 
     Returns:
         pd.DataFrame: A dataframe with all target column values mapped
@@ -82,13 +79,9 @@ def sic_to_pg_mapper(
         df (pd.DataFrame): The dataset containing all the PG numbers.
         sicmapper (pd.DataFrame): The mapper dataframe loaded using custom function.
         target_col (str, optional): The column we want to convert (product_group).
-        Defaults to '201'.
         sic_column (str, optional): The column containing the SIC numbers.
-        Defaults to 'rusic'.
         from_col (str, optional): The column in the mapper that is used to map from.
-        Defaults to "SIC 2007_CODE".
         to_col (str, optional): The column in the mapper that is used to map to.
-        Defaults to "2016 > Pub PG".
 
     Returns:
         pd.DataFrame: A dataframe with all target column values mapped

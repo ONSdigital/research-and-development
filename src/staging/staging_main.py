@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable
 from datetime import datetime
+from typing import Tuple
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
@@ -17,7 +18,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
