@@ -1,17 +1,54 @@
-[cell_id]
-Description = "Cell ID"
-Deduced_Data_Type = "Categorical"
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
 Nullable = "nan"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
 q_code = ""
-old_ref = "None"
+old_ref = "nan"
 
-[civ_or_def]
+[101]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[103]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[104]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[200]
 Description = "Business type: Civil or Defence"
-Deduced_Data_Type = "Categorical"
+Deduced_Data_Type = "str"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = "None"
@@ -20,119 +57,9 @@ Possible_categorical_Values = []
 q_code = ""
 old_ref = "c_or_d"
 
-[current_sic]
-Description = "Sic - Standard Industry Classification"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "sic92"
-
-[data_source]
-Description = "Constructed"
-Deduced_Data_Type = "Categorical"
-Nullable = "nan"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[employee_count]
-Description = "Employee Count (IDBR)"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[foreign_owner]
-Description = "Foreign Owner"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "f_owner"
-
-[form_status]
-Description = "Status"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[form_type]
-Description = "Form Type"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "form"
-
-[freeze_id]
-Description = "Freeze ID - bespoke to openroad"
-Deduced_Data_Type = "Categorical"
-Nullable = "nan"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[period]
-Description = "Openroad Specific"
-Deduced_Data_Type = "Categorical"
-Nullable = "nan"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "period"
-
-[period_contributor_id]
-Description = "Openroad Specific"
-Deduced_Data_Type = "Categorical"
-Nullable = "nan"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[period_year]
-Description = "Period"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "None"
-
-[product_group]
+[201]
 Description = "Published Product Group"
-Deduced_Data_Type = "Categorical"
+Deduced_Data_Type = "Int64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = "None"
@@ -141,42 +68,9 @@ Possible_categorical_Values = []
 q_code = ""
 old_ref = "selgrpno"
 
-[reference]
-Description = "Reference"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "ref"
-
-[sizeband]
-Description = "SizeBand"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "sizebd"
-
-[wowentref]
-Description = "Wowentref"
-Deduced_Data_Type = "Categorical"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "wow"
-
 [202]
 Description = "Salaries & Wages"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -187,7 +81,7 @@ old_ref = "slries"
 
 [203]
 Description = "Other current expenditure"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -198,7 +92,7 @@ old_ref = "curr_oth"
 
 [204]
 Description = "Total Current Expenditure"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -209,7 +103,7 @@ old_ref = "curr_tot"
 
 [205]
 Description = "Basic Research"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -220,7 +114,7 @@ old_ref = "res_bas"
 
 [206]
 Description = "Applied Research"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -231,7 +125,7 @@ old_ref = "res_app"
 
 [207]
 Description = "Experimental Development"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -240,20 +134,9 @@ Possible_categorical_Values = []
 q_code = "q207"
 old_ref = "experm"
 
-[208]
-Description = "Land & Build CapEx"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q208"
-old_ref = "c_lnd_bl"
-
 [209]
 Description = "Equipment & Machinery CapEx"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -264,7 +147,7 @@ old_ref = "cxplm"
 
 [210]
 Description = "Total Capex."
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -275,7 +158,7 @@ old_ref = "None"
 
 [211]
 Description = "Total Inhouse Expenditure"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -286,7 +169,7 @@ old_ref = "intram"
 
 [212]
 Description = "Own Funds"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -295,20 +178,9 @@ Possible_categorical_Values = []
 q_code = "q212"
 old_ref = "own_f"
 
-[213]
-Description = "Funding - Commission of the EU"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q213"
-old_ref = "ovss_ec"
-
 [214]
 Description = "Funding - UK government"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -317,20 +189,9 @@ Possible_categorical_Values = []
 q_code = "q214"
 old_ref = "ex_uk_gv"
 
-[215]
-Description = "Funding - Organisations outside the UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q215"
-old_ref = "ex_uk_b"
-
 [216]
 Description = "Funding - Other UK Private Bus/Public Orgs"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -339,20 +200,9 @@ Possible_categorical_Values = []
 q_code = "q216"
 old_ref = "ex_uk"
 
-[217]
-Description = "Funding - Any Other UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q217"
-old_ref = "None"
-
 [218]
 Description = "Total Funding"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -363,7 +213,7 @@ old_ref = "f_tot"
 
 [219]
 Description = "Land Acquired for R&D (Split of Land & Build CapEx)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -374,7 +224,7 @@ old_ref = "None"
 
 [220]
 Description = "Buildings acquired/constructed for R&D (Split of Land & Build CapEx)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -385,7 +235,7 @@ old_ref = "None"
 
 [221]
 Description = "Expenditure on computer software only (of which from Equipment & Machinery CapEx)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -396,7 +246,7 @@ old_ref = "None"
 
 [222]
 Description = "Purchase of Materials (Split of Other current)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -407,7 +257,7 @@ old_ref = "None"
 
 [223]
 Description = "Purchase of Services (Split of Other current)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -418,7 +268,7 @@ old_ref = "None"
 
 [225]
 Description = "Ownership - Own Business"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -429,7 +279,7 @@ old_ref = "None"
 
 [226]
 Description = "Ownership - UK Government"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -440,7 +290,7 @@ old_ref = "None"
 
 [227]
 Description = "Ownership - Other UK Priv Bus"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -451,7 +301,7 @@ old_ref = "None"
 
 [228]
 Description = "Ownership - Other UK Orgs"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -462,7 +312,7 @@ old_ref = "None"
 
 [229]
 Description = "Ownership - Bus Enterprises in Group Outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -471,86 +321,9 @@ Possible_categorical_Values = []
 q_code = "q229"
 old_ref = "None"
 
-[230]
-Description = "Ownership - Other Bus Enterprises outside UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q230"
-old_ref = "None"
-
-[231]
-Description = "Ownership - Other Governments outside UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q231"
-old_ref = "None"
-
-[232]
-Description = "Ownership - Higher Education Establishments outside UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q232"
-old_ref = "None"
-
-[233]
-Description = "Ownership - Non-profit Orgs outside the UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q233"
-old_ref = "None"
-
-[234]
-Description = "Ownership - Commission of EU"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q234"
-old_ref = "None"
-
-[235]
-Description = "Ownership - International Orgs"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q235"
-old_ref = "None"
-
-[236]
-Description = "Ownership - Any other Orgs outside UK"
-Deduced_Data_Type = "int64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q236"
-old_ref = "None"
-
 [237]
 Description = "Ownership - not owned freely available"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -559,42 +332,9 @@ Possible_categorical_Values = []
 q_code = "q237"
 old_ref = "None"
 
-[239]
-Description = "Life Length - Basic Research"
-Deduced_Data_Type = "int64"
-Nullable = "Not Asked"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q239"
-old_ref = "None"
-
-[240]
-Description = "Life Length - Applied Research"
-Deduced_Data_Type = "int64"
-Nullable = "Not Asked"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q240"
-old_ref = "None"
-
-[241]
-Description = "Life Length - Experimental Res"
-Deduced_Data_Type = "int64"
-Nullable = "Not Asked"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q241"
-old_ref = "None"
-
 [242]
 Description = "Funding - Any other UK organisations"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -605,7 +345,7 @@ old_ref = "None"
 
 [243]
 Description = "Funding - Business Enterprises in group outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -616,7 +356,7 @@ old_ref = "None"
 
 [244]
 Description = "Funding - Other Business Enterprises outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -627,7 +367,7 @@ old_ref = "None"
 
 [245]
 Description = "Funding - Other Governments outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -638,7 +378,7 @@ old_ref = "None"
 
 [246]
 Description = "Funding - Higher Education Est Outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -649,7 +389,7 @@ old_ref = "None"
 
 [247]
 Description = "Funding - Non-profit Orgs outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -660,7 +400,7 @@ old_ref = "None"
 
 [248]
 Description = "Funding - International Orgs"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -671,7 +411,7 @@ old_ref = "None"
 
 [249]
 Description = "Funding - Any other orgs outside UK"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -682,7 +422,7 @@ old_ref = "None"
 
 [250]
 Description = "Funding - UK Higher Education Establishments"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -702,6 +442,30 @@ Possible_categorical_Values = []
 q_code = "q251"
 old_ref = "None"
 
+[300]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[301]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
 [302]
 Description = "Purchased/funded R&D in the UK (Yes or No)"
 Deduced_Data_Type = "bool"
@@ -715,7 +479,7 @@ old_ref = "None"
 
 [303]
 Description = "Purchased Outside UK (Govt Funded)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -726,7 +490,7 @@ old_ref = "None"
 
 [304]
 Description = "Purchased Outside UK (Other)"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -737,7 +501,7 @@ old_ref = "None"
 
 [305]
 Description = "Total Purchased"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -778,6 +542,349 @@ Max_values = "None"
 Possible_categorical_Values = []
 q_code = "q309"
 old_ref = "None"
+
+[405]
+Description ="emp_researcher (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[406]
+Description ="emp_researcher (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[407]
+Description ="emp_technician (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[408]
+Description ="emp_technician (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[409]
+Description ="emp_other (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[410]
+Description ="emp_other (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[411]
+Description ="total fte(Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[412]
+Description ="total fte(Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[501]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[502]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[503]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[504]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[505]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[506]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[507]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[508]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[601]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[602]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[604]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[605]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+
+[701]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[702]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "Int64"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[703]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[704]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[705]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[706]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[707]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[709]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[710]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[711]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
 
 [713]
 Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM"
