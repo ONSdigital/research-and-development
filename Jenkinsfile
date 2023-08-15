@@ -24,8 +24,8 @@ pipeline {
         ARTIFACTORY_CREDS       = 's_jenkins_epds'
         ARTIFACTORY_PYPI_REPO   = 'yr-python'
         PROJECT_NAME            = 'resdev'
-        BUILD_BRANCH            = '142_jenkinsFile_RAP'  // Any commits to this branch will create a build in artifactory
-        BUILD_TAG               = 'v*'  // Any commits tagged with this pattern will create a build in artifactory
+        BUILD_BRANCH            = 'main'  // Any commits to this branch will create a build in artifactory
+        BUILD_TAG               = '*-release'  // Any commits tagged with this pattern will create a build in artifactory
         MIN_COVERAGE_PC         = '0'
         GITLAB_CREDS            = 'epds_gitlab_token'  // Credentials used for notifying GitLab of build status
     }
@@ -133,7 +133,7 @@ pipeline {
             when {
                 anyOf{
                     branch BUILD_BRANCH
-                    //tag BUILD_TAG
+                    tag BUILD_TAG
                 }
                 beforeAgent true
             }
