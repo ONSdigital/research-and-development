@@ -3,18 +3,17 @@ import numpy as np
 
 from src.outlier_detection.manual_outliers import apply_manual_outliers
 
+
 class TestManualOutliers:
     """Unit tests for apply_manual_outliers function."""
-    
+
     def input_data(self):
         """Input dataframe for the three different scenarios."""
         data = {
-            
-        "reference": [1, 2, 3],
-        "instance": [0, 0, 0],
-        "auto_outlier": [False, False, True],
-        "manual_outlier": [True, np.nan ,False],
-        
+            "reference": [1, 2, 3],
+            "instance": [0, 0, 0],
+            "auto_outlier": [False, False, True],
+            "manual_outlier": [True, np.nan, False],
         }
 
         input_data = pd.DataFrame(data)
@@ -23,17 +22,16 @@ class TestManualOutliers:
     def output_data(self):
         """Output dataframe for the three different scenarios."""
         data = {
-            
-        "reference": [1, 2, 3],
-        "instance": [0, 0, 0],
-        "auto_outlier": [False, False, True],
-        "manual_outlier": [True, np.nan ,False],
-        "outlier": [True, False, False]
+            "reference": [1, 2, 3],
+            "instance": [0, 0, 0],
+            "auto_outlier": [False, False, True],
+            "manual_outlier": [True, np.nan, False],
+            "outlier": [True, False, False],
         }
 
         output_data = pd.DataFrame(data)
         return output_data
-    
+
     def test_apply_manual_outliers(self):
         """Test for flag_outliers function."""
         input_data = self.input_data()
