@@ -1,3 +1,15 @@
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+q_code = ""
+old_ref = "nan"
+
 [reference]
 Description = "nan"
 Deduced_Data_Type = "int64"
