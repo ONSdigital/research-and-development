@@ -1,15 +1,3 @@
-[instance]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
-q_code = ""
-old_ref = "nan"
-
 [reference]
 Description = "nan"
 Deduced_Data_Type = "int64"
@@ -63,6 +51,16 @@ Possible_Categorical_Values = ["nan"]
 [adjustedresponse]
 Description = "nan"
 Deduced_Data_Type = "pd.NA"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
