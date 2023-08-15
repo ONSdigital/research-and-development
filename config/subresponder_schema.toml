@@ -108,12 +108,3 @@ Min_values = "nan"
 Max_values = "nan"
 Possible_categorical_Values = ["nan"]
 
-[instance]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = false
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]

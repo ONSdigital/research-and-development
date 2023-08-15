@@ -107,10 +107,10 @@ def run_staging(
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
-        test_folder = config["network_paths"]["staging_test_foldername"]
+        staging_folder = config["network_paths"]["staging_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_BERD_full_responses_{tdate}.csv"
-        write_csv(f"{test_folder}/{staged_filename}", full_responses)
+        staged_filename = f"staging_qa/staged_BERD_full_responses_{tdate}.csv"
+        write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
     return full_responses
