@@ -71,7 +71,7 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses = run_staging(
+    full_responses, manual_outlier_file = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
     MainLogger.info("Finished Data Ingest.")
@@ -80,7 +80,9 @@ def run_pipeline(start):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(full_responses, config, write_csv, read_csv)
+    outliered_responses = run_outliers(
+        full_responses, manual_outlier_file, config, write_csv
+    )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 

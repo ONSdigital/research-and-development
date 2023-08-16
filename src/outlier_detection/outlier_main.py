@@ -11,7 +11,10 @@ OutlierMainLogger = logging.getLogger(__name__)
 
 
 def run_outliers(
-    df: pd.DataFrame, config: dict, write_csv: Callable, read_csv: Callable
+    df: pd.DataFrame,
+    df_manual_supplied: pd.DataFrame,
+    config: dict,
+    write_csv: Callable,
 ) -> pd.DataFrame:
     """
     Run the outliering module.
@@ -46,6 +49,7 @@ def run_outliers(
 
     # output the outlier flags for QA
     # TODO when working on DAP need to output QA there also.
+    # TODO Return a single QA file for both auto and manual outliers?
     if config["global"]["network_or_hdfs"] == "network":
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         folder = config["network_paths"]["outliers_path"]
@@ -54,17 +58,12 @@ def run_outliers(
         write_csv(f"{folder}/outliers_qa/{filename}", df_auto_flagged)
         OutlierMainLogger.info("Finished QA output of outliers data.")
 
-    # read in file for manual outliers
-    if config["global"]["network_or_hdfs"] == "network":
-        OutlierMainLogger.info("Loading Manual Outlier File")
-        manual_path = config["network_paths"]["manual_outliers_path"]
-        df_manual_supplied = read_csv(manual_path)
-        OutlierMainLogger.info("Manual Outlier File Loaded Successfully...")
-
     # update outlier flag column with manual outliers
 
     OutlierMainLogger.info("Starting Manual Outlier Detection")
     df_manual_flagged = manual.apply_manual_outliers(df_manual_supplied)
     OutlierMainLogger.info("Finished Manual Outlier Detection")
+
+    # TODO Join the manual outlier data to the original dataframe
 
     return df_manual_flagged

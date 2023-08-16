@@ -105,6 +105,13 @@ def run_staging(
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
 
+    # read in file for manual outliers
+    if network_or_hdfs == "network":
+        StagingMainLogger.info("Loading Manual Outlier File")
+        manual_path = config["network_paths"]["manual_outliers_path"]
+        df_manual_supplied = read_csv(manual_path)
+        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -114,4 +121,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses
+    return full_responses, df_manual_supplied
