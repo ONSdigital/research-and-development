@@ -2,14 +2,14 @@
 import logging
 import pandas as pd
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Dict, Any
 
 from src.outlier_detection import auto_outliers as auto
 
 OutlierMainLogger = logging.getLogger(__name__)
 
 
-def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable) -> pd.DataFrame:
+def run_outliers(df: pd.DataFrame, config: Dict[str, Any], write_csv: Callable) -> pd.DataFrame:
     """
     Run the outliering module.
 
