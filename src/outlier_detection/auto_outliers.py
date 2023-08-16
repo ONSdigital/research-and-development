@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Callable
 
+
 OutlierMainLogger = logging.getLogger(__name__)
 
 # Set defaults
@@ -214,7 +215,9 @@ def write_short_form_outlier_csv(
     short_form_cols: List[str],
     output_path: str,
     write_csv: Callable,
-    form_type_no: int = 6,
+    file_exists: Callable,
+    runlog_number: str,
+    form_type_no: str = "0006",
 ):
     """Write a CSV file containing relevant columns for short forms.
 
@@ -232,14 +235,25 @@ def write_short_form_outlier_csv(
     short_form_df = df[df["formtype"] == form_type_no]
 
     # Add the manual_outlier col
-    short_form_df["manual_outlier_flag"] = np.nan
+    short_form_df["manual_outlier"] = np.nan
 
     # Create a new df with selected cols and additional cols
-    cols_for_output = short_form_cols + ["auto_outlier_flag", "manual_outlier_flag"]
+    cols_for_output = short_form_cols + ["auto_outlier", "manual_outlier"]
     output_df = short_form_df[cols_for_output]
 
-    # Use the provided write_csv function to write out the df
-    write_csv(output_df, output_path)
+    # Create final output file_path
+    file_path = output_path + "manual_outlier.csv"
+
+    # Check if the manual outlier file exists as it is a requirement not to overwrite
+    if file_exists(file_path):
+        # Use the provided write_csv function to write out the df
+        write_csv(file_path, output_df)
+    else:
+        OutlierMainLogger.warning(
+            "The manual outlier file as one already exists. Appending runlog number"
+        )
+        file_path = output_path + f"manual_outlier_{runlog_number}.csv"
+        write_csv(file_path, output_df)
 
     # Log result
     OutlierMainLogger.info("Finished writing CSV to %s", output_path)

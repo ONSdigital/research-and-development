@@ -33,6 +33,7 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
+    from src.utils.local_file_mods import local_file_exists as file_exists
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
@@ -42,6 +43,7 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
+    from src.utils.hdfs_mods import hdfs_file_exists as file_exists
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -79,7 +81,7 @@ def run_pipeline(start):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(full_responses, config, write_csv)
+    outliered_responses = run_outliers(full_responses, config, write_csv, file_exists)
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 

@@ -9,7 +9,13 @@ from src.outlier_detection import auto_outliers as auto
 OutlierMainLogger = logging.getLogger(__name__)
 
 
-def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable) -> pd.DataFrame:
+def run_outliers(
+    df: pd.DataFrame,
+    config: dict,
+    write_csv: Callable,
+    file_exists: Callable,
+    run_log_num: str,
+) -> pd.DataFrame:
     """
     Run the outliering module.
 
@@ -33,26 +39,38 @@ def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable) -> pd.Data
             indicating outliers for use the estimation module.
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
-
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
+    outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
+    man_outlier_path = outlier_path + "manual_outliers"
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
+    auto.write_short_form_outlier_csv(
+        df_auto_flagged,
+        short_form_cols=flag_cols,
+        output_path=man_outlier_path,
+        write_csv=write_csv,
+        file_exists=file_exists,
+        runlog_number="test_number",
+        form_type_no="0006",
+    )
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
 
     # output the outlier flags for QA
     # TODO when working on DAP need to output QA there also.
-    if config["global"]["network_or_hdfs"] == "network":
+    if NETWORK_OR_HDFS == "network":
         OutlierMainLogger.info("Starting output of Outlier QA data...")
-        folder = config["network_paths"]["outliers_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"outliers_qa_{tdate}.csv"
-        write_csv(f"{folder}/outliers_qa/{filename}", df_auto_flagged)
+        write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
         OutlierMainLogger.info("Finished QA output of outliers data.")
 
     # read in file for manual outliers
 
     # update outlier flag column with manual outliers
+
+    # Write out the CSV
 
     return df_auto_flagged
