@@ -12,6 +12,18 @@ old_ref = "nan"
 
 [101]
 Description = "nan"
+Deduced_Data_Type = "bool"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[102]
+Description = "nan"
 Deduced_Data_Type = "Int64"
 Nullable = "nan"
 Current_Data_Type = "object"
@@ -733,7 +745,19 @@ old_ref = "nan"
 
 [602]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[603]
+Description = "nan"
+Deduced_Data_Type = "str"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -745,7 +769,7 @@ old_ref = "nan"
 
 [604]
 Description = "nan"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "bool"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -757,7 +781,7 @@ old_ref = "nan"
 
 [605]
 Description = "nan"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "bool"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -850,6 +874,18 @@ Possible_Categorical_Values = [ "nan",]
 q_code = ""
 old_ref = "nan"
 
+[708]
+Description = "nan"
+Deduced_Data_Type = "bool"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
 [709]
 Description = "nan"
 Deduced_Data_Type = "float64"
@@ -886,6 +922,18 @@ Possible_Categorical_Values = [ "nan",]
 q_code = ""
 old_ref = "nan"
 
+[712]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
 [713]
 Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM"
 Deduced_Data_Type = "bool"
@@ -907,3 +955,171 @@ Max_values = "None"
 Possible_categorical_Values = []
 q_code = "q714"
 old_ref = "None"
+
+[9000]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9001]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9002]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9003]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9004]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9005]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9006]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9007]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9008]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9009]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9010]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9011]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9012]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9013]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
