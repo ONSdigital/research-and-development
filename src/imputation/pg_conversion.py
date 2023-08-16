@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 
-pg_logger = logging.getLogger(__name__)
+PgLogger = logging.getLogger(__name__)
 
 
 def pg_to_pg_mapper(
@@ -32,7 +32,7 @@ def pg_to_pg_mapper(
     )
     # Log the conflicts for the user to fix
     if map_errors:
-        pg_logger.error(
+        PgLogger.error(
             (
                 f"The following product groups are trying to map to multiple letters: "
                 f"{map_errors}"
@@ -48,16 +48,18 @@ def pg_to_pg_mapper(
             mapless_errors.append(key)
 
     if mapless_errors:
-        pg_logger.error(
+        PgLogger.error(
             f"Mapping doesnt exist for the following product groups: {mapless_errors}"
         )
     # Map using the dictionary taking into account the null values.
     # Then convert to categorigal datatype
     df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
+    # TODO: add in some error handling and cleaning here.
+    # See ticket RDRP-386
     df[target_col] = df[target_col].map(map_dict)
     df[target_col] = df[target_col].astype("category")
 
-    pg_logger.info("Product groups successfully mapped to letters")
+    PgLogger.info("Product groups successfully mapped to letters")
 
     return df
 
@@ -93,7 +95,7 @@ def sic_to_pg_mapper(
     )
     # Log the conflicts for the user to fix
     if map_errors:
-        pg_logger.error(
+        PgLogger.error(
             f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
         )
     # Create a mapping dictionary from the 2 columns
@@ -106,7 +108,7 @@ def sic_to_pg_mapper(
             mapless_errors.append(key)
 
     if mapless_errors:
-        pg_logger.error(
+        PgLogger.error(
             f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
         )
     # Map to the target column using the dictionary taking into account the null values.
@@ -115,6 +117,6 @@ def sic_to_pg_mapper(
     df[target_col] = df[sic_column].map(map_dict)
     df[target_col] = df[target_col].astype("category")
 
-    pg_logger.info("SIC numbers successfully mapped to PG letters")
+    PgLogger.info("SIC numbers successfully mapped to PG letters")
 
     return df
