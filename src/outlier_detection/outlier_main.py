@@ -52,7 +52,7 @@ def run_outliers(
         output_path=man_outlier_path,
         write_csv=write_csv,
         file_exists=file_exists,
-        runlog_number="test_number",
+        runlog_number="test_number",  # TODO: replace with real runlog number
         form_type_no="0006",
     )
 
