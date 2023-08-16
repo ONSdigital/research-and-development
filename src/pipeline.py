@@ -9,6 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
 
 
@@ -32,7 +33,6 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
-
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
@@ -42,7 +42,6 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -71,7 +70,7 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses = run_staging(
+    full_responses, pg_mapper = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
     MainLogger.info("Finished Data Ingest.")
@@ -84,7 +83,15 @@ def run_pipeline(start):
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
-    # Estimation
+    # Data processing: Imputation
+
+    MainLogger.info("Starting Imputation...")
+    imputed_df = run_imputation(full_responses, pg_mapper)
+    MainLogger.info("Finished  Imputation...")
+
+    print(imputed_df.sample(10))
+
+    # Data processing: Estimation
 
     # Data processing: Regional Apportionment
 

@@ -34,7 +34,7 @@ class TestOutlierFlagging:
             [20, "P", 2020, 20, 3.0],
             [21, "P", 2020, 20, 0.0],
             [22, "P", 2020, 20, 0.0],
-            [23, "C", 2020, 20, 4.0],         
+            [23, "C", 2020, 20, 4.0],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -74,7 +74,7 @@ class TestOutlierFlagging:
             [20, "P", 2020, 20, 3.0, True],
             [21, "P", 2020, 20, 0.0, False],
             [22, "P", 2020, 20, 0.0, False],
-            [23, "C", 2020, 20, 4.0, False],     
+            [23, "C", 2020, 20, 4.0, False],
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
@@ -88,9 +88,7 @@ class TestOutlierFlagging:
         upper_clip = 0.1
         lower_clip = 0
         value_col = "701"
-        result_df = flag_outliers(
-            input_df, upper_clip, lower_clip, value_col
-        )
+        result_df = flag_outliers(input_df, upper_clip, lower_clip, value_col)
 
         assert_frame_equal(result_df, expected_df)
 
@@ -100,14 +98,19 @@ class TestDecideOutliers:
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
-        input_cols = ["reference", "701_outlier_flag", "702_outlier_flag", "703_outlier_flag"]
+        input_cols = [
+            "reference",
+            "701_outlier_flag",
+            "702_outlier_flag",
+            "703_outlier_flag",
+        ]
 
         data = [
-            [1, True,  False, False],
+            [1, True, False, False],
             [2, False, False, False],
-            [3, False, True,  False],
-            [4, True,  True,  False],
-            [5, True,  True,  True]
+            [3, False, True, False],
+            [4, True, True, False],
+            [5, True, True, True],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -115,14 +118,20 @@ class TestDecideOutliers:
 
     def create_expected_df(self):
         """Create an input dataframe for the test."""
-        exp_cols = ["reference", "701_outlier_flag", "702_outlier_flag", "703_outlier_flag", "auto_outlier"]
+        exp_cols = [
+            "reference",
+            "701_outlier_flag",
+            "702_outlier_flag",
+            "703_outlier_flag",
+            "auto_outlier",
+        ]
 
         data = [
-            [1, True,  False, False, True],
+            [1, True, False, False, True],
             [2, False, False, False, False],
-            [3, False, True,  False, True],
-            [4, True,  True,  False, True],
-            [5, True,  True,  True, True]
+            [3, False, True, False, True],
+            [4, True, True, False, True],
+            [5, True, True, True, True],
         ]
 
         exp_df = pandasDF(data=data, columns=exp_cols)

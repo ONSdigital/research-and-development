@@ -1,8 +1,8 @@
 """The main file for the staging and validation module."""
 import logging
 import pandas as pd
+from typing import Callable, Tuple
 from datetime import datetime
-from typing import Callable
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
@@ -12,12 +12,12 @@ StagingMainLogger = logging.getLogger(__name__)
 
 
 def run_staging(
-    config: dict, 
-    check_file_exists: Callable, 
-    load_json: Callable, 
+    config: dict,
+    check_file_exists: Callable,
+    load_json: Callable,
     read_csv: Callable,
-    write_csv: Callable
-) -> pd.DataFrame:
+    write_csv: Callable,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -25,7 +25,7 @@ def run_staging(
     and transmuted so each question has its own column. The resulting dataframe
     undergoes validation.
 
-    When running on the local network, 
+    When running on the local network,
 
     Args:
         config (dict): The pipeline configuration
@@ -81,7 +81,11 @@ def run_staging(
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    # the anonymised snapshot data we use in hdfs 
+    # Load the PG mapper
+    mapper_path = paths["mapper_path"]
+    mapper = read_csv(mapper_path)
+
+    # the anonymised snapshot data we use in hdfs
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
     if network_or_hdfs == "hdfs":
@@ -114,4 +118,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses
+    return full_responses, mapper

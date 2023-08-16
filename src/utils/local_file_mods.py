@@ -6,8 +6,9 @@ import pandas as pd
 import logging
 
 
-# Set up logger 
+# Set up logger
 lfmod_logger = logging.getLogger(__name__)
+
 
 def read_local_csv(filepath: str) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
@@ -33,7 +34,7 @@ def write_local_csv(filepath: str, data: pd.DataFrame):
         data (pd.DataFrame): Data to be stored
     """
     # Open the file in write mode
-    with open(filepath, "w", newline='\n', encoding='utf-8') as file:
+    with open(filepath, "w", newline="\n", encoding="utf-8") as file:
         # Write dataframe to the file
         data.to_csv(file, index=False)
 
@@ -119,9 +120,10 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
 
     return output
 
+
 def local_mkdir(path):
     """Creates a directory on a local network drive
-    
+
     Args:
         path (string) -- The path to create
     """
@@ -131,7 +133,7 @@ def local_mkdir(path):
 
 def local_open(filepath, mode):
     """Opens a file on a local network drive
-    
+
     Args:
         filepath (string) -- The filepath
         mode (string) -- The mode to open the file in
@@ -142,7 +144,7 @@ def local_open(filepath, mode):
 
 def local_file_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
-    
+
     Args:
         filepath (string) -- The filepath
         df (pd.DataFrame) -- The data to write

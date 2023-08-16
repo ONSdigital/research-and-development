@@ -9,9 +9,7 @@ from src.outlier_detection import auto_outliers as auto
 OutlierMainLogger = logging.getLogger(__name__)
 
 
-def run_outliers(df: pd.DataFrame, 
-                 config: dict, 
-                 write_csv: Callable) -> pd.DataFrame:
+def run_outliers(df: pd.DataFrame, config: dict, write_csv: Callable) -> pd.DataFrame:
     """
     Run the outliering module.
 
@@ -44,7 +42,7 @@ def run_outliers(df: pd.DataFrame,
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
 
     # output the outlier flags for QA
-    #TODO when working on DAP need to output QA there also.
+    # TODO when working on DAP need to output QA there also.
     if config["global"]["network_or_hdfs"] == "network":
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         folder = config["network_paths"]["outliers_path"]
@@ -53,8 +51,8 @@ def run_outliers(df: pd.DataFrame,
         write_csv(f"{folder}/outliers_qa/{filename}", df_auto_flagged)
         OutlierMainLogger.info("Finished QA output of outliers data.")
 
-     # read in file for manual outliers
+    # read in file for manual outliers
 
-     # update outlier flag column with manual outliers   
+    # update outlier flag column with manual outliers
 
     return df_auto_flagged
