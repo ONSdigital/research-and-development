@@ -1,9 +1,8 @@
 """The main file for the staging and validation module."""
 import logging
 import pandas as pd
-from typing import Callable
+from typing import Callable, Tuple
 from datetime import datetime
-from typing import Tuple
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing

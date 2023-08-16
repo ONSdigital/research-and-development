@@ -40,7 +40,6 @@ def pg_to_pg_mapper(
         )
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
-    map_dict = {i: j for i, j in map_dict.items()}
     # Flag all PGs that don't have a corresponding map value
     mapless_errors = []
     for key, value in map_dict.items():
@@ -100,7 +99,6 @@ def sic_to_pg_mapper(
         )
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
-    map_dict = {i: j for i, j in map_dict.items()}
     # Flag all SIC numbers that don't have a corresponding map value
     mapless_errors = []
     for key, value in map_dict.items():
