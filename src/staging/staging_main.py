@@ -74,6 +74,7 @@ def run_staging(
             raise Exception("The historic data did not load")
 
     # Check data file exists, raise an error if it does not.
+    StagingMainLogger.info("Loading SPP snapshot data...")
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file

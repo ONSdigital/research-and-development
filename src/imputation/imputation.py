@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
+import logging
 
 # TODO almost each could be further generalised in terms of
 # variable and function names
+
+ImputationLogger = logging.getLogger(__name__)
 
 
 def filter_by_column_content(
@@ -113,6 +116,36 @@ def filter_pairs(
     return matched_pairs_df
 
 
+def flag_nulls_and_zeros(
+    target_variables_list: list,
+    df: pd.DataFrame,
+    curr_q: str,
+    prev_q: str,
+):
+    """Flag target variables containing nulls or zreos.
+
+    A new column {var}_valid is created for each var in the target variables.
+    This is flagged with 1 if either the current period or previous period
+    contains either a null or a zero. Otherwise, the flag is 0.
+
+    Args:
+        target_variables (list of str): the target variables
+        df (pd.DataFrame): dataframe with current and previous periods
+        curr_q (str): the current period
+        prev_q (str): the previous period
+
+    Returns:
+        pd.DataFrame - a dataframe indicating nulls and zeros in target cols.
+    """
+    df = df.copy()
+    for var in target_variables_list:
+        cond1 = (df[f"{curr_q}_{var}"].isnull()) | (df[f"{prev_q}_{var}"].isnull())
+        cond2 = (df[f"{curr_q}_{var}"] == 0) | (df[f"{prev_q}_{var}"] == 0)
+        df[f"{var}_valid"] = np.where(cond1 | cond2, False, True)
+
+    return df
+
+
 def calc_growth_ratio(
     target_variable: str,
     df: pd.DataFrame,
@@ -121,20 +154,39 @@ def calc_growth_ratio(
 ) -> pd.DataFrame:
     """Calculate the growth ratio for imputation.
 
+    For the current target_variable, a growth_ratio column is created.
+    A growth rate is calculated for those rows where the "target_value_valid"
+    is true, meaning that there are no nulls or zeros in the previous or
+    current periods, TODO and the status is a 'responder' status.
+
+    If this condition is not met, the row has a null value in this column.
+
     Args:
         target_variable (str): The column name of the target variable.
         df (pd.DataFrame): The dataframe containing the target variables.
         current_period
 
     Returns:
-        _type_: _description_
+        pd.DataFrame
     """
-    # for every target variable a growth ratio is calcualted
-
-    df[f"{target_variable}_growth_ratio"] = (
-        df[f"{current_period}_{target_variable}"]
-        / df[f"{previous_period}_{target_variable}"]
+    flagged_df = flag_nulls_and_zeros(
+        [target_variable], df, current_period, previous_period
     )
+
+    responder_statuses = ["Clear", "Clear - overridden", "Clear - overridden SE"]
+
+    cond1 = flagged_df[f"{target_variable}_valid"]
+    cond2 = flagged_df["status"].isin(responder_statuses)
+
+    flagged_df[f"{target_variable}_growth_ratio"] = np.where(
+        cond1 & cond2,
+        (
+            df[f"{current_period}_{target_variable}"]
+            / df[f"{previous_period}_{target_variable}"]
+        ),
+        np.nan,
+    )
+    df = flagged_df.drop(columns=[f"{target_variable}_valid"])
 
     return df
 
@@ -153,13 +205,6 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     # ipdb.set_trace()
     # sorted based on hard coded list (in arg by=)
     sorted_df = df.sort_values(
-        # by=[
-        #     "product_group",
-        #     "civ_or_def",
-        #     f"{target_variable}_growth_ratio",
-        #     "employee_count",
-        #     "ru_ref",
-        # ],
         by=[
             "200",
             "201",
@@ -441,10 +486,6 @@ def run_imputation(
         _type_: _description_
     """
 
-    current_period = "202012"
-    previous_period = "202009"
-    target_variables_list = ["var1", "var2"]
-
     # replacing civ_or_def with 200 and Product_group with 201
     test_df = rename_imp_col(test_df)
 
@@ -452,6 +493,12 @@ def run_imputation(
     # q201 is Product Group
     clean_df = create_imp_class_col(test_df, "200", "201", f"{current_period}_class")
     clean_df.reset_index(drop=True, inplace=True)
+
+    # TODO:flag_nulls_and_zeros() could can optionally be run to output a QA csv
+    # indicating where there are nulls and zeros in the target variables
+    # flagged_df = flag_nulls_and_zeros(
+    #     target_variables_list, clean_df, current_period, previous_period
+    # )
 
     forward_df = forward_imputation(
         clean_df,
@@ -470,3 +517,65 @@ def run_imputation(
     )
 
     return forward_df, backwards_df
+
+
+def update_imputed(
+    full_resp_df,
+    imputed_vals_df,
+    target_variables_list,
+    imputation_direction,
+    ref_col="reference",
+) -> pd.DataFrame:
+    """Updates missing response data with imputed values for target variables
+
+    Keyword Arguments:
+        full_resp_df -- DataFrame of the response data
+        imputed_vals_df -- DataFrame contining imputed values calculated in
+        imputation module
+        target_variables_list -- list of variable that need imputed if no
+        response
+        imputation_direction -- can be either "forwards" or "backwards" depending on
+        whether current or previous period has no response
+
+    Returns:
+        full_resp_df: DataFrame with missing exchanged for imputed values
+        for target variables
+    """
+
+    # Validate the input dataframes checking for columns
+    if not all(
+        col in full_resp_df.columns for col in [ref_col] + target_variables_list
+    ):
+        ImputationLogger.debug("There are some cols missing in full responses.")
+        raise ValueError("One or more columns are missing in full_resp_df")
+
+    if not all(
+        col in imputed_vals_df.columns
+        for col in [ref_col]
+        + [f"{imputation_direction}_imputed_{col}" for col in target_variables_list]
+    ):
+        ImputationLogger.debug("There are some cols missing in imputed_vals_df.")
+        raise ValueError("One or more columns are missing in imputed_vals_df")
+
+    # add imputed tag column
+    full_resp_df["imputation_marker"] = "response"
+    imputed_vals_df["imputation_marker"] = f"{imputation_direction}_imputed"
+
+    # exchange reference col for index
+    # in preparation for update function
+    full_resp_df.index = full_resp_df[ref_col]
+    imputed_vals_df.index = imputed_vals_df[ref_col]
+
+    # rename cols in preparation for update function
+    for col in target_variables_list:
+        imputed_vals_df = imputed_vals_df.rename(
+            columns={f"{imputation_direction}_imputed_{col}": col}
+        )
+
+    # apply update - changes input_full inplace
+    full_resp_df.update(imputed_vals_df)
+
+    # change index back to normal
+    full_resp_df = full_resp_df.reset_index(drop=True)
+
+    return full_resp_df
