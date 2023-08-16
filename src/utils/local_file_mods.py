@@ -14,7 +14,7 @@ def read_local_csv(filepath: str, cols: List[str]=None) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
     Args:
         filepath (str): Filepath
-
+        cols (List[str]): Optional list of columns to be read in
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
