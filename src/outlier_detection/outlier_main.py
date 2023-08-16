@@ -46,24 +46,28 @@ def run_outliers(
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
+    df_auto_flagged = df_auto_flagged.drop(['manual_outlier'], axis=1)
+    outlier_df = df_auto_flagged.merge(
+        df_manual_supplied, on=["reference", "instance", "auto_outlier"], how="left"
+    )
+    
+    # update outlier flag column with manual outliers
+
+    OutlierMainLogger.info("Starting Manual Outlier Detection")
+    flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
+    OutlierMainLogger.info("Finished Manual Outlier Detection")
 
     # output the outlier flags for QA
     # TODO when working on DAP need to output QA there also.
-    # TODO Return a single QA file for both auto and manual outliers?
     if config["global"]["network_or_hdfs"] == "network":
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         folder = config["network_paths"]["outliers_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"outliers_qa_{tdate}.csv"
-        write_csv(f"{folder}/outliers_qa/{filename}", df_auto_flagged)
+        write_csv(f"{folder}/outliers_qa/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
 
-    # update outlier flag column with manual outliers
 
-    OutlierMainLogger.info("Starting Manual Outlier Detection")
-    df_manual_flagged = manual.apply_manual_outliers(df_manual_supplied)
-    OutlierMainLogger.info("Finished Manual Outlier Detection")
+    
 
-    # TODO Join the manual outlier data to the original dataframe
-
-    return df_manual_flagged
+    return flagged_outlier_df 
