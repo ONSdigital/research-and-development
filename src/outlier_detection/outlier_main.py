@@ -2,7 +2,7 @@
 import logging
 import pandas as pd
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Dict, Any
 
 from src.outlier_detection import auto_outliers as auto
 
@@ -11,7 +11,7 @@ OutlierMainLogger = logging.getLogger(__name__)
 
 def run_outliers(
     df: pd.DataFrame,
-    config: dict,
+    config: Dict[str, Any],
     write_csv: Callable,
     file_exists: Callable,
     run_log_num: str,
