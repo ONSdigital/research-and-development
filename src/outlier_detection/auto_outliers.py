@@ -1,7 +1,8 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-from typing import List
+import numpy as np
+from typing import List, Callable
 
 OutlierMainLogger = logging.getLogger(__name__)
 
@@ -206,3 +207,39 @@ def run_auto_flagging(
     OutlierMainLogger.info("Finishing automatic outlier detection.")
 
     return df
+
+
+def write_short_form_outlier_csv(
+    df: pd.DataFrame,
+    short_form_cols: List[str],
+    output_path: str,
+    write_csv: Callable,
+    form_type_no: int = 6,
+):
+    """Write a CSV file containing relevant columns for short forms.
+
+    Args:
+        df (pd.Dataframe): The input dataframe with auto outlier flags present
+        short_form_cols (List[str]): List of relevant columns for short forms
+        output_path (str): Path to save the CSV file to
+        write_csv (Callable): This is the environment specific function to
+            write the CSV
+        form_type_no (int): The number which corresponds to the form type you
+            are selecting for. Default is form_type == 6 is for short forms
+    """
+
+    # Filter to the correct form type
+    short_form_df = df[df["formtype"] == form_type_no]
+
+    # Add the manual_outlier col
+    short_form_df["manual_outlier_flag"] = np.nan
+
+    # Create a new df with selected cols and additional cols
+    cols_for_output = short_form_cols + ["auto_outlier_flag", "manual_outlier_flag"]
+    output_df = short_form_df[cols_for_output]
+
+    # Use the provided write_csv function to write out the df
+    write_csv(output_df, output_path)
+
+    # Log result
+    OutlierMainLogger.info("Finished writing CSV to %s", output_path)
