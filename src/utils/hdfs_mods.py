@@ -5,6 +5,7 @@
 import pandas as pd
 import json
 import logging
+from typing import List
 
 try:
     import pydoop.hdfs as hdfs
@@ -18,7 +19,7 @@ except ImportError:
 hdfs_logger = logging.getLogger(__name__)
 
 
-def read_hdfs_csv(filepath: str, cols: List[str]=None) -> pd.DataFrame:
+def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from DAP into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
@@ -34,10 +35,10 @@ def read_hdfs_csv(filepath: str, cols: List[str]=None) -> pd.DataFrame:
         else:
             try:
                 df_from_hdfs = pd.read_csv(file, usecols=cols)
-            except:
-                lfmod_logger.error(f"Could not find specified columns in {filepath}")
-                lfmod_logger.info("Columns specified: " + str(cols))
-                raise ValueError          
+            except Exception:
+                hdfs_logger.error(f"Could not find specified columns in {filepath}")
+                hdfs_logger.info("Columns specified: " + str(cols))
+                raise ValueError
     return df_from_hdfs
 
 

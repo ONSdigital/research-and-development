@@ -10,7 +10,8 @@ from typing import List
 # Set up logger
 lfmod_logger = logging.getLogger(__name__)
 
-def read_local_csv(filepath: str, cols: List[str]=None) -> pd.DataFrame:
+
+def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
     Args:
         filepath (str): Filepath
@@ -26,7 +27,7 @@ def read_local_csv(filepath: str, cols: List[str]=None) -> pd.DataFrame:
         else:
             try:
                 df = pd.read_csv(file, usecols=cols)
-            except:
+            except Exception:
                 lfmod_logger.error(f"Could not find specified columns in {filepath}")
                 lfmod_logger.info("Columns specified: " + str(cols))
                 raise ValueError
