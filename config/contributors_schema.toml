@@ -1,6 +1,6 @@
 [reference]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -10,7 +10,7 @@ Possible_Categorical_Values = ["nan"]
 
 [period]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = 6
@@ -32,7 +32,7 @@ Possible_Categorical_Values = ["002"]
 Description = "nan"
 Deduced_Data_Type = "category"
 Nullable = false
-Current_Data_Type = "int64"
+Current_Data_Type = "Int64"
 Length = 2
 Min_values = "nan"
 Max_values = "nan"
@@ -52,7 +52,7 @@ Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Cle
 Description = "nan"
 Deduced_Data_Type = "category"
 Nullable = false
-Current_Data_Type = "int64"
+Current_Data_Type = "Int64"
 Length = 3
 Min_values = "nan"
 Max_values = "nan"
@@ -110,7 +110,7 @@ Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L",
 
 [frozensicoutdated]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -120,7 +120,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusicoutdated]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -130,7 +130,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozensic]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -140,7 +140,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusic]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -150,7 +150,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenemployees]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -160,7 +160,7 @@ Possible_Categorical_Values = ["nan"]
 
 [employees]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -170,7 +170,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenemployment]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -180,7 +180,7 @@ Possible_Categorical_Values = ["nan"]
 
 [employment]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -210,7 +210,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozenturnover]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -220,7 +220,7 @@ Possible_Categorical_Values = ["nan"]
 
 [turnover]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -230,7 +230,7 @@ Possible_Categorical_Values = ["nan"]
 
 [enterprisereference]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -240,7 +240,7 @@ Possible_categorical_Values = ["nan"]
 
 [wowenterprisereference]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -250,9 +250,9 @@ Possible_categorical_Values = ["nan"]
 
 [cellnumber]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
-Current_Data_Type = "int64"
+Current_Data_Type = "Int64"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
@@ -300,7 +300,7 @@ Possible_Categorical_Values = ["CRN"]
 
 [numberlivelocalunits]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -310,7 +310,7 @@ Possible_categorical_Values = ["nan"]
 
 [numberlivevat]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -320,7 +320,7 @@ Possible_categorical_Values = ["nan"]
 
 [numberlivepaye]
 Description = "nan"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "Int64"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
