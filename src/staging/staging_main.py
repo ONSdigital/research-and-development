@@ -17,7 +17,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -81,10 +81,6 @@ def run_staging(
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    mapper = read_csv(mapper_path)
-
     # the anonymised snapshot data we use in hdfs
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
@@ -109,6 +105,19 @@ def run_staging(
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
 
+    # Stage the manual outliers file
+    StagingMainLogger.info("Loading Manual Outlier File")
+    manual_path = config["network_paths"]["manual_outliers_path"]
+    check_file_exists(manual_path)
+    wanted_cols = ["reference", "instance", "auto_outlier", "manual_outlier"]
+    manual_outliers = read_csv(manual_path, wanted_cols)
+    StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+
+    # Load the PG mapper
+    mapper_path = paths["mapper_path"]
+    check_file_exists(mapper_path)
+    mapper = read_csv(mapper_path)
+
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -118,4 +127,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, mapper
+    return full_responses, manual_outliers, mapper
