@@ -109,12 +109,14 @@ def run_staging(
     # Stage the manual outliers file
     StagingMainLogger.info("Loading Manual Outlier File")
     manual_path = config["network_paths"]["manual_outliers_path"]
+    check_file_exists(manual_path)
     wanted_cols = ["reference", "instance", "auto_outlier", "manual_outlier"]
     manual_outliers = read_csv(manual_path, wanted_cols)
     StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
 
     # Load the PG mapper
     mapper_path = paths["mapper_path"]
+    check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
     # Output the staged BERD data for BaU testing when on local network.
