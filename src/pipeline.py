@@ -70,10 +70,13 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses, pg_mapper = run_staging(
+
+    full_responses, manual_outliers, pg_mapper = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
-    MainLogger.info("Finished Data Ingest.")
+    MainLogger.info("Finished Data Ingest...")
+    print(full_responses.sample(10))
+    print(manual_outliers.head())
 
     # Imputation module
 
