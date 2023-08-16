@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
+import logging
 
 # TODO almost each could be further generalised in terms of
 # variable and function names
+
+ImputationLogger = logging.getLogger(__name__)
 
 
 def filter_by_column_content(
@@ -514,3 +517,65 @@ def run_imputation(
     )
 
     return forward_df, backwards_df
+
+
+def update_imputed(
+    full_resp_df,
+    imputed_vals_df,
+    target_variables_list,
+    imputation_direction,
+    ref_col="reference",
+) -> pd.DataFrame:
+    """Updates missing response data with imputed values for target variables
+
+    Keyword Arguments:
+        full_resp_df -- DataFrame of the response data
+        imputed_vals_df -- DataFrame contining imputed values calculated in
+        imputation module
+        target_variables_list -- list of variable that need imputed if no
+        response
+        imputation_direction -- can be either "forwards" or "backwards" depending on
+        whether current or previous period has no response
+
+    Returns:
+        full_resp_df: DataFrame with missing exchanged for imputed values
+        for target variables
+    """
+
+    # Validate the input dataframes checking for columns
+    if not all(
+        col in full_resp_df.columns for col in [ref_col] + target_variables_list
+    ):
+        ImputationLogger.debug("There are some cols missing in full responses.")
+        raise ValueError("One or more columns are missing in full_resp_df")
+
+    if not all(
+        col in imputed_vals_df.columns
+        for col in [ref_col]
+        + [f"{imputation_direction}_imputed_{col}" for col in target_variables_list]
+    ):
+        ImputationLogger.debug("There are some cols missing in imputed_vals_df.")
+        raise ValueError("One or more columns are missing in imputed_vals_df")
+
+    # add imputed tag column
+    full_resp_df["imputation_marker"] = "response"
+    imputed_vals_df["imputation_marker"] = f"{imputation_direction}_imputed"
+
+    # exchange reference col for index
+    # in preparation for update function
+    full_resp_df.index = full_resp_df[ref_col]
+    imputed_vals_df.index = imputed_vals_df[ref_col]
+
+    # rename cols in preparation for update function
+    for col in target_variables_list:
+        imputed_vals_df = imputed_vals_df.rename(
+            columns={f"{imputation_direction}_imputed_{col}": col}
+        )
+
+    # apply update - changes input_full inplace
+    full_resp_df.update(imputed_vals_df)
+
+    # change index back to normal
+    full_resp_df = full_resp_df.reset_index(drop=True)
+
+    return full_resp_df

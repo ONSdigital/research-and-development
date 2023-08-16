@@ -1,10 +1,14 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-from typing import List
 import numpy as np
+from typing import List
 
 OutlierMainLogger = logging.getLogger(__name__)
+
+# Set defaults
+LOWER_BAND_DEFAULT = 0
+UPPER_BAND_DEFAULT = 1
 
 
 def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
@@ -55,8 +59,8 @@ def flag_outliers(
         pd.DataFrame: The same dataframe with a new boolean column indicating
                         whether the column 'value_col' is an outlier.
     """
-    lower_band = 0 + lower_clip
-    upper_band = 1 - upper_clip
+    lower_band = LOWER_BAND_DEFAULT + lower_clip
+    upper_band = UPPER_BAND_DEFAULT - upper_clip
 
     # Note: selectiontype=='P' doesn't exist in anonymised data!
     filter_cond = (df[value_col] > 0) & (df.selectiontype == "P")
@@ -134,7 +138,7 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
         value_col (str): The name of the col outliers are calculated for
     """
     flag_col = f"{value_col}_outlier_flag"
-    num_flagged = df[df[flag_col] == True][flag_col].count()
+    num_flagged = df[df[flag_col]][flag_col].count()
 
     tot_nonzero = df[df[value_col] > 0][value_col].count()
 
@@ -182,6 +186,7 @@ def run_auto_flagging(
         # to_numeric is needed to convert strings. However 'coerce' means values that
         # can't be converted are represented by NaNs.
         # TODO data validation and cleaning should replace the need for 'to_numeric'
+        # check ticket (RDRP-386)
         df[value_col] = pd.to_numeric(df[value_col], errors="coerce")
 
         # Call function to add a flag for auto outliers in column value_col
@@ -193,10 +198,11 @@ def run_auto_flagging(
     # create 'master' outlier column- which is True if any of the other flags is True
     df = decide_outliers(df, flag_value_cols)
 
+    # Create empty column for user to edit
     df["manual_outlier"] = np.nan
 
     # log the number of True flags in the master outlier flag column
-    num_flagged = df[df["auto_outlier"] == True]["auto_outlier"].count()
+    num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
     msg = f"Outlier flags have been created for {num_flagged} records in total."
     OutlierMainLogger.info(msg)

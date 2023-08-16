@@ -46,11 +46,11 @@ def run_outliers(
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")
-    df_auto_flagged = df_auto_flagged.drop(['manual_outlier'], axis=1)
+    df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
     outlier_df = df_auto_flagged.merge(
         df_manual_supplied, on=["reference", "instance", "auto_outlier"], how="left"
     )
-    
+
     # update outlier flag column with manual outliers
 
     OutlierMainLogger.info("Starting Manual Outlier Detection")
@@ -67,7 +67,4 @@ def run_outliers(
         write_csv(f"{folder}/outliers_qa/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
 
-
-    
-
-    return flagged_outlier_df 
+    return flagged_outlier_df

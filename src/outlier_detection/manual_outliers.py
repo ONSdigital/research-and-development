@@ -22,7 +22,8 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
     msg = f"Manual outlier flags have been found for {num_manual_flagged} records in total."  # noqa
 
     # Conditions & decisions for overwriting the auto-outliers
-    conditions = [df["manual_outlier"] == True, df["manual_outlier"] == False]
+    # Using .isin() to avoid linting errors
+    conditions = [df["manual_outlier"].isin([True]), df["manual_outlier"].isin([False])]
     decisions = [True, False]
 
     # Overwriting auto-outliers with manual outliers
