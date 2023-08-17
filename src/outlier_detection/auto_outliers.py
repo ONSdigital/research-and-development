@@ -245,7 +245,7 @@ def write_short_form_outlier_csv(
     file_path = output_path + "manual_outlier.csv"
 
     # Check if the manual outlier file exists as it is a requirement not to overwrite
-    if file_exists(file_path):
+    if not file_exists(file_path):
         # Use the provided write_csv function to write out the df
         write_csv(file_path, output_df)
     else:
