@@ -29,7 +29,7 @@ network_paths:
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
-  manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_short.csv"
+  manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_test_file.csv"
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0

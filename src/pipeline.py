@@ -70,17 +70,20 @@ def run_pipeline(start):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-    full_responses, manual_outlier_file, pg_mapper = run_staging(
+
+    full_responses, manual_outliers, pg_mapper = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
-    MainLogger.info("Finished Data Ingest.")
+    MainLogger.info("Finished Data Ingest...")
+    print(full_responses.sample(10))
+    print(manual_outliers.head())
 
     # Imputation module
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
-        full_responses, manual_outlier_file, config, write_csv
+        full_responses, manual_outliers, config, write_csv
     )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
