@@ -17,7 +17,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -81,10 +81,6 @@ def run_staging(
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    mapper = read_csv(mapper_path)
-
     # the anonymised snapshot data we use in hdfs
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
@@ -98,6 +94,11 @@ def run_staging(
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
+    val.combine_schemas_validate_full_df(
+        full_responses,
+        "config/contributors_schema.toml",
+        "config/wide_responses.toml",
+    )
 
     # Validate and force data types for the full responses df
     val.validate_data_with_both_schema(
@@ -113,6 +114,19 @@ def run_staging(
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
 
+    # Stage the manual outliers file
+    StagingMainLogger.info("Loading Manual Outlier File")
+    manual_path = config["network_paths"]["manual_outliers_path"]
+    check_file_exists(manual_path)
+    wanted_cols = ["reference", "instance", "auto_outlier", "manual_outlier"]
+    manual_outliers = read_csv(manual_path, wanted_cols)
+    StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+
+    # Load the PG mapper
+    mapper_path = paths["mapper_path"]
+    check_file_exists(mapper_path)
+    mapper = read_csv(mapper_path)
+
     processing.response_rate(contributors_df, responses_df)
     StagingMainLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
@@ -127,4 +141,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, mapper
+    return full_responses, manual_outliers, mapper

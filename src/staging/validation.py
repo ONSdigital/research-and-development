@@ -282,3 +282,54 @@ def validate_data_with_both_schema(
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
             validation_logger.error(e)
+
+
+@exception_wrap
+def combine_schemas_validate_full_df(
+    survey_df: pd.DataFrame, contributor_schema: "str", wide_response_schema: "str"
+):
+    """Takes the schemas from the toml file and validates the survey data df.
+
+    Args:
+        survey_df (pd.DataFrame): Survey data in a pd.df format
+        contributor_schema (str): path to the schema toml (should be in config folder)
+        wide_response_schema (str): path to the schema toml (should be in config folder)
+    """
+    # Load schemas from toml
+    dtypes_con_schema = load_schema(contributor_schema)
+    dtypes_res_schema = load_schema(wide_response_schema)
+
+    # Create all unique keys from both schema
+    full_columns_list = set(dtypes_con_schema) | set(dtypes_res_schema)
+
+    # Create a dict for dtypes only
+    dtypes = {
+        column_nm: dtypes_con_schema[column_nm]["Deduced_Data_Type"]
+        if column_nm in dtypes_con_schema
+        else dtypes_res_schema[column_nm]["Deduced_Data_Type"]
+        for column_nm in full_columns_list
+    }
+
+    # Cast each column individually and catch any errors
+    for column in survey_df.columns:
+        # Fix for the columns which contain empty strings. We want to cast as NaN
+        if dtypes[column] == "pd.NA":
+            # Replace whatever is in that column with np.nan
+            survey_df[column] = nan
+            dtypes[column] = "float64"
+
+            # Try to cast each column to the required data type
+        validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
+        if dtypes[column] == "Int64":
+            # Convert non-integer string to NaN
+            survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
+            # Cast columns to Int64
+            survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
+        elif dtypes[column] == "float64":
+            # Convert non-integer string to NaN
+            survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
+            # Cast columns to float64
+            survey_df[column] = survey_df[column].astype("float64", errors="ignore")
+        else:
+            survey_df[column] = survey_df[column].astype(dtypes[column])
+        validation_logger.debug(f"{column} after: {survey_df[column].dtype}")

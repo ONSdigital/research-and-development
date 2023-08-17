@@ -9,7 +9,7 @@ from src.staging.validation import (
     validate_postcode_pattern,
     check_pcs_real,
     validate_data_with_schema,
-    validate_data_with_both_schema,
+    combine_schemas_validate_full_df,
 )
 from src.utils.helpers import Config_settings
 
@@ -286,7 +286,7 @@ def mock_load_schemas(monkeypatch):
     monkeypatch.setattr("src.staging.validation.load_schema", mock_load_both_data)
 
 
-def test_validate_data_with_both_schema(mock_load_schemas):
+def test_combine_schemas_validate_full_df(mock_load_schemas):
     """Test the validate_data_with_shcema  to data types are correct in
     the source data
     """
@@ -307,7 +307,9 @@ def test_validate_data_with_both_schema(mock_load_schemas):
     dumy_data["date"] = pd.to_datetime(dumy_data["date"])
 
     # Call the function to be tested
-    validate_data_with_both_schema(dumy_data, "mock_schema1.toml", "mock_schema2.toml")
+    combine_schemas_validate_full_df(
+        dumy_data, "mock_schema1.toml", "mock_schema2.toml"
+    )
 
     # Check data types after validation
     assert dumy_data[["reference", "q201"]].dtypes.all() == np.int
