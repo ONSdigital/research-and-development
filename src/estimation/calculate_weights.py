@@ -46,7 +46,35 @@ def check_outliers(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def calculate_weighting_factor(df: pd.DataFrame) -> dict:
+def calc_lower_n(df: pd.DatatFrame, exp_col: str = "710") -> dict:
+    """Calculates 'n' which is a number of unique RU references that have
+        positive (non-negative) non-Null expenditure.
+
+    Args:
+        df (pd.DatatFrame): The input dataframe which contains survey data,
+            including expenditure data
+
+    Returns:
+        int: The number of unique references that have positive (non-negative)
+            non-Null expenditure.
+    """
+
+    # Check if any of the key cols are missing
+    cols = set(df.columns)
+    if not ("reference" in cols & exp_col in cols):
+        raise ValueError(f"'reference' or {exp_col} missing.")
+
+    # Filter out 0 and null vals
+    df_filtered = df[df[exp_col] > 0]
+    df_filtered = df_filtered.dropna(subset=[exp_col])
+
+    # Count the filtered records
+    n = df_filtered["reference"].nunique()
+
+    return n
+
+
+def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
     """Calculate the weighting factor 'a' for each cell in the survery data
 
     Note: A 'cell' is a group of businesses.
@@ -84,18 +112,21 @@ def calculate_weighting_factor(df: pd.DataFrame) -> dict:
         # Get name for the dict key
         cell_name = tuple(name)
 
+        # Get N from cellno_dict
+        N = cellno_dict[cell_name]
+
+        # Get lower n
+        n = calc_lower_n(cell_group)
+
         # Count the outliers for this group (will count all the `True` values)
         outlier_count = cell_group["is_outlier"].sum()
 
         CalcWeights_Logger.debug(
             "The number of outliers in %s is %s", name, outlier_count
         )
+        CalcWeights_Logger.debug("For %s N is %s and n is %s", name, N, n)
 
         # Calculate 'a' for this group
-        weighting_factors_dict[cell_name] = (
-            cell_group["N_count"]
-            - outlier_count / cell_group["n_count"]
-            - outlier_count
-        )
+        weighting_factors_dict[cell_name] = N - outlier_count / n - outlier_count
 
     return weighting_factors_dict
