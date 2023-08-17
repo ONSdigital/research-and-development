@@ -94,7 +94,7 @@ def run_staging(
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
-    val.validate_data_with_both_schema(
+    val.combine_schemas_validate_full_df(
         full_responses,
         "config/contributors_schema.toml",
         "config/wide_responses.toml",
