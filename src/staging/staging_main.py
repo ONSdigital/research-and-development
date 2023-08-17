@@ -98,21 +98,25 @@ def run_staging(
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
+
+    # Validate and force data types for the full responses df
     val.validate_data_with_both_schema(
         full_responses,
         "config/contributors_schema.toml",
         "config/wide_responses.toml",
     )
 
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info("Finished Data Transmutation...")
-
     # Data validation
     val.check_data_shape(full_responses)
 
-    # Check the postcode column
+    # Validate the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
+
+    processing.response_rate(contributors_df, responses_df)
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
 
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
