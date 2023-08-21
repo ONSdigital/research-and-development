@@ -17,6 +17,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
+    run_id: int
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
@@ -37,6 +38,7 @@ def run_staging(
             This will be the hdfs or network version depending on settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
+        run_id (int): The run id for this run.
     Returns:
         pd.DataFrame: The staged and vaildated snapshot data.
     """
@@ -129,9 +131,9 @@ def run_staging(
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
-    cell_path_no = config["network_paths"]["cell_no_path"]
-    cellno_df = read_csv(cell_path_no)
-    cell_unit_dict = val.cellno_unit_dict(cellno_df)
+    cellno_path = config["network_paths"]["cellno_path"]
+    check_file_exists(cellno_path)
+    cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
@@ -139,8 +141,8 @@ def run_staging(
         StagingMainLogger.info("Starting output of staged BERD data...")
         test_folder = config["network_paths"]["staging_test_foldername"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_BERD_full_responses_{tdate}.csv"
+        staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, manual_outliers, mapper, cell_unit_dict
+    return full_responses, manual_outliers, mapper, cellno_df
