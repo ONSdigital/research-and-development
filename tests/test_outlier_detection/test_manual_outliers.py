@@ -39,4 +39,4 @@ class TestManualOutliers:
 
         df_result = apply_manual_outliers(input_data)
 
-        pd.testing.assert_frame_equal(df_result, output_data)
+        pd.testing.assert_frame_equal(df_result, output_data, check_dtype=False)

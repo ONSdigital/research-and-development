@@ -1,6 +1,5 @@
 import logging
 import pandas as pd
-import numpy as np
 
 ManualOutlierLogger = logging.getLogger(__name__)
 
@@ -19,15 +18,10 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
 
     # Count number of manually flagged outliers
     num_manual_flagged = len(df["manual_outlier"]) - df["manual_outlier"].isnull().sum()
-    msg = f"Manual outlier flags have been found for {num_manual_flagged} records in total."  # noqa
-
-    # Conditions & decisions for overwriting the auto-outliers
-    # Using .isin() to avoid linting errors
-    conditions = [df["manual_outlier"].isin([True]), df["manual_outlier"].isin([False])]
-    decisions = [True, False]
+    msg = f"Manual outlier flags have been identified for {num_manual_flagged} records."  # noqa
 
     # Overwriting auto-outliers with manual outliers
-    df["outlier"] = np.select(conditions, decisions, default=df["auto_outlier"])
+    df["outlier"] = df["manual_outlier"].combine_first(df["auto_outlier"])
 
     # log the difference in the number of True flags in the final outlier column
     man_true_flagged = df[df["outlier"]]["outlier"].count()
