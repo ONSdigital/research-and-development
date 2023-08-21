@@ -143,17 +143,17 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
 @exception_wrap
 def check_data_shape(
     data_df: pd.DataFrame,
-    schema_path: str = "./config/contributors_schema.toml",
+    contributor_schema: str = "./config/contributors_schema.toml",
+    wide_respon_schema: str = "./config/wide_responses.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        data_df -- Pandas dataframe containing data to be checked.
-        schema_path -- Path to schema dictionary file
-        (default: {"./config/DataSchema.toml"})
-
+        data_df(pd.DataFrame): Pandas dataframe containing data to be checked.
+        contributor_schema(str): Path to the schema toml (should be in config folder)
+        wide_respon_schema(str): Path to the schema toml (should be in config folder)
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
     """
@@ -166,8 +166,13 @@ def check_data_shape(
 
     data_dict = data_df.to_dict()
 
-    # Load toml data schema into dictionary
-    toml_string = load_schema(schema_path)
+    # Load toml data schemas into dictionary
+    toml_string_cont = load_schema(contributor_schema)
+    toml_string_response = load_schema(wide_respon_schema)
+
+    # Combained two dicts
+    full_columns_list = {**toml_string_cont, **toml_string_response}
+    toml_string = [key for key in full_columns_list.keys() if key in data_df.columns]
 
     # Compare length of data dictionary to the data schema
     if len(data_dict) == len(toml_string):
@@ -181,7 +186,7 @@ def check_data_shape(
         validation_logger.info(f"Data columns match schema: {cols_match}.")
 
     validation_logger.info(
-        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
+        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string )}"
     )
     return cols_match
 
@@ -223,62 +228,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
-            validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
-        except Exception as e:
-            validation_logger.error(e)
-
-
-def validate_data_with_both_schema(
-    survey_df: pd.DataFrame, schema_path1: "str", schema_path2: "str"
-):
-    """Takes the schemas from the toml file and validates the survey data df.
-
-    Args:
-        survey_df (pd.DataFrame): Survey data in a pd.df format
-        schema_path1 (str): path to the schema toml (should be in config folder)
-        schema_path2 (str): path to the schema toml (should be in config folder)
-    """
-    # Load schemas from toml
-    dtypes_schema1 = load_schema(schema_path1)
-    dtypes_schema2 = load_schema(schema_path2)
-
-    # Create all unique keys from both schema
-    full_columns_list = set(dtypes_schema1) | set(dtypes_schema2)
-
-    # Create a dict for dtypes only
-    dtypes = {
-        column_nm: dtypes_schema1[column_nm]["Deduced_Data_Type"]
-        if column_nm in dtypes_schema1
-        else dtypes_schema2[column_nm]["Deduced_Data_Type"]
-        for column_nm in full_columns_list
-    }
-
-    # Cast each column individually and catch any errors
-    for column in survey_df.columns:
-        # Fix for the columns which contain empty strings. We want to cast as NaN
-        if dtypes[column] == "pd.NA":
-            # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
-            dtypes[column] = "float64"
-        try:
-            # Try to cast each column to the required data type
-            validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
-            if dtypes[column] == "Int64":
-                # Convert non-integer string to NaN
-                survey_df[column] = survey_df[column].apply(
-                    pd.to_numeric, errors="coerce"
-                )
-                # Cast columns to Int64
-                survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
-            elif dtypes[column] == "float64":
-                # Convert non-integer string to NaN
-                survey_df[column] = survey_df[column].apply(
-                    pd.to_numeric, errors="coerce"
-                )
-                # Cast columns to float64
-                survey_df[column] = survey_df[column].astype("float64", errors="ignore")
-            else:
-                survey_df[column] = survey_df[column].astype(dtypes[column])
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
             validation_logger.error(e)
