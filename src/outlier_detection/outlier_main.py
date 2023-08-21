@@ -46,26 +46,24 @@ def run_outliers(
     outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
-    auto.write_short_form_outlier_csv(
-        df_auto_flagged,
-        output_path=auto_outlier_path,
-        write_csv=write_csv,
-        file_exists=file_exists,
-        runlog_number=run_log_num,
-        form_type_no="0006",
-        sel_type="P",
+
+    # Apply short form filters before output
+    filtered_df = auto.apply_short_form_filters(df_auto_flagged)
+
+    # Output the auto outlier file
+    OutlierMainLogger.info(
+        f"Appending runlog number {run_log_num} to the manual outlier file"
     )
+    file_path = auto_outlier_path + f"/manual_outlier_{run_log_num}.csv"
+    write_csv(file_path, filtered_df)
+    OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
 
-    OutlierMainLogger.info("Finished Auto Outlier Detection.")
-
-    # output the outlier flags for QA
-    # TODO when working on DAP need to output QA there also.
-    if NETWORK_OR_HDFS == "network":
-        OutlierMainLogger.info("Starting output of Outlier QA data...")
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        filename = f"outliers_qa_{tdate}.csv"
-        write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
-        OutlierMainLogger.info("Finished QA output of outliers data.")
+    # Output the outlier flags for QA
+    OutlierMainLogger.info("Starting output of Outlier QA data...")
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    filename = f"outliers_qa_{tdate}.csv"
+    write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
+    OutlierMainLogger.info("Finished QA output of outliers data.")
 
     # read in file for manual outliers
 

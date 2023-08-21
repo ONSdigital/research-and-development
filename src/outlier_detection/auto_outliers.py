@@ -1,10 +1,10 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-from typing import List, Callable
+from typing import List
 
 
-OutlierMainLogger = logging.getLogger(__name__)
+AutoOutlierLogger = logging.getLogger(__name__)
 
 # Set defaults
 LOWER_BAND_DEFAULT = 0
@@ -22,24 +22,24 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
     Raises:
         ImportError if upper_clip or lower_clip have invalid values
     """
-    OutlierMainLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
-    OutlierMainLogger.info(f"The columns to be flagged for outliers: {flag_value_cols}")
+    AutoOutlierLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
+    AutoOutlierLogger.info(f"The columns to be flagged for outliers: {flag_value_cols}")
 
     if (upper_clip == 0) and (lower_clip == 0):
-        OutlierMainLogger.warning(
+        AutoOutlierLogger.warning(
             "upper_clip and lower_clip both zero: "
             "All auto_outlier flags will be False"
         )
     elif (upper_clip < 0) | (lower_clip < 0):
-        OutlierMainLogger.error("upper_clip and lower_clip cannot be negative")
+        AutoOutlierLogger.error("upper_clip and lower_clip cannot be negative")
         raise ImportError
     elif upper_clip + lower_clip >= 1.0:
-        OutlierMainLogger.error("upper_clip and lower_clip must sum to < 1")
+        AutoOutlierLogger.error("upper_clip and lower_clip must sum to < 1")
         raise ImportError
 
     if not isinstance(flag_value_cols, list):
 
-        OutlierMainLogger.error(
+        AutoOutlierLogger.error(
             "In config, flag_value_cols must be specified as a list."
         )
         raise ImportError
@@ -66,7 +66,7 @@ def flag_outliers(
     filter_cond = (df[value_col] > 0) & (df.selectiontype == "P")
     filtered_df = df[filter_cond]
     if filtered_df.empty:
-        OutlierMainLogger.error(
+        AutoOutlierLogger.error(
             "This data does not contain value 'P' in "
             "column 'selectiontype'. \n Note that outliering cannot be "
             "performed on the current anonomysed spp snapshot data."
@@ -146,7 +146,7 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
         f"{num_flagged} outliers were detected out of a total of "
         f"{tot_nonzero} non-zero entries in column {value_col}"
     )
-    OutlierMainLogger.info(msg)
+    AutoOutlierLogger.info(msg)
 
 
 def run_auto_flagging(
@@ -176,7 +176,7 @@ def run_auto_flagging(
     Returns:
         df (pd.DataFrame): The full dataset with flag columns indicating outliers.
     """
-    OutlierMainLogger.info("Starting outlier detection...")
+    AutoOutlierLogger.info("Starting outlier detection...")
 
     # Validate the outlier configuration settings
     validate_config(upper_clip, lower_clip, flag_value_cols)
@@ -202,48 +202,22 @@ def run_auto_flagging(
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
     msg = f"Outlier flags have been created for {num_flagged} records in total."
-    OutlierMainLogger.info(msg)
+    AutoOutlierLogger.info(msg)
 
-    OutlierMainLogger.info("Finishing automatic outlier detection.")
+    AutoOutlierLogger.info("Finishing automatic outlier detection.")
 
     return df
 
 
-def write_short_form_outlier_csv(
+def apply_short_form_filters(
     df: pd.DataFrame,
-    output_path: str,
-    write_csv: Callable,
-    file_exists: Callable,
-    runlog_number: str,
     form_type_no: str = "0006",
     sel_type: str = "P",
 ):
-    """Write a CSV file containing relevant columns for short forms.
-
-    Args:
-        df (pd.Dataframe): The input dataframe with auto outlier flags present
-        short_form_cols (List[str]): List of relevant columns for short forms
-        output_path (str): Path to save the CSV file to
-        write_csv (Callable): This is the environment specific function to
-            write the CSV
-        form_type_no (int): The number which corresponds to the form type you
-            are selecting for. Default is form_type == 6 is for short forms
-    """
 
     # Filter to the correct form type
-    filtered_df = df[df["formtype"] == form_type_no & df["selectiontype"] == sel_type]
+    filtered_df = df[
+        (df["formtype"] == form_type_no) & (df["selectiontype"] == sel_type)
+    ]
 
-    # TODO Confirm the use of the runlog number on every output file
-    # Check if the manual outlier file exists as it is a requirement not to overwrite
-    # if not file_exists(file_path):
-    #     # Use the provided write_csv function to write out the df
-    #     write_csv(file_path, filtered_df)
-    # else:
-    OutlierMainLogger.info(
-        f"Appending runlog number {runlog_number} to the manual outlier file"
-    )
-    file_path = output_path + f"/manual_outlier_{runlog_number}.csv"
-    write_csv(file_path, filtered_df)
-
-    # Log result
-    OutlierMainLogger.info("Finished writing CSV to %s", output_path)
+    return filtered_df
