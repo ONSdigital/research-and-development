@@ -292,12 +292,10 @@ def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
 
     Args:
         cellno_df (pd.DataFrame):cellno coverage data frame
-        
+
     Returns:
         dict: Dictionary contains cell_no as key, UNI_Count as values
     """
-
-    # read data frame from R dive
 
     # Filtering object columns then Convert to object columns as integer
     object_col = [col for col in cellno_df.columns if cellno_df[col].dtypes == "object"]
@@ -305,7 +303,7 @@ def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
         cellno_df[col] = cellno_df[col].str.replace(",", "").astype(int)
 
     # Creating dictionary cell_no and UNI_count
-    cell_unit_dict = dict(zip(cellno_df["cell_no"], cellno_df["UNI_Count"]))
+    cell_unit_dict = cellno_df.set_index("cell_no").to_dict()["UNI_Count"]
 
     return cell_unit_dict
 
