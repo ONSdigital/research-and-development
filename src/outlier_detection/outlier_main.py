@@ -13,7 +13,6 @@ def run_outliers(
     df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
-    file_exists: Callable,
     run_log_num: str,
 ) -> pd.DataFrame:
     """

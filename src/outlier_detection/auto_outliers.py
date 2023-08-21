@@ -1,6 +1,7 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
+import numpy as np
 from typing import List
 
 
@@ -197,6 +198,9 @@ def run_auto_flagging(
 
     # create 'master' outlier column- which is True if any of the other flags is True
     df = decide_outliers(df, flag_value_cols)
+
+    # Create empty column for user to edit
+    df["manual_outlier"] = np.nan
 
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
