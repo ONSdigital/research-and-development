@@ -82,7 +82,7 @@ def run_pipeline(start):
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
-        full_responses, config, write_csv, file_exists, run_log_num="test_number"
+        full_responses, config, write_csv, file_exists, runlog_obj.run_id
     )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")

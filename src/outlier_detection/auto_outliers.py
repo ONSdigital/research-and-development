@@ -1,7 +1,6 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-import numpy as np
 from typing import List, Callable
 
 
@@ -212,12 +211,12 @@ def run_auto_flagging(
 
 def write_short_form_outlier_csv(
     df: pd.DataFrame,
-    short_form_cols: List[str],
     output_path: str,
     write_csv: Callable,
     file_exists: Callable,
     runlog_number: str,
     form_type_no: str = "0006",
+    sel_type: str = "P",
 ):
     """Write a CSV file containing relevant columns for short forms.
 
@@ -232,28 +231,19 @@ def write_short_form_outlier_csv(
     """
 
     # Filter to the correct form type
-    short_form_df = df[df["formtype"] == form_type_no]
+    filtered_df = df[df["formtype"] == form_type_no & df["selectiontype"] == sel_type]
 
-    # Add the manual_outlier col
-    short_form_df["manual_outlier"] = np.nan
-
-    # Create a new df with selected cols and additional cols
-    cols_for_output = short_form_cols + ["auto_outlier", "manual_outlier"]
-    output_df = short_form_df[cols_for_output]
-
-    # Create final output file_path
-    file_path = output_path + "manual_outlier.csv"
-
+    # TODO Confirm the use of the runlog number on every output file
     # Check if the manual outlier file exists as it is a requirement not to overwrite
-    if not file_exists(file_path):
-        # Use the provided write_csv function to write out the df
-        write_csv(file_path, output_df)
-    else:
-        OutlierMainLogger.warning(
-            "The manual outlier file as one already exists. Appending runlog number"
-        )
-        file_path = output_path + f"manual_outlier_{runlog_number}.csv"
-        write_csv(file_path, output_df)
+    # if not file_exists(file_path):
+    #     # Use the provided write_csv function to write out the df
+    #     write_csv(file_path, filtered_df)
+    # else:
+    OutlierMainLogger.info(
+        f"Appending runlog number {runlog_number} to the manual outlier file"
+    )
+    file_path = output_path + f"/manual_outlier_{runlog_number}.csv"
+    write_csv(file_path, filtered_df)
 
     # Log result
     OutlierMainLogger.info("Finished writing CSV to %s", output_path)

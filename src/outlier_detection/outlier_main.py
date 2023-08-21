@@ -44,16 +44,16 @@ def run_outliers(
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
     outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
-    man_outlier_path = outlier_path + "manual_outliers"
+    auto_outlier_path = outlier_path + "/auto_outliers"
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
     auto.write_short_form_outlier_csv(
         df_auto_flagged,
-        short_form_cols=flag_cols,
-        output_path=man_outlier_path,
+        output_path=auto_outlier_path,
         write_csv=write_csv,
         file_exists=file_exists,
-        runlog_number=run_log_num,  # TODO: replace with real runlog number
+        runlog_number=run_log_num,
         form_type_no="0006",
+        sel_type="P",
     )
 
     OutlierMainLogger.info("Finished Auto Outlier Detection.")

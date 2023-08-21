@@ -34,6 +34,7 @@ outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
     flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
+
 csv_filenames:
     main: "main_runlog.csv"
     configs: "configs_runlog.csv"
