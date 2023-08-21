@@ -172,6 +172,8 @@ def check_data_shape(
 
     # Combained two dicts
     full_columns_list = {**toml_string_cont, **toml_string_response}
+
+    # Filtered schema colum if is in data columns
     toml_string = [key for key in full_columns_list.keys() if key in data_df.columns]
 
     # Compare length of data dictionary to the data schema
@@ -186,7 +188,7 @@ def check_data_shape(
         validation_logger.info(f"Data columns match schema: {cols_match}.")
 
     validation_logger.info(
-        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string )}"
+        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
     )
     return cols_match
 
