@@ -292,7 +292,8 @@ def test_cellno_unit_dict(mock_read_csv):
     expected_result = {1: 8757, 2: 1314, 3: 23, 4: 14, 5: 9}
 
     assert actual_result == expected_result
-    
+
+
 # Mock the schemas data
 def mock_load_both_data(filepath):
     data_type_schema1 = {
@@ -310,6 +311,7 @@ def mock_load_both_data(filepath):
     data_type_schema = {**data_type_schema1, **data_type_schema2}
 
     return data_type_schema
+
 
 @pytest.fixture
 def mock_load_schemas(monkeypatch):

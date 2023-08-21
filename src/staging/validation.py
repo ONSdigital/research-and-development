@@ -282,7 +282,7 @@ def validate_data_with_both_schema(
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
             validation_logger.error(e)
-            
+
 
 def cellno_unit_dict(file_path: str) -> dict:
     """To creted dictioanry from The berd_2022_cellno_coverage.xlsx going to be use for mapping
@@ -309,6 +309,7 @@ def cellno_unit_dict(file_path: str) -> dict:
     cell_unit_dict = dict(zip(cellno_df["cell_no"], cellno_df["UNI_Count"]))
 
     return cell_unit_dict
+
 
 @exception_wrap
 def combine_schemas_validate_full_df(
@@ -359,4 +360,3 @@ def combine_schemas_validate_full_df(
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
-
