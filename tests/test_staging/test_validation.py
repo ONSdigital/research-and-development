@@ -11,6 +11,7 @@ from src.staging.validation import (
     check_pcs_real,
     validate_data_with_schema,
     cellno_unit_dict,
+    combine_schemas_validate_full_df,
 )
 from src.utils.helpers import Config_settings
 
@@ -291,3 +292,59 @@ def test_cellno_unit_dict(mock_read_csv):
     expected_result = {1: 8757, 2: 1314, 3: 23, 4: 14, 5: 9}
 
     assert actual_result == expected_result
+    
+# Mock the schemas data
+def mock_load_both_data(filepath):
+    data_type_schema1 = {
+        "reference": {"Deduced_Data_Type": "int"},
+        "createdby": {"Deduced_Data_Type": "str"},
+        "instance": {"Deduced_Data_Type": "float"},
+        "date": {"Deduced_Data_Type": "datetime64[ns]"},
+    }
+    data_type_schema2 = {
+        "q200": {"Deduced_Data_Type": "str"},
+        "q201": {"Deduced_Data_Type": "int"},
+        "q203": {"Deduced_Data_Type": "float"},
+        "q307": {"Deduced_Data_Type": "bool"},
+    }
+    data_type_schema = {**data_type_schema1, **data_type_schema2}
+
+    return data_type_schema
+
+@pytest.fixture
+def mock_load_schemas(monkeypatch):
+
+    monkeypatch.setattr("src.staging.validation.load_schema", mock_load_both_data)
+
+
+def test_combine_schemas_validate_full_df(mock_load_schemas):
+    """Test the validate_data_with_shcema  to data types are correct in
+    the source data
+    """
+    # Dumy data for testing
+    dumy_data = pd.DataFrame(
+        {
+            "reference": [2, 4, 6],
+            "createdby": ["Z", "Y", "V"],
+            "instance": [2.6, 3.8, 4.6],
+            "date": ["2023-07-23", "2023-07-24", "2023-07-25"],
+            "q200": ["C", "D", "C"],
+            "q201": [5, 7, 9],
+            "q203": [2.6, 3.8, 4.6],
+            "q307": [True, False, True],
+        }
+    )
+    # convert date datetime type
+    dumy_data["date"] = pd.to_datetime(dumy_data["date"])
+
+    # Call the function to be tested
+    combine_schemas_validate_full_df(
+        dumy_data, "mock_schema1.toml", "mock_schema2.toml"
+    )
+
+    # Check data types after validation
+    assert dumy_data[["reference", "q201"]].dtypes.all() == np.int
+    assert dumy_data[["createdby", "q200"]].dtypes.all() == np.object
+    assert dumy_data[["instance", "q203"]].dtypes.all() == np.float
+    assert pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
+    assert dumy_data["q307"].dtypes == np.bool
