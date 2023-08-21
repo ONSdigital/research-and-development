@@ -13,7 +13,7 @@ def run_outliers(
     df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
-    run_log_num: str,
+    run_id: str,
 ) -> pd.DataFrame:
     """
     Run the outliering module.
@@ -38,29 +38,32 @@ def run_outliers(
             indicating outliers for use the estimation module.
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
+
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
     outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
+    
+    # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
     # Apply short form filters before output
     filtered_df = auto.apply_short_form_filters(df_auto_flagged)
 
-    # Output the auto outlier file
+    # Output the file with auto outliers for manual checking
+    tdate = datetime.now().strftime("%Y-%m-%d")
     OutlierMainLogger.info(
-        f"Appending runlog number {run_log_num} to the manual outlier file"
+        f"Starting the output of the automatic outliers file"
     )
-    file_path = auto_outlier_path + f"/manual_outlier_{run_log_num}.csv"
+    file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
     write_csv(file_path, filtered_df)
     OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
 
     # Output the outlier flags for QA
     OutlierMainLogger.info("Starting output of Outlier QA data...")
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"outliers_qa_{tdate}.csv"
+    filename = f"outliers_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
     OutlierMainLogger.info("Finished QA output of outliers data.")
 

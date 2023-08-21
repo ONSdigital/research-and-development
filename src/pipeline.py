@@ -63,6 +63,8 @@ def run_pipeline(start):
     )
 
     logger = logger_creator(global_config)
+    run_id = runlog_obj.run_id
+
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     # Data Ingest
@@ -74,29 +76,29 @@ def run_pipeline(start):
     MainLogger.info("Starting Staging and Validation...")
 
     full_responses, manual_outliers, pg_mapper = run_staging(
-        config, check_file_exists, load_json, read_csv, write_csv
+        config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
     print(full_responses.sample(10))
     print(manual_outliers.head())
 
     # Imputation module
+    # MainLogger.info("Starting Imputation...")
+    # imputed_df = run_imputation(full_responses, pg_mapper)
+    # MainLogger.info("Finished  Imputation...")
+    # print(imputed_df.sample(10))
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
-        full_responses, config, write_csv, file_exists, runlog_obj.run_id
+        full_responses, config, write_csv, run_id
     )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
     # Data processing: Imputation
 
-    MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper)
-    MainLogger.info("Finished  Imputation...")
 
-    print(imputed_df.sample(10))
 
     # Data processing: Estimation
 

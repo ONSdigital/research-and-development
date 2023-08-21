@@ -218,7 +218,7 @@ def apply_short_form_filters(
     form_type_no: str = "0006",
     sel_type: str = "P",
 ):
-
+    """Apply a filter for only short forms with selection type 'P'."""
     # Filter to the correct form type
     filtered_df = df[
         (df["formtype"] == form_type_no) & (df["selectiontype"] == sel_type)
