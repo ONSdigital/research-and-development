@@ -228,62 +228,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
             validation_logger.error(e)
 
 
-def validate_data_with_both_schema(
-    survey_df: pd.DataFrame, schema_path1: "str", schema_path2: "str"
-):
-    """Takes the schemas from the toml file and validates the survey data df.
-
-    Args:
-        survey_df (pd.DataFrame): Survey data in a pd.df format
-        schema_path1 (str): path to the schema toml (should be in config folder)
-        schema_path2 (str): path to the schema toml (should be in config folder)
-    """
-    # Load schemas from toml
-    dtypes_schema1 = load_schema(schema_path1)
-    dtypes_schema2 = load_schema(schema_path2)
-
-    # Create all unique keys from both schema
-    full_columns_list = set(dtypes_schema1) | set(dtypes_schema2)
-
-    # Create a dict for dtypes only
-    dtypes = {
-        column_nm: dtypes_schema1[column_nm]["Deduced_Data_Type"]
-        if column_nm in dtypes_schema1
-        else dtypes_schema2[column_nm]["Deduced_Data_Type"]
-        for column_nm in full_columns_list
-    }
-
-    # Cast each column individually and catch any errors
-    for column in survey_df.columns:
-        # Fix for the columns which contain empty strings. We want to cast as NaN
-        if dtypes[column] == "pd.NA":
-            # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
-            dtypes[column] = "float64"
-        try:
-            # Try to cast each column to the required data type
-            validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
-            if dtypes[column] == "Int64":
-                # Convert non-integer string to NaN
-                survey_df[column] = survey_df[column].apply(
-                    pd.to_numeric, errors="coerce"
-                )
-                # Cast columns to Int64
-                survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
-            elif dtypes[column] == "float64":
-                # Convert non-integer string to NaN
-                survey_df[column] = survey_df[column].apply(
-                    pd.to_numeric, errors="coerce"
-                )
-                # Cast columns to float64
-                survey_df[column] = survey_df[column].astype("float64", errors="ignore")
-            else:
-                survey_df[column] = survey_df[column].astype(dtypes[column])
-            validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
-        except Exception as e:
-            validation_logger.error(e)
-
-
 @exception_wrap
 def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
     """To creted dictioanry from The berd_2022_cellno_coverage.xlsx
