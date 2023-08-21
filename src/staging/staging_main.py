@@ -96,7 +96,7 @@ def run_staging(
     full_responses = processing.full_responses(contributors_df, responses_df)
 
     # Validate and force data types for the full responses df
-    val.validate_data_with_both_schema(
+    val.combine_schemas_validate_full_df(
         full_responses,
         "config/contributors_schema.toml",
         "config/wide_responses.toml",
