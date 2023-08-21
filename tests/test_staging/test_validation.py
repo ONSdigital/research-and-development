@@ -263,9 +263,9 @@ def test_validate_data_with_schema(mock_load_schema):
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
 
 
-# Mocking read csv
-@pytest.fixture
-def mock_read_csv(monkeypatch):
+# testing cellno_unit_dict
+def test_cellno_unit_dict():
+    # Mock data
     mock_data = pd.DataFrame(
         {
             "cell_no": [
@@ -280,15 +280,10 @@ def mock_read_csv(monkeypatch):
             "uni_turnover": ["22,67", "1,83", "15,24", "8,48", "8,55"],
         }
     )
+    # Call cellno_unit_dict function
+    actual_result = cellno_unit_dict(mock_data)
 
-    mock_read_csv = Mock(return_value=mock_data)
-    monkeypatch.setattr(pd, "read_csv", mock_read_csv)
-
-
-def test_cellno_unit_dict(mock_read_csv):
-    # Mocked file path
-    actual_result = cellno_unit_dict("dumy_file_path.csv")
-
+    # Defined expected result
     expected_result = {1: 8757, 2: 1314, 3: 23, 4: 14, 5: 9}
 
     assert actual_result == expected_result
