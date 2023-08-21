@@ -284,21 +284,20 @@ def validate_data_with_both_schema(
             validation_logger.error(e)
 
 
-def cellno_unit_dict(file_path: str) -> dict:
-    """To creted dictioanry from The berd_2022_cellno_coverage.xlsx going to be use for mapping
+@exception_wrap
+def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
+    """To creted dictioanry from The berd_2022_cellno_coverage.xlsx
+    going to be use for mapping
 
 
     Args:
-        file_path (str): path to read data frame
-        ('R:/BERD Results System Development 2023/DAP_emulation/mappers
-        /2023/berd_2022_cellno_coverage.csv')
-
+        cellno_df (pd.DataFrame):cellno coverage data frame
+        
     Returns:
         dict: Dictionary contains cell_no as key, UNI_Count as values
     """
 
     # read data frame from R dive
-    cellno_df = pd.read_csv(file_path)
 
     # Filtering object columns then Convert to object columns as integer
     object_col = [col for col in cellno_df.columns if cellno_df[col].dtypes == "object"]

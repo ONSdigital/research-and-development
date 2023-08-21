@@ -127,6 +127,13 @@ def run_staging(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
 
+    # Loading cell number covarege
+    StagingMainLogger.info("Loading Cell Covarage File...")
+    cell_path_no = config["network_paths"]["cell_no_path"]
+    cellno_df = read_csv(cell_path_no)
+    cell_unit_dict = val.cellno_unit_dict(cellno_df)
+    StagingMainLogger.info("Covarage File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -136,4 +143,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, manual_outliers, mapper
+    return full_responses, manual_outliers, mapper, cell_unit_dict

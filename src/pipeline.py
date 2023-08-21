@@ -71,7 +71,7 @@ def run_pipeline(start):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper = run_staging(
+    full_responses, manual_outliers, pg_mapper, cell_unit_dict = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv
     )
     MainLogger.info("Finished Data Ingest...")
@@ -95,6 +95,7 @@ def run_pipeline(start):
     print(imputed_df.sample(10))
 
     # Data processing: Estimation
+    # use cell_unit_dict for estimation
 
     # Data processing: Regional Apportionment
 
