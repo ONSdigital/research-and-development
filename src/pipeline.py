@@ -75,7 +75,7 @@ def run_pipeline(start):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper, cell_unit_dict = run_staging(
+    full_responses, manual_outliers, pg_mapper, cellno_df = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
