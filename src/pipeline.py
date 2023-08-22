@@ -11,6 +11,7 @@ from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
+from src.estimation.estimation_main import run_estimation
 
 
 MainLogger = logging.getLogger(__name__)

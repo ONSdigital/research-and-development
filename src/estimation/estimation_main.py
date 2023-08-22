@@ -7,7 +7,7 @@ from src.estimation import calculate_weights as weights
 EstMainLogger = logging.getLogger(__name__)
 
 
-def run_esimation(df: pd.DataFrame) -> pd.DataFrame:
+def run_estimation(df: pd.DataFrame) -> pd.DataFrame:
     """
     Run the estimation module.
 
@@ -18,7 +18,8 @@ def run_esimation(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The main dataset after the application of estimation.
     """
     EstMainLogger.info("Starting estimation weights calculation...")
-    weights.add_weights(df)
+    df = weights.outlier_weights(df)
+    print(df.head())
     EstMainLogger.info("Finished estimation weights calculation.")
 
     

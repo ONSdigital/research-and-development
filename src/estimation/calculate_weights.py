@@ -17,5 +17,8 @@ def outlier_weights(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The dataframe with the a_weights set to 1 for outliers.
     """
-    df["a_weight"] = np.where()
+    df["a_weight"] = np.nan
+    df["a_weight"] = np.where(df["auto_outlier"], 1, df["a_weight"])
+
+    return df
 
