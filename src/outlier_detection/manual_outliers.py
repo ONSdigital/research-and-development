@@ -37,11 +37,6 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
     msg = f"{f_outlier_diff} record(s) have been manually updated as False."
     ManualOutlierLogger.info(msg)
 
-    # Log the number of unchanged outlier flags
-    u_outlier_diff = len(df.loc[df["manual_outlier"].isnull()])
-    msg = f"{u_outlier_diff} record(s) are unchanged."
-    ManualOutlierLogger.info(msg)
-
     ManualOutlierLogger.info("Finalised outlier decisions have been implemented.")
 
     return df
