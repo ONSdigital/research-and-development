@@ -16,10 +16,7 @@ class Config_settings:
 
     def _get_config_settings(self):
         """Get the config settings from the config file."""
-        with open(self.config_file, "r") as file:
-            config = yaml.safe_load(file)
-
-        return config
+         
 
 
 def user_config_reader(configfile: str = user_config_path) -> dict:
