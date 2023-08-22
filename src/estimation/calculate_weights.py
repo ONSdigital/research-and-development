@@ -104,7 +104,7 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         raise ValueError("The column essential 'is_outlier' is missing.")
 
     # Group by cell number
-    groupd_by_cell = df.groupby("cell_no")
+    groupd_by_cell = df.groupby("cellnumber")
 
     # Create a dict that maps each cell to the weighting factor
     weighting_factors_dict = {}
