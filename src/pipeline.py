@@ -11,6 +11,7 @@ from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
+from src.estimation.estimation_main import run_estimation
 
 
 MainLogger = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
+    from src.utils.local_file_mods import local_file_exists as file_exists
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
@@ -42,6 +44,7 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
+    from src.utils.hdfs_mods import hdfs_file_exists as file_exists
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -61,6 +64,8 @@ def run_pipeline(start):
     )
 
     logger = logger_creator(global_config)
+    run_id = runlog_obj.run_id
+
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     # Data Ingest
@@ -71,30 +76,29 @@ def run_pipeline(start):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper = run_staging(
-        config, check_file_exists, load_json, read_csv, write_csv
+    full_responses, manual_outliers, pg_mapper, cellno_df = run_staging(
+        config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
     print(full_responses.sample(10))
     print(manual_outliers.head())
 
     # Imputation module
+    # MainLogger.info("Starting Imputation...")
+    # imputed_df = run_imputation(full_responses, pg_mapper)
+    # MainLogger.info("Finished  Imputation...")
+    # print(imputed_df.sample(10))
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(full_responses, config, write_csv)
+    outliered_responses = run_outliers(
+        full_responses, config, write_csv, run_id
+    )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
-    # Data processing: Imputation
-
-    MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper)
-    MainLogger.info("Finished  Imputation...")
-
-    print(imputed_df.sample(10))
-
-    # Data processing: Estimation
+    # Estimation module
+    run_estimation(outliered_responses, cellno_df)
 
     # Data processing: Regional Apportionment
 
