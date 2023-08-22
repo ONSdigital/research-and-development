@@ -113,6 +113,11 @@ def run_staging(
     # Data validation
     val.check_data_shape(full_responses)
 
+    processing.response_rate(contributors_df, responses_df)
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
+
     # Validate the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
@@ -130,10 +135,12 @@ def run_staging(
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info(
-        "Finished Data Transmutation and validation of full responses dataframe"
-    )
+    # Loading cell number covarege
+    StagingMainLogger.info("Loading Cell Covarage File...")
+    cellno_path = config["network_paths"]["cellno_path"]
+    check_file_exists(cellno_path)
+    cellno_df = read_csv(cellno_path)
+    StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
@@ -144,4 +151,4 @@ def run_staging(
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, manual_outliers, mapper
+    return full_responses, manual_outliers, mapper, cellno_df

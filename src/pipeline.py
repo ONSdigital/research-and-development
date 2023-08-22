@@ -11,6 +11,7 @@ from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
+from src.estimation.estimation_main import run_estimation
 
 
 MainLogger = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ def run_pipeline(start):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper = run_staging(
+    full_responses, manual_outliers, pg_mapper, cellno_df = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
@@ -96,11 +97,8 @@ def run_pipeline(start):
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
-    # Estimation
-
-    # Data processing: Imputation
-
-    # Data processing: Estimation
+    # Estimation module
+    run_estimation(outliered_responses, cellno_df)
 
     # Data processing: Regional Apportionment
 
