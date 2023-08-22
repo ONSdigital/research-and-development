@@ -47,7 +47,7 @@ def check_outliers(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def calc_lower_n(df: pd.DataFrame, exp_col: str = "710") -> dict:
+def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     """Calculates 'n' which is a number of unique RU references that have
         positive (non-negative) non-Null expenditure.
 
@@ -115,9 +115,7 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
 
     # Create a dict that maps each cell to the weighting factor
 
-    for name, cell_group in groupd_by_cell:
-        # Get name for the dict key
-        cell_name = tuple(name)
+    for cell_name, cell_group in groupd_by_cell:
 
         # Get N from cellno_dict
         N = cellno_dict[cell_name]
@@ -129,14 +127,14 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         outlier_count = cell_group["is_outlier"].sum()
 
         CalcWeights_Logger.debug(
-            "The number of outliers in %s is %s", name, outlier_count
+            "The number of outliers in %s is %s", cell_name, outlier_count
         )
-        CalcWeights_Logger.debug("For %s N is %s and n is %s", name, N, n)
+        CalcWeights_Logger.debug("For %s N is %s and n is %s", cell_name, N, n)
 
         # Calculate 'a' for this group
         a_weight = (N - outlier_count) / n - outlier_count
 
         # Put the weight into the column just for this cell number
-        df.loc[df["cell_no"] == name, "a_weight"] = a_weight
+        df.loc[df["cell_no"] == cell_name, "a_weight"] = a_weight
 
     return df
