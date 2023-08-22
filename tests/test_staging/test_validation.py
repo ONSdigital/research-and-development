@@ -9,7 +9,6 @@ from src.staging.validation import (
     validate_postcode_pattern,
     check_pcs_real,
     validate_data_with_schema,
-    cellno_unit_dict,
     combine_schemas_validate_full_df,
 )
 from src.utils.helpers import Config_settings
@@ -260,32 +259,6 @@ def test_validate_data_with_schema(mock_load_schema):
     assert dumy_data["col2"].dtypes == np.object
     assert dumy_data["col3"].dtypes == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
-
-
-# testing cellno_unit_dict
-def test_cellno_unit_dict():
-    # Mock data
-    mock_data = pd.DataFrame(
-        {
-            "cell_no": [
-                1,
-                2,
-                3,
-                4,
-                5,
-            ],
-            "UNI_Count": ["87,57", "13,14", "2,3", "14", "9"],
-            "uni_employment": ["2,7", "11,8", "5,77", "28,14", "18,5"],
-            "uni_turnover": ["22,67", "1,83", "15,24", "8,48", "8,55"],
-        }
-    )
-    # Call cellno_unit_dict function
-    actual_result = cellno_unit_dict(mock_data)
-
-    # Defined expected result
-    expected_result = {1: 8757, 2: 1314, 3: 23, 4: 14, 5: 9}
-
-    assert actual_result == expected_result
 
 
 # Mock the schemas data

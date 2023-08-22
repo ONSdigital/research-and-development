@@ -107,6 +107,11 @@ def run_staging(
     # Data validation
     val.check_data_shape(full_responses)
 
+    processing.response_rate(contributors_df, responses_df)
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
+
     # Validate the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
     val.validate_post_col(contributors_df, postcode_masterlist)
@@ -123,11 +128,6 @@ def run_staging(
     mapper_path = paths["mapper_path"]
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
-
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info(
-        "Finished Data Transmutation and validation of full responses dataframe"
-    )
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")

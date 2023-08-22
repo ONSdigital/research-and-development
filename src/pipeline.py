@@ -11,6 +11,7 @@ from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
+from src.estimation.estimation_main import run_estimation
 
 
 MainLogger = logging.getLogger(__name__)
@@ -96,12 +97,8 @@ def run_pipeline(start):
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
-    # Data processing: Imputation
-
-
-
-    # Data processing: Estimation
-    # use cell_unit_dict for estimation
+    # Estimation module
+    run_estimation(outliered_responses, cellno_df)
 
     # Data processing: Regional Apportionment
 

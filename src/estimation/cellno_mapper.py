@@ -1,4 +1,5 @@
 """Return a dictionary for the cell_no mapper"""
+import pandas as pd
 
 def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
     """To creted dictioanry from The berd_2022_cellno_coverage.xlsx
