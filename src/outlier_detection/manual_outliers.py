@@ -23,12 +23,23 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
     # Overwriting auto-outliers with manual outliers
     df["outlier"] = df["manual_outlier"].combine_first(df["auto_outlier"])
 
-    # log the difference in the number of True flags in the final outlier column
-    man_true_flagged = df[df["outlier"]]["outlier"].count()
-    auto_true_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
+    # Log the number of manually applied True flags
+    t_outlier_diff = len(
+        df.loc[(df["auto_outlier"].isin([False])) & (df["outlier"].isin([True]))]
+    )
+    msg = f"{t_outlier_diff} record(s) have been manually updated as True."
+    ManualOutlierLogger.info(msg)
 
-    outlier_diff = abs(auto_true_flagged - man_true_flagged)
-    msg = f"Outlier flags have been updated for {outlier_diff} records in total."
+    # Log the number of manually applied False flags
+    f_outlier_diff = len(
+        df.loc[(df["auto_outlier"].isin([True])) & (df["outlier"].isin([False]))]
+    )
+    msg = f"{f_outlier_diff} record(s) have been manually updated as False."
+    ManualOutlierLogger.info(msg)
+
+    # Log the number of unchanged outlier flags
+    u_outlier_diff = len(df.loc[df["manual_outlier"].isnull()])
+    msg = f"{u_outlier_diff} record(s) are unchanged."
     ManualOutlierLogger.info(msg)
 
     ManualOutlierLogger.info("Finalised outlier decisions have been implemented.")

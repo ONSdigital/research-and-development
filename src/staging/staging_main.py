@@ -126,7 +126,7 @@ def run_staging(
     StagingMainLogger.info("Loading Manual Outlier File")
     manual_path = config["network_paths"]["manual_outliers_path"]
     check_file_exists(manual_path)
-    wanted_cols = ["reference", "instance", "auto_outlier", "manual_outlier"]
+    wanted_cols = ["reference", "instance", "manual_outlier"]
     manual_outliers = read_csv(manual_path, wanted_cols)
     StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
 
