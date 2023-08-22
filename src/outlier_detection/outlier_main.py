@@ -45,7 +45,7 @@ def run_outliers(
     flag_cols = config["outliers"]["flag_cols"]
     outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
-    
+
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
@@ -54,9 +54,7 @@ def run_outliers(
 
     # Output the file with auto outliers for manual checking
     tdate = datetime.now().strftime("%Y-%m-%d")
-    OutlierMainLogger.info(
-        f"Starting the output of the automatic outliers file"
-    )
+    OutlierMainLogger.info(f"Starting the output of the automatic outliers file")
     file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
     write_csv(file_path, filtered_df)
     OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)

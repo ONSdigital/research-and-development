@@ -3,6 +3,9 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
+  loading_historic_data: False
+  output_full_responses: False
+  output_outlier_qa : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
