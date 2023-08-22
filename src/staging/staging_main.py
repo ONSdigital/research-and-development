@@ -17,6 +17,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
+    run_id: int
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
@@ -37,6 +38,7 @@ def run_staging(
             This will be the hdfs or network version depending on settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
+        run_id (int): The run id for this run.
     Returns:
         pd.DataFrame: The staged and vaildated snapshot data.
     """
@@ -94,14 +96,9 @@ def run_staging(
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
-    val.combine_schemas_validate_full_df(
-        full_responses,
-        "config/contributors_schema.toml",
-        "config/wide_responses.toml",
-    )
 
     # Validate and force data types for the full responses df
-    val.validate_data_with_both_schema(
+    val.combine_schemas_validate_full_df(
         full_responses,
         "config/contributors_schema.toml",
         "config/wide_responses.toml",
@@ -109,6 +106,11 @@ def run_staging(
 
     # Data validation
     val.check_data_shape(full_responses)
+
+    processing.response_rate(contributors_df, responses_df)
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
 
     # Validate the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
@@ -127,18 +129,20 @@ def run_staging(
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info(
-        "Finished Data Transmutation and validation of full responses dataframe"
-    )
+    # Loading cell number covarege
+    StagingMainLogger.info("Loading Cell Covarage File...")
+    cellno_path = config["network_paths"]["cellno_path"]
+    check_file_exists(cellno_path)
+    cellno_df = read_csv(cellno_path)
+    StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
     if network_or_hdfs == "network":
         StagingMainLogger.info("Starting output of staged BERD data...")
         test_folder = config["network_paths"]["staging_test_foldername"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_BERD_full_responses_{tdate}.csv"
+        staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
 
-    return full_responses, manual_outliers, mapper
+    return full_responses, manual_outliers, mapper, cellno_df
