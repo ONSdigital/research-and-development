@@ -62,12 +62,11 @@ def run_outliers(
     OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
 
     # update outlier flag column with manual outliers
+    OutlierMainLogger.info("Starting Manual Outlier Application")
     df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
     outlier_df = df_auto_flagged.merge(
         df_manual_supplied, on=["reference", "instance", "auto_outlier"], how="left"
     )
-
-    OutlierMainLogger.info("Starting Manual Outlier Application")
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")
 
@@ -76,5 +75,18 @@ def run_outliers(
     filename = f"outliers_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
     OutlierMainLogger.info("Finished QA output of outliers data.")
+
+    # Return clean dataframe to pipline
+    drop_cols = [
+        "701_outlier_flag",
+        "702_outlier_flag",
+        "703_outlier_flag",
+        "704_outlier_flag",
+        "705_outlier_flag",
+        "706_outlier_flag",
+        "707_outlier_flag",
+    ]
+
+    flagged_outlier_df = flagged_outlier_df.drop(drop_cols, axis=1)
 
     return flagged_outlier_df
