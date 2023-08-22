@@ -34,19 +34,19 @@ def check_outliers(df: pd.DataFrame) -> pd.DataFrame:
 
     # Check if the automatic and manual cols are present
     cols = set(df.columns)
-    if not ("automatic_outlier" in cols and "manual_outlier" in cols):
+    if not ("auto_outlier" in cols and "manual_outlier" in cols):
         raise ValueError(
             "Either automatic_outlier or manual_outlier are not present in df"
         )
 
     # Create a new col "is_outlier" using automatic_outlier as main source of
     # logic and manual as override
-    df["is_outlier"] = df["manual_outlier"].combine_first(df["automatic_outlier"])
+    df["is_outlier"] = df["manual_outlier"].combine_first(df["auto_outlier"])
 
     return df
 
 
-def calc_lower_n(df: pd.DatatFrame, exp_col: str = "710") -> dict:
+def calc_lower_n(df: pd.DataFrame, exp_col: str = "710") -> dict:
     """Calculates 'n' which is a number of unique RU references that have
         positive (non-negative) non-Null expenditure.
 
@@ -127,6 +127,6 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         CalcWeights_Logger.debug("For %s N is %s and n is %s", name, N, n)
 
         # Calculate 'a' for this group
-        weighting_factors_dict[cell_name] = N - outlier_count / n - outlier_count
+        weighting_factors_dict[cell_name] = (N - outlier_count) / n - outlier_count
 
     return weighting_factors_dict
