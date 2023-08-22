@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import logging
 
 
@@ -103,11 +104,17 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
     if not ("is_outlier" in cols):
         raise ValueError("The column essential 'is_outlier' is missing.")
 
+    # Make a copy of the dataframe
+    df = df.copy()
+
+    # Create a new blank column with a_weight as name
+    df["a_weight"] = np.nan
+
     # Group by cell number
     groupd_by_cell = df.groupby("cellnumber")
 
     # Create a dict that maps each cell to the weighting factor
-    weighting_factors_dict = {}
+
     for name, cell_group in groupd_by_cell:
         # Get name for the dict key
         cell_name = tuple(name)
@@ -127,6 +134,9 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         CalcWeights_Logger.debug("For %s N is %s and n is %s", name, N, n)
 
         # Calculate 'a' for this group
-        weighting_factors_dict[cell_name] = (N - outlier_count) / n - outlier_count
+        a_weight = (N - outlier_count) / n - outlier_count
 
-    return weighting_factors_dict
+        # Put the weight into the column just for this cell number
+        df.loc[df["cell_no"] == name, "a_weight"] = a_weight
+
+    return df
