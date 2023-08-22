@@ -35,7 +35,7 @@ def check_outliers(df: pd.DataFrame) -> pd.DataFrame:
 
     # Check if the automatic and manual cols are present
     cols = set(df.columns)
-    if not ("auto_outlier" in cols and "manual_outlier" in cols):
+    if not ("auto_outlier" in cols) & ("manual_outlier" in cols):
         raise ValueError(
             "Either automatic_outlier or manual_outlier are not present in df"
         )
@@ -54,6 +54,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     Args:
         df (pd.DatatFrame): The input dataframe which contains survey data,
             including expenditure data
+        exp_col (str): An appropriate column to count n
 
     Returns:
         int: The number of unique references that have positive (non-negative)
@@ -62,7 +63,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
 
     # Check if any of the key cols are missing
     cols = set(df.columns)
-    if not ("reference" in cols & exp_col in cols):
+    if not ("reference" in cols) & (exp_col in cols):
         raise ValueError(f"'reference' or {exp_col} missing.")
 
     # Filter out 0 and null vals
@@ -115,10 +116,10 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
 
     # Create a dict that maps each cell to the weighting factor
 
-    for cell_name, cell_group in groupd_by_cell:
+    for cell_number, cell_group in groupd_by_cell:
 
         # Get N from cellno_dict
-        N = cellno_dict[cell_name]
+        N = cellno_dict[cell_number]
 
         # Get lower n
         n = calc_lower_n(cell_group)
@@ -127,14 +128,14 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         outlier_count = cell_group["is_outlier"].sum()
 
         CalcWeights_Logger.debug(
-            "The number of outliers in %s is %s", cell_name, outlier_count
+            "The number of outliers in %s is %s", cell_number, outlier_count
         )
-        CalcWeights_Logger.debug("For %s N is %s and n is %s", cell_name, N, n)
+        CalcWeights_Logger.debug("For %s N is %s and n is %s", cell_number, N, n)
 
         # Calculate 'a' for this group
-        a_weight = (N - outlier_count) / n - outlier_count
+        a_weight = (N - outlier_count) / (n - outlier_count)
 
         # Put the weight into the column just for this cell number
-        df.loc[df["cell_no"] == cell_name, "a_weight"] = a_weight
+        df.loc[df["cell_no"] == cell_number, "a_weight"] = a_weight
 
     return df
