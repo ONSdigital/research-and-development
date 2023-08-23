@@ -10,6 +10,7 @@ def run_estimation(df, cellno_df):
     df = calcw.check_outliers(df)
 
     # Calculate weighting factor
-    df = calcw.calculate_weighting_factor(df, cell_unit_dict)
+    df, qa_df = calcw.calculate_weighting_factor(df, cell_unit_dict)
 
     print(df.sample(20))
+    print(qa_df.sample(20))
