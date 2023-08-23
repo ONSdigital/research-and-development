@@ -50,7 +50,7 @@ def run_staging(
     snapshot_path = paths["snapshot_path"]
 
     # Load historic data
-    if config["global"]["loading_historic_data"]:
+    if config["global"]["load_historic_data"]:
         curent_year = config["years"]["current_year"]
         years_to_load = config["years"]["previous_years_to_load"]
         years_gen = history_loader.history_years(curent_year, years_to_load)
@@ -75,6 +75,9 @@ def run_staging(
                     "Problem loading historic data. Dict may be empty or not present"
                 )
                 raise Exception("The historic data did not load")
+
+    else:
+        StagingMainLogger.info("Skipping loading historic data...")
 
     # Check data file exists, raise an error if it does not.
     StagingMainLogger.info("Loading SPP snapshot data...")
