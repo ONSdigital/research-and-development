@@ -8,7 +8,7 @@ from src.estimation import cellno_mapper as cmap
 EstMainLogger = logging.getLogger(__name__)
 
 
-def run_estimation(df: pd.DataFrame) -> pd.DataFrame:
+def run_estimation(df: pd.DataFrame, cellno_df: pd.DataFrame) -> pd.DataFrame:
     """
     Run the estimation module.
 
@@ -25,5 +25,3 @@ def run_estimation(df: pd.DataFrame) -> pd.DataFrame:
     df = weights.outlier_weights(df)
     print(df.head())
     EstMainLogger.info("Finished estimation weights calculation.")
-
-

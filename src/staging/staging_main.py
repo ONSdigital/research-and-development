@@ -17,7 +17,7 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
-    run_id: int
+    run_id: int,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
@@ -98,11 +98,12 @@ def run_staging(
     full_responses = processing.full_responses(contributors_df, responses_df)
 
     # Validate and force data types for the full responses df
-    val.combine_schemas_validate_full_df(
-        full_responses,
-        "config/contributors_schema.toml",
-        "config/wide_responses.toml",
-    )
+    # TODO Find a fix for the datatype casting before uncommenting
+    # val.combine_schemas_validate_full_df(
+    #     full_responses,
+    #     "config/contributors_schema.toml",
+    #     "config/wide_responses.toml",
+    # )
 
     # Data validation
     val.check_data_shape(full_responses)
@@ -120,7 +121,7 @@ def run_staging(
     StagingMainLogger.info("Loading Manual Outlier File")
     manual_path = config["network_paths"]["manual_outliers_path"]
     check_file_exists(manual_path)
-    wanted_cols = ["reference", "instance", "auto_outlier", "manual_outlier"]
+    wanted_cols = ["reference", "instance", "manual_outlier"]
     manual_outliers = read_csv(manual_path, wanted_cols)
     StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
 
