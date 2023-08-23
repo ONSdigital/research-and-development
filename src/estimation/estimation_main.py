@@ -15,7 +15,7 @@ def run_estimation(
     cellno_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
-    run_id: str,
+    run_id: int,
     ) -> pd.DataFrame:
     """
     Run the estimation module.
@@ -23,6 +23,10 @@ def run_estimation(
     Args:
         df (pd.DataFrame): The main dataset were estimation will be applied.
         cellno_df (pd.DataFrame): The cellno mapper
+        config (dict): The configuration settings.
+        write_csv (Callable): Function to write to a csv file.
+            This will be the hdfs or network version depending on settings.
+        run_id (int): The current run id
 
     Returns:
         pd.DataFrame: The main dataset after the application of estimation.
@@ -31,10 +35,15 @@ def run_estimation(
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     est_path = config[f"{NETWORK_OR_HDFS}_paths"]["estimation_path"]
+
     # clean and create a dictionary from the cellno mapper
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
 
+    # calculate the weights
+
+    # calculate the weights for outliers
     weighted_df = weights.outlier_weights(df)
+
     print(weighted_df[weighted_df["outlier"]].head())
 
     if config["global"]["output_estimation_qa"]:
