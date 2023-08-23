@@ -5,8 +5,8 @@ global:
   postcode_csv_check: False
   load_historic_data: False
   output_full_responses: False
-  output_auto_outliers: False
-  output_outlier_qa : False
+  output_auto_outliers: True
+  output_outlier_qa : True
   output_estimation_qa: False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:

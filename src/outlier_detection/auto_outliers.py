@@ -51,6 +51,12 @@ def flag_outliers(
 ) -> pd.DataFrame:
     """Create Boolean column to flag outliers in a given column.
 
+    Note:
+        Outliers are only computed from valid, positive responses 
+        of PRN sampled data (selectiontype = P).
+        Valid responses have statuses of Clear or Clear Overridden
+        (statusencoded = 210 or 211).
+
     Args:
         df (pd.DataFrame): The dataframe used for finding outliers
         upper_clip (float): The percentage for upper clipping as float
@@ -63,6 +69,7 @@ def flag_outliers(
     lower_band = LOWER_BAND_DEFAULT + lower_clip
     upper_band = UPPER_BAND_DEFAULT - upper_clip
 
+    # Filter for PRN sampled data and positive values in the value column
     # Note: selectiontype=='P' doesn't exist in anonymised data!
     filter_cond = (df[value_col] > 0) & (df.selectiontype == "P")
     filtered_df = df[filter_cond]
@@ -73,6 +80,10 @@ def flag_outliers(
             "performed on the current anonomysed spp snapshot data."
         )
         raise ValueError
+
+    # filter for the correct statuses
+    status_cond = filtered_df["statusencoded"].isin(['210','211'])
+    filtered_df = filtered_df[status_cond]
 
     groupby_cols = ["period", "cellnumber"]
 
@@ -103,7 +114,7 @@ def flag_outliers(
     outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band)
 
     # create boolean auto_outlier col based on conditional logic
-    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond
+    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond & status_cond
     df = df.drop(["upper_band", "lower_band"], axis=1)
     return df
 
