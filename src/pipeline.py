@@ -92,13 +92,17 @@ def run_pipeline(start):
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
-        full_responses, config, write_csv, run_id
+        full_responses, manual_outliers, config, write_csv, run_id
     )
     print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
-    run_estimation(outliered_responses, cellno_df)
+    MainLogger.info("Starting Estimation...")
+    run_estimation(
+        outliered_responses, cellno_df, config, write_csv, run_id
+        )
+    MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
 

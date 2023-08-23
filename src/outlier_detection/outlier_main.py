@@ -5,15 +5,17 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 from src.outlier_detection import auto_outliers as auto
+from src.outlier_detection import manual_outliers as manual
 
 OutlierMainLogger = logging.getLogger(__name__)
 
 
 def run_outliers(
     df: pd.DataFrame,
+    df_manual_supplied: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
-    run_id: str,
+    run_id: int,
 ) -> pd.DataFrame:
     """
     Run the outliering module.
@@ -29,9 +31,11 @@ def run_outliers(
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated.
+        df_manual_supplied (pd.DataFrame): Dataframe with manual outlier flags
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
+        run_id (int): The current run id
 
     Returns:
         df_outliers_applied (pd.DataFrame): The main dataset with a flag column
@@ -45,7 +49,7 @@ def run_outliers(
     flag_cols = config["outliers"]["flag_cols"]
     outlier_path = config[f"{NETWORK_OR_HDFS}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
-    
+
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
@@ -54,23 +58,43 @@ def run_outliers(
 
     # Output the file with auto outliers for manual checking
     tdate = datetime.now().strftime("%Y-%m-%d")
-    OutlierMainLogger.info(
-        f"Starting the output of the automatic outliers file"
-    )
-    file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
-    write_csv(file_path, filtered_df)
-    OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
-
-    # Output the outlier flags for QA
-    OutlierMainLogger.info("Starting output of Outlier QA data...")
-    filename = f"outliers_qa_{tdate}_v{run_id}.csv"
-    write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
-    OutlierMainLogger.info("Finished QA output of outliers data.")
-
-    # read in file for manual outliers
+    if config["global"]["output_auto_outliers"]:
+        OutlierMainLogger.info("Starting the output of the automatic outliers file")
+        file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
+        write_csv(file_path, filtered_df)
+        OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
+    else:
+        OutlierMainLogger.info("Skipping the output of the automatic outliers file")
 
     # update outlier flag column with manual outliers
+    OutlierMainLogger.info("Starting Manual Outlier Application")
+    df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
+    outlier_df = df_auto_flagged.merge(
+        df_manual_supplied, on=["reference", "instance"], how="left"
+    )
+    flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
+    OutlierMainLogger.info("Finished Manual Outlier Application")
 
-    # Write out the CSV
+    # Output the outlier flags for QA
+    if config["global"]["output_outlier_qa"]:
+        OutlierMainLogger.info("Starting output of Outlier QA data...")
+        filename = f"outliers_qa_{tdate}_v{run_id}.csv"
+        write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
+        OutlierMainLogger.info("Finished QA output of outliers data.")
+    else:
+        OutlierMainLogger.info("Skipping output of Outlier QA data...")
 
-    return df_auto_flagged
+    # Return clean dataframe to pipline
+    drop_cols = [
+        "701_outlier_flag",
+        "702_outlier_flag",
+        "703_outlier_flag",
+        "704_outlier_flag",
+        "705_outlier_flag",
+        "706_outlier_flag",
+        "707_outlier_flag",
+    ]
+
+    flagged_outlier_df = flagged_outlier_df.drop(drop_cols, axis=1)
+
+    return flagged_outlier_df
