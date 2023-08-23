@@ -5,12 +5,14 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 from src.outlier_detection import auto_outliers as auto
+from src.outlier_detection import manual_outliers as manual
 
 OutlierMainLogger = logging.getLogger(__name__)
 
 
 def run_outliers(
     df: pd.DataFrame,
+    df_manual_supplied: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: str,
@@ -54,21 +56,37 @@ def run_outliers(
 
     # Output the file with auto outliers for manual checking
     tdate = datetime.now().strftime("%Y-%m-%d")
-    OutlierMainLogger.info(f"Starting the output of the automatic outliers file")
+    OutlierMainLogger.info("Starting the output of the automatic outliers file")
     file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
     write_csv(file_path, filtered_df)
     OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
 
+    # update outlier flag column with manual outliers
+    OutlierMainLogger.info("Starting Manual Outlier Application")
+    df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
+    outlier_df = df_auto_flagged.merge(
+        df_manual_supplied, on=["reference", "instance"], how="left"
+    )
+    flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
+    OutlierMainLogger.info("Finished Manual Outlier Application")
+
     # Output the outlier flags for QA
     OutlierMainLogger.info("Starting output of Outlier QA data...")
     filename = f"outliers_qa_{tdate}_v{run_id}.csv"
-    write_csv(f"{outlier_path}/outliers_qa/{filename}", df_auto_flagged)
+    write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
     OutlierMainLogger.info("Finished QA output of outliers data.")
 
-    # read in file for manual outliers
+    # Return clean dataframe to pipline
+    drop_cols = [
+        "701_outlier_flag",
+        "702_outlier_flag",
+        "703_outlier_flag",
+        "704_outlier_flag",
+        "705_outlier_flag",
+        "706_outlier_flag",
+        "707_outlier_flag",
+    ]
 
-    # update outlier flag column with manual outliers
+    flagged_outlier_df = flagged_outlier_df.drop(drop_cols, axis=1)
 
-    # Write out the CSV
-
-    return df_auto_flagged
+    return flagged_outlier_df
