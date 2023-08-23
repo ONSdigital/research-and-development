@@ -3,6 +3,11 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
+  load_historic_data: False
+  output_full_responses: False
+  output_auto_outliers: False
+  output_outlier_qa : False
+  output_estimation_qa: False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
@@ -31,6 +36,7 @@ network_paths:
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-22_v45.csv"
+  estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
