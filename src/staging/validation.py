@@ -37,15 +37,13 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
 
 @exception_wrap
-def get_masterlist(postcode_masterlist, read_csv: Callable) -> pd.Series:
+def get_masterlist(postcode_masterlist) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
     Returns:
         pd.Series: The dataframe of postcodes
     """
-    masterlist = read_csv(postcode_masterlist, ["pcd"])
-
-    masterlist = masterlist.squeeze()
+    masterlist = postcode_masterlist.squeeze()
 
     return masterlist
 
@@ -53,7 +51,7 @@ def get_masterlist(postcode_masterlist, read_csv: Callable) -> pd.Series:
 @time_logger_wrap
 @exception_wrap
 def validate_post_col(
-    df: pd.DataFrame, postcode_masterlist: str, read_csv: Callable
+    df: pd.DataFrame, postcode_masterlist: str
 ) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
@@ -68,7 +66,7 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist, read_csv)
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
@@ -103,10 +101,10 @@ def validate_post_col(
     return True
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str, read_csv: Callable):
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
-        master_series = get_masterlist(postcode_masterlist, read_csv)
+        master_series = get_masterlist(postcode_masterlist)
 
         # Check if postcode are real
         unreal_postcodes = df.loc[

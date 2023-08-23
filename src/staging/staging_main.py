@@ -117,9 +117,15 @@ def run_staging(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
 
-    # Validate the postcode column
-    postcode_masterlist = paths["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist, read_csv)
+    # Stage and validate the postcode column
+    if config["global"]["postcode_csv_check"]:
+        StagingMainLogger.info("Starting PostCode Validation")
+        postcode_masterlist = paths["postcode_masterlist"]
+        check_file_exists(postcode_masterlist)
+        postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
+        val.validate_post_col(contributors_df, postcode_masterlist)
+    else:
+        StagingMainLogger.info("PostCode Validation skipped")
 
     # Stage the manual outliers file
     StagingMainLogger.info("Loading Manual Outlier File")
