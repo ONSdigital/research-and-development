@@ -6,12 +6,13 @@ from typing import Callable, Dict, Any
 
 from src.estimation import calculate_weights as weights
 from src.estimation import cellno_mapper as cmap
+from src.estimation.duplicates_check import duplicates_check
 
 EstMainLogger = logging.getLogger(__name__)
 
 
 def run_estimation(
-    df: pd.DataFrame, 
+    df: pd.DataFrame,
     cellno_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
@@ -35,6 +36,9 @@ def run_estimation(
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     est_path = config[f"{NETWORK_OR_HDFS}_paths"]["estimation_path"]
+    col = config["global"]["duplicate_check_col"]
+
+    duplicates_check(df, col)
 
     # clean and create a dictionary from the cellno mapper
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)

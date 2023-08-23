@@ -9,6 +9,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
+  duplicate_check_col : reference
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig

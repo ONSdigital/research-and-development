@@ -9,15 +9,13 @@ class TestCountUnique:
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
-            "reference",
-            "col1",
-            "col2"
+            "reference"
         ]
 
         data = [
-            [1, 123, 123],
-            [1, 123, 123],
-            [2, 1234, 1234],
+            [1],
+            [1],
+            [2],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -27,13 +25,11 @@ class TestCountUnique:
         """Create an input dataframe for the test."""
         input_cols = [
             "reference",
-            "col1",
-            "col2"
         ]
 
         data = [
-            [1, 123, 123],
-            [2, 1234, 1234],
+            [1],
+            [2],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -43,14 +39,12 @@ class TestCountUnique:
         """Create an input dataframe for the test."""
         exp_cols = [
             "reference",
-            "col1",
-            "col2",
             "count"
         ]
 
         data = [
-            [1, 123, 123, 2],
-            [2, 1234, 1234, 1],
+            [1, 2],
+            [2, 1],
         ]
 
         exp_df = pandasDF(data=data, columns=exp_cols)
@@ -60,14 +54,12 @@ class TestCountUnique:
         """Create an input dataframe for the test."""
         exp_cols = [
             "reference",
-            "col1",
-            "col2",
             "count"
         ]
 
         data = [
-            [1, 123, 123, 1],
-            [2, 1234, 1234, 1],
+            [1, 1],
+            [2, 1],
         ]
 
         exp_df = pandasDF(data=data, columns=exp_cols)
@@ -78,7 +70,7 @@ class TestCountUnique:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df = count_unique(input_df)
+        result_df = count_unique(input_df, "reference")
 
         assert_frame_equal(result_df, expected_df)
 
@@ -87,6 +79,6 @@ class TestCountUnique:
         input_df = self.create_input_df_nodup()
         expected_df = self.create_expected_df_nodup()
 
-        result_df = count_unique(input_df)
+        result_df = count_unique(input_df, "reference")
 
         assert_frame_equal(result_df, expected_df)
