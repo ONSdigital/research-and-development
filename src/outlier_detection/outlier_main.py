@@ -55,8 +55,8 @@ def run_outliers(
     filtered_df = auto.apply_short_form_filters(df_auto_flagged)
 
     # Output the file with auto outliers for manual checking
+    tdate = datetime.now().strftime("%Y-%m-%d")
     if config["global"]["output_auto_outliers"]:
-        tdate = datetime.now().strftime("%Y-%m-%d")
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
         file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
         write_csv(file_path, filtered_df)
