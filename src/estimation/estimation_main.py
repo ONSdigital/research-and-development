@@ -6,8 +6,6 @@ from typing import Callable, Dict, Any
 
 from src.estimation import calculate_weights as weights
 from src.estimation import cellno_mapper as cmap
-import src.estimation.calculate_weights as calcw
-
 
 EstMainLogger = logging.getLogger(__name__)
 
@@ -42,14 +40,16 @@ def run_estimation(
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
 
     # calculate the weights
+    df, qa_df = weights.calculate_weighting_factor(df, cell_unit_dict)
 
     # calculate the weights for outliers
-    weighted_df = weights.outlier_weights(df)
-
-    print(weighted_df[weighted_df["outlier"]].head())
+    weights.outlier_weights(df)
 
     if config["global"]["output_estimation_qa"]:
+        EstMainLogger.info("Outputting estimation QA file.")
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"estimation_qa_{tdate}_v{run_id}.csv"
-        write_csv(f"{est_path}/estimation_qa/{filename}", weighted_df)
+        write_csv(f"{est_path}/estimation_qa/{filename}", qa_df)
     EstMainLogger.info("Finished estimation weights calculation.")
+    
+    return df
