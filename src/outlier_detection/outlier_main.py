@@ -71,10 +71,13 @@ def run_outliers(
     OutlierMainLogger.info("Finished Manual Outlier Application")
 
     # Output the outlier flags for QA
-    OutlierMainLogger.info("Starting output of Outlier QA data...")
-    filename = f"outliers_qa_{tdate}_v{run_id}.csv"
-    write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
-    OutlierMainLogger.info("Finished QA output of outliers data.")
+    if config["global"]["output_outlier_qa"]:
+        OutlierMainLogger.info("Starting output of Outlier QA data...")
+        filename = f"outliers_qa_{tdate}_v{run_id}.csv"
+        write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
+        OutlierMainLogger.info("Finished QA output of outliers data.")
+    else:
+        OutlierMainLogger.info("Skipping output of Outlier QA data...")
 
     # Return clean dataframe to pipline
     drop_cols = [
