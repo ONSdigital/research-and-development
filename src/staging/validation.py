@@ -3,6 +3,7 @@ import toml
 import postcodes_uk
 import pandas as pd
 from numpy import nan
+from typing import Callable
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -36,19 +37,24 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
 
 @exception_wrap
-def get_masterlist(postcode_masterlist) -> pd.Series:
+def get_masterlist(postcode_masterlist, read_csv: Callable) -> pd.Series:
     """This function loads the masterlist of postcodes from a csv file
 
     Returns:
         pd.Series: The dataframe of postcodes
     """
-    masterlist = pd.read_csv(postcode_masterlist, usecols=["pcd"]).squeeze()
+    masterlist = read_csv(postcode_masterlist, ["pcd"])
+
+    masterlist = masterlist.squeeze()
+
     return masterlist
 
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
+def validate_post_col(
+    df: pd.DataFrame, postcode_masterlist: str, read_csv: Callable
+) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.
@@ -62,7 +68,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist, read_csv)
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
@@ -97,10 +103,10 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     return True
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str, read_csv: Callable):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
-        master_series = get_masterlist(postcode_masterlist)
+        master_series = get_masterlist(postcode_masterlist, read_csv)
 
         # Check if postcode are real
         unreal_postcodes = df.loc[

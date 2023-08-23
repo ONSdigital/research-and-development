@@ -4,6 +4,7 @@ import logging
 
 CalcWeights_Logger = logging.getLogger(__name__)
 
+
 def outlier_weights(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate weights for outliers.
 
@@ -18,4 +19,3 @@ def outlier_weights(df: pd.DataFrame) -> pd.DataFrame:
     """
     df.loc[df["outlier"], "a_weight"] = 1.0
     return df
-

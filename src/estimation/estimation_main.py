@@ -11,12 +11,12 @@ EstMainLogger = logging.getLogger(__name__)
 
 
 def run_estimation(
-    df: pd.DataFrame, 
+    df: pd.DataFrame,
     cellno_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """
     Run the estimation module.
 

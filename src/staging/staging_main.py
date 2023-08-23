@@ -118,12 +118,12 @@ def run_staging(
     )
 
     # Validate the postcode column
-    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
+    postcode_masterlist = paths["postcode_masterlist"]
+    val.validate_post_col(contributors_df, postcode_masterlist, read_csv)
 
     # Stage the manual outliers file
     StagingMainLogger.info("Loading Manual Outlier File")
-    manual_path = config["network_paths"]["manual_outliers_path"]
+    manual_path = paths["manual_outliers_path"]
     check_file_exists(manual_path)
     wanted_cols = ["reference", "instance", "manual_outlier"]
     manual_outliers = read_csv(manual_path, wanted_cols)
@@ -136,7 +136,7 @@ def run_staging(
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
-    cellno_path = config["network_paths"]["cellno_path"]
+    cellno_path = paths["cellno_path"]
     check_file_exists(cellno_path)
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
