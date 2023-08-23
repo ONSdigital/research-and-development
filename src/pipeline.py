@@ -99,7 +99,9 @@ def run_pipeline(start):
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    run_estimation(outliered_responses, cellno_df)
+    run_estimation(
+        outliered_responses, cellno_df, config, write_csv, run_id
+        )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
