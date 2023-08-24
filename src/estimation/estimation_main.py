@@ -36,9 +36,9 @@ def run_estimation(
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     est_path = config[f"{NETWORK_OR_HDFS}_paths"]["estimation_path"]
-    col = config["global"]["duplicate_check_col"]
 
-    duplicates_check(df, col)
+    #checking for duplicates in reference column
+    duplicates_check(df, 'reference')
 
     # clean and create a dictionary from the cellno mapper
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
