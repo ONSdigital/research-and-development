@@ -7,7 +7,7 @@ global:
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
+  output_estimation_qa: True
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   duplicate_check_col : reference
 years:

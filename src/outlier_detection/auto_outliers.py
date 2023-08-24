@@ -46,6 +46,44 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
         raise ImportError
 
 
+def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
+    """Filter for valid responses in a given value column.
+    
+    Outliers are only computed from valid, positive responses 
+    of PRN sampled data (selectiontype = P).
+    Valid responses have statuses of Clear or Clear Overridden
+    (statusencoded = 210 or 211).
+
+    Args:
+        df (pd.DataFrame): The dataframe of responses to be filtered.
+        value_col (str): The name of the value column.
+
+    Returns:
+        pd.DataFrame: The filtered dataframe
+    """
+    sample_cond = df.selectiontype == "P"
+    if df[sample_cond].empty:
+        AutoOutlierLogger.error(
+            "This data does not contain value 'P' in "
+            "column 'selectiontype'. \n Note that outliering cannot be "
+            "performed on the current anonomysed spp snapshot data."
+        )
+        raise ValueError
+    status_cond = df.statusencoded.isin(['210','211'])
+    positive_cond = df[value_col]>0
+
+    filtered_df = df[sample_cond & status_cond & positive_cond]
+
+    if filtered_df.empty:
+        AutoOutlierLogger.error(
+            f"column {value_col} has no valid returns for outliers."
+            "This column should not be considered for outliers."
+        )
+        raise ValueError
+    
+    return filtered_df
+
+
 def flag_outliers(
     df: pd.DataFrame, upper_clip: float, lower_clip: float, value_col: str
 ) -> pd.DataFrame:
@@ -63,17 +101,10 @@ def flag_outliers(
     lower_band = LOWER_BAND_DEFAULT + lower_clip
     upper_band = UPPER_BAND_DEFAULT - upper_clip
 
-    # Note: selectiontype=='P' doesn't exist in anonymised data!
-    filter_cond = (df[value_col] > 0) & (df.selectiontype == "P")
-    filtered_df = df[filter_cond]
-    if filtered_df.empty:
-        AutoOutlierLogger.error(
-            "This data does not contain value 'P' in "
-            "column 'selectiontype'. \n Note that outliering cannot be "
-            "performed on the current anonomysed spp snapshot data."
-        )
-        raise ValueError
+    # Filter for valid sampled data and positive values in the value column
+    filtered_df = filter_valid(df, value_col)
 
+    # calculate the quantiles
     groupby_cols = ["period", "cellnumber"]
 
     quantiles_up = (
@@ -100,10 +131,12 @@ def flag_outliers(
         quantiles_low, on=groupby_cols, how="left"
     )
 
-    outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band)
+    outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band) #noqa
 
     # create boolean auto_outlier col based on conditional logic
-    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond
+    filter_cond = (df.selectiontype == "P") & (df[value_col]>0)
+    status_cond = (df.statusencoded.isin(['210','211']))
+    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond & status_cond
     df = df.drop(["upper_band", "lower_band"], axis=1)
     return df
 
@@ -131,7 +164,7 @@ def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFram
 def log_outlier_info(df: pd.DataFrame, value_col: str):
     """Log the number of outliers flagged.
 
-    Also calculate the total number of non-zero entries in the specified
+    Also calculate the total number of 'valid' entries in the specified
     value_col column being flagged.
 
     Args:
@@ -141,11 +174,12 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
     flag_col = f"{value_col}_outlier_flag"
     num_flagged = df[df[flag_col]][flag_col].count()
 
-    tot_nonzero = df[df[value_col] > 0][value_col].count()
+    filtered_df = filter_valid(df, value_col)
+    tot_nonzero = filtered_df[value_col].count()
 
     msg = (
         f"{num_flagged} outliers were detected out of a total of "
-        f"{tot_nonzero} non-zero entries in column {value_col}"
+        f"{tot_nonzero} valid entries in column {value_col}"
     )
     AutoOutlierLogger.info(msg)
 

@@ -17,7 +17,7 @@ def run_estimation(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """
     Run the estimation module.
 
