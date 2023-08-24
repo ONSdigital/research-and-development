@@ -215,7 +215,7 @@ def run_auto_flagging(
 
 def apply_short_form_filters(
     df: pd.DataFrame,
-    form_type_no: str = "0006",
+    form_type_no: str = "",
     sel_type: str = "P",
 ):
     """Apply a filter for only short forms with selection type 'P'."""
