@@ -50,9 +50,7 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(
-    df: pd.DataFrame, postcode_masterlist: str
-) -> bool:
+def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.

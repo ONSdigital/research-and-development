@@ -51,3 +51,5 @@ def run_estimation(
         filename = f"estimation_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{est_path}/estimation_qa/{filename}", weighted_df)
     EstMainLogger.info("Finished estimation weights calculation.")
+
+    return weighted_df
