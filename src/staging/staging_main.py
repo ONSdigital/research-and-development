@@ -123,7 +123,15 @@ def run_staging(
         postcode_masterlist = paths["postcode_masterlist"]
         check_file_exists(postcode_masterlist)
         postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
-        val.validate_post_col(contributors_df, postcode_masterlist)
+        invalid_df, unreal_df = val.validate_post_col(
+            full_responses, postcode_masterlist
+        )
+        pcodes_folder = paths["postcode_path"]
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+        unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+        write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
     else:
         StagingMainLogger.info("PostCode Validation skipped")
 

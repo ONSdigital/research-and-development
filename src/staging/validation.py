@@ -3,7 +3,6 @@ import toml
 import postcodes_uk
 import pandas as pd
 from numpy import nan
-from typing import Callable
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -50,9 +49,7 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(
-    df: pd.DataFrame, postcode_masterlist: str
-) -> bool:
+def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.
@@ -66,23 +63,41 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
-
-    # Log the unreal postcodes
-    if not unreal_postcodes.empty:
-        validation_logger.warning(
-            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
-        )
-
     # Check if postcodes match pattern
     invalid_pattern_postcodes = df.loc[
         ~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"
     ]
 
+    # Save to df
+    invalid_df = pd.DataFrame(
+        {
+            "reference": df.loc[invalid_pattern_postcodes.index, "reference"],
+            "instance": df.loc[invalid_pattern_postcodes.index, "instance"],
+            "invalid_pattern_pcodes": invalid_pattern_postcodes,
+        }
+    )
+
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
         validation_logger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
+        )
+
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
+
+    # Save to df
+    unreal_df = pd.DataFrame(
+        {
+            "reference": df.loc[unreal_postcodes.index, "reference"],
+            "instance": df.loc[unreal_postcodes.index, "instance"],
+            "not_real_pcodes": unreal_postcodes,
+        }
+    )
+
+    # Log the unreal postcodes
+    if not unreal_postcodes.empty:
+        validation_logger.warning(
+            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
     # Combine the two lists
@@ -91,20 +106,34 @@ def validate_post_col(
     )
     combined_invalid_postcodes.drop_duplicates(inplace=True)
 
-    if not combined_invalid_postcodes.empty:
-        raise ValueError(
-            f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
-        )
+    # if not combined_invalid_postcodes.empty:
+    #     raise ValueError(
+    #         f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
+    #     )
 
     validation_logger.info("All postcodes validated....")
 
-    return True
+    return invalid_df, unreal_df
+
+
+def insert_space(string, integer):
+    return string[0:integer] + " " + string[integer:]
 
 
 def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
+
+        # Renove whitespaces on larger than 7 characters
+        df.loc[df["referencepostcode"].str.len() > 7, "referencepostcode"] = df.loc[
+            df["referencepostcode"].str.len() > 7, "referencepostcode"
+        ].str.replace(" ", "")
+
+        # Add whitespace to short postcodes
+        df.loc[df["referencepostcode"].str.len() < 7, "referencepostcode"] = df.loc[
+            df["referencepostcode"].str.len() < 7, "referencepostcode"
+        ].apply(lambda x: insert_space(x, 3))
 
         # Check if postcode are real
         unreal_postcodes = df.loc[
