@@ -35,7 +35,9 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     return n
 
 
-def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
+def calculate_weighting_factor(
+    df: pd.DataFrame, cellno_dict, exp_col: str = "709"
+) -> dict:
     """Calculate the weighting factor 'a' for each cell in the survery data
 
     Note: A 'cell' is a group of businesses.
@@ -70,17 +72,14 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
     # Create a new blank column with a_weight as name
     df["a_weight"] = np.nan
 
-    # Filter for shortforms with 'P' seltype
+    # Create filters for dataframe
+    positive_cond = df[exp_col] > 0
+    sample_cond = df["selectiontype"] == "P"
+    status_cond = df.statusencoded.isin(["210", "211"])
+    formtype_cond = df["formtype"] == "0006"
 
-    filtered_df = df[(df["formtype"] == "0006") & (df["selectiontype"] == "P")]
-
-    # Filter out 0 and null vals for column 709
-    filtered_df = filtered_df[filtered_df["709"] > 0]
-    filtered_df = filtered_df.dropna(subset=["709"])
-
-    # Filter for clean statuses 211, 210 statusencoded
-
-    filtered_df = filtered_df[filtered_df["statusencoded"].isin(["210", "211"])]
+    filtered_df = df[formtype_cond & sample_cond & status_cond & positive_cond]
+    filtered_df = filtered_df.dropna(subset=[exp_col])
 
     # Default a_weight for filtered_df = 1
 
@@ -117,8 +116,12 @@ def calculate_weighting_factor(df: pd.DataFrame, cellno_dict) -> dict:
         # Calculate 'a' for this group
         a_weight = (N - outlier_count) / (n - outlier_count)
 
-        # Put the weight into the column just for this cell number
-        df.loc[(df["cellnumber"] == cell_number), "a_weight"] = a_weight
+        # Put the weight into the column just for this cell number and filters
+        cell_cond = df["cellnumber"] == cell_number
+        df.loc[
+            formtype_cond & sample_cond & status_cond & positive_cond & cell_cond,
+            "a_weight",
+        ] = a_weight
 
         # Save the relevant estimation info for QA seperately.
         qa_list = [cell_number, N, n, outlier_count, a_weight]
