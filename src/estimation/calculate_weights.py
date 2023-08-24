@@ -24,12 +24,8 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     if not ("reference" in cols) & (exp_col in cols):
         raise ValueError(f"'reference' or {exp_col} missing.")
 
-    # Filter out 0 and null vals
-    df_filtered = df[df[exp_col] > 0]
-    df_filtered = df_filtered.dropna(subset=[exp_col])
-
     # Count the filtered records
-    n = df_filtered["reference"].nunique()
+    n = df["reference"].nunique()
 
     return n
 
