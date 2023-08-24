@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import logging
 
 
@@ -69,21 +68,16 @@ def calculate_weighting_factor(
     # Convert 709 column to numeric
     df["709"] = pd.to_numeric(df["709"], errors="coerce")
 
-    # Create a new blank column with a_weight as name
-    df["a_weight"] = np.nan
+    # Default a_weight = 1 for all entries
+    df["a_weight"] = 1.0
 
     # Create filters for dataframe
-    positive_cond = df[exp_col] > 0
     sample_cond = df["selectiontype"] == "P"
     status_cond = df.statusencoded.isin(["210", "211"])
     formtype_cond = df["formtype"] == "0006"
 
-    filtered_df = df[formtype_cond & sample_cond & status_cond & positive_cond]
+    filtered_df = df[formtype_cond & sample_cond & status_cond]
     filtered_df = filtered_df.dropna(subset=[exp_col])
-
-    # Default a_weight for filtered_df = 1
-
-    filtered_df["a_weight"] = 1.0
 
     # Create small QA dataframe
 
@@ -119,7 +113,7 @@ def calculate_weighting_factor(
         # Put the weight into the column just for this cell number and filters
         cell_cond = df["cellnumber"] == cell_number
         df.loc[
-            formtype_cond & sample_cond & status_cond & positive_cond & cell_cond,
+            formtype_cond & sample_cond & status_cond & cell_cond,
             "a_weight",
         ] = a_weight
 
