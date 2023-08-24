@@ -48,8 +48,8 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
 
 def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     """Filter for valid responses in a given value column.
-    
-    Outliers are only computed from valid, positive responses 
+
+    Outliers are only computed from valid, positive responses
     of PRN sampled data (selectiontype = P).
     Valid responses have statuses of Clear or Clear Overridden
     (statusencoded = 210 or 211).
@@ -69,8 +69,8 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
             "performed on the current anonomysed spp snapshot data."
         )
         raise ValueError
-    status_cond = df.statusencoded.isin(['210','211'])
-    positive_cond = df[value_col]>0
+    status_cond = df.statusencoded.isin(["210", "211"])
+    positive_cond = df[value_col] > 0
 
     filtered_df = df[sample_cond & status_cond & positive_cond]
 
@@ -80,7 +80,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
             "This column should not be considered for outliers."
         )
         raise ValueError
-    
+
     return filtered_df
 
 
@@ -131,11 +131,13 @@ def flag_outliers(
         quantiles_low, on=groupby_cols, how="left"
     )
 
-    outlier_cond = (df[value_col] > df.upper_band) | (df[value_col] < df.lower_band) #noqa
+    outlier_cond = (df[value_col] > df.upper_band) | (
+        df[value_col] < df.lower_band
+    )  # noqa
 
     # create boolean auto_outlier col based on conditional logic
-    filter_cond = (df.selectiontype == "P") & (df[value_col]>0)
-    status_cond = (df.statusencoded.isin(['210','211']))
+    filter_cond = (df.selectiontype == "P") & (df[value_col] > 0)
+    status_cond = df.statusencoded.isin(["210", "211"])
     df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond & status_cond
     df = df.drop(["upper_band", "lower_band"], axis=1)
     return df
