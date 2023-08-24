@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.shor_form_out import create_new_cols
+from src.outputs.short_form_out import create_new_cols
 
 OutputMainLogger = logging.getLogger(__name__)
 
