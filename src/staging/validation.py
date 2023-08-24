@@ -3,6 +3,7 @@ import toml
 import postcodes_uk
 import pandas as pd
 from numpy import nan
+from typing import Callable
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -42,13 +43,16 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     Returns:
         pd.Series: The dataframe of postcodes
     """
-    masterlist = pd.read_csv(postcode_masterlist, usecols=["pcd"]).squeeze()
+    masterlist = postcode_masterlist.squeeze()
+
     return masterlist
 
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
+def validate_post_col(
+    df: pd.DataFrame, postcode_masterlist: str
+) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.
