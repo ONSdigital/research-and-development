@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 from src.estimation import calculate_weights as weights
+from src.estimation import apply_weights as appweights
 from src.estimation import cellno_mapper as cmap
 
 EstMainLogger = logging.getLogger(__name__)
@@ -44,10 +45,12 @@ def run_estimation(
     # calculate the weights for outliers
     weighted_df = weights.outlier_weights(df)
 
-    print(weighted_df[weighted_df["outlier"]].head())
+    estimated_df = appweights.apply_weights(weighted_df, 4)
 
     if config["global"]["output_estimation_qa"]:
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"estimation_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{est_path}/estimation_qa/{filename}", weighted_df)
     EstMainLogger.info("Finished estimation weights calculation.")
+
+    return estimated_df
