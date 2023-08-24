@@ -6,8 +6,8 @@ CalcWeights_Logger = logging.getLogger(__name__)
 
 
 def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
-    """Calculates 'n' which is a number of unique RU references that have
-        positive (non-negative) non-Null expenditure.
+    """Calculates 'n' which is a number of
+    unique RU references in the filtered dataset.
 
     Args:
         df (pd.DatatFrame): The input dataframe which contains survey data,
@@ -15,8 +15,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
         exp_col (str): An appropriate column to count n
 
     Returns:
-        int: The number of unique references that have positive (non-negative)
-            non-Null expenditure.
+        int: The number of unique references.
     """
 
     # Check if any of the key cols are missing
@@ -24,7 +23,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     if not ("reference" in cols) & (exp_col in cols):
         raise ValueError(f"'reference' or {exp_col} missing.")
 
-    # Count the filtered records
+    # Count the records
     n = df["reference"].nunique()
 
     return n
@@ -51,15 +50,16 @@ def calculate_weighting_factor(
 
     Args:
         df (pd.DataFrame): The input df containing survey data
+        cellno_dict (_type_): Dictionary of cellnumbers and UNI_counts
+        exp_col (str, optional): The column that is used to calculate n.
 
     Returns:
         weighting_factor_dict (dict): The input df with an aditional column
-
     """
 
     cols = set(df.columns)
     if not ("outlier" in cols):
-        raise ValueError("The column essential 'is_outlier' is missing.")
+        raise ValueError("The column essential 'outlier' is missing.")
 
     # Convert 709 column to numeric
     df["709"] = pd.to_numeric(df["709"], errors="coerce")
