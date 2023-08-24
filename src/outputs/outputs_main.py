@@ -15,7 +15,7 @@ def run_output(
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
-    """_summary_
+    """Run the outputs module.
 
     Args:
         estimated_df (pd.DataFrame): The main dataset contains short form output
