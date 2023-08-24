@@ -106,10 +106,10 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     )
     combined_invalid_postcodes.drop_duplicates(inplace=True)
 
-    # if not combined_invalid_postcodes.empty:
-    #     raise ValueError(
-    #         f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
-    #     )
+    if not combined_invalid_postcodes.empty:
+        validation_logger.warning(
+            f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
+        )
 
     validation_logger.info("All postcodes validated....")
 

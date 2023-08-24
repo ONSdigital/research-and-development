@@ -9,7 +9,14 @@ class TestOutlierFlagging:
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
-        input_cols = ["reference", "selectiontype", "statusencoded", "period", "cellnumber", "701"]
+        input_cols = [
+            "reference",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
 
         data = [
             [1, "P", "210", 2020, 10, 1.1],
