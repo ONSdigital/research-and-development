@@ -85,15 +85,7 @@ def run_outliers(
         OutlierMainLogger.info("Skipping output of Outlier QA data...")
 
     # Return clean dataframe to pipline
-    drop_cols = [
-        "701_outlier_flag",
-        "702_outlier_flag",
-        "703_outlier_flag",
-        "704_outlier_flag",
-        "705_outlier_flag",
-        "706_outlier_flag",
-        "707_outlier_flag",
-    ]
+    drop_cols = [f"{col}_outlier_flag" for col in flag_cols]
 
     flagged_outlier_df = flagged_outlier_df.drop(drop_cols, axis=1)
 
