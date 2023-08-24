@@ -90,7 +90,7 @@ class TestFilterShortForms:
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
-            "form_type_no"
+            "formtype"
         ]
 
         data = [
@@ -104,7 +104,7 @@ class TestFilterShortForms:
     def create_expected_df(self):
         """Create an input dataframe for the test."""
         exp_cols = [
-            "form_type_no"
+            "formtype"
         ]
 
         data = [
@@ -114,12 +114,11 @@ class TestFilterShortForms:
         exp_df = pandasDF(data=data, columns=exp_cols)
         return exp_df
 
-
     def test_filter_short_forms_nodup(self):
         """Test for filter_short_forms function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df = filter_short_forms(input_df, "reference")
+        result_df = filter_short_forms(input_df)
 
         assert_frame_equal(result_df, expected_df)
