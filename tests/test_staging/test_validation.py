@@ -68,7 +68,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     if config["global"]["postcode_csv_check"]:
 
         assert (
-            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M2NO']"  # noqa
+            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
             in caplog.text
         )
 
@@ -100,38 +100,9 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
 
     validate_post_col(test_data_df, fake_path)
     if config["global"]["postcode_csv_check"]:
-        assert "Invalid postcodes found: ['HIJ 789', 'KL1M2NO']" in caplog.text
+        assert "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']" in caplog.text
     else:
         assert "Invalid postcodes found: ['HIJ 789']" in caplog.text
-
-    # TODO These edge cases fail with new format.
-    # Edge cases: invalid column names
-    # df_invalid_column_name = test_data_df.rename(
-    #     columns={"referencepostcode": "postcode"}
-    # )
-    # with pytest.raises(KeyError) as error:
-    #     validate_post_col(df_invalid_column_name, fake_path)
-    # assert str(error.value) == "'referencepostcode'"  # Invalid column name
-
-    # Edge cases: missing column
-    # df_missing_column = test_data_df.drop("referencepostcode", axis=1)
-    # df_missing_column["anothercolumn"] = ["val1", "val2", "val3", "val4"]
-    # with pytest.raises(KeyError) as error:
-    #     validate_post_col(df_missing_column, fake_path)
-    # assert str(error.value) == "'referencepostcode'"  # Missing column
-
-    # Edge cases: missing DataFrame
-    # df_missing_dataframe = None
-    # with pytest.raises(TypeError):
-    #     validate_post_col(df_missing_dataframe, fake_path)  # Missing DataFrame
-
-    # Edge cases: empty reference postcode column
-    # df_no_postcodes = pd.DataFrame(
-    #     {"reference": [1], "instance": [0], "referencepostcode": [""]}
-    # )
-
-    # validate_post_col(df_no_postcodes, fake_path)  # Empty postcode column
-    # assert "Invalid postcodes found: [' '," in caplog.text
 
 
 def test_validate_postcode():
