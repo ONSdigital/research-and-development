@@ -103,9 +103,9 @@ def run_pipeline(start):
     estimated_df = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
-    
+
     print(estimated_df.sample(20))
-    
+
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment

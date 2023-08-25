@@ -14,7 +14,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-) -> pd.DataFrame:
+):
     """Run the outputs module.
 
     Args:
@@ -26,7 +26,7 @@ def run_output(
 
 
     """
-    OutputMainLogger.info("Starting short output form...")
+    OutputMainLogger.info("Starting short form output...")
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
@@ -38,4 +38,4 @@ def run_output(
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"output_short_form{tdate}_v{run_id}.csv"
         write_csv(f"{output_path}/output_short_form/{filename}", short_form_df)
-    OutputMainLogger.info("Finished short output form.")
+    OutputMainLogger.info("Finished short form output.")
