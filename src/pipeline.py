@@ -9,7 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
-from src.imputation.imputation_main import run_imputation
+from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
 from src.outputs.outputs_main import run_output
@@ -35,7 +35,7 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_open as open_file
     from src.utils.local_file_mods import read_local_csv as read_csv
     from src.utils.local_file_mods import write_local_csv as write_csv
-    from src.utils.local_file_mods import local_file_exists as file_exists
+    from src.utils.local_file_mods import local_file_exists as file_exists  # noqa
 elif network_or_hdfs == "hdfs":
     HDFS_AVAILABLE = True
 
@@ -45,7 +45,7 @@ elif network_or_hdfs == "hdfs":
     from src.utils.hdfs_mods import hdfs_open as open_file
     from src.utils.hdfs_mods import read_hdfs_csv as read_csv
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-    from src.utils.hdfs_mods import hdfs_file_exists as file_exists
+    from src.utils.hdfs_mods import hdfs_file_exists as file_exists  # noqa
 else:
     MainLogger.error("The network_or_hdfs configuration is wrong")
     raise ImportError
@@ -103,6 +103,9 @@ def run_pipeline(start):
     estimated_df = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
+    
+    print(estimated_df.sample(20))
+    
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
