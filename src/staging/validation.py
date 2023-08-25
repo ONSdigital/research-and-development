@@ -116,8 +116,8 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     return invalid_df, unreal_df
 
 
-def insert_space(string, integer):
-    return string[0:integer] + " " + string[integer:]
+def insert_space(postcode, position):
+    return postcode[0:position] + " " + postcode[position:]
 
 
 def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
