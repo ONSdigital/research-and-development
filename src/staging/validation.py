@@ -125,20 +125,31 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
+        copydf = df.copy()
+
         # Renove whitespaces on larger than 7 characters
-        df.loc[df["referencepostcode"].str.len() > 7, "referencepostcode"] = df.loc[
-            df["referencepostcode"].str.len() > 7, "referencepostcode"
-        ].str.replace(" ", "")
+        copydf.loc[
+            copydf["referencepostcode"].str.len() > 7, "referencepostcode"
+        ] = copydf.loc[
+            copydf["referencepostcode"].str.len() > 7, "referencepostcode"
+        ].str.replace(
+            " ", ""
+        )
 
         # Add whitespace to short postcodes
-        df.loc[df["referencepostcode"].str.len() < 7, "referencepostcode"] = df.loc[
+        copydf.loc[
             df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ].apply(lambda x: insert_space(x, 3))
+        ] = copydf.loc[
+            copydf["referencepostcode"].str.len() < 7, "referencepostcode"
+        ].apply(
+            lambda x: insert_space(x, 3)
+        )
 
         # Check if postcode are real
         unreal_postcodes = df.loc[
-            ~df["referencepostcode"].isin(master_series), "referencepostcode"
+            ~copydf["referencepostcode"].isin(master_series), "referencepostcode"
         ]
+
     else:
         emptydf = pd.DataFrame(columns=["referencepostcode"])
         unreal_postcodes = emptydf.loc[
