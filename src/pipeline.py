@@ -115,7 +115,7 @@ def run_pipeline(start):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_df, config, write_csv, run_id)
+    run_output(estimated_responses, config, write_csv, run_id)
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
