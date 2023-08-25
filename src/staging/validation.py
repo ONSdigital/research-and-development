@@ -121,7 +121,18 @@ def insert_space(postcode, position):
 
 
 def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
-    """Checks if the postcodes are real against a masterlist of actual postcodes"""
+    """Checks if the postcodes are real against a masterlist of actual postcodes.
+
+    In the masterlist, all postcodes are 7 characters long, therefore the
+    reference are formatted to match this format.
+
+    All postcodes above 7 characters are stripped of whitespaces.
+    All postcodes less than 7 characters have added whitespaces in the middle.
+
+    This formatting is applied to a copy dataframe so the original is unchanged.
+
+    The final output are the postcodes from the original dataframe
+    """
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
