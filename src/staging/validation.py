@@ -3,7 +3,6 @@ import toml
 import postcodes_uk
 import pandas as pd
 from numpy import nan
-from typing import Callable
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
