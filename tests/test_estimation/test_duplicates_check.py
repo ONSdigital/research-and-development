@@ -12,11 +12,9 @@ class TestCountUnique:
             "reference"
         ]
 
-        data = [
-            [1],
-            [1],
-            [2],
-        ]
+        data = [[1],
+                [1],
+                [2]]
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -27,10 +25,8 @@ class TestCountUnique:
             "reference",
         ]
 
-        data = [
-            [1],
-            [2],
-        ]
+        data = [[1],
+                [2]]
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -42,10 +38,8 @@ class TestCountUnique:
             "count"
         ]
 
-        data = [
-            [1, 2],
-            [2, 1],
-        ]
+        data = [[1, 2],
+                [2, 1]]
 
         exp_df = pandasDF(data=data, columns=exp_cols)
         return exp_df
@@ -57,16 +51,15 @@ class TestCountUnique:
             "count"
         ]
 
-        data = [
-            [1, 1],
-            [2, 1],
-        ]
+        data = [[1, 1],
+                [2, 1]]
 
         exp_df = pandasDF(data=data, columns=exp_cols)
         return exp_df
 
     def test_count_unique(self):
         """Test for count_unique function."""
+        #test for data contianing duplicates
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
@@ -74,8 +67,7 @@ class TestCountUnique:
 
         assert_frame_equal(result_df, expected_df)
 
-    def test_count_unique_nodup(self):
-        """Test for count_unique function."""
+        #test for data contianing no duplicates
         input_df = self.create_input_df_nodup()
         expected_df = self.create_expected_df_nodup()
 
@@ -93,10 +85,8 @@ class TestFilterShortForms:
             "formtype"
         ]
 
-        data = [
-            ["0006"],
-            ["NOT0006"],
-        ]
+        data = [["0006"],
+                ["NOT0006"]]
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -107,9 +97,7 @@ class TestFilterShortForms:
             "formtype"
         ]
 
-        data = [
-            ["0006"],
-        ]
+        data = [["0006"]]
 
         exp_df = pandasDF(data=data, columns=exp_cols)
         return exp_df

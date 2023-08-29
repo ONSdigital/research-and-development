@@ -77,8 +77,7 @@ def duplicates_check(df: pd.DataFrame, col:str) -> pd.DataFrame:
             )
         )
 
-        #exit pipeline if any duplicates
-        sys.exit()
+        raise ValueError
     else:
         print("wihtin else")
         DupLogger.info(
