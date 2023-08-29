@@ -43,9 +43,8 @@ def count_unique(df: pd.DataFrame, col:str) -> pd.DataFrame:
 
     # group by all columns and
     # add col "count" with count of unique rows
-    duplicates = df.groupby(
-        [col]
-        ).size().reset_index().rename(columns={0:'count'})
+    duplicates = df.groupby(col
+                            ).size().reset_index().rename(columns={0:'count'})
 
     return duplicates
 
