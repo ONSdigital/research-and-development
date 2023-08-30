@@ -10,8 +10,8 @@ user_config_path = "config/userconfig.toml"
 class Config_settings:
     """Get the config settings from the config file."""
 
-    def __init__(self):
-        self.config_file = "src/developer_config.yaml"
+    def __init__(self, config_path):
+        self.config_file = config_path
         self.config_dict = self._get_config_settings()
 
     def _get_config_settings(self):

@@ -114,7 +114,7 @@ def run_staging(
 
     # Validate the postcode column
     postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
+    val.validate_post_col(contributors_df, postcode_masterlist, config)
 
     # Stage the manual outliers file
     StagingMainLogger.info("Loading Manual Outlier File")

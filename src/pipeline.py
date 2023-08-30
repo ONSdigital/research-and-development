@@ -6,13 +6,12 @@ import logging
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-# from src.utils.helpers import Config_settings
+from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
-
 
 MainLogger = logging.getLogger(__name__)
 
@@ -24,11 +23,12 @@ def run_pipeline(start, config_path):
         generated from the time module using time.time()
     """
     # load config
-    # conf_obj = Config_settings()
-    # config = conf_obj.config_dict
-    import yaml
-    with open(config_path, "r") as file:
-        config = yaml.safe_load(file)
+    conf_obj = Config_settings(config_path)
+    config = conf_obj.config_dict
+
+    # import yaml
+    # with open(config_path, "r") as file:
+    #     config = yaml.safe_load(file)
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -66,7 +66,7 @@ def run_pipeline(start, config_path):
 
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
-    MainLogger.info(r"I intend to read config from {config_path}, but not yet")
+    MainLogger.info(f"Reading config from {config_path}.")
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
@@ -122,5 +122,5 @@ def run_pipeline(start, config_path):
     runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
     runlog_obj._create_runlog_dfs()
-    runlog_obj.create_runlog_files()
+    runlog_obj.create_runlog_files(config)
     runlog_obj._write_runlog()

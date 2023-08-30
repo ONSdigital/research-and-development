@@ -6,12 +6,12 @@ from numpy import nan
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
-from src.utils.helpers import Config_settings
+# from src.utils.helpers import Config_settings
 
 # Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-global_config = config["global"]
+# conf_obj = Config_settings(config_path)
+# config = conf_obj.config_dict
+# global_config = config["global"]
 
 # Set up logging
 validation_logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
+def validate_post_col(df: pd.DataFrame, postcode_masterlist: str, config: dict) -> bool:
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode` function to
         perform the validation.
@@ -62,7 +62,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
 
     # Log the unreal postcodes
     if not unreal_postcodes.empty:
@@ -97,7 +97,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
     return True
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str, config: dict):
     """Checks if the postcodes are real against a masterlist of actual postcodes"""
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
