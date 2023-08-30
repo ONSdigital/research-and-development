@@ -91,15 +91,15 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         }
     )
     validate_post_col(df_invalid, fake_path)
-    assert "Invalid postcodes found: ['EFG 456', 'HIJ 789']" in caplog.text
+    assert "Total list of unique invalid postcodes found: ['EFG 456', 'HIJ 789']" in caplog.text
 
     # Mixed valid and invalid postcodes - as is in the test_data
 
     validate_post_col(test_data_df, fake_path)
     if config["global"]["postcode_csv_check"]:
-        assert "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']" in caplog.text
+        assert "Total list of unique invalid postcodes found: ['HIJ 789', 'KL1M 2NO']" in caplog.text
     else:
-        assert "Invalid postcodes found: ['HIJ 789']" in caplog.text
+        assert "Total list of unique invalid postcodes found: ['HIJ 789']" in caplog.text
 
 
 def test_validate_postcode():

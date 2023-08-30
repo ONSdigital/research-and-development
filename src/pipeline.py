@@ -12,6 +12,7 @@ from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
+from src.outputs.outputs_main import run_output
 
 
 MainLogger = logging.getLogger(__name__)
@@ -94,17 +95,14 @@ def run_pipeline(start):
     outliered_responses = run_outliers(
         full_responses, manual_outliers, config, write_csv, run_id
     )
-    print(outliered_responses.sample(10))
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_df = run_estimation(
+    estimated_responses = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
-
-    print(estimated_df.sample(20))
-
+    print(estimated_responses.sample(10))
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
@@ -116,6 +114,9 @@ def run_pipeline(start):
     # Data output: Disclosure Control
 
     # Data output: File Outputs
+    MainLogger.info("Starting Output...")
+    run_output(estimated_responses, config, write_csv, run_id)
+    MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
 
