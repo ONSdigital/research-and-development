@@ -42,7 +42,8 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     Returns:
         pd.Series: The dataframe of postcodes
     """
-    masterlist = pd.read_csv(postcode_masterlist, usecols=["pcd"]).squeeze()
+    masterlist = postcode_masterlist.squeeze()
+
     return masterlist
 
 
@@ -143,17 +144,17 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
 @exception_wrap
 def check_data_shape(
     data_df: pd.DataFrame,
-    schema_path: str = "./config/contributors_schema.toml",
+    contributor_schema: str = "./config/contributors_schema.toml",
+    wide_respon_schema: str = "./config/wide_responses.toml",
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
     otherwise.
 
     Keyword Arguments:
-        data_df -- Pandas dataframe containing data to be checked.
-        schema_path -- Path to schema dictionary file
-        (default: {"./config/DataSchema.toml"})
-
+        data_df(pd.DataFrame): Pandas dataframe containing data to be checked.
+        contributor_schema(str): Path to the schema toml (should be in config folder)
+        wide_respon_schema(str): Path to the schema toml (should be in config folder)
     Returns:
         A bool: boolean, True if number of columns is as expected, otherwise False
     """
@@ -166,8 +167,15 @@ def check_data_shape(
 
     data_dict = data_df.to_dict()
 
-    # Load toml data schema into dictionary
-    toml_string = load_schema(schema_path)
+    # Load toml data schemas into dictionary
+    toml_string_cont = load_schema(contributor_schema)
+    toml_string_response = load_schema(wide_respon_schema)
+
+    # Combained two dicts
+    full_columns_list = {**toml_string_cont, **toml_string_response}
+
+    # Filtered schema colum if is in data columns
+    toml_string = [key for key in full_columns_list.keys() if key in data_df.columns]
 
     # Compare length of data dictionary to the data schema
     if len(data_dict) == len(toml_string):
