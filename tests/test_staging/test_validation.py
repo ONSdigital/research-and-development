@@ -299,7 +299,7 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
 
     # Check data types after validation
     assert dumy_data[["reference", "q201"]].dtypes.all() == np.int
-    assert dumy_data[["createdby", "q200"]].dtypes.all() == np.object
+    assert dumy_data[["createdby", "q200"]].dtypes.all() == pd.StringDtype()
     assert dumy_data[["instance", "q203"]].dtypes.all() == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
     assert dumy_data["q307"].dtypes == np.bool

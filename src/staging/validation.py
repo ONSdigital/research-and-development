@@ -287,7 +287,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     }
 
     # Cast each column individually and catch any errors
-    for column in survey_df.columns:
+    for column in dtypes_dict.keys():
 
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes_dict[column] == "pd.NA":
@@ -351,12 +351,14 @@ def combine_schemas_validate_full_df(
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
             # Cast columns to Int64
-            survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
+            survey_df[column] = survey_df[column].astype("Int64")
         elif dtypes[column] == "float64":
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
             # Cast columns to float64
             survey_df[column] = survey_df[column].astype("float64", errors="ignore")
+        elif dtypes[column] == "str":
+            survey_df[column] = survey_df[column].astype("string")
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
