@@ -34,3 +34,33 @@ def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
     df["period_year"] = df["period"].astype("str").str[:4]
 
     return df
+
+
+    def create_headcount_cols(
+        df: pd.DataFrame, 
+        round_val: int = 4,
+    ) -> pd.DataFrame:
+        """Create new columns with headcounts for civil and defence.
+
+        Column '705' contains the total headcount value, and 
+        from this the headcount values for civil and defence are calculated
+        based on the percentages of civil and defence in columns '706' (civil)
+        and '707' (defence).
+
+        Args:
+            df: The survey dataframe being prepared for short form output.
+
+        Returns:
+            pd.DataFrame: The same dataframe with extra columns for civil and
+                defence headcount values.
+        """
+        df["headcount_civil"] = round(
+            df["705"] * df["706"]/(df["706"] + df["707"]), round_val
+        )
+
+        df["headcount_defence"] = round(
+            df["705"] * df["707"]/(df["706"] + df["707"]), round_val
+        )
+
+        return df
+
