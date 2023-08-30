@@ -118,7 +118,7 @@ def run_staging(
     )
 
     # Stage and validate the postcode column
-    if config["global"]["postcode_csv_check"]:
+    if config["global"]["validate_postcodes"]:
         StagingMainLogger.info("Starting PostCode Validation")
         postcode_masterlist = paths["postcode_masterlist"]
         check_file_exists(postcode_masterlist)
