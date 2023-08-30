@@ -25,8 +25,8 @@ def parse_snap_data(snapdata: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     responsesdict = snapdata["responses"]
 
     # Make dataframes
-    contributors_df = pd.DataFrame(contributordict).replace("nan", None)
-    responses_df = pd.DataFrame(responsesdict).replace("nan", None)
+    contributors_df = pd.DataFrame(contributordict)
+    responses_df = pd.DataFrame(responsesdict)
 
     spp_parser_logger.info("SPP Snapshot data successfully loaded...")
 
