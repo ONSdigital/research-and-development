@@ -3,7 +3,7 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   validate_postcodes: True
-  postcode_csv_check: False
+  postcode_csv_check: True
   load_historic_data: False
   output_full_responses: False
   output_auto_outliers: False
