@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import pytest
-import toml
 
 # from unittest.mock import MagicMock, patch
 from src.staging.validation import (
@@ -17,10 +16,6 @@ from src.utils.helpers import Config_settings
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 
-# Create a dummy dictionary and pandas dataframe
-dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
-dummy_df = pd.DataFrame(data=dummy_dict)
-
 
 @pytest.fixture
 def test_data_dict():
@@ -29,14 +24,6 @@ def test_data_dict():
         "instance": [0, 0, 0, 0],
         "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
-
-
-def write_dict_to_toml(tmp_path, test_data_dict):
-    # Write test data dict to toml
-    file_path = tmp_path / "test.toml"
-    with open(file_path, "w") as tom:
-        toml.dump(test_data_dict, tom)
-    return file_path
 
 
 @pytest.fixture  # noqa
@@ -83,7 +70,17 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
             "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
-    assert validate_post_col(df_valid, fake_path)
+    df_result = validate_post_col(df_valid, fake_path)
+    exp_output1 = pd.DataFrame(
+        columns=["reference", "instance", "invalid_pattern_pcodes"]
+    )
+    exp_output2 = pd.DataFrame(columns=["reference", "instance", "not_real_pcodes"])
+    pd.testing.assert_frame_equal(
+        df_result[0], exp_output1, check_dtype=False, check_index_type=False
+    )
+    pd.testing.assert_frame_equal(
+        df_result[1], exp_output2, check_dtype=False, check_index_type=False
+    )
 
     # Invalid postcodes
     df_invalid = pd.DataFrame(
@@ -136,8 +133,8 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
-    unreal_postcodes = unreal_postcodes.reset_index(drop=True)
+    result_df = check_pcs_real(test_data_df, postcode_masterlist)
+    result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
         expected_unreal_postcodes = pd.Series(
@@ -149,7 +146,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
         )
 
     pd.testing.assert_series_equal(
-        unreal_postcodes, expected_unreal_postcodes
+        result_df, expected_unreal_postcodes
     )  # Assert that the unreal postcodes match the expected ones
 
 

@@ -18,7 +18,8 @@ validation_logger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
-    """A function to validate UK postcodes which uses the
+    """A function to validate UK postcodes which uses the postcodes_uk package
+    to verify the pattern of a postcode by using regex.
 
     Args:
         pcode (str): The postcode to validate
@@ -35,35 +36,27 @@ def validate_postcode_pattern(pcode: str) -> bool:
     return valid_bool
 
 
-@exception_wrap
-def get_masterlist(postcode_masterlist) -> pd.Series:
-    """This function loads the masterlist of postcodes from a csv file
-
-    Returns:
-        pd.Series: The dataframe of postcodes
-    """
-    masterlist = postcode_masterlist.squeeze()
-
-    return masterlist
-
-
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
+def validate_post_col(df: pd.DataFrame, postcode_masterlist: pd.DataFrame):
     """This function checks if all postcodes in the specified DataFrame column
-        are valid UK postcodes. It uses the `validate_postcode` function to
+        are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
+        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
+        postocdes to check against
 
     Returns:
-        A bool: boolean, True if number of columns is as expected, otherwise False
+        invalid_df (pd.DataFrame): A dataframe of postcodes with the incorrect pattern
+        unreal_df (pd.DataFrame): A dataframe of postcodes not found in the masterlist
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
     # Check if postcodes match pattern
+    # Create list of postcodes with incorrect patterns
     invalid_pattern_postcodes = df.loc[
         ~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"
     ]
@@ -83,6 +76,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
+    # Create a list of postcodes not found in masterlist
     unreal_postcodes = check_pcs_real(df, postcode_masterlist)
 
     # Save to df
@@ -108,7 +102,11 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str) -> bool:
 
     if not combined_invalid_postcodes.empty:
         validation_logger.warning(
-            f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
+            f"Total list of unique invalid postcodes found: {combined_invalid_postcodes.to_list()}"  # noqa
+        )
+
+        validation_logger.warning(
+            f"Total count of unique invalid postcodes found: {len(combined_invalid_postcodes.to_list())}"  # noqa
         )
 
     validation_logger.info("All postcodes validated....")
@@ -120,7 +118,19 @@ def insert_space(postcode, position):
     return postcode[0:position] + " " + postcode[position:]
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
+@exception_wrap
+def get_masterlist(postcode_masterlist) -> pd.Series:
+    """This function converts the masterlist dataframe to a Pandas series
+
+    Returns:
+        pd.Series: A series of postcodes
+    """
+    masterlist = postcode_masterlist.squeeze()
+
+    return masterlist
+
+
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame):
     """Checks if the postcodes are real against a masterlist of actual postcodes.
 
     In the masterlist, all postcodes are 7 characters long, therefore the
@@ -132,33 +142,44 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str):
     This formatting is applied to a copy dataframe so the original is unchanged.
 
     The final output are the postcodes from the original dataframe
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the postcodes.
+        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
+        postocdes to check against
+
+    Returns:
+        unreal_postcodes (pd.DataFrame): A dataframe containing all the
+        original postcodes not found in the masterlist
+
     """
+    # Create a copy df for validation
+    check_real_df = df.copy()
+
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
-        copydf = df.copy()
-
         # Renove whitespaces on larger than 7 characters
-        copydf.loc[
-            copydf["referencepostcode"].str.len() > 7, "referencepostcode"
-        ] = copydf.loc[
-            copydf["referencepostcode"].str.len() > 7, "referencepostcode"
+        check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
+        ] = check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
         ].str.replace(
             " ", ""
         )
 
         # Add whitespace to short postcodes
-        copydf.loc[
+        check_real_df.loc[
             df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ] = copydf.loc[
-            copydf["referencepostcode"].str.len() < 7, "referencepostcode"
+        ] = check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() < 7, "referencepostcode"
         ].apply(
             lambda x: insert_space(x, 3)
         )
 
         # Check if postcode are real
         unreal_postcodes = df.loc[
-            ~copydf["referencepostcode"].isin(master_series), "referencepostcode"
+            ~check_real_df["referencepostcode"].isin(master_series), "referencepostcode"
         ]
 
     else:
