@@ -3,6 +3,7 @@ import numpy as np
 import pytest
 import toml
 
+
 # from unittest.mock import MagicMock, patch
 from src.staging.validation import (
     validate_post_col,
@@ -11,11 +12,15 @@ from src.staging.validation import (
     validate_data_with_schema,
     combine_schemas_validate_full_df,
 )
-from src.utils.helpers import Config_settings
+
 
 # Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
+def generate_config(val):
+    """Generate a dummy config file"""
+    config = {"global": {"postcode_csv_check": val}}
+
+    return config
+
 
 # Create a dummy dictionary and pandas dataframe
 dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
@@ -57,9 +62,11 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
     with pytest.raises(ValueError):
-        validate_post_col(test_data_df, fake_path)
+        validate_post_col(test_data_df, fake_path, config)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
@@ -74,17 +81,17 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
 
     # Valid AND real postcodes
     df_valid = pd.DataFrame({"referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"]})
-    assert validate_post_col(df_valid, fake_path)
+    assert validate_post_col(df_valid, fake_path, config)
 
     # Invalid postcodes
     df_invalid = pd.DataFrame({"referencepostcode": ["EFG 456", "HIJ 789"]})
     with pytest.raises(ValueError) as error:
-        validate_post_col(df_invalid, fake_path)
+        validate_post_col(df_invalid, fake_path, config)
     assert str(error.value) == "Invalid postcodes found: ['EFG 456', 'HIJ 789']"
 
     # Mixed valid and invalid postcodes - as is in the test_data
     with pytest.raises(ValueError) as error:
-        validate_post_col(test_data_df, fake_path)
+        validate_post_col(test_data_df, fake_path, config)
     if config["global"]["postcode_csv_check"]:
         assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
     else:
@@ -95,25 +102,25 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         columns={"referencepostcode": "postcode"}
     )
     with pytest.raises(KeyError) as error:
-        validate_post_col(df_invalid_column_name, fake_path)
+        validate_post_col(df_invalid_column_name, fake_path, config)
     assert str(error.value) == "'referencepostcode'"  # Invalid column name
 
     # Edge cases: missing column
     df_missing_column = test_data_df.drop("referencepostcode", axis=1)
     df_missing_column["anothercolumn"] = ["val1", "val2", "val3", "val4"]
     with pytest.raises(KeyError) as error:
-        validate_post_col(df_missing_column, fake_path)
+        validate_post_col(df_missing_column, fake_path, config)
     assert str(error.value) == "'referencepostcode'"  # Missing column
 
     # Edge cases: missing DataFrame
     df_missing_dataframe = None
     with pytest.raises(TypeError):
-        validate_post_col(df_missing_dataframe, fake_path)  # Missing DataFrame
+        validate_post_col(df_missing_dataframe, fake_path, config)  # Missing DataFrame
 
     # Edge cases: empty reference postcode column
     df_no_postcodes = pd.DataFrame({"referencepostcode": [""]})
     with pytest.raises(ValueError):
-        validate_post_col(df_no_postcodes, fake_path)  # Empty postcode column
+        validate_post_col(df_no_postcodes, fake_path, config)  # Empty postcode column
 
 
 def test_validate_postcode():
@@ -146,8 +153,10 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist, config)
     unreal_postcodes = unreal_postcodes.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
@@ -171,8 +180,10 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist, config)
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False

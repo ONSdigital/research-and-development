@@ -123,7 +123,7 @@ def run_staging(
         postcode_masterlist = paths["postcode_masterlist"]
         check_file_exists(postcode_masterlist)
         postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
-        val.validate_post_col(contributors_df, postcode_masterlist)
+        val.validate_post_col(contributors_df, postcode_masterlist, config)
     else:
         StagingMainLogger.info("PostCode Validation skipped")
 

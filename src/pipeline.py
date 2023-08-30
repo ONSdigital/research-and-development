@@ -16,6 +16,7 @@ from src.outputs.outputs_main import run_output
 
 MainLogger = logging.getLogger(__name__)
 
+
 def run_pipeline(start, config_path):
     """The main pipeline.
 
@@ -33,7 +34,6 @@ def run_pipeline(start, config_path):
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
-
 
     if network_or_hdfs == "network":
         HDFS_AVAILABLE = False
@@ -130,5 +130,5 @@ def run_pipeline(start, config_path):
     runlog_obj.retrieve_configs()
     runlog_obj._create_runlog_dicts()
     runlog_obj._create_runlog_dfs()
-    runlog_obj.create_runlog_files(config)
+    runlog_obj.create_runlog_files()
     runlog_obj._write_runlog()

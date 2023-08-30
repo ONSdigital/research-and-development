@@ -6,6 +6,7 @@ from numpy import nan
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
+
 # from src.utils.helpers import Config_settings
 
 # Get the config
