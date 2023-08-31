@@ -50,20 +50,21 @@ def create_headcount_cols(
     things to '705' so will not in general total to the '705' value.
 
     Args:
-        df: The survey dataframe being prepared for short form output.
-        round_val: The number of decimal places for rounding.
+        df (pd.DataFrame): The survey dataframe being prepared for 
+            short form output.
+        round_val (int): The number of decimal places for rounding.
 
     Returns:
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
-    # use np.where to avoid division by zero
-    df["headcount_civil"] = np.where(df["706"] + df["707"] > 0,
+    # Use np.where to avoid division by zero.  
+    df["headcount_civil"] = np.where(df["706"] + df["707"] != 0,
         df["705"] * df["706"]/(df["706"] + df["707"]), 
         0
     )
 
-    df["headcount_defence"] = np.where(df["706"] + df["707"] > 0,
+    df["headcount_defence"] = np.where(df["706"] + df["707"] != 0,
         df["705"] * df["707"]/(df["706"] + df["707"]),
         0
     )
@@ -85,8 +86,9 @@ def run_shortform_prep(
     micro data output.
 
     Args:
-        df: The survey dataframe being prepared for short form output.
-        round_val: The number of decimal places for rounding.
+        df (pd.DataFrame): The survey dataframe being prepared for 
+            short form output.
+        round_val (int): The number of decimal places for rounding.
 
     Returns:
         pd.DataFrame: The dataframe prepared for short form output.
