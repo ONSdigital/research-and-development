@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.short_form_out import create_new_cols
+from src.outputs.short_form_out import run_shortform_prep
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def run_output(
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
     # Creating blank columns for short form output
-    short_form_df = create_new_cols(estimated_df)
+    short_form_df = run_shortform_prep(estimated_df, round_val=4)
 
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")
