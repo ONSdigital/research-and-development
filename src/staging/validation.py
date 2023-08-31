@@ -286,6 +286,7 @@ def combine_schemas_validate_full_df(
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
 
+
 @exception_wrap
 def validate_ultfoc_csv(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -301,25 +302,30 @@ def validate_ultfoc_csv(df: pd.DataFrame) -> pd.DataFrame:
         # Check DataFrame shape
         if df.shape[1] != 2:
             raise ValueError("CSV file must have exactly two columns")
-        
+
         # Check column headers
         if list(df.columns) != ["ruref", "ultfoc"]:
             raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
-        
+
         # Check column data types
-        if df['ruref'].dtype != 'Int64' or df['ultfoc'].dtype != 'object':
-            raise ValueError("'ruref' column should be of type 'Int64' and 'ultfoc' column should be of type 'object'")
-        
+        if df["ruref"].dtype != "Int64" or df["ultfoc"].dtype != "object":
+            raise ValueError(
+                "'ruref' column should be of type 'Int64' and 'ultfoc' column should be of type 'object'"
+            )
+
         # Check 'ultfoc' values
         def check_ultfoc(value):
             return isinstance(value, str) and (len(value) == 2 or len(value) == 0)
-        
-        df['validation_check'] = df.apply(lambda row: check_ultfoc(row['ultfoc']), axis=1)
-        
+
+        df["validation_check"] = df.apply(
+            lambda row: check_ultfoc(row["ultfoc"]), axis=1
+        )
+
         return df
-        
+
     except ValueError as ve:
         raise ValueError("Validation failed: " + str(ve))
+
 
 @exception_wrap
 def run_validate_ultfoc(csv_file_path: str) -> pd.DataFrame:
@@ -335,12 +341,12 @@ def run_validate_ultfoc(csv_file_path: str) -> pd.DataFrame:
     try:
         # Read CSV into a DataFrame
         df = pd.read_csv(csv_file_path)
-        
+
         # Run validation
         validated_df = validate_ultfoc_csv(df)
-        
+
         if validated_df is not None:
             return validated_df
-    
+
     except ValueError as e:
         raise ValueError("Validation error: " + str(e))

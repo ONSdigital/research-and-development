@@ -1,11 +1,12 @@
-
 import pandas as pd
 
 from src.utils.wrappers import exception_wrap
 
 
 @exception_wrap
-def combine_dataframes(main_df: pd.DataFrame, mapper_csv_path: pd.DataFrame) -> pd.DataFrame:
+def combine_dataframes(
+    main_df: pd.DataFrame, mapper_csv_path: pd.DataFrame
+) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 
@@ -19,15 +20,18 @@ def combine_dataframes(main_df: pd.DataFrame, mapper_csv_path: pd.DataFrame) -> 
     try:
         # Read the mapper DataFrame from CSV
         mapper_df = pd.read_csv(mapper_csv_path)
-        
-        # Perform left join
-        combined_df = main_df.merge(mapper_df, how='left', left_on='reference', right_on='ruref')
-        
-        return combined_df
-    
-    except Exception as e:
-        raise ValueError("An error occurred while combining main_df and mapper_df: " + str(e))
 
+        # Perform left join
+        combined_df = main_df.merge(
+            mapper_df, how="left", left_on="reference", right_on="ruref"
+        )
+
+        return combined_df
+
+    except Exception as e:
+        raise ValueError(
+            "An error occurred while combining main_df and mapper_df: " + str(e)
+        )
 
 
 # TODO PLACEHOLDER UNTIL I FIND THE LOCATION TO PLUG IN
