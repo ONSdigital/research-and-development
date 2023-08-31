@@ -93,10 +93,13 @@ def run_shortform_prep(
     Returns:
         pd.DataFrame: The dataframe prepared for short form output.
     """
+    
+    # TODO: Filter for short-forms and CORA statuses [600, 800]
+    
     # create new columns and create a 'year' column
     df = create_new_cols(df)
     
     # create columns for headcounts for civil and defense
-    df = create_headcount_cols(df)
+    df = create_headcount_cols(df, round_val)
 
     return df
