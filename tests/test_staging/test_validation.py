@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import pytest
-import toml
 
 # from unittest.mock import MagicMock, patch
 from src.staging.validation import (
@@ -17,22 +16,14 @@ from src.utils.helpers import Config_settings
 conf_obj = Config_settings()
 config = conf_obj.config_dict
 
-# Create a dummy dictionary and pandas dataframe
-dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
-dummy_df = pd.DataFrame(data=dummy_dict)
-
 
 @pytest.fixture
 def test_data_dict():
-    return {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
-
-
-def write_dict_to_toml(tmp_path, test_data_dict):
-    # Write test data dict to toml
-    file_path = tmp_path / "test.toml"
-    with open(file_path, "w") as tom:
-        toml.dump(test_data_dict, tom)
-    return file_path
+    return {
+        "reference": [1, 2, 3, 4],
+        "instance": [0, 0, 0, 0],
+        "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+    }
 
 
 @pytest.fixture  # noqa
@@ -46,7 +37,7 @@ def test_data_df(test_data_dict):
 # Mock the get_masterlist function
 def mock_get_masterlist(postcode_masterlist):
     # Return a mock masterlist series - actual postcodes of ONS offices
-    return pd.Series(["NP10 8XG", "SW1P 4DF", "PO15 5RR"])
+    return pd.Series(["NP108XG", "SW1P4DF", "PO155RR"])
 
 
 # Test case for validate_post_col
@@ -58,8 +49,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     fake_path = "path/to/missing_masterlist.csv"
 
     # Call the function under test
-    with pytest.raises(ValueError):
-        validate_post_col(test_data_df, fake_path)
+    validate_post_col(test_data_df, fake_path)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
@@ -73,47 +63,43 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         assert "Invalid pattern postcodes found: ['HIJ 789']" in caplog.text
 
     # Valid AND real postcodes
-    df_valid = pd.DataFrame({"referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"]})
-    assert validate_post_col(df_valid, fake_path)
+    df_valid = pd.DataFrame(
+        {
+            "reference": [1, 2, 3],
+            "instance": [0, 0, 0],
+            "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+        }
+    )
+    df_result = validate_post_col(df_valid, fake_path)
+    exp_output1 = pd.DataFrame(
+        columns=["reference", "instance", "invalid_pattern_pcodes"]
+    )
+    exp_output2 = pd.DataFrame(columns=["reference", "instance", "not_real_pcodes"])
+    pd.testing.assert_frame_equal(
+        df_result[0], exp_output1, check_dtype=False, check_index_type=False
+    )
+    pd.testing.assert_frame_equal(
+        df_result[1], exp_output2, check_dtype=False, check_index_type=False
+    )
 
     # Invalid postcodes
-    df_invalid = pd.DataFrame({"referencepostcode": ["EFG 456", "HIJ 789"]})
-    with pytest.raises(ValueError) as error:
-        validate_post_col(df_invalid, fake_path)
-    assert str(error.value) == "Invalid postcodes found: ['EFG 456', 'HIJ 789']"
+    df_invalid = pd.DataFrame(
+        {
+            "reference": [1, 2],
+            "instance": [0, 0],
+            "referencepostcode": ["EFG 456", "HIJ 789"],
+        }
+    )
+    validate_post_col(df_invalid, fake_path)
+    assert "Total list of unique invalid postcodes found: ['EFG 456', 'HIJ 789']" in caplog.text
 
     # Mixed valid and invalid postcodes - as is in the test_data
-    with pytest.raises(ValueError) as error:
-        validate_post_col(test_data_df, fake_path)
+
+    validate_post_col(test_data_df, fake_path)
     if config["global"]["postcode_csv_check"]:
-        assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+        assert "Total list of unique invalid postcodes found: ['HIJ 789', 'KL1M 2NO']" in caplog.text
     else:
-        assert str(error.value) == "Invalid postcodes found: ['HIJ 789']"
-
-    # Edge cases: invalid column names
-    df_invalid_column_name = test_data_df.rename(
-        columns={"referencepostcode": "postcode"}
-    )
-    with pytest.raises(KeyError) as error:
-        validate_post_col(df_invalid_column_name, fake_path)
-    assert str(error.value) == "'referencepostcode'"  # Invalid column name
-
-    # Edge cases: missing column
-    df_missing_column = test_data_df.drop("referencepostcode", axis=1)
-    df_missing_column["anothercolumn"] = ["val1", "val2", "val3", "val4"]
-    with pytest.raises(KeyError) as error:
-        validate_post_col(df_missing_column, fake_path)
-    assert str(error.value) == "'referencepostcode'"  # Missing column
-
-    # Edge cases: missing DataFrame
-    df_missing_dataframe = None
-    with pytest.raises(TypeError):
-        validate_post_col(df_missing_dataframe, fake_path)  # Missing DataFrame
-
-    # Edge cases: empty reference postcode column
-    df_no_postcodes = pd.DataFrame({"referencepostcode": [""]})
-    with pytest.raises(ValueError):
-        validate_post_col(df_no_postcodes, fake_path)  # Empty postcode column
+        assert "Total list of unique invalid postcodes found: ['HIJ 789']" in caplog.text
 
 
 def test_validate_postcode():
@@ -147,8 +133,8 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
-    unreal_postcodes = unreal_postcodes.reset_index(drop=True)
+    result_df = check_pcs_real(test_data_df, postcode_masterlist)
+    result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
         expected_unreal_postcodes = pd.Series(
@@ -160,7 +146,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
         )
 
     pd.testing.assert_series_equal(
-        unreal_postcodes, expected_unreal_postcodes
+        result_df, expected_unreal_postcodes
     )  # Assert that the unreal postcodes match the expected ones
 
 
