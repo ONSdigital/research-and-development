@@ -4,8 +4,12 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
+<<<<<<< HEAD
 from src.outputs.short_form_out import create_new_cols
 from src.outputs.temp_file_to_be_deleted import combine_dataframes
+=======
+from src.outputs.short_form_out import run_shortform_prep
+>>>>>>> origin/develop
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -34,7 +38,7 @@ def run_output(
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
     # Creating blank columns for short form output
-    short_form_df = create_new_cols(estimated_df)
+    short_form_df = run_shortform_prep(estimated_df, round_val=4)
 
     # Create combined ownership column using mapper
     short_form_df = combine_dataframes(short_form_df, ultfoc_mapper)
