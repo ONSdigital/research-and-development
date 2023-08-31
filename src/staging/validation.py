@@ -19,7 +19,8 @@ validation_logger = logging.getLogger(__name__)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
-    """A function to validate UK postcodes which uses the
+    """A function to validate UK postcodes which uses the postcodes_uk package
+    to verify the pattern of a postcode by using regex.
 
     Args:
         pcode (str): The postcode to validate
@@ -36,51 +37,64 @@ def validate_postcode_pattern(pcode: str) -> bool:
     return valid_bool
 
 
-@exception_wrap
-def get_masterlist(postcode_masterlist) -> pd.Series:
-    """This function loads the masterlist of postcodes from a csv file
-
-    Returns:
-        pd.Series: The dataframe of postcodes
-    """
-    masterlist = postcode_masterlist.squeeze()
-
-    return masterlist
-
-
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: str, config: dict) -> bool:
+def validate_post_col(
+    df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict
+):
     """This function checks if all postcodes in the specified DataFrame column
-        are valid UK postcodes. It uses the `validate_postcode` function to
+        are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
+        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
+        postocdes to check against
 
     Returns:
-        A bool: boolean, True if number of columns is as expected, otherwise False
+        invalid_df (pd.DataFrame): A dataframe of postcodes with the incorrect pattern
+        unreal_df (pd.DataFrame): A dataframe of postcodes not found in the masterlist
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
-
-    # Log the unreal postcodes
-    if not unreal_postcodes.empty:
-        validation_logger.warning(
-            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
-        )
-
     # Check if postcodes match pattern
+    # Create list of postcodes with incorrect patterns
     invalid_pattern_postcodes = df.loc[
         ~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"
     ]
+
+    # Save to df
+    invalid_df = pd.DataFrame(
+        {
+            "reference": df.loc[invalid_pattern_postcodes.index, "reference"],
+            "instance": df.loc[invalid_pattern_postcodes.index, "instance"],
+            "invalid_pattern_pcodes": invalid_pattern_postcodes,
+        }
+    )
 
     # Log the invalid postcodes
     if not invalid_pattern_postcodes.empty:
         validation_logger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
+        )
+
+    # Create a list of postcodes not found in masterlist
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
+
+    # Save to df
+    unreal_df = pd.DataFrame(
+        {
+            "reference": df.loc[unreal_postcodes.index, "reference"],
+            "instance": df.loc[unreal_postcodes.index, "instance"],
+            "not_real_pcodes": unreal_postcodes,
+        }
+    )
+
+    # Log the unreal postcodes
+    if not unreal_postcodes.empty:
+        validation_logger.warning(
+            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
         )
 
     # Combine the two lists
@@ -90,24 +104,87 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: str, config: dict) 
     combined_invalid_postcodes.drop_duplicates(inplace=True)
 
     if not combined_invalid_postcodes.empty:
-        raise ValueError(
-            f"Invalid postcodes found: {combined_invalid_postcodes.to_list()}"
+        validation_logger.warning(
+            f"Total list of unique invalid postcodes found: {combined_invalid_postcodes.to_list()}"  # noqa
+        )
+
+        validation_logger.warning(
+            f"Total count of unique invalid postcodes found: {len(combined_invalid_postcodes.to_list())}"  # noqa
         )
 
     validation_logger.info("All postcodes validated....")
 
-    return True
+    return invalid_df, unreal_df
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: str, config: dict):
-    """Checks if the postcodes are real against a masterlist of actual postcodes"""
+def insert_space(postcode, position):
+    return postcode[0:position] + " " + postcode[position:]
+
+
+@exception_wrap
+def get_masterlist(postcode_masterlist) -> pd.Series:
+    """This function converts the masterlist dataframe to a Pandas series
+
+    Returns:
+        pd.Series: A series of postcodes
+    """
+    masterlist = postcode_masterlist.squeeze()
+
+    return masterlist
+
+
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict):
+    """Checks if the postcodes are real against a masterlist of actual postcodes.
+
+    In the masterlist, all postcodes are 7 characters long, therefore the
+    reference are formatted to match this format.
+
+    All postcodes above 7 characters are stripped of whitespaces.
+    All postcodes less than 7 characters have added whitespaces in the middle.
+
+    This formatting is applied to a copy dataframe so the original is unchanged.
+
+    The final output are the postcodes from the original dataframe
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the postcodes.
+        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
+        postocdes to check against
+
+    Returns:
+        unreal_postcodes (pd.DataFrame): A dataframe containing all the
+        original postcodes not found in the masterlist
+
+    """
+    # Create a copy df for validation
+    check_real_df = df.copy()
+
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
+        # Renove whitespaces on larger than 7 characters
+        check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
+        ] = check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
+        ].str.replace(
+            " ", ""
+        )
+
+        # Add whitespace to short postcodes
+        check_real_df.loc[
+            df["referencepostcode"].str.len() < 7, "referencepostcode"
+        ] = check_real_df.loc[
+            check_real_df["referencepostcode"].str.len() < 7, "referencepostcode"
+        ].apply(
+            lambda x: insert_space(x, 3)
+        )
+
         # Check if postcode are real
         unreal_postcodes = df.loc[
-            ~df["referencepostcode"].isin(master_series), "referencepostcode"
+            ~check_real_df["referencepostcode"].isin(master_series), "referencepostcode"
         ]
+
     else:
         emptydf = pd.DataFrame(columns=["referencepostcode"])
         unreal_postcodes = emptydf.loc[
@@ -213,7 +290,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     }
 
     # Cast each column individually and catch any errors
-    for column in survey_df.columns:
+    for column in dtypes_dict.keys():
 
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes_dict[column] == "pd.NA":
@@ -277,12 +354,14 @@ def combine_schemas_validate_full_df(
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
             # Cast columns to Int64
-            survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
+            survey_df[column] = survey_df[column].astype("Int64")
         elif dtypes[column] == "float64":
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
             # Cast columns to float64
             survey_df[column] = survey_df[column].astype("float64", errors="ignore")
+        elif dtypes[column] == "str":
+            survey_df[column] = survey_df[column].astype("string")
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
