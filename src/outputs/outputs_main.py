@@ -33,11 +33,11 @@ def run_output(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
+    # Create combined ownership column using mapper
+    estimated_df = combine_dataframes(estimated_df, ultfoc_mapper)
+
     # Creating blank columns for short form output
     short_form_df = run_shortform_prep(estimated_df, round_val=4)
-
-    # Create combined ownership column using mapper
-    short_form_df = combine_dataframes(short_form_df, ultfoc_mapper)
 
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")
