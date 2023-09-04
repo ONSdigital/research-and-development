@@ -1,6 +1,7 @@
 """Prepare the survey data for short form microdata output."""
 import pandas as pd
 import numpy as np
+from src.staging.validation import load_schema
 
 
 def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
@@ -23,7 +24,6 @@ def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
         "post_code",
         "ua_county",
         "foreign_owner",
-        "product_group",
         "sizeband",
     ]
 
@@ -96,7 +96,11 @@ def run_shortform_prep(
         pd.DataFrame: The dataframe prepared for short form output.
     """
 
-    # TODO: Filter for short-forms and CORA statuses [600, 800]
+    # Filter for short-forms
+    df = df.loc[df["formtype"] == "0006"]
+
+    # TODO: Filter for CORA statuses [600, 800]
+    df = df.loc[df["statusencoded"].isin(["210", "211"])]
 
     # create new columns and create a 'year' column
     df = create_new_cols(df)
@@ -105,3 +109,35 @@ def run_shortform_prep(
     df = create_headcount_cols(df, round_val)
 
     return df
+
+
+def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
+    """Creates the shortform dataframe for outputs with
+    the required columns. The naming
+
+    Args:
+        df (pd.DataFrame): Dataframe containing all columns
+        schema (str): Toml schema containing the old and new
+        column names for the outputs
+
+    Returns:
+        (pd.DataFrame): A dataframe consisting of only the
+        required short form output data
+    """
+    # Load schema using pre-built function
+    output_schema = load_schema(schema)
+
+    # Create dict of current and required column names
+    colname_dict = {
+        output_schema[column_nm]["old_name"]: column_nm
+        for column_nm in output_schema.keys()
+    }
+
+    # Create empty dataframe for outputs
+    output_df = pd.DataFrame()
+
+    # Add required columns from schema to output
+    for key in colname_dict.keys():
+        output_df[colname_dict[key]] = df[key]
+
+    return output_df

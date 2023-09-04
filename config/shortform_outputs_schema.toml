@@ -1,0 +1,103 @@
+[freeze_id]
+old_name = "freeze_id"
+Deduced_Data_Type = "float64"
+
+[inquiry_id]
+old_name = "inquiry_id"
+Deduced_Data_Type = "float64"
+
+[period_year]
+old_name = "period_year"
+Deduced_Data_Type = "Int64"
+
+[ru_ref]
+old_name = "reference"
+Deduced_Data_Type = "Int64"
+
+[period_contributor_id]
+old_name = "period_contributor_id"
+Deduced_Data_Type = "float64"
+
+[form_type]
+old_name = "formtype"
+Deduced_Data_Type = "category"
+
+[form_status]
+old_name = "status"
+Deduced_Data_Type = "category"
+
+[ua_county]
+old_name = "ua_county"
+Deduced_Data_Type = "float64"
+
+[employee_count]
+old_name = "frozenemployment"
+Deduced_Data_Type = "Int64"
+
+[wowentref]
+old_name = "wowenterprisereference"
+Deduced_Data_Type = "Int64"
+
+[current_sic]
+old_name = "frozensic"
+Deduced_Data_Type = "Int64"
+
+[foreign_owner]
+old_name = "foreign_owner"
+Deduced_Data_Type = "float64"
+
+[product_group]
+old_name = "product_group"
+Deduced_Data_Type = "str"
+
+[sizeband]
+old_name = "sizeband"
+Deduced_Data_Type = "float64"
+
+[q701]
+old_name = "701_estimated"
+Deduced_Data_Type = "float64"
+
+[q702]
+old_name = "702_estimated"
+Deduced_Data_Type = "float64"
+
+[q703]
+old_name = "703_estimated"
+Deduced_Data_Type = "float64"
+
+[q704]
+old_name = "704_estimated"
+Deduced_Data_Type = "float64"
+
+[q705]
+old_name = "705_estimated"
+Deduced_Data_Type = "float64"
+
+[q706]
+old_name = "706_estimated"
+Deduced_Data_Type = "float64"
+
+[q707]
+old_name = "707_estimated"
+Deduced_Data_Type = "float64"
+
+[headcount_civil]
+old_name = "headcount_civil"
+Deduced_Data_Type = "float64"
+
+[headcount_defence]
+old_name = "headcount_defence"
+Deduced_Data_Type = "float64"
+
+[post_code]
+old_name = "referencepostcode"
+Deduced_Data_Type = "str"
+
+[q713]
+old_name = "713"
+Deduced_Data_Type = "str"
+
+[q714]
+old_name = "714"
+Deduced_Data_Type = "str"

@@ -7,6 +7,7 @@ from datetime import datetime
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
+from src.staging import pg_conversion as pg
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -150,6 +151,11 @@ def run_staging(
     mapper_path = paths["mapper_path"]
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
+
+    # Map PG from SIC numbers to new column 'product_group
+    full_responses = pg.sic_to_pg_mapper(
+        full_responses, mapper, target_col=["product_group"]
+    )
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
