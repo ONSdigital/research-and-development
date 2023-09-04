@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.short_form_out import create_new_cols
+from src.outputs.short_form_out import run_shortform_prep
 from src.outputs.temp_file_to_be_deleted import combine_dataframes
 
 OutputMainLogger = logging.getLogger(__name__)
