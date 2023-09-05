@@ -23,6 +23,8 @@ def run_pipeline(start, config_path):
     Args:
         start (float): The time when the pipeline is launched
         generated from the time module using time.time()
+        config_path (string): The path to the config file to be
+        used.
     """
     # load config
     conf_obj = Config_settings(config_path)
