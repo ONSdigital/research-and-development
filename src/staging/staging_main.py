@@ -152,10 +152,8 @@ def run_staging(
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
-    # Map PG from SIC numbers to new column 'product_group
-    full_responses = pg.sic_to_pg_mapper(
-        full_responses, mapper, target_col=["product_group"]
-    )
+    # Map PG from SIC/PG numbers to new column '201'.
+    full_responses = pg.run_pg_conversion(full_responses, mapper, target_col="201")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")

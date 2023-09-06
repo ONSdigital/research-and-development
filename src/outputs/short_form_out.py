@@ -22,6 +22,7 @@ def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
         "inquiry_id",
         "period_contributor_id",
         "post_code",
+        "product_group",
         "ua_county",
         "foreign_owner",
         "sizeband",

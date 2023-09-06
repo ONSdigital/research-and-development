@@ -47,7 +47,7 @@ old_name = "foreign_owner"
 Deduced_Data_Type = "float64"
 
 [product_group]
-old_name = "product_group"
+old_name = "201"
 Deduced_Data_Type = "str"
 
 [sizeband]
