@@ -1,23 +1,11 @@
-import os
-import toml
-import postcodes_uk
-import pandas as pd
-import numpy as np
-from numpy import nan
-
 import logging
-from src.utils.wrappers import time_logger_wrap, exception_wrap
-from src.utils.helpers import Config_settings
+import pandas as pd
 
-# Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-global_config = config["global"]
+from src.utils.wrappers import exception_wrap
 
-# Set up logging
 validation_logger = logging.getLogger(__name__)
 
-
+@exception_wrap
 def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Validates cora mapper df:
@@ -61,4 +49,3 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("cora status mapper validation failed: " + str(ve))
-
