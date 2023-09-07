@@ -123,9 +123,11 @@ def flag_outliers(
             return f
         else:
             return f + 1
+    # Define groups for outliers: cell number and period
+    groupby_cols = ["period", "cellnumber"]
     
     # Add group count - how many RU refs there are in a cell, perod
-    df["group_count"] = df.groupby(group_cols)[value_col].transform("count")
+    df["group_count"] = df.groupby(groupby_cols)[value_col].transform("count")
 
     # Compute rank margins
     df["high"] = df["group_count"] * upper_clip
@@ -137,7 +139,7 @@ def flag_outliers(
 
     # Compute ranks of RU refs per group, depending on their value
     df["group_rank"] = (df
-        .groupby(group_cols)[value_col]
+        .groupby(groupby_cols)[value_col]
         .rank(method="first", ascending=True))
 
     # Compute outlier conditions
