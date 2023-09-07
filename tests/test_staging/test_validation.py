@@ -26,7 +26,7 @@ def test_data_dict():
     return {
         "reference": [1, 2, 3, 4],
         "instance": [0, 0, 0, 0],
-        "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+        "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
 
 
@@ -61,7 +61,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     if config["global"]["postcode_csv_check"]:
 
         assert (
-            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
+            "These postcodes are not found in the ONS postcode list: ['KL1M 2NO']"
             in caplog.text
         )
 
@@ -73,7 +73,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
-            "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+            "601": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
     df_result = validate_post_col(df_valid, fake_path, config)
@@ -93,7 +93,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2],
             "instance": [0, 0],
-            "referencepostcode": ["EFG 456", "HIJ 789"],
+            "601": ["EFG 456", "HIJ 789"],
         }
     )
     validate_post_col(df_invalid, fake_path, config)
@@ -107,7 +107,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     validate_post_col(test_data_df, fake_path, config)
     if config["global"]["postcode_csv_check"]:
         assert (
-            "Total list of unique invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+            "Total list of unique invalid postcodes found: ['KL1M 2NO', 'HIJ 789']"
             in caplog.text
         )
     else:
@@ -153,13 +153,9 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
-        expected_unreal_postcodes = pd.Series(
-            ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
-        )
+        expected_unreal_postcodes = pd.Series(["HIJ 789", "KL1M 2NO"], name="601")
     else:
-        expected_unreal_postcodes = pd.Series(
-            [], name="referencepostcode", dtype=object
-        )
+        expected_unreal_postcodes = pd.Series([], name="601", dtype=object)
 
     pd.testing.assert_series_equal(
         result_df, expected_unreal_postcodes

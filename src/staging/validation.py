@@ -2,7 +2,7 @@ import os
 import toml
 import postcodes_uk
 import pandas as pd
-from numpy import nan
+import numpy as np
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
@@ -28,8 +28,11 @@ def validate_postcode_pattern(pcode: str) -> bool:
     Returns:
         bool: True or False depending on if it is valid or not
     """
+
     if pcode is None:
         return False
+
+    pcode = pcode.upper()
 
     # Validation step
     valid_bool = postcodes_uk.validate(pcode)
@@ -60,8 +63,11 @@ def validate_post_col(
 
     # Check if postcodes match pattern
     # Create list of postcodes with incorrect patterns
+
+    df = df.loc[~df["601"].isnull()]
+
     invalid_pattern_postcodes = df.loc[
-        ~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"
+        ~df["601"].apply(validate_postcode_pattern), "601"
     ]
 
     # Save to df
@@ -78,6 +84,8 @@ def validate_post_col(
         validation_logger.warning(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
+
+    df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
 
     # Create a list of postcodes not found in masterlist
     unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
@@ -159,37 +167,29 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: 
     # Create a copy df for validation
     check_real_df = df.copy()
 
+    check_real_df["601"] = check_real_df["601"].str.upper()
+
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
         # Renove whitespaces on larger than 7 characters
         check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
-        ] = check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
-        ].str.replace(
+            check_real_df["601"].str.len() > 7, "601"
+        ] = check_real_df.loc[check_real_df["601"].str.len() > 7, "601"].str.replace(
             " ", ""
         )
 
         # Add whitespace to short postcodes
-        check_real_df.loc[
-            df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ] = check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ].apply(
-            lambda x: insert_space(x, 3)
-        )
+        check_real_df.loc[df["601"].str.len() < 7, "601"] = check_real_df.loc[
+            check_real_df["601"].str.len() < 7, "601"
+        ].apply(lambda x: insert_space(x, 3))
 
         # Check if postcode are real
-        unreal_postcodes = df.loc[
-            ~check_real_df["referencepostcode"].isin(master_series), "referencepostcode"
-        ]
+        unreal_postcodes = df.loc[~check_real_df["601"].isin(master_series), "601"]
 
     else:
-        emptydf = pd.DataFrame(columns=["referencepostcode"])
-        unreal_postcodes = emptydf.loc[
-            ~emptydf["referencepostcode"], "referencepostcode"
-        ]
+        emptydf = pd.DataFrame(columns=["601"])
+        unreal_postcodes = emptydf.loc[~emptydf["601"], "601"]
 
     return unreal_postcodes
 
@@ -295,7 +295,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes_dict[column] == "pd.NA":
             # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
+            survey_df[column] = np.nan
             dtypes_dict[column] = "float64"
 
         try:
@@ -345,7 +345,7 @@ def combine_schemas_validate_full_df(
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes[column] == "pd.NA":
             # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
+            survey_df[column] = np.nan
             dtypes[column] = "float64"
 
             # Try to cast each column to the required data type
@@ -365,42 +365,3 @@ def combine_schemas_validate_full_df(
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
-
-
-@exception_wrap
-def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
-        """
-    Validates ultfoc df:
-    1. Checks if the DataFrame has exactly two columns.
-    2. Checks if the column headers are 'ruref' and 'ultfoc'.
-    3. Checks the validity of values in the 'ultfoc' column.
-    Args:
-        df (pd.DataFrame): The input DataFrame containing 'ruref'
-        and 'ultfoc' columns.
-
-    """
-        try:
-            # Check DataFrame shape
-            if df.shape[1] != 2:
-                raise ValueError("Dataframe file must have exactly two columns")
-
-            # Check column headers
-            if list(df.columns) != ["ruref", "ultfoc"]:
-                raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
-
-            # Check 'ultfoc' values are either 2 characters or 'nan'
-            def check_ultfoc(value):
-                return isinstance(value, str) and (len(value) == 2 or len(value) == 3)
-
-            df["contents_check"] = df.apply(
-                lambda row: check_ultfoc(row["ultfoc"]), axis=1
-            )
-            
-            # check any unexpected contents
-            if (df["contents_check"]==False).any():
-                raise ValueError("Unexpected format within 'ultfoc' column contents")
-            
-            df.drop(columns=["contents_check"], inplace=True)
-
-        except ValueError as ve:
-            raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
