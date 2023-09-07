@@ -1,7 +1,7 @@
 """Prepare the survey data for short form microdata output."""
 import pandas as pd
 import numpy as np
-from src.staging.validation import load_schema
+from src.staging.validation import load_schema, validate_data_with_schema
 
 
 def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
@@ -140,5 +140,8 @@ def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
     # Add required columns from schema to output
     for key in colname_dict.keys():
         output_df[colname_dict[key]] = df[key]
+
+    # Validate datatypes before output
+    validate_data_with_schema(output_df, schema)
 
     return output_df

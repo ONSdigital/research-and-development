@@ -304,6 +304,8 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 )
                 # Cast columns to Int64
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
+            elif dtypes_dict[column] == "str":
+                survey_df[column] = survey_df[column].astype("string")
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
