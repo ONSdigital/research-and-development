@@ -151,6 +151,17 @@ def run_staging(
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
+    # Load ultfoc (Foreign Ownership) mapper
+    StagingMainLogger.info("Loading Foreign Ownership File")
+    ultfoc_mapper_path = paths["ultfoc_mapper_path"]
+    check_file_exists(ultfoc_mapper_path)
+    ultfoc_mapper = read_csv(ultfoc_mapper_path)
+    val.validate_data_with_schema(
+        ultfoc_mapper, "./config/ultfoc_schema.toml"
+    )
+    val.validate_ultfoc_df(ultfoc_mapper)
+    StagingMainLogger.info("Foreign Ownership File Loaded Successfully...")
+
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
     cellno_path = paths["cellno_path"]
@@ -169,4 +180,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, cellno_df
+    return full_responses, manual_outliers, mapper, ultfoc_mapper, cellno_df
