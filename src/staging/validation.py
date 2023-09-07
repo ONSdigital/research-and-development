@@ -179,10 +179,18 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: 
             " ", ""
         )
 
-        # Add whitespace to short postcodes
+        # Add whitespace to 6 digit postcodes
         check_real_df.loc[df["601"].str.len() < 7, "601"] = check_real_df.loc[
             check_real_df["601"].str.len() < 7, "601"
         ].apply(lambda x: insert_space(x, 3))
+
+        # Add 2 whitespaces to 5 digit postcodes
+        check_real_df.loc[df["601"].str.len() < 6, "601"] = (
+            check_real_df.loc[df["601"].str.len() == 5, "601"]
+            .str.replace(" ", "")
+            .apply(lambda x: insert_space(x, 2))
+            .apply(lambda x: insert_space(x, 3))
+        )
 
         # Check if postcode are real
         unreal_postcodes = df.loc[~check_real_df["601"].isin(master_series), "601"]
