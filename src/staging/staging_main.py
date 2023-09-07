@@ -125,7 +125,7 @@ def run_staging(
         check_file_exists(postcode_masterlist)
         postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
         invalid_df, unreal_df = val.validate_post_col(
-            full_responses, postcode_masterlist
+            full_responses, postcode_masterlist, config
         )
         pcodes_folder = paths["postcode_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
