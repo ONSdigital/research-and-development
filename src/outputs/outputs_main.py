@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 from src.outputs.short_form_out import run_shortform_prep
+from src.outputs.cora_mapping_temp_file_delete import create_cora_status_col
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    cora_mapper: pd.DataFrame
 ):
     """Run the outputs module.
 
@@ -23,6 +25,7 @@ def run_output(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
+        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
 
 
     """
@@ -30,6 +33,9 @@ def run_output(
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+
+    # add cora status "form_status" using mapper
+    estimated_df = create_cora_status_col(estimated_df, cora_mapper)
 
     # Creating blank columns for short form output
     short_form_df = run_shortform_prep(estimated_df, round_val=4)
