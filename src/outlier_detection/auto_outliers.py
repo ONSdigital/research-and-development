@@ -73,7 +73,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     status_cond = df.statusencoded.isin(["210", "211"])
     positive_cond = df[value_col] > 0
 
-    filtered_df = df.loc[df[sample_cond & status_cond & positive_cond]].copy()
+    filtered_df = df[sample_cond & status_cond & positive_cond].copy()
 
     if filtered_df.empty:
         AutoOutlierLogger.error(
@@ -119,7 +119,7 @@ def flag_outliers(
             int: Rounded value
         """
         f = math.floor(x)
-        if n - f < 0.5:
+        if x - f < 0.5:
             return f
         else:
             return f + 1
@@ -129,7 +129,7 @@ def flag_outliers(
     # Add group count - how many RU refs there are in a cell, perod
     filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform("count")
 
-    # Compute rank margins
+    # Rank margins
     filtered_df["high"] = filtered_df["group_count"] * upper_clip
     filtered_df["high_rounded"]= filtered_df.apply(lambda row: _normal_round(row["high"]), axis=1)
     filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
@@ -137,27 +137,28 @@ def flag_outliers(
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(lambda row: _normal_round(row["low"]), axis=1)
 
-    # Compute ranks of RU refs per group, depending on their value
+    # Ranks of RU refs in each group, depending on their value
     filtered_df["group_rank"] = (filtered_df
         .groupby(groupby_cols)[value_col]
         .rank(method="first", ascending=True))
     
-    # Compute outlier conditions
+    # Outlier conditions
     outlier_cond = (
         (filtered_df["group_rank"] > filtered_df["upper_band"]) | 
         (filtered_df["group_rank"] <= filtered_df["lower_band"])) 
 
-    # Compute outlier column in filtered df
+    # Create outlier flag
     filtered_df[f"{value_col}_outlier_flag"] = outlier_cond
 
-    #%% Select cloumns that would be joined back to main df
-    cols_sel = group_cols + [ruref_col, f"{value_col}_outlier_flag"]
+    # Select columns that would be joined back to main df
+    cols_sel = groupby_cols + [ruref_col, f"{value_col}_outlier_flag"]
     filtered_df = filtered_df[cols_sel]
-    #%% merge back to the original df
+    
+    # merge back to the original df
     df = df.merge(
         filtered_df,
         how='left',
-        on=group_cols + [ruref_col])
+        on=groupby_cols + [ruref_col])
     df[f"{value_col}_outlier_flag"] = df[f"{value_col}_outlier_flag"].fillna(False)
     
     return df
