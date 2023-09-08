@@ -73,7 +73,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     status_cond = df.statusencoded.isin(["210", "211"])
     positive_cond = df[value_col] > 0
 
-    filtered_df = df[sample_cond & status_cond & positive_cond]
+    filtered_df = df.loc[df[sample_cond & status_cond & positive_cond]].copy()
 
     if filtered_df.empty:
         AutoOutlierLogger.error(
@@ -99,14 +99,14 @@ def flag_outliers(
         pd.DataFrame: The same dataframe with a new boolean column indicating
                         whether the column 'value_col' is an outlier.
     """
-    lower_band = LOWER_BAND_DEFAULT + lower_clip
-    upper_band = UPPER_BAND_DEFAULT - upper_clip
+    # Define groups for outliers: cell number and period
+    groupby_cols = ["period", "cellnumber"]
+
+    # Define RU reference column
+    ruref_col = "reference"
 
     # Filter for valid sampled data and positive values in the value column
     filtered_df = filter_valid(df, value_col)
-
-    # calculate the quantiles
-    groupby_cols = ["period", "cellnumber"]
 
     def _normal_round(x: float) -> int:
         """Simple rounding, so that 0.5 rounds to 1, 
@@ -123,43 +123,43 @@ def flag_outliers(
             return f
         else:
             return f + 1
-    # Define groups for outliers: cell number and period
-    groupby_cols = ["period", "cellnumber"]
+
+
     
     # Add group count - how many RU refs there are in a cell, perod
-    df["group_count"] = df.groupby(groupby_cols)[value_col].transform("count")
+    filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform("count")
 
     # Compute rank margins
-    df["high"] = df["group_count"] * upper_clip
-    df["high_rounded"]= df.apply(lambda row: _normal_round(row["high"]), axis=1)
-    df["upper_band"] = df["group_count"] - df["high_rounded"]
+    filtered_df["high"] = filtered_df["group_count"] * upper_clip
+    filtered_df["high_rounded"]= filtered_df.apply(lambda row: _normal_round(row["high"]), axis=1)
+    filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
 
-    df["low"]=df["group_count"] * lower_clip
-    df["lower_band"]= df.apply(lambda row: _normal_round(row["low"]), axis=1)
+    filtered_df["low"] = filtered_df["group_count"] * lower_clip
+    filtered_df["lower_band"] = filtered_df.apply(lambda row: _normal_round(row["low"]), axis=1)
 
     # Compute ranks of RU refs per group, depending on their value
-    df["group_rank"] = (df
+    filtered_df["group_rank"] = (filtered_df
         .groupby(groupby_cols)[value_col]
         .rank(method="first", ascending=True))
-
+    
     # Compute outlier conditions
     outlier_cond = (
-        (df["group_rank"] > df["upper_band"]) | 
-        (df["group_rank"] <= df["lower_band"])) 
+        (filtered_df["group_rank"] > filtered_df["upper_band"]) | 
+        (filtered_df["group_rank"] <= filtered_df["lower_band"])) 
 
-    # create boolean auto_outlier col based on conditional logic
-    filter_cond = (df.selectiontype == "P") & (df[value_col] > 0)
-    status_cond = df.statusencoded.isin(["210", "211"])
-    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond & status_cond
-    df = df.drop([
-        "group_count", 
-        "high",
-        "high_rounded",
-        "upper_band",
-        "low",
-        "lower_band",
-        "group_rank"
-        ], axis=1)
+    # Compute outlier column in filtered df
+    filtered_df[f"{value_col}_outlier_flag"] = outlier_cond
+
+    #%% Select cloumns that would be joined back to main df
+    cols_sel = group_cols + [ruref_col, f"{value_col}_outlier_flag"]
+    filtered_df = filtered_df[cols_sel]
+    #%% merge back to the original df
+    df = df.merge(
+        filtered_df,
+        how='left',
+        on=group_cols + [ruref_col])
+    df[f"{value_col}_outlier_flag"] = df[f"{value_col}_outlier_flag"].fillna(False)
+    
     return df
 
 
