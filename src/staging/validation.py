@@ -6,12 +6,13 @@ from numpy import nan
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
-from src.utils.helpers import Config_settings
+
+# from src.utils.helpers import Config_settings
 
 # Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-global_config = config["global"]
+# conf_obj = Config_settings(config_path)
+# config = conf_obj.config_dict
+# global_config = config["global"]
 
 # Set up logging
 validation_logger = logging.getLogger(__name__)
@@ -38,7 +39,9 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
 @time_logger_wrap
 @exception_wrap
-def validate_post_col(df: pd.DataFrame, postcode_masterlist: pd.DataFrame):
+def validate_post_col(
+    df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict
+):
     """This function checks if all postcodes in the specified DataFrame column
         are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
@@ -77,7 +80,7 @@ def validate_post_col(df: pd.DataFrame, postcode_masterlist: pd.DataFrame):
         )
 
     # Create a list of postcodes not found in masterlist
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
 
     # Save to df
     unreal_df = pd.DataFrame(
@@ -130,7 +133,7 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     return masterlist
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame):
+def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict):
     """Checks if the postcodes are real against a masterlist of actual postcodes.
 
     In the masterlist, all postcodes are 7 characters long, therefore the
@@ -364,3 +367,42 @@ def combine_schemas_validate_full_df(
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
+
+
+@exception_wrap
+def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
+        """
+    Validates ultfoc df:
+    1. Checks if the DataFrame has exactly two columns.
+    2. Checks if the column headers are 'ruref' and 'ultfoc'.
+    3. Checks the validity of values in the 'ultfoc' column.
+    Args:
+        df (pd.DataFrame): The input DataFrame containing 'ruref'
+        and 'ultfoc' columns.
+
+    """
+        try:
+            # Check DataFrame shape
+            if df.shape[1] != 2:
+                raise ValueError("Dataframe file must have exactly two columns")
+
+            # Check column headers
+            if list(df.columns) != ["ruref", "ultfoc"]:
+                raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
+
+            # Check 'ultfoc' values are either 2 characters or 'nan'
+            def check_ultfoc(value):
+                return isinstance(value, str) and (len(value) == 2 or len(value) == 3)
+
+            df["contents_check"] = df.apply(
+                lambda row: check_ultfoc(row["ultfoc"]), axis=1
+            )
+            
+            # check any unexpected contents
+            if (df["contents_check"]==False).any():
+                raise ValueError("Unexpected format within 'ultfoc' column contents")
+            
+            df.drop(columns=["contents_check"], inplace=True)
+
+        except ValueError as ve:
+            raise ValueError("Foreign ownership mapper validation failed: " + str(ve))

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
+
 # from unittest.mock import MagicMock, patch
 from src.staging.validation import (
     validate_post_col,
@@ -10,11 +11,14 @@ from src.staging.validation import (
     validate_data_with_schema,
     combine_schemas_validate_full_df,
 )
-from src.utils.helpers import Config_settings
+
 
 # Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
+def generate_config(val):
+    """Generate a dummy config file"""
+    config = {"global": {"postcode_csv_check": val}}
+
+    return config
 
 
 @pytest.fixture
@@ -48,8 +52,10 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    validate_post_col(test_data_df, fake_path)
+    validate_post_col(test_data_df, fake_path, config)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
@@ -70,7 +76,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
             "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
-    df_result = validate_post_col(df_valid, fake_path)
+    df_result = validate_post_col(df_valid, fake_path, config)
     exp_output1 = pd.DataFrame(
         columns=["reference", "instance", "invalid_pattern_pcodes"]
     )
@@ -90,7 +96,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
             "referencepostcode": ["EFG 456", "HIJ 789"],
         }
     )
-    validate_post_col(df_invalid, fake_path)
+    validate_post_col(df_invalid, fake_path, config)
     assert (
         "Total list of unique invalid postcodes found: ['EFG 456', 'HIJ 789']"
         in caplog.text
@@ -98,7 +104,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
 
     # Mixed valid and invalid postcodes - as is in the test_data
 
-    validate_post_col(test_data_df, fake_path)
+    validate_post_col(test_data_df, fake_path, config)
     if config["global"]["postcode_csv_check"]:
         assert (
             "Total list of unique invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
@@ -140,8 +146,10 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    result_df = check_pcs_real(test_data_df, postcode_masterlist)
+    result_df = check_pcs_real(test_data_df, postcode_masterlist, config)
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
@@ -165,8 +173,10 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist, config)
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False

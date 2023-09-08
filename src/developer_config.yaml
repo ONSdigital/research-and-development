@@ -36,6 +36,7 @@ network_paths:
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/SIC_to_PG.csv"
+  ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"

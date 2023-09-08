@@ -4,7 +4,8 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs import short_form_out as short
+from src.outputs.short_form_out import run_shortform_prep, create_shortform_df
+from src.outputs.temp_file_to_be_deleted import combine_dataframes
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    ultfoc_mapper: pd.DataFrame
 ):
     """Run the outputs module.
 
@@ -31,12 +33,15 @@ def run_output(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
-    # Creating blank and headcount columns for short form output
-    short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
+    # Create combined ownership column using mapper
+    estimated_df = combine_dataframes(estimated_df, ultfoc_mapper)
 
+    # Creating blank columns for short form output
+    short_form_df = run_shortform_prep(estimated_df, round_val=4)
+    
     # Create short form output dataframe with required columns
     schema_path = "config/shortform_outputs_schema.toml"
-    shortform_output = short.create_shortform_df(short_form_df, schema_path)
+    shortform_output = create_shortform_df(short_form_df, schema_path)
 
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")

@@ -125,7 +125,7 @@ def run_staging(
         check_file_exists(postcode_masterlist)
         postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
         invalid_df, unreal_df = val.validate_post_col(
-            full_responses, postcode_masterlist
+            full_responses, postcode_masterlist, config
         )
         pcodes_folder = paths["postcode_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
@@ -154,6 +154,17 @@ def run_staging(
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(full_responses, mapper, target_col="201")
+    
+    # Load ultfoc (Foreign Ownership) mapper
+    StagingMainLogger.info("Loading Foreign Ownership File")
+    ultfoc_mapper_path = paths["ultfoc_mapper_path"]
+    check_file_exists(ultfoc_mapper_path)
+    ultfoc_mapper = read_csv(ultfoc_mapper_path)
+    val.validate_data_with_schema(
+        ultfoc_mapper, "./config/ultfoc_schema.toml"
+    )
+    val.validate_ultfoc_df(ultfoc_mapper)
+    StagingMainLogger.info("Foreign Ownership File Loaded Successfully...")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
@@ -173,4 +184,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, cellno_df
+    return full_responses, manual_outliers, mapper, ultfoc_mapper, cellno_df

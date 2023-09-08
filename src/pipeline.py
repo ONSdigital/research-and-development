@@ -14,50 +14,53 @@ from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
 from src.outputs.outputs_main import run_output
 
-
 MainLogger = logging.getLogger(__name__)
 
 
-# load config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-
-# Check the environment switch
-network_or_hdfs = config["global"]["network_or_hdfs"]
-
-
-if network_or_hdfs == "network":
-    HDFS_AVAILABLE = False
-
-    from src.utils.local_file_mods import load_local_json as load_json
-    from src.utils.local_file_mods import local_file_exists as check_file_exists
-    from src.utils.local_file_mods import local_mkdir as mkdir
-    from src.utils.local_file_mods import local_open as open_file
-    from src.utils.local_file_mods import read_local_csv as read_csv
-    from src.utils.local_file_mods import write_local_csv as write_csv
-    from src.utils.local_file_mods import local_file_exists as file_exists  # noqa
-elif network_or_hdfs == "hdfs":
-    HDFS_AVAILABLE = True
-
-    from src.utils.hdfs_mods import hdfs_load_json as load_json
-    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
-    from src.utils.hdfs_mods import hdfs_mkdir as mkdir
-    from src.utils.hdfs_mods import hdfs_open as open_file
-    from src.utils.hdfs_mods import read_hdfs_csv as read_csv
-    from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-    from src.utils.hdfs_mods import hdfs_file_exists as file_exists  # noqa
-else:
-    MainLogger.error("The network_or_hdfs configuration is wrong")
-    raise ImportError
-
-
-def run_pipeline(start):
+def run_pipeline(start, config_path):
     """The main pipeline.
 
     Args:
         start (float): The time when the pipeline is launched
         generated from the time module using time.time()
+        config_path (string): The path to the config file to be
+        used.
     """
+    # load config
+    conf_obj = Config_settings(config_path)
+    config = conf_obj.config_dict
+
+    # import yaml
+    # with open(config_path, "r") as file:
+    #     config = yaml.safe_load(file)
+
+    # Check the environment switch
+    network_or_hdfs = config["global"]["network_or_hdfs"]
+
+    if network_or_hdfs == "network":
+        HDFS_AVAILABLE = False
+
+        from src.utils.local_file_mods import load_local_json as load_json
+        from src.utils.local_file_mods import local_file_exists as check_file_exists
+        from src.utils.local_file_mods import local_mkdir as mkdir
+        from src.utils.local_file_mods import local_open as open_file
+        from src.utils.local_file_mods import read_local_csv as read_csv
+        from src.utils.local_file_mods import write_local_csv as write_csv
+        from src.utils.local_file_mods import local_file_exists as file_exists
+    elif network_or_hdfs == "hdfs":
+        HDFS_AVAILABLE = True
+
+        from src.utils.hdfs_mods import hdfs_load_json as load_json
+        from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
+        from src.utils.hdfs_mods import hdfs_mkdir as mkdir
+        from src.utils.hdfs_mods import hdfs_open as open_file
+        from src.utils.hdfs_mods import read_hdfs_csv as read_csv
+        from src.utils.hdfs_mods import write_hdfs_csv as write_csv
+        from src.utils.hdfs_mods import hdfs_file_exists as file_exists
+    else:
+        MainLogger.error("The network_or_hdfs configuration is wrong")
+        raise ImportError
+
     # Set up the run logger
     global_config = config["global"]
     runlog_obj = runlog.RunLog(
@@ -66,6 +69,7 @@ def run_pipeline(start):
 
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
+    MainLogger.info(f"Reading config from {config_path}.")
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
@@ -77,7 +81,7 @@ def run_pipeline(start):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper, cellno_df = run_staging(
+    full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cellno_df = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
@@ -115,7 +119,7 @@ def run_pipeline(start):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_responses, config, write_csv, run_id)
+    run_output(estimated_responses, config, write_csv, run_id, ultfoc_mapper)
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
