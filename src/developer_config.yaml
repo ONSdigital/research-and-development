@@ -9,7 +9,8 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_short_form: True
+  output_short_form: False
+  dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
