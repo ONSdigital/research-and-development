@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import logging
 from typing import List
+import subprocess
 
 try:
     import pydoop.hdfs as hdfs
@@ -165,3 +166,95 @@ def hdfs_write_feather(filepath, df):
     hdfs_logger.info(f"Dataframe written to {filepath} as feather file")
 
     return True
+
+def _perform(command, shell: bool = False, str_output: bool = False, ignore_error: bool = False, full_out=False):
+    """
+    Run shell command in subprocess returning exit code or full string output.
+    _perform() will build the command that will be put into HDFS.
+    This will also be used for the functions below.
+    Parameters
+    ----------
+    shell
+        If true, the command will be executed through the shell.
+        See subprocess.Popen() reference.
+    str_output
+        output exception as string
+    ignore_error
+    """
+    process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    if str_output:
+        if stderr and not ignore_error:
+            raise Exception(stderr.decode("UTF-8").strip("\n"))
+        if full_out:
+            return stdout
+        return stdout.decode("UTF-8").strip("\n")
+
+    return process.returncode == 0
+
+def delete_file(path: str):
+    """
+    Delete a file. Uses 'hadoop fs -rm'.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    command = ["hadoop", "fs", "-rm", path]
+    return _perform(command)
+
+def hdfs_md5sum(path: str):
+    """
+    Get md5sum of a specific file on HDFS.
+    """
+    return _perform(f"hadoop fs -cat {path} | md5sum", shell=True, str_output=True, ignore_error=True).split(" ")[0]
+
+def hdfs_stat_size(path: str):
+    """
+    Runs stat command on a file or directory to get the size in bytes.
+    """
+    command = ["hadoop", "fs", "-du", "-s", path]
+    return _perform(command, str_output=True).split(" ")[0]
+
+
+def isdir(path: str) -> bool:
+    """
+    Test if directory exists. Uses 'hadoop fs -test -d'.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    command = ["hadoop", "fs", "-test", "-d", path]
+    return _perform(command)
+
+def isfile(path: str) -> bool:
+    """
+    Test if file exists. Uses 'hadoop fs -test -f.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+
+    Note
+    ----
+    If checking that directory with partitioned files (i.e. csv, parquet)
+    exists this will return false use isdir instead.
+    """
+    command = ["hadoop", "fs", "-test", "-f", path]
+    return _perform(command)
+
+def read_header(path: str):
+    """
+    Reads the first line of a file on HDFS
+    """
+    return _perform(f"hadoop fs -cat {path} | head -1", shell=True, str_output=True, ignore_error=True)
+
+
+def write_string_to_file(content: bytes, path: str):
+    """
+    Writes a string into the specified file path
+    """
+    _write_string_to_file = subprocess.Popen(f"hadoop fs -put - {path}", stdin=subprocess.PIPE, shell=True)
+    return _write_string_to_file.communicate(content)
