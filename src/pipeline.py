@@ -57,6 +57,14 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
         from src.utils.hdfs_mods import hdfs_file_exists as file_exists
+        from src.utils.hdfs_mods import hdfs_stat_size as file_stat_size
+        from src.utils.hdfs_mods import hdfs_md5sum as md5sum_check
+        from src.utils.hdfs_mods import hdfs_isdir as isdir
+        from src.utils.hdfs_mods import hdfs_delete_file as delete_file
+        from src.utils.hdfs_mods import hdfs_isfile as isfile
+        from src.utils.hdfs_mods import hdfs_read_header as read_header
+        from src.utils.hdfs_mods import hdfs_write_string_to_file as write_string_to_file
+        
     else:
         MainLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
@@ -119,7 +127,20 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_responses, config, write_csv, run_id, ultfoc_mapper)
+    run_output(
+        estimated_responses,
+        config,
+        write_csv,
+        run_id,
+        ultfoc_mapper,
+        delete_file=delete_file,
+        hdfs_md5sum=md5sum_check,
+        hdfs_stat_size=file_stat_size,
+        isdir=isdir,
+        isfile=isfile,
+        read_header=read_header,
+        write_string_to_file=write_string_to_file,
+    )
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
