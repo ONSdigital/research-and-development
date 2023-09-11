@@ -47,6 +47,14 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
         from src.utils.local_file_mods import local_file_exists as file_exists
+        from src.utils.local_file_mods import local_stat_size as file_stat_size
+        from src.utils.local_file_mods import local_md5sum as md5sum_check
+        from src.utils.local_file_mods import local_isdir as isdir
+        from src.utils.local_file_mods import local_delete_file as delete_file
+        from src.utils.local_file_mods import local_isfile as isfile
+        from src.utils.local_file_mods import local_read_header as read_header
+        from src.utils.local_file_mods import local_write_string_to_file as write_string_to_file
+    
     elif network_or_hdfs == "hdfs":
         HDFS_AVAILABLE = True
 
