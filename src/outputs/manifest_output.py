@@ -30,17 +30,16 @@ class Manifest:
         outgoing_directory: str,
         pipeline_run_datetime: datetime,
         dry_run: bool = False,
-        # functions
-        delete_file: callable = delete_file,
-        hdfs_md5sum: callable = hdfs_md5sum,
-        hdfs_stat_size: callable = hdfs_stat_size,
-        isdir: callable = isdir,
-        isfile: callable = isfile,
-        read_header: callable = read_header,
-        write_string_to_file: callable = write_string_to_file        
+        delete_file_func: callable,
+        md5sum_func: callable,
+        stat_size_func: callable,
+        isdir_func: callable,
+        isfile_func: callable,
+        read_header_func: callable,
+        string_to_file_func: callable        
     ):
         self.outgoing_directory = outgoing_directory
-        if not isdir(outgoing_directory):
+        if not isdir_func(outgoing_directory):
             raise ManifestError(
                 f"Outgoing directory does not exist: {self.outgoing_directory}"
             )
