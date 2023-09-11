@@ -90,7 +90,7 @@ def run_staging(
     # the anonymised snapshot data we use in hdfs
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
-    if network_or_hdfs == "hdfs":
+    if network_or_hdfs == "hdfs" and  config["global"]["dev_test"]:
         responses_df["instance"] = 0
     StagingMainLogger.info("Finished Data Ingest...")
 
