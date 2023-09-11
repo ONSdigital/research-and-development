@@ -86,3 +86,9 @@ def run_output(
         read_header_func=read_header,
         string_to_file_func=write_string_to_file,
     )
+    
+    # Add the short form output file to the manifest object
+    manifest.add_file(f"{output_path}/output_short_form/{filename}")
+    
+    # Write the manifest file to the outgoing directory
+    manifest.write_manifest()
