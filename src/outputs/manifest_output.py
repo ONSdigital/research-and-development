@@ -38,6 +38,14 @@ class Manifest:
         outgoing_directory: str,
         pipeline_run_datetime: datetime,
         dry_run: bool = False,
+        # functions
+        delete_file: callable = delete_file,
+        hdfs_md5sum: callable = hdfs_md5sum,
+        hdfs_stat_size: callable = hdfs_stat_size,
+        isdir: callable = isdir,
+        isfile: callable = isfile,
+        read_header: callable = read_header,
+        write_string_to_file: callable = write_string_to_file        
     ):
         self.outgoing_directory = outgoing_directory
         if not isdir(outgoing_directory):
@@ -58,6 +66,8 @@ class Manifest:
 
         self.invalid_headers: list = []
         self.dry_run = dry_run
+
+
 
     def add_file(
         self,
@@ -162,7 +172,7 @@ class Manifest:
         match the target file for transfer, or during a dry run.
         """
 
-        for f in self.manifest["files"]:
+        for f in self.manifest["files"]:.0
             absolute_path = os.path.join(
                 self.outgoing_directory, f["subfolder"], f["file"]
             )
