@@ -30,6 +30,7 @@ hdfs_paths:
   mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   outliers_path: None
+  output_path:  "/ons/rdbe_dev/outputs"
 network_paths:
   root: None
   logs_foldername: "logs/run_logs"
