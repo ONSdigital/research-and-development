@@ -2,14 +2,6 @@ import json
 import os
 from datetime import datetime
 
-from cishouseholds.hdfs_utils import delete_file
-from cishouseholds.hdfs_utils import hdfs_md5sum
-from cishouseholds.hdfs_utils import hdfs_stat_size
-from cishouseholds.hdfs_utils import isdir
-from cishouseholds.hdfs_utils import isfile
-from cishouseholds.hdfs_utils import read_header
-from cishouseholds.hdfs_utils import write_string_to_file
-
 
 class ManifestError(Exception):
     pass
