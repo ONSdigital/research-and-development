@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import logging
 from typing import List
+import hashlib
 
 
 # Set up logger
@@ -159,3 +160,81 @@ def local_file_write_feather(filepath, df):
     """
     df.to_feather(filepath)
     return True
+
+
+def local_delete_file(path: str):
+    """
+    Delete a file on the local file system.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    try:
+        os.remove(path)
+        return True
+    except OSError:
+        return False
+
+def local_md5sum(path: str):
+    """
+    Get md5sum of a specific file on the local file system.
+
+    Returns
+    -------
+    The md5sum of the file.
+    """
+    with open(path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+def local_stat_size(path: str):
+    """
+    Get the size of a file or directory in bytes on the local file system.
+
+    Returns
+    -------
+    The size of the file or directory in bytes.
+    """
+    return os.stat(path).st_size
+
+def local_isdir(path: str) -> bool:
+    """
+    Test if directory exists on the local file system.
+
+    Returns
+    -------
+    True if the directory exists. Else False.
+    """
+    return os.path.isdir(path)
+
+def local_isfile(path: str) -> bool:
+    """
+    Test if file exists on the local file system.
+
+    Returns
+    -------
+    True if the file exists. Else False.
+    """
+    return os.path.isfile(path)
+
+def local_read_header(path: str):
+    """
+    Reads the first line of a file on the local file system.
+
+    Returns
+    -------
+    The first line of the file.
+    """
+    with open(path, "r") as f:
+        return f.readline()
+
+def local_write_string_to_file(content: bytes, path: str):
+    """
+    Writes a string into the specified file path on the local file system.
+
+    Returns
+    -------
+    None
+    """
+    with open(path, "wb") as f:
+        f.write(content)
