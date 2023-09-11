@@ -43,8 +43,8 @@ old_name = "frozensic"
 Deduced_Data_Type = "Int64"
 
 [foreign_owner]
-old_name = "foreign_owner"
-Deduced_Data_Type = "float64"
+old_name = "ultfoc"
+Deduced_Data_Type = "str"
 
 [product_group]
 old_name = "201"
@@ -91,7 +91,7 @@ old_name = "headcount_defence"
 Deduced_Data_Type = "float64"
 
 [post_code]
-old_name = "referencepostcode"
+old_name = "601"
 Deduced_Data_Type = "str"
 
 [q713]

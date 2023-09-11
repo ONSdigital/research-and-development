@@ -154,15 +154,13 @@ def run_staging(
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(full_responses, mapper, target_col="201")
-    
+
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
     check_file_exists(ultfoc_mapper_path)
     ultfoc_mapper = read_csv(ultfoc_mapper_path)
-    val.validate_data_with_schema(
-        ultfoc_mapper, "./config/ultfoc_schema.toml"
-    )
+    val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
     StagingMainLogger.info("Foreign Ownership File Loaded Successfully...")
 

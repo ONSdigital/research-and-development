@@ -15,7 +15,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame
+    ultfoc_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -38,7 +38,7 @@ def run_output(
 
     # Creating blank columns for short form output
     short_form_df = run_shortform_prep(estimated_df, round_val=4)
-    
+
     # Create short form output dataframe with required columns
     schema_path = "config/shortform_outputs_schema.toml"
     shortform_output = create_shortform_df(short_form_df, schema_path)
