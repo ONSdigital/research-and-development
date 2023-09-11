@@ -193,7 +193,7 @@ def _perform(command, shell: bool = False, str_output: bool = False, ignore_erro
 
     return process.returncode == 0
 
-def delete_file(path: str):
+def hdfs_delete_file(path: str):
     """
     Delete a file. Uses 'hadoop fs -rm'.
 
@@ -218,7 +218,7 @@ def hdfs_stat_size(path: str):
     return _perform(command, str_output=True).split(" ")[0]
 
 
-def isdir(path: str) -> bool:
+def hdfs_isdir(path: str) -> bool:
     """
     Test if directory exists. Uses 'hadoop fs -test -d'.
 
@@ -229,7 +229,7 @@ def isdir(path: str) -> bool:
     command = ["hadoop", "fs", "-test", "-d", path]
     return _perform(command)
 
-def isfile(path: str) -> bool:
+def hdfs_isfile(path: str) -> bool:
     """
     Test if file exists. Uses 'hadoop fs -test -f.
 
@@ -245,14 +245,14 @@ def isfile(path: str) -> bool:
     command = ["hadoop", "fs", "-test", "-f", path]
     return _perform(command)
 
-def read_header(path: str):
+def hdfs_read_header(path: str):
     """
     Reads the first line of a file on HDFS
     """
     return _perform(f"hadoop fs -cat {path} | head -1", shell=True, str_output=True, ignore_error=True)
 
 
-def write_string_to_file(content: bytes, path: str):
+def hdfs_write_string_to_file(content: bytes, path: str):
     """
     Writes a string into the specified file path
     """
