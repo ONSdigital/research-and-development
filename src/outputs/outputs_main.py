@@ -56,6 +56,10 @@ def run_output(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
+    # Create a datetime object for the pipeline run - TODO: replace this with
+    # the pipeline run datetime from the runlog object
+    pipeline_run_datetime = datetime.now()
+
     # Create combined ownership column using mapper
     estimated_df = combine_dataframes(estimated_df, ultfoc_mapper)
 
@@ -71,9 +75,9 @@ def run_output(
 
     # Creating a manifest file using the Manifest class in manifest_output.py
     manifest = Manifest(
-        outgoing_directory,
-        pipeline_run_datetime,
-        dry_run,
+        outgoing_directory=output_path,
+        pipeline_run_datetime=pipeline_run_datetime,
+        dry_run=True,
         delete_file=delete_file,
         hdfs_md5sum=hdfs_md5sum,
         hdfs_stat_size=hdfs_stat_size,
