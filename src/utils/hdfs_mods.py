@@ -52,7 +52,7 @@ def write_hdfs_csv(filepath: str, data: pd.DataFrame):
     # Open the file in write mode
     with hdfs.open(filepath, "wt") as file:
         # Write dataframe to DAP context
-        data.to_csv(file, index=False)
+        data.to_csv(file, date_format="%Y-%m-%d %H:%M:%S.%f+00", index=False)
     return None
 
 

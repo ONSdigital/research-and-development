@@ -59,12 +59,12 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
         full_responses -- DataFrame containing both response and contributor data
     """
 
-    drop_cols = ["createdby", "createddate", "lastupdatedby", "lastupdateddate"]
+    drop_cols = ["createdby", "createddate", "lastupdatedby"]
 
     unique_id_cols = ["reference", "instance"]
 
     contributors_dropped = contributors.drop(drop_cols, axis=1)
-    responses_dropped = responses.drop(drop_cols + ["adjustedresponse"], axis=1)
+    responses_dropped = responses.drop(drop_cols + ["lastupdateddate", "adjustedresponse"], axis=1)
 
     responses_dropped = responses_dropped.astype({"instance": "Int64"})
 

@@ -72,6 +72,7 @@ def expected_output():
     expected_schema = {
         "reference": "int64",
         "instance": "Int64",
+        "lastupdateddate": "Int64",
         200: "Int64",
         201: "Int64",
         202: "Int64",
@@ -80,10 +81,10 @@ def expected_output():
     }
 
     expected_data = [
-        [101, 0, 0, 50, 100, 202012, 1],
-        [101, 1, 10, 510, 110, 202012, 1],
-        [102, 0, 75, 25, 65, 202012, 1],
-        [103, np.nan, np.nan, np.nan, np.nan, 202012, 1],
+        [101, 0, 2020, 0, 50, 100, 202012, 1],
+        [101, 1, 2020, 10, 510, 110, 202012, 1],
+        [102, 0, 2020, 75, 25, 65, 202012, 1],
+        [103, np.nan, 2020, np.nan, np.nan, np.nan, 202012, 1],
     ]
 
     expected_output = pd.DataFrame(
