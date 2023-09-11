@@ -29,14 +29,14 @@ class Manifest:
         self,
         outgoing_directory: str,
         pipeline_run_datetime: datetime,
-        dry_run: bool = False,
         delete_file_func: callable,
         md5sum_func: callable,
         stat_size_func: callable,
         isdir_func: callable,
         isfile_func: callable,
         read_header_func: callable,
-        string_to_file_func: callable        
+        string_to_file_func: callable,
+        dry_run: bool = False     
     ):
         self.outgoing_directory = outgoing_directory
         if not isdir_func(outgoing_directory):
@@ -54,10 +54,18 @@ class Manifest:
         )
         self.manifest: dict = {"files": []}
         self.written = False
-
         self.invalid_headers: list = []
         self.dry_run = dry_run
 
+        # Functions
+        self.delete_file = delete_file_func
+        self.md5sum = md5sum_func
+        self.stat_size = stat_size_func
+        self.isdir = isdir_func
+        self.isfile = isfile_func
+        self.read_header = read_header_func
+        self.string_to_file = string_to_file_func
+        
 
 
     def add_file(
@@ -88,19 +96,22 @@ class Manifest:
 
         absolute_file_path = os.path.join(self.outgoing_directory, relative_file_path)
 
-        if not isfile(absolute_file_path):
+        if not self.isfile(absolute_file_path):
             raise ManifestError(
                 (
                     f"""Cannot add file to manifest, file does not exist:
                     {absolute_file_path}"""
                 )
             )
-
-        true_header_string = read_header(absolute_file_path)
+        # Get the col headers from the file
+        true_header_string = self.read_header(absolute_file_path)
         true_header_list = true_header_string.split(sep)
         if true_header_string != column_header:
+            # Column headers in file do not match expected column headers
             column_header_list = column_header.split(sep)
 
+            # Compare strings `true_header_string` and `column_header`
+            # Generate a report of the differences between them.
             self.invalid_headers.append(
                 f"File:{absolute_file_path}\n"
                 f"Expected:     {column_header}\n"
@@ -124,8 +135,8 @@ class Manifest:
         file_manifest = {
             "file": os.path.basename(relative_file_path),
             "subfolder": os.path.dirname(relative_file_path),
-            "sizeBytes": hdfs_stat_size(absolute_file_path),
-            "md5sum": hdfs_md5sum(absolute_file_path),
+            "sizeBytes": self.stat_size(absolute_file_path),
+            "md5sum": self.md5sum(absolute_file_path),
             "header": column_header,
         }
         self.manifest["files"].append(file_manifest)
@@ -152,7 +163,7 @@ class Manifest:
             self.written = True
             return
 
-        write_string_to_file(
+        self.string_to_file(
             json.dumps(self.manifest, indent=4).encode("utf-8"), self.manifest_file_path
         )
         self.written = True
@@ -163,9 +174,9 @@ class Manifest:
         match the target file for transfer, or during a dry run.
         """
 
-        for f in self.manifest["files"]:.0
+        for f in self.manifest["files"]:
             absolute_path = os.path.join(
                 self.outgoing_directory, f["subfolder"], f["file"]
             )
-            if isfile(absolute_path):
-                delete_file(absolute_path)
+            if self.isfile(absolute_path):
+                self.delete_file(absolute_path)
