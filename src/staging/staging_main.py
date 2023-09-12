@@ -135,16 +135,20 @@ def run_staging(
     else:
         StagingMainLogger.info("PostCode Validation skipped")
 
-    # Stage the manual outliers file
-    StagingMainLogger.info("Loading Manual Outlier File")
-    manual_path = paths["manual_outliers_path"]
-    check_file_exists(manual_path)
-    wanted_cols = ["reference", "instance", "manual_outlier"]
-    manual_outliers = read_csv(manual_path, wanted_cols)
-    val.validate_data_with_schema(
-        manual_outliers, "./config/manual_outliers_schema.toml"
-    )
-    StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    if config["global"]["load_manual_outliers"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Manual Outlier File")
+        manual_path = paths["manual_outliers_path"]
+        check_file_exists(manual_path)
+        wanted_cols = ["reference", "instance", "manual_outlier"]
+        manual_outliers = read_csv(manual_path, wanted_cols)
+        val.validate_data_with_schema(
+            manual_outliers, "./config/manual_outliers_schema.toml"
+        )
+        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    else:
+        manual_outliers = None
+        StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
     mapper_path = paths["mapper_path"]
