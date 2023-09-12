@@ -186,4 +186,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, ultfoc_mapper, cellno_df
+    return full_responses, manual_outliers, mapper, ultfoc_mapper, cellno_df, itl_mapper
