@@ -9,8 +9,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_short_form: False
-  dev_test : False
+  output_short_form: True
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
@@ -22,21 +21,20 @@ runlog_writer:
     display: False # Display the runlog in the terminal
     log_path: "data/log"
 hdfs_paths:
-  hdfs_paths:
-    root: "/ons/rdbe_dev/"
-    logs_foldername: "logs/run_logs"
-    snapshot_path: "/ons/rdbe_dev/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
-    postcode_masterlist: "/ons/rdbe_dev/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
-    postcode_path: "/ons/rdbe_dev/DAP_emulation/staging/staging_qa/postcode_validation"
-    mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/SIC_to_PG.csv"
-    ultfoc_mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
-    staging_test_foldername: "/ons/rdbe_dev/DAP_emulation/Staged_Test_Output"
-    history_path: "/ons/rdbe_dev/DAP_emulation/BERD_V7_Anonymised"
-    outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers"
-    manual_outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-    estimation_path:  "/ons/rdbe_dev/DAP_emulation/estimation"
-    output_path:  "/ons/rdbe_dev/DAP_emulation/outputs"
-    cellno_path: '/ons/rdbe_dev/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
+  root: "/ons/rdbe_dev/"
+  logs_foldername: "logs/run_logs"
+  snapshot_path: "/ons/rdbe_dev/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  postcode_masterlist: "/ons/rdbe_dev/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
+  postcode_path: "/ons/rdbe_dev/DAP_emulation/staging/staging_qa/postcode_validation"
+  mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/SIC_to_PG.csv"
+  ultfoc_mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
+  staging_test_foldername: "/ons/rdbe_dev/DAP_emulation/Staged_Test_Output"
+  history_path: "/ons/rdbe_dev/DAP_emulation/BERD_V7_Anonymised"
+  outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers"
+  manual_outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  estimation_path:  "/ons/rdbe_dev/DAP_emulation/estimation"
+  output_path:  "/ons/rdbe_dev/DAP_emulation/outputs"
+  cellno_path: '/ons/rdbe_dev/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
