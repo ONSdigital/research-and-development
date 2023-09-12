@@ -369,7 +369,7 @@ def combine_schemas_validate_full_df(
 
 @exception_wrap
 def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
-        """
+    """
     Validates ultfoc df:
     1. Checks if the DataFrame has exactly two columns.
     2. Checks if the column headers are 'ruref' and 'ultfoc'.
@@ -379,28 +379,26 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
         and 'ultfoc' columns.
 
     """
-        try:
-            # Check DataFrame shape
-            if df.shape[1] != 2:
-                raise ValueError("Dataframe file must have exactly two columns")
+    try:
+        # Check DataFrame shape
+        if df.shape[1] != 2:
+            raise ValueError("Dataframe file must have exactly two columns")
 
-            # Check column headers
-            if list(df.columns) != ["ruref", "ultfoc"]:
-                raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
+        # Check column headers
+        if list(df.columns) != ["ruref", "ultfoc"]:
+            raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
 
-            # Check 'ultfoc' values are either 2 characters or 'nan'
-            def check_ultfoc(value):
-                return isinstance(value, str) and (len(value) == 2 or len(value) == 3)
+        # Check 'ultfoc' values are either 2 characters or 'nan'
+        def check_ultfoc(value):
+            return isinstance(value, str) and (len(value) == 2 or len(value) == 3)
 
-            df["contents_check"] = df.apply(
-                lambda row: check_ultfoc(row["ultfoc"]), axis=1
-            )
-            
-            # check any unexpected contents
-            if (df["contents_check"]==False).any():
-                raise ValueError("Unexpected format within 'ultfoc' column contents")
-            
-            df.drop(columns=["contents_check"], inplace=True)
+        df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
 
-        except ValueError as ve:
-            raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
+        # check any unexpected contents
+        if (df["contents_check"] == False).any():
+            raise ValueError("Unexpected format within 'ultfoc' column contents")
+
+        df.drop(columns=["contents_check"], inplace=True)
+
+    except ValueError as ve:
+        raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
