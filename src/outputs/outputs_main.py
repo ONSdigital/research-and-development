@@ -23,7 +23,7 @@ def run_output(
     isdir: Callable,
     isfile: Callable,
     read_header: Callable,
-    write_string_to_file: Callable
+    write_string_to_file: Callable,
 ):
     """Run the outputs module.
 
@@ -72,7 +72,6 @@ def run_output(
         write_csv(f"{output_path}/output_short_form/{filename}", short_form_df)
     OutputMainLogger.info("Finished short form output.")
 
-
     # Creating a manifest file using the Manifest class in manifest_output.py
     manifest = Manifest(
         outgoing_directory=output_path,
@@ -86,9 +85,11 @@ def run_output(
         read_header_func=read_header,
         string_to_file_func=write_string_to_file,
     )
-    
+
     # Add the short form output file to the manifest object
-    manifest.add_file(f"{output_path}/output_short_form/{filename}")
-    
+    manifest.add_file(
+        f"{output_path}/output_short_form/{filename}", column_header="SOMESTRING"
+    )
+
     # Write the manifest file to the outgoing directory
     manifest.write_manifest()
