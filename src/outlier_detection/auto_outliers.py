@@ -8,10 +8,6 @@ import math
 
 AutoOutlierLogger = logging.getLogger(__name__)
 
-# Set defaults
-LOWER_BAND_DEFAULT = 0
-UPPER_BAND_DEFAULT = 1
-
 
 def validate_config(
         upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
