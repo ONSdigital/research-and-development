@@ -22,17 +22,23 @@ runlog_writer:
     display: False # Display the runlog in the terminal
     log_path: "data/log"
 hdfs_paths:
-  root: None
-  logs_foldername: "resdev/logs/run_logs"
-  snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
-  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
-  postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
-  mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
-  history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
-  outliers_path: None
-  output_path:  "/ons/rdbe_dev/outputs"
+  hdfs_paths:
+    root: "/ons/rdbe_dev/"
+    logs_foldername: "logs/run_logs"
+    snapshot_path: "/ons/rdbe_dev/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+    postcode_masterlist: "/ons/rdbe_dev/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
+    postcode_path: "/ons/rdbe_dev/DAP_emulation/staging/staging_qa/postcode_validation"
+    mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/SIC_to_PG.csv"
+    ultfoc_mapper_path: "/ons/rdbe_dev/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
+    staging_test_foldername: "/ons/rdbe_dev/DAP_emulation/Staged_Test_Output"
+    history_path: "/ons/rdbe_dev/DAP_emulation/BERD_V7_Anonymised"
+    outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers"
+    manual_outliers_path: "/ons/rdbe_dev/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+    estimation_path:  "/ons/rdbe_dev/DAP_emulation/estimation"
+    output_path:  "/ons/rdbe_dev/DAP_emulation/outputs"
+    cellno_path: '/ons/rdbe_dev/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
 network_paths:
-  root: None
+  root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
