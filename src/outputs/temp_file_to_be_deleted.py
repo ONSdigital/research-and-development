@@ -4,9 +4,7 @@ from src.utils.wrappers import exception_wrap
 
 
 @exception_wrap
-def combine_dataframes(
-    main_df: pd.DataFrame, mapper_df: pd.DataFrame
-) -> pd.DataFrame:
+def combine_dataframes(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 

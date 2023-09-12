@@ -3,16 +3,14 @@ import logging
 import pandas as pd
 import numpy as np
 from typing import List
+import math
 
 
 AutoOutlierLogger = logging.getLogger(__name__)
 
-# Set defaults
-LOWER_BAND_DEFAULT = 0
-UPPER_BAND_DEFAULT = 1
 
-
-def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
+def validate_config(
+        upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
     """Validate the outlier config settings.
 
     Args:
@@ -23,8 +21,10 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
     Raises:
         ImportError if upper_clip or lower_clip have invalid values
     """
-    AutoOutlierLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
-    AutoOutlierLogger.info(f"The columns to be flagged for outliers: {flag_value_cols}")
+    AutoOutlierLogger.info(
+        f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
+    AutoOutlierLogger.info(
+        f"The columns to be flagged for outliers: {flag_value_cols}")
 
     if (upper_clip == 0) and (lower_clip == 0):
         AutoOutlierLogger.warning(
@@ -72,7 +72,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     status_cond = df.statusencoded.isin(["210", "211"])
     positive_cond = df[value_col] > 0
 
-    filtered_df = df[sample_cond & status_cond & positive_cond]
+    filtered_df = df[sample_cond & status_cond & positive_cond].copy()
 
     if filtered_df.empty:
         AutoOutlierLogger.error(
@@ -98,52 +98,76 @@ def flag_outliers(
         pd.DataFrame: The same dataframe with a new boolean column indicating
                         whether the column 'value_col' is an outlier.
     """
-    lower_band = LOWER_BAND_DEFAULT + lower_clip
-    upper_band = UPPER_BAND_DEFAULT - upper_clip
+    # Define groups for outliers: cell number and period
+    groupby_cols = ["period", "cellnumber"]
+
+    # Define RU reference column
+    ruref_col = "reference"
 
     # Filter for valid sampled data and positive values in the value column
     filtered_df = filter_valid(df, value_col)
 
-    # calculate the quantiles
-    groupby_cols = ["period", "cellnumber"]
+    def _normal_round(x: float) -> int:
+        """Simple rounding, so that 0.5 rounds to 1,
+        as opposed to default banking rounding that rounds halves
+        to nearest even integers.
 
-    quantiles_up = (
-        filtered_df[groupby_cols + [value_col]]
-        .groupby(groupby_cols)
-        .quantile([upper_band], interpolation="nearest")
-        .reset_index()
+        Args:
+            x (float): Fractional number to be rounded
+        Returns:
+            int: Rounded value
+        """
+        f = math.floor(x)
+        if x - f < 0.5:
+            return f
+        else:
+            return f + 1
+
+    # Add group count - how many RU refs there are in a cell, perod
+    filtered_df["group_count"] = filtered_df.groupby(
+        groupby_cols)[value_col].transform("count")
+
+    # Rank margins
+    filtered_df["high"] = filtered_df["group_count"] * upper_clip
+    filtered_df["high_rounded"] = filtered_df.apply(
+        lambda row: _normal_round(row["high"]), axis=1
     )
-    quantiles_up = quantiles_up.rename(columns={value_col: "upper_band"})[
-        groupby_cols + ["upper_band"]
-    ]
+    filtered_df["upper_band"] = filtered_df[
+        "group_count"] - filtered_df["high_rounded"]
 
-    quantiles_low = (
-        filtered_df[groupby_cols + [value_col]]
-        .groupby(groupby_cols)
-        .quantile([lower_band], interpolation="nearest")
-        .reset_index()
-    )
-    quantiles_low = quantiles_low.rename(columns={value_col: "lower_band"})[
-        groupby_cols + ["lower_band"]
-    ]
-
-    df = df.merge(quantiles_up, on=groupby_cols, how="left").merge(
-        quantiles_low, on=groupby_cols, how="left"
+    filtered_df["low"] = filtered_df["group_count"] * lower_clip
+    filtered_df["lower_band"] = filtered_df.apply(
+        lambda row: _normal_round(row["low"]), axis=1
     )
 
-    outlier_cond = (df[value_col] > df.upper_band) | (
-        df[value_col] < df.lower_band
-    )  # noqa
+    # Ranks of RU refs in each group, depending on their value
+    filtered_df["group_rank"] = filtered_df.groupby(
+        groupby_cols)[value_col].rank(
+        method="first", ascending=True
+    )
 
-    # create boolean auto_outlier col based on conditional logic
-    filter_cond = (df.selectiontype == "P") & (df[value_col] > 0)
-    status_cond = df.statusencoded.isin(["210", "211"])
-    df[f"{value_col}_outlier_flag"] = outlier_cond & filter_cond & status_cond
-    df = df.drop(["upper_band", "lower_band"], axis=1)
+    # Outlier conditions
+    outlier_cond = (filtered_df["group_rank"] > filtered_df["upper_band"]) | (
+        filtered_df["group_rank"] <= filtered_df["lower_band"]
+    )
+
+    # Create outlier flag
+    filtered_df[f"{value_col}_outlier_flag"] = outlier_cond
+
+    # Select columns that would be joined back to main df
+    cols_sel = groupby_cols + [ruref_col, f"{value_col}_outlier_flag"]
+    filtered_df = filtered_df[cols_sel]
+
+    # merge back to the original df
+    df = df.merge(filtered_df, how="left", on=groupby_cols + [ruref_col])
+    df[f"{value_col}_outlier_flag"] = df[
+        f"{value_col}_outlier_flag"].fillna(False)
+
     return df
 
 
-def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
+def decide_outliers(
+        df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
     """Determine whether a reference should be treated as an outlier.
 
     If any of the colunns in the list flag_value_cols has been flagged as an
@@ -152,7 +176,8 @@ def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFram
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated
-        flag_value_cols: (List[str]): The names of the columns to flag for outliers
+        flag_value_cols: (List[str]): The names of the columns to flag
+        for outliers
 
     Returns:
         df (pd.DataFrame): The full dataset with flag column indicating whether
@@ -187,18 +212,22 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
 
 
 def run_auto_flagging(
-    df: pd.DataFrame, upper_clip: float, lower_clip: float, flag_value_cols: List[str]
+    df: pd.DataFrame,
+    upper_clip: float,
+    lower_clip: float,
+    flag_value_cols: List[str]
 ) -> pd.DataFrame:
     """Flag outliers based on clipping values specified in the config.
 
     For each of the 'flag_cols' columns specified in the developers config, a
-    boolean flag is created for the highest values in the in the column, based on
-    the upper_clip percentage, and the lowest non-zero values, based on the
-    lower_clip percengage (usually the lower clip will be zero, so not effective.)
-    Zero or null values are not included in the flagging process.
+    boolean flag is created for the highest values in the in the column,
+    based on the upper_clip percentage, and the lowest non-zero values,
+    based on the lower_clip percengage (usually the lower clip will be zero,
+    so not effective.) Zero or null values are not included in the
+    flagging process.
 
-    A master outlier flag, 'auto_outlier', is created with a value True if any one
-    of the other outlier flags is True.
+    A master outlier flag, 'auto_outlier', is created with a value True if
+    any one of the other outlier flags is True.
 
     Notes:
         - Outliering is only done for randomly sampled (rather than 'census')
@@ -208,10 +237,12 @@ def run_auto_flagging(
         df (pd.DataFrame): The main dataset where outliers are to be calculated
         upper_clip (float): The percentage for upper clipping
         lower_clip (float): The percentage for lower clipping
-        flag_value_cols: (List[str]): The names of the columns to flag for outliers
+        flag_value_cols: (List[str]): The names of the columns to flag
+        for outliers
 
     Returns:
-        df (pd.DataFrame): The full dataset with flag columns indicating outliers.
+        df (pd.DataFrame): The full dataset with flag columns indicating
+        outliers.
     """
     AutoOutlierLogger.info("Starting outlier detection...")
 
@@ -220,9 +251,11 @@ def run_auto_flagging(
 
     # loop through all columns to be flagged for outliers
     for value_col in flag_value_cols:
-        # to_numeric is needed to convert strings. However 'coerce' means values that
+        # to_numeric is needed to convert strings. However 'coerce'
+        # means values that
         # can't be converted are represented by NaNs.
-        # TODO data validation and cleaning should replace the need for 'to_numeric'
+        # TODO data validation and cleaning should replace the need for
+        # 'to_numeric'
         # check ticket (RDRP-386)
         df[value_col] = pd.to_numeric(df[value_col], errors="coerce")
 
@@ -232,7 +265,8 @@ def run_auto_flagging(
         # Log infomation on the number of outliers in column value_col
         log_outlier_info(df, value_col)
 
-    # create 'master' outlier column- which is True if any of the other flags is True
+    # create 'master' outlier column- which is True if any of the other
+    # flags is True
     df = decide_outliers(df, flag_value_cols)
 
     # Create empty column for user to edit
@@ -241,7 +275,8 @@ def run_auto_flagging(
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
-    msg = f"Outlier flags have been created for {num_flagged} records in total."
+    msg = ("Outlier flags have been created"
+           f"for {num_flagged} records in total.")
     AutoOutlierLogger.info(msg)
 
     AutoOutlierLogger.info("Finishing automatic outlier detection.")
