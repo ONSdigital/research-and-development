@@ -105,8 +105,8 @@ def run_staging(
     # TODO Find a fix for the datatype casting before uncommenting
     val.combine_schemas_validate_full_df(
         full_responses,
-        "config/contributors_schema.toml",
-        "config/wide_responses.toml",
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
     )
 
     # Data validation
@@ -156,9 +156,7 @@ def run_staging(
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
     check_file_exists(ultfoc_mapper_path)
     ultfoc_mapper = read_csv(ultfoc_mapper_path)
-    val.validate_data_with_schema(
-        ultfoc_mapper, "./config/ultfoc_schema.toml"
-    )
+    val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
     StagingMainLogger.info("Foreign Ownership File Loaded Successfully...")
 
