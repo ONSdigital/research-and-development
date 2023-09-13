@@ -78,6 +78,48 @@ def create_headcount_cols(
     return df
 
 
+def map_sizebands(
+    df: pd.DataFrame,
+):
+    """Generate sizebands from the frozen employent column
+
+    Args:
+        df (pd.DataFrame): The original dataframe
+
+    Returns:
+        (pd.DataFrame): The dataframe with the sizebands column added
+    """
+    # Create a dictionary of sizeband parameters
+    sizeband_dict = {
+        1: {"min": 0, "max": 9},
+        2: {"min": 10, "max": 99},
+        3: {"min": 20, "max": 49},
+        4: {"min": 50, "max": 99},
+        5: {"min": 100, "max": 249},
+        6: {"min": 250, "max": np.inf},
+    }
+
+    # Create empty column
+    df["sizeband"] = np.nan
+
+    # Create conditions for sizebands
+    conditions = [
+        (sizeband_dict[key]["min"] <= df["frozenemployment"])
+        & (df["frozenemployment"] <= sizeband_dict[key]["max"])
+        for key in sizeband_dict.keys()
+    ]
+    decisions = [key for key in sizeband_dict.keys()]
+
+    # Apply the sizebands
+    for i in range(len(conditions)):
+        df.loc[conditions[i], "sizeband"] = decisions[i]
+
+    # Convert datatype to int
+    df["sizeband"] = df["sizeband"].astype("Int64")
+
+    return df
+
+
 def run_shortform_prep(
     df: pd.DataFrame,
     round_val: int = 4,
@@ -108,6 +150,9 @@ def run_shortform_prep(
 
     # create columns for headcounts for civil and defense
     df = create_headcount_cols(df, round_val)
+
+    # Map the sizebands based on frozen employment
+    df = map_sizebands(df)
 
     return df
 
