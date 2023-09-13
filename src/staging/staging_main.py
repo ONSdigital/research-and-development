@@ -7,6 +7,7 @@ from datetime import datetime
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
+from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -105,8 +106,8 @@ def run_staging(
     # TODO Find a fix for the datatype casting before uncommenting
     val.combine_schemas_validate_full_df(
         full_responses,
-        "config/contributors_schema.toml",
-        "config/wide_responses.toml",
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
     )
 
     # Data validation
@@ -135,22 +136,38 @@ def run_staging(
     else:
         StagingMainLogger.info("PostCode Validation skipped")
 
-    # Stage the manual outliers file
-    StagingMainLogger.info("Loading Manual Outlier File")
-    manual_path = paths["manual_outliers_path"]
-    check_file_exists(manual_path)
-    wanted_cols = ["reference", "instance", "manual_outlier"]
-    manual_outliers = read_csv(manual_path, wanted_cols)
-    val.validate_data_with_schema(
-        manual_outliers, "./config/manual_outliers_schema.toml"
-    )
-    StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    if config["global"]["load_manual_outliers"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Manual Outlier File")
+        manual_path = paths["manual_outliers_path"]
+        check_file_exists(manual_path)
+        wanted_cols = ["reference", "instance", "manual_outlier"]
+        manual_outliers = read_csv(manual_path, wanted_cols)
+        val.validate_data_with_schema(
+            manual_outliers, "./config/manual_outliers_schema.toml"
+        )
+        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    else:
+        manual_outliers = None
+        StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
     mapper_path = paths["mapper_path"]
     check_file_exists(mapper_path)
     mapper = read_csv(mapper_path)
 
+    # Load cora mapper
+    StagingMainLogger.info("Loading Cora status mapper file")
+    cora_mapper_path = paths["cora_mapper_path"]
+    check_file_exists(cora_mapper_path)
+    cora_mapper = read_csv(cora_mapper_path)
+    #validates and updates from int64 to string type
+    val.validate_data_with_schema(
+        cora_mapper, "./config/cora_schema.toml"
+    )
+    cora_mapper = validate_cora_df(cora_mapper)
+    StagingMainLogger.info("Cora status mapper file loaded successfully...")
+    
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
@@ -158,7 +175,7 @@ def run_staging(
     ultfoc_mapper = read_csv(ultfoc_mapper_path)
     val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
-    StagingMainLogger.info("Foreign Ownership File Loaded Successfully...")
+    StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
@@ -178,4 +195,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, ultfoc_mapper, cellno_df
+    return full_responses, manual_outliers, mapper, ultfoc_mapper, cora_mapper, cellno_df

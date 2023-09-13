@@ -2,7 +2,6 @@ from datetime import datetime
 import pandas as pd
 import os
 import csv
-import yaml
 
 
 class RunLog:
@@ -112,10 +111,8 @@ class RunLog:
 
     def retrieve_configs(self):
         """Gets the configs settings for each run of the pipeline"""
-        with open("src/developer_config.yaml", "r") as file:
-            self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
-        dct = {k: [v] for k, v in self.configdata.items()}
+        dct = {k: [v] for k, v in self.config.items()}
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
