@@ -176,6 +176,7 @@ def local_delete_file(path: str):
     except OSError:
         return False
 
+
 def local_md5sum(path: str):
     """
     Get md5sum of a specific file on the local file system.
@@ -187,6 +188,7 @@ def local_md5sum(path: str):
     with open(path, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
 
+
 def local_stat_size(path: str):
     """
     Get the size of a file or directory in bytes on the local file system.
@@ -196,6 +198,7 @@ def local_stat_size(path: str):
     The size of the file or directory in bytes.
     """
     return os.stat(path).st_size
+
 
 def local_isdir(path: str) -> bool:
     """
@@ -207,6 +210,7 @@ def local_isdir(path: str) -> bool:
     """
     return os.path.isdir(path)
 
+
 def local_isfile(path: str) -> bool:
     """
     Test if file exists on the local file system.
@@ -217,16 +221,18 @@ def local_isfile(path: str) -> bool:
     """
     return os.path.isfile(path)
 
+
 def local_read_header(path: str):
     """
     Reads the first line of a file on the local file system.
 
     Returns
     -------
-    The first line of the file.
+    The first line of the file as a string.
     """
     with open(path, "r") as f:
         return f.readline()
+
 
 def local_write_string_to_file(content: bytes, path: str):
     """
