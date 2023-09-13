@@ -158,10 +158,10 @@ def run_staging(
     check_file_exists(cora_mapper_path)
     cora_mapper = read_csv(cora_mapper_path)
     #validates and updates from int64 to string type
-    cora_mapper = validate_cora_df(cora_mapper)
     val.validate_data_with_schema(
         cora_mapper, "./config/cora_schema.toml"
     )
+    cora_mapper = validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
 
     # Loading cell number covarege

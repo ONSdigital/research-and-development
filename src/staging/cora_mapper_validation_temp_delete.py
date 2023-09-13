@@ -27,10 +27,6 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
         if list(df.columns) != ["statusencoded", "form_status"]:
             raise ValueError("Column headers must be 'statusencoded' and 'form_status'")
 
-        # update data types of mapper to str
-        df["statusencoded"] = df["statusencoded"].astype(str)
-        df["form_status"] = df["form_status"].astype(str)
-
         # Check the contents of the "status" and "form_status" columns
         status_check = df["statusencoded"].str.len() == 3
         from_status_check = df["form_status"].str.len().isin([3, 4])
