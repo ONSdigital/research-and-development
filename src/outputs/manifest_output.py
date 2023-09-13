@@ -36,7 +36,7 @@ class Manifest:
         isfile_func: callable,
         read_header_func: callable,
         string_to_file_func: callable,
-        dry_run: bool = False     
+        dry_run: bool = False,
     ):
         self.outgoing_directory = outgoing_directory
         if not isdir_func(outgoing_directory):
@@ -65,15 +65,13 @@ class Manifest:
         self.isfile = isfile_func
         self.read_header = read_header_func
         self.string_to_file = string_to_file_func
-        
-
 
     def add_file(
         self,
         relative_file_path: str,
         column_header: str,
         validate_col_name_length: bool = True,
-        sep: str = "|",
+        sep: str = ",",
     ):
         """
         Add a file in the outgoing folder to the manifest.
@@ -104,9 +102,14 @@ class Manifest:
                 )
             )
         # Get the col headers from the file
-        true_header_string = self.read_header(absolute_file_path)
-        true_header_list = true_header_string.split(sep)
-        if true_header_string != column_header:
+        file_header_string = self.read_header(absolute_file_path)
+
+        # Cleanup file_header_list because \n is appearing in it
+        file_header_string = file_header_string.replace("\n", "")
+
+        file_header_list = file_header_string.split(sep)
+
+        if file_header_string != column_header:
             # Column headers in file do not match expected column headers
             column_header_list = column_header.split(sep)
 
@@ -115,13 +118,14 @@ class Manifest:
             self.invalid_headers.append(
                 f"File:{absolute_file_path}\n"
                 f"Expected:     {column_header}\n"
-                f"Got:          {true_header_string}\n"
-                f"Missing:      {set(column_header_list) - set(true_header_list)}\n"
-                f"Additional:   {set(true_header_list) - set(column_header_list)}\n"
+                f"Got:          {file_header_string}\n"
+                f"Missing:      {set(column_header_list) - set(file_header_list)}\n"
+                f"Additional:   {set(file_header_list) - set(column_header_list)}\n"
             )
 
+        # Checks that column names are not more than 32 chars
         if validate_col_name_length:
-            col_above_max_len = [head for head in true_header_list if len(head) > 32]
+            col_above_max_len = [head for head in file_header_list if len(head) > 32]
 
             if len(col_above_max_len) > 0:
                 self.invalid_headers.append(
