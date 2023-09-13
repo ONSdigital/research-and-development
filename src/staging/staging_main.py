@@ -147,9 +147,9 @@ def run_staging(
     StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
 
     # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    check_file_exists(mapper_path)
-    mapper = read_csv(mapper_path)
+    pg_mapper = paths["mapper_path"]
+    check_file_exists(pg_mapper)
+    mapper = read_csv(pg_mapper)
 
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
