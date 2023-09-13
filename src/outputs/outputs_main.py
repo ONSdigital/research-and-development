@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
+import toml
 
 from src.outputs.short_form_out import run_shortform_prep
 from src.outputs.temp_file_to_be_deleted import combine_dataframes
@@ -54,7 +55,8 @@ def run_output(
     OutputMainLogger.info("Starting short form output...")
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    paths = config[f"{NETWORK_OR_HDFS}_paths"]
+    output_path = paths["output_path"]
 
     # Create a datetime object for the pipeline run - TODO: replace this with
     # the pipeline run datetime from the runlog object
@@ -86,9 +88,15 @@ def run_output(
         string_to_file_func=write_string_to_file,
     )
 
+    # Getting correct headers to verify that df and output are the same
+    s_f_schema_path = paths["short_form_schema"]
+    short_form_schema = toml.load(s_f_schema_path)
+    short_form_headers = short_form_schema["headers"]
+    df_col_string = ",".join(short_form_headers)
+
     # Add the short form output file to the manifest object
     manifest.add_file(
-        f"{output_path}/output_short_form/{filename}", column_header="SOMESTRING"
+        f"{output_path}/output_short_form/{filename}", column_header=df_col_string
     )
 
     # Write the manifest file to the outgoing directory
