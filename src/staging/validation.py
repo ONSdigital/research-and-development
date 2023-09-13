@@ -53,6 +53,7 @@ def validate_post_col(
         df (pd.DataFrame): The DataFrame containing the postcodes.
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
         postocdes to check against
+        config (dict): The postcode settings from the config settings
 
     Returns:
         invalid_df (pd.DataFrame): A dataframe of postcodes with the incorrect pattern
@@ -61,13 +62,12 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    # Check if postcodes match pattern
-    # Create list of postcodes with incorrect patterns
+    # Can only validate not null postcodes
+    val_df = df.loc[~df["601"].isnull()]
 
-    df = df.loc[~df["601"].isnull()]
-
-    invalid_pattern_postcodes = df.loc[
-        ~df["601"].apply(validate_postcode_pattern), "601"
+    # Apply the pattern validation function
+    invalid_pattern_postcodes = val_df.loc[
+        ~val_df["601"].apply(validate_postcode_pattern), "601"
     ]
 
     # Save to df
@@ -85,10 +85,26 @@ def validate_post_col(
             f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
         )
 
-    df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
+    # Remove the invalid pattern postcodes from the masterlist test
+    val_df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
+
+    # Clean and harmonise the "601" postcodes to match the masterlist
+    check_real_df = clean_postcodes(val_df, "601")
+
+    # Only validate not null postcodes
+    check_real_df = check_real_df.loc[~check_real_df["601"].isnull()]
 
     # Create a list of postcodes not found in masterlist
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
+    unreal_postcodes = check_pcs_real(df, check_real_df, postcode_masterlist, config)
+
+    # Create empty column for harmonised postcodes
+    df["postcodes_harmonised"] = np.nan
+
+    # Return harmonised postcodes for all rows of postcodes
+    harmonised_df = clean_postcodes(val_df, "postcodes_harmonised")
+    df.loc[harmonised_df.index, "postcodes_harmonised"] = harmonised_df[
+        "postcodes_harmonised"
+    ]
 
     # Save to df
     unreal_df = pd.DataFrame(
@@ -126,6 +142,7 @@ def validate_post_col(
 
 
 def insert_space(postcode, position):
+    """Automate the insertion of a space in a string"""
     return postcode[0:position] + " " + postcode[position:]
 
 
@@ -141,7 +158,64 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     return masterlist
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict):
+def clean_postcodes(df, column):
+    """Clean the postcodes to fit the masterlist format"""
+
+    # Create a copy df to manipulate
+    check_real_df = df.copy()
+
+    # Fill the new column with "601" and the nulls with "referencepostcode"
+    if column == "postcodes_harmonised":
+        check_real_df[column] = check_real_df["601"].fillna(
+            check_real_df["referencepostcode"]
+        )
+
+    # Convert to uppercase and strip whitespaces at start/end
+    check_real_df[column] = check_real_df[column].str.upper()
+    check_real_df[column] = check_real_df[column].str.strip()
+
+    # Renove whitespaces on larger than 8 characters
+    check_real_df.loc[
+        check_real_df[column].str.strip().str.len() > 8, column
+    ] = check_real_df.loc[
+        check_real_df[column].str.strip().str.len() > 8, column
+    ].str.replace(
+        " ", ""
+    )
+
+    # Add whitespace to 7 digit postcodes
+    check_real_df.loc[
+        check_real_df[column].str.strip().str.len() == 7, column
+    ] = check_real_df.loc[
+        check_real_df[column].str.strip().str.len() == 7, column
+    ].apply(
+        lambda x: insert_space(x, 4)
+    )
+
+    # Add 2 whitespaces to 6 digit postcodes
+    check_real_df.loc[check_real_df[column].str.strip().str.len() == 6, column] = (
+        check_real_df.loc[check_real_df[column].str.strip().str.len() == 6, column]
+        .apply(lambda x: insert_space(x, 3))
+        .apply(lambda x: insert_space(x, 4))
+    )
+
+    # Add 3 whitespaces to 5 digit postcodes
+    check_real_df.loc[check_real_df[column].str.strip().str.len() == 5, column] = (
+        check_real_df.loc[check_real_df[column].str.strip().str.len() == 5, column]
+        .apply(lambda x: insert_space(x, 2))
+        .apply(lambda x: insert_space(x, 3))
+        .apply(lambda x: insert_space(x, 4))
+    )
+
+    return check_real_df
+
+
+def check_pcs_real(
+    df: pd.DataFrame,
+    check_real_df: pd.DataFrame,
+    postcode_masterlist: pd.DataFrame,
+    config: dict,
+):
     """Checks if the postcodes are real against a masterlist of actual postcodes.
 
     In the masterlist, all postcodes are 7 characters long, therefore the
@@ -164,50 +238,13 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: 
         original postcodes not found in the masterlist
 
     """
-    # Create a copy df for validation
-    check_real_df = df.copy()
-
-    check_real_df["601"] = check_real_df["601"].str.upper()
-    check_real_df["601"] = check_real_df["601"].str.strip()
 
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
-        # Renove whitespaces on larger than 8 characters
-        check_real_df.loc[
-            check_real_df["601"].str.strip().str.len() > 8, "601"
-        ] = check_real_df.loc[
-            check_real_df["601"].str.strip().str.len() > 8, "601"
-        ].str.replace(
-            " ", ""
-        )
-
-        # Add whitespace to 7 digit postcodes
-        check_real_df.loc[
-            df["601"].str.strip().str.len() == 7, "601"
-        ] = check_real_df.loc[
-            check_real_df["601"].str.strip().str.len() == 7, "601"
-        ].apply(
-            lambda x: insert_space(x, 4)
-        )
-
-        # Add 2 whitespaces to 6 digit postcodes
-        check_real_df.loc[df["601"].str.strip().str.len() == 6, "601"] = (
-            check_real_df.loc[df["601"].str.strip().str.len() == 6, "601"]
-            .apply(lambda x: insert_space(x, 3))
-            .apply(lambda x: insert_space(x, 4))
-        )
-
-        # Add 3 whitespaces to 5 digit postcodes
-        check_real_df.loc[df["601"].str.strip().str.len() == 5, "601"] = (
-            check_real_df.loc[df["601"].str.strip().str.len() == 5, "601"]
-            .apply(lambda x: insert_space(x, 2))
-            .apply(lambda x: insert_space(x, 3))
-            .apply(lambda x: insert_space(x, 4))
-        )
-
         # Check if postcode are real
-        unreal_postcodes = df.loc[~check_real_df["601"].isin(master_series), "601"]
+        check = check_real_df[~check_real_df["601"].isin(master_series)]
+        unreal_postcodes = df.loc[check.index, "601"]
 
     else:
         emptydf = pd.DataFrame(columns=["601"])
