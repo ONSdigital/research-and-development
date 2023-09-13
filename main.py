@@ -9,4 +9,6 @@ reload(src)
 config_path = os.path.join("src", "developer_config.yaml")
 
 start = time.time()
-src.run_pipeline(start, config_path)
+run_time = src.run_pipeline(start, config_path)
+
+print(f"Time taken for pipeline: {run_time}")
