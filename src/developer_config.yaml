@@ -5,11 +5,13 @@ global:
   validate_postcodes: False
   postcode_csv_check: False
   load_historic_data: False
+  load_manual_outliers: False
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_short_form: True
+  output_short_form: False
+  dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
   current_year: 2022 # TODO: put this in the userconfig
@@ -36,7 +38,9 @@ network_paths:
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/gz_temp.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/SIC_to_PG.csv"
+  cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
+  cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
