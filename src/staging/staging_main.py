@@ -165,7 +165,7 @@ def run_staging(
     itl_mapper_path = paths["itl_path"]
     check_file_exists(itl_mapper_path)
     itl_mapper = read_csv(itl_mapper_path)
-    val.validate_data_with_schema(itl_mapper, "./config\itl_schema.toml")
+    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
     StagingMainLogger.info("ITL File Loaded Successfully...")
 
     # Loading cell number covarege
