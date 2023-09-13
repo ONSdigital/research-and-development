@@ -15,7 +15,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame
+    ultfoc_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
