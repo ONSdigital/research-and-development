@@ -98,7 +98,7 @@ def calculate_weighting_factor(
 
     for cell_number, cell_group in groupd_by_cell:
 
-        cell_number += 1
+        # cell_number += 1 TODO: investigate if this is needed in HDFS
 
         # Get N from cellno_dict
         N = cellno_dict[cell_number]
