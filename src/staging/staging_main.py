@@ -122,7 +122,7 @@ def run_staging(
         StagingMainLogger.info("Starting PostCode Validation")
         postcode_masterlist = paths["postcode_masterlist"]
         check_file_exists(postcode_masterlist)
-        postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
+        postcode_masterlist = read_csv(postcode_masterlist, ["pcd2"])
         invalid_df, unreal_df = val.validate_post_col(
             full_responses, postcode_masterlist, config
         )

@@ -41,7 +41,7 @@ def test_data_df(test_data_dict):
 # Mock the get_masterlist function
 def mock_get_masterlist(postcode_masterlist):
     # Return a mock masterlist series - actual postcodes of ONS offices
-    return pd.Series(["NP108XG", "SW1P4DF", "PO155RR"])
+    return pd.Series(["NP10 8XG", "SW1P 4DF", "PO15 5RR"])
 
 
 # Test case for validate_post_col
