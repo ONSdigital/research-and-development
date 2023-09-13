@@ -81,7 +81,7 @@ def run_pipeline(start, config_path):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper, cora_mapper, cellno_df = run_staging(
+    full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cora_mapper, cellno_df = run_staging(
         config, check_file_exists, load_json, read_csv, write_csv, run_id
     )
     MainLogger.info("Finished Data Ingest...")
@@ -119,7 +119,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_responses, config, write_csv, run_id, cora_mapper)
+    run_output(estimated_responses, config, write_csv, run_id, cora_mapper, ultfoc_mapper)
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")

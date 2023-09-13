@@ -88,10 +88,10 @@ def run_staging(
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    # the anonymised snapshot data we use in hdfs
+    # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
-    if network_or_hdfs == "hdfs":
+    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
     StagingMainLogger.info("Finished Data Ingest...")
 
@@ -163,6 +163,15 @@ def run_staging(
     )
     cora_mapper = validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
+    
+    # Load ultfoc (Foreign Ownership) mapper
+    StagingMainLogger.info("Loading Foreign Ownership File")
+    ultfoc_mapper_path = paths["ultfoc_mapper_path"]
+    check_file_exists(ultfoc_mapper_path)
+    ultfoc_mapper = read_csv(ultfoc_mapper_path)
+    val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
+    val.validate_ultfoc_df(ultfoc_mapper)
+    StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
@@ -182,4 +191,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, cora_mapper, cellno_df
+    return full_responses, manual_outliers, mapper, ultfoc_mapper, cora_mapper, cellno_df
