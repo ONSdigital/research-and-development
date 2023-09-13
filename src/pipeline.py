@@ -119,7 +119,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_responses, config, write_csv, run_id, cora_mapper, ultfoc_mapper)
+    run_output(estimated_responses, config, write_csv, run_id, ultfoc_mapper, cora_mapper)
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
