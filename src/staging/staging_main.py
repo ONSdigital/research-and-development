@@ -107,8 +107,8 @@ def run_staging(
     # TODO Find a fix for the datatype casting before uncommenting
     val.combine_schemas_validate_full_df(
         full_responses,
-        "config/contributors_schema.toml",
-        "config/wide_responses.toml",
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
     )
 
     # Data validation
@@ -124,7 +124,7 @@ def run_staging(
         StagingMainLogger.info("Starting PostCode Validation")
         postcode_masterlist = paths["postcode_masterlist"]
         check_file_exists(postcode_masterlist)
-        postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
+        postcode_masterlist = read_csv(postcode_masterlist, ["pcd2"])
         invalid_df, unreal_df = val.validate_post_col(
             full_responses, postcode_masterlist, config
         )
@@ -137,24 +137,28 @@ def run_staging(
     else:
         StagingMainLogger.info("PostCode Validation skipped")
 
-    # Stage the manual outliers file
-    StagingMainLogger.info("Loading Manual Outlier File")
-    manual_path = paths["manual_outliers_path"]
-    check_file_exists(manual_path)
-    wanted_cols = ["reference", "instance", "manual_outlier"]
-    manual_outliers = read_csv(manual_path, wanted_cols)
-    val.validate_data_with_schema(
-        manual_outliers, "./config/manual_outliers_schema.toml"
-    )
-    StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    if config["global"]["load_manual_outliers"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Manual Outlier File")
+        manual_path = paths["manual_outliers_path"]
+        check_file_exists(manual_path)
+        wanted_cols = ["reference", "instance", "manual_outlier"]
+        manual_outliers = read_csv(manual_path, wanted_cols)
+        val.validate_data_with_schema(
+            manual_outliers, "./config/manual_outliers_schema.toml"
+        )
+        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    else:
+        manual_outliers = None
+        StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    check_file_exists(mapper_path)
-    mapper = read_csv(mapper_path)
+    pg_mapper = paths["pg_mapper_path"]
+    check_file_exists(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
 
     # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(full_responses, mapper, target_col="201")
+    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -174,6 +178,14 @@ def run_staging(
     val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
     StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
+
+    # Load itl mapper
+    StagingMainLogger.info("Loading ITL File")
+    itl_mapper_path = paths["itl_path"]
+    check_file_exists(itl_mapper_path)
+    itl_mapper = read_csv(itl_mapper_path)
+    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
+    StagingMainLogger.info("ITL File Loaded Successfully...")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
@@ -196,7 +208,7 @@ def run_staging(
     return (
         full_responses,
         manual_outliers,
-        mapper,
+        pg_mapper,
         ultfoc_mapper,
         cora_mapper,
         cellno_df,

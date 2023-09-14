@@ -90,8 +90,6 @@ def run_pipeline(start, config_path):
         cellno_df,
     ) = run_staging(config, check_file_exists, load_json, read_csv, write_csv, run_id)
     MainLogger.info("Finished Data Ingest...")
-    print(full_responses.sample(10))
-    print(manual_outliers.head())
 
     # Imputation module
     # MainLogger.info("Starting Imputation...")
