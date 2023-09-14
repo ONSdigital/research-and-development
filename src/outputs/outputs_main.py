@@ -4,7 +4,8 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.short_form_out import run_shortform_prep, create_shortform_df
+import src.outputs.short_form_out as short
+import src.outputs.map_output_cols as map
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -34,13 +35,25 @@ def run_output(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
+    # Prepare the columns needed for outputs:
+
+    # Join foriegn ownership column using ultfoc mapper
+    estimated_df = map.join_fgn_ownership(estimated_df, ultfoc_mapper)
+
+    # Map to the CORA statuses from the statusencoded column
+    estimated_df = map.create_cora_status_col(estimated_df, cora_mapper)
+
+    # Map the sizebands based on frozen employment
+    estimated_df = map.map_sizebands(estimated_df)
+
+    # TODO: Map the itl regions using the postcodes
 
     # Prepare the shortform output dataframe
-    short_form_df = run_shortform_prep(estimated_df, cora_mapper, ultfoc_mapper, round_val=4)
+    short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
 
     # Create short form output dataframe with required columns from schema
-    schema_path = "config/shortform_outputs_schema.toml"
-    shortform_output = create_shortform_df(short_form_df, schema_path)
+    schema_path = "src/outputs/output_schemas/frozen_shortform_schema.toml"
+    shortform_output = short.create_shortform_df(short_form_df, schema_path)
 
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")

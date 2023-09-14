@@ -27,11 +27,7 @@ class TestCreateNewCols(unittest.TestCase):
                 "freeze_id": [np.nan, np.nan, np.nan, np.nan],
                 "inquiry_id": [np.nan, np.nan, np.nan, np.nan],
                 "period_contributor_id": [np.nan, np.nan, np.nan, np.nan],
-                "post_code": [np.nan, np.nan, np.nan, np.nan],
-                "product_group": [np.nan, np.nan, np.nan, np.nan],
                 "ua_county": [np.nan, np.nan, np.nan, np.nan],
-                "foreign_owner": [np.nan, np.nan, np.nan, np.nan],
-                "sizeband": [np.nan, np.nan, np.nan, np.nan],
                 "period_year": ["2022", "2022", "2021", "2021"],
             }
         )

@@ -21,11 +21,7 @@ def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
         "freeze_id",
         "inquiry_id",
         "period_contributor_id",
-        "post_code",
-        "product_group",
         "ua_county",
-        "foreign_owner",
-        "sizeband",
     ]
 
     # Added new columns from column_names list
@@ -77,104 +73,9 @@ def create_headcount_cols(
 
     return df
 
-def combine_dataframes(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Combine two DataFrames using a left join based on specified columns.
-
-    Args:
-        main_df (pd.DataFrame): The main DataFrame.
-        mapper_csv_path (pd.DataFrame): The mapper DataFrame.
-
-    Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
-    """
-    try:
-        # Perform left join
-        combined_df = main_df.merge(
-            mapper_df, how="left", left_on="reference", right_on="ruref"
-        )
-        combined_df.drop(columns=["ruref"], inplace=True)
-
-        return combined_df
-
-    except Exception as e:
-        raise ValueError(
-            "An error occurred while combining main_df and mapper_df: " + str(e)
-        )
-
-
-
-def map_sizebands(
-    df: pd.DataFrame,
-):
-    """Generate sizebands from the frozen employent column
-
-    Args:
-        df (pd.DataFrame): The original dataframe
-
-    Returns:
-        (pd.DataFrame): The dataframe with the sizebands column added
-    """
-    # Create a dictionary of sizeband parameters
-    sizeband_dict = {
-        1: {"min": 0, "max": 9},
-        2: {"min": 10, "max": 99},
-        3: {"min": 20, "max": 49},
-        4: {"min": 50, "max": 99},
-        5: {"min": 100, "max": 249},
-        6: {"min": 250, "max": np.inf},
-    }
-
-    # Create empty column
-    df["sizeband"] = np.nan
-
-    # Create conditions for sizebands
-    conditions = [
-        (sizeband_dict[key]["min"] <= df["frozenemployment"])
-        & (df["frozenemployment"] <= sizeband_dict[key]["max"])
-        for key in sizeband_dict.keys()
-    ]
-    decisions = [key for key in sizeband_dict.keys()]
-
-    # Apply the sizebands
-    for i in range(len(conditions)):
-        df.loc[conditions[i], "sizeband"] = decisions[i]
-
-    # Convert datatype to int
-    df["sizeband"] = df["sizeband"].astype("Int64")
-
-    return df
-
-def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
-    """_summary_
-
-    Args:
-        df (pd.DataFrame): main data containing responses
-        mapper_df (pd.DataFrame): mapper with cora status equivalents
-        main_col (str, optional): Defaults to "statusencoded".
-
-    Returns:
-        df: main data with cora status column added
-    """
-    
-    # Create hardcoded dictionary for mapping if csv is not used
-    cora_dict = {"statusencoded": 	[100,101,102,200,201,210,211,302,303,304,309],
-        "form_status": [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400]}
-
-    # convert mapper df to dictionary
-    mapper_dict = dict(zip(mapper_df[main_col], mapper_df["form_status"]))
-
-    # Create a new column by mapping values from main_col using the
-    # mapper dictionary
-    df["form_status"] = df[main_col].map(mapper_dict)
-    
-    return df
-
 
 def run_shortform_prep(
     df: pd.DataFrame,
-    cora_mapper: pd.DataFrame,
-    ultfoc_mapper: pd.DataFrame,
     round_val: int = 4,
 ) -> pd.DataFrame:
     """Prepare data for short form output.
@@ -191,28 +92,19 @@ def run_shortform_prep(
     Returns:
         pd.DataFrame: The dataframe prepared for short form output.
     """
-    
-    # Create combined ownership column using mapper
-    df = combine_dataframes(df, ultfoc_mapper)
 
     # Filter for short-forms
     df = df.loc[df["formtype"] == "0006"]
-    
-    # Map to the CORA statuses from the statusencoded column
-    df = create_cora_status_col(df,cora_mapper)
 
     # Filter for CORA statuses [600, 800]
     df = df.loc[df["form_status"].isin(["600", "800"])]
 
-    # create new columns and create a 'year' column
+    # Create missing columns and create a 'year' column
     df = create_new_cols(df)
 
     # create columns for headcounts for civil and defense
     df = create_headcount_cols(df, round_val)
 
-    # Map the sizebands based on frozen employment
-    df = map_sizebands(df)
-    
     return df
 
 
