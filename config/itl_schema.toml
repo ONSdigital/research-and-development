@@ -1,0 +1,99 @@
+[LAD20CD]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[LAD20NM]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[LAU121CD]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[LAU121NM]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL321CD]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL321NM]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL221CD]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL221NM]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL121CD]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+
+[ITL121NM]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]

@@ -152,9 +152,9 @@ def run_staging(
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    check_file_exists(mapper_path)
-    mapper = read_csv(mapper_path)
+    pg_mapper = paths["pg_mapper_path"]
+    check_file_exists(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -175,6 +175,14 @@ def run_staging(
     val.validate_ultfoc_df(ultfoc_mapper)
     StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
 
+    # Load itl mapper
+    StagingMainLogger.info("Loading ITL File")
+    itl_mapper_path = paths["itl_path"]
+    check_file_exists(itl_mapper_path)
+    itl_mapper = read_csv(itl_mapper_path)
+    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
+    StagingMainLogger.info("ITL File Loaded Successfully...")
+
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
     cellno_path = paths["cellno_path"]
@@ -193,11 +201,5 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return (
-        full_responses,
-        manual_outliers,
-        mapper,
-        ultfoc_mapper,
-        cora_mapper,
-        cellno_df,
-    )
+    return full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cora_mapper, cellno_df
+
