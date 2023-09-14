@@ -36,7 +36,7 @@ hdfs_paths:
   estimation_path:  "/ons/rdbe_dev/estimation"
   output_path:  "/ons/rdbe_dev/outputs"
   cellno_path: '/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv'
-  short_form_schema: "src\outputs\output_schemas\shortform_output_schema.toml"
+  short_form_schema: "src/outputs/output_schemas/shortform_output_schema.toml"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
