@@ -154,7 +154,7 @@ def run_staging(
     # Load the PG mapper
     pg_mapper = paths["pg_mapper_path"]
     check_file_exists(pg_mapper)
-    mapper = read_csv(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -203,4 +203,4 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, ultfoc_mapper, cora_mapper, cellno_df
+    return full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cora_mapper, cellno_df
