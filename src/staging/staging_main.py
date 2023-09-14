@@ -149,21 +149,7 @@ def run_staging(
     # Load the PG mapper
     mapper_path = paths["mapper_path"]
     check_file_exists(mapper_path)
-    mapper = read_csv(
-        mapper_path,
-        cols=[
-            "SIC 2003",
-            "SIC 2003_Description",
-            "SIC 2007_CODE",
-            "SIC 2007_Description",
-            "Table 23 SIC Group",
-            "2010 Pub PG",
-            "2016 > Pub PG",
-            "2009 Form PG",
-            "2010 Form PG",
-            "2016 > Form PG",
-        ],
-    )
+    mapper = read_csv(mapper_path)
 
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
