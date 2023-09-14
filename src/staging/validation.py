@@ -117,10 +117,13 @@ def validate_post_col(
     )
 
     # Log the unreal postcodes
-    if not unreal_postcodes.empty:
-        validation_logger.warning(
-            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
-        )
+    validation_logger.warning(
+        f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
+    )
+    
+    validation_logger.warning(
+        f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
+    )
 
     # Combine the two lists
     combined_invalid_postcodes = pd.concat(
