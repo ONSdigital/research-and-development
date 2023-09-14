@@ -161,13 +161,11 @@ def run_staging(
     cora_mapper_path = paths["cora_mapper_path"]
     check_file_exists(cora_mapper_path)
     cora_mapper = read_csv(cora_mapper_path)
-    #validates and updates from int64 to string type
-    val.validate_data_with_schema(
-        cora_mapper, "./config/cora_schema.toml"
-    )
+    # validates and updates from int64 to string type
+    val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
     cora_mapper = validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
-    
+
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
@@ -195,4 +193,11 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, ultfoc_mapper, cora_mapper, cellno_df
+    return (
+        full_responses,
+        manual_outliers,
+        mapper,
+        ultfoc_mapper,
+        cora_mapper,
+        cellno_df,
+    )

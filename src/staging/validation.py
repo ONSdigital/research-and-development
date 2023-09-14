@@ -7,13 +7,6 @@ import numpy as np
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
 
-# from src.utils.helpers import Config_settings
-
-# Get the config
-# conf_obj = Config_settings(config_path)
-# config = conf_obj.config_dict
-# global_config = config["global"]
-
 # Set up logging
 validation_logger = logging.getLogger(__name__)
 
@@ -49,6 +42,10 @@ def validate_post_col(
         are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
 
+        This is done in 2 steps:
+        First we validate the pattern of the postcode.
+        Secondly if a postcode is valid, we validate that the postcodes are real
+
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
@@ -80,28 +77,32 @@ def validate_post_col(
     )
 
     # Log the invalid postcodes
-    if not invalid_pattern_postcodes.empty:
-        validation_logger.warning(
-            f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
-        )
+    validation_logger.warning(
+        f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
+    )
+    validation_logger.warning(
+        f"Number of invalid pattern postcodes found: {len(invalid_pattern_postcodes.to_list())}"
+    )
 
-    # Remove the invalid pattern postcodes from the masterlist test
+    # Remove the invalid pattern postcodes before checking if they are real
     val_df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
 
     # Clean and harmonise the "601" postcodes to match the masterlist
     check_real_df = clean_postcodes(val_df, "601")
 
-    # Only validate not null postcodes
+    # Only validate not null postcodes for the column "601"
     check_real_df = check_real_df.loc[~check_real_df["601"].isnull()]
 
-    # Create a list of postcodes not found in masterlist
+    # Create a list of not real postcodes not found in masterlist for the column "601"
     unreal_postcodes = check_pcs_real(df, check_real_df, postcode_masterlist, config)
 
     # Create empty column for harmonised postcodes
     df["postcodes_harmonised"] = np.nan
 
     # Return harmonised postcodes for all rows of postcodes
+    # (either "601" or "referencepostcode")
     harmonised_df = clean_postcodes(val_df, "postcodes_harmonised")
+    # Fill the harmonised postcodes into the full dataframe
     df.loc[harmonised_df.index, "postcodes_harmonised"] = harmonised_df[
         "postcodes_harmonised"
     ]
@@ -159,7 +160,17 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
 
 
 def clean_postcodes(df, column):
-    """Clean the postcodes to fit the masterlist format"""
+    """Clean the postcodes to fit the masterlist format
+    This is done by applying all the following steps:
+
+    - remove whitespaces on postcodes of 8+ characters
+    - add 1 whitespace for 7 digit postcodes
+    - add 2 whitespaces for 6 digit postcodes
+    - add 3 whitespaces for 5 digit postcodes
+
+    Once all the postcodes are 8 characters long, they match the pcd2 column
+    we is used to validate postcodes.
+    """
 
     # Create a copy df to manipulate
     check_real_df = df.copy()

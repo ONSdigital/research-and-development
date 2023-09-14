@@ -18,7 +18,7 @@ def run_output(
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
-    cora_mapper: pd.DataFrame
+    cora_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -36,7 +36,7 @@ def run_output(
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
-    
+
     # Create combined ownership column using mapper
     estimated_df = combine_dataframes(estimated_df, ultfoc_mapper)
 
