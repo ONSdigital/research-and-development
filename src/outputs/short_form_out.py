@@ -21,7 +21,6 @@ def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
         "freeze_id",
         "inquiry_id",
         "period_contributor_id",
-        "ua_county",
     ]
 
     # Added new columns from column_names list

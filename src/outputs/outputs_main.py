@@ -17,6 +17,7 @@ def run_output(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
+    postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -46,7 +47,8 @@ def run_output(
     # Map the sizebands based on frozen employment
     estimated_df = map.map_sizebands(estimated_df)
 
-    # TODO: Map the itl regions using the postcodes
+    # Map the itl regions using the postcodes
+    estimated_df = map.join_itl_regions(estimated_df, postcode_itl_mapper)
 
     # Prepare the shortform output dataframe
     short_form_df = short.run_shortform_prep(estimated_df, round_val=4)

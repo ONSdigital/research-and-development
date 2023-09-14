@@ -120,7 +120,7 @@ def validate_post_col(
     validation_logger.warning(
         f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
     )
-    
+
     validation_logger.warning(
         f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
     )

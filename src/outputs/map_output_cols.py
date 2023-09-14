@@ -98,3 +98,28 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
     df["form_status"] = df[main_col].map(mapper_dict)
 
     return df
+
+
+def join_itl_regions(df: pd.DataFrame, itl_mapper: pd.DataFrame):
+    """Joins the itl regions onto the full dataframe using the mapper provided
+
+    Args:
+        df (pd.DataFrame): Full dataframe
+        itl_mapper (pd.DataFrame): Mapper containing postcodes and regions
+
+    Returns:
+        df: Dataframe with column "ua_county" for regions
+    """
+    try:
+        # Perform left join
+        df = df.merge(
+            itl_mapper, how="left", left_on="postcodes_harmonised", right_on="pcd2"
+        )
+        df.drop(columns=["pcd2"], inplace=True)
+
+        return df
+
+    except Exception as e:
+        raise ValueError(
+            "An error occurred while combining df and itl_mapper: " + str(e)
+        )

@@ -27,7 +27,7 @@ old_name = "form_status"
 Deduced_Data_Type = "category"
 
 [ua_county]
-old_name = "ua_county"
+old_name = "itl"
 Deduced_Data_Type = "float64"
 
 [employee_count]

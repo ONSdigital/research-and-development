@@ -119,23 +119,23 @@ def run_staging(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
 
-    # Stage and validate the postcode column
-    if config["global"]["validate_postcodes"]:
-        StagingMainLogger.info("Starting PostCode Validation")
-        postcode_masterlist = paths["postcode_masterlist"]
-        check_file_exists(postcode_masterlist)
-        postcode_masterlist = read_csv(postcode_masterlist, ["pcd2"])
-        invalid_df, unreal_df = val.validate_post_col(
-            full_responses, postcode_masterlist, config
-        )
-        pcodes_folder = paths["postcode_path"]
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
-        unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
-        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-        write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
-    else:
-        StagingMainLogger.info("PostCode Validation skipped")
+    # Stage, validate and harmonise the postcode column
+    StagingMainLogger.info("Starting PostCode Validation")
+    postcode_masterlist = paths["postcode_masterlist"]
+    check_file_exists(postcode_masterlist)
+    postcode_df = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_df["pcd2"]
+    invalid_df, unreal_df = val.validate_post_col(
+        full_responses, postcode_masterlist, config
+    )
+    StagingMainLogger.info("Saving Invalid Postcodes to File")
+    pcodes_folder = paths["postcode_path"]
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+    unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+    write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
+    StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -212,4 +212,5 @@ def run_staging(
         ultfoc_mapper,
         cora_mapper,
         cellno_df,
+        postcode_df,
     )
