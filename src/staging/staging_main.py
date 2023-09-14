@@ -152,7 +152,7 @@ def run_staging(
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
-    pg_mapper = paths["mapper_path"]
+    pg_mapper = paths["pg_mapper_path"]
     check_file_exists(pg_mapper)
     mapper = read_csv(pg_mapper)
 
