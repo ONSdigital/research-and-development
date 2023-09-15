@@ -54,7 +54,7 @@ def run_output(
     short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
 
     # Create short form output dataframe with required columns from schema
-    schema_path = "src/outputs/output_schemas/frozen_shortform_schema.toml"
+    schema_path = config["schema_paths"]["frozen_shortform_schema"]
     shortform_output = short.create_shortform_df(short_form_df, schema_path)
 
     if config["global"]["output_short_form"]:

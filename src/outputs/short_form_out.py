@@ -109,7 +109,8 @@ def run_shortform_prep(
 
 def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
     """Creates the shortform dataframe for outputs with
-    the required columns. The naming
+    the required columns. The naming of the columns comes
+    from the schema provided.
 
     Args:
         df (pd.DataFrame): Dataframe containing all columns
@@ -129,12 +130,16 @@ def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
         for column_nm in output_schema.keys()
     }
 
-    # Create empty dataframe for outputs
-    output_df = pd.DataFrame()
+    # Create subset dataframe with only the required outputs
+    output_df = df[df.columns.intersection(colname_dict.keys())]
 
-    # Add required columns from schema to output
-    for key in colname_dict.keys():
-        output_df[colname_dict[key]] = df[key]
+    # Rename columns to match the output specification
+    output_df.rename(
+        columns={key: colname_dict[key] for key in colname_dict}, inplace=True
+    )
+
+    # Rearrange to match user defined output order
+    output_df = output_df[colname_dict.values()]
 
     # Validate datatypes before output
     validate_data_with_schema(output_df, schema)

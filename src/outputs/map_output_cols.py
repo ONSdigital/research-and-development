@@ -73,7 +73,11 @@ def map_sizebands(
 
 
 def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
-    """_summary_
+    """Creates a new column named form_status by mapping
+    the statusencoded column using a provided mapper.
+
+    NOTE: A dictionary of the mapper is also provided in the case
+    that a decison to not use a csv file is made.
 
     Args:
         df (pd.DataFrame): main data containing responses
