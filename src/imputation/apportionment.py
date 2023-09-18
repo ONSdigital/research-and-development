@@ -22,11 +22,9 @@ def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The main dataset with totals.
     """
-    total_202_all = df.groupby("reference")["202"].transform(sum)
-    df["tot_202_all"] = np.where(total_202_all >0, total_202_all, np.nan)
+    df["tot_202_all"] = df.groupby("reference")["202"].transform(sum)
 
-    total_202_CD = df.groupby(["reference", "200"])["202"].transform(sum)
-    df["tot_202_CD"] = np.where(total_202_CD >0, total_202_CD, np.nan)
+    df["tot_202_CD"] = df.groupby(["reference", "200"])["202"].transform(sum)
 
     return df
 
@@ -63,16 +61,16 @@ def calc_fte_column(
         pd.Dataframe: The dataset with one new column for FTE.    
     """
 
-    # create new apportionment column for the civil cases
+    # create new apportionment column for the civil cases (avoid division by 0)
     for new_col, old_cols in fte_dict.items():
-        df.loc[df["200"] == "C", new_col] = round(
+        df.loc[(df["200"] == "C") & (df["tot_202_CD"] > 0), new_col] = round(
             update_column(df, old_cols[0]) * df["202"] / df["tot_202_CD"],
             round_val
         )
 
-    # # create new apportionment column for the defence cases
+    # create new apportionment column for the defence cases (avoid div'n by 0)
     for new_col, old_cols in fte_dict.items():
-        df.loc[df["200"] == "D", new_col] = round(
+        df.loc[(df["200"] == "D") & (df["tot_202_CD"] > 0), new_col] = round(
             update_column(df, old_cols[1]) * df["202"] / df["tot_202_CD"],
             round_val
         )
