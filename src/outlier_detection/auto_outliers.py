@@ -9,8 +9,7 @@ import math
 AutoOutlierLogger = logging.getLogger(__name__)
 
 
-def validate_config(
-        upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
+def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
     """Validate the outlier config settings.
 
     Args:
@@ -21,10 +20,8 @@ def validate_config(
     Raises:
         ImportError if upper_clip or lower_clip have invalid values
     """
-    AutoOutlierLogger.info(
-        f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
-    AutoOutlierLogger.info(
-        f"The columns to be flagged for outliers: {flag_value_cols}")
+    AutoOutlierLogger.info(f"Upper clip: {upper_clip}, Lower clip: {lower_clip}")
+    AutoOutlierLogger.info(f"The columns to be flagged for outliers: {flag_value_cols}")
 
     if (upper_clip == 0) and (lower_clip == 0):
         AutoOutlierLogger.warning(
@@ -124,16 +121,16 @@ def flag_outliers(
             return f + 1
 
     # Add group count - how many RU refs there are in a cell, perod
-    filtered_df["group_count"] = filtered_df.groupby(
-        groupby_cols)[value_col].transform("count")
+    filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform(
+        "count"
+    )
 
     # Rank margins
     filtered_df["high"] = filtered_df["group_count"] * upper_clip
     filtered_df["high_rounded"] = filtered_df.apply(
         lambda row: _normal_round(row["high"]), axis=1
     )
-    filtered_df["upper_band"] = filtered_df[
-        "group_count"] - filtered_df["high_rounded"]
+    filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(
@@ -141,8 +138,7 @@ def flag_outliers(
     )
 
     # Ranks of RU refs in each group, depending on their value
-    filtered_df["group_rank"] = filtered_df.groupby(
-        groupby_cols)[value_col].rank(
+    filtered_df["group_rank"] = filtered_df.groupby(groupby_cols)[value_col].rank(
         method="first", ascending=True
     )
 
@@ -160,14 +156,12 @@ def flag_outliers(
 
     # merge back to the original df
     df = df.merge(filtered_df, how="left", on=groupby_cols + [ruref_col])
-    df[f"{value_col}_outlier_flag"] = df[
-        f"{value_col}_outlier_flag"].fillna(False)
+    df[f"{value_col}_outlier_flag"] = df[f"{value_col}_outlier_flag"].fillna(False)
 
     return df
 
 
-def decide_outliers(
-        df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
+def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
     """Determine whether a reference should be treated as an outlier.
 
     If any of the colunns in the list flag_value_cols has been flagged as an
@@ -212,10 +206,7 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
 
 
 def run_auto_flagging(
-    df: pd.DataFrame,
-    upper_clip: float,
-    lower_clip: float,
-    flag_value_cols: List[str]
+    df: pd.DataFrame, upper_clip: float, lower_clip: float, flag_value_cols: List[str]
 ) -> pd.DataFrame:
     """Flag outliers based on clipping values specified in the config.
 
@@ -275,8 +266,7 @@ def run_auto_flagging(
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
-    msg = ("Outlier flags have been created"
-           f"for {num_flagged} records in total.")
+    msg = "Outlier flags have been created" f"for {num_flagged} records in total."
     AutoOutlierLogger.info(msg)
 
     AutoOutlierLogger.info("Finishing automatic outlier detection.")

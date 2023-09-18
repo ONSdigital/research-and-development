@@ -2,17 +2,10 @@ import os
 import toml
 import postcodes_uk
 import pandas as pd
-from numpy import nan
+import numpy as np
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
-
-# from src.utils.helpers import Config_settings
-
-# Get the config
-# conf_obj = Config_settings(config_path)
-# config = conf_obj.config_dict
-# global_config = config["global"]
 
 # Set up logging
 validation_logger = logging.getLogger(__name__)
@@ -28,8 +21,11 @@ def validate_postcode_pattern(pcode: str) -> bool:
     Returns:
         bool: True or False depending on if it is valid or not
     """
+
     if pcode is None:
         return False
+
+    pcode = pcode.upper().strip()
 
     # Validation step
     valid_bool = postcodes_uk.validate(pcode)
@@ -46,10 +42,15 @@ def validate_post_col(
         are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
 
+        This is done in 2 steps:
+        First we validate the pattern of the postcode.
+        Secondly if a postcode is valid, we validate that the postcodes are real
+
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
         postocdes to check against
+        config (dict): The postcode settings from the config settings
 
     Returns:
         invalid_df (pd.DataFrame): A dataframe of postcodes with the incorrect pattern
@@ -58,10 +59,12 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    # Check if postcodes match pattern
-    # Create list of postcodes with incorrect patterns
-    invalid_pattern_postcodes = df.loc[
-        ~df["referencepostcode"].apply(validate_postcode_pattern), "referencepostcode"
+    # Can only validate not null postcodes
+    val_df = df.loc[~df["601"].isnull()]
+
+    # Apply the pattern validation function
+    invalid_pattern_postcodes = val_df.loc[
+        ~val_df["601"].apply(validate_postcode_pattern), "601"
     ]
 
     # Save to df
@@ -74,13 +77,35 @@ def validate_post_col(
     )
 
     # Log the invalid postcodes
-    if not invalid_pattern_postcodes.empty:
-        validation_logger.warning(
-            f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
-        )
+    validation_logger.warning(
+        f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
+    )
+    validation_logger.warning(
+        f"Number of invalid pattern postcodes found: {len(invalid_pattern_postcodes.to_list())}"
+    )
 
-    # Create a list of postcodes not found in masterlist
-    unreal_postcodes = check_pcs_real(df, postcode_masterlist, config)
+    # Remove the invalid pattern postcodes before checking if they are real
+    val_df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
+
+    # Clean and harmonise the "601" postcodes to match the masterlist
+    check_real_df = clean_postcodes(val_df, "601")
+
+    # Only validate not null postcodes for the column "601"
+    check_real_df = check_real_df.loc[~check_real_df["601"].isnull()]
+
+    # Create a list of not real postcodes not found in masterlist for the column "601"
+    unreal_postcodes = check_pcs_real(df, check_real_df, postcode_masterlist, config)
+
+    # Create empty column for harmonised postcodes
+    df["postcodes_harmonised"] = np.nan
+
+    # Return harmonised postcodes for all rows of postcodes
+    # (either "601" or "referencepostcode")
+    harmonised_df = clean_postcodes(val_df, "postcodes_harmonised")
+    # Fill the harmonised postcodes into the full dataframe
+    df.loc[harmonised_df.index, "postcodes_harmonised"] = harmonised_df[
+        "postcodes_harmonised"
+    ]
 
     # Save to df
     unreal_df = pd.DataFrame(
@@ -92,10 +117,13 @@ def validate_post_col(
     )
 
     # Log the unreal postcodes
-    if not unreal_postcodes.empty:
-        validation_logger.warning(
-            f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
-        )
+    validation_logger.warning(
+        f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
+    )
+    
+    validation_logger.warning(
+        f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
+    )
 
     # Combine the two lists
     combined_invalid_postcodes = pd.concat(
@@ -118,6 +146,7 @@ def validate_post_col(
 
 
 def insert_space(postcode, position):
+    """Automate the insertion of a space in a string"""
     return postcode[0:position] + " " + postcode[position:]
 
 
@@ -133,7 +162,74 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     return masterlist
 
 
-def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict):
+def clean_postcodes(df, column):
+    """Clean the postcodes to fit the masterlist format
+    This is done by applying all the following steps:
+
+    - remove whitespaces on postcodes of 8+ characters
+    - add 1 whitespace for 7 digit postcodes
+    - add 2 whitespaces for 6 digit postcodes
+    - add 3 whitespaces for 5 digit postcodes
+
+    Once all the postcodes are 8 characters long, they match the pcd2 column
+    we is used to validate postcodes.
+    """
+
+    # Create a copy df to manipulate
+    check_real_df = df.copy()
+
+    # Fill the new column with "601" and the nulls with "referencepostcode"
+    if column == "postcodes_harmonised":
+        check_real_df[column] = check_real_df["601"].fillna(
+            check_real_df["referencepostcode"]
+        )
+
+    # Convert to uppercase and strip whitespaces at start/end
+    check_real_df[column] = check_real_df[column].str.upper()
+    check_real_df[column] = check_real_df[column].str.strip()
+
+    # Renove whitespaces on larger than 8 characters
+    check_real_df.loc[
+        check_real_df[column].str.strip().str.len() > 8, column
+    ] = check_real_df.loc[
+        check_real_df[column].str.strip().str.len() > 8, column
+    ].str.replace(
+        " ", ""
+    )
+
+    # Add whitespace to 7 digit postcodes
+    check_real_df.loc[
+        check_real_df[column].str.strip().str.len() == 7, column
+    ] = check_real_df.loc[
+        check_real_df[column].str.strip().str.len() == 7, column
+    ].apply(
+        lambda x: insert_space(x, 4)
+    )
+
+    # Add 2 whitespaces to 6 digit postcodes
+    check_real_df.loc[check_real_df[column].str.strip().str.len() == 6, column] = (
+        check_real_df.loc[check_real_df[column].str.strip().str.len() == 6, column]
+        .apply(lambda x: insert_space(x, 3))
+        .apply(lambda x: insert_space(x, 4))
+    )
+
+    # Add 3 whitespaces to 5 digit postcodes
+    check_real_df.loc[check_real_df[column].str.strip().str.len() == 5, column] = (
+        check_real_df.loc[check_real_df[column].str.strip().str.len() == 5, column]
+        .apply(lambda x: insert_space(x, 2))
+        .apply(lambda x: insert_space(x, 3))
+        .apply(lambda x: insert_space(x, 4))
+    )
+
+    return check_real_df
+
+
+def check_pcs_real(
+    df: pd.DataFrame,
+    check_real_df: pd.DataFrame,
+    postcode_masterlist: pd.DataFrame,
+    config: dict,
+):
     """Checks if the postcodes are real against a masterlist of actual postcodes.
 
     In the masterlist, all postcodes are 7 characters long, therefore the
@@ -156,40 +252,17 @@ def check_pcs_real(df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: 
         original postcodes not found in the masterlist
 
     """
-    # Create a copy df for validation
-    check_real_df = df.copy()
 
     if config["global"]["postcode_csv_check"]:
         master_series = get_masterlist(postcode_masterlist)
 
-        # Renove whitespaces on larger than 7 characters
-        check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
-        ] = check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() > 7, "referencepostcode"
-        ].str.replace(
-            " ", ""
-        )
-
-        # Add whitespace to short postcodes
-        check_real_df.loc[
-            df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ] = check_real_df.loc[
-            check_real_df["referencepostcode"].str.len() < 7, "referencepostcode"
-        ].apply(
-            lambda x: insert_space(x, 3)
-        )
-
         # Check if postcode are real
-        unreal_postcodes = df.loc[
-            ~check_real_df["referencepostcode"].isin(master_series), "referencepostcode"
-        ]
+        check = check_real_df[~check_real_df["601"].isin(master_series)]
+        unreal_postcodes = df.loc[check.index, "601"]
 
     else:
-        emptydf = pd.DataFrame(columns=["referencepostcode"])
-        unreal_postcodes = emptydf.loc[
-            ~emptydf["referencepostcode"], "referencepostcode"
-        ]
+        emptydf = pd.DataFrame(columns=["601"])
+        unreal_postcodes = emptydf.loc[~emptydf["601"], "601"]
 
     return unreal_postcodes
 
@@ -295,7 +368,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes_dict[column] == "pd.NA":
             # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
+            survey_df[column] = np.nan
             dtypes_dict[column] = "float64"
 
         try:
@@ -345,7 +418,7 @@ def combine_schemas_validate_full_df(
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes[column] == "pd.NA":
             # Replace whatever is in that column with np.nan
-            survey_df[column] = nan
+            survey_df[column] = np.nan
             dtypes[column] = "float64"
 
             # Try to cast each column to the required data type
@@ -377,7 +450,6 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
     Args:
         df (pd.DataFrame): The input DataFrame containing 'ruref'
         and 'ultfoc' columns.
-
     """
     try:
         # Check DataFrame shape
