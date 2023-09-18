@@ -3,6 +3,8 @@ import logging
 import pandas as pd
 import numpy as np
 
+from typing import Dict, List
+
 ApportionmentLogger = logging.getLogger(__name__)
 
 
@@ -48,10 +50,39 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
     return updated_col
 
 
-def calc_fte_column(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
+def calc_fte_column(
+    df: pd.DataFrame, 
+    fte_dict: Dict[str, List[str]], 
+    round_val=4
+) -> pd.DataFrame:
     """Create a new column for FTE values.
 
-    FTE is Full Time Equivalent and the values from instance 0
+    Args:
+        df (pd.DataFrame): The main dataset for apportionment.
+    Returns:
+        pd.Dataframe: The dataset with one new column for FTE.    
+    """
+
+    # create new apportionment column for the civil cases
+    for new_col, old_cols in fte_dict.items():
+        df.loc[df["200"] == "C", new_col] = round(
+            update_column(df, old_cols[0]) * df["202"] / df["tot_202_CD"],
+            round_val
+        )
+
+    # # create new apportionment column for the defence cases
+    for new_col, old_cols in fte_dict.items():
+        df.loc[df["200"] == "D", new_col] = round(
+            update_column(df, old_cols[1]) * df["202"] / df["tot_202_CD"],
+            round_val
+        )
+
+    return df
+
+
+def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
+    """
+        FTE is Full Time Equivalent and the values from instance 0
     are apportioned to other instances, based on values in 
     the 4xx columns (405 - 412)
     8 new columns are created, 4 each for Civil and Defence.
@@ -59,17 +90,23 @@ def calc_fte_column(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
     Returns:
-        pd.Dataframe: The dataset with new columns for FTE.    
+        pd.Dataframe: The dataset with all the new columns for FTE.   
     """
-    #TODO: Generalise this function to pass a dictionary {newcol:oldcol} 
-    #TODO and whether C or D.
-    df.loc[df["200"] == "C", "emp_researcher"] = round(
-        update_column(df, "405") * df["202"] / df["tot_202_CD"],
-        round_val
-    )
+    FTE_dict = {
+        "emp_researcher": ["405", "406"],
+        "emp_technician": ["407", "408"],
+        "emp_other": ["409", "410"],
+        "emp_total": ["411", "412"],
+    }
+
+    df = calc_fte_column(df, fte_dict, round_val=4)
+    # FTE_defence = {
+    #     "emp_researcher": "406",
+    #     "emp_technician": "407",
+    #     "emp_other": "409",
+    #     "emp_total": "411",
+    # }
     return df
-
-
 
 def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
     """Create new columns for FTE values.
