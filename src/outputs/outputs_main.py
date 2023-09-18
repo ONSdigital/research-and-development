@@ -49,6 +49,9 @@ def run_output(
 
     # Map the itl regions using the postcodes
     estimated_df = map_o.join_itl_regions(estimated_df, postcode_itl_mapper)
+    
+    # Map q713 and q714 to numeric format
+    estimated_df = map_o.map_to_numeric(estimated_df)
 
     # Prepare the shortform output dataframe
     short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
