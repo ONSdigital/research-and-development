@@ -128,6 +128,7 @@ def join_itl_regions(df: pd.DataFrame, itl_mapper: pd.DataFrame):
             "An error occurred while combining df and itl_mapper: " + str(e)
         )
 
+
 def map_to_numeric(df: pd.DataFrame):
     """Map q713 and q714 in dataframe from letters to numeric format
     Yes is mapped to 1
@@ -137,26 +138,22 @@ def map_to_numeric(df: pd.DataFrame):
 
     Args:
         df (pd.DataFrame): The original dataframe
-        
+
     Returns:
         df: Dataframe with numeric values for q713/714
     """
-    
-    
-    df = df.astype({'713': 'object', '714': 'object'})
+
+    df = df.astype({"713": "object", "714": "object"})
     # Map the actual responses to the corresponding integer
-    mapper_dict = {"Yes": 1,
-                   "No": 2,
-                   "": 3}
-    
+    mapper_dict = {"Yes": 1, "No": 2, "": 3}
+
     df["713"] = df["713"].map(mapper_dict)
     df["714"] = df["714"].map(mapper_dict)
-    
+
     # Convert all nulls to unanswered (map to 3)
     df.loc[df["713"].isnull(), "713"] = 3
     df.loc[df["714"].isnull(), "714"] = 3
-    
+
     # Return columns as integers
-    df = df.astype({'713': 'Int64', '714': 'Int64'})
+    df = df.astype({"713": "Int64", "714": "Int64"})
     return df
-    

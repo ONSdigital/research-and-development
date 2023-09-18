@@ -49,7 +49,7 @@ def run_output(
 
     # Map the itl regions using the postcodes
     estimated_df = map_o.join_itl_regions(estimated_df, postcode_itl_mapper)
-    
+
     # Map q713 and q714 to numeric format
     estimated_df = map_o.map_to_numeric(estimated_df)
 
