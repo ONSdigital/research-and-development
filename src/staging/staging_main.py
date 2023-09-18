@@ -191,12 +191,12 @@ def run_staging(
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
-    if (network_or_hdfs == "network") & (config["global"]["output_full_responses"]):
+    if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
-        test_folder = config["network_paths"]["staging_test_foldername"]
+        staging_folder = paths["staging_output_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
         staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
-        write_csv(f"{test_folder}/{staged_filename}", full_responses)
+        write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
