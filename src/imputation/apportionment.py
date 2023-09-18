@@ -78,6 +78,29 @@ def calc_fte_column(
     return df
 
 
+def calc_headcount_column(
+    df: pd.DataFrame, 
+    hc_dict: Dict[str, str], 
+    round_val=4
+) -> pd.DataFrame:
+    """Create a new column for headcount values.
+
+    Args:
+        df (pd.DataFrame): The main dataset for apportionment.
+    Returns:
+        pd.Dataframe: The dataset with one new column for headcounts
+    """
+
+    # create new apportionment column (avoid division by 0)
+    for new_col, old_col in hc_dict.items():
+        df.loc[df["tot_202_all"] > 0, new_col] = round(
+            update_column(df, old_col) * df["202"] / df["tot_202_all"],
+            round_val
+        )
+
+    return df
+
+
 def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     """
         FTE is Full Time Equivalent and the values from instance 0
@@ -90,7 +113,7 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     Returns:
         pd.Dataframe: The dataset with all the new columns for FTE.   
     """
-    FTE_dict = {
+    fte_dict = {
         "emp_researcher": ["405", "406"],
         "emp_technician": ["407", "408"],
         "emp_other": ["409", "410"],
@@ -98,13 +121,10 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     }
 
     df = calc_fte_column(df, fte_dict, round_val=4)
-    # FTE_defence = {
-    #     "emp_researcher": "406",
-    #     "emp_technician": "407",
-    #     "emp_other": "409",
-    #     "emp_total": "411",
-    # }
+
     return df
+
+
 
 def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
     """Create new columns for FTE values.
@@ -118,10 +138,21 @@ def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.Dataframe: The dataset with new columns headcounts
     """
-    #TODO: just one column created so far and code not tested
-    df["headcount_res_m"] = (
-        update_column(df, "501") * df["202"] / df["tot_202_all"]
-    )
+    hc_dict = {
+        "headcount_res_m": "501",
+        "headcount_res_f": "502",
+        "headcount_tec_m": "503",
+        "headcount_tec_f": "504",
+        "headcount_oth_m": "505",
+        "headcount_oth_f": "506",
+        "headcount_tot_m": "507", 
+        "headcount_tot_f": "508"
+    }
+
+    df = calc_headcount_column(df, hc_dict, round_val=4)
+
+    df["headcount_total"] = df["headcount_tot_m"] + df["headcount_tot_f"]
+
     return df
 
 def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
@@ -133,5 +164,7 @@ def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The main dataset with new apportionment columns.
     """
-    df_totals = calc_202_totals(df)
+    df = calc_202_totals(df)
+    df = apportion_fte(df)
+    df = apportion_headcounts(df)
     return df
