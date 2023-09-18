@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 import src.outputs.short_form_out as short
-import src.outputs.map_output_cols as map
+import src.outputs.map_output_cols as map_o
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -39,16 +39,16 @@ def run_output(
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
-    estimated_df = map.join_fgn_ownership(estimated_df, ultfoc_mapper)
+    estimated_df = map_o.join_fgn_ownership(estimated_df, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
-    estimated_df = map.create_cora_status_col(estimated_df, cora_mapper)
+    estimated_df = map_o.create_cora_status_col(estimated_df, cora_mapper)
 
     # Map the sizebands based on frozen employment
-    estimated_df = map.map_sizebands(estimated_df)
+    estimated_df = map_o.map_sizebands(estimated_df)
 
     # Map the itl regions using the postcodes
-    estimated_df = map.join_itl_regions(estimated_df, postcode_itl_mapper)
+    estimated_df = map_o.join_itl_regions(estimated_df, postcode_itl_mapper)
 
     # Prepare the shortform output dataframe
     short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
@@ -59,6 +59,6 @@ def run_output(
 
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")
-        filename = f"output_short_form{tdate}_v{run_id}.csv"
+        filename = f"output_short_form_{tdate}_v{run_id}.csv"
         write_csv(f"{output_path}/output_short_form/{filename}", shortform_output)
     OutputMainLogger.info("Finished short form output.")
