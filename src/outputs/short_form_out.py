@@ -4,28 +4,17 @@ import numpy as np
 from src.staging.validation import load_schema, validate_data_with_schema
 
 
-def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
-    """Created blank columns & year column for short form output
+def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
+    """Created year column for short form output
 
-    Blank columns are created for short form output that are required
-    but will currently be supplied empty.
     The 'period_year' column is added containing the year in form 'YYYY'.
 
     Args:
         df (pd.DataFrame): The main dataframe to be used for short form output.
 
     Returns:
-        pd.DataFrame: returns short form output data frame with added new cols
+        pd.DataFrame: returns short form output data frame with added new col
     """
-    columns_names = [
-        "freeze_id",
-        "inquiry_id",
-        "period_contributor_id",
-    ]
-
-    # Added new columns from column_names list
-    for col in columns_names:
-        df[col] = np.nan
 
     # Extracted the year from period and crated new columns 'period_year'
     df["period_year"] = df["period"].astype("str").str[:4]
@@ -98,8 +87,8 @@ def run_shortform_prep(
     # Filter for CORA statuses [600, 800]
     df = df.loc[df["form_status"].isin(["600", "800"])]
 
-    # Create missing columns and create a 'year' column
-    df = create_new_cols(df)
+    # Create a 'year' column
+    df = create_period_year(df)
 
     # create columns for headcounts for civil and defense
     df = create_headcount_cols(df, round_val)
