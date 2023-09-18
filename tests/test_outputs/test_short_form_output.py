@@ -3,7 +3,7 @@ import pandas as pd
 import unittest
 from pandas._testing import assert_frame_equal
 
-from src.outputs.short_form_out import create_new_cols, create_headcount_cols
+from src.outputs.short_form_out import create_period_year, create_headcount_cols
 
 
 class TestCreateNewCols(unittest.TestCase):
@@ -19,14 +19,11 @@ class TestCreateNewCols(unittest.TestCase):
     def test_create_new_cols(self):
         # Call the create_new_cols funtion
         df_input = self.data_frame()
-        actual_result = create_new_cols(df_input)
+        actual_result = create_period_year(df_input)
 
         expected_result = pd.DataFrame(
             {
                 "period": ["202201", "202206", "202109", "202112"],
-                "freeze_id": [np.nan, np.nan, np.nan, np.nan],
-                "inquiry_id": [np.nan, np.nan, np.nan, np.nan],
-                "period_contributor_id": [np.nan, np.nan, np.nan, np.nan],
                 "period_year": ["2022", "2022", "2021", "2021"],
             }
         )
