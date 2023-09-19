@@ -83,6 +83,7 @@ def fill_zeros(df: pd.DataFrame, column: str):
 
 
 def clean_no_rd_data(filtered_df, og_df, target_variables: list):
+    """TODO: Check if we need to do this"""
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
     og_df = apply_to_original(filtered_df, og_df)
@@ -228,7 +229,7 @@ def calculate_means(df, target_variable_list):
 
     filtered_df = apply_filters(copy_df)
 
-    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+    # filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -250,7 +251,7 @@ def calculate_means(df, target_variable_list):
             tr_df = trimmed_df.set_index("pre_index")
 
             dfs_list.append(tr_df)
-            # Calculate mean and count
+            # Calculate mean and count # TODO: Rename this
             means = get_mean_growth_ratio(trimmed_df, k, var)
 
             # Update full dict with values
@@ -276,7 +277,7 @@ def tmi_imputation(df, target_variables, mean_dict):
         copy_df, "status", ["Form sent out", "Check needed"]
     )
 
-    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+    # filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
@@ -323,5 +324,7 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    final_df.to_csv("data/interim/final_df.csv")
 
     return final_df
