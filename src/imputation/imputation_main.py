@@ -9,7 +9,6 @@ ImputationMainLogger = logging.getLogger(__name__)
 
 def run_imputation(
     df: pd.DataFrame,
-    mapper: pd.DataFrame,
 ) -> pd.DataFrame:
 
     df = run_apportionment(df)

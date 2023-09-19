@@ -7,6 +7,7 @@ from datetime import datetime
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
+from src.staging import pg_conversion as pg
 from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -118,23 +119,23 @@ def run_staging(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
 
-    # Stage and validate the postcode column
-    if config["global"]["validate_postcodes"]:
-        StagingMainLogger.info("Starting PostCode Validation")
-        postcode_masterlist = paths["postcode_masterlist"]
-        check_file_exists(postcode_masterlist)
-        postcode_masterlist = read_csv(postcode_masterlist, ["pcd"])
-        invalid_df, unreal_df = val.validate_post_col(
-            full_responses, postcode_masterlist, config
-        )
-        pcodes_folder = paths["postcode_path"]
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
-        unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
-        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-        write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
-    else:
-        StagingMainLogger.info("PostCode Validation skipped")
+    # Stage, validate and harmonise the postcode column
+    StagingMainLogger.info("Starting PostCode Validation")
+    postcode_masterlist = paths["postcode_masterlist"]
+    check_file_exists(postcode_masterlist)
+    postcode_df = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_df["pcd2"]
+    invalid_df, unreal_df = val.validate_post_col(
+        full_responses, postcode_masterlist, config
+    )
+    StagingMainLogger.info("Saving Invalid Postcodes to File")
+    pcodes_folder = paths["postcode_path"]
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+    unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+    write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
+    StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -152,22 +153,23 @@ def run_staging(
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    check_file_exists(mapper_path)
-    mapper = read_csv(mapper_path)
+    pg_mapper = paths["pg_mapper_path"]
+    check_file_exists(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
+
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
     check_file_exists(cora_mapper_path)
     cora_mapper = read_csv(cora_mapper_path)
-    #validates and updates from int64 to string type
-    val.validate_data_with_schema(
-        cora_mapper, "./config/cora_schema.toml"
-    )
+    # validates and updates from int64 to string type
+    val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
     cora_mapper = validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
-    
+
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
@@ -176,6 +178,14 @@ def run_staging(
     val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
     StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
+
+    # Load itl mapper
+    StagingMainLogger.info("Loading ITL File")
+    itl_mapper_path = paths["itl_path"]
+    check_file_exists(itl_mapper_path)
+    itl_mapper = read_csv(itl_mapper_path)
+    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
+    StagingMainLogger.info("ITL File Loaded Successfully...")
 
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
@@ -195,4 +205,12 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, mapper, ultfoc_mapper, cora_mapper, cellno_df
+    return (
+        full_responses,
+        manual_outliers,
+        pg_mapper,
+        ultfoc_mapper,
+        cora_mapper,
+        cellno_df,
+        postcode_df,
+    )

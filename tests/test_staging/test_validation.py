@@ -7,6 +7,7 @@ import pytest
 from src.staging.validation import (
     validate_post_col,
     validate_postcode_pattern,
+    clean_postcodes,
     check_pcs_real,
     validate_data_with_schema,
     combine_schemas_validate_full_df,
@@ -26,6 +27,7 @@ def test_data_dict():
     return {
         "reference": [1, 2, 3, 4],
         "instance": [0, 0, 0, 0],
+        "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
         "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
 
@@ -41,7 +43,7 @@ def test_data_df(test_data_dict):
 # Mock the get_masterlist function
 def mock_get_masterlist(postcode_masterlist):
     # Return a mock masterlist series - actual postcodes of ONS offices
-    return pd.Series(["NP108XG", "SW1P4DF", "PO155RR"])
+    return pd.Series(["NP10 8XG", "SW1P 4DF", "PO15 5RR"])
 
 
 # Test case for validate_post_col
@@ -61,7 +63,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     if config["global"]["postcode_csv_check"]:
 
         assert (
-            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
+            "These postcodes are not found in the ONS postcode list: ['KL1M 2NO']"
             in caplog.text
         )
 
@@ -73,6 +75,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
+            "601": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
             "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
@@ -93,6 +96,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2],
             "instance": [0, 0],
+            "601": ["EFG 456", "HIJ 789"],
             "referencepostcode": ["EFG 456", "HIJ 789"],
         }
     )
@@ -107,7 +111,7 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     validate_post_col(test_data_df, fake_path, config)
     if config["global"]["postcode_csv_check"]:
         assert (
-            "Total list of unique invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+            "Total list of unique invalid postcodes found: ['KL1M 2NO', 'HIJ 789']"
             in caplog.text
         )
     else:
@@ -148,18 +152,16 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
+    check_real_df = clean_postcodes(test_data_df, "601")
+
     # Call the function under test
-    result_df = check_pcs_real(test_data_df, postcode_masterlist, config)
+    result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
-        expected_unreal_postcodes = pd.Series(
-            ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
-        )
+        expected_unreal_postcodes = pd.Series(["HIJ 789", "KL1M 2NO"], name="601")
     else:
-        expected_unreal_postcodes = pd.Series(
-            [], name="referencepostcode", dtype=object
-        )
+        expected_unreal_postcodes = pd.Series([], name="601", dtype=object)
 
     pd.testing.assert_series_equal(
         result_df, expected_unreal_postcodes
@@ -175,8 +177,12 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
+    check_real_df = clean_postcodes(test_data_df, "601")
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist, config)
+    unreal_postcodes = check_pcs_real(
+        test_data_df, check_real_df, postcode_masterlist, config
+    )
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False
@@ -260,7 +266,7 @@ def test_validate_data_with_schema(mock_load_schema):
 
     # Check data types after validation
     assert dumy_data["col1"].dtypes == np.int
-    assert dumy_data["col2"].dtypes == np.object
+    assert dumy_data["col2"].dtypes == pd.StringDtype()
     assert dumy_data["col3"].dtypes == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
 

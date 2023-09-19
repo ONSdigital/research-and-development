@@ -5,6 +5,7 @@ from src.utils.wrappers import exception_wrap
 
 validation_logger = logging.getLogger(__name__)
 
+
 @exception_wrap
 def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -35,7 +36,7 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
         df["contents_check"] = status_check & from_status_check
 
         # Check if there are any False values in the "contents_check" column
-        if (df["contents_check"]==False).any():
+        if (df["contents_check"] == False).any():
             raise ValueError("Unexpected format within column contents")
 
         # Drop the "contents_check" column
