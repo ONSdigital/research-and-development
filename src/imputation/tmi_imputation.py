@@ -29,6 +29,9 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         pd.DataFrame: Returns the original dataframe with new PGs
         overwriting the missing values
     """
+    
+    df['200'] = df['200'].astype("category")
+    
     long_df = filter_by_column_content(df, "formtype", ["0001"])
 
     # Filter for q604 = No or status = "Form sent out"
@@ -36,7 +39,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
     ]
 
-    sic_to_pg_mapper(filtered_data, sic_mapper)
+    filtered_data = sic_to_pg_mapper(filtered_data, sic_mapper)
 
     updated_df = apply_to_original(filtered_data, df)
 
@@ -268,8 +271,9 @@ def calculate_means(df, target_variable_list):
 
 
 def tmi_imputation(df, target_variables, mean_dict):
-
-    df["imp_marker"] = "N/A"
+    
+    for var in target_variables:
+        df[f"{var}_imp_marker"] = "N/A"
 
     copy_df = df.copy()
 
@@ -294,10 +298,10 @@ def tmi_imputation(df, target_variables, mean_dict):
             if f"{var}_{item}_mean and count" in mean_dict[var].keys():
                 # Replace nulls with means
                 subnulls[var] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
-                subnulls["imp_marker"] = "TMI"
+                subnulls[f"{var}_imp_marker"] = "TMI"
 
             else:
-                subnulls["imp_marker"] = "No mean found"
+                subnulls[f"{var}_imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
             final_df = apply_to_original(subnulls, filtered_df)
