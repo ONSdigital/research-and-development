@@ -66,7 +66,7 @@ class RunLog:
         latest_id = 0
 
         # Check if file exists using the open function provided
-        if self.file_open_func and os.path.isfile(mainfile):
+        if self.file_open_func and self.file_exists_func(mainfile):
             with self.file_open_func(mainfile, "r") as file:
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
