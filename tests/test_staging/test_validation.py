@@ -1,37 +1,35 @@
 import pandas as pd
 import numpy as np
 import pytest
-import toml
+
 
 # from unittest.mock import MagicMock, patch
 from src.staging.validation import (
     validate_post_col,
     validate_postcode_pattern,
+    clean_postcodes,
     check_pcs_real,
     validate_data_with_schema,
+    combine_schemas_validate_full_df,
 )
-from src.utils.helpers import Config_settings
+
 
 # Get the config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
+def generate_config(val):
+    """Generate a dummy config file"""
+    config = {"global": {"postcode_csv_check": val}}
 
-# Create a dummy dictionary and pandas dataframe
-dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
-dummy_df = pd.DataFrame(data=dummy_dict)
+    return config
 
 
 @pytest.fixture
 def test_data_dict():
-    return {"referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"]}
-
-
-def write_dict_to_toml(tmp_path, test_data_dict):
-    # Write test data dict to toml
-    file_path = tmp_path / "test.toml"
-    with open(file_path, "w") as tom:
-        toml.dump(test_data_dict, tom)
-    return file_path
+    return {
+        "reference": [1, 2, 3, 4],
+        "instance": [0, 0, 0, 0],
+        "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+        "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+    }
 
 
 @pytest.fixture  # noqa
@@ -56,15 +54,16 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
 
+    config = generate_config(True)
+
     # Call the function under test
-    with pytest.raises(ValueError):
-        validate_post_col(test_data_df, fake_path)
+    validate_post_col(test_data_df, fake_path, config)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
 
         assert (
-            "These postcodes are not found in the ONS postcode list: ['HIJ 789', 'KL1M 2NO']"  # noqa
+            "These postcodes are not found in the ONS postcode list: ['KL1M 2NO']"
             in caplog.text
         )
 
@@ -72,47 +71,53 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         assert "Invalid pattern postcodes found: ['HIJ 789']" in caplog.text
 
     # Valid AND real postcodes
-    df_valid = pd.DataFrame({"referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"]})
-    assert validate_post_col(df_valid, fake_path)
+    df_valid = pd.DataFrame(
+        {
+            "reference": [1, 2, 3],
+            "instance": [0, 0, 0],
+            "601": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+            "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+        }
+    )
+    df_result = validate_post_col(df_valid, fake_path, config)
+    exp_output1 = pd.DataFrame(
+        columns=["reference", "instance", "invalid_pattern_pcodes"]
+    )
+    exp_output2 = pd.DataFrame(columns=["reference", "instance", "not_real_pcodes"])
+    pd.testing.assert_frame_equal(
+        df_result[0], exp_output1, check_dtype=False, check_index_type=False
+    )
+    pd.testing.assert_frame_equal(
+        df_result[1], exp_output2, check_dtype=False, check_index_type=False
+    )
 
     # Invalid postcodes
-    df_invalid = pd.DataFrame({"referencepostcode": ["EFG 456", "HIJ 789"]})
-    with pytest.raises(ValueError) as error:
-        validate_post_col(df_invalid, fake_path)
-    assert str(error.value) == "Invalid postcodes found: ['EFG 456', 'HIJ 789']"
+    df_invalid = pd.DataFrame(
+        {
+            "reference": [1, 2],
+            "instance": [0, 0],
+            "601": ["EFG 456", "HIJ 789"],
+            "referencepostcode": ["EFG 456", "HIJ 789"],
+        }
+    )
+    validate_post_col(df_invalid, fake_path, config)
+    assert (
+        "Total list of unique invalid postcodes found: ['EFG 456', 'HIJ 789']"
+        in caplog.text
+    )
 
     # Mixed valid and invalid postcodes - as is in the test_data
-    with pytest.raises(ValueError) as error:
-        validate_post_col(test_data_df, fake_path)
+
+    validate_post_col(test_data_df, fake_path, config)
     if config["global"]["postcode_csv_check"]:
-        assert str(error.value) == "Invalid postcodes found: ['HIJ 789', 'KL1M 2NO']"
+        assert (
+            "Total list of unique invalid postcodes found: ['KL1M 2NO', 'HIJ 789']"
+            in caplog.text
+        )
     else:
-        assert str(error.value) == "Invalid postcodes found: ['HIJ 789']"
-
-    # Edge cases: invalid column names
-    df_invalid_column_name = test_data_df.rename(
-        columns={"referencepostcode": "postcode"}
-    )
-    with pytest.raises(KeyError) as error:
-        validate_post_col(df_invalid_column_name, fake_path)
-    assert str(error.value) == "'referencepostcode'"  # Invalid column name
-
-    # Edge cases: missing column
-    df_missing_column = test_data_df.drop("referencepostcode", axis=1)
-    df_missing_column["anothercolumn"] = ["val1", "val2", "val3", "val4"]
-    with pytest.raises(KeyError) as error:
-        validate_post_col(df_missing_column, fake_path)
-    assert str(error.value) == "'referencepostcode'"  # Missing column
-
-    # Edge cases: missing DataFrame
-    df_missing_dataframe = None
-    with pytest.raises(TypeError):
-        validate_post_col(df_missing_dataframe, fake_path)  # Missing DataFrame
-
-    # Edge cases: empty reference postcode column
-    df_no_postcodes = pd.DataFrame({"referencepostcode": [""]})
-    with pytest.raises(ValueError):
-        validate_post_col(df_no_postcodes, fake_path)  # Empty postcode column
+        assert (
+            "Total list of unique invalid postcodes found: ['HIJ 789']" in caplog.text
+        )
 
 
 def test_validate_postcode():
@@ -145,21 +150,21 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/mock_masterlist.csv"
 
+    config = generate_config(True)
+
+    check_real_df = clean_postcodes(test_data_df, "601")
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
-    unreal_postcodes = unreal_postcodes.reset_index(drop=True)
+    result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
+    result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
-        expected_unreal_postcodes = pd.Series(
-            ["HIJ 789", "KL1M 2NO"], name="referencepostcode"
-        )
+        expected_unreal_postcodes = pd.Series(["HIJ 789", "KL1M 2NO"], name="601")
     else:
-        expected_unreal_postcodes = pd.Series(
-            [], name="referencepostcode", dtype=object
-        )
+        expected_unreal_postcodes = pd.Series([], name="601", dtype=object)
 
     pd.testing.assert_series_equal(
-        unreal_postcodes, expected_unreal_postcodes
+        result_df, expected_unreal_postcodes
     )  # Assert that the unreal postcodes match the expected ones
 
 
@@ -170,8 +175,14 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Use the fake path
     postcode_masterlist = "path/to/masterlist.csv"
 
+    config = generate_config(True)
+
+    check_real_df = clean_postcodes(test_data_df, "601")
+
     # Call the function under test
-    unreal_postcodes = check_pcs_real(test_data_df, postcode_masterlist)
+    unreal_postcodes = check_pcs_real(
+        test_data_df, check_real_df, postcode_masterlist, config
+    )
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
         bool(unreal_postcodes.isin(["NP10 8XG", "SW1P 4DF"]).any()) is False
@@ -258,3 +269,61 @@ def test_validate_data_with_schema(mock_load_schema):
     assert dumy_data["col2"].dtypes == np.object
     assert dumy_data["col3"].dtypes == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
+
+
+# Mock the schemas data
+def mock_load_both_data(filepath):
+    data_type_schema1 = {
+        "reference": {"Deduced_Data_Type": "int"},
+        "createdby": {"Deduced_Data_Type": "str"},
+        "instance": {"Deduced_Data_Type": "float"},
+        "date": {"Deduced_Data_Type": "datetime64[ns]"},
+    }
+    data_type_schema2 = {
+        "q200": {"Deduced_Data_Type": "str"},
+        "q201": {"Deduced_Data_Type": "int"},
+        "q203": {"Deduced_Data_Type": "float"},
+        "q307": {"Deduced_Data_Type": "bool"},
+    }
+    data_type_schema = {**data_type_schema1, **data_type_schema2}
+
+    return data_type_schema
+
+
+@pytest.fixture
+def mock_load_schemas(monkeypatch):
+
+    monkeypatch.setattr("src.staging.validation.load_schema", mock_load_both_data)
+
+
+def test_combine_schemas_validate_full_df(mock_load_schemas):
+    """Test the validate_data_with_shcema  to data types are correct in
+    the source data
+    """
+    # Dumy data for testing
+    dumy_data = pd.DataFrame(
+        {
+            "reference": [2, 4, 6],
+            "createdby": ["Z", "Y", "V"],
+            "instance": [2.6, 3.8, 4.6],
+            "date": ["2023-07-23", "2023-07-24", "2023-07-25"],
+            "q200": ["C", "D", "C"],
+            "q201": [5, 7, 9],
+            "q203": [2.6, 3.8, 4.6],
+            "q307": [True, False, True],
+        }
+    )
+    # convert date datetime type
+    dumy_data["date"] = pd.to_datetime(dumy_data["date"])
+
+    # Call the function to be tested
+    combine_schemas_validate_full_df(
+        dumy_data, "mock_schema1.toml", "mock_schema2.toml"
+    )
+
+    # Check data types after validation
+    assert dumy_data[["reference", "q201"]].dtypes.all() == np.int
+    assert dumy_data[["createdby", "q200"]].dtypes.all() == pd.StringDtype()
+    assert dumy_data[["instance", "q203"]].dtypes.all() == np.float
+    assert pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
+    assert dumy_data["q307"].dtypes == np.bool

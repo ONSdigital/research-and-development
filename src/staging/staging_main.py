@@ -1,13 +1,13 @@
 """The main file for the staging and validation module."""
 import logging
 import pandas as pd
-from datetime import datetime
-from typing import Callable
+from typing import Callable, Tuple
 from datetime import datetime
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
+from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -18,7 +18,8 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
-) -> pd.DataFrame:
+    run_id: int,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -38,6 +39,7 @@ def run_staging(
             This will be the hdfs or network version depending on settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
+        run_id (int): The run id for this run.
     Returns:
         pd.DataFrame: The staged and vaildated snapshot data.
     """
@@ -49,73 +51,155 @@ def run_staging(
     snapshot_path = paths["snapshot_path"]
 
     # Load historic data
-    curent_year = config["years"]["current_year"]
-    years_to_load = config["years"]["previous_years_to_load"]
-    years_gen = history_loader.history_years(curent_year, years_to_load)
+    if config["global"]["load_historic_data"]:
+        curent_year = config["years"]["current_year"]
+        years_to_load = config["years"]["previous_years_to_load"]
+        years_gen = history_loader.history_years(curent_year, years_to_load)
 
-    if years_gen is None:
-        StagingMainLogger.info("No historic data to load for this run.")
-    else:
-        StagingMainLogger.info("Loading historic data...")
-        history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(
-            years_gen, history_path, read_csv
-        )
-        # Check if it has loaded and is not empty
-        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-            StagingMainLogger.info(
-                "Dictionary of history data: %s loaded into pipeline",
-                ", ".join(dict_of_hist_dfs),
-            )
-            StagingMainLogger.info("Historic data loaded.")
+        if years_gen is None:
+            StagingMainLogger.info("No historic data to load for this run.")
         else:
-            StagingMainLogger.warning(
-                "Problem loading historic data. Dict may be empty or not present"
+            StagingMainLogger.info("Loading historic data...")
+            history_path = paths["history_path"]
+            dict_of_hist_dfs = history_loader.load_history(
+                years_gen, history_path, read_csv
             )
-            raise Exception("The historic data did not load")
+            # Check if it has loaded and is not empty
+            if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
+                StagingMainLogger.info(
+                    "Dictionary of history data: %s loaded into pipeline",
+                    ", ".join(dict_of_hist_dfs),
+                )
+                StagingMainLogger.info("Historic data loaded.")
+            else:
+                StagingMainLogger.warning(
+                    "Problem loading historic data. Dict may be empty or not present"
+                )
+                raise Exception("The historic data did not load")
+
+    else:
+        StagingMainLogger.info("Skipping loading historic data...")
 
     # Check data file exists, raise an error if it does not.
+    StagingMainLogger.info("Loading SPP snapshot data...")
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
     snapdata = load_json(snapshot_path)
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    # Load the PG mapper
-    mapper_path = paths["mapper_path"]
-    mapper = read_csv(mapper_path)
-
-    # the anonymised snapshot data we use in hdfs
+    # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
-    if network_or_hdfs == "hdfs":
+    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
     StagingMainLogger.info("Finished Data Ingest...")
 
     val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
-    val.validate_data_with_schema(responses_df, "./config/subresponder_schema.toml")
+    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
 
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info("Finished Data Transmutation...")
+    # Validate and force data types for the full responses df
+    # TODO Find a fix for the datatype casting before uncommenting
+    val.combine_schemas_validate_full_df(
+        full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
 
     # Data validation
     val.check_data_shape(full_responses)
 
-    # Check the postcode column
-    postcode_masterlist = config["hdfs_paths"]["postcode_masterlist"]
-    val.validate_post_col(contributors_df, postcode_masterlist)
+    processing.response_rate(contributors_df, responses_df)
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
+
+    # Stage and validate the postcode column
+    if config["global"]["validate_postcodes"]:
+        StagingMainLogger.info("Starting PostCode Validation")
+        postcode_masterlist = paths["postcode_masterlist"]
+        check_file_exists(postcode_masterlist)
+        postcode_masterlist = read_csv(postcode_masterlist, ["pcd2"])
+        invalid_df, unreal_df = val.validate_post_col(
+            full_responses, postcode_masterlist, config
+        )
+        pcodes_folder = paths["postcode_path"]
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+        unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+        write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
+    else:
+        StagingMainLogger.info("PostCode Validation skipped")
+
+    if config["global"]["load_manual_outliers"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Manual Outlier File")
+        manual_path = paths["manual_outliers_path"]
+        check_file_exists(manual_path)
+        wanted_cols = ["reference", "instance", "manual_outlier"]
+        manual_outliers = read_csv(manual_path, wanted_cols)
+        val.validate_data_with_schema(
+            manual_outliers, "./config/manual_outliers_schema.toml"
+        )
+        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+    else:
+        manual_outliers = None
+        StagingMainLogger.info("Loading of Manual Outlier File skipped")
+
+    # Load the PG mapper
+    pg_mapper = paths["pg_mapper_path"]
+    check_file_exists(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
+
+    # Load cora mapper
+    StagingMainLogger.info("Loading Cora status mapper file")
+    cora_mapper_path = paths["cora_mapper_path"]
+    check_file_exists(cora_mapper_path)
+    cora_mapper = read_csv(cora_mapper_path)
+    # validates and updates from int64 to string type
+    val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
+    cora_mapper = validate_cora_df(cora_mapper)
+    StagingMainLogger.info("Cora status mapper file loaded successfully...")
+
+    # Load ultfoc (Foreign Ownership) mapper
+    StagingMainLogger.info("Loading Foreign Ownership File")
+    ultfoc_mapper_path = paths["ultfoc_mapper_path"]
+    check_file_exists(ultfoc_mapper_path)
+    ultfoc_mapper = read_csv(ultfoc_mapper_path)
+    val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
+    val.validate_ultfoc_df(ultfoc_mapper)
+    StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
+
+    # Load itl mapper
+    StagingMainLogger.info("Loading ITL File")
+    itl_mapper_path = paths["itl_path"]
+    check_file_exists(itl_mapper_path)
+    itl_mapper = read_csv(itl_mapper_path)
+    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
+    StagingMainLogger.info("ITL File Loaded Successfully...")
+
+    # Loading cell number covarege
+    StagingMainLogger.info("Loading Cell Covarage File...")
+    cellno_path = paths["cellno_path"]
+    check_file_exists(cellno_path)
+    cellno_df = read_csv(cellno_path)
+    StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
-    if network_or_hdfs == "network":
+    if (network_or_hdfs == "network") & (config["global"]["output_full_responses"]):
         StagingMainLogger.info("Starting output of staged BERD data...")
         test_folder = config["network_paths"]["staging_test_foldername"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_BERD_full_responses_{tdate}.csv"
+        staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         write_csv(f"{test_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
+    else:
+        StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, mapper
+    return full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cora_mapper, cellno_df
+

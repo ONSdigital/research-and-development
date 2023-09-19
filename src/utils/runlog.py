@@ -1,26 +1,7 @@
 from datetime import datetime
 import pandas as pd
 import os
-from src.utils.helpers import Config_settings
 import csv
-import yaml
-
-# Get config
-conf_obj = Config_settings()
-config = conf_obj.config_dict
-csv_filenames = config["csv_filenames"]
-network_or_hdfs = config["global"]["network_or_hdfs"]
-
-# Conditional imports
-if network_or_hdfs == "network":
-    HDFS_AVAILABLE = False
-    # from src.utils.local_file_mods import read_local_csv as read_csv
-    # from src.utils.local_file_mods import write_local_csv as write_csv
-
-elif network_or_hdfs == "hdfs":
-    HDFS_AVAILABLE = True
-    # from src.utils.hdfs_mods import read_hdfs_csv as read_csv
-    # from src.utils.hdfs_mods import write_hdfs_csv as write_csv
 
 
 class RunLog:
@@ -46,6 +27,7 @@ class RunLog:
         self.write_csv_func = write_csv_func
         self.environment = config["global"]["network_or_hdfs"]
         self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
+        self.csv_filenames = config["csv_filenames"]
         self.main_path = self._make_main_path()
         self.run_id = self._create_run_id()
         self.version = version
@@ -79,7 +61,7 @@ class RunLog:
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
         # Import name of main log file
-        runid_path = csv_filenames["main"]
+        runid_path = self.csv_filenames["main"]
         mainfile = f"{self.main_path}/{runid_path}"
         latest_id = 0
 
@@ -129,10 +111,8 @@ class RunLog:
 
     def retrieve_configs(self):
         """Gets the configs settings for each run of the pipeline"""
-        with open("src/developer_config.yaml", "r") as file:
-            self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
-        dct = {k: [v] for k, v in self.configdata.items()}
+        dct = {k: [v] for k, v in self.config.items()}
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
@@ -213,17 +193,17 @@ class RunLog:
         """
 
         main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
-        file_name = csv_filenames["main"]
+        file_name = self.csv_filenames["main"]
         file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, main_columns)
 
         config_columns = list(self.configdf.columns.values)
-        file_name = csv_filenames["configs"]
+        file_name = self.csv_filenames["configs"]
         file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
-        file_name = csv_filenames["logs"]
+        file_name = self.csv_filenames["logs"]
         file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, log_columns)
 
@@ -237,20 +217,19 @@ class RunLog:
 
         if write_csv:
             # write the runlog to a csv file
-
-            file_name = csv_filenames["main"]
+            file_name = self.csv_filenames["main"]
             file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_main_df)
             self.write_func(file_path, newdf)
 
-            file_name = csv_filenames["configs"]
+            file_name = self.csv_filenames["configs"]
             file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_configs_df)
             self.write_func(file_path, newdf)
 
-            file_name = csv_filenames["logs"]
+            file_name = self.csv_filenames["logs"]
             file_path = str(os.path.join(self.main_path, file_name))
             df = self.read_func(file_path)
             newdf = df.append(self.runlog_logs_df)
