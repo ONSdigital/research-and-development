@@ -166,5 +166,8 @@ def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = calc_202_totals(df)
     df = apportion_fte(df)
+
+    #TODO: drop columns tot_202_all and tot_202_CD when QA for apportionment
+    #TODO has been complted.
     df = apportion_headcounts(df)
     return df
