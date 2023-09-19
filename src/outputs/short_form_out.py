@@ -1,35 +1,20 @@
 """Prepare the survey data for short form microdata output."""
 import pandas as pd
 import numpy as np
+from src.staging.validation import load_schema, validate_data_with_schema
 
 
-def create_new_cols(df: pd.DataFrame) -> pd.DataFrame:
-    """Created blank columns & year column for short form output
+def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
+    """Created year column for short form output
 
-    Blank columns are created for short form output that are required
-    but will currently be supplied empty.
     The 'period_year' column is added containing the year in form 'YYYY'.
 
     Args:
         df (pd.DataFrame): The main dataframe to be used for short form output.
 
     Returns:
-        pd.DataFrame: returns short form output data frame with added new cols
+        pd.DataFrame: returns short form output data frame with added new col
     """
-    columns_names = [
-        "freeze_id",
-        "inquiry_id",
-        "period_contributor_id",
-        "post_code",
-        "ua_county",
-        "foreign_owner",
-        "product_group",
-        "sizeband",
-    ]
-
-    # Added new columns from column_names list
-    for col in columns_names:
-        df[col] = np.nan
 
     # Extracted the year from period and crated new columns 'period_year'
     df["period_year"] = df["period"].astype("str").str[:4]
@@ -96,12 +81,56 @@ def run_shortform_prep(
         pd.DataFrame: The dataframe prepared for short form output.
     """
 
-    # TODO: Filter for short-forms and CORA statuses [600, 800]
+    # Filter for short-forms
+    df = df.loc[df["formtype"] == "0006"]
 
-    # create new columns and create a 'year' column
-    df = create_new_cols(df)
+    # Filter for CORA statuses [600, 800]
+    df = df.loc[df["form_status"].isin(["600", "800"])]
+
+    # Create a 'year' column
+    df = create_period_year(df)
 
     # create columns for headcounts for civil and defense
     df = create_headcount_cols(df, round_val)
 
     return df
+
+
+def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
+    """Creates the shortform dataframe for outputs with
+    the required columns. The naming of the columns comes
+    from the schema provided.
+
+    Args:
+        df (pd.DataFrame): Dataframe containing all columns
+        schema (str): Toml schema containing the old and new
+        column names for the outputs
+
+    Returns:
+        (pd.DataFrame): A dataframe consisting of only the
+        required short form output data
+    """
+    # Load schema using pre-built function
+    output_schema = load_schema(schema)
+
+    # Create dict of current and required column names
+    colname_dict = {
+        output_schema[column_nm]["old_name"]: column_nm
+        for column_nm in output_schema.keys()
+    }
+
+    # Create subset dataframe with only the required outputs
+    output_df = df[df.columns.intersection(colname_dict.keys())]
+
+    # Rename columns to match the output specification
+    output_df.rename(
+        columns={key: colname_dict[key] for key in colname_dict}, inplace=True
+    )
+
+    # Rearrange to match user defined output order
+    output_df = output_df[colname_dict.values()]
+
+    # Validate datatypes before output
+    validate_data_with_schema(output_df, schema)
+
+    return output_df
