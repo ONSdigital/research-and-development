@@ -29,7 +29,7 @@ hdfs_paths:
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
-  mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
+  pg_mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   outliers_path: None
 network_paths:
