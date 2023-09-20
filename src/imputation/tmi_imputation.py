@@ -232,7 +232,8 @@ def calculate_means(df, target_variable_list):
 
     filtered_df = apply_filters(copy_df)
 
-    # filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+    filtered_df = filtered_df[filtered_df["formtype"] == "0001"]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -274,6 +275,7 @@ def tmi_imputation(df, target_variables, mean_dict):
     
     for var in target_variables:
         df[f"{var}_imp_marker"] = "N/A"
+        df[f"{var}_imputed"] = df[var]
 
     copy_df = df.copy()
 
@@ -281,7 +283,7 @@ def tmi_imputation(df, target_variables, mean_dict):
         copy_df, "status", ["Form sent out", "Check needed"]
     )
 
-    # filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
@@ -297,10 +299,11 @@ def tmi_imputation(df, target_variables, mean_dict):
 
             if f"{var}_{item}_mean and count" in mean_dict[var].keys():
                 # Replace nulls with means
-                subnulls[var] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
+                subnulls[f"{var}_imputed"] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
                 subnulls[f"{var}_imp_marker"] = "TMI"
 
             else:
+                subnulls[f"{var}_imputed"] = subnulls[var]
                 subnulls[f"{var}_imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
@@ -320,8 +323,13 @@ def run_tmi(full_df, target_variables, sic_mapper):
     df = tmi_pre_processing(df, target_variables)
 
     mean_dict, qa_df = calculate_means(df, target_variables)
+    
+    import csv
+    with open('mycsvfile.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
+        w = csv.DictWriter(f, mean_dict.keys())
+        w.writeheader()
+        w.writerow(mean_dict)
 
-    qa_df.to_csv("data/interim/qa_df.csv")
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
     final_df = tmi_imputation(df, target_variables, mean_dict)
@@ -329,6 +337,4 @@ def run_tmi(full_df, target_variables, sic_mapper):
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    final_df.to_csv("data/interim/final_df.csv")
-
-    return final_df
+    return final_df, qa_df
