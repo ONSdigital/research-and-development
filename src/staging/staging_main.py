@@ -7,6 +7,7 @@ from datetime import datetime
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
+from src.staging import pg_conversion as pg
 from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -118,23 +119,23 @@ def run_staging(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
 
-    # Stage and validate the postcode column
-    if config["global"]["validate_postcodes"]:
-        StagingMainLogger.info("Starting PostCode Validation")
-        postcode_masterlist = paths["postcode_masterlist"]
-        check_file_exists(postcode_masterlist)
-        postcode_masterlist = read_csv(postcode_masterlist, ["pcd2"])
-        invalid_df, unreal_df = val.validate_post_col(
-            full_responses, postcode_masterlist, config
-        )
-        pcodes_folder = paths["postcode_path"]
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
-        unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
-        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-        write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
-    else:
-        StagingMainLogger.info("PostCode Validation skipped")
+    # Stage, validate and harmonise the postcode column
+    StagingMainLogger.info("Starting PostCode Validation")
+    postcode_masterlist = paths["postcode_masterlist"]
+    check_file_exists(postcode_masterlist)
+    postcode_df = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_df["pcd2"]
+    invalid_df, unreal_df = val.validate_post_col(
+        full_responses, postcode_masterlist, config
+    )
+    StagingMainLogger.info("Saving Invalid Postcodes to File")
+    pcodes_folder = paths["postcode_path"]
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+    unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+    write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
+    StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -155,6 +156,9 @@ def run_staging(
     pg_mapper = paths["pg_mapper_path"]
     check_file_exists(pg_mapper)
     pg_mapper = read_csv(pg_mapper)
+
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -191,15 +195,22 @@ def run_staging(
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
-    if (network_or_hdfs == "network") & (config["global"]["output_full_responses"]):
+    if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
-        test_folder = config["network_paths"]["staging_test_foldername"]
+        staging_folder = paths["staging_output_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
         staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
-        write_csv(f"{test_folder}/{staged_filename}", full_responses)
+        write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    return full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cora_mapper, cellno_df
-
+    return (
+        full_responses,
+        manual_outliers,
+        pg_mapper,
+        ultfoc_mapper,
+        cora_mapper,
+        cellno_df,
+        postcode_df,
+    )

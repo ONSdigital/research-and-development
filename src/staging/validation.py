@@ -120,7 +120,7 @@ def validate_post_col(
     validation_logger.warning(
         f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
     )
-    
+
     validation_logger.warning(
         f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
     )
@@ -380,6 +380,8 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 )
                 # Cast columns to Int64
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
+            elif dtypes_dict[column] == "str":
+                survey_df[column] = survey_df[column].astype("string")
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
@@ -462,7 +464,10 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
         # Check 'ultfoc' values are either 2 characters or 'nan'
         def check_ultfoc(value):
-            return isinstance(value, str) and (len(value) == 2 or len(value) == 3)
+            if pd.isna(value):
+                return True
+            else:
+                return isinstance(value, str) and (len(value) == 2)
 
         df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
 

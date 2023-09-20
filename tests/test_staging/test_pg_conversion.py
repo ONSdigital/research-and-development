@@ -4,18 +4,15 @@ import pandas as pd
 import pytest
 import numpy as np
 
-from src.imputation.pg_conversion import pg_to_pg_mapper, sic_to_pg_mapper
+from src.staging.pg_conversion import pg_to_pg_mapper, sic_to_pg_mapper
 
 
 @pytest.fixture
 def dummy_data() -> pd.DataFrame:
     # Set up the dummyinput  data
     data = pd.DataFrame(
-        {
-            "201": [0, 1, 2, 3, 4],
-        }
+        {"201": [0, 1, 2, 3, 4], "formtype": ["0001", "0001", "0001", "0001", "0001"]}
     )
-    data.astype("category")
     return data
 
 
@@ -35,8 +32,11 @@ def expected_output() -> pd.DataFrame:
     expected_output = pd.DataFrame(
         {
             "201": [np.nan, "A", "B", "C", "C"],
+            "formtype": ["0001", "0001", "0001", "0001", "0001"],
         }
     )
+
+    expected_output["201"] = expected_output["201"].astype("category")
     return expected_output
 
 
@@ -44,21 +44,17 @@ def test_pg_mapper(dummy_data, expected_output, mapper):
     """Tests for pg mapper function."""
 
     target_col = dummy_data.columns[0]
-    expected_output_data = expected_output.astype("category")
 
     df_result = pg_to_pg_mapper(dummy_data, mapper, target_col)
 
-    pd.testing.assert_frame_equal(df_result, expected_output_data)
+    pd.testing.assert_frame_equal(df_result, expected_output)
 
 
 @pytest.fixture
 def sic_dummy_data() -> pd.DataFrame:
     # Set up the dummyinput  data
     data = pd.DataFrame(
-        {
-            "rusic": [1110, 10101],
-            "201": [np.nan, np.nan],
-        }
+        {"rusic": [1110, 10101], "201": [np.nan, np.nan], "formtype": ["0006", "0006"]}
     )
     return data
 
@@ -77,10 +73,7 @@ def sic_mapper() -> pd.DataFrame:
 def sic_expected_output() -> pd.DataFrame:
     # Set up the dummy output data
     expected_output = pd.DataFrame(
-        {
-            "rusic": [1110, 10101],
-            "201": ["A", "B"],
-        }
+        {"rusic": [1110, 10101], "201": ["A", "B"], "formtype": ["0006", "0006"]}
     )
     expected_output["201"] = expected_output["201"].astype("category")
     return expected_output
@@ -91,6 +84,6 @@ def test_sic_mapper(sic_dummy_data, sic_expected_output, sic_mapper):
 
     expected_output_data = sic_expected_output
 
-    df_result = sic_to_pg_mapper(sic_dummy_data, sic_mapper)
+    df_result = sic_to_pg_mapper(sic_dummy_data, sic_mapper, target_col="201")
 
     pd.testing.assert_frame_equal(df_result, expected_output_data)

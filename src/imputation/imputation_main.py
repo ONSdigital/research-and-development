@@ -4,7 +4,6 @@ import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
 
-from src.imputation.pg_conversion import pg_to_pg_mapper
 from src.imputation import tmi_imputation as tmi
 
 ImputationMainLogger = logging.getLogger(__name__)
@@ -17,8 +16,6 @@ def run_imputation(
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
-
-    df = pg_to_pg_mapper(df, mapper)
 
     keyvars = [
         "211",

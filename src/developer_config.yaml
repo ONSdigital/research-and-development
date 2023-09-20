@@ -2,7 +2,6 @@ global:
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-  validate_postcodes: True
   postcode_csv_check: True
   load_historic_data: False
   load_manual_outliers: False
@@ -11,7 +10,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: True
-  output_short_form: False
+  output_short_form: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
 years:
@@ -29,7 +28,12 @@ hdfs_paths:
   snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
-  mapper_path: "/ons/rdbe_dev/berd_Mappers/SIC_to_PG.csv"
+  pg_mapper_path: "/ons/rdbe_dev/mappers/2023/SIC_to_PG_UTF-8.csv"
+  ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
+  cora_mapper_path: "/ons/rdbe_dev/mappers/2023/cora_mapper.csv"
+  staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
+  cellno_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
+  itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   outliers_path: None
 network_paths:
@@ -41,8 +45,8 @@ network_paths:
   pg_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/SIC_to_PG.csv"
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
-  cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
+  staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
@@ -51,11 +55,12 @@ network_paths:
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+schema_paths:
+  frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
     flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
-
 csv_filenames:
     main: "main_runlog.csv"
     configs: "configs_runlog.csv"
