@@ -1,7 +1,7 @@
 import pandas as pd
 import math
 import numpy as np
-from src.imputation.pg_conversion import sic_to_pg_mapper
+from src.staging.pg_conversion import sic_to_pg_mapper
 
 def apply_to_original(filtered_df, original_df):
     original_df.loc[filtered_df.index] = filtered_df
