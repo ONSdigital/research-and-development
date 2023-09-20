@@ -6,6 +6,7 @@ import pandas as pd
 import logging
 from typing import List
 import hashlib
+import shutil
 
 
 # Set up logger
@@ -244,3 +245,23 @@ def local_write_string_to_file(content: bytes, path: str):
     """
     with open(path, "wb") as f:
         f.write(content)
+
+def local_copy(src_path: str, dst_path: str):
+    """
+    Copies a file from src_path to dst_path on the local file system.
+
+    Returns
+    -------
+    None
+    """
+    shutil.copy(src_path, dst_path)
+    
+def local_list_files(path: str):
+    """
+    Lists all files in a directory on the local file system.
+
+    Returns
+    -------
+    A list of files in the directory.
+    """
+    return os.listdir(path)

@@ -258,3 +258,17 @@ def hdfs_write_string_to_file(content: bytes, path: str):
     """
     _write_string_to_file = subprocess.Popen(f"hadoop fs -put - {path}", stdin=subprocess.PIPE, shell=True)
     return _write_string_to_file.communicate(content)
+
+def hdfs_copy_file(src_path: str, dst_path: str):
+    """
+    Copy a file from one location to another. Uses 'hadoop fs -cp'.
+    """
+    command = ["hadoop", "fs", "-cp", src_path, dst_path]
+    return _perform(command)
+
+def hdfs_list_files(path: str):
+    """
+    List files in a directory. Uses 'hadoop fs -ls'.
+    """
+    command = ["hadoop", "fs", "-ls", path]
+    return _perform(command, str_output=True, full_out=True).split("\n")
