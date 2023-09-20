@@ -17,14 +17,7 @@ def run_output(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
-    delete_file: Callable,
-    hdfs_md5sum: Callable,
-    hdfs_stat_size: Callable,
-    isdir: Callable,
-    isfile: Callable,
-    read_header: Callable,
-    write_string_to_file: Callable,
+    ultfoc_mapper: pd.DataFrame
 ):
     """Run the outputs module.
 
@@ -58,10 +51,6 @@ def run_output(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Create a datetime object for the pipeline run - TODO: replace this with
-    # the pipeline run datetime from the runlog object
-    pipeline_run_datetime = datetime.now()
-
     # Create combined ownership column using mapper
     estimated_df = combine_dataframes(estimated_df, ultfoc_mapper)
 
@@ -74,30 +63,4 @@ def run_output(
         write_csv(f"{output_path}/output_short_form/{filename}", short_form_df)
     OutputMainLogger.info("Finished short form output.")
 
-    # Creating a manifest file using the Manifest class in manifest_output.py
-    manifest = Manifest(
-        outgoing_directory=output_path,
-        pipeline_run_datetime=pipeline_run_datetime,
-        dry_run=True,
-        delete_file_func=delete_file,
-        md5sum_func=hdfs_md5sum,
-        stat_size_func=hdfs_stat_size,
-        isdir_func=isdir,
-        isfile_func=isfile,
-        read_header_func=read_header,
-        string_to_file_func=write_string_to_file,
-    )
-
-    # Getting correct headers to verify that df and output are the same
-    s_f_schema_path = paths["short_form_schema"]
-    short_form_schema = toml.load(s_f_schema_path)
-    short_form_headers = short_form_schema["headers"]
-    df_col_string = ",".join(short_form_headers)
-
-    # Add the short form output file to the manifest object
-    manifest.add_file(
-        f"{output_path}/output_short_form/{filename}", column_header=df_col_string
-    )
-
-    # Write the manifest file to the outgoing directory
-    manifest.write_manifest()
+   
