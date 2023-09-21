@@ -246,22 +246,24 @@ def local_write_string_to_file(content: bytes, path: str):
     with open(path, "wb") as f:
         f.write(content)
 
-def local_copy(src_path: str, dst_path: str):
+
+def local_copy_file(src_path: str, dst_path: str):
     """
     Copies a file from src_path to dst_path on the local file system.
 
     Returns: None
     """
     shutil.copy(src_path, dst_path)
-    
-def local_move(src_path: str, dst_path: str):
+
+
+def local_move_file(src_path: str, dst_path: str):
     """Moves a file from src_path to dst_path on the local file system.
-    
+
     Returns: None
     """
     shutil.move(src_path, dst_path)
-    
-    
+
+
 def local_list_files(path: str):
     """
     Lists all files in a directory on the local file system.
@@ -274,21 +276,22 @@ def local_list_files(path: str):
 
 
 def local_search_file(dir_path, ending):
-    """Search for a file with a particular suffix in a directory on the local file system.
+    """Search for a file with a particular suffix in a directory on the local
+        file system.
 
     Args:
         path (_type_): _description_
         ending (_type_): _description_
-        
+
     Returns:
         str: The path of the target file
     """
     for _, __, files in os.walk(dir_path):
         for file in files:
-    
+
             # change the extension from '.mp3' to
             # the one of your choice.
-            if file.endswith('ending'):
+            if file.endswith("ending"):
                 target_file = str(file)
-    
+
     return target_file
