@@ -58,22 +58,21 @@ def calc_fte_column(
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
     Returns:
-        pd.Dataframe: The dataset with one new column for FTE.    
+        pd.Dataframe: The dataset with new columns for FTE.    
     """
 
-    # create new apportionment column for the civil cases (avoid division by 0)
+    # create new apportionment column for each item in the dictionary
     for new_col, old_cols in fte_dict.items():
-        df.loc[(df["200"] == "C") & (df["tot_202_CD"] > 0), new_col] = round(
-            update_column(df, old_cols[0]) * df["202"] / df["tot_202_CD"],
-            round_val
-        )
-
-    # create new apportionment column for the defence cases (avoid div'n by 0)
-    for new_col, old_cols in fte_dict.items():
-        df.loc[(df["200"] == "D") & (df["tot_202_CD"] > 0), new_col] = round(
-            update_column(df, old_cols[1]) * df["202"] / df["tot_202_CD"],
-            round_val
-        )
+        # take the civil and defence cases in turn
+        cases_list = [["C", 0], ["D", 1]]
+        for item in cases_list:
+            condition = (df["200"] == item[0]) & (df["tot_202_CD"] > 0)
+            df.loc[condition, new_col] = round(
+                update_column(
+                    df, old_cols[item[1]]
+                ) * df["202"] / df["tot_202_CD"],
+                round_val
+            )
 
     return df
 
@@ -166,8 +165,9 @@ def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
     """
     df = calc_202_totals(df)
     df = apportion_fte(df)
-
-    #TODO: drop columns tot_202_all and tot_202_CD when QA for apportionment
-    #TODO has been complted.
     df = apportion_headcounts(df)
+    
+    # drop temporary columns
+    df = df.drop(["tot_202_all", "tot_202_CD"], axis=1)
+
     return df
