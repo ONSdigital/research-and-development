@@ -36,11 +36,8 @@ class RunLog:
         self.timestamp = self._generate_time()
 
     def _make_main_path(self):
-        """Creating a local runlog folder if it doesn't exist"""
-        if self.environment == "hdfs":
-            logs_folder = self.logs_folder
-        elif self.environment == "network":
-            logs_folder = self.logs_folder
+        """Returns the log folder from the config"""
+        logs_folder = self.logs_folder
         return logs_folder
 
     def _create_folder(self):
