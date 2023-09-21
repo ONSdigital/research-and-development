@@ -264,7 +264,7 @@ def local_move_file(src_path: str, dst_path: str):
     shutil.move(src_path, dst_path)
 
 
-def local_list_files(path: str):
+def local_list_files(path: str, ext: str = None):
     """
     Lists all files in a directory on the local file system.
 
@@ -272,7 +272,14 @@ def local_list_files(path: str):
     -------
     A list of files in the directory.
     """
-    return os.listdir(path)
+    files_in_dir = os.listdir(path)
+
+    if ext:
+        files_in_dir = [
+            file for file in files_in_dir if os.path.splitext(file)[1] == ext
+        ]
+
+    return files_in_dir
 
 
 def local_search_file(dir_path, ending):
