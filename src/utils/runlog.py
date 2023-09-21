@@ -38,7 +38,7 @@ class RunLog:
     def _make_main_path(self):
         """Creating a local runlog folder if it doesn't exist"""
         if self.environment == "hdfs":
-            logs_folder = f"/user/{self.user}/{self.logs_folder}"
+            logs_folder = self.logs_folder
         elif self.environment == "network":
             logs_folder = self.logs_folder
         return logs_folder
