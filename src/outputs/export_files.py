@@ -28,6 +28,7 @@ if network_or_hdfs == "network":
     from src.utils.local_file_mods import local_list_files as list_files
     from src.utils.local_file_mods import local_copy_file as copy_files
     from src.utils.local_file_mods import local_move_file as move_files
+    from src.utils.local_file_mods import local_search_file as search_files
     from src.utils.local_file_mods import local_isfile as isfile
     from src.utils.local_file_mods import local_delete_file as delete_file
     from src.utils.local_file_mods import local_md5sum as hdfs_md5sum
@@ -42,6 +43,7 @@ elif network_or_hdfs == "hdfs":
     from src.utils.local_file_mods import hdfs_list_files as list_files
     from src.utils.hdfs_mods import hdfs_copy_file as copy_files
     from src.utils.hdfs_mods import hdfs_move_file as move_files
+    from src.utils.hdfs_mods import hdfs_search_file as search_files
     from src.utils.hdfs_mods import hdfs_isfile as isfile
     from src.utils.hdfs_mods import hdfs_delete_file as delete_file
     from src.utils.hdfs_mods import hdfs_md5sum as hdfs_md5sum
@@ -147,6 +149,7 @@ def main():
     copy_files(file_list)
     
     # Move the manifest file to the outgoing folder
+    manifest_file = search_files(output_path, "_manifest.json")
     move_files()
 
     # Log success message

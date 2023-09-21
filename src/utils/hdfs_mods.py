@@ -167,6 +167,7 @@ def hdfs_write_feather(filepath, df):
 
     return True
 
+
 def _perform(command, shell: bool = False, str_output: bool = False, ignore_error: bool = False, full_out=False):
     """
     Run shell command in subprocess returning exit code or full string output.
@@ -193,6 +194,7 @@ def _perform(command, shell: bool = False, str_output: bool = False, ignore_erro
 
     return process.returncode == 0
 
+
 def hdfs_delete_file(path: str):
     """
     Delete a file. Uses 'hadoop fs -rm'.
@@ -204,11 +206,13 @@ def hdfs_delete_file(path: str):
     command = ["hadoop", "fs", "-rm", path]
     return _perform(command)
 
+
 def hdfs_md5sum(path: str):
     """
     Get md5sum of a specific file on HDFS.
     """
     return _perform(f"hadoop fs -cat {path} | md5sum", shell=True, str_output=True, ignore_error=True).split(" ")[0]
+
 
 def hdfs_stat_size(path: str):
     """
@@ -229,6 +233,7 @@ def hdfs_isdir(path: str) -> bool:
     command = ["hadoop", "fs", "-test", "-d", path]
     return _perform(command)
 
+
 def hdfs_isfile(path: str) -> bool:
     """
     Test if file exists. Uses 'hadoop fs -test -f.
@@ -245,6 +250,7 @@ def hdfs_isfile(path: str) -> bool:
     command = ["hadoop", "fs", "-test", "-f", path]
     return _perform(command)
 
+
 def hdfs_read_header(path: str):
     """
     Reads the first line of a file on HDFS
@@ -259,12 +265,14 @@ def hdfs_write_string_to_file(content: bytes, path: str):
     _write_string_to_file = subprocess.Popen(f"hadoop fs -put - {path}", stdin=subprocess.PIPE, shell=True)
     return _write_string_to_file.communicate(content)
 
+
 def hdfs_copy_file(src_path: str, dst_path: str):
     """
     Copy a file from one location to another. Uses 'hadoop fs -cp'.
     """
     command = ["hadoop", "fs", "-cp", src_path, dst_path]
     return _perform(command)
+
 
 def hdfs_move_file(src_path: str, dst_path: str):
     """
@@ -273,9 +281,26 @@ def hdfs_move_file(src_path: str, dst_path: str):
     command = ["hadoop", "fs", "-mv", src_path, dst_path]
     return _perform(command)
 
+
 def hdfs_list_files(path: str):
     """
     List files in a directory. Uses 'hadoop fs -ls'.
     """
     command = ["hadoop", "fs", "-ls", path]
     return _perform(command, str_output=True, full_out=True).split("\n")
+
+
+def hdfs_search_file(dir_path, ending):
+    """Find a file in a directory with a specific ending using grep and hadoop fs -ls.
+
+    Args:
+        dir_path (_type_): _description_
+        ending (_type_): _description_
+    """
+    target_file = _perform(f"hadoop fs -ls {dir_path} | grep {ending}", shell=True, str_output=True, ignore_error=True)
+    
+    # Handle case where file does not exist
+    if not target_file:
+        raise FileNotFoundError(f"File with ending {ending} does not exist in {dir_path}")
+    
+    return target_file

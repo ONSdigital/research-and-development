@@ -271,3 +271,24 @@ def local_list_files(path: str):
     A list of files in the directory.
     """
     return os.listdir(path)
+
+
+def local_search_file(dir_path, ending):
+    """Search for a file with a particular suffix in a directory on the local file system.
+
+    Args:
+        path (_type_): _description_
+        ending (_type_): _description_
+        
+    Returns:
+        str: The path of the target file
+    """
+    for _, __, files in os.walk(dir_path):
+        for file in files:
+    
+            # change the extension from '.mp3' to
+            # the one of your choice.
+            if file.endswith('ending'):
+                target_file = str(file)
+    
+    return target_file
