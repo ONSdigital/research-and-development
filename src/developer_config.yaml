@@ -37,6 +37,7 @@ hdfs_paths:
   output_path:  "/ons/rdbe_dev/outputs"
   cellno_path: '/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv'
   short_form_schema: "src/outputs/output_schemas/shortform_output_schema.toml"
+  outgoing_path: /ons/rdbe_dev/outgoing_export
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
@@ -53,6 +54,7 @@ network_paths:
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   short_form_schema: "src/outputs/output_schemas/shortform_output_schema.toml"
+  outgoing_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
