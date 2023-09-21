@@ -250,11 +250,17 @@ def local_copy(src_path: str, dst_path: str):
     """
     Copies a file from src_path to dst_path on the local file system.
 
-    Returns
-    -------
-    None
+    Returns: None
     """
     shutil.copy(src_path, dst_path)
+    
+def local_move(src_path: str, dst_path: str):
+    """Moves a file from src_path to dst_path on the local file system.
+    
+    Returns: None
+    """
+    shutil.move(src_path, dst_path)
+    
     
 def local_list_files(path: str):
     """

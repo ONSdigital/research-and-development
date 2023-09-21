@@ -27,6 +27,7 @@ if network_or_hdfs == "network":
 
     from src.utils.local_file_mods import local_list_files as list_files
     from src.utils.local_file_mods import local_copy_file as copy_files
+    from src.utils.local_file_mods import local_move_file as move_files
     from src.utils.local_file_mods import local_isfile as isfile
     from src.utils.local_file_mods import local_delete_file as delete_file
     from src.utils.local_file_mods import local_md5sum as hdfs_md5sum
@@ -40,6 +41,7 @@ elif network_or_hdfs == "hdfs":
 
     from src.utils.local_file_mods import hdfs_list_files as list_files
     from src.utils.hdfs_mods import hdfs_copy_file as copy_files
+    from src.utils.hdfs_mods import hdfs_move_file as move_files
     from src.utils.hdfs_mods import hdfs_isfile as isfile
     from src.utils.hdfs_mods import hdfs_delete_file as delete_file
     from src.utils.hdfs_mods import hdfs_md5sum as hdfs_md5sum
@@ -74,8 +76,11 @@ df_col_string = ",".join(short_form_headers)
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice():
-    """Prompt user to select a file to transfer."""
+def get_file_choice(output_path):
+    """Prompt user to select a files to transfer.
+    
+    Returns:
+        selction_list (list): A list of the files to transfer."""
     file_list = list_files(output_path)
     selction_list = []
     print("Select a file to transfer:")
@@ -140,6 +145,9 @@ def main():
 
     # Copy files to outgoing folder
     copy_files(file_list)
+    
+    # Move the manifest file to the outgoing folder
+    move_files()
 
     # Log success message
     OutgoingLogger.info("Files transferred successfully.")

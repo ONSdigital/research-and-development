@@ -266,6 +266,13 @@ def hdfs_copy_file(src_path: str, dst_path: str):
     command = ["hadoop", "fs", "-cp", src_path, dst_path]
     return _perform(command)
 
+def hdfs_move_file(src_path: str, dst_path: str):
+    """
+    Move a file from one location to another. Uses 'hadoop fs -mv'.
+    """
+    command = ["hadoop", "fs", "-mv", src_path, dst_path]
+    return _perform(command)
+
 def hdfs_list_files(path: str):
     """
     List files in a directory. Uses 'hadoop fs -ls'.
