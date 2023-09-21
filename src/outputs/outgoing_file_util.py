@@ -23,7 +23,6 @@ config = conf_obj.config_dict
 # Check the environment switch
 network_or_hdfs = config["global"]["network_or_hdfs"]
 
-
 if network_or_hdfs == "network":
 
     from src.utils.local_file_mods import local_list_files as list_files
@@ -64,6 +63,12 @@ paths = config[f"{NETWORK_OR_HDFS}_paths"]
 output_path = paths["output_path"]
 outgoing_folder = paths["outgoing_path"]
 
+# Getting correct headers to verify that df and output are the same
+s_f_schema_path = paths["short_form_schema"]
+short_form_schema = toml.load(s_f_schema_path)
+short_form_headers = short_form_schema["headers"]
+df_col_string = ",".join(short_form_headers)
+
 # Create a datetime object for the pipeline run - TODO: replace this with
 # the pipeline run datetime from the runlog object
 pipeline_run_datetime = datetime.now()
@@ -76,7 +81,7 @@ def get_file_choice():
     print("Select a file to transfer:")
     for i, file in enumerate(file_list):
         print(f"{i+1}. {file}")
-    file_num = "X"
+    file_num = "X" # initialize file_num to a non-integer value
     while True and file_num != "Q":
         try:
             file_num = int(input("Enter file number or press 'Q' to quit: "))
@@ -90,22 +95,22 @@ def get_file_choice():
     return selction_list
 
 def check_files_exist(file_list):
-    """Check that files exist."""
+    """Check that all the files in the file list exist using 
+        the imported isfile function."""
     for file in file_list:
         if not isfile(file):
             OutgoingLogger.error(f"File {file} does not exist.")
             raise FileNotFoundError
 
 def main():
-    """Main function to run pipeline."""
-    # Get list of files to transfer
+    """Main function to run the data export pipeline."""
+    # Get list of files to transfer from user
     file_list = get_file_choice()
 
     # Check that files exist
     check_files_exist(file_list)
 
-    # Create manifest file
-    # Creating a manifest file using the Manifest class in manifest_output.py
+    # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
         outgoing_directory=output_path,
         pipeline_run_datetime=pipeline_run_datetime,
@@ -119,28 +124,25 @@ def main():
         string_to_file_func=write_string_to_file,
     )
 
-    # Getting correct headers to verify that df and output are the same
-    s_f_schema_path = paths["short_form_schema"]
-    short_form_schema = toml.load(s_f_schema_path)
-    short_form_headers = short_form_schema["headers"]
-    df_col_string = ",".join(short_form_headers)
 
-    filename = f"output_short_form{tdate}_v{run_id}.csv"
-    
     # Add the short form output file to the manifest object
-    manifest.add_file(
-        f"{output_path}/output_short_form/{filename}", column_header=df_col_string
-    )
+    for filename in file_list:
+        manifest.add_file(
+            f"{output_path}/output_short_form/{filename}",
+            column_header=df_col_string,
+            validate_col_name_length=True,
+            sep=","
+        )
+
 
     # Write the manifest file to the outgoing directory
     manifest.write_manifest()
-
 
     # Copy files to outgoing folder
     copy_files(file_list)
 
     # Log success message
-    logging.info("Files transferred successfully.")
+    OutgoingLogger.info("Files transferred successfully.")
 
 if __name__ == "__main__":
     main()
