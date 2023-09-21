@@ -72,8 +72,12 @@ outgoing_folder = paths["outgoing_path"]
 # Getting correct headers to verify that df and output are the same
 s_f_schema_path = paths["short_form_schema"]
 short_form_schema = toml.load(s_f_schema_path)
-short_form_headers = short_form_schema["headers"]
+
+
+# Get the headers from the short form schema
+short_form_headers = short_form_schema.keys()
 schema_columns_str = ",".join(short_form_headers)
+
 
 # Create a datetime object for the pipeline run - TODO: replace this with
 # the pipeline run datetime from the runlog object
