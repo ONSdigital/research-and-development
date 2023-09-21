@@ -119,8 +119,8 @@ class Manifest:
                 f"File:{absolute_file_path}\n"
                 f"Expected:     {column_header}\n"
                 f"Got:          {file_header_string}\n"
-                f"Missing:      {set(column_header_list) - set(file_header_list)}\n"
-                f"Additional:   {set(file_header_list) - set(column_header_list)}\n"
+                f"Missing from file: {set(column_header_list) - set(file_header_list)}\n"  # noqa
+                f"Missing from schema: {set(file_header_list) - set(column_header_list)}\n"  # noqa
             )
 
         # Checks that column names are not more than 32 chars
