@@ -39,7 +39,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
     ]
 
-    filtered_data = sic_to_pg_mapper(filtered_data, sic_mapper)
+    filtered_data = sic_to_pg_mapper(filtered_data, sic_mapper, target_col="201", formtype = "0001")
 
     updated_df = apply_to_original(filtered_data, df)
 
@@ -294,20 +294,17 @@ def tmi_imputation(df, target_variables, mean_dict):
             # Get grouped dataframe
             subgrp = grp.get_group(item)
 
-            # Find all nulls for target variable in subgroup
-            subnulls = subgrp[subgrp[var].isnull()].copy()
-
             if f"{var}_{item}_mean and count" in mean_dict[var].keys():
                 # Replace nulls with means
-                subnulls[f"{var}_imputed"] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
-                subnulls[f"{var}_imp_marker"] = "TMI"
+                subgrp[f"{var}_imputed"] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
+                subgrp[f"{var}_imp_marker"] = "TMI"
 
             else:
-                subnulls[f"{var}_imputed"] = subnulls[var]
-                subnulls[f"{var}_imp_marker"] = "No mean found"
+                subgrp[f"{var}_imputed"] = subgrp[var]
+                subgrp[f"{var}_imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
-            final_df = apply_to_original(subnulls, filtered_df)
+            final_df = apply_to_original(subgrp, filtered_df)
 
     final_df = apply_to_original(final_df, df)
 
