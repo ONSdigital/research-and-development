@@ -2,6 +2,7 @@
 import logging
 import pandas as pd
 
+from src.imputation.apportionment import run_apportionment
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -9,5 +10,7 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
+
+    df = run_apportionment(df)
 
     return df
