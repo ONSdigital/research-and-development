@@ -9,18 +9,18 @@ ApportionmentLogger = logging.getLogger(__name__)
 
 
 def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
-    """Calculate totals of q202 by reference.
+    """Calculate subtotals of q202 by reference.
 
     For each reference, the sum over all instances for q202 is 
-    calculated and entered in column qtot_202_all for each instance. 
-    Also, the sums over all instances for just the civil or just 
-    defence is entered in column qtot_202_CD.
+    calculated and entered in column tot_202_all. 
+    Also, for each reference, the sums over all instances 
+    for just the civil or just defence is entered in column tot_202_CD.
     
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
 
     Returns:
-        pd.DataFrame: The main dataset with totals.
+        pd.DataFrame: The main dataset with 202 subtotals.
     """
     df["tot_202_all"] = df.groupby("reference")["202"].transform(sum)
 
@@ -33,16 +33,16 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
     """Copy item in insance 0 to all other instances in a given reference.
 
     For long form entries, questions 405 - 412 and 501 - 508 are recorded
-    in instance 0. A series is returned representing an updated version of the 
-    column with the values from instance 0 copied to all other instances.
+    in instance 0. A series is returned representing the updated column with
+    values from instance 0 copied to all other instances of a reference.
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
         col (str): The name of the 4xx or 5xx column being treated.
 
     Returns:
-        pd.Series: A series with the values in instance 0 copied to
-            other instances for the same reference.
+        pd.Series: A single column dataframe with the values in instance 0 
+        copied to other instances for the same reference.
     """
     updated_col = df.groupby("reference")[col].transform(sum)
     return updated_col
@@ -51,12 +51,18 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
 def calc_fte_column(
     df: pd.DataFrame, 
     fte_dict: Dict[str, List[str]], 
-    round_val=4
+    round_val: int = 4
 ) -> pd.DataFrame:
-    """Create a new column for FTE values.
+    """Create new columns for FTE values.
+
+    8 new columns are created, 4 each for Civil and Defence.
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
+        fte_dict (Dict[str, List[str]]): A dictionary containing the new
+            column name as key and a list of the old column names as value.
+        round_val (int): The number of decimal places for rounding.
+
     Returns:
         pd.Dataframe: The dataset with new columns for FTE.    
     """
@@ -86,6 +92,9 @@ def calc_headcount_column(
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
+        fc_dict (Dict[str, str]): A dictionary containing the new
+            column name as key and old column names as the value.
+        round_val (int): The number of decimal places for rounding.
     Returns:
         pd.Dataframe: The dataset with one new column for headcounts
     """
@@ -101,14 +110,15 @@ def calc_headcount_column(
 
 
 def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
-    """
-        FTE is Full Time Equivalent and the values from instance 0
+    """Call funtion to apportion FTE values.
+
+    FTE is Full Time Equivalent and the values from instance 0
     are apportioned to other instances, based on values in 
     the 4xx columns (405 - 412)
-    8 new columns are created, 4 each for Civil and Defence.
-
+    
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
+        round_val (int): The number of decimal places for rounding.
     Returns:
         pd.Dataframe: The dataset with all the new columns for FTE.   
     """
@@ -126,7 +136,7 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
 
 
 def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
-    """Create new columns for FTE values.
+    """Call function to apportion headcount.
 
     The values from instance 0 are apportioned to other instances, 
     based on values in the 5xx columns (501 - 508)
