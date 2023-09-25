@@ -178,24 +178,31 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     return sorted_df
 
 
-def trim_check(
-    df: pd.DataFrame, check_value=10
-) -> pd.DataFrame:  # TODO add check_value to a config
+def apply_trim_check(
+    df: pd.DataFrame, variable: str, check_value=10, 
+    ) -> pd.DataFrame:  # TODO add check_value to a config
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
-    if len(df) <= check_value:  # TODO or is this just <
+    
+    # Filter out zero values for trim calculations
+    df = df.loc[df[variable] != 0]
+    
+    if len(df[variable]) <= check_value:  # TODO or is this just <
         df["trim_check"] = "below_trim_threshold"
     else:
         df["trim_check"] = "above_trim_threshold"
 
+    # Default is dont_trim for all entries
+    df[f"{variable}_trim"] = "dont_trim"
     return df
 
 
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
+    check_value = 10,
     lower_perc=15,  # TODO add percentages to config -
     # check method inBERD_imputation_spec_V3
     upper_perc=15,
@@ -206,12 +213,9 @@ def trim_bounds(
 
     # Save the index before the sorting
     df["pre_index"] = df.index
-
-    # Filter out zero values for trim calculations
-    df = df.loc[df[variable] != 0]
-
-    if len(df) <= 10:
-        df[f"{variable}_trim"] = "dont trim"
+    
+    if len(df) <= check_value:
+        df[f"{variable}_trim"] = "dont_trim"
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
@@ -222,11 +226,13 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-
-        df[f"{variable}_trim"] = "do trim"
+        
+        # To match the SML, we trim for rows strictly less than remove_lower and 
+        # strictly greater than remove_upper
+        df[f"{variable}_trim"] = "do_trim"
         df.loc[
-            remove_lower : remove_upper - 2, f"{variable}_trim"
-        ] = "dont trim"  # TODO check if needs to be inclusive of exlusive
+            remove_lower -1 : remove_upper - 1, f"{variable}_trim"
+        ] = "dont_trim" 
 
     return df
 
@@ -238,7 +244,7 @@ def calculate_mean(
     Returns a dictionary."""
 
     # remove the "trim" tagged rows
-    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont trim"])
+    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont_trim"])
 
     # convert to floats for mean calculation
     trimmed_df[f"{target_variable}"] = trimmed_df[f"{target_variable}"].astype("float")
@@ -284,7 +290,7 @@ def calculate_means(df, target_variable_list):
             sorted_df = sort(var, subgrp)
 
             # Add trimming threshold marker
-            trimcheck_df = trim_check(sorted_df)
+            trimcheck_df = apply_trim_check(sorted_df, var)
 
             # Apply trimming marker
             trimmed_df = trim_bounds(trimcheck_df, var)

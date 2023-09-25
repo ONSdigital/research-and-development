@@ -19,20 +19,17 @@ def run_imputation(
 ) -> pd.DataFrame:
 
     keyvars = [
-        "211",
-        "305",
-        "405",
-        "406",
-        "407",
-        "408",
-        "409",
-        "410",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
+       "211", 
+       "305",
+       "emp_researcher", 
+       "emp_technician",
+       "emp_other", 
+       "headcount_res_m", 
+       "headcount_res_f", 
+       "headcount_tec_m" , 
+       "headcount_tec_f" , 
+       "headcount_oth_m", 
+       "headcount_oth_f"
     ]
 
     df = run_apportionment(df)
