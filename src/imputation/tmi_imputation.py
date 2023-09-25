@@ -231,7 +231,7 @@ def trim_bounds(
     return df
 
 
-def get_mean_growth_ratio(
+def calculate_mean(
     df: pd.DataFrame, unique_item: str, target_variable: str
 ) -> pd.DataFrame:
     """Calculate the mean and count for each target and imputation class combination
@@ -246,10 +246,8 @@ def get_mean_growth_ratio(
     dict_mean_growth_ratio = {}
 
     # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean and count"] = [
-        trimmed_df[f"{target_variable}"].mean(),
-        len(trimmed_df),
-    ]
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[f"{target_variable}"].mean()
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(trimmed_df[f"{target_variable}"])
 
     return dict_mean_growth_ratio
 
@@ -295,7 +293,7 @@ def calculate_means(df, target_variable_list):
 
             dfs_list.append(tr_df)
             # Calculate mean and count # TODO: Rename this
-            means = get_mean_growth_ratio(trimmed_df, k, var)
+            means = calculate_mean(trimmed_df, k, var)
 
             # Update full dict with values
             if mean_dict[var] is None:
@@ -334,10 +332,10 @@ def tmi_imputation(df, target_variables, mean_dict):
             # Get grouped dataframe
             subgrp = grp.get_group(item)
 
-            if f"{var}_{item}_mean and count" in mean_dict[var].keys():
+            if f"{var}_{item}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
                 subgrp[f"{var}_imputed"] = float(
-                    mean_dict[var][f"{var}_{item}_mean and count"][0]
+                    mean_dict[var][f"{var}_{item}_mean"]
                 )
                 subgrp["imp_marker"] = "TMI"
 
