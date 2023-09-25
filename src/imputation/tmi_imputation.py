@@ -34,7 +34,7 @@ def duplicate_rows(df: pd.DataFrame):
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
-    updated_df = updated_df.sort_values(["reference"]).reset_index(drop=True)
+    updated_df = updated_df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(drop=True)
     return updated_df
 
 
@@ -60,7 +60,6 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
     filtered_data = long_df.loc[
         (long_df["status"] == "Form sent out")
         | (long_df["604"] == "No")
-        | (long_df["instance"] == 1)
     ]
 
     filtered_data = sic_to_pg_mapper(
