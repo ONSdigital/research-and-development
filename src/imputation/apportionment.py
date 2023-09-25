@@ -11,11 +11,11 @@ ApportionmentLogger = logging.getLogger(__name__)
 def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate subtotals of q202 by reference.
 
-    For each reference, the sum over all instances for q202 is 
-    calculated and entered in column tot_202_all. 
-    Also, for each reference, the sums over all instances 
+    For each reference, the sum over all instances for q202 is
+    calculated and entered in column tot_202_all.
+    Also, for each reference, the sums over all instances
     for just the civil or just defence is entered in column tot_202_CD.
-    
+
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
 
@@ -41,7 +41,7 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
         col (str): The name of the 4xx or 5xx column being treated.
 
     Returns:
-        pd.Series: A single column dataframe with the values in instance 0 
+        pd.Series: A single column dataframe with the values in instance 0
         copied to other instances for the same reference.
     """
     updated_col = df.groupby("reference")[col].transform(sum)
@@ -49,9 +49,7 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
 
 
 def calc_fte_column(
-    df: pd.DataFrame, 
-    fte_dict: Dict[str, List[str]], 
-    round_val: int = 4
+    df: pd.DataFrame, fte_dict: Dict[str, List[str]], round_val: int = 4
 ) -> pd.DataFrame:
     """Create new columns for FTE values.
 
@@ -64,7 +62,7 @@ def calc_fte_column(
         round_val (int): The number of decimal places for rounding.
 
     Returns:
-        pd.Dataframe: The dataset with new columns for FTE.    
+        pd.Dataframe: The dataset with new columns for FTE.
     """
 
     # create new apportionment column for each item in the dictionary
@@ -74,19 +72,15 @@ def calc_fte_column(
         for item in cases_list:
             condition = (df["200"] == item[0]) & (df["tot_202_CD"] > 0)
             df.loc[condition, new_col] = round(
-                update_column(
-                    df, old_cols[item[1]]
-                ) * df["202"] / df["tot_202_CD"],
-                round_val
+                update_column(df, old_cols[item[1]]) * df["202"] / df["tot_202_CD"],
+                round_val,
             )
 
     return df
 
 
 def calc_headcount_column(
-    df: pd.DataFrame, 
-    hc_dict: Dict[str, str], 
-    round_val=4
+    df: pd.DataFrame, hc_dict: Dict[str, str], round_val=4
 ) -> pd.DataFrame:
     """Create a new column for headcount values.
 
@@ -102,8 +96,7 @@ def calc_headcount_column(
     # create new apportionment column (avoid division by 0)
     for new_col, old_col in hc_dict.items():
         df.loc[df["tot_202_all"] > 0, new_col] = round(
-            update_column(df, old_col) * df["202"] / df["tot_202_all"],
-            round_val
+            update_column(df, old_col) * df["202"] / df["tot_202_all"], round_val
         )
 
     return df
@@ -113,14 +106,14 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     """Call funtion to apportion FTE values.
 
     FTE is Full Time Equivalent and the values from instance 0
-    are apportioned to other instances, based on values in 
+    are apportioned to other instances, based on values in
     the 4xx columns (405 - 412)
-    
+
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
         round_val (int): The number of decimal places for rounding.
     Returns:
-        pd.Dataframe: The dataset with all the new columns for FTE.   
+        pd.Dataframe: The dataset with all the new columns for FTE.
     """
     fte_dict = {
         "emp_researcher": ["405", "406"],
@@ -134,11 +127,10 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     return df
 
 
-
 def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
     """Call function to apportion headcount.
 
-    The values from instance 0 are apportioned to other instances, 
+    The values from instance 0 are apportioned to other instances,
     based on values in the 5xx columns (501 - 508)
     9 new columns are created, and Civil and Defence are treated together.
 
@@ -154,8 +146,8 @@ def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
         "headcount_tec_f": "504",
         "headcount_oth_m": "505",
         "headcount_oth_f": "506",
-        "headcount_tot_m": "507", 
-        "headcount_tot_f": "508"
+        "headcount_tot_m": "507",
+        "headcount_tot_f": "508",
     }
 
     df = calc_headcount_column(df, hc_dict, round_val=4)
@@ -164,9 +156,10 @@ def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+
 def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate apportionment for headcount and FTE.
-    
+
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
 
@@ -176,7 +169,7 @@ def run_apportionment(df: pd.DataFrame) -> pd.DataFrame:
     df = calc_202_totals(df)
     df = apportion_fte(df)
     df = apportion_headcounts(df)
-    
+
     # drop temporary columns
     df = df.drop(["tot_202_all", "tot_202_CD"], axis=1)
 

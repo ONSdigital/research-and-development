@@ -3,7 +3,9 @@ import math
 import numpy as np
 from src.staging.pg_conversion import sic_to_pg_mapper
 
+
 def apply_to_original(filtered_df, original_df):
+    """Overwrites a dataframe with updated row values"""
     original_df.loc[filtered_df.index] = filtered_df
     return original_df
 
@@ -11,15 +13,35 @@ def apply_to_original(filtered_df, original_df):
 def filter_by_column_content(
     raw_df: pd.DataFrame, column: str, column_content: list
 ) -> pd.DataFrame:
+    """A generic Pandas filter to be re-used in this module"""
 
     clean_df = raw_df[raw_df[column].isin(column_content)].copy()
 
     return clean_df
 
 
+def instance_fix(df: pd.DataFrame):
+    """Changes instance to 1 for status = "Form sent out" """
+    filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
+    filtered_df["instance"] = 1
+    updated_df = apply_to_original(filtered_df, df)
+    return updated_df
+
+
+def duplicate_rows(df: pd.DataFrame):
+    """Duplicates rows for companies that do no R&D and changes instance to 1.
+    This also sorts the dataframe on reference"""
+    filtered_df = filter_by_column_content(df, "604", ["No"])
+    filtered_df["instance"] = 1
+    updated_df = pd.concat([df, filtered_df], ignore_index=True)
+    updated_df = updated_df.sort_values(["reference"]).reset_index(drop=True)
+    return updated_df
+
+
 def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
-    """Impute missing product groups for companies that do no r&d
-    and status = "Form sent out" using the SIC number ('rusic').
+    """Impute missing product groups for companies that do no r&d,
+    where instance = 1 and status = "Form sent out"
+    using the SIC number ('rusic').
 
     Args:
         df (pd.DataFrame): initial dataframe from staging
@@ -29,17 +51,21 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         pd.DataFrame: Returns the original dataframe with new PGs
         overwriting the missing values
     """
-    
-    df['200'] = df['200'].astype("category")
-    
+
+    df["200"] = df["200"].astype("category")
+
     long_df = filter_by_column_content(df, "formtype", ["0001"])
 
     # Filter for q604 = No or status = "Form sent out"
     filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
+        (long_df["status"] == "Form sent out")
+        | (long_df["604"] == "No")
+        | (long_df["instance"] == 1)
     ]
 
-    filtered_data = sic_to_pg_mapper(filtered_data, sic_mapper, target_col="201", formtype = "0001")
+    filtered_data = sic_to_pg_mapper(
+        filtered_data, sic_mapper, target_col="201", formtype="0001"
+    )
 
     updated_df = apply_to_original(filtered_data, df)
 
@@ -54,69 +80,83 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 
 
 def create_imp_class_col(
-    clean_df: pd.DataFrame, col_first_half: str, col_second_half: str, class_name: str
+    df: pd.DataFrame,
+    col_first_half: str,
+    col_second_half: str,
+    class_name: str = "imp_class",
 ) -> pd.DataFrame:
+    """Creates a column for the imputation class by concatenating
+    the business type "200" and product group "201" columns. The
+    special case for cell number 817 is added as a suffix.
+
+    Args:
+        df (pd.DataFrame): Full dataframe
+        col_first_half (str): The first half of the class string
+        "200" is generally used.
+        col_second_half (str): The second half of the class string
+        "201" is generally used.
+        class_name (str): The name of the column to save the class to.
+        Defaults to "imp_class"
+    Returns:
+        pd.DataFrame: Dataframe which contains a new column with the
+        imputation classes.
+    """
 
     # Create class col with concatenation
-    clean_df[f"{class_name}"] = (
-        clean_df[f"{col_first_half}"].astype(str)
-        + "_"
-        + clean_df[f"{col_second_half}"].astype(str)
+    df[f"{class_name}"] = (
+        df[f"{col_first_half}"].astype(str) + "_" + df[f"{col_second_half}"].astype(str)
     )
 
-    fil_df = filter_by_column_content(clean_df, "cellnumber", [817])
+    fil_df = filter_by_column_content(df, "cellnumber", [817])
     # Create class col with concatenation + 817
     fil_df[f"{class_name}"] = fil_df[f"{class_name}"] + "_817"
 
-    clean_df = apply_to_original(fil_df, clean_df)
+    df = apply_to_original(fil_df, df)
 
-    return clean_df
-
-
-def apply_filters(df):
-
-    clean_statuses = ["Clear", "Clear - overridden", "Clear - overridden SE"]
-    filtered_df = filter_by_column_content(df, "status", clean_statuses)
-
-    return filtered_df
+    return df
 
 
 def fill_zeros(df: pd.DataFrame, column: str):
+    """Fills null values with zeros"""
     return df[column].replace({math.nan: 0}).astype("float")
 
 
-def clean_no_rd_data(filtered_df, og_df, target_variables: list):
-    """TODO: Check if we need to do this"""
+def apply_fill_zeros(filtered_df, df, target_variables: list):
+    """Applies the fill zeros function to the specified columns"""
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
-    og_df = apply_to_original(filtered_df, og_df)
+    df = apply_to_original(filtered_df, df)
 
     # Replace Nan with zero for companies with NO R&D Q604 = "No"
-    no_rd = filter_by_column_content(og_df, "604", ["No"])
+    no_rd = filter_by_column_content(df, "604", ["No"])
 
     for i in target_variables:
         no_rd[i] = fill_zeros(no_rd, i)
 
-    og_df = apply_to_original(no_rd, og_df)
+    df = apply_to_original(no_rd, df)
 
     # Return cleaned original dataset
-    return og_df
+    return df
 
 
 def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
-
+    """Function that brings together the steps needed before calculating
+    the trimmed mean"""
     # Create a copy for reference
     copy_df = df.copy()
 
     # Filter for long form data
     long_df = filter_by_column_content(copy_df, "formtype", ["0001"])
 
-    # Filter for good statuses
-    fil_df = apply_filters(long_df)
+    # Filter for instance is not 0
+    filtered_df = long_df.loc[long_df["instance"] != 0]
+
+    # Filter for clear statuses
+    clear_statuses = ["210", "211"]
+    clear_df = filter_by_column_content(filtered_df, "statusencoded", clear_statuses)
 
     # Fill zeros for no r&d and apply to original
-
-    df = clean_no_rd_data(fil_df, df, target_variables_list)
+    df = apply_fill_zeros(clear_df, df, target_variables_list)
 
     # Calculate imputation classes for each row
     imp_df = create_imp_class_col(df, "200", "201", "imp_class")
@@ -125,6 +165,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
 
 
 def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
+    "Sorts a dataframe using the list and order provided."
     sort_list = [
         f"{target_variable}",
         "employees",
@@ -134,22 +175,15 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
         by=sort_list,
         ascending=[True, False, True],
     )
-    # sorted_df.reset_index(drop=True, inplace=True)
 
     return sorted_df
 
 
 def trim_check(
     df: pd.DataFrame, check_value=10
-) -> pd.DataFrame:  # TODO add check_value to a cofig
-    """_summary_
-
-    Args:
-        df (pd.DataFrame, check_value, optional): _description_
-        Defaults to 10)->pd.DataFrame(.
-
-    Returns:
-        _type_: _description_
+) -> pd.DataFrame:  # TODO add check_value to a config
+    """Checks if the number of records is above or below
+    the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
     if len(df) <= check_value:  # TODO or is this just <
@@ -167,17 +201,15 @@ def trim_bounds(
     # check method inBERD_imputation_spec_V3
     upper_perc=15,
 ) -> pd.DataFrame:
-    """_summary_
-
-    Args:
-        df (pd.DataFrame, lower_perc, optional): _description_.
-        Defaults to 15, TODO add percentages to config
-
-    Returns:
-        _type_: _description_
+    """Applies a marker to specifiy if a value is to be trimmed or not.
+    NOTE: Trims only if more than 10 valid records
     """
-    # trim only if more than 10
+
+    # Save the index before the sorting
     df["pre_index"] = df.index
+
+    # Filter out zero values for trim calculations
+    df = df.loc[df[variable] != 0]
 
     if len(df) <= 10:
         df[f"{variable}_trim"] = "dont trim"
@@ -203,11 +235,13 @@ def trim_bounds(
 def get_mean_growth_ratio(
     df: pd.DataFrame, unique_item: str, target_variable: str
 ) -> pd.DataFrame:
+    """Calculate the mean and count for each target and imputation class combination
+    Returns a dictionary."""
 
     # remove the "trim" tagged rows
     trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont trim"])
 
-    # convert to floats for now TODO: Should be done in staging
+    # convert to floats for mean calculation
     trimmed_df[f"{target_variable}"] = trimmed_df[f"{target_variable}"].astype("float")
 
     dict_mean_growth_ratio = {}
@@ -222,7 +256,10 @@ def get_mean_growth_ratio(
 
 
 def calculate_means(df, target_variable_list):
-
+    """Function to apply multiple steps to calculate the means for each target
+    variable.
+    Returns a dictionary of mean values and counts for each unique class and variable
+    Also returns a QA dataframe containing information on how trimming was applied"""
     dfs_list = []
 
     # Create an empty dict to store means
@@ -230,8 +267,11 @@ def calculate_means(df, target_variable_list):
 
     copy_df = df.copy()
 
-    filtered_df = apply_filters(copy_df)
+    # Filter for clear statuses
+    clear_statuses = ["210", "211"]
+    filtered_df = filter_by_column_content(copy_df, "statusencoded", clear_statuses)
 
+    # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
     filtered_df = filtered_df[filtered_df["formtype"] == "0001"]
 
@@ -272,9 +312,10 @@ def calculate_means(df, target_variable_list):
 
 
 def tmi_imputation(df, target_variables, mean_dict):
-    
+    """Function to replace the not clear statuses with the mean value
+    for each imputation class"""
     for var in target_variables:
-        df[f"{var}_imp_marker"] = "N/A"
+        df["imp_marker"] = "N/A"
         df[f"{var}_imputed"] = df[var]
 
     copy_df = df.copy()
@@ -296,12 +337,14 @@ def tmi_imputation(df, target_variables, mean_dict):
 
             if f"{var}_{item}_mean and count" in mean_dict[var].keys():
                 # Replace nulls with means
-                subgrp[f"{var}_imputed"] = float(mean_dict[var][f"{var}_{item}_mean and count"][0])
-                subgrp[f"{var}_imp_marker"] = "TMI"
+                subgrp[f"{var}_imputed"] = float(
+                    mean_dict[var][f"{var}_{item}_mean and count"][0]
+                )
+                subgrp["imp_marker"] = "TMI"
 
             else:
                 subgrp[f"{var}_imputed"] = subgrp[var]
-                subgrp[f"{var}_imp_marker"] = "No mean found"
+                subgrp["imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
             final_df = apply_to_original(subgrp, filtered_df)
@@ -312,22 +355,22 @@ def tmi_imputation(df, target_variables, mean_dict):
 
 
 def run_tmi(full_df, target_variables, sic_mapper):
-
+    """Function to run imputation end to end and returns the final
+    dataframe back to the pipeline"""
     copy_df = full_df.copy()
+
+    copy_df = instance_fix(copy_df)
+    copy_df = duplicate_rows(copy_df)
 
     df = impute_pg_by_sic(copy_df, sic_mapper)
 
     df = tmi_pre_processing(df, target_variables)
 
     mean_dict, qa_df = calculate_means(df, target_variables)
-    
-    import csv
-    with open('mycsvfile.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
-        w = csv.DictWriter(f, mean_dict.keys())
-        w.writeheader()
-        w.writerow(mean_dict)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
+
+    qa_df = qa_df.drop("trim_check", axis=1)
 
     final_df = tmi_imputation(df, target_variables, mean_dict)
 

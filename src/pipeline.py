@@ -94,7 +94,7 @@ def run_pipeline(start, config_path):
 
     # Imputation module
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses)
+    imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
     MainLogger.info("Finished  Imputation...")
     print(imputed_df.sample(10))
 
@@ -104,14 +104,6 @@ def run_pipeline(start, config_path):
         full_responses, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
-
-    # Data processing: Imputation
-
-    MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper,config, write_csv,run_id)
-    MainLogger.info("Finished  Imputation...")
-
-    print(imputed_df.sample(10))
 
     # Data processing: Estimation
     # Estimation module
