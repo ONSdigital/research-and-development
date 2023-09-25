@@ -16,7 +16,7 @@ Deduced_Data_Type = "category"
 
 [ua_county]
 old_name = "itl"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "str"
 
 [employee_count]
 old_name = "frozenemployment"

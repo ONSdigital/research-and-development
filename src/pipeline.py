@@ -81,18 +81,22 @@ def run_pipeline(start, config_path):
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
-    full_responses, manual_outliers, pg_mapper, ultfoc_mapper, cellno_df = run_staging(
-        config, check_file_exists, load_json, read_csv, write_csv, run_id
-    )
+    (
+        full_responses,
+        manual_outliers,
+        pg_mapper,
+        ultfoc_mapper,
+        cora_mapper,
+        cellno_df,
+        postcode_itl_mapper,
+    ) = run_staging(config, check_file_exists, load_json, read_csv, write_csv, run_id)
     MainLogger.info("Finished Data Ingest...")
-    print(full_responses.sample(10))
-    print(manual_outliers.head())
 
     # Imputation module
-    # MainLogger.info("Starting Imputation...")
-    # imputed_df = run_imputation(full_responses, pg_mapper)
-    # MainLogger.info("Finished  Imputation...")
-    # print(imputed_df.sample(10))
+    MainLogger.info("Starting Imputation...")
+    imputed_df = run_imputation(full_responses)
+    MainLogger.info("Finished  Imputation...")
+    print(imputed_df.sample(10))
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
@@ -119,7 +123,15 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Output...")
-    run_output(estimated_responses, config, write_csv, run_id, ultfoc_mapper)
+    run_output(
+        estimated_responses,
+        config,
+        write_csv,
+        run_id,
+        ultfoc_mapper,
+        cora_mapper,
+        postcode_itl_mapper,
+    )
     MainLogger.info("Finished Output module.")
 
     MainLogger.info("Finishing Pipeline .......................")
