@@ -72,13 +72,6 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
     return updated_df
 
 
-# # Impute Business R&D type TODO: STEP 2
-# filtered_data["200"] = np.random.choice(
-#     ["C", "D"], size=len(filtered_data), p=[0.7, 0.3]
-# )
-# cur_df = apply_to_original(filtered_data, cur_df)
-
-
 def create_imp_class_col(
     df: pd.DataFrame,
     col_first_half: str,
