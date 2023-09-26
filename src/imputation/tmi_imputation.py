@@ -53,6 +53,8 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         pd.DataFrame: Returns the original dataframe with new PGs
         overwriting the missing values
     """
+    
+    df = df.copy()
 
     df["200"] = df["200"].astype("category")
 
@@ -101,6 +103,8 @@ def create_imp_class_col(
         pd.DataFrame: Dataframe which contains a new column with the
         imputation classes.
     """
+    
+    df = df.copy()
 
     # Create class col with concatenation
     df[f"{class_name}"] = (
@@ -188,7 +192,9 @@ def apply_trim_check(
     the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
-
+    
+    df = df.copy()
+    
     # Exclude zero values in trim calculations
     if len(df.loc[df[variable] != 0]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
@@ -211,7 +217,8 @@ def trim_bounds(
     """Applies a marker to specifiy if a value is to be trimmed or not.
     NOTE: Trims only if more than 10 valid records
     """
-
+    
+    df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
 
@@ -321,14 +328,16 @@ def calculate_means(df, target_variable_list):
 def tmi_imputation(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
+    
+    df  = df.copy()
+    df["imp_marker"] = "N/A"
+    
     for var in target_variables:
-        df["imp_marker"] = "N/A"
         df[f"{var}_imputed"] = df[var]
 
-    copy_df = df.copy()
 
     filtered_df = filter_by_column_content(
-        copy_df, "status", ["Form sent out", "Check needed"]
+        df, "status", ["Form sent out", "Check needed"]
     )
 
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
@@ -341,6 +350,8 @@ def tmi_imputation(df, target_variables, mean_dict):
 
             # Get grouped dataframe
             imp_class_df = grp.get_group(imp_class_key)
+            
+            imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
                 # Replace nulls with means

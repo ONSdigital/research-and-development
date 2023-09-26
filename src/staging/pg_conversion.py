@@ -134,6 +134,8 @@ def sic_to_pg_mapper(
     filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
     filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
     filtered_df[target_col] = filtered_df[target_col].astype("category")
+    
+    df = df.copy()
 
     df.loc[
         filtered_df.index,
