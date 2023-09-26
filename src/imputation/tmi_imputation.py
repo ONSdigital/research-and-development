@@ -168,7 +168,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     return imp_df
 
 
-def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
+def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     "Sorts a dataframe using the list and order provided."
     sort_list = [
         f"{target_variable}",
@@ -269,7 +269,7 @@ def calculate_mean(
     return dict_mean_growth_ratio
 
 
-def calculate_means(df, target_variable_list):
+def create_mean_dict(df, target_variable_list):
     """Function to apply multiple steps to calculate the means for each target
     variable.
     Returns a dictionary of mean values and counts for each unique class and variable
@@ -298,7 +298,7 @@ def calculate_means(df, target_variable_list):
             # Get subgroup dataframe
             subgrp = grp.get_group(k)
             # Sort by target_variable, df['employees'], reference
-            sorted_df = sort(var, subgrp)
+            sorted_df = sort_df(var, subgrp)
 
             # Add trimming threshold marker
             trimcheck_df = apply_trim_check(sorted_df, var)
@@ -384,7 +384,7 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     df = tmi_pre_processing(df, target_variables)
 
-    mean_dict, qa_df = calculate_means(df, target_variables)
+    mean_dict, qa_df = create_mean_dict(df, target_variables)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
