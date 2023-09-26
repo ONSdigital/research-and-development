@@ -186,10 +186,8 @@ def apply_trim_check(
     """
     # tag for those classes with more than check_value (currently 10)
     
-    # Filter out zero values for trim calculations
-    df = df.loc[df[variable] != 0]
-    
-    if len(df[variable]) <= check_value:  # TODO or is this just <
+    # Exclude zero values in trim calculations
+    if len(df.loc[df[variable] != 0]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
     else:
         df["trim_check"] = "above_trim_threshold"
@@ -214,7 +212,8 @@ def trim_bounds(
     # Save the index before the sorting
     df["pre_index"] = df.index
     
-    if len(df) <= check_value:
+    # trim only if the number of non-zeros is above check_value
+    if len(df.loc[df[variable] != 0]) <= check_value:
         df[f"{variable}_trim"] = "dont_trim"
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
