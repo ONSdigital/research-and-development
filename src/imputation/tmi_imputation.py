@@ -53,6 +53,8 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         pd.DataFrame: Returns the original dataframe with new PGs
         overwriting the missing values
     """
+    
+    df = df.copy()
 
     df["200"] = df["200"].astype("category")
 
@@ -94,6 +96,8 @@ def create_imp_class_col(
         pd.DataFrame: Dataframe which contains a new column with the
         imputation classes.
     """
+    
+    df = df.copy()
 
     # Create class col with concatenation
     df[f"{class_name}"] = (
@@ -157,7 +161,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     return imp_df
 
 
-def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
+def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     "Sorts a dataframe using the list and order provided."
     sort_list = [
         f"{target_variable}",
@@ -181,7 +185,9 @@ def apply_trim_check(
     the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
-
+    
+    df = df.copy()
+    
     # Exclude zero values in trim calculations
     if len(df.loc[df[variable] != 0]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
@@ -204,7 +210,8 @@ def trim_bounds(
     """Applies a marker to specifiy if a value is to be trimmed or not.
     NOTE: Trims only if more than 10 valid records
     """
-
+    
+    df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
 
@@ -255,7 +262,7 @@ def calculate_mean(
     return dict_mean_growth_ratio
 
 
-def calculate_means(df, target_variable_list):
+def create_mean_dict(df, target_variable_list):
     """Function to apply multiple steps to calculate the means for each target
     variable.
     Returns a dictionary of mean values and counts for each unique class and variable
@@ -284,7 +291,7 @@ def calculate_means(df, target_variable_list):
             # Get subgroup dataframe
             subgrp = grp.get_group(k)
             # Sort by target_variable, df['employees'], reference
-            sorted_df = sort(var, subgrp)
+            sorted_df = sort_df(var, subgrp)
 
             # Add trimming threshold marker
             trimcheck_df = apply_trim_check(sorted_df, var)
@@ -311,17 +318,19 @@ def calculate_means(df, target_variable_list):
     return mean_dict, df
 
 
-def tmi_imputation(df, target_variables, mean_dict):
+def apply_tmi(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
+    
+    df  = df.copy()
+    df["imp_marker"] = "N/A"
+    
     for var in target_variables:
-        df["imp_marker"] = "N/A"
         df[f"{var}_imputed"] = df[var]
 
-    copy_df = df.copy()
 
     filtered_df = filter_by_column_content(
-        copy_df, "status", ["Form sent out", "Check needed"]
+        df, "status", ["Form sent out", "Check needed"]
     )
 
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
@@ -334,6 +343,8 @@ def tmi_imputation(df, target_variables, mean_dict):
 
             # Get grouped dataframe
             imp_class_df = grp.get_group(imp_class_key)
+            
+            imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
@@ -366,13 +377,13 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     df = tmi_pre_processing(df, target_variables)
 
-    mean_dict, qa_df = calculate_means(df, target_variables)
+    mean_dict, qa_df = create_mean_dict(df, target_variables)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = tmi_imputation(df, target_variables, mean_dict)
+    final_df = apply_tmi(df, target_variables, mean_dict)
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
