@@ -70,7 +70,7 @@ short_form_output = os.path.join(output_path, "output_short_form")
 outgoing_folder = paths["outgoing_path"]
 
 # Getting correct headers to verify that df and output are the same
-s_f_schema_path = paths["short_form_schema"]
+s_f_schema_path = config["schema_paths"]["frozen_shortform_schema"]
 short_form_schema = toml.load(s_f_schema_path)
 
 
