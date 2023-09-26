@@ -325,7 +325,7 @@ def create_mean_dict(df, target_variable_list):
     return mean_dict, df
 
 
-def tmi_imputation(df, target_variables, mean_dict):
+def apply_tmi(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
     
@@ -390,7 +390,7 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = tmi_imputation(df, target_variables, mean_dict)
+    final_df = apply_tmi(df, target_variables, mean_dict)
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
