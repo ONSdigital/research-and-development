@@ -34,7 +34,9 @@ def duplicate_rows(df: pd.DataFrame):
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
-    updated_df = updated_df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(drop=True)
+    updated_df = updated_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
     return updated_df
 
 
@@ -58,8 +60,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 
     # Filter for q604 = No or status = "Form sent out"
     filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out")
-        | (long_df["604"] == "No")
+        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
     ]
 
     filtered_data = sic_to_pg_mapper(
@@ -179,13 +180,15 @@ def sort(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def apply_trim_check(
-    df: pd.DataFrame, variable: str, check_value=10, 
-    ) -> pd.DataFrame:  # TODO add check_value to a config
+    df: pd.DataFrame,
+    variable: str,
+    check_value=10,
+) -> pd.DataFrame:  # TODO add check_value to a config
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
-    
+
     # Exclude zero values in trim calculations
     if len(df.loc[df[variable] != 0]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
@@ -200,7 +203,7 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    check_value = 10,
+    check_value=10,
     lower_perc=15,  # TODO add percentages to config -
     # check method inBERD_imputation_spec_V3
     upper_perc=15,
@@ -211,7 +214,7 @@ def trim_bounds(
 
     # Save the index before the sorting
     df["pre_index"] = df.index
-    
+
     # trim only if the number of non-zeros is above check_value
     if len(df.loc[df[variable] != 0]) <= check_value:
         df[f"{variable}_trim"] = "dont_trim"
@@ -225,13 +228,11 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-        
-        # To match the SML, we trim for rows strictly less than remove_lower and 
+
+        # To match the SML, we trim for rows strictly less than remove_lower and
         # strictly greater than remove_upper
         df[f"{variable}_trim"] = "do_trim"
-        df.loc[
-            remove_lower -1 : remove_upper - 1, f"{variable}_trim"
-        ] = "dont_trim" 
+        df.loc[remove_lower - 1 : remove_upper - 1, f"{variable}_trim"] = "dont_trim"
 
     return df
 
@@ -251,8 +252,12 @@ def calculate_mean(
     dict_mean_growth_ratio = {}
 
     # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[f"{target_variable}"].mean()
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(trimmed_df[f"{target_variable}"])
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
+        f"{target_variable}"
+    ].mean()
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
+        trimmed_df[f"{target_variable}"]
+    )
 
     return dict_mean_growth_ratio
 
@@ -335,21 +340,21 @@ def tmi_imputation(df, target_variables, mean_dict):
         for item in class_keys:
 
             # Get grouped dataframe
-            subgrp = grp.get_group(item)
+            imp_class_df = grp.get_group(item)
 
             if f"{var}_{item}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
-                subgrp[f"{var}_imputed"] = float(
+                imp_class_df[f"{var}_imputed"] = float(
                     mean_dict[var][f"{var}_{item}_mean"]
                 )
-                subgrp["imp_marker"] = "TMI"
+                imp_class_df["imp_marker"] = "TMI"
 
             else:
-                subgrp[f"{var}_imputed"] = subgrp[var]
-                subgrp["imp_marker"] = "No mean found"
+                imp_class_df[f"{var}_imputed"] = imp_class_df[var]
+                imp_class_df["imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
-            final_df = apply_to_original(subgrp, filtered_df)
+            final_df = apply_to_original(imp_class_df, filtered_df)
 
     final_df = apply_to_original(final_df, df)
 
