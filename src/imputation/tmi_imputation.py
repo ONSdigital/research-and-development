@@ -337,15 +337,15 @@ def tmi_imputation(df, target_variables, mean_dict):
     class_keys = list(grp.groups.keys())
 
     for var in target_variables:
-        for item in class_keys:
+        for imp_class_key in class_keys:
 
             # Get grouped dataframe
-            imp_class_df = grp.get_group(item)
+            imp_class_df = grp.get_group(imp_class_key)
 
-            if f"{var}_{item}_mean" in mean_dict[var].keys():
+            if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
                 imp_class_df[f"{var}_imputed"] = float(
-                    mean_dict[var][f"{var}_{item}_mean"]
+                    mean_dict[var][f"{var}_{imp_class_key}_mean"]
                 )
                 imp_class_df["imp_marker"] = "TMI"
 
