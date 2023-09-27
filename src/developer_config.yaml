@@ -38,7 +38,7 @@ hdfs_paths:
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  outgoing_path: /ons/rdbe_dev/outgoing_export
+  export_path: /ons/rdbe_dev/outgoing_export
   outliers_path: None
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
@@ -57,7 +57,7 @@ network_paths:
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
-  outgoing_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
+  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
 schema_paths:
   frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
