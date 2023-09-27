@@ -5,24 +5,22 @@ from src.staging.pg_conversion import sic_to_pg_mapper
 
 
 def apply_to_original(filtered_df, original_df):
-    """Overwrites a dataframe with updated row values."""
-    original_df.loc[filtered_df.index] = filtered_df
+    """Overwrites a dataframe with updated row values"""
+    original_df.update(filtered_df)
     return original_df
 
 
 def filter_by_column_content(
-    raw_df: pd.DataFrame, column: str, column_content: list
+    df: pd.DataFrame, column: str, column_content: list
 ) -> pd.DataFrame:
     """Function to filter dataframe column by content."""
-    clean_df = raw_df[raw_df[column].isin(column_content)].copy()
-
-    return clean_df
+    return df[df[column].isin(column_content)].copy()
 
 
 def instance_fix(df: pd.DataFrame):
     """Set instance to 1 for status 'Form sent out.'
-    
-    References with status 'Form sent out' initially have a null in the instance 
+
+    References with status 'Form sent out' initially have a null in the instance
     column.
     """
     filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
@@ -32,8 +30,7 @@ def instance_fix(df: pd.DataFrame):
 
 
 def duplicate_rows(df: pd.DataFrame):
-    """Create a duplicate of references with no R&D and set instance to 1.
-    """
+    """Create a duplicate of references with no R&D and set instance to 1."""
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
@@ -56,7 +53,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
         pd.DataFrame: Returns the original dataframe with new PGs
         overwriting the missing values
     """
-    
+
     df = df.copy()
 
     df["200"] = df["200"].astype("category")
@@ -99,7 +96,7 @@ def create_imp_class_col(
         pd.DataFrame: Dataframe which contains a new column with the
         imputation classes.
     """
-    
+
     df = df.copy()
 
     # Create class col with concatenation
@@ -118,7 +115,7 @@ def create_imp_class_col(
 
 def fill_zeros(df: pd.DataFrame, column: str):
     """Fills null values with zeros in a given column."""
-    return df[column].replace({math.nan: 0}).astype("float")
+    return df[column].fillna(0).astype("float")
 
 
 def apply_fill_zeros(filtered_df, df, target_variables: list):
@@ -145,11 +142,9 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
 def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean"""
-    # Create a copy for reference
-    copy_df = df.copy()
 
     # Filter for long form data
-    long_df = filter_by_column_content(copy_df, "formtype", ["0001"])
+    long_df = filter_by_column_content(df, "formtype", ["0001"])
 
     # Filter for instance is not 0
     filtered_df = long_df.loc[long_df["instance"] != 0]
@@ -191,9 +186,9 @@ def apply_trim_check(
     the threshold required for trimming.
     """
     # tag for those classes with more than check_value (currently 10)
-    
+
     df = df.copy()
-    
+
     # Exclude zero values in trim calculations
     if len(df.loc[df[variable] > 0, variable]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
@@ -208,14 +203,14 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    check_value: int=10,
-    lower_perc: int=15,  # TODO add percentages to config -
-    upper_perc: int=15,
+    check_value: int = 10,
+    lower_perc: int = 15,  # TODO add percentages to config -
+    upper_perc: int = 15,
 ) -> pd.DataFrame:
     """Applies a marker to specifiy whether a mean calculation is to be trimmed.
 
     If the 'variable' column contains more than 'check_value' non-zero values,
-    the largest and smallest values are flagged for trimming based on the 
+    the largest and smallest values are flagged for trimming based on the
     percentages specified.
 
     Args:
@@ -234,8 +229,12 @@ def trim_bounds(
         df.reset_index(drop=True, inplace=True)
 
         # define the bounds for trimming
-        remove_lower = np.ceil(len(df.loc[df[variable] > 0, variable]) * (lower_perc / 100))
-        remove_upper = np.ceil(len(df.loc[df[variable] > 0, variable]) * (upper_perc / 100))
+        remove_lower = np.ceil(
+            len(df.loc[df[variable] > 0, variable]) * (lower_perc / 100)
+        )
+        remove_upper = np.ceil(
+            len(df.loc[df[variable] > 0, variable]) * (upper_perc / 100)
+        )
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
@@ -243,9 +242,9 @@ def trim_bounds(
         # To match the SML, we trim for rows strictly less than remove_lower and
         # strictly greater than remove_upper
         df[f"{variable}_trim"] = "do_trim"
-        lower_keep_index = remove_lower - 1 
+        lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
-        df.loc[lower_keep_index : upper_keep_index, f"{variable}_trim"] = "dont_trim"
+        df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] = "dont_trim"
 
     return df
 
@@ -260,7 +259,7 @@ def calculate_mean(
     trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont_trim"])
 
     # convert to floats for mean calculation
-    trimmed_df[f"{target_variable}"] = trimmed_df[f"{target_variable}"].astype("float")
+    trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
 
     dict_mean_growth_ratio = {}
 
@@ -285,11 +284,9 @@ def create_mean_dict(df, target_variable_list):
     # Create an empty dict to store means
     mean_dict = dict.fromkeys(target_variable_list)
 
-    copy_df = df.copy()
-
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
-    filtered_df = filter_by_column_content(copy_df, "statusencoded", clear_statuses)
+    filtered_df = filter_by_column_content(df, "statusencoded", clear_statuses)
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
@@ -334,18 +331,20 @@ def create_mean_dict(df, target_variable_list):
 def apply_tmi(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
-    
-    df  = df.copy()
+
+    df = df.copy()
     df["imp_marker"] = "N/A"
-    
+
     for var in target_variables:
         df[f"{var}_imputed"] = df[var]
-
 
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
     )
 
+    # Filter out any cases where 200 or 201 are missing from the imputation class
+    # This ensures that means are calculated using only valid imputation classes
+    # Since imp_class is string type, any entry containing "nan" is excluded.
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     grp = filtered_df.groupby("imp_class")
@@ -356,7 +355,7 @@ def apply_tmi(df, target_variables, mean_dict):
 
             # Get grouped dataframe
             imp_class_df = grp.get_group(imp_class_key)
-            
+
             imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
