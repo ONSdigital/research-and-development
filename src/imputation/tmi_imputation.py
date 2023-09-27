@@ -5,7 +5,7 @@ from src.staging.pg_conversion import sic_to_pg_mapper
 
 
 def apply_to_original(filtered_df, original_df):
-    """Overwrites a dataframe with updated row values"""
+    """Overwrites a dataframe with updated row values."""
     original_df.loc[filtered_df.index] = filtered_df
     return original_df
 
@@ -13,15 +13,18 @@ def apply_to_original(filtered_df, original_df):
 def filter_by_column_content(
     raw_df: pd.DataFrame, column: str, column_content: list
 ) -> pd.DataFrame:
-    """A generic Pandas filter to be re-used in this module"""
-
+    """Function to filter dataframe column by content."""
     clean_df = raw_df[raw_df[column].isin(column_content)].copy()
 
     return clean_df
 
 
 def instance_fix(df: pd.DataFrame):
-    """Changes instance to 1 for status = "Form sent out" """
+    """Set instance to 1 for status 'Form sent out.'
+    
+    References with status 'Form sent out' initially have a null in the instance 
+    column.
+    """
     filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
     filtered_df["instance"] = 1
     updated_df = apply_to_original(filtered_df, df)
@@ -29,8 +32,8 @@ def instance_fix(df: pd.DataFrame):
 
 
 def duplicate_rows(df: pd.DataFrame):
-    """Duplicates rows for companies that do no R&D and changes instance to 1.
-    This also sorts the dataframe on reference"""
+    """Create a duplicate of references with no R&D and set instance to 1.
+    """
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
@@ -114,19 +117,22 @@ def create_imp_class_col(
 
 
 def fill_zeros(df: pd.DataFrame, column: str):
-    """Fills null values with zeros"""
+    """Fills null values with zeros in a given column."""
     return df[column].replace({math.nan: 0}).astype("float")
 
 
 def apply_fill_zeros(filtered_df, df, target_variables: list):
-    """Applies the fill zeros function to the specified columns"""
+    """Applies the fill zeros function to filtered dataframes."""
+    # only fill zeros where intance is not zero
+    filtered_df = filtered_df.loc[filtered_df["instance"] != 0]
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
     df = apply_to_original(filtered_df, df)
 
     # Replace Nan with zero for companies with NO R&D Q604 = "No"
-    no_rd = filter_by_column_content(df, "604", ["No"])
 
+    no_rd = filter_by_column_content(df, "604", ["No"])
+    no_rd = no_rd.loc[no_rd["instance"] != 0]
     for i in target_variables:
         no_rd[i] = fill_zeros(no_rd, i)
 
@@ -162,7 +168,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
 
 
 def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
-    "Sorts a dataframe using the list and order provided."
+    """Sorts a dataframe by the target variable and other variables."""
     sort_list = [
         f"{target_variable}",
         "employees",
@@ -189,7 +195,7 @@ def apply_trim_check(
     df = df.copy()
     
     # Exclude zero values in trim calculations
-    if len(df.loc[df[variable] != 0]) <= check_value:
+    if len(df.loc[df[variable] > 0, variable]) <= check_value:
         df["trim_check"] = "below_trim_threshold"
     else:
         df["trim_check"] = "above_trim_threshold"
@@ -202,29 +208,34 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    check_value=10,
-    lower_perc=15,  # TODO add percentages to config -
-    # check method inBERD_imputation_spec_V3
-    upper_perc=15,
+    check_value: int=10,
+    lower_perc: int=15,  # TODO add percentages to config -
+    upper_perc: int=15,
 ) -> pd.DataFrame:
-    """Applies a marker to specifiy if a value is to be trimmed or not.
-    NOTE: Trims only if more than 10 valid records
+    """Applies a marker to specifiy whether a mean calculation is to be trimmed.
+
+    If the 'variable' column contains more than 'check_value' non-zero values,
+    the largest and smallest values are flagged for trimming based on the 
+    percentages specified.
+
+    Args:
+        df (pd.DataFrame): Dataframe of the imputation class
     """
-    
     df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
 
     # trim only if the number of non-zeros is above check_value
-    if len(df.loc[df[variable] != 0]) <= check_value:
+    full_length = len(df[variable])
+    if len(df.loc[df[variable] > 0, variable]) <= check_value:
         df[f"{variable}_trim"] = "dont_trim"
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
 
         # define the bounds for trimming
-        remove_lower = np.ceil(len(df) * (lower_perc / 100))
-        remove_upper = np.ceil(len(df) * (1 - upper_perc / 100))
+        remove_lower = np.ceil(len(df.loc[df[variable] > 0, variable]) * (lower_perc / 100))
+        remove_upper = np.ceil(len(df.loc[df[variable] > 0, variable]) * (upper_perc / 100))
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
@@ -232,7 +243,9 @@ def trim_bounds(
         # To match the SML, we trim for rows strictly less than remove_lower and
         # strictly greater than remove_upper
         df[f"{variable}_trim"] = "do_trim"
-        df.loc[remove_lower - 1 : remove_upper - 1, f"{variable}_trim"] = "dont_trim"
+        lower_keep_index = remove_lower - 1 
+        upper_keep_index = full_length - remove_upper
+        df.loc[lower_keep_index : upper_keep_index, f"{variable}_trim"] = "dont_trim"
 
     return df
 
