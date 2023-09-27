@@ -28,6 +28,7 @@ class Manifest:
     def __init__(
         self,
         outgoing_directory: str,
+        export_directory: str,
         pipeline_run_datetime: datetime,
         delete_file_func: callable,
         md5sum_func: callable,
@@ -39,7 +40,12 @@ class Manifest:
         dry_run: bool = False,
     ):
         self.outgoing_directory = outgoing_directory
+        self.export_directory = export_directory
         if not isdir_func(outgoing_directory):
+            raise ManifestError(
+                f"Outgoing directory does not exist: {self.outgoing_directory}"
+            )
+        if not isdir_func(export_directory):
             raise ManifestError(
                 f"Outgoing directory does not exist: {self.outgoing_directory}"
             )
@@ -135,11 +141,21 @@ class Manifest:
                         "of 32: {col_above_max_len}\n"
                     )
                 )
+        # Check that files are not more than 2.5Gb as nifi can't cope
+        file_size_bytes = self.stat_size(absolute_file_path)
+        file_size_gb = file_size_bytes / 1024**3
+        if file_size_gb > 2.5:
+            raise ManifestError(
+                (
+                    f"""Error with {absolute_file_path}
+                    File size is too big"""
+                )
+            )
 
         file_manifest = {
             "file": os.path.basename(relative_file_path),
             "subfolder": os.path.dirname(relative_file_path),
-            "sizeBytes": self.stat_size(absolute_file_path),
+            "sizeBytes": file_size_bytes,
             "md5sum": self.md5sum(absolute_file_path),
             "header": column_header,
         }
