@@ -42,6 +42,14 @@ Deduced_Data_Type = "str"
 old_name = "sizeband"
 Deduced_Data_Type = "float64"
 
+[q604]
+old_name = 604
+Deduced_Data_Type = "str"
+
+[q605]
+old_name = 605
+Deduced_Data_Type = "str"
+
 [q701]
 old_name = "701_estimated"
 Deduced_Data_Type = "float64"
