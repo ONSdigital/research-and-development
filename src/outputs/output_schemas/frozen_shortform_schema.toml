@@ -19,7 +19,7 @@ old_name = "itl"
 Deduced_Data_Type = "str"
 
 [employee_count]
-old_name = "frozenemployment"
+old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [wowentref]
@@ -27,7 +27,7 @@ old_name = "wowenterprisereference"
 Deduced_Data_Type = "Int64"
 
 [current_sic]
-old_name = "frozensic"
+old_name = "rusic"
 Deduced_Data_Type = "Int64"
 
 [foreign_owner]
@@ -41,6 +41,14 @@ Deduced_Data_Type = "str"
 [sizeband]
 old_name = "sizeband"
 Deduced_Data_Type = "float64"
+
+[q604]
+old_name = "604"
+Deduced_Data_Type = "str"
+
+[q605]
+old_name = "605"
+Deduced_Data_Type = "str"
 
 [q701]
 old_name = "701_estimated"
