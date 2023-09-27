@@ -296,9 +296,8 @@ def local_search_file(dir_path, ending):
     for _, __, files in os.walk(dir_path):
         for file in files:
 
-            # change the extension from '.mp3' to
-            # the one of your choice.
-            if file.endswith("ending"):
+            # Check for ending
+            if file.endswith(ending):
                 target_file = str(file)
 
     return target_file
