@@ -71,10 +71,6 @@ def run_output(
     schema_path = config["schema_paths"]["frozen_shortform_schema"]
     shortform_output = short.create_shortform_df(short_form_df, schema_path)
 
-    # Filter to the needed columns only
-    # TODO: remove this and replace with Ilyas's method
-    short_form_df = short_form_df[short_form_cols]
-
     if config["global"]["output_short_form"]:
         tdate = datetime.now().strftime("%Y-%m-%d")
         filename = f"output_short_form_{tdate}_v{run_id}.csv"
