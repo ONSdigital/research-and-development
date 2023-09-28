@@ -1,8 +1,9 @@
 import pandas as pd
-import math
 import numpy as np
 from src.staging.pg_conversion import sic_to_pg_mapper
 
+formtype_long  = "0001"
+formtype_short = "0006"
 
 def apply_to_original(filtered_df, original_df):
     """Overwrites a dataframe with updated row values"""
@@ -58,7 +59,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 
     df["200"] = df["200"].astype("category")
 
-    long_df = filter_by_column_content(df, "formtype", ["0001"])
+    long_df = filter_by_column_content(df, "formtype", [formtype_long])
 
     # Filter for q604 = No or status = "Form sent out"
     filtered_data = long_df.loc[
@@ -66,7 +67,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
     ]
 
     filtered_data = sic_to_pg_mapper(
-        filtered_data, sic_mapper, target_col="201", formtype="0001"
+        filtered_data, sic_mapper, target_col="201", formtype=formtype_long
     )
 
     updated_df = apply_to_original(filtered_data, df)
@@ -144,7 +145,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     the trimmed mean"""
 
     # Filter for long form data
-    long_df = filter_by_column_content(df, "formtype", ["0001"])
+    long_df = filter_by_column_content(df, "formtype", [formtype_long])
 
     # Filter for instance is not 0
     filtered_df = long_df.loc[long_df["instance"] != 0]
@@ -165,7 +166,7 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
 def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     """Sorts a dataframe by the target variable and other variables."""
     sort_list = [
-        f"{target_variable}",
+        target_variable,
         "employees",
         "reference",
     ]
@@ -196,7 +197,7 @@ def apply_trim_check(
         df["trim_check"] = "above_trim_threshold"
 
     # Default is dont_trim for all entries
-    df[f"{variable}_trim"] = "dont_trim"
+    df[f"{variable}_trim"] = False
     return df
 
 
@@ -223,7 +224,7 @@ def trim_bounds(
     # trim only if the number of non-zeros is above check_value
     full_length = len(df[variable])
     if len(df.loc[df[variable] > 0, variable]) <= check_value:
-        df[f"{variable}_trim"] = "dont_trim"
+        df[f"{variable}_trim"] = False
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
@@ -238,13 +239,11 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-
-        # To match the SML, we trim for rows strictly less than remove_lower and
-        # strictly greater than remove_upper
-        df[f"{variable}_trim"] = "do_trim"
+        
+        df[f"{variable}_trim"] = True
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
-        df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] = "dont_trim"
+        df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] = False
 
     return df
 
@@ -256,7 +255,7 @@ def calculate_mean(
     Returns a dictionary."""
 
     # remove the "trim" tagged rows
-    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", ["dont_trim"])
+    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", [False])
 
     # convert to floats for mean calculation
     trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
@@ -267,6 +266,7 @@ def calculate_mean(
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
         f"{target_variable}"
     ].mean()
+    # Count is the number of items in the trimmed class
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
         trimmed_df[f"{target_variable}"]
     )
@@ -290,7 +290,7 @@ def create_mean_dict(df, target_variable_list):
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    filtered_df = filtered_df[filtered_df["formtype"] == "0001"]
+    filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
