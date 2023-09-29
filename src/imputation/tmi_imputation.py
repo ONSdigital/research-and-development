@@ -260,15 +260,22 @@ def calculate_mean(
     # convert to floats for mean calculation
     trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
 
-    dict_mean_growth_ratio = {}
+    dict_mean_growth_ratio = {target_variable: {}}
 
-    # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
+
+    # Add mean of trimmed data to dict
+    dict_mean_growth_ratio[f"{target_variable}_mean"] = trimmed_df[
         f"{target_variable}"
     ].mean()
-    # Count is the number of items in the trimmed class
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
-        trimmed_df[f"{target_variable}"]
+    
+    # Count is the number of items in the non-trimmed data
+    dict_mean_growth_ratio[f"{target_variable}_count"] = len(
+        df[f"{target_variable}"]
+    )
+    
+    # Non zero count is the number of no zero items before the trimmed class
+    dict_mean_growth_ratio[f"{target_variable}_nonzero_count"] = len(
+        df.loc[df[f"{target_variable}"] > 0, f"{target_variable}"]
     )
 
     return dict_mean_growth_ratio
@@ -281,9 +288,6 @@ def create_mean_dict(df, target_variable_list):
     Also returns a QA dataframe containing information on how trimming was applied"""
     dfs_list = []
 
-    # Create an empty dict to store means
-    mean_dict = dict.fromkeys(target_variable_list)
-
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
     filtered_df = filter_by_column_content(df, "statusencoded", clear_statuses)
@@ -295,6 +299,9 @@ def create_mean_dict(df, target_variable_list):
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
+    
+    # Create an empty dict to store means
+    mean_dict = dict.fromkeys(class_keys)
 
     for var in target_variable_list:
         for k in class_keys:
@@ -316,10 +323,10 @@ def create_mean_dict(df, target_variable_list):
             means = calculate_mean(trimmed_df, k, var)
 
             # Update full dict with values
-            if mean_dict[var] is None:
-                mean_dict[var] = means
+            if mean_dict[k] is None:
+                mean_dict[k] = means
             else:
-                mean_dict[var].update(means)
+                mean_dict[k].update(means)
 
     df = pd.concat(dfs_list)
     df["qa_index"] = df.index
@@ -358,10 +365,10 @@ def apply_tmi(df, target_variables, mean_dict):
 
             imp_class_df = imp_class_df.copy()
 
-            if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
+            if imp_class_key in mean_dict.keys():
                 # Replace nulls with means
                 imp_class_df[f"{var}_imputed"] = float(
-                    mean_dict[var][f"{var}_{imp_class_key}_mean"]
+                    mean_dict[imp_class_key][f"{var}_mean"]
                 )
                 imp_class_df["imp_marker"] = "TMI"
 
@@ -396,8 +403,12 @@ def run_tmi(full_df, target_variables, sic_mapper):
     qa_df = qa_df.drop("trim_check", axis=1)
 
     final_df = apply_tmi(df, target_variables, mean_dict)
+    
+    # TODO: Output this dataframe for each imp class
+    mean_df = pd.DataFrame.from_dict(mean_dict,orient='index')
+    mean_df = mean_df.drop(columns=target_variables)
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    return final_df, qa_df
+    return final_df, qa_df, mean_df
