@@ -1,12 +1,15 @@
 import pandas as pd
 import numpy as np
+from typing import Dict, List
+
 from src.staging.pg_conversion import sic_to_pg_mapper
+from src.imputation.impute_civil_defence import impute_civil_defence
 
 formtype_long  = "0001"
 formtype_short = "0006"
 
 def apply_to_original(filtered_df, original_df):
-    """Overwrites a dataframe with updated row values"""
+    """Overwrite a dataframe with updated row values."""
     original_df.update(filtered_df)
     return original_df
 
@@ -30,7 +33,7 @@ def instance_fix(df: pd.DataFrame):
     return updated_df
 
 
-def duplicate_rows(df: pd.DataFrame):
+def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Create a duplicate of references with no R&D and set instance to 1."""
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
@@ -41,13 +44,16 @@ def duplicate_rows(df: pd.DataFrame):
     return updated_df
 
 
-def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
+def impute_pg_by_sic(
+    df: pd.DataFrame, 
+    sic_mapper: pd.DataFrame
+    ) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"
     using the SIC number ('rusic').
 
     Args:
-        df (pd.DataFrame): initial dataframe from staging
+        df (pd.DataFrame): SPP dataframe from staging
         sic_mapper (pd.DataFrame): SIC to PG mapper
 
     Returns:
@@ -81,8 +87,11 @@ def create_imp_class_col(
     col_second_half: str,
     class_name: str = "imp_class",
 ) -> pd.DataFrame:
-    """Creates a column for the imputation class by concatenating
-    the business type "200" and product group "201" columns. The
+    """Creates a column for the imputation class.
+    
+    This is done by concatenating the R&D business type, C or D from  q200 
+    and the product group from  q201.
+
     special case for cell number 817 is added as a suffix.
 
     Args:
@@ -101,20 +110,20 @@ def create_imp_class_col(
     df = df.copy()
 
     # Create class col with concatenation
-    df[f"{class_name}"] = (
-        df[f"{col_first_half}"].astype(str) + "_" + df[f"{col_second_half}"].astype(str)
+    df[class_name] = (
+        df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
     )
 
     fil_df = filter_by_column_content(df, "cellnumber", [817])
     # Create class col with concatenation + 817
-    fil_df[f"{class_name}"] = fil_df[f"{class_name}"] + "_817"
+    fil_df[class_name] = fil_df[class_name] + "_817"
 
     df = apply_to_original(fil_df, df)
 
     return df
 
 
-def fill_zeros(df: pd.DataFrame, column: str):
+def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Fills null values with zeros in a given column."""
     return df[column].fillna(0).astype("float")
 
@@ -143,12 +152,7 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
 def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean"""
-
-    # Filter for long form data
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
-    # Filter for instance is not 0
-    filtered_df = long_df.loc[long_df["instance"] != 0]
+    filtered_df = df.loc[df["instance"] != 0]
 
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
@@ -274,8 +278,11 @@ def calculate_mean(
     return dict_mean_growth_ratio
 
 
-def create_mean_dict(df, target_variable_list):
-    """Function to apply multiple steps to calculate the means for each target
+def create_mean_dict(
+    df: pd.DataFrame, 
+    target_variable_list: List[str]
+    ) -> pd.DataFrame: 
+    """Apply multiple steps to calculate the means for each target
     variable.
     Returns a dictionary of mean values and counts for each unique class and variable
     Also returns a QA dataframe containing information on how trimming was applied"""
@@ -290,7 +297,7 @@ def create_mean_dict(df, target_variable_list):
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
+    # filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -382,10 +389,17 @@ def run_tmi(full_df, target_variables, sic_mapper):
     dataframe back to the pipeline"""
     copy_df = full_df.copy()
 
-    copy_df = instance_fix(copy_df)
-    copy_df = duplicate_rows(copy_df)
+    # Filter for long form data
+    long_df = filter_by_column_content(copy_df, "formtype", [formtype_long])
 
-    df = impute_pg_by_sic(copy_df, sic_mapper)
+    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
+    long_df = instance_fix(long_df)
+    long_df = duplicate_rows(long_df)
+
+    # TMI Step 1: impute the Product Group
+    df = impute_pg_by_sic(long_df, sic_mapper)
+
+    df = impute_civil_defence(df, target_variables)
 
     df = tmi_pre_processing(df, target_variables)
 
