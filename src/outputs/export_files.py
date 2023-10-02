@@ -43,7 +43,7 @@ if network_or_hdfs == "network":
 
 elif network_or_hdfs == "hdfs":
 
-    from src.utils.local_file_mods import hdfs_list_files as list_files
+    from src.utils.hdfs_mods import hdfs_list_files as list_files
     from src.utils.hdfs_mods import hdfs_copy_file as copy_files
     from src.utils.hdfs_mods import hdfs_move_file as move_files
     from src.utils.hdfs_mods import hdfs_search_file as search_files
