@@ -6,6 +6,7 @@ import os
 import logging
 from datetime import datetime
 import toml
+from typing import List
 
 from src.utils.helpers import Config_settings
 from src.outputs.manifest_output import Manifest
@@ -84,7 +85,7 @@ schema_columns_str = ",".join(short_form_headers)
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice(output_path):
+def get_file_choice(output_path: str):
     """Prompt user to select a files to transfer.
 
     Returns:
@@ -112,7 +113,7 @@ def get_file_choice(output_path):
     return selction_list
 
 
-def check_files_exist(dir, file_list):
+def check_files_exist(dir: str, file_list: List):
     """Check that all the files in the file list exist using
     the imported isfile function."""
     for file in file_list:
