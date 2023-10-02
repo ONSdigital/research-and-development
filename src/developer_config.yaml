@@ -8,7 +8,8 @@ global:
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: True
+  output_estimation_qa: False
+  output_imputation_qa: True
   output_short_form: True
   dev_test : True
   network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
@@ -55,6 +56,7 @@ network_paths:
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
+  imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"

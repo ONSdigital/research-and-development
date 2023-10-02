@@ -82,6 +82,7 @@ def sic_to_pg_mapper(
     sic_column: str = "rusic",
     from_col: str = "SIC 2007_CODE",
     to_col: str = "2016 > Pub PG",
+    formtype: str = "0006",
 ):
     """This function maps all values in one column to another column
     using a mapper file. This is only applied for short forms and unsampled
@@ -104,7 +105,7 @@ def sic_to_pg_mapper(
 
     filtered_df = df.copy()
 
-    formtype_cond = filtered_df["formtype"] == "0006"
+    formtype_cond = filtered_df["formtype"] == formtype
     filtered_df = filtered_df[formtype_cond]
     # Create list of SIC numbers that have one-to-many cardinality
     mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
@@ -133,6 +134,8 @@ def sic_to_pg_mapper(
     filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
     filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
     filtered_df[target_col] = filtered_df[target_col].astype("category")
+
+    df = df.copy()
 
     df.loc[
         filtered_df.index,

@@ -3,7 +3,12 @@ import numpy as np
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal
 
-from src.imputation.apportionment import calc_202_totals, calc_fte_column, calc_headcount_column
+from src.imputation.apportionment import (
+    calc_202_totals,
+    calc_fte_column,
+    calc_headcount_column,
+)
+
 
 class TestCalc202Totals:
     """Unit tests for flag_outliers functtion."""
@@ -144,7 +149,7 @@ class TestCalcFteColumn:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        fte_dict = {"emp_researcher":["405", "406"]}
+        fte_dict = {"emp_researcher": ["405", "406"]}
 
         result_df = calc_fte_column(input_df, fte_dict, round_val=3)
         assert_frame_equal(result_df, expected_df)
