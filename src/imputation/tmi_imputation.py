@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from src.staging.pg_conversion import sic_to_pg_mapper
 from src.imputation.impute_civil_defence import impute_civil_defence
@@ -253,10 +253,24 @@ def trim_bounds(
 
 
 def calculate_mean(
-    df: pd.DataFrame, unique_item: str, target_variable: str
-) -> pd.DataFrame:
-    """Calculate the mean and count for each target and imputation class combination
-    Returns a dictionary."""
+    df: pd.DataFrame, imp_class: str, target_variable: str
+) -> Dict[str, float]:
+    """Calculate the mean of the given target variable and imputation class.
+
+    Dictionary values are created for the mean of the given target variable for
+    the given imputation class, and also for the 'count' or number of values 
+    used to calculate the mean.
+    
+    Args:
+        df (pd.DataFrame): The dataframe of 'clear' responses for the given 
+            imputation class
+        imp_class (str): The given imputation class
+        target_variable (str): The given target variable for which the mean is 
+            to be evaluated.
+    
+    Returns:
+        Dict[str, float]
+    """
 
     # remove the "trim" tagged rows
     trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", [False])
@@ -267,11 +281,11 @@ def calculate_mean(
     dict_mean_growth_ratio = {}
 
     # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
+    dict_mean_growth_ratio[f"{target_variable}_{imp_class}_mean"] = trimmed_df[
         f"{target_variable}"
     ].mean()
     # Count is the number of items in the trimmed class
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
+    dict_mean_growth_ratio[f"{target_variable}_{imp_class}_count"] = len(
         trimmed_df[f"{target_variable}"]
     )
 
@@ -281,12 +295,21 @@ def calculate_mean(
 def create_mean_dict(
     df: pd.DataFrame, 
     target_variable_list: List[str]
-    ) -> pd.DataFrame: 
-    """Apply multiple steps to calculate the means for each target
-    variable.
+    ) -> Tuple[Dict, pd.DataFrame]: 
+    """Calculate trimmed mean values for each target variable and imputation class.
+
     Returns a dictionary of mean values and counts for each unique class and variable
-    Also returns a QA dataframe containing information on how trimming was applied"""
-    dfs_list = []
+    Also returns a QA dataframe containing information on how trimming was applied.
+
+    Args:
+        df (pd.DataFrame): The dataframe of 'clear' responses for the given 
+            imputation class
+        target_variable List(str): List of target variables for which the mean is 
+            to be evaluated.        
+    Returns:
+        Tuple[Dict[str, float], pd.DataFrame]
+    """
+    df_list = []
 
     # Create an empty dict to store means
     mean_dict = dict.fromkeys(target_variable_list)
@@ -318,7 +341,7 @@ def create_mean_dict(
 
             tr_df = trimmed_df.set_index("pre_index")
 
-            dfs_list.append(tr_df)
+            df_list.append(tr_df)
             # Calculate mean and count # TODO: Rename this
             means = calculate_mean(trimmed_df, k, var)
 
@@ -328,7 +351,7 @@ def create_mean_dict(
             else:
                 mean_dict[var].update(means)
 
-    df = pd.concat(dfs_list)
+    df = pd.concat(df_list)
     df["qa_index"] = df.index
     df = df.groupby(["pre_index"], as_index=False).first()
 
