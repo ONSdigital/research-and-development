@@ -3,7 +3,7 @@ import numpy as np
 from typing import Dict, List, Tuple
 
 from src.staging.pg_conversion import sic_to_pg_mapper
-from src.imputation.impute_civil_defence import impute_civil_defence
+from src.imputation.impute_civ_def import impute_civil_defence
 
 formtype_long  = "0001"
 formtype_short = "0006"
@@ -278,18 +278,18 @@ def calculate_mean(
     # convert to floats for mean calculation
     trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
 
-    dict_mean_growth_ratio = {}
+    dict_trimmed_mean = {}
 
     # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{imp_class}_mean"] = trimmed_df[
+    dict_trimmed_mean[f"{target_variable}_{imp_class}_mean"] = trimmed_df[
         f"{target_variable}"
     ].mean()
-    # Count is the number of items in the trimmed class
-    dict_mean_growth_ratio[f"{target_variable}_{imp_class}_count"] = len(
-        trimmed_df[f"{target_variable}"]
+    # Count is the number of non-null items in the trimmed class
+    dict_trimmed_mean[f"{target_variable}_{imp_class}_count"] = len(
+        trimmed_df.loc[~trimmed_df[target_variable].isnull()]
     )
 
-    return dict_mean_growth_ratio
+    return dict_trimmed_mean
 
 
 def create_mean_dict(
@@ -302,8 +302,7 @@ def create_mean_dict(
     Also returns a QA dataframe containing information on how trimming was applied.
 
     Args:
-        df (pd.DataFrame): The dataframe of 'clear' responses for the given 
-            imputation class
+        df (pd.DataFrame): The dataframe for imputation
         target_variable List(str): List of target variables for which the mean is 
             to be evaluated.        
     Returns:
@@ -342,7 +341,8 @@ def create_mean_dict(
             tr_df = trimmed_df.set_index("pre_index")
 
             df_list.append(tr_df)
-            # Calculate mean and count # TODO: Rename this
+            # Create a dictionary with the target variable as the key
+            # and a dictionary containing the 
             means = calculate_mean(trimmed_df, k, var)
 
             # Update full dict with values
@@ -389,7 +389,7 @@ def apply_tmi(df, target_variables, mean_dict):
             imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
-                # Replace nulls with means
+                # Create new column with the imputed value
                 imp_class_df[f"{var}_imputed"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_mean"]
                 )

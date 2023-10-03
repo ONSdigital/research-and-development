@@ -90,10 +90,15 @@ def run_staging(
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
     # the anonymised snapshot data we use in the DevTest environment
-    # does not include the instance column. This fix should be removed
+    # does not include data in several columns. This fix should be removed
     # when new anonymised data is given.
     if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
+        # In the anonymised data the selectiontype is always 'L'
+        col_size = df.shape[0]
+        random.seed(seed=42)
+        df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
+        df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
     StagingMainLogger.info("Finished Data Ingest...")
 
     val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
