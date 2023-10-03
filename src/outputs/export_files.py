@@ -64,8 +64,7 @@ OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
 
 # Define paths
-NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-paths = config[f"{NETWORK_OR_HDFS}_paths"]
+paths = config[f"{network_or_hdfs}_paths"]
 output_path = paths["output_path"]
 short_form_output = os.path.join(output_path, "output_short_form")
 export_folder = paths["export_path"]
