@@ -13,10 +13,6 @@ OutputMainLogger = logging.getLogger(__name__)
 # Get the shortform schema
 short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
 
-# Columns are needed for filtering
-short_form_cols = short_form_schema.keys()
-short_form_cols = [col[1:] if col.startswith("q") else col for col in short_form_cols]
-
 
 def run_output(
     estimated_df: pd.DataFrame,
