@@ -41,6 +41,7 @@ hdfs_paths:
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   outliers_path: None
+  imputation_path: /ons/rdbe_dev/imputation
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
