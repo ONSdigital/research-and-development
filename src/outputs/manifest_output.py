@@ -53,11 +53,11 @@ class Manifest:
         if not isinstance(pipeline_run_datetime, datetime):
             raise ManifestError("Pipeline run datetime must be a datetime object.")
 
-        self.manifest_datetime = pipeline_run_datetime.strftime("%Y%m%d_%H:%M%")
+        self.manifest_datetime = pipeline_run_datetime.strftime("%Y%m%d_%H:%M")
         self.manifest_filename = self.manifest_datetime
 
         self.manifest_file_path = os.path.join(
-            outgoing_directory, (self.manifest_datetime + "metadata_manifest.json")
+            outgoing_directory, (self.manifest_datetime + "metadata_manife5st.json")
         )
         self.manifest: dict = {"files": []}
         self.written = False
@@ -143,7 +143,7 @@ class Manifest:
                     )
                 )
         # Check that files are not more than 2.5Gb as nifi can't cope
-        file_size_bytes = self.stat_size(absolute_file_path)
+        file_size_bytes = int(self.stat_size(absolute_file_path))
         file_size_gb = file_size_bytes / 1024**3
         if file_size_gb > 2.5:
             raise ManifestError(
