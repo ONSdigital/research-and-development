@@ -9,6 +9,8 @@ from typing import List
 import subprocess
 import os
 
+from src.utils.wrappers import time_logger_wrap
+
 try:
     import pydoop.hdfs as hdfs
 
@@ -159,6 +161,7 @@ def hdfs_open(filepath, mode):
     return file
 
 
+@time_logger_wrap
 def hdfs_write_feather(filepath, df):
     """Function to write dataframe as feather file in HDFS"""
     with hdfs.open(filepath, "wb") as file:
@@ -169,6 +172,7 @@ def hdfs_write_feather(filepath, df):
     return True
 
 
+@time_logger_wrap
 def hdfs_read_feather(filepath):
     """Function to read feather file from HDFS"""
     with hdfs.open(filepath, "rb") as file:
