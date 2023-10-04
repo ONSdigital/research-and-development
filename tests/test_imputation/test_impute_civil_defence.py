@@ -6,6 +6,7 @@ from pandas._testing import assert_frame_equal
 from src.imputation.tmi_imputation import run_tmi
 from src.imputation.impute_civ_def import (
     impute_civil_defence,
+    prep_cd_imp_classes,
     create_civdef_dict,
     calc_cd_proportions
 )
@@ -74,59 +75,62 @@ class TestCreateCivdefDict:
             "200",
             "201",
             "202",
-            "cellnumber",
-            "rusic"]
-
-        data = [
-            [1001, 0, np.nan, np.nan, 0, "800", "1234"],
-            [1001, 1, "C", "AC", 100, "800", "1234"],
-            [1001, 2, "C", "AC", 200, "800", "1234"],
-            [1001, 3, "D", "AC", 50, "800", "1234"],
-            [1002, 0, np.nan, np.nan, 0, "800", "1234"],
-            [1002, 1, "C", "AC", 100, "800", "1234"],
-            [2002, 0, np.nan, np.nan, np.nan, "800", "1234"],
-            [2002, 1, np.nan, "DD", 200, "800", "1234"],
-            [3003, 0, np.nan, np.nan, 0, "800", "1234"],
-            [3003, 1, "C",  "ZZ", 230, "800", "12"],
-            [3003, 2, "C",  "ZZ", 59, "800", "12"],
-            [3003, 3, "D",  "ZZ", 805, "800", "12"],
-            [3003, 4, "C",  "ZZ", 33044, "800", "12"],
-            [3003, 5, "D",  "ZZ", 4677, "800", "12"],
-            [3003, 6, np.nan, np.nan, 0, "800", "12"],
-        ]
-
-        input_df = pandasDF(data=data, columns=input_cols)
-        return input_df
-
-    def create_exp_output_df(self):
-        """Create an input dataframe for the test."""
-        output_cols = [
-            "reference",
-            "instance",
-            "200",
-            "201",
-            "202",
+            "statusencoded",
             "cellnumber",
             "rusic",
             "pg_sic_class",
             "empty_group"]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "800", "1234", "nan_1234", False],
-            [1001, 1, "C", "AC", 100, "800", "1234", "AC_1234", False],
-            [1001, 2, "C", "AC", 200, "800", "1234", "AC_1234", False],
-            [1001, 3, "D", "AC", 50, "800", "1234", "AC_1234", False],
-            [1002, 0, np.nan, np.nan, 0, "800", "1234", "nan_1234", False],
-            [1002, 1, "C", "AC", 100, "800", "1234", "AC_1234", False],
-            [2002, 0, np.nan, np.nan, np.nan, "800", "1234", "nan_1234", False],
-            [2002, 1, np.nan, "DD", 200, "800", "1234", "DD_1234", False],
-            [3003, 0, np.nan, np.nan, 0, "800", "1234", "nan_1234", False],
-            [3003, 1, "C",  "ZZ", 230, "800", "12", "ZZ_12", False],
-            [3003, 2, "C",  "ZZ", 59, "800", "12", "ZZ_12", False],
-            [3003, 3, "D",  "ZZ", 805, "800", "12", "ZZ_12", False],
-            [3003, 4, "C",  "ZZ", 33044, "800", "12", "ZZ_12", False],
-            [3003, 5, "D",  "ZZ", 4677, "800", "12", "ZZ_12", False],
-            [3003, 6, np.nan, np.nan, 0, "800", "12", "nan_12", False],
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "1234", "nan_1234", False],
+            [2002, 1, np.nan, "DD", 200, "211", "800", "1234", "DD_1234", False],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False],
+        ]
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_exp_output_df(self):
+        """Create an expected output dataframe for the test."""
+        output_cols = [
+            "reference",
+            "instance",
+            "200",
+            "201",
+            "202",
+            "statusencoded",
+            "cellnumber",
+            "rusic",
+            "pg_sic_class",
+            "empty_group"]
+
+        data = [
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "1234", "nan_1234", False],
+            [2002, 1, np.nan, "DD", 200, "211", "800", "1234", "DD_1234", False],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False],
         ]
 
         output_df = pandasDF(data=data, columns=output_cols)
@@ -135,9 +139,103 @@ class TestCreateCivdefDict:
     def test_create_civdef_dict(self):
         "Test for calc_cd_proportions function."
         input_df = self.create_input_df()
+
+        result_dict, result_df = create_civdef_dict(input_df)
+
+        exp_dict = {"AC_1234": (0.75, 0.25), "ZZ_12": (0.6, 0.4)}
+
+        assert result_dict == exp_dict
+
+    def test_create_civdef_dict_df(self):
+        "Test for calc_cd_proportions function."
+        input_df = self.create_input_df()
         expected_df = self.create_exp_output_df()
 
         result_dict, result_df = create_civdef_dict(input_df)
 
         assert_frame_equal(result_df, expected_df)
 
+
+class TestPrepCDImpClasses:
+    """Unit tests for calc_cd_proportions function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "200",
+            "201",
+            "202",
+            "statusencoded",
+            "cellnumber",
+            "rusic"]
+
+        data = [
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234"],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234"],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234"],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234"],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234"],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234"],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "1234"],
+            [2002, 1, np.nan, "DD", 200, "211", "800", "1234"],
+            [2002, 2, "D", "DD", 200, "999", "800", "1234"],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234"],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12"],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12"],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12"],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12"],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12"],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12"],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_exp_output_df(self):
+        """Create an expected output dataframe for the test."""
+        output_cols = [
+            "reference",
+            "instance",
+            "200",
+            "201",
+            "202",
+            "statusencoded",
+            "cellnumber",
+            "rusic",
+            "pg_sic_class",
+            "empty_group",
+            "sic_class"]
+
+        data = [
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "1234"],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "1234"],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "1234"],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "1234"],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "1234"],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "1234"],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "1234", "nan_1234", False, "1234"],
+            [2002, 1, np.nan, "DD", 200, "211", "800", "1234", "DD_1234", True, "1234"],
+            [2002, 2, "D", "DD", 200, "999", "800", "1234", "DD_1234", True, "1234"],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "1234"],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "12"],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "12"],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "12"],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "12"],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "12"],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "12"],
+        ]
+
+        output_df = pandasDF(data=data, columns=output_cols)
+        return output_df
+        
+
+    def test_prep_cd_imp_classes(self):
+        """Test for prep_imp_classes function"""
+        input_df = self.create_input_df()
+        expected_df = self.create_exp_output_df()
+
+        result_df = prep_cd_imp_classes(input_df)
+
+        assert_frame_equal(result_df, expected_df)

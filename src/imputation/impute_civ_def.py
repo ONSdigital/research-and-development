@@ -36,12 +36,6 @@ def create_civdef_dict(
     # create dictionary to hold civil or defence ratios for each class
     civdef_dict = {}
 
-    # create imputation classes based on product group and rusic
-    df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
-
-    # create column to record whether a group is empty
-    df["empty_group"] = False
-
     # Filter out imputation classes that are missing either "201" or "rusic"
     filtered_df = df[~(df["pg_sic_class"].str.contains("nan"))]
 
@@ -60,6 +54,29 @@ def create_civdef_dict(
     return civdef_dict, df
 
 
+def prep_cd_imp_classes(df):
+    # create imputation classes based on product group and rusic
+    df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
+
+    clear_status_cond = df["statusencoded"].isin(["210", "211"])
+    df["valid_civdef_val"] = ~df["200"].isnull() & clear_status_cond
+
+    # calculate the number of valid entries in the class for column 200 
+    num_valid = df.groupby("pg_sic_class")["valid_civdef_val"].transform(sum)
+
+    # exclude classes that do not contain are not valid
+    valid_class_cond = ~(df["pg_sic_class"].str.contains("nan"))
+
+    df["empty_group"] = valid_class_cond &  (num_valid == 0) 
+
+    # create a new imputation class to be used only when "empty_group" is true
+    df = tmi.create_imp_class_col(df, None, "rusic", "sic_class")
+
+    df = df.drop("valid_civdef_val", axis=1)
+    print(df)
+    return df
+
+
 def impute_civil_defence(
     df: pd.DataFrame,
     target_variable_list: List[str]
@@ -73,14 +90,14 @@ def impute_civil_defence(
         pd.DataFrame: The original dataframe with imputed values for 
             R&D type (civil or defence)
     """
+
+    df = prep_cd_imp_classes(df)
+
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
     clear_df = tmi.filter_by_column_content(df, "statusencoded", clear_statuses)
 
-    # # Filter out imputation classes that are missing either "200" or "201"
-    # clear_df = clear_df[~(clear_df["imp_class"].str.contains("nan"))]
-
     # create a dict mapping each class to either 'C' (civil) or 'D'(defence)
-    civil_def_dict = create_civdef_dict(clear_df)
+    civil_def_dict, clear_df = create_civdef_dict(clear_df)
 
     return df
