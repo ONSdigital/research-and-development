@@ -301,3 +301,16 @@ def local_search_file(dir_path, ending):
                 target_file = str(file)
 
     return target_file
+
+
+def local_read_feather(filepath):
+    """Reads a feather file from a local network drive into a Pandas DataFrame
+
+    Args:
+        filepath (str): Filepath
+
+    Returns:
+        pd.DataFrame: Dataframe created from feather file
+    """
+    df = pd.read_feather(filepath)
+    return df
