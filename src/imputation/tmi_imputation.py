@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.staging.pg_conversion import sic_to_pg_mapper
+#from src.staging.pg_conversion import sic_to_pg_mapper
 
 formtype_long = "0001"
 formtype_short = "0006"
@@ -301,8 +301,20 @@ def create_mean_dict(df, target_variable_list):
         for k in class_keys:
             # Get subgroup dataframe
             subgrp = grp.get_group(k)
+
+            # Check for NaNs, "nan", Nones, and empty strings
+            if subgrp[var].isna().any() or subgrp[var].eq('nan').any() or subgrp[var].eq('').any():
+                print(f"Warning: NaNs, 'nan', Nones, or empty strings found in the {var} column.")
+
+            #replace "nan" with actual nan values
+            filter_nans = subgrp.copy()
+            filter_nans[var] = filter_nans[var].replace("nan", np.nan)
+
+            # Filter rows that do not contain NaNs, Nones, blanks, or empty strings in the "var" column
+            filter_nans = filter_nans.dropna(subset=[var])
+
             # Sort by target_variable, df['employees'], reference
-            sorted_df = sort_df(var, subgrp)
+            sorted_df = sort_df(var, filter_nans)
 
             # Add trimming threshold marker
             trimcheck_df = apply_trim_check(sorted_df, var)
@@ -402,3 +414,4 @@ def run_tmi(full_df, target_variables, sic_mapper):
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
     return final_df, qa_df
+print("fnjkdfsnjk")

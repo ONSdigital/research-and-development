@@ -19,29 +19,30 @@ def test_create_mean_dict():
         "employees",
         "formtype",
     ]
-
+    import numpy as np
     # Create a sample DataFrame for testing
     data = [
-        ["210", "A", "dont trim", 100, 100, "O", 100, "0001"],
-        ["210", "A", "dont trim", 100, 100, "P", 100, "0001"],
-        ["210", "A", "dont trim", 9, 100, "Q", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "R", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "S", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "T", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "U", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "V", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "W", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "X", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "N", 100, "0001"],
-        ["210", "A", "dont trim", 0, 100, "J", 100, "0001"],
-        ["210", "A", "dont trim", 0, 100, "K", 100, "0001"],
-        ["210", "A", "dont trim", 0, 100, "L", 100, "0001"],
+        ["210", "A", "dont trim", None, 100, "A", 100, "0001"],
+        ["210", "A", "dont trim", 100, 100, "B", 100, "0001"],
+        ["210", "A", "dont trim", 100, 100, "C", 100, "0001"],
+        ["210", "A", "dont trim", 9, 100, "D", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "E", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "F", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "G", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "H", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "I", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "J", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "K", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "L", 100, "0001"],
         ["210", "A", "dont trim", 0, 100, "M", 100, "0001"],
-        ["210", "B", "dont trim", 1, 100, "Z", 100, "0001"],
-        ["211", "B", "dont trim", 1, 100, "W", 100, "0001"],
-        ["210", "C", "dont trim", 1, 100, "V", 100, "0001"],
-        ["211", "C", "dont trim", 1, 100, "U", 100, "0001"],
-        ["not_210_or_211", "C", "dont trim", 1, 100, "S", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "N", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "O", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "P", 100, "0001"],
+        ["210", "B", "dont trim", 1, 100, "Q", 100, "0001"],
+        ["211", "B", "dont trim", 1, 100, "R", 100, "0001"],
+        ["210", "C", "dont trim", 1, 100, "S", 100, "0001"],
+        ["211", "C", "dont trim", 1, 100, "T", 100, "0001"],
+        ["not_210_or_211", "C", "dont trim", 1, 100, "U", 100, "0001"],
     ]
 
     df = pd.DataFrame(data=data, columns=cols)
@@ -64,7 +65,7 @@ def test_create_mean_dict():
         },
         "Value2": {
             "Value2_A_mean": 100.0,
-            "Value2_A_count": 11,
+            "Value2_A_count": 12,
             "Value2_B_mean": 100.0,
             "Value2_B_count": 2,
             "Value2_C_mean": 100.0,
@@ -89,44 +90,46 @@ def test_create_mean_dict():
 
     # Create a sample DataFrame for testing
     expected_result_data = [
-        ["210", "A", "dont trim", 100, 100, "O", 100, "0001"]
-        + ["above_trim_threshold", False, False, 0],
-        ["210", "A", "dont trim", 100, 100, "P", 100, "0001"]
-        + ["above_trim_threshold", True, False, 1],
-        ["210", "A", "dont trim", 9, 100, "Q", 100, "0001"]
-        + ["above_trim_threshold", False, False, 2],
-        ["210", "A", "dont trim", 1, 100, "R", 100, "0001"]
+        ["210", "A", "dont trim", None, 100, "A", 100, "0001"]
+        + ["above_trim_threshold", None, True, 0],
+        ["210", "A", "dont trim", 100, 100, "B", 100, "0001"]
+        + ["above_trim_threshold", False, True, 1],
+        ["210", "A", "dont trim", 100, 100, "C", 100, "0001"]
+        + ["above_trim_threshold", True, False, 2],
+        ["210", "A", "dont trim", 9, 100, "D", 100, "0001"]
         + ["above_trim_threshold", False, False, 3],
-        ["210", "A", "dont trim", 1, 100, "S", 100, "0001"]
+        ["210", "A", "dont trim", 1, 100, "E", 100, "0001"]
         + ["above_trim_threshold", False, False, 4],
-        ["210", "A", "dont trim", 1, 100, "T", 100, "0001"]
+        ["210", "A", "dont trim", 1, 100, "F", 100, "0001"]
         + ["above_trim_threshold", False, False, 5],
-        ["210", "A", "dont trim", 1, 100, "U", 100, "0001"]
+        ["210", "A", "dont trim", 1, 100, "G", 100, "0001"]
         + ["above_trim_threshold", False, False, 6],
-        ["210", "A", "dont trim", 1, 100, "V", 100, "0001"]
+        ["210", "A", "dont trim", 1, 100, "H", 100, "0001"]
         + ["above_trim_threshold", False, False, 7],
-        ["210", "A", "dont trim", 1, 100, "W", 100, "0001"]
-        + ["above_trim_threshold", False, True, 8],
-        ["210", "A", "dont trim", 1, 100, "X", 100, "0001"]
-        + ["above_trim_threshold", False, True, 9],
-        ["210", "A", "dont trim", 1, 100, "N", 100, "0001"]
+        ["210", "A", "dont trim", 1, 100, "I", 100, "0001"]
+        + ["above_trim_threshold", False, False, 8],
+        ["210", "A", "dont trim", 1, 100, "J", 100, "0001"]
+        + ["above_trim_threshold", False, False, 9],
+        ["210", "A", "dont trim", 1, 100, "K", 100, "0001"]
         + ["above_trim_threshold", False, False, 10],
-        ["210", "A", "dont trim", 0, 100, "J", 100, "0001"]
-        + ["above_trim_threshold", True, True, 11],
-        ["210", "A", "dont trim", 0, 100, "K", 100, "0001"]
-        + ["above_trim_threshold", False, True, 12],
-        ["210", "A", "dont trim", 0, 100, "L", 100, "0001"]
-        + ["above_trim_threshold", False, False, 13],
+        ["210", "A", "dont trim", 1, 100, "L", 100, "0001"]
+        + ["above_trim_threshold", False, False, 11],
         ["210", "A", "dont trim", 0, 100, "M", 100, "0001"]
-        + ["above_trim_threshold", False, False, 14],
-        ["210", "B", "dont trim", 1, 100, "Z", 100, "0001"]
-        + ["below_trim_threshold", False, False, 15],
-        ["211", "B", "dont trim", 1, 100, "W", 100, "0001"]
+        + ["above_trim_threshold", True, False, 12],
+        ["210", "A", "dont trim", 0, 100, "N", 100, "0001"]
+        + ["above_trim_threshold", False, False, 13],
+        ["210", "A", "dont trim", 0, 100, "O", 100, "0001"]
+        + ["above_trim_threshold", False, True, 14],
+        ["210", "A", "dont trim", 0, 100, "P", 100, "0001"]
+        + ["above_trim_threshold", False, True, 15],
+        ["210", "B", "dont trim", 1, 100, "Q", 100, "0001"]
         + ["below_trim_threshold", False, False, 16],
-        ["210", "C", "dont trim", 1, 100, "V", 100, "0001"]
+        ["211", "B", "dont trim", 1, 100, "R", 100, "0001"]
         + ["below_trim_threshold", False, False, 17],
-        ["211", "C", "dont trim", 1, 100, "U", 100, "0001"]
+        ["210", "C", "dont trim", 1, 100, "S", 100, "0001"]
         + ["below_trim_threshold", False, False, 18],
+        ["211", "C", "dont trim", 1, 100, "T", 100, "0001"]
+        + ["below_trim_threshold", False, False, 19],
     ]
 
     expected_result_df = pd.DataFrame(data=expected_result_data, columns=expected_cols)
