@@ -163,6 +163,7 @@ def run_export():
 
     # Move the manifest file to the outgoing folder
     manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
+
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
     move_files(manifest_path, manifest.export_directory)
 

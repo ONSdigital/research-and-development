@@ -347,17 +347,7 @@ def hdfs_search_file(dir_path, ending):
             f"File with ending {ending} does not exist in {dir_path}"
         )
 
+    # Return file path + name
+    target_file = target_file.split()[-1]
+
     return target_file
-
-def hdfs_write_json(json_data, file_path):
-    """
-    Write a JSON object to a file in HDFS.
-    """
-    # Convert JSON data to string
-    json_str = json.dumps(json_data)
-
-    # Write string to file in HDFS
-    command = ["hadoop", "fs", "-put", "-", file_path]
-    process = _perform(command)
-
-    return True
