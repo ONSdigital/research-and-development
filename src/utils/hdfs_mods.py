@@ -169,6 +169,16 @@ def hdfs_write_feather(filepath, df):
     return True
 
 
+def hdfs_read_feather(filepath):
+    """Function to read feather file from HDFS"""
+    with hdfs.open(filepath, "rb") as file:
+        df = pd.read_feather(file)
+    # Check log written to feather
+    hdfs_logger.info(f"Dataframe read from {filepath} as feather file")
+
+    return df
+
+
 def _perform(
     command,
     shell: bool = False,

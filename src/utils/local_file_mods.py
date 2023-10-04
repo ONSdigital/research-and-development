@@ -164,8 +164,7 @@ def local_write_feather(filepath: str, df: pd.DataFrame):
     return True
 
 
-@time_logger_wrap
-def local_read_feather(filepath: str) -> pd.DataFrame:
+def local_read_feather(filepath):
     """Reads a feather file from a local network drive into a Pandas DataFrame
 
     Args:
