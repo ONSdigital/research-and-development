@@ -95,9 +95,11 @@ def get_file_choice(output_path: str):
     for i, file in enumerate(file_list):
         print(f"{i+1}. {file}")
     file_num = "X"  # initialize file_num to a non-integer value
-    while True and file_num != "Q":
+    while True:
+        file_num = input("Enter file number or press 'Q' to quit: ")
+        if file_num.lower() == "q":
+            break
         try:
-            file_num = input("Enter file number or press 'Q' to quit: ")
             file_num = int(file_num)
             choices.append(file_num - 1)
             if file_num < 1 or file_num > len(file_list):
