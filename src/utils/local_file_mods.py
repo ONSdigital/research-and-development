@@ -6,6 +6,8 @@ import pandas as pd
 import logging
 from typing import List
 
+from src.utils.wrappers import time_logger_wrap
+
 
 # Set up logger
 lfmod_logger = logging.getLogger(__name__)
@@ -150,6 +152,7 @@ def local_open(filepath, mode):
     return file
 
 
+@time_logger_wrap
 def local_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
@@ -161,6 +164,7 @@ def local_write_feather(filepath, df):
     return True
 
 
+@time_logger_wrap
 def local_read_feather(filepath):
     """Reads a feather file from a local network drive into a Pandas DataFrame
 
