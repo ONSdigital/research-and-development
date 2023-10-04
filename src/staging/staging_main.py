@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable, Tuple
 from datetime import datetime
+import os
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
@@ -19,6 +20,8 @@ def run_staging(
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
+    read_feather: Callable,
+    write_feather: Callable,
     run_id: int,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the staging and validation module.
@@ -86,30 +89,49 @@ def run_staging(
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
-    snapdata = load_json(snapshot_path)
-    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+    
+    # Check if feather file exists in snapshot path
+    feather_files = [f for f in os.listdir(snapshot_path) if f.endswith('.feather')]
+    if feather_files:
+        # Load data from first feather file found
+        feather_file = os.path.join(snapshot_path, feather_files[0])
+        snapdata = read_feather(feather_file)
+        READ_FROM_FEATHER = True
+    else:
+        # Load data from JSON file
+        json_file = os.path.join(snapshot_path, "data.json")
+        snapdata = load_json(json_file)
 
-    # the anonymised snapshot data we use in the DevTest environment
-    # does not include the instance column. This fix should be removed
-    # when new anonymised data is given.
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        responses_df["instance"] = 0
-    StagingMainLogger.info("Finished Data Ingest...")
+        contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
-    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
-    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+        # the anonymised snapshot data we use in the DevTest environment
+        # does not include the instance column. This fix should be removed
+        # when new anonymised data is given.
+        if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+            responses_df["instance"] = 0
+        StagingMainLogger.info("Finished Data Ingest...")
 
-    # Data Transmutation
-    StagingMainLogger.info("Starting Data Transmutation...")
-    full_responses = processing.full_responses(contributors_df, responses_df)
+        val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+        val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
-    # Validate and force data types for the full responses df
-    # TODO Find a fix for the datatype casting before uncommenting
-    val.combine_schemas_validate_full_df(
-        full_responses,
-        "./config/contributors_schema.toml",
-        "./config/wide_responses.toml",
-    )
+        # Data Transmutation
+        StagingMainLogger.info("Starting Data Transmutation...")
+        full_responses = processing.full_responses(contributors_df, responses_df)
+
+        # Validate and force data types for the full responses df
+        # TODO Find a fix for the datatype casting before uncommenting
+        val.combine_schemas_validate_full_df(
+            full_responses,
+            "./config/contributors_schema.toml",
+            "./config/wide_responses.toml",
+        )
+        
+        # Write feather file to snapshot path
+        feather_file = os.path.join(snapshot_path, "snapshot.feather")
+
+    if READ_FROM_FEATHER:
+        full_responses = snapdata
+        
 
     # Data validation
     val.check_data_shape(full_responses)
