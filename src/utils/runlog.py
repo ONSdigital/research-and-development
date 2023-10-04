@@ -2,7 +2,6 @@ from datetime import datetime
 import pandas as pd
 import os
 import csv
-import yaml
 
 
 class RunLog:
@@ -37,11 +36,8 @@ class RunLog:
         self.timestamp = self._generate_time()
 
     def _make_main_path(self):
-        """Creating a local runlog folder if it doesn't exist"""
-        if self.environment == "hdfs":
-            logs_folder = f"/user/{self.user}/{self.logs_folder}"
-        elif self.environment == "network":
-            logs_folder = self.logs_folder
+        """Returns the log folder from the config"""
+        logs_folder = self.logs_folder
         return logs_folder
 
     def _create_folder(self):
@@ -67,7 +63,7 @@ class RunLog:
         latest_id = 0
 
         # Check if file exists using the open function provided
-        if self.file_open_func and os.path.isfile(mainfile):
+        if self.file_open_func and self.file_exists_func(mainfile):
             with self.file_open_func(mainfile, "r") as file:
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
@@ -112,10 +108,8 @@ class RunLog:
 
     def retrieve_configs(self):
         """Gets the configs settings for each run of the pipeline"""
-        with open("src/developer_config.yaml", "r") as file:
-            self.configdata = yaml.load(file, Loader=yaml.FullLoader)
         # Convert the YAML data to a Pandas DataFrame
-        dct = {k: [v] for k, v in self.configdata.items()}
+        dct = {k: [v] for k, v in self.config.items()}
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():

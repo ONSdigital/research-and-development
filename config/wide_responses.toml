@@ -170,7 +170,7 @@ old_ref = "None"
 
 [211]
 Description = "Total Inhouse Expenditure"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -513,7 +513,7 @@ old_ref = "None"
 
 [305]
 Description = "Total Purchased"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0

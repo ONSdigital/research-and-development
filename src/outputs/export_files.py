@@ -6,6 +6,7 @@ import os
 import logging
 from datetime import datetime
 import toml
+from typing import List
 
 from src.utils.helpers import Config_settings
 from src.outputs.manifest_output import Manifest
@@ -42,7 +43,7 @@ if network_or_hdfs == "network":
 
 elif network_or_hdfs == "hdfs":
 
-    from src.utils.local_file_mods import hdfs_list_files as list_files
+    from src.utils.hdfs_mods import hdfs_list_files as list_files
     from src.utils.hdfs_mods import hdfs_copy_file as copy_files
     from src.utils.hdfs_mods import hdfs_move_file as move_files
     from src.utils.hdfs_mods import hdfs_search_file as search_files
@@ -63,14 +64,13 @@ OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
 
 # Define paths
-NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-paths = config[f"{NETWORK_OR_HDFS}_paths"]
+paths = config[f"{network_or_hdfs}_paths"]
 output_path = paths["output_path"]
 short_form_output = os.path.join(output_path, "output_short_form")
-outgoing_folder = paths["outgoing_path"]
+export_folder = paths["export_path"]
 
 # Getting correct headers to verify that df and output are the same
-s_f_schema_path = paths["short_form_schema"]
+s_f_schema_path = config["schema_paths"]["frozen_shortform_schema"]
 short_form_schema = toml.load(s_f_schema_path)
 
 
@@ -84,7 +84,7 @@ schema_columns_str = ",".join(short_form_headers)
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice(output_path):
+def get_file_choice(output_path: str):
     """Prompt user to select a files to transfer.
 
     Returns:
@@ -112,7 +112,7 @@ def get_file_choice(output_path):
     return selction_list
 
 
-def check_files_exist(dir, file_list):
+def check_files_exist(dir: str, file_list: List):
     """Check that all the files in the file list exist using
     the imported isfile function."""
     for file in file_list:
@@ -133,8 +133,9 @@ def run_export():
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
         outgoing_directory=output_path,
+        export_directory=export_folder,
         pipeline_run_datetime=pipeline_run_datetime,
-        dry_run=True,
+        dry_run=False,
         delete_file_func=delete_file,
         md5sum_func=hdfs_md5sum,
         stat_size_func=hdfs_stat_size,
@@ -144,10 +145,12 @@ def run_export():
         string_to_file_func=write_string_to_file,
     )
 
+    file_paths = [f"{output_path}/output_short_form/{file}" for file in file_list]
+
     # Add the short form output file to the manifest object
-    for filename in file_list:
+    for file_path in file_paths:
         manifest.add_file(
-            f"{output_path}/output_short_form/{filename}",
+            file_path,
             column_header=schema_columns_str,
             validate_col_name_length=True,
             sep=",",
@@ -156,12 +159,15 @@ def run_export():
     # Write the manifest file to the outgoing directory
     manifest.write_manifest()
 
-    # Copy files to outgoing folder
-    copy_files(file_list)
-
     # Move the manifest file to the outgoing folder
-    manifest_file = search_files(output_path, "_manifest.json")
-    move_files(manifest_file)
+    manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
+    manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
+    move_files(manifest_path, manifest.export_directory)
+
+    # Copy files to outgoing folder
+    for file_path in file_paths:
+        file_path = os.path.join(file_path)
+        copy_files(file_path, manifest.export_directory)
 
     # Log success message
     OutgoingLogger.info("Files transferred successfully.")

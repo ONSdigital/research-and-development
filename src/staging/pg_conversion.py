@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import numpy as np
 
 PgLogger = logging.getLogger(__name__)
 
@@ -7,24 +8,32 @@ PgLogger = logging.getLogger(__name__)
 def pg_to_pg_mapper(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
-    target_col: str = "201",
+    target_col: str = "product_group",
+    pg_column: str = "201",
     from_col: str = "2016 > Form PG",
     to_col: str = "2016 > Pub PG",
 ):
     """This function maps all values in one column to another column
-    using a mapper file.
+    using a mapper file. This is applied to long forms only.
     The default this is used for is PG numeric to letter conversion.
 
     Args:
         df (pd.DataFrame): The dataset containing all the PG numbers
         mapper (pd.DataFrame): The mapper dataframe loaded using custom function
-        target_col (str, optional): The column we want to convert (product_group).
+        target_col (str, optional): The column we output the
+        mapped values to (product_group).
+        pg_column (str, optional): The column we want to convert (201).
         from_col (str, optional): The column in the mapper that is used to map from.
         to_col (str, optional): The column in the mapper that is used to map to.
 
     Returns:
         pd.DataFrame: A dataframe with all target column values mapped
     """
+
+    filtered_df = df.copy()
+
+    formtype_cond = filtered_df["formtype"] == "0001"
+    filtered_df = filtered_df[formtype_cond]
     # Create list of PGs that have one-to-many cardinality
     mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
     map_errors = (
@@ -52,11 +61,14 @@ def pg_to_pg_mapper(
         )
     # Map using the dictionary taking into account the null values.
     # Then convert to categorigal datatype
-    df[target_col] = pd.to_numeric(df[target_col], errors="coerce")
-    # TODO: add in some error handling and cleaning here.
-    # See ticket RDRP-386
-    df[target_col] = df[target_col].map(map_dict)
-    df[target_col] = df[target_col].astype("category")
+    filtered_df[pg_column] = pd.to_numeric(filtered_df[pg_column], errors="coerce")
+    filtered_df[target_col] = filtered_df[pg_column].map(map_dict)
+    filtered_df[target_col] = filtered_df[target_col].astype("category")
+
+    df.loc[
+        filtered_df.index,
+        f"{target_col}",
+    ] = filtered_df[target_col]
 
     PgLogger.info("Product groups successfully mapped to letters")
 
@@ -66,20 +78,23 @@ def pg_to_pg_mapper(
 def sic_to_pg_mapper(
     df: pd.DataFrame,
     sicmapper: pd.DataFrame,
-    target_col: str = "201",
+    target_col: str = "product_group",
     sic_column: str = "rusic",
     from_col: str = "SIC 2007_CODE",
     to_col: str = "2016 > Pub PG",
+    formtype: str = "0006",
 ):
     """This function maps all values in one column to another column
-    using a mapper file.
+    using a mapper file. This is only applied for short forms and unsampled
+    refs.
 
     The default this is used for is PG numeric to letter conversion.
 
     Args:
         df (pd.DataFrame): The dataset containing all the PG numbers.
         sicmapper (pd.DataFrame): The mapper dataframe loaded using custom function.
-        target_col (str, optional): The column we want to convert (product_group).
+        target_col (str, optional): The column we output the
+        mapped values to (product_group).
         sic_column (str, optional): The column containing the SIC numbers.
         from_col (str, optional): The column in the mapper that is used to map from.
         to_col (str, optional): The column in the mapper that is used to map to.
@@ -87,6 +102,11 @@ def sic_to_pg_mapper(
     Returns:
         pd.DataFrame: A dataframe with all target column values mapped
     """
+
+    filtered_df = df.copy()
+
+    formtype_cond = filtered_df["formtype"] == formtype
+    filtered_df = filtered_df[formtype_cond]
     # Create list of SIC numbers that have one-to-many cardinality
     mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
     map_errors = (
@@ -111,10 +131,53 @@ def sic_to_pg_mapper(
         )
     # Map to the target column using the dictionary taking into account the null values.
     # Then convert to categorigal datatype
-    df[sic_column] = pd.to_numeric(df[sic_column], errors="coerce")
-    df[target_col] = df[sic_column].map(map_dict)
-    df[target_col] = df[target_col].astype("category")
+    filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
+    filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
+    filtered_df[target_col] = filtered_df[target_col].astype("category")
+
+    df = df.copy()
+
+    df.loc[
+        filtered_df.index,
+        f"{target_col}",
+    ] = filtered_df[target_col]
 
     PgLogger.info("SIC numbers successfully mapped to PG letters")
+
+    return df
+
+
+def run_pg_conversion(
+    df: pd.DataFrame, mapper: pd.DataFrame, target_col: str = "product_group"
+):
+    """Run the product group mapping functions and return a
+    dataframe with the correct mapping for each formtype.
+
+    Args:
+        df (pd.DataFrame): Dataframe of full responses data
+        mapper (pd.DataFrame): The mapper file used for PG conversion
+        target_col (str, optional): The column to be created
+        which stores mapped values.
+
+    Returns:
+        (pd.DataFrame): Dataframe with mapped values
+    """
+
+    if target_col == "201":
+        target_col = "201_mapping"
+    else:
+        # Create a new column to store PGs
+        df[target_col] = np.nan
+
+    # SIC mapping for short forms
+    df = sic_to_pg_mapper(df, mapper, target_col=target_col)
+
+    # PG mapping for long forms
+    df = pg_to_pg_mapper(df, mapper, target_col=target_col)
+
+    # Overwrite the 201 column if target_col = 201
+    if target_col == "201_mapping":
+        df["201"] = df[target_col]
+        df = df.drop(columns=[target_col])
 
     return df
