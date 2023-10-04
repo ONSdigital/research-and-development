@@ -89,18 +89,19 @@ def run_staging(
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
-    
+
     # Check if feather file exists in snapshot path
-    feather_files = [f for f in os.listdir(snapshot_path) if f.endswith('.feather')]
+    snapshot_dir = os.path.dirname(snapshot_path)
+    feather_files = [f for f in os.listdir(snapshot_dir) if f.endswith(".feather")]
     if feather_files:
         # Load data from first feather file found
-        feather_file = os.path.join(snapshot_path, feather_files[0])
+        feather_file = os.path.join(snapshot_dir, feather_files[0])
+        StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         READ_FROM_FEATHER = True
     else:
         # Load data from JSON file
-        json_file = os.path.join(snapshot_path, "data.json")
-        snapdata = load_json(json_file)
+        snapdata = load_json(snapshot_path)
 
         contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
@@ -111,7 +112,9 @@ def run_staging(
             responses_df["instance"] = 0
         StagingMainLogger.info("Finished Data Ingest...")
 
-        val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+        val.validate_data_with_schema(
+            contributors_df, "./config/contributors_schema.toml"
+        )
         val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
         # Data Transmutation
@@ -125,18 +128,22 @@ def run_staging(
             "./config/contributors_schema.toml",
             "./config/wide_responses.toml",
         )
-        
+
+        # Get response rate
+        processing.response_rate(contributors_df, responses_df)
+
         # Write feather file to snapshot path
-        feather_file = os.path.join(snapshot_path, "snapshot.feather")
+        snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
+        feather_file = os.path.join(snapshot_dir, f"{snapshot_name}.feather")
+        write_feather(feather_file, full_responses)
+        READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
         full_responses = snapdata
-        
 
     # Data validation
     val.check_data_shape(full_responses)
 
-    processing.response_rate(contributors_df, responses_df)
     StagingMainLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
