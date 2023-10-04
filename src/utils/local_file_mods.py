@@ -159,3 +159,15 @@ def local_file_write_feather(filepath, df):
     """
     df.to_feather(filepath)
     return True
+
+def local_read_feather(filepath):
+    """Reads a feather file from a local network drive into a Pandas DataFrame
+
+    Args:
+        filepath (str): Filepath
+
+    Returns:
+        pd.DataFrame: Dataframe created from feather file
+    """
+    df = pd.read_feather(filepath)
+    return df
