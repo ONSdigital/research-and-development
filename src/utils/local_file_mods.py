@@ -150,7 +150,7 @@ def local_open(filepath, mode):
     return file
 
 
-def local_file_write_feather(filepath, df):
+def local_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
     Args:
@@ -159,6 +159,7 @@ def local_file_write_feather(filepath, df):
     """
     df.to_feather(filepath)
     return True
+
 
 def local_read_feather(filepath):
     """Reads a feather file from a local network drive into a Pandas DataFrame
