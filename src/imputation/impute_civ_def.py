@@ -70,10 +70,50 @@ def prep_cd_imp_classes(df):
     df["empty_group"] = valid_class_cond &  (num_valid == 0) 
 
     # create a new imputation class to be used only when "empty_group" is true
+    #TODO: update to impute by PG only, not rusic and create pg_class
     df = tmi.create_imp_class_col(df, None, "rusic", "sic_class")
 
     df = df.drop("valid_civdef_val", axis=1)
-    print(df)
+
+    return df
+
+
+def apply_civdev_imputation(
+    df: pd.DataFrame, 
+    cd_dict: Dict[str, float]
+) -> pd.DataFrame:
+    """Apply imputation for R&D type for non-responders and 'No R&D'.
+
+    Values in column 200 (R&D type) are imputed with either "C" for civl or
+    "D" for defence, based on ratios in the same imputation class in 
+    clear responders.
+    
+    Args:
+        df (pd.DataFrame): The dataframe of all responses
+        cd_dict (Dict[str, Tuple(float, float)]): Dictionary with values to 
+            use for imputation.
+
+    Returns:
+        pd.DataFrame: An updated dataframe with new col "200_imputed".
+    '"""
+    df["200_imputed"] = "N/A"
+    df = df.copy()
+    # filter out empty and invalid imputation classes
+    cond1 = (df["empty_group"] == False) & ~(df["pg_sic_class"].str.contains("nan"))
+    # filter for 'No R&D' and for status 'Form sent out'
+    cond2 = (df["status"] == "Form sent out") | (df["604"] == "No")
+
+    # also exclude instance 0
+
+
+    filtered_df = df.loc[cond1 & cond2]
+
+    # use groupby to update each class in turn.
+
+    # create new column
+    filtered_df["200_imputed"] = "Test"
+    updated_df = tmi.apply_to_original(filtered_df, df)
+
     return df
 
 
@@ -94,10 +134,14 @@ def impute_civil_defence(
     df = prep_cd_imp_classes(df)
 
     # Filter for clear statuses
-    clear_statuses = ["210", "211"]
-    clear_df = tmi.filter_by_column_content(df, "statusencoded", clear_statuses)
+    clear_df = tmi.filter_by_column_content(df, "statusencoded", ["210", "211"])
+
+    # exclude empty pg_rusic imputation classes
+    clear_df = clear_df.loc[df["empty_group"] == False]
 
     # create a dict mapping each class to either 'C' (civil) or 'D'(defence)
     civil_def_dict, clear_df = create_civdef_dict(clear_df)
+
+    df = apply_civdev_imputation(df, civil_def_dict)
 
     return df
