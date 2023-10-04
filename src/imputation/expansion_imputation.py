@@ -1,7 +1,7 @@
 """_summary_
 """
 
-from tmi_imputation import filter_by_column_content
+from src.imputation.tmi_imputation import filter_by_column_content
 
 
 def run_expansion(df):
@@ -13,11 +13,14 @@ def run_expansion(df):
     clear_resp_df = filter_by_column_content(df, "statusencoded", clear_statuses)
 
     # Group by imp_class
-    clear_imp_class_df = clear_resp_df.groupby("imp_class")
-    class_keys = list(clear_imp_class_df.groups.keys())
+    clear_imp_class_grps = clear_resp_df.groupby("imp_class")
+    class_keys = list(clear_imp_class_grps.groups.keys())
 
-    # Filter to exclude the same rows trimmed for 211_trim == True
-    trimmed_df = clear_imp_class_df.loc[clear_imp_class_df["211_trim"]]
+    for k in class_keys:
+        # Get subgroup dataframe
+        subgrp_df = clear_imp_class_grps.get_group(k)
 
-    print(class_keys)
-    print(trimmed_df.head())
+        # Filter to exclude the same rows trimmed for 211_trim == True
+        trimmed_df = subgrp_df.loc[subgrp_df["211_trim"]]
+
+        print(trimmed_df)
