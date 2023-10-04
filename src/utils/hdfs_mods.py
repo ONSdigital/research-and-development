@@ -347,4 +347,7 @@ def hdfs_search_file(dir_path, ending):
             f"File with ending {ending} does not exist in {dir_path}"
         )
 
+    # Return file path + name
+    target_file = target_file.split()[-1]
+
     return target_file
