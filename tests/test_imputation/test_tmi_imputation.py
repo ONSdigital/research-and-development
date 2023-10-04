@@ -24,16 +24,19 @@ def test_create_mean_dict():
     data = [
         ["210", "A", "dont trim", 100, 100, "O", 100, "0001"],
         ["210", "A", "dont trim", 100, 100, "P", 100, "0001"],
-        ["210", "A", "dont trim", 1, 100, "Q", 100, "0001"],
+        ["210", "A", "dont trim", 9, 100, "Q", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "R", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "S", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "T", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "U", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "V", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "W", 100, "0001"],
-        ["210", "A", "dont trim", 0, 100, "X", 100, "0001"],
+        ["210", "A", "dont trim", 1, 100, "X", 100, "0001"],
         ["210", "A", "dont trim", 1, 100, "N", 100, "0001"],
-        ["211", "A", "dont trim", 1, 100, "Y", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "J", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "K", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "L", 100, "0001"],
+        ["210", "A", "dont trim", 0, 100, "M", 100, "0001"],
         ["210", "B", "dont trim", 1, 100, "Z", 100, "0001"],
         ["211", "B", "dont trim", 1, 100, "W", 100, "0001"],
         ["210", "C", "dont trim", 1, 100, "V", 100, "0001"],
@@ -52,8 +55,8 @@ def test_create_mean_dict():
     # Define the expected mean_dict and result_df
     expected_mean_dict = {
         "Value1": {
-            "Value1_A_mean": 10.9,
-            "Value1_A_count": 10,
+            "Value1_A_mean": 9.0,
+            "Value1_A_count": 13,
             "Value1_B_mean": 1.0,
             "Value1_B_count": 2,
             "Value1_C_mean": 1.0,
@@ -61,7 +64,7 @@ def test_create_mean_dict():
         },
         "Value2": {
             "Value2_A_mean": 100.0,
-            "Value2_A_count": 10,
+            "Value2_A_count": 11,
             "Value2_B_mean": 100.0,
             "Value2_B_count": 2,
             "Value2_C_mean": 100.0,
@@ -90,7 +93,7 @@ def test_create_mean_dict():
         + ["above_trim_threshold", False, False, 0],
         ["210", "A", "dont trim", 100, 100, "P", 100, "0001"]
         + ["above_trim_threshold", True, False, 1],
-        ["210", "A", "dont trim", 1, 100, "Q", 100, "0001"]
+        ["210", "A", "dont trim", 9, 100, "Q", 100, "0001"]
         + ["above_trim_threshold", False, False, 2],
         ["210", "A", "dont trim", 1, 100, "R", 100, "0001"]
         + ["above_trim_threshold", False, False, 3],
@@ -103,21 +106,27 @@ def test_create_mean_dict():
         ["210", "A", "dont trim", 1, 100, "V", 100, "0001"]
         + ["above_trim_threshold", False, False, 7],
         ["210", "A", "dont trim", 1, 100, "W", 100, "0001"]
-        + ["above_trim_threshold", False, False, 8],
-        ["210", "A", "dont trim", 0, 100, "X", 100, "0001"]
-        + ["above_trim_threshold", True, False, 9],
+        + ["above_trim_threshold", False, True, 8],
+        ["210", "A", "dont trim", 1, 100, "X", 100, "0001"]
+        + ["above_trim_threshold", False, True, 9],
         ["210", "A", "dont trim", 1, 100, "N", 100, "0001"]
-        + ["above_trim_threshold", False, True, 10],
-        ["211", "A", "dont trim", 1, 100, "Y", 100, "0001"]
-        + ["above_trim_threshold", False, True, 11],
+        + ["above_trim_threshold", False, False, 10],
+        ["210", "A", "dont trim", 0, 100, "J", 100, "0001"]
+        + ["above_trim_threshold", True, True, 11],
+        ["210", "A", "dont trim", 0, 100, "K", 100, "0001"]
+        + ["above_trim_threshold", False, True, 12],
+        ["210", "A", "dont trim", 0, 100, "L", 100, "0001"]
+        + ["above_trim_threshold", False, False, 13],
+        ["210", "A", "dont trim", 0, 100, "M", 100, "0001"]
+        + ["above_trim_threshold", False, False, 14],
         ["210", "B", "dont trim", 1, 100, "Z", 100, "0001"]
-        + ["below_trim_threshold", False, False, 12],
-        ["211", "B", "dont trim", 1, 100, "W", 100, "0001"]
-        + ["below_trim_threshold", False, False, 13],
-        ["210", "C", "dont trim", 1, 100, "V", 100, "0001"]
-        + ["below_trim_threshold", False, False, 14],
-        ["211", "C", "dont trim", 1, 100, "U", 100, "0001"]
         + ["below_trim_threshold", False, False, 15],
+        ["211", "B", "dont trim", 1, 100, "W", 100, "0001"]
+        + ["below_trim_threshold", False, False, 16],
+        ["210", "C", "dont trim", 1, 100, "V", 100, "0001"]
+        + ["below_trim_threshold", False, False, 17],
+        ["211", "C", "dont trim", 1, 100, "U", 100, "0001"]
+        + ["below_trim_threshold", False, False, 18],
     ]
 
     expected_result_df = pd.DataFrame(data=expected_result_data, columns=expected_cols)
