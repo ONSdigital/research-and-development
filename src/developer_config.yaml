@@ -37,11 +37,11 @@ hdfs_paths:
   itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+  imputation_path: "/ons/rdbe_dev/imputation"
+  outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
-  outliers_path: None
-  imputation_path: /ons/rdbe_dev/imputation
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
