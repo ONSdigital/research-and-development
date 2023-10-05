@@ -90,12 +90,12 @@ def run_staging(
 
     # load and parse the snapshot data json file
     # Check if feather file exists in snapshot path
-    snapshot_dir = os.path.dirname(snapshot_path)
+    feather_path = os.path.dirname(paths["feather_path"])
     load_from_feather = config["global"]["load_from_feather"]
-    feather_files = [f for f in os.listdir(snapshot_dir) if f.endswith(".feather")]
+    feather_files = [f for f in os.listdir(feather_path) if f.endswith(".feather")]
     if bool(feather_files) & load_from_feather:
         # Load data from first feather file found
-        feather_file = os.path.join(snapshot_dir, feather_files[0])
+        feather_file = os.path.join(feather_path, feather_files[0])
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
@@ -134,17 +134,17 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-        # Get response rate
-        processing.response_rate(contributors_df, responses_df)
-
         # Write feather file to snapshot path
         snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
-        feather_file = os.path.join(snapshot_dir, f"{snapshot_name}.feather")
+        feather_file = os.path.join(feather_path, snapshot_name)
         write_feather(feather_file, full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
         full_responses = snapdata
+
+    # Get response rate
+    processing.response_rate(contributors_df, responses_df)
 
     # Data validation
     val.check_data_shape(full_responses)
