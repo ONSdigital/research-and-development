@@ -85,21 +85,24 @@ def run_staging(
         StagingMainLogger.info("Skipping loading historic data...")
 
     # Check data file exists, raise an error if it does not.
-    StagingMainLogger.info("Loading SPP snapshot data...")
+
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
 
     # Check if feather file exists in snapshot path
     snapshot_dir = os.path.dirname(snapshot_path)
+    load_from_feather = config["global"]["load_from_feather"]
     feather_files = [f for f in os.listdir(snapshot_dir) if f.endswith(".feather")]
-    if feather_files:
+    if bool(feather_files) & load_from_feather:
         # Load data from first feather file found
         feather_file = os.path.join(snapshot_dir, feather_files[0])
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
+        StagingMainLogger.info(f"{feather_file} loaded")
         READ_FROM_FEATHER = True
     else:
+        StagingMainLogger.info("Loading SPP snapshot data from json file")
         # Load data from JSON file
         snapdata = load_json(snapshot_path)
 
@@ -120,6 +123,9 @@ def run_staging(
         # Data Transmutation
         StagingMainLogger.info("Starting Data Transmutation...")
         full_responses = processing.full_responses(contributors_df, responses_df)
+        StagingMainLogger.info(
+            "Finished Data Transmutation and validation of full responses dataframe"
+        )
 
         # Validate and force data types for the full responses df
         # TODO Find a fix for the datatype casting before uncommenting
@@ -143,10 +149,6 @@ def run_staging(
 
     # Data validation
     val.check_data_shape(full_responses)
-
-    StagingMainLogger.info(
-        "Finished Data Transmutation and validation of full responses dataframe"
-    )
 
     # Stage, validate and harmonise the postcode column
     StagingMainLogger.info("Starting PostCode Validation")
