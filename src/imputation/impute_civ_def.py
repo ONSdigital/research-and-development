@@ -16,8 +16,6 @@ def calc_cd_proportions(df: pd.DataFrame): # -> Tuple[float, float]:
     proportion_civ = num_civ/(num_civ + num_def)
     proportion_def = num_def/(num_civ + num_def)
 
-    print(proportion_civ)
-
     return proportion_civ, proportion_def
 
 
@@ -38,61 +36,84 @@ def create_civdef_dict(
 
     # Filter out imputation classes that are missing either "201" or "rusic"
     # and exclude empty pg_sic classes
-    cond1 = ~(df["pg_sic_class"].str.contains("nan")) & (df["empty_group"] == False)
+    cond1 = ~(df["pg_sic_class"].str.contains("nan")) & (df["empty_pgsic_group"] == False)
     filtered_df = df[cond1]
 
-    # Group by the pg_sic imputation class the loop through the groups
+    # Group by the pg_sic imputation class 
     pg_sic_grp = filtered_df.loc[filtered_df["instance"] != 0].groupby("pg_sic_class")
 
+    # loop through the pg_sic imputation class groups
     for pg_sic_class, class_group in pg_sic_grp:
         civdef_dict[pg_sic_class] = calc_cd_proportions(class_group)
 
     # create a second dictionary to hold civil or defence ratios 
-    # for the "empty_group" cases
+    # for the "empty_pgsic_group" cases
     civdef_empty_group_dict = {}
 
-    cond2 = ~(df["pg_class"].str.contains("nan")) 
+    # filter out invalid pg classes and empty pg groups from the original dataframe
+    cond2 = ~(df["pg_class"].str.contains("nan")) & (df["empty_pg_group"] == False)
     filtered_df2 = df[cond2]
+
+    # evaluate which pg classes are needed for empty pg_sic groups
+    num_empty = filtered_df2.groupby("pg_class")["empty_pgsic_group"].transform(sum)
+
+    filtered_df2 = filtered_df2.loc[num_empty > 0]
 
     # Group by the pg-only imputation class the loop through the groups
     pg_grp = filtered_df2.loc[filtered_df2["instance"] != 0].groupby("pg_class")
 
-    # for pg_class, class_group in pg_grp:
-    #     # check if any item in the class has "empty group"
-    #    # class_group["num_empty"] = 
-    #     civdef_empty_group_dict[pg_class] = calc_cd_proportions(class_group)
+    for pg_class, class_group in pg_grp:
+        civdef_empty_group_dict[pg_class] = calc_cd_proportions(class_group)
 
-    return civdef_dict, df
+    return civdef_dict, civdef_empty_group_dict
 
 
-def prep_cd_imp_classes(df):
-    # create imputation classes based on product group and rusic
-    df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
+def calc_empty_group(
+        df: pd.DataFrame, 
+        class_name: str, 
+        new_col_name: str
+) -> pd.DataFrame:
+    """Add a new bool column flagging empty groups."""
 
     clear_status_cond = df["statusencoded"].isin(["210", "211"])
     df["valid_civdef_val"] = ~df["200"].isnull() & clear_status_cond
 
     # calculate the number of valid entries in the class for column 200 
-    num_valid = df.groupby("pg_sic_class")["valid_civdef_val"].transform(sum)
+    num_valid = df.groupby(class_name)["valid_civdef_val"].transform(sum)
 
-    # exclude classes that do not contain are not valid
-    valid_class_cond = ~(df["pg_sic_class"].str.contains("nan"))
+    # exclude classes that are not valid
+    valid_class_cond = ~(df[class_name].str.contains("nan"))
 
-    df["empty_group"] = valid_class_cond &  (num_valid == 0) 
-
-    # create a new imputation class called "pg_class" to be used only when
-    # "empty_group" is true (ie, no avaible R&D type entries)
-    # this imputation class will include product group (col 201) only.
-    df = tmi.create_imp_class_col(df, "201", None, "pg_class")
+    # create new bool column to flag empty classes
+    df[new_col_name] = valid_class_cond &  (num_valid == 0) 
 
     df = df.drop("valid_civdef_val", axis=1)
 
     return df
 
 
+def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
+    # create imputation classes based on product group and rusic
+    df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
+
+    # flag empty pg_sic_classes in new bool col "empty_pgsic_class"
+    df = calc_empty_group(df, "pg_sic_class", "empty_pgsic_group")
+
+    # create a new imputation class called "pg_class" to be used only when
+    # "empty_pgsic_group" is true (ie, no avaible R&D type entries)
+    # this imputation class will include product group (col 201) only.
+    df = tmi.create_imp_class_col(df, "201", None, "pg_class")
+
+    # flag empty pg_classes in new bool col "empty_pg_class"
+    df = calc_empty_group(df, "pg_class", "empty_pg_group")
+
+    return df
+
+
 def apply_civdev_imputation(
     df: pd.DataFrame, 
-    cd_dict: Dict[str, float]
+    pgsic_dict: Dict[str, Tuple[float, float]],
+    pg_dict: Dict[str, Tuple[float, float]]
 ) -> pd.DataFrame:
     """Apply imputation for R&D type for non-responders and 'No R&D'.
 
@@ -109,24 +130,40 @@ def apply_civdev_imputation(
         pd.DataFrame: An updated dataframe with new col "200_imputed".
     '"""
     df["200_imputed"] = "N/A"
-    df = df.copy()
-    # filter out empty and invalid imputation classes
-    cond1 = (df["empty_group"] == False) & ~(df["pg_sic_class"].str.contains("nan"))
+
     # filter for 'No R&D' and for status 'Form sent out'
-    cond2 = (df["status"] == "Form sent out") | (df["604"] == "No")
-
+    to_impute_cond = (df["status"] == "Form sent out") | (df["604"] == "No")
     # also exclude instance 0
+    to_impute_df = df.loc[to_impute_cond & df["instance"] != 0]
 
+    # first impute the pg_sic 
+    # filter out empty and invalid imputation classes
+    cond1 = to_impute_df["empty_pgsic_group"] == False
+    cond2 = ~to_impute_df["pg_sic_class"].str.contains("nan")
 
-    filtered_df = df.loc[cond1 & cond2]
+    filtered_df = to_impute_df.loc[cond1 & cond2].copy()
 
-    # use groupby to update each class in turn.
+    # loop through the pg_sic imputation classes to apply imputation
+    pg_sic_grp = filtered_df.loc[filtered_df["instance"] != 0].groupby("pg_sic_class")
 
-    # create new column
-    filtered_df["200_imputed"] = "Test"
-    updated_df = tmi.apply_to_original(filtered_df, df)
+    for pg_sic_class, class_group_df in pg_sic_grp:
+        if pg_sic_class in pgsic_dict.keys():
+            class_group_df["200_imputed"] = np.random.choice(
+                ["C", "D"], 
+                size = len(class_group_df), 
+                p = pgsic_dict[pg_sic_class]
+            )
+            class_group_df["200_imp_marker"] = "pg_sic group imputed"
+        else:
+            #TODO could put empty_group flag in here
+            class_group_df["200_imp_marker"] = "no imp value available"
 
-    return df
+        filtered_df.update(class_group_df)
+    updated_df = df.update(filtered_df)
+
+    # next, fill in the values where "empty_pgsic_group" is true
+
+    return updated_df
 
 
 def impute_civil_defence(
@@ -148,12 +185,9 @@ def impute_civil_defence(
     # Filter for clear statuses
     clear_df = tmi.filter_by_column_content(df, "statusencoded", ["210", "211"])
 
-    # exclude empty pg_rusic imputation classes
-  #  clear_df = clear_df.loc[df["empty_group"] == False]
-
     # create a dict mapping each class to either 'C' (civil) or 'D'(defence)
-    civil_def_dict, clear_df = create_civdef_dict(clear_df)
+    pgsic_dict, pg_dict = create_civdef_dict(clear_df)
 
-    df = apply_civdev_imputation(df, civil_def_dict)
+    df = apply_civdev_imputation(df, pgsic_dict, pg_dict)
 
     return df

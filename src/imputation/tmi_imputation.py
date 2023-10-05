@@ -403,9 +403,9 @@ def apply_tmi(df, target_variables, mean_dict):
                 imp_class_df["imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
-            final_df = apply_to_original(imp_class_df, filtered_df)
+            apply_to_original(imp_class_df, filtered_df)
 
-    final_df = apply_to_original(final_df, df)
+    final_df = apply_to_original(filtered_df, df)
 
     return final_df
 

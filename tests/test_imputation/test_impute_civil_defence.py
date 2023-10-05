@@ -10,10 +10,7 @@ from src.imputation.impute_civ_def import (
     create_civdef_dict,
     calc_cd_proportions
 )
-# from src.imputation.impute_civil_defence import (
-#     calc_cd_proportions
-# )
-# from src.imputation.impute_civil_defence import calc_cd_proportions
+
 
 class TestCalcCDPorportions:
     """Unit tests for calc_cd_proportions function."""
@@ -70,7 +67,7 @@ class TestCreateCivdefDict:
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
-            "reference",
+           "reference",
             "instance",
             "200",
             "201",
@@ -79,26 +76,27 @@ class TestCreateCivdefDict:
             "cellnumber",
             "rusic",
             "pg_sic_class",
-            "empty_group",
-            "pg_class"]
+            "empty_pgsic_group",
+            "pg_class",
+            "empty_pg_group"]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC"],
-            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444", "nan_444", False, "nan"],
-            [2002, 1, np.nan, "AC", 200, "211", "800", "444", "AC_444", True, "AC"],
-            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC"],
-            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "nan"],
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444", "nan_444", False, "nan", False],
+            [2002, 1, np.nan, "AC", 200, "211", "800", "444", "AC_444", True, "AC", False],
+            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "nan", False],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -106,16 +104,25 @@ class TestCreateCivdefDict:
 
 
     def test_create_civdef_dict(self):
-        "Test for calc_cd_proportions function."
+        "Test the pg_sic dict calcuclation in create_civdef_dict function."
         input_df = self.create_input_df()
 
-        pgsic_dict, result_df = create_civdef_dict(input_df)
+        pgsic_dict, pg_dict = create_civdef_dict(input_df)
 
         exp_pgsic_dict = {"AC_1234": (0.75, 0.25), "ZZ_12": (0.6, 0.4)}
 
         assert pgsic_dict == exp_pgsic_dict
 
-       # exp_pg_dict = {"AC": ()}
+
+    def test_create_civdef_dict(self):
+        "Test the pg only dict calcuclation in create_civdef_dict function."
+        input_df = self.create_input_df()
+
+        pgsic_dict, pg_dict = create_civdef_dict(input_df)
+
+        exp_pg_dict = {"AC":(0.6, 0.4)}
+
+        assert pg_dict == exp_pg_dict
 
 
 class TestPrepCDImpClasses:
@@ -167,26 +174,27 @@ class TestPrepCDImpClasses:
             "cellnumber",
             "rusic",
             "pg_sic_class",
-            "empty_group",
-            "pg_class"]
+            "empty_pgsic_group",
+            "pg_class",
+            "empty_pg_group"]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "AC"],
-            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC"],
-            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444", "nan_444", False, "nan"],
-            [2002, 1, np.nan, "AC", 200, "211", "800", "444", "AC_444", True, "AC"],
-            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC"],
-            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan"],
-            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "ZZ"],
-            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "nan"],
+            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
+            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444", "nan_444", False, "nan", False],
+            [2002, 1, np.nan, "AC", 200, "211", "800", "444", "AC_444", True, "AC", False],
+            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False],
+            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
+            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "ZZ", False],
+            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "nan", False],
         ]
 
         output_df = pandasDF(data=data, columns=output_cols)
