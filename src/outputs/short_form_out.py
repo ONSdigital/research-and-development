@@ -81,11 +81,12 @@ def run_shortform_prep(
         pd.DataFrame: The dataframe prepared for short form output.
     """
 
-    # Filter for short-forms
-    df = df.loc[df["formtype"] == "0006"]
-
-    # Filter for CORA statuses [600, 800]
-    df = df.loc[df["form_status"].isin(["600", "800"])]
+    # Filter for short-forms, CORA statuses and instance
+    df = df.loc[
+        (df["formtype"] == "0006")
+        & (df["form_status"].isin(["600", "800"]))
+        & (df["instance"] == 0)
+    ]
 
     # Create a 'year' column
     df = create_period_year(df)
