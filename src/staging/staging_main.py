@@ -1,6 +1,7 @@
 """The main file for the staging and validation module."""
 import logging
 import pandas as pd
+from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
 
@@ -90,10 +91,16 @@ def run_staging(
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
     # the anonymised snapshot data we use in the DevTest environment
-    # does not include the instance column. This fix should be removed
+    # does not include data in several columns. This fix should be removed
     # when new anonymised data is given.
     if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
+        # In the anonymised data the selectiontype is always 'L'
+        col_size = contributors_df.shape[0]
+        random.seed(seed=42)
+        contributors_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
+        cellno_list = config["devtest"]["seltype_list"]
+        contributors_df["cellnumber"] = random.choice(cellno_list, size=col_size)
     StagingMainLogger.info("Finished Data Ingest...")
 
     val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")

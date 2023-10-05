@@ -38,7 +38,6 @@ def run_pipeline(start, config_path):
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
     if network_or_hdfs == "network":
-        HDFS_AVAILABLE = False
 
         from src.utils.local_file_mods import load_local_json as load_json
         from src.utils.local_file_mods import local_file_exists as check_file_exists
@@ -46,9 +45,8 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import local_open as open_file
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
-        from src.utils.local_file_mods import local_file_exists as file_exists
+
     elif network_or_hdfs == "hdfs":
-        HDFS_AVAILABLE = True
 
         from src.utils.hdfs_mods import hdfs_load_json as load_json
         from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
@@ -56,10 +54,12 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import hdfs_open as open_file
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-        from src.utils.hdfs_mods import hdfs_file_exists as file_exists
+
     else:
         MainLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
+
+    MainLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
     # Set up the run logger
     global_config = config["global"]
@@ -147,3 +147,5 @@ def run_pipeline(start, config_path):
     runlog_obj._create_runlog_dfs()
     runlog_obj.create_runlog_files()
     runlog_obj._write_runlog()
+
+    return run_time
