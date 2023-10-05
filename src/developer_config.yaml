@@ -38,6 +38,7 @@ hdfs_paths:
   itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   outliers_path: None
+  feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
   root: None
   logs_foldername: "logs/run_logs"
@@ -57,6 +58,7 @@ network_paths:
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+  feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
 schema_paths:
   frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
 outliers:
