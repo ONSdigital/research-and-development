@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 
 from src.imputation import tmi_imputation as tmi
+from src.imputation import expansion_imputation as ximp
 from src.imputation.apportionment import run_apportionment
 
 ImputationMainLogger = logging.getLogger(__name__)
@@ -35,6 +36,8 @@ def run_imputation(
     df = run_apportionment(df)
 
     imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
+
+    imputed_df = ximp.run_expansion(imputed_df, config)
 
     imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
 
