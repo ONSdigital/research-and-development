@@ -4,7 +4,16 @@
 from src.imputation.tmi_imputation import filter_by_column_content
 
 
-def run_expansion(df):
+def evaluate_imputed_2xx(group, cols_to_sum):
+    """Evaluate the imputed 2xx as the sum of all 2xx over the sum of all 211
+    multiplied by the imputed 211."""
+    sum_211 = group.loc["211"]
+    sum_2xx = group.loc[:, cols_to_sum].sum(axis=1)
+
+    return (sum_2xx / sum_211) * group["211_imputed"]
+
+
+def run_expansion(df, config):
     # Step 4: Expansion imputation for breakdown questions
 
     # Identify clean responders (by status) again
@@ -12,18 +21,20 @@ def run_expansion(df):
     clear_statuses = ["210", "211"]
     clear_resp_df = filter_by_column_content(df, "statusencoded", clear_statuses)
 
-    # Group by imp_class
-    clear_imp_class_grps = clear_resp_df.groupby("imp_class")
-    class_keys = list(clear_imp_class_grps.groups.keys())
+    # TODO: remove this temporary fix to cast Nans to False
+    clear_resp_df = clear_resp_df["211_trim"].fillna(False)
 
-    for k in class_keys:
-        # Get subgroup dataframe
-        subgrp_df = clear_imp_class_grps.get_group(k)
+    # Filter to exclude the same rows trimmed for 211_trim == True
+    trimmed_df = clear_resp_df.loc[df["211_trim"]]
 
-        # TODO: remove this temporary fix to cast Nans to False
-        subgrp_df["211_trim"] = subgrp_df["211_trim"].fillna(False)
+    # Get all the 2xx cols, minus 211, imputed vals and trim marker
+    breakdown_qs = config["2xx_breakdowns"]
 
-        # Filter to exclude the same rows trimmed for 211_trim == True
-        trimmed_df = subgrp_df.loc[subgrp_df["211_trim"]]
+    # Evaluate imputed 2xx
+    trimmed_df["imputed_2xx"] = (
+        trimmed_df.groupby("imp_class")
+        .apply(evaluate_imputed_2xx, args=breakdown_qs)
+        .reset_index(drop=True)
+    )
 
-        print(trimmed_df)
+    print(trimmed_df)
