@@ -92,11 +92,10 @@ def calculate_weighting_factor(
     )
 
     # Group by cell number
-    groupd_by_cell = filtered_df.groupby("cellnumber")
+    grouped_by_cell = filtered_df.groupby("cellnumber")
 
     # Create a dict that maps each cell to the weighting factor
-
-    for cell_number, cell_group in groupd_by_cell:
+    for cell_number, cell_group in grouped_by_cell:
 
         # Get N from cellno_dict
         N = cellno_dict[cell_number]
