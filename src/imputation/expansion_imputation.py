@@ -20,6 +20,9 @@ def run_expansion(df):
         # Get subgroup dataframe
         subgrp_df = clear_imp_class_grps.get_group(k)
 
+        # TODO: remove this temporary fix to cast Nans to False
+        subgrp_df["211_trim"] = subgrp_df["211_trim"].fillna(False)
+
         # Filter to exclude the same rows trimmed for 211_trim == True
         trimmed_df = subgrp_df.loc[subgrp_df["211_trim"]]
 
