@@ -31,9 +31,11 @@ def create_instance_df(df, old_column, new_column, type, instance_no):
         type (string): The type of spending - either 'C' or 'D'
         instance_no (int): The instance number that these will be
     """
+    # Select only short forms
     df.loc[
         df["formtype"] == "0006",
     ]
+    # Copy old column values into the new column, set the type and instance number
     df[new_column] = df[old_column]
     df["200"] = type
     df["instance"] = instance_no
