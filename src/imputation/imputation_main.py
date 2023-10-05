@@ -6,6 +6,8 @@ from datetime import datetime
 
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
+from src.imputation.short_to_long import short_to_long
+from src.outputs.short_form_out import create_headcount_cols
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -31,6 +33,14 @@ def run_imputation(
         "headcount_oth_m",
         "headcount_oth_f",
     ]
+
+    df = create_headcount_cols(df, 4)
+
+    convert_short_to_long = [(df, "703", "704", "305"), 
+                             (df, "706", "707", "Employment total"), 
+                             (df, "headcount_civil", "headcount_defence", "headcount_total")]
+    for each in convert_short_to_long:
+        df = short_to_long(*each)
 
     df = run_apportionment(df)
 

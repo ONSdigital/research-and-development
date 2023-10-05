@@ -14,7 +14,7 @@ def short_to_long(df, civil_column, defence_column, new_column):
     civil_df = create_instance_df(df.copy(), civil_column, new_column, "C", 1)
     defence_df = create_instance_df(df.copy(), defence_column, new_column, "D", 2)
 
-    return pd.concat([df, civil_df, defence_df])
+    return pd.concat([df, civil_df, defence_df], ignore_index=True)
 
 
 def create_instance_df(df, old_column, new_column, type, instance_no):
