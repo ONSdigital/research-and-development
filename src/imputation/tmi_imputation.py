@@ -110,12 +110,12 @@ def create_imp_class_col(
     df = df.copy()
 
     # Create class col with concatenation
-    if col_first_half:
+    if col_second_half:
         df[class_name] = (
             df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
         )
     else:
-        df[class_name] = df[col_second_half].astype(str)
+        df[class_name] = df[col_first_half].astype(str)
 
     fil_df = filter_by_column_content(df, "cellnumber", [817])
     # Create class col with concatenation + 817
