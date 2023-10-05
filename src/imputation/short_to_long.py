@@ -11,16 +11,10 @@ def short_to_long(df, civil_column, defence_column, new_column):
         new_column (string): Combined long form column where values correspond to either
                              civil or defence (indicated by 'C' or 'D' in column '200'.)
     """
-    short_df = df.loc[
-        df["formtype"] == "0006",
-    ]
-    long_df = df.loc[
-        df["formtype"] != "0006",
-    ]
-    civil_df = create_instance_df(short_df.copy(), civil_column, new_column, "C", 1)
-    defence_df = create_instance_df(short_df.copy(), defence_column, new_column, "D", 2)
+    civil_df = create_instance_df(df.copy(), civil_column, new_column, "C", 1)
+    defence_df = create_instance_df(df.copy(), defence_column, new_column, "D", 2)
 
-    return pd.concat([short_df, long_df, civil_df, defence_df])
+    return pd.concat([df, civil_df, defence_df])
 
 
 def create_instance_df(df, old_column, new_column, type, instance_no):
@@ -37,6 +31,9 @@ def create_instance_df(df, old_column, new_column, type, instance_no):
         type (string): The type of spending - either 'C' or 'D'
         instance_no (int): The instance number that these will be
     """
+    df.loc[
+        df["formtype"] == "0006",
+    ]
     df[new_column] = df[old_column]
     df["200"] = type
     df["instance"] = instance_no
