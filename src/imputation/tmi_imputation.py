@@ -266,10 +266,14 @@ def calculate_mean(
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
         f"{target_variable}"
     ].mean()
+
     # Count is the number of items in the trimmed class
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
         trimmed_df[f"{target_variable}"]
     )
+
+    # Count before timming is applied
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count_before_trim"] = len(df)
 
     return dict_mean_growth_ratio
 
@@ -333,10 +337,17 @@ def apply_tmi(df, target_variables, mean_dict):
     for each imputation class"""
 
     df = df.copy()
+
     df["imp_marker"] = "N/A"
 
     for var in target_variables:
         df[f"{var}_imputed"] = df[var]
+
+    for var in target_variables:
+        df[f"{var}_imputed_count"] = np.nan
+
+    for var in target_variables:
+        df[f"{var}_imputed_count_before_trim"] = np.nan
 
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
@@ -349,6 +360,10 @@ def apply_tmi(df, target_variables, mean_dict):
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
+    
+    #create dataframes for further QA ouput
+    qa_df = df.copy()
+    qa_filtered_df = filtered_df.copy()
 
     for var in target_variables:
         for imp_class_key in class_keys:
@@ -369,12 +384,39 @@ def apply_tmi(df, target_variables, mean_dict):
                 imp_class_df[f"{var}_imputed"] = imp_class_df[var]
                 imp_class_df["imp_marker"] = "No mean found"
 
-            # Apply changes to copy_df
+            # Apply changes to filtered_df
             final_df = apply_to_original(imp_class_df, filtered_df)
 
-    final_df = apply_to_original(final_df, df)
+            # repeat for count
+            if f"{var}_{imp_class_key}_count" in mean_dict[var].keys():
+                # Replace nulls with counts
+                imp_class_df[f"{var}_imputed_count"] = float(
+                    mean_dict[var][f"{var}_{imp_class_key}_count"]
+                )
 
-    return final_df
+            else:
+                imp_class_df[f"{var}_imputed_count"] = "No count found"
+
+            # Apply changes to qa_filtered_df
+            #final_qa = apply_to_original(imp_class_df, qa_filtered_df)
+            
+            # repeat for count before trim
+            if f"{var}_{imp_class_key}_count_before_trim" in mean_dict[var].keys():
+                # Replace nulls with counts
+                imp_class_df[f"{var}_imputed_count_before_trim"] = float(
+                    mean_dict[var][f"{var}_{imp_class_key}_count_before_trim"]
+                )
+
+            else:
+                imp_class_df[f"{var}_imputed_count_before_trim"] = "No count before trim found"
+
+            # Apply changes to qa_filtered_df
+            final_qa = apply_to_original(imp_class_df, qa_filtered_df)
+
+    final_df = apply_to_original(final_df, df)
+    further_qa = apply_to_original(final_qa, qa_df)
+
+    return final_df, further_qa
 
 
 def run_tmi(full_df, target_variables, sic_mapper):
@@ -395,9 +437,9 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = apply_tmi(df, target_variables, mean_dict)
+    final_df, further_qa = apply_tmi(df, target_variables, mean_dict)
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    return final_df, qa_df
+    return final_df, qa_df, further_qa
