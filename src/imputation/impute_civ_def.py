@@ -22,7 +22,11 @@ def calc_cd_proportions(df: pd.DataFrame): # -> Tuple[float, float]:
 def create_civdef_dict(
     df: pd.DataFrame
 ) -> Tuple[Dict[str, float], pd.DataFrame]:
-    """Create dictionary with values to use for civil and defence imputation.
+    """Create dictionaries with values to use for civil and defence imputation.
+
+    Two dictionaries are created, one for imputation classes based on both
+    product group and SIC, and the second for imputation classes based
+    on product group only.
 
     Args:
         df (pd.DataFrame): The dataframe of 'clear' responses for the given 
@@ -32,7 +36,7 @@ def create_civdef_dict(
         Dict[str, Tuple(float, float)]
     """
     # create dictionary to hold civil or defence ratios for each class
-    civdef_dict = {}
+    pgsic_dict = {}
 
     # Filter out imputation classes that are missing either "201" or "rusic"
     # and exclude empty pg_sic classes
@@ -44,11 +48,11 @@ def create_civdef_dict(
 
     # loop through the pg_sic imputation class groups
     for pg_sic_class, class_group_df in pg_sic_grp:
-        civdef_dict[pg_sic_class] = calc_cd_proportions(class_group_df)
+        pgsic_dict[pg_sic_class] = calc_cd_proportions(class_group_df)
 
     # create a second dictionary to hold civil or defence ratios 
     # for the "empty_pgsic_group" cases
-    civdef_empty_group_dict = {}
+    pg_dict = {}
 
     # filter out invalid pg classes and empty pg groups from the original dataframe
     cond2 = ~(df["pg_class"].str.contains("nan")) & (df["empty_pg_group"] == False)
@@ -56,16 +60,15 @@ def create_civdef_dict(
 
     # evaluate which pg classes are needed for empty pg_sic groups
     num_empty = filtered_df2.groupby("pg_class")["empty_pgsic_group"].transform(sum)
-
     filtered_df2 = filtered_df2.loc[num_empty > 0]
 
     # Group by the pg-only imputation class the loop through the groups
     pg_grp = filtered_df2.loc[filtered_df2["instance"] != 0].groupby("pg_class")
 
     for pg_class, class_group_df in pg_grp:
-        civdef_empty_group_dict[pg_class] = calc_cd_proportions(class_group_df)
+        pg_dict[pg_class] = calc_cd_proportions(class_group_df)
 
-    return civdef_dict, civdef_empty_group_dict
+    return pgsic_dict, pg_dict
 
 
 def calc_empty_group(
@@ -132,6 +135,11 @@ def apply_civdev_imputation(
     Values in column 200 (R&D type) are imputed with either "C" for civl or
     "D" for defence, based on ratios in the same imputation class in 
     clear responders.
+
+    This is done in three passes for successively smaller imputation classes:
+    - The first class consists of all clear responders
+    - The second set of imputation classes are based on product group only
+    - The final set of imputation classes are bassed on product group and SIC
     
     Args:
         df (pd.DataFrame): The dataframe of all responses
@@ -141,7 +149,7 @@ def apply_civdev_imputation(
     Returns:
         pd.DataFrame: An updated dataframe with new col "200_imputed".
     '"""
-    df["200_imputed"] = "N/A"
+    df["200_imputed"] = df["200"]
     df["200_imp_marker"] = "N/A"
 
     # Create logic conditions for filtering
@@ -151,8 +159,7 @@ def apply_civdev_imputation(
         & df["instance"] != 0
     )
 
-
-    # find civil and defence proportions for the whole clear dataframe
+    # PASS 1: find civil and defence proportions for the whole clear dataframe
     clear_df = df.loc[clear_status_cond].copy()
     proportions = calc_cd_proportions(clear_df)
 
@@ -161,7 +168,8 @@ def apply_civdev_imputation(
     to_impute_df = random_assign_civdef(to_impute_df, proportions)
     to_impute_df["200_imp_marker"] = "fall_back_imputed"
 
-    # next refine the civil and defence based on product group imputation class
+    # PASS 2: refine based on product group imputation class
+
     # filter out empty and invalid imputation classes
     cond1 = to_impute_df["empty_pg_group"] == False
     cond2 = ~to_impute_df["pg_class"].str.contains("nan")
@@ -178,14 +186,13 @@ def apply_civdev_imputation(
                 pg_dict[pg_class]
             )
             class_group_df["200_imp_marker"] = "pg_group_imputed"
-        else:
-            class_group_df["200_imp_marker"] = "no pg value available"
 
         tmi.apply_to_original(class_group_df, filtered_df)
 
     tmi.apply_to_original(filtered_df, to_impute_df)
 
-    # first impute the pg_sic 
+    # PASS 3: refine again based on product group and SIC imputation class
+
     # filter out empty and invalid imputation classes
     cond3 = to_impute_df["empty_pgsic_group"] == False
     cond4 = ~to_impute_df["pg_sic_class"].str.contains("nan")
@@ -201,15 +208,15 @@ def apply_civdev_imputation(
                 class_group_df, 
                 pgsic_dict[pg_sic_class]
             )
-            class_group_df["200_imp_marker"] = "pg_sic group imputed"
-        else:
-            #TODO could put empty_group flag in here
-            class_group_df["200_imp_marker"] = "no pgsic value available"
+            class_group_df["200_imp_marker"] = "pg_sic_group_imputed"
 
         tmi.apply_to_original(class_group_df, filtered_df2)
     tmi.apply_to_original(filtered_df2, to_impute_df)
 
     updated_df = tmi.apply_to_original(to_impute_df, df)
+    updated_df["200"] = updated_df["200_imputed"]
+
+    updated_df = updated_df.drop(["200_imputed", "pg_class"], axis=1)
     return updated_df
 
 
@@ -226,10 +233,8 @@ def impute_civil_defence(df: pd.DataFrame) -> pd.DataFrame:
 
     df = prep_cd_imp_classes(df)
 
-    # Filter for clear statuses
-    clear_df = tmi.filter_by_column_content(df, "statusencoded", ["210", "211"])
-
     # create a dict mapping each class to either 'C' (civil) or 'D'(defence)
+    clear_df = df[df["statusencoded"].isin(["210", "211"])].copy()
     pgsic_dict, pg_dict = create_civdef_dict(clear_df)
 
     df = apply_civdev_imputation(df, pgsic_dict, pg_dict)
