@@ -4,6 +4,19 @@ from src.outputs.short_form_out import create_headcount_cols
 
 
 def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
+    """Implement short form to long form conversion
+    
+    Args:
+        df (pd.DataFrame): The survey dataframe being prepared for
+            short form output.
+        fte_civil (str): Column containing percentage of civil.
+        fte_defence (str): Column containing percentage of defence.
+        hc_total (str): Column containing total headcount value.
+
+    Returns:
+        pd.DataFrame: The dataframe with additional instances for civil and
+            defence short form responses, in long form format.    
+    """
 
     df = create_headcount_cols(df, fte_civil, fte_defence, hc_total)
 

@@ -27,15 +27,18 @@ def create_headcount_cols(
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
-    Column '705' contains the total headcount value, and
+    The column represented by hc_total contains the total headcount value, and
     from this the headcount values for civil and defence are calculated
-    based on the percentages of civil and defence in columns '706' (civil)
-    and '707' (defence). Note that columns '706' and '707' measure different
-    things to '705' so will not in general total to the '705' value.
+    based on the percentages of civil and defence in fte_civil (civil)
+    fte_defence (defence). Note that fte_civil and fte_defence measure different
+    things to hc_total so will not in general total to the hc_total value.
 
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
+        fte_civil (str): Column containing percentage of civil.
+        fte_defence (str): Column containing percentage of defence.
+        hc_total (str): Column containing total headcount value.
         round_val (int): The number of decimal places for rounding.
 
     Returns:
