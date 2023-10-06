@@ -4,7 +4,7 @@ from src.outputs.short_form_out import create_headcount_cols
 
 
 def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
-    """Implement short form to long form conversion
+    """Implement short form to long form conversion.
     
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
