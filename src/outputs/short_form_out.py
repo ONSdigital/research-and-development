@@ -23,11 +23,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_headcount_cols(
-    df: pd.DataFrame,
-    fte_civil,
-    fte_defence,
-    hc_total,
-    round_val = 4
+    df: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
@@ -95,7 +91,9 @@ def run_shortform_prep(
     df = create_period_year(df)
 
     # create columns for headcounts for civil and defense
-    df = create_headcount_cols(df, round_val)
+    df = create_headcount_cols(
+        df, "706_estimated", "707_estimated", "705_estimated", round_val
+    )
 
     return df
 
