@@ -33,6 +33,9 @@ def create_headcount_cols(
     fte_defence (defence). Note that fte_civil and fte_defence measure different
     things to hc_total so will not in general total to the hc_total value.
 
+    fte_civil will usually be 706, fte_defence will usually be 707, and 
+    hc_total will usually be 705.
+
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
