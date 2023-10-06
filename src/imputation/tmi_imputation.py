@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple
@@ -7,6 +8,8 @@ from src.imputation.impute_civ_def import impute_civil_defence
 
 formtype_long  = "0001"
 formtype_short = "0006"
+
+TMILogger = logging.getLogger(__name__)
 
 def apply_to_original(filtered_df, original_df):
     """Overwrite a dataframe with updated row values."""
@@ -403,9 +406,9 @@ def apply_tmi(df, target_variables, mean_dict):
                 imp_class_df["imp_marker"] = "No mean found"
 
             # Apply changes to copy_df
-            apply_to_original(imp_class_df, filtered_df)
+            final_df = apply_to_original(imp_class_df, filtered_df)
 
-    final_df = apply_to_original(filtered_df, df)
+    final_df = apply_to_original(final_df, df)
 
     return final_df
 
@@ -413,6 +416,7 @@ def apply_tmi(df, target_variables, mean_dict):
 def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
+    TMILogger.info("Starting TMI imputation.")
     copy_df = full_df.copy()
 
     # Filter for long form data
@@ -425,8 +429,10 @@ def run_tmi(full_df, target_variables, sic_mapper):
     # TMI Step 1: impute the Product Group
     df = impute_pg_by_sic(long_df, sic_mapper)
 
-    df = impute_civil_defence(df, target_variables)
+    TMILogger.info("Imputing for R&D type (civil or defence).")
+    df = impute_civil_defence(df)
 
+    TMILogger.info("Calculating the trimmed mean for target variables")
     df = tmi_pre_processing(df, target_variables)
 
     mean_dict, qa_df = create_mean_dict(df, target_variables)
@@ -440,4 +446,5 @@ def run_tmi(full_df, target_variables, sic_mapper):
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
+    TMILogger.info("TMI imputation completed.")
     return final_df, qa_df
