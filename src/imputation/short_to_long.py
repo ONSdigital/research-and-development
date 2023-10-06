@@ -9,8 +9,8 @@ def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
-        fte_civil (str): Column containing percentage of civil.
-        fte_defence (str): Column containing percentage of defence.
+        fte_civil (str): Column containing percentage of civil employees.
+        fte_defence (str): Column containing percentage of defence employees.
         hc_total (str): Column containing total headcount value.
 
     Returns:

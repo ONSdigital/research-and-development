@@ -36,8 +36,8 @@ def create_headcount_cols(
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
-        fte_civil (str): Column containing percentage of civil.
-        fte_defence (str): Column containing percentage of defence.
+        fte_civil (str): Column containing percentage of civil employees.
+        fte_defence (str): Column containing percentage of defence employees.
         hc_total (str): Column containing total headcount value.
         round_val (int): The number of decimal places for rounding.
 
