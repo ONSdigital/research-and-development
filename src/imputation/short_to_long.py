@@ -1,4 +1,23 @@
 import pandas as pd
+import numpy as np
+
+from src.outputs.short_form_out import create_headcount_cols
+
+def run_short_to_long(df):
+    df = create_headcount_cols(df)
+
+    convert_short_to_long = [('701', '702', '211'),
+                            ("703", "704", "305"),
+                            ("706", "707", "Employment total"),
+                            ("headcount_civil", "headcount_defence", "headcount_total")]
+    civil_df = df.loc[df["formtype"] == "0006",].copy()
+    defence_df = civil_df.copy()
+
+    for each in convert_short_to_long:
+        # This needs updating to work with civil_df and defence_df
+        # df = short_to_long(df, *each)
+    df = df.drop(['headcount_civil', 'headcount_defence'], axis=1)
+    return df
 
 
 def short_to_long(df, civil_column, defence_column, new_column):
