@@ -24,7 +24,10 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 def create_headcount_cols(
     df: pd.DataFrame,
-    round_val: int = 4,
+    fte_civil,
+    fte_defence,
+    hc_total,
+    round_val = 4
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
@@ -45,14 +48,14 @@ def create_headcount_cols(
     """
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["706"] / (df["706"] + df["707"]),
+        df[fte_civil] + df[fte_defence] != 0,  # noqa
+        df[hc_total] * df[fte_civil] / (df[fte_civil] + df[fte_defence]),
         0,
     )
 
     df["headcount_defence"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["707"] / (df["706"] + df["707"]),
+        df[fte_civil] + df[fte_defence] != 0,  # noqa
+        df[hc_total] * df[fte_defence] / (df[fte_civil] + df[fte_defence]),
         0,
     )
 

@@ -6,7 +6,7 @@ from datetime import datetime
 
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
-from src.imputation.short_to_long import short_to_long, run_short_to_long
+from src.imputation.short_to_long import run_short_to_long
 from src.outputs.short_form_out import create_headcount_cols
 
 ImputationMainLogger = logging.getLogger(__name__)
