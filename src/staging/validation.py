@@ -477,7 +477,7 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
         df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
 
         # check any unexpected contents
-        if (df["contents_check"] is False).any():
+        if not df["contents_check"].all():
             raise ValueError("Unexpected format within 'ultfoc' column contents")
 
         df.drop(columns=["contents_check"], inplace=True)
