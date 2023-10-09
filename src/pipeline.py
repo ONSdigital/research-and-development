@@ -46,6 +46,9 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
 
+        # from src.utils.local_file_mods import local_file_exists as file_exists
+        from src.utils.local_file_mods import local_write_feather as write_feather
+        from src.utils.local_file_mods import local_read_feather as read_feather
     elif network_or_hdfs == "hdfs":
 
         from src.utils.hdfs_mods import hdfs_load_json as load_json
@@ -55,11 +58,12 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
 
+        # from src.utils.hdfs_mods import hdfs_file_exists as file_exists
+        from src.utils.hdfs_mods import hdfs_write_feather as write_feather
+        from src.utils.hdfs_mods import hdfs_read_feather as read_feather
     else:
         MainLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
-
-    MainLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
     # Set up the run logger
     global_config = config["global"]
@@ -89,7 +93,16 @@ def run_pipeline(start, config_path):
         cora_mapper,
         cellno_df,
         postcode_itl_mapper,
-    ) = run_staging(config, check_file_exists, load_json, read_csv, write_csv, run_id)
+    ) = run_staging(
+        config,
+        check_file_exists,
+        load_json,
+        read_csv,
+        write_csv,
+        read_feather,
+        write_feather,
+        run_id,
+    )
     MainLogger.info("Finished Data Ingest...")
 
     # Imputation module
