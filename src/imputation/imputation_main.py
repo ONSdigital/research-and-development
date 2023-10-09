@@ -7,7 +7,6 @@ from datetime import datetime
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
-from src.outputs.short_form_out import create_headcount_cols
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -40,7 +39,8 @@ def run_imputation(
 
     imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
 
-    imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
+    # imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
+    imputed_output_df = imputed_df
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
