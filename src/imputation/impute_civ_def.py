@@ -101,15 +101,20 @@ def calc_empty_group(
 
 
 def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
+    """Create new columns to use for imputation classes,
+
+    Also create boolean columns to flag for when these contain no
+    valid entries that can be used for imputation.
+    """
     # create imputation classes based on product group and rusic
     df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
 
     # flag empty pg_sic_classes in new bool col "empty_pgsic_class"
     df = calc_empty_group(df, "pg_sic_class", "empty_pgsic_group")
 
-    # create a new imputation class called "pg_class" to be used only when
-    # "empty_pgsic_group" is true (ie, no avaible R&D type entries)
-    # this imputation class will include product group (col 201) only.
+    # create a new imputation class called "pg_class" based on product group
+    # (col 201) only, to be used when imputation cannot be performed using 
+    # both prodcut group and SIC.
     df = tmi.create_imp_class_col(df, "201", None, "pg_class")
 
     # flag empty pg_classes in new bool col "empty_pg_class"
@@ -118,7 +123,10 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def random_assign_civdef(df: pd.DataFrame, proportions: Tuple[float, float]) -> pd.DataFrame:
+def random_assign_civdef(
+    df: pd.DataFrame, 
+    proportions: Tuple[float, float]
+) -> pd.DataFrame:
     """Assign "C" for civil or "D" for defence randomly based on
         the proportions supplied.
     """
@@ -149,11 +157,13 @@ def apply_civdev_imputation(
     
     Args:
         df (pd.DataFrame): The dataframe of all responses
-        cd_dict (Dict[str, Tuple(float, float)]): Dictionary with values to 
-            use for imputation.
+        pgsic_dict (Dict[str, Tuple(float, float)]): Dictionary with proportions
+            to use in imputation based on product group and SIC.
+        pg_dict (Dict[str, Tuple(float, float)]): Dictionary with proportions
+            to use in imputation based on product group only.
 
     Returns:
-        pd.DataFrame: An updated dataframe with new col "200_imputed".
+        pd.DataFrame: The same dataframe with R&D type imputed.
     '"""
     df["200_imputed"] = df["200"]
     df["200_imp_marker"] = "N/A"
@@ -230,7 +240,7 @@ def impute_civil_defence(df: pd.DataFrame) -> pd.DataFrame:
     """Impute the R&D type for non-responders and 'No R&D'.
 
     Args:
-        df (pd.DataFrame): SPP dataframe afer PG imputation.
+        df (pd.DataFrame): SPP dataframe afer product group imputation.
 
     Returns:
         pd.DataFrame: The original dataframe with imputed values for 
