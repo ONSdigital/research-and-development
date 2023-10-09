@@ -53,6 +53,7 @@ def run_staging(
     # Conditionally load paths
     paths = config[f"{network_or_hdfs}_paths"]
     snapshot_path = paths["snapshot_path"]
+    snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
 
     # Load historic data
     if config["global"]["load_historic_data"]:
@@ -90,7 +91,7 @@ def run_staging(
 
     # load and parse the snapshot data json file
     # Check if feather file exists in snapshot path
-    feather_path = os.path.dirname(paths["feather_path"])
+    feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
     feather_files = [f for f in os.listdir(feather_path) if f.endswith(".feather")]
     if bool(feather_files) & load_from_feather:
@@ -106,6 +107,16 @@ def run_staging(
         snapdata = load_json(snapshot_path)
 
         contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+
+        StagingMainLogger.info("Writing contributors and responses to feather")
+        write_feather(
+            os.path.join(feather_path, f"{snapshot_name}_contributors.feather"),
+            contributors_df,
+        )
+        write_feather(
+            os.path.join(feather_path, f"{snapshot_name}_responses.feather"),
+            responses_df,
+        )
 
         # the anonymised snapshot data we use in the DevTest environment
         # does not include the instance column. This fix should be removed
@@ -135,12 +146,17 @@ def run_staging(
         )
 
         # Write feather file to snapshot path
-        snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
-        feather_file = os.path.join(feather_path, snapshot_name)
+        feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
         write_feather(feather_file, full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
+        contributors_df = read_feather(
+            os.path.join(feather_path, f"{snapshot_name}_contributors.feather")
+        )
+        responses_df = read_feather(
+            os.path.join(feather_path, f"{snapshot_name}_responses.feather")
+        )
         full_responses = snapdata
 
     # Get response rate
