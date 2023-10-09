@@ -153,7 +153,7 @@ def local_open(filepath, mode):
 
 
 @time_logger_wrap
-def local_write_feather(filepath, df):
+def local_write_feather(filepath: str, df: pd.DataFrame):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
     Args:
@@ -165,7 +165,7 @@ def local_write_feather(filepath, df):
 
 
 @time_logger_wrap
-def local_read_feather(filepath):
+def local_read_feather(filepath: str) -> pd.DataFrame:
     """Reads a feather file from a local network drive into a Pandas DataFrame
 
     Args:

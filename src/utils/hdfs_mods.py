@@ -160,7 +160,7 @@ def hdfs_open(filepath, mode):
 
 
 @time_logger_wrap
-def hdfs_write_feather(filepath, df):
+def hdfs_write_feather(filepath: str, df: pd.DataFrame):
     """Function to write dataframe as feather file in HDFS"""
     with hdfs.open(filepath, "wb") as file:
         df.to_feather(file)
@@ -171,7 +171,7 @@ def hdfs_write_feather(filepath, df):
 
 
 @time_logger_wrap
-def hdfs_read_feather(filepath):
+def hdfs_read_feather(filepath: str) -> pd.DataFrame:
     """Function to read feather file from HDFS"""
     with hdfs.open(filepath, "rb") as file:
         df = pd.read_feather(file)
