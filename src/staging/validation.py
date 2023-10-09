@@ -11,6 +11,7 @@ from src.utils.wrappers import time_logger_wrap, exception_wrap
 validation_logger = logging.getLogger(__name__)
 
 
+@time_logger_wrap
 def validate_postcode_pattern(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the postcodes_uk package
     to verify the pattern of a postcode by using regex.
@@ -81,7 +82,8 @@ def validate_post_col(
         f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
     )
     validation_logger.warning(
-        f"Number of invalid pattern postcodes found: {len(invalid_pattern_postcodes.to_list())}"
+        f"""Number of invalid pattern postcodes found:
+        {len(invalid_pattern_postcodes.to_list())}"""
     )
 
     # Remove the invalid pattern postcodes before checking if they are real
@@ -345,6 +347,7 @@ def check_data_shape(
     return cols_match
 
 
+@time_logger_wrap
 def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     """Takes the schema from the toml file and validates the survey data df.
 
@@ -389,6 +392,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
             validation_logger.error(e)
 
 
+@time_logger_wrap
 @exception_wrap
 def combine_schemas_validate_full_df(
     survey_df: pd.DataFrame, contributor_schema: "str", wide_response_schema: "str"
@@ -442,6 +446,7 @@ def combine_schemas_validate_full_df(
         validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
 
 
+@time_logger_wrap
 @exception_wrap
 def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -472,7 +477,7 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
         df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
 
         # check any unexpected contents
-        if (df["contents_check"] == False).any():
+        if (df["contents_check"] is False).any():
             raise ValueError("Unexpected format within 'ultfoc' column contents")
 
         df.drop(columns=["contents_check"], inplace=True)
