@@ -9,7 +9,12 @@ from src.imputation import tmi_imputation as tmi
 
 
 def calc_cd_proportions(df: pd.DataFrame): # -> Tuple[float, float]:
-    """Calc the proportion of civil and defence entries in a df"""
+    """Calc the proportion of civil and defence entries
+    
+    The proportions are calculated for a dataframe representing a
+    single imputation class, which contains at least one non-null
+    entry for column 200, so division by zero will be avoided.
+    """
     num_civ = len(df.loc[df["200"] == 'C', "200"])
     num_def = len(df.loc[df["200"] == 'D', "200"])
 
@@ -117,6 +122,7 @@ def random_assign_civdef(df: pd.DataFrame, proportions: Tuple[float, float]) -> 
     """Assign "C" for civil or "D" for defence randomly based on
         the proportions supplied.
     """
+    np.random.seed(seed=42)
     df["200_imputed"] = np.random.choice(
         ["C", "D"], 
         size = len(df), 
