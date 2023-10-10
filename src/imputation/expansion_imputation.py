@@ -4,7 +4,7 @@
 import logging
 
 from src.imputation.tmi_imputation import filter_by_column_content
-from src.utils.wrappers import df_change_wrap
+from src.utils.wrappers import df_change_func_wrap
 
 ExpansionLogger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def evaluate_imputed_ixx(group, master_col, break_down_cols):
     return group
 
 
-@df_change_wrap
+@df_change_func_wrap
 def only_trimmed_records(df, trim_bool_col):
     """Trims the dataframe to only include records that have True in the
     trim_bool_col column"""
@@ -71,7 +71,7 @@ def run_expansion(df, config):
     # Calculate the imputation values for 2xx questions
     breakdown_qs_2xx = config["2xx_breakdowns"]
     result_df = trim_grouped.apply(
-        evaluate_imputed_ixx, break_down_cols=breakdown_qs_2xx
+        evaluate_imputed_ixx, "211", break_down_cols=breakdown_qs_2xx
     )
 
     # Calculate the imputation values for 3xx questions
