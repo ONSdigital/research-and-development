@@ -46,9 +46,21 @@ def run_estimation(
     # calculate the weights for outliers
     weighted_df = weights.outlier_weights(df)
 
+    # temporary - for debugging
+    import os
+    out_fol = r"D:\data\res_dev\estimation"
+    mypath = os.path.join(out_fol, "weighted_df.csv")
+    weighted_df.to_csv(mypath, index=None)
+    # end of debugging
+
     # apply the weights to the dataframe and apply the specified rounding
     estimated_df = appweights.apply_weights(weighted_df, 4)
-
+    
+    # temporary - for debugging
+    mypath = os.path.join(out_fol, "estimated_df.csv")
+    estimated_df.to_csv(mypath, index=None)
+    # end of debugging
+    
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")
         tdate = datetime.now().strftime("%Y-%m-%d")
@@ -58,4 +70,4 @@ def run_estimation(
         write_csv(f"{est_path}/estimation_qa/{full_qa_filename}", estimated_df)
     EstMainLogger.info("Finished estimation weights calculation.")
 
-    return estimated_df
+    return estimated_df, weighted_df
