@@ -382,6 +382,7 @@ def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
     copy_df = full_df.copy().loc[full_df["formtype"] == "0001", :]
+    filtered_out_df = full_df.copy().loc[full_df["formtype"] != "0001", :]
 
     copy_df = instance_fix(copy_df)
     copy_df = duplicate_rows(copy_df)
@@ -396,9 +397,13 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = apply_tmi(df, target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
 
-    final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    df = pd.concat([final_tmi_df, filtered_out_df])
+
+    final_df = df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(drop=True)
 
     return final_df, qa_df

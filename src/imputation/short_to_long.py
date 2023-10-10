@@ -32,6 +32,8 @@ def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
     ].copy()
     defence_df = civil_df.copy()
 
+    df.loc[:, "instance"] = 0
+
     civil_df.loc[:, "200"] = "C"
     civil_df.loc[:, "instance"] = 1
 
@@ -42,7 +44,9 @@ def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
         civil_df[each[2]] = civil_df[each[0]]
         defence_df[each[2]] = defence_df[each[1]]
 
-    df = pd.concat([df, civil_df, defence_df], ignore_index=True)
+    df = pd.concat([df, civil_df, defence_df])
+
+    df = df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(drop=True)
 
     df = df.drop(["headcount_civil", "headcount_defence"], axis=1)
 

@@ -39,9 +39,6 @@ def run_imputation(
 
     imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
 
-    # imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
-    imputed_output_df = imputed_df
-
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
@@ -51,7 +48,7 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
-        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_output_df)
+        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     return imputed_df
