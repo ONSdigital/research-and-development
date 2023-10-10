@@ -4,17 +4,48 @@
 import logging
 
 from src.imputation.tmi_imputation import filter_by_column_content
+from src.utils.wrappers import df_change_wrap
 
 ExpansionLogger = logging.getLogger(__name__)
 
 
-def evaluate_imputed_2xx(group, cols_to_sum):
+def evaluate_imputed_2xx(group, break_down_q):
     """Evaluate the imputed 2xx as the sum of all 2xx over the sum of all 211
     multiplied by the imputed 211."""
-    sum_211 = group.loc["211"].sum(axis=1)  # scalar
-    sum_2xx = group.loc[:, cols_to_sum].sum(axis=1)  # scalar
+    sum_211 = group["211"].sum()  # scalar
+    sum_2xx = group[str(break_down_q)].sum()  # scalar
 
-    return (sum_2xx / sum_211) * group["211_imputed"]
+    imputed = (sum_2xx / sum_211) * group["211_imputed"]
+
+    group[f"imputed_{break_down_q}"] = imputed
+
+    return group
+
+
+def evaluate_imputed_ixx(group, master_col, break_down_cols):
+    """Evaluate the imputed 2xx as the sum of all 2xx over the sum of all 211
+    multiplied by the imputed 211."""
+
+    # Make cols into str just in case coming through as ints
+    bd_cols = [str(col) for col in break_down_cols]
+
+    # Make imputed column names
+    imp_cols = [f"{col}_imputed" for col in bd_cols]
+
+    sum_211 = group[master_col].sum()  # scalar
+
+    for imp_col, bd_col in zip(imp_cols, bd_cols):
+        group[imp_col] = (group[bd_col].sum() / sum_211) * group["211_imputed"]
+
+    return group
+
+
+@df_change_wrap
+def only_trimmed_records(df, trim_bool_col):
+    """Trims the dataframe to only include records that have True in the
+    trim_bool_col column"""
+
+    return df.loc[df[trim_bool_col]]
 
 
 def run_expansion(df, config):
@@ -29,16 +60,24 @@ def run_expansion(df, config):
     clear_resp_df["211_trim"].fillna(False, inplace=True)
 
     # Filter to exclude the same rows trimmed for 211_trim == True
-    trimmed_df = clear_resp_df.loc[clear_resp_df["211_trim"]]
+    trimmed_df = only_trimmed_records(clear_resp_df, "211_trim")
 
-    # Get all the 2xx cols, minus 211, imputed vals and trim marker
-    breakdown_qs = config["2xx_breakdowns"]
+    # Trimmed groups
+    trim_grouped = trimmed_df.groupby("imp_class")
 
-    # Evaluate imputed 2xx
-    for breakdown_q in breakdown_qs:
+    # result_df = (trim_grouped.transform(
+    # lambda group: evaluate_imputed_2xx_2(group, breakdown_qs)))
 
-        trimmed_df[f"imputed_{breakdown_q}"] = trimmed_df.groupby("imp_class").apply(
-            (lambda x: evaluate_imputed_2xx(breakdown_q)).reset_index(drop=True)
-        )
+    # Calculate the imputation values for 2xx questions
+    breakdown_qs_2xx = config["2xx_breakdowns"]
+    result_df = trim_grouped.apply(
+        evaluate_imputed_ixx, break_down_cols=breakdown_qs_2xx
+    )
 
-    print(trimmed_df)
+    # Calculate the imputation values for 3xx questions
+    breakdown_qs_3xx = config["3xx_breakdowns"]
+    result_df = trim_grouped.apply(
+        evaluate_imputed_ixx, "305", break_down_cols=breakdown_qs_3xx
+    )
+
+    print(result_df)
