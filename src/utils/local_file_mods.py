@@ -5,8 +5,8 @@ import os
 import pandas as pd
 import logging
 from typing import List
-
-from src.utils.wrappers import time_logger_wrap
+import hashlib
+import shutil
 
 
 # Set up logger
@@ -152,8 +152,7 @@ def local_open(filepath, mode):
     return file
 
 
-@time_logger_wrap
-def local_write_feather(filepath: str, df: pd.DataFrame):
+def local_file_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
     Args:
@@ -164,15 +163,141 @@ def local_write_feather(filepath: str, df: pd.DataFrame):
     return True
 
 
-@time_logger_wrap
-def local_read_feather(filepath):
-    """Reads a feather file from a local network drive into a Pandas DataFrame
+def local_delete_file(path: str):
+    """
+    Delete a file on the local file system.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    try:
+        os.remove(path)
+        return True
+    except OSError:
+        return False
+
+
+def local_md5sum(path: str):
+    """
+    Get md5sum of a specific file on the local file system.
+
+    Returns
+    -------
+    The md5sum of the file.
+    """
+    with open(path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
+def local_stat_size(path: str):
+    """
+    Get the size of a file or directory in bytes on the local file system.
+
+    Returns
+    -------
+    The size of the file or directory in bytes.
+    """
+    return os.stat(path).st_size
+
+
+def local_isdir(path: str) -> bool:
+    """
+    Test if directory exists on the local file system.
+
+    Returns
+    -------
+    True if the directory exists. Else False.
+    """
+    return os.path.isdir(path)
+
+
+def local_isfile(path: str) -> bool:
+    """
+    Test if file exists on the local file system.
+
+    Returns
+    -------
+    True if the file exists. Else False.
+    """
+    return os.path.isfile(path)
+
+
+def local_read_header(path: str):
+    """
+    Reads the first line of a file on the local file system.
+
+    Returns
+    -------
+    The first line of the file as a string.
+    """
+    with open(path, "r") as f:
+        return f.readline()
+
+
+def local_write_string_to_file(content: bytes, path: str):
+    """
+    Writes a string into the specified file path on the local file system.
+
+    Returns
+    -------
+    None
+    """
+    with open(path, "wb") as f:
+        f.write(content)
+
+
+def local_copy_file(src_path: str, dst_path: str):
+    """
+    Copies a file from src_path to dst_path on the local file system.
+
+    Returns: None
+    """
+    shutil.copy(src_path, dst_path)
+
+
+def local_move_file(src_path: str, dst_path: str):
+    """Moves a file from src_path to dst_path on the local file system.
+
+    Returns: None
+    """
+    shutil.move(src_path, dst_path)
+
+
+def local_list_files(path: str, ext: str = None):
+    """
+    Lists all files in a directory on the local file system.
+
+    Returns
+    -------
+    A list of files in the directory.
+    """
+    files_in_dir = os.listdir(path)
+
+    if ext:
+        files_in_dir = [
+            file for file in files_in_dir if os.path.splitext(file)[1] == ext
+        ]
+
+    return files_in_dir
+
+
+def local_search_file(dir_path, ending):
+    """Search for a file with a particular suffix in a directory on the local
+        file system.
 
     Args:
-        filepath (str): Filepath
+        path (_type_): _description_
+        ending (_type_): _description_
 
     Returns:
-        pd.DataFrame: Dataframe created from feather file
+        str: The path of the target file
     """
-    df = pd.read_feather(filepath)
-    return df
+    for _, __, files in os.walk(dir_path):
+        for file in files:
+
+            # Check for ending
+            if file.endswith(ending):
+                target_file = str(file)
+
+    return target_file
