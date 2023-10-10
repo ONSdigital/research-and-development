@@ -15,7 +15,7 @@ old_name = "wowenterprisereference"
 Deduced_Data_Type = "Int64"
 
 [selgrpno]
-old_name = "201"
+old_name = "201_numeric"
 Deduced_Data_Type = "str"
 
 [sic07]
@@ -34,88 +34,26 @@ Deduced_Data_Type = "Int64"
 old_name = "frozenturnover"
 Deduced_Data_Type = "Int64"
 
+[f_owner]
+old_name = "ultfoc"
+Deduced_Data_Type = "str"
 
-# [f_owner]
-# old_name = "ultfoc"
-# Deduced_Data_Type = "str"
-#
-[form_status]
-old_name = "form_status"
-Deduced_Data_Type = "category"
+[sizebd]
+old_name = "sizeband"
+Deduced_Data_Type = "Int64"
 
-[ua_county]
+[rec_mkr]
+old_name = "statusencoded"
+Deduced_Data_Type = "Int64"
+
+[reg_code]
 old_name = "itl"
 Deduced_Data_Type = "str"
 
-[employee_count]
-old_name = "employment"
-Deduced_Data_Type = "Int64"
-
-[current_sic]
-old_name = "rusic"
-Deduced_Data_Type = "Int64"
-
-
-[product_group]
-old_name = "201"
-Deduced_Data_Type = "str"
-
-[sizeband]
-old_name = "sizeband"
+[percent]
+old_name = "602"
 Deduced_Data_Type = "float64"
 
-[q604]
-old_name = "604"
-Deduced_Data_Type = "str"
-
-[q605]
-old_name = "605"
-Deduced_Data_Type = "str"
-
-[q701]
-old_name = "701_estimated"
-Deduced_Data_Type = "float64"
-
-[q702]
-old_name = "702_estimated"
-Deduced_Data_Type = "float64"
-
-[q703]
-old_name = "703_estimated"
-Deduced_Data_Type = "float64"
-
-[q704]
-old_name = "704_estimated"
-Deduced_Data_Type = "float64"
-
-[q705]
-old_name = "705_estimated"
-Deduced_Data_Type = "float64"
-
-[q706]
-old_name = "706_estimated"
-Deduced_Data_Type = "float64"
-
-[q707]
-old_name = "707_estimated"
-Deduced_Data_Type = "float64"
-
-[headcount_civil]
-old_name = "headcount_civil"
-Deduced_Data_Type = "float64"
-
-[headcount_defence]
-old_name = "headcount_defence"
-Deduced_Data_Type = "float64"
-
-[post_code]
-old_name = "601"
-Deduced_Data_Type = "str"
-
-[q713]
-old_name = "713"
-Deduced_Data_Type = "str"
-
-[q714]
-old_name = "714"
+[c_or_d]
+old_name = "200"
 Deduced_Data_Type = "str"

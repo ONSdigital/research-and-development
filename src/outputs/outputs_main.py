@@ -9,6 +9,7 @@ import src.outputs.short_form_out as short
 import src.outputs.map_output_cols as map_o
 
 from src.outputs.short_form import run_short_form
+from src.outputs.tau import run_tau
 
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -58,16 +59,15 @@ def run_outputs(
         OutputMainLogger.info("Finished short form output.")
 
     # Running TAU output
-    if config["global"]["output_short_form"]:
+    if config["global"]["output_tau"]:
         OutputMainLogger.info("Starting TAU output...")
-        # run_short_form(
-        #     estimated_df,
-        #     config,
-        #     write_csv,
-        #     run_id,
-        #     ultfoc_mapper,
-        #     cora_mapper,
-        #     postcode_itl_mapper,
-        # )
-        OutputMainLogger.info(f"Weighted responses loaded, size {weighted_df.size}.")
-        OutputMainLogger.info("Finished TAUoutput.")
+        run_tau(
+            weighted_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_itl_mapper,
+        )
+        OutputMainLogger.info("Finished TAU output.")

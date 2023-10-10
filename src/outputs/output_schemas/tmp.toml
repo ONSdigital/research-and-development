@@ -1,16 +1,4 @@
 
-# [f_owner]
-# old_name = "ultfoc"
-# Deduced_Data_Type = "str"
-#
-[form_status]
-old_name = "form_status"
-Deduced_Data_Type = "category"
-
-[ua_county]
-old_name = "itl"
-Deduced_Data_Type = "str"
-
 [employee_count]
 old_name = "employment"
 Deduced_Data_Type = "Int64"
