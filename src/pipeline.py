@@ -12,7 +12,7 @@ from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
-from src.outputs.outputs_main import run_short_output
+from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
 
@@ -126,18 +126,8 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Outputs...")
     
     # Run short frozen form output
-    run_short_output(
+    run_outputs(
         estimated_responses,
-        config,
-        write_csv,
-        run_id,
-        ultfoc_mapper,
-        cora_mapper,
-        postcode_itl_mapper,
-    )
-
-    # Run outputs for Tau Argus
-    run_tau_output(
         weighted_responses,
         config,
         write_csv,
@@ -146,6 +136,7 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_itl_mapper,
     )
+
     
     MainLogger.info("Finished All Output modules.")
 
