@@ -133,7 +133,7 @@ def exception_wrap(func):
     return wrapper
 
 
-def df_change_wrap(func):
+def df_change_class_wrap(func):
     """This wrapper logs the change in a dataframe's columns
     and rows. It can only wrap around the main method of a class.
     The class must have attribute self.vf_df which is the current state of
