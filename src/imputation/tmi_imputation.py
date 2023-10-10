@@ -1,12 +1,24 @@
 import pandas as pd
 import numpy as np
+from typing import Tuple
 from src.staging.pg_conversion import sic_to_pg_mapper
 
-formtype_long  = "0001"
+formtype_long = "0001"
 formtype_short = "0006"
 
-def apply_to_original(filtered_df, original_df):
-    """Overwrites a dataframe with updated row values"""
+
+def apply_to_original(filtered_df: pd.DataFrame, original_df) -> pd.DataFrame:
+    """Overwrites a dataframe with updated row values
+
+    Args:
+        filtered_df (pd.DataFrame): dataframe with
+        desired updates
+        original_df (pd.DataFrame): main dataframe
+
+    Returns:
+        original_df: original_df with updates from
+        filtered_df
+    """
     original_df.update(filtered_df)
     return original_df
 
@@ -14,15 +26,30 @@ def apply_to_original(filtered_df, original_df):
 def filter_by_column_content(
     df: pd.DataFrame, column: str, column_content: list
 ) -> pd.DataFrame:
-    """Function to filter dataframe column by content."""
+    """Function to filter dataframe column by content.
+
+    Args:
+        df (pd.DataFrame): dataframe to filter
+        column (str): column ehader
+        column_content (list): list to filter by
+
+    Returns:
+        pd.DataFrame: filtered dataframe
+    """
     return df[df[column].isin(column_content)].copy()
 
 
-def instance_fix(df: pd.DataFrame):
-    """Set instance to 1 for status 'Form sent out.'
+def instance_fix(df: pd.DataFrame) -> pd.DataFrame:
+    """Sets instance to 1 for status 'Form sent out.'
 
-    References with status 'Form sent out' initially have a null in the instance
-    column.
+    References with status 'Form sent out' initially have a null in the
+    instance column.
+
+    Args:
+        df (pd.DataFrame): original data
+
+    Returns:
+        pd.DataFrame: data with instance col added
     """
     filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
     filtered_df["instance"] = 1
@@ -30,8 +57,16 @@ def instance_fix(df: pd.DataFrame):
     return updated_df
 
 
-def duplicate_rows(df: pd.DataFrame):
-    """Create a duplicate of references with no R&D and set instance to 1."""
+def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a duplicate of references with no R&D and set instance to 1.
+
+    Args:
+        df (pd.DataFrame): main dataframe
+
+    Returns:
+        pd.DataFrame: dataframe extra row with instance column set to 1
+        where col 604 is "No"
+    """
     filtered_df = filter_by_column_content(df, "604", ["No"])
     filtered_df["instance"] = 1
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
@@ -41,7 +76,7 @@ def duplicate_rows(df: pd.DataFrame):
     return updated_df
 
 
-def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
+def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"
     using the SIC number ('rusic').
@@ -101,13 +136,13 @@ def create_imp_class_col(
     df = df.copy()
 
     # Create class col with concatenation
-    df[f"{class_name}"] = (
-        df[f"{col_first_half}"].astype(str) + "_" + df[f"{col_second_half}"].astype(str)
+    df[class_name] = (
+        df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
     )
 
     fil_df = filter_by_column_content(df, "cellnumber", [817])
     # Create class col with concatenation + 817
-    fil_df[f"{class_name}"] = fil_df[f"{class_name}"] + "_817"
+    fil_df[class_name] = fil_df[class_name] + "_817"
 
     df = apply_to_original(fil_df, df)
 
@@ -119,16 +154,30 @@ def fill_zeros(df: pd.DataFrame, column: str):
     return df[column].fillna(0).astype("float")
 
 
-def apply_fill_zeros(filtered_df, df, target_variables: list):
-    """Applies the fill zeros function to filtered dataframes."""
+def apply_fill_zeros(
+    filtered_df: pd.DataFrame, df: pd.DataFrame, target_variables: list
+) -> pd.DataFrame:
+    """Applies the fill zeros function to filtered dataframes.
+
+    Args:
+        filtered_df (pd.DataFrame): filtered data
+        df (pd.DataFrame): main data
+        target_variables (list): key variables
+
+    Returns:
+        pd.DataFrame: for each target variable and 305 the
+        nans are filled with zero where
+        instance != zero and 604 == "No"
+    """
+
     # only fill zeros where intance is not zero
     filtered_df = filtered_df.loc[filtered_df["instance"] != 0]
+
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
     df = apply_to_original(filtered_df, df)
 
     # Replace Nan with zero for companies with NO R&D Q604 = "No"
-
     no_rd = filter_by_column_content(df, "604", ["No"])
     no_rd = no_rd.loc[no_rd["instance"] != 0]
     for i in target_variables:
@@ -140,9 +189,17 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
     return df
 
 
-def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
+def tmi_pre_processing(df: pd.DataFrame, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
-    the trimmed mean"""
+    the trimmed mean
+
+    Args:
+        df (pd.DataFrame): main data
+        target_variables_list (list): key variables
+
+    Returns:
+        pd.DataFrame: data with preprocessing complete
+    """
 
     # Filter for long form data
     long_df = filter_by_column_content(df, "formtype", [formtype_long])
@@ -164,7 +221,15 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
 
 
 def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
-    """Sorts a dataframe by the target variable and other variables."""
+    """Sorts a dataframe by the target variable and other variables.
+
+    Args:
+        target_variable (str): name of column of interest
+        df (pd.DataFrame): main data
+
+    Returns:
+        pd.DataFrame: sorted data
+    """
     sort_list = [
         target_variable,
         "employees",
@@ -178,29 +243,6 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
     return sorted_df
 
 
-def apply_trim_check(
-    df: pd.DataFrame,
-    variable: str,
-    check_value=10,
-) -> pd.DataFrame:  # TODO add check_value to a config
-    """Checks if the number of records is above or below
-    the threshold required for trimming.
-    """
-    # tag for those classes with more than check_value (currently 10)
-
-    df = df.copy()
-
-    # Exclude zero values in trim calculations
-    if len(df.loc[df[variable] > 0, variable]) <= check_value:
-        df["trim_check"] = "below_trim_threshold"
-    else:
-        df["trim_check"] = "above_trim_threshold"
-
-    # Default is dont_trim for all entries
-    df[f"{variable}_trim"] = False
-    return df
-
-
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
@@ -208,14 +250,25 @@ def trim_bounds(
     lower_perc: int = 15,  # TODO add percentages to config -
     upper_perc: int = 15,
 ) -> pd.DataFrame:
-    """Applies a marker to specifiy whether a mean calculation is to be trimmed.
+    """Applies a marker to specify whether a mean calculation is to be trimmed.
 
-    If the 'variable' column contains more than 'check_value' non-zero values,
-    the largest and smallest values are flagged for trimming based on the
-    percentages specified.
+    If the 'variable' column contains  non-zero values, the largest and
+    smallest values are flagged for trimming based on the percentages
+    specified.
 
     Args:
         df (pd.DataFrame): Dataframe of the imputation class
+        variable (str): column for which missing data will be imputed
+        check_value (int, optional): rows equal and below are removed
+        Defaults to 10.
+        lower_perc (int, optional): lower percentage to be removed.
+        Defaults to 15.
+        upper_perc (int, optional): upper percentage to be removed.
+        Defaults to 15.
+
+    Returns:
+        pd.DataFrame: main data with outliers identified
+        f"{variable}_trim" col set to True
     """
     df = df.copy()
     # Save the index before the sorting
@@ -226,7 +279,6 @@ def trim_bounds(
     if len(df.loc[df[variable] > 0, variable]) <= check_value:
         df[f"{variable}_trim"] = False
     else:
-        df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
 
         # define the bounds for trimming
@@ -237,9 +289,7 @@ def trim_bounds(
             len(df.loc[df[variable] > 0, variable]) * (upper_perc / 100)
         )
 
-        # create trim tag (distinct from trim_check)
-        # to mark which to trim for mean growth ratio
-        
+        # create trim tag to mark which to trim
         df[f"{variable}_trim"] = True
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
@@ -251,10 +301,21 @@ def trim_bounds(
 def calculate_mean(
     df: pd.DataFrame, unique_item: str, target_variable: str
 ) -> pd.DataFrame:
-    """Calculate the mean and count for each target and imputation class combination
-    Returns a dictionary."""
+    """Calculate the mean and count for each target and imputation
+    class combination
+    Returns a dictionary.
 
-    # remove the "trim" tagged rows
+    Args:
+        df (pd.DataFrame): main data
+        unique_item (str): unique class
+        target_variable (str): each key variable col of interest
+
+    Returns:
+        pd.DataFrame: dictionary with mean, count and count before trimming
+        for each class and target variable combination
+    """
+
+    # remove the True tagged rows for col f"{target_variable}_trim"
     trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", [False])
 
     # convert to floats for mean calculation
@@ -264,25 +325,39 @@ def calculate_mean(
 
     # Add mean and count to dictionary
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
-        f"{target_variable}"
+        target_variable
     ].mean()
 
     # Count is the number of items in the trimmed class
     dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
-        trimmed_df[f"{target_variable}"]
+        trimmed_df[target_variable]
     )
 
-    # Count before timming is applied
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count_before_trim"] = len(df)
+    # Count before trimming is applied
+    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count_before_trim"] = len(
+        df
+    )
 
     return dict_mean_growth_ratio
 
 
-def create_mean_dict(df, target_variable_list):
+def create_mean_dict(
+    df: pd.DataFrame, target_variable_list: list
+) -> Tuple[dict, pd.DataFrame]:
     """Function to apply multiple steps to calculate the means for each target
     variable.
     Returns a dictionary of mean values and counts for each unique class and variable
-    Also returns a QA dataframe containing information on how trimming was applied"""
+    Also returns a QA dataframe containing information on how trimming was applied
+
+    Args:
+        df (pd.DataFrame): main data
+        target_variable_list (list): key variables
+
+    Returns:
+        Tuple[dict, pd.DataFrame]: dictionary containing means and counts
+        and dataframe with details of trimmined data not included in
+        mean calculation.
+    """
     dfs_list = []
 
     # Create an empty dict to store means
@@ -304,14 +379,31 @@ def create_mean_dict(df, target_variable_list):
         for k in class_keys:
             # Get subgroup dataframe
             subgrp = grp.get_group(k)
-            # Sort by target_variable, df['employees'], reference
-            sorted_df = sort_df(var, subgrp)
 
-            # Add trimming threshold marker
-            trimcheck_df = apply_trim_check(sorted_df, var)
+            # Check for NaNs, "nan", Nones, and empty strings
+            if (
+                subgrp[var].isna().any()
+                or subgrp[var].eq("nan").any()
+                or subgrp[var].eq("").any()
+            ):
+                print(
+                    "Warning: NaNs, 'nan', Nones, or "
+                    f"empty strings found in the {var} column."
+                )
+
+            # replace "nan" with actual nan values
+            filter_nans = subgrp.copy()
+            filter_nans[var] = filter_nans[var].replace("nan", np.nan)
+
+            # Filter rows that do not contain NaNs, Nones, blanks
+            # or empty strings in the "var" column
+            filter_nans = filter_nans.dropna(subset=[var])
+
+            # Sort by target_variable, df['employees'], reference
+            sorted_df = sort_df(var, filter_nans)
 
             # Apply trimming marker
-            trimmed_df = trim_bounds(trimcheck_df, var)
+            trimmed_df = trim_bounds(sorted_df, var)
 
             tr_df = trimmed_df.set_index("pre_index")
 
@@ -332,9 +424,22 @@ def create_mean_dict(df, target_variable_list):
     return mean_dict, df
 
 
-def apply_tmi(df, target_variables, mean_dict):
+def apply_tmi(
+    df: pd.DataFrame, target_variables: list, mean_dict: dict
+) -> pd.DataFrame:
     """Function to replace the not clear statuses with the mean value
-    for each imputation class"""
+    for each imputation class
+
+    Args:
+        df (pd.DataFrame): main data
+        target_variables (list): key variables
+        mean_dict (dict): dictionary containing means and counts
+        for each class and variable combination
+
+    Returns:
+        final_qa_df: dataframe with the imputed valued added
+        and counts columns
+    """
 
     df = df.copy()
 
@@ -360,8 +465,8 @@ def apply_tmi(df, target_variables, mean_dict):
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
-    
-    #create dataframes for further QA ouput
+
+    # create dataframes for further QA ouput
     qa_df = df.copy()
     qa_filtered_df = filtered_df.copy()
 
@@ -373,6 +478,7 @@ def apply_tmi(df, target_variables, mean_dict):
 
             imp_class_df = imp_class_df.copy()
 
+            # add mean value
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
                 imp_class_df[f"{var}_imputed"] = float(
@@ -384,9 +490,6 @@ def apply_tmi(df, target_variables, mean_dict):
                 imp_class_df[f"{var}_imputed"] = imp_class_df[var]
                 imp_class_df["imp_marker"] = "No mean found"
 
-            # Apply changes to filtered_df
-            final_df = apply_to_original(imp_class_df, filtered_df)
-
             # repeat for count
             if f"{var}_{imp_class_key}_count" in mean_dict[var].keys():
                 # Replace nulls with counts
@@ -397,9 +500,6 @@ def apply_tmi(df, target_variables, mean_dict):
             else:
                 imp_class_df[f"{var}_imputed_count"] = "No count found"
 
-            # Apply changes to qa_filtered_df
-            #final_qa = apply_to_original(imp_class_df, qa_filtered_df)
-            
             # repeat for count before trim
             if f"{var}_{imp_class_key}_count_before_trim" in mean_dict[var].keys():
                 # Replace nulls with counts
@@ -408,20 +508,34 @@ def apply_tmi(df, target_variables, mean_dict):
                 )
 
             else:
-                imp_class_df[f"{var}_imputed_count_before_trim"] = "No count before trim found"
+                imp_class_df[
+                    f"{var}_imputed_count_before_trim"
+                ] = "No count before trim found"
 
             # Apply changes to qa_filtered_df
             final_qa = apply_to_original(imp_class_df, qa_filtered_df)
 
-    final_df = apply_to_original(final_df, df)
-    further_qa = apply_to_original(final_qa, qa_df)
+    final_qa_df = apply_to_original(final_qa, qa_df)
 
-    return final_df, further_qa
+    return final_qa_df
 
 
-def run_tmi(full_df, target_variables, sic_mapper):
+def run_tmi(
+    full_df: pd.DataFrame, target_variables: list, sic_mapper: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Function to run imputation end to end and returns the final
-    dataframe back to the pipeline"""
+    dataframe back to the pipeline
+
+    Args:
+        full_df (pd.DataFrame): main data
+        target_variables (list): key variables
+        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+
+    Returns:
+        final_df: dataframe with the imputed valued added
+        and counts columns
+        qa_df: qa dataframe
+    """
     copy_df = full_df.copy()
 
     copy_df = instance_fix(copy_df)
@@ -435,11 +549,9 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
-    qa_df = qa_df.drop("trim_check", axis=1)
-
-    final_df, further_qa = apply_tmi(df, target_variables, mean_dict)
+    final_df = apply_tmi(df, target_variables, mean_dict)
 
     final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    return final_df, qa_df, further_qa
+    return final_df, qa_df

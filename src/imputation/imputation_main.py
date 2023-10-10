@@ -34,7 +34,7 @@ def run_imputation(
 
     df = run_apportionment(df)
 
-    imputed_df, qa_df, further_qa = tmi.run_tmi(df, keyvars, mapper)
+    imputed_df, qa_df= tmi.run_tmi(df, keyvars, mapper)
 
     imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
 
@@ -46,10 +46,9 @@ def run_imputation(
         tdate = datetime.now().strftime("%Y-%m-%d")
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
-        further_qa_filename = f"further_tmi_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_output_df)
-        write_csv(f"{imp_path}/imputation_qa/{further_qa_filename}", further_qa)
+
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     return imputed_df
