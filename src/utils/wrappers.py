@@ -219,7 +219,7 @@ def df_change_func_wrap(func):
         result = func(*args, **kwargs)
 
         # Get shape after function
-        after_shape = df_arg.shape
+        after_shape = result.shape
 
         # Extract rows and col
         rows_before = before_shape[0]
@@ -246,8 +246,8 @@ def df_change_func_wrap(func):
             logger.info("There has been no change in the dataframe")
         else:
             logger.info("Changes to the dataframe are as follows")
-            logger.info(f"{rows_diff} rows were {row_change}")
-            logger.info(f"{cols_diff} columns were {col_change}")
+            logger.info(f"{abs(rows_diff)} rows were {row_change}")
+            logger.info(f"{abs(cols_diff)} columns were {col_change}")
 
         return result
 
