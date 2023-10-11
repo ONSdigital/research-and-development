@@ -1,8 +1,11 @@
-"""_summary_
+"""Expansion imputation for the 2xx and 3xx questions.
 """
 
 import logging
 import numpy as np
+import pandas as pd
+
+from typing import List, Union
 
 from src.imputation.tmi_imputation import filter_by_column_content
 from src.utils.wrappers import df_change_func_wrap
@@ -10,9 +13,11 @@ from src.utils.wrappers import df_change_func_wrap
 ExpansionLogger = logging.getLogger(__name__)
 
 
-def evaluate_imputed_ixx(group, master_col, break_down_cols):
+def evaluate_imputed_ixx(group: pd.core.groupby.DataFrameGroupBy,
+                         master_col: str,
+                         break_down_cols: List[Union[str, int]])-> pd.DataFrame:
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
-    over the sum of all 211 multiplied by the imputed 211."""
+    over the sum of all 211 or 311 values, multiplied by the imputed 211."""
 
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
@@ -22,6 +27,7 @@ def evaluate_imputed_ixx(group, master_col, break_down_cols):
 
     sum_master_q = np.sum(group[master_col])  # scalar
 
+    # Carry abou the imputation calculation for each breakdown question
     for imp_col, bd_col in zip(imp_cols, bd_cols):
         sum_breakdown_q = np.sum(group[bd_col])
         group[imp_col] = (sum_breakdown_q / sum_master_q) * group[
@@ -32,14 +38,17 @@ def evaluate_imputed_ixx(group, master_col, break_down_cols):
 
 
 @df_change_func_wrap
-def only_trimmed_records(df, trim_bool_col):
+def only_trimmed_records(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Trims the dataframe to only include records that have False in the
     trim_bool_col column"""
 
     return df.loc[~df[trim_bool_col]]
 
 
-def run_expansion(df, config):
+def run_expansion(df: pd.DataFrame, config: dict):
+    """The main 'entry point' function to run the expansion imputation. 
+    """
+    
     # Step 4: Expansion imputation for breakdown questions
 
     # Identify clean responders (by status) again
@@ -56,9 +65,6 @@ def run_expansion(df, config):
 
     # Trimmed groups
     trim_grouped = trimmed_df.groupby("imp_class")
-
-    # result_df = (trim_grouped.transform(
-    # lambda group: evaluate_imputed_2xx_2(group, breakdown_qs)))
 
     # Calculate the imputation values for 2xx questions
     breakdown_qs_2xx = config["breakdowns"]["2xx"]
