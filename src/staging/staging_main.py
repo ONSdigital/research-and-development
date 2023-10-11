@@ -94,9 +94,10 @@ def run_staging(
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
     feather_files = [f for f in os.listdir(feather_path) if f.endswith(".feather")]
+
     if bool(feather_files) & load_from_feather:
         # Load data from first feather file found
-        feather_file = os.path.join(feather_path, feather_files[0])
+        feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
