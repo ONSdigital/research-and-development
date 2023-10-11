@@ -6,6 +6,8 @@ import pandas as pd
 import json
 import logging
 from typing import List
+import subprocess
+import os
 
 from src.utils.wrappers import time_logger_wrap
 
@@ -179,3 +181,187 @@ def hdfs_read_feather(filepath):
     hdfs_logger.info(f"Dataframe read from {filepath} as feather file")
 
     return df
+
+
+def _perform(
+    command,
+    shell: bool = False,
+    str_output: bool = False,
+    ignore_error: bool = False,
+    full_out=False,
+):
+    """
+    Run shell command in subprocess returning exit code or full string output.
+    _perform() will build the command that will be put into HDFS.
+    This will also be used for the functions below.
+    Parameters
+    ----------
+    shell
+        If true, the command will be executed through the shell.
+        See subprocess.Popen() reference.
+    str_output
+        output exception as string
+    ignore_error
+    """
+    process = subprocess.Popen(
+        command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+
+    if str_output:
+        if stderr and not ignore_error:
+            raise Exception(stderr.decode("UTF-8").strip("\n"))
+        if full_out:
+            return stdout
+        return stdout.decode("UTF-8").strip("\n")
+
+    return process.returncode == 0
+
+
+def hdfs_delete_file(path: str):
+    """
+    Delete a file. Uses 'hadoop fs -rm'.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    command = ["hadoop", "fs", "-rm", path]
+    return _perform(command)
+
+
+def hdfs_md5sum(path: str):
+    """
+    Get md5sum of a specific file on HDFS.
+    """
+    return _perform(
+        f"hadoop fs -cat {path} | md5sum",
+        shell=True,
+        str_output=True,
+        ignore_error=True,
+    ).split(" ")[0]
+
+
+def hdfs_stat_size(path: str):
+    """
+    Runs stat command on a file or directory to get the size in bytes.
+    """
+    command = ["hadoop", "fs", "-du", "-s", path]
+    return _perform(command, str_output=True).split(" ")[0]
+
+
+def hdfs_isdir(path: str) -> bool:
+    """
+    Test if directory exists. Uses 'hadoop fs -test -d'.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+    """
+    command = ["hadoop", "fs", "-test", "-d", path]
+    return _perform(command)
+
+
+def hdfs_isfile(path: str) -> bool:
+    """
+    Test if file exists. Uses 'hadoop fs -test -f.
+
+    Returns
+    -------
+    True for successfully completed operation. Else False.
+
+    Note
+    ----
+    If checking that directory with partitioned files (i.e. csv, parquet)
+    exists this will return false use isdir instead.
+    """
+    command = ["hadoop", "fs", "-test", "-f", path]
+    return _perform(command)
+
+
+def hdfs_read_header(path: str):
+    """
+    Reads the first line of a file on HDFS
+    """
+    return _perform(
+        f"hadoop fs -cat {path} | head -1",
+        shell=True,
+        str_output=True,
+        ignore_error=True,
+    )
+
+
+def hdfs_write_string_to_file(content: bytes, path: str):
+    """
+    Writes a string into the specified file path
+    """
+    _write_string_to_file = subprocess.Popen(
+        f"hadoop fs -put - {path}", stdin=subprocess.PIPE, shell=True
+    )
+    return _write_string_to_file.communicate(content)
+
+
+def hdfs_copy_file(src_path: str, dst_path: str):
+    """
+    Copy a file from one location to another. Uses 'hadoop fs -cp'.
+    """
+    command = ["hadoop", "fs", "-cp", src_path, dst_path]
+    return _perform(command)
+
+
+def hdfs_move_file(src_path: str, dst_path: str):
+    """
+    Move a file from one location to another. Uses 'hadoop fs -mv'.
+    """
+    command = ["hadoop", "fs", "-mv", src_path, dst_path]
+    return _perform(command)
+
+
+def hdfs_list_files(path: str, ext: str = None):
+    """
+    List files in a directory. Uses 'hadoop fs -ls'.
+    """
+    # Forming the command line command and executing
+    command = ["hadoop", "fs", "-ls", path]
+    files_as_str = _perform(command, str_output=True)
+
+    # Breaking up the returned string, and stripping down to just paths of files
+    file_paths = [line.split()[-1] for line in files_as_str.strip().split("\n")[1:]]
+
+    # Getting just the filename (including ext) alone
+    file_names_in_dir = [os.path.basename(path) for path in file_paths]
+
+    # Filtering the files to just those with the required extension
+    if ext:
+        ext = f".{ext}"
+        file_names_in_dir = [
+            file for file in file_names_in_dir if os.path.splitext(file)[1] == ext
+        ]
+
+    return file_names_in_dir
+
+
+def hdfs_search_file(dir_path, ending):
+    """Find a file in a directory with a specific ending using grep and hadoop fs -ls.
+
+    Args:
+        dir_path (_type_): _description_
+        ending (_type_): _description_
+    """
+    target_file = _perform(
+        f"hadoop fs -ls {dir_path} | grep {ending}",
+        shell=True,
+        str_output=True,
+        ignore_error=True,
+    )
+
+    # Handle case where file does not exist
+    if not target_file:
+        raise FileNotFoundError(
+            f"File with ending {ending} does not exist in {dir_path}"
+        )
+
+    # Return file path + name
+    target_file = target_file.split()[-1]
+
+    return target_file
