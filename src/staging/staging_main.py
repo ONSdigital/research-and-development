@@ -201,6 +201,14 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_alpha_num_path = paths["pg_alpha_num_path"]
+    check_file_exists(pg_alpha_num_path)
+    pg_alpha_num = read_csv(pg_alpha_num_path)
+    val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -220,4 +228,5 @@ def run_staging(
         cora_mapper,
         cellno_df,
         postcode_df,
+        pg_alpha_num
     )
