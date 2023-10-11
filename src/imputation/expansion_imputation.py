@@ -10,19 +10,6 @@ from src.utils.wrappers import df_change_func_wrap
 ExpansionLogger = logging.getLogger(__name__)
 
 
-def evaluate_imputed_2xx(group, break_down_q):
-    """Evaluate the imputed 2xx as the sum of all 2xx over the sum of all 211
-    multiplied by the imputed 211."""
-    sum_211 = group["211"].sum()  # scalar
-    sum_2xx = group[str(break_down_q)].sum()  # scalar
-
-    imputed = (sum_2xx / sum_211) * group["211_imputed"]
-
-    group[f"imputed_{break_down_q}"] = imputed
-
-    return group
-
-
 def evaluate_imputed_ixx(group, master_col, break_down_cols):
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 multiplied by the imputed 211."""
