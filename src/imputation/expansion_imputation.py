@@ -5,11 +5,12 @@ import logging
 import numpy as np
 
 from src.imputation.tmi_imputation import filter_by_column_content
-from src.utils.wrappers import df_change_func_wrap
+from src.utils.wrappers import df_change_func_wrap, time_logger_wrap
 
 ExpansionLogger = logging.getLogger(__name__)
 
 
+@time_logger_wrap
 def evaluate_imputed_ixx(group, master_col, break_down_cols):
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 multiplied by the imputed 211."""
@@ -17,16 +18,20 @@ def evaluate_imputed_ixx(group, master_col, break_down_cols):
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
-    # Make imputed column names
+    # Make list of imputed column names
     imp_cols = [f"{col}_imputed" for col in bd_cols]
 
+    # Sum the master column, e.g. "211" or "305"
     sum_master_q = np.sum(group[master_col])  # scalar
 
-    for imp_col, bd_col in zip(imp_cols, bd_cols):
-        sum_breakdown_q = np.sum(group[bd_col])
-        group[imp_col] = (sum_breakdown_q / sum_master_q) * group[
-            f"{master_col}_imputed"
-        ]
+    # Breakdown questions summed
+    bds_summed = group[bd_cols].sum(axis=0)  # vector
+
+    # Master col imputed, e.g. 211_imputed or 305_imputed
+    master_col_imputed = group[f"{master_col}_imputed"].values[0]  # vector
+
+    # Calculate the imputation columns for the breakdown questions
+    group[imp_cols] = ((bds_summed / sum_master_q) * master_col_imputed).values
 
     return group
 
