@@ -81,11 +81,11 @@ def run_tau(
 
     
     # for debugging
-    import os
-    mydir = r"D:\data\res_dev\outputs"
-    myfile = "tau_output_raw.csv"
-    mypath = os.path.join(mydir, myfile)
-    df.to_csv(mypath, index=None)
+    # import os
+    # mydir = r"D:\data\res_dev\outputs"
+    # myfile = "tau_output_raw.csv"
+    # mypath = os.path.join(mydir, myfile)
+    # df.to_csv(mypath, index=None)
     # End of debugging
     
     # Create tau output dataframe with required columns from schema
@@ -93,9 +93,9 @@ def run_tau(
     tau_output = create_output_df(df, schema_path)
 
     # debugging start
-    myfile = "tau_output_out.csv"
-    mypath = os.path.join(mydir, myfile)
-    tau_output.to_csv(mypath, index=None)
+    # myfile = "tau_output_out.csv"
+    # mypath = os.path.join(mydir, myfile)
+    # tau_output.to_csv(mypath, index=None)
     # debugging end
   
 
