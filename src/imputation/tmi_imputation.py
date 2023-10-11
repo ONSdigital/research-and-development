@@ -76,7 +76,10 @@ def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
     return updated_df
 
 
-def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
+def impute_pg_by_sic(
+        df: pd.DataFrame,
+        sic_mapper: pd.DataFrame
+) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"
     using the SIC number ('rusic').
@@ -189,7 +192,10 @@ def apply_fill_zeros(
     return df
 
 
-def tmi_pre_processing(df: pd.DataFrame, target_variables_list: list) -> pd.DataFrame:
+def tmi_pre_processing(
+        df: pd.DataFrame,
+        target_variables_list: list
+) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean
 
@@ -209,7 +215,9 @@ def tmi_pre_processing(df: pd.DataFrame, target_variables_list: list) -> pd.Data
 
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
-    clear_df = filter_by_column_content(filtered_df, "statusencoded", clear_statuses)
+    clear_df = filter_by_column_content(filtered_df,
+                                        "statusencoded",
+                                        clear_statuses)
 
     # Fill zeros for no r&d and apply to original
     df = apply_fill_zeros(clear_df, df, target_variables_list)
@@ -316,7 +324,9 @@ def calculate_mean(
     """
 
     # remove the True tagged rows for col f"{target_variable}_trim"
-    trimmed_df = filter_by_column_content(df, f"{target_variable}_trim", [False])
+    trimmed_df = filter_by_column_content(df,
+                                          f"{target_variable}_trim",
+                                          [False])
 
     # convert to floats for mean calculation
     trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
@@ -324,19 +334,16 @@ def calculate_mean(
     dict_mean_growth_ratio = {}
 
     # Add mean and count to dictionary
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_mean"] = trimmed_df[
-        target_variable
-    ].mean()
+    mean_key = f"{target_variable}_{unique_item}_mean"
+    dict_mean_growth_ratio[mean_key] = trimmed_df[target_variable].mean()
 
     # Count is the number of items in the trimmed class
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count"] = len(
-        trimmed_df[target_variable]
-    )
+    count_key = f"{target_variable}_{unique_item}_count"
+    dict_mean_growth_ratio[count_key] = len(trimmed_df[target_variable])
 
     # Count before trimming is applied
-    dict_mean_growth_ratio[f"{target_variable}_{unique_item}_count_before_trim"] = len(
-        df
-    )
+    count_before = f"{target_variable}_{unique_item}_count_before_trim"
+    dict_mean_growth_ratio[count_before] = len(df)
 
     return dict_mean_growth_ratio
 
@@ -346,8 +353,10 @@ def create_mean_dict(
 ) -> Tuple[dict, pd.DataFrame]:
     """Function to apply multiple steps to calculate the means for each target
     variable.
-    Returns a dictionary of mean values and counts for each unique class and variable
-    Also returns a QA dataframe containing information on how trimming was applied
+    Returns a dictionary of mean values and counts for each unique class
+    and variable
+    Also returns a QA dataframe containing information on how trimming
+    was applied
 
     Args:
         df (pd.DataFrame): main data
@@ -458,8 +467,8 @@ def apply_tmi(
         df, "status", ["Form sent out", "Check needed"]
     )
 
-    # Filter out any cases where 200 or 201 are missing from the imputation class
-    # This ensures that means are calculated using only valid imputation classes
+    # Filter out any cases where 200 or 201 are missing from the imp class
+    # This ensures means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
@@ -501,7 +510,8 @@ def apply_tmi(
                 imp_class_df[f"{var}_imputed_count"] = "No count found"
 
             # repeat for count before trim
-            if f"{var}_{imp_class_key}_count_before_trim" in mean_dict[var].keys():
+            count_before = f"{var}_{imp_class_key}_count_before_trim"
+            if count_before in mean_dict[var].keys():
                 # Replace nulls with counts
                 imp_class_df[f"{var}_imputed_count_before_trim"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_count_before_trim"]

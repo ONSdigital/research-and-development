@@ -95,46 +95,26 @@ def test_create_mean_dict():
 
     # Create a sample DataFrame for testing
     expected_result_data = [
-        ["210", "A", "dont trim", None, 100, "A", 100, "0001"]
-        + [None, True, 0],
-        ["210", "A", "dont trim", 100, 100, "B", 100, "0001"]
-        + [False, True, 1],
-        ["210", "A", "dont trim", 100, 100, "C", 100, "0001"]
-        + [True, False, 2],
-        ["210", "A", "dont trim", 9, 100, "D", 100, "0001"]
-        + [False, False, 3],
-        ["210", "A", "dont trim", 1, 100, "E", 100, "0001"]
-        + [False, False, 4],
-        ["210", "A", "dont trim", 1, 100, "F", 100, "0001"]
-        + [False, False, 5],
-        ["210", "A", "dont trim", 1, 100, "G", 100, "0001"]
-        + [False, False, 6],
-        ["210", "A", "dont trim", 1, 100, "H", 100, "0001"]
-        + [False, False, 7],
-        ["210", "A", "dont trim", 1, 100, "I", 100, "0001"]
-        + [False, False, 8],
-        ["210", "A", "dont trim", 1, 100, "J", 100, "0001"]
-        + [False, False, 9],
-        ["210", "A", "dont trim", 1, 100, "K", 100, "0001"]
-        + [False, False, 10],
-        ["210", "A", "dont trim", 1, 100, "L", 100, "0001"]
-        + [False, False, 11],
-        ["210", "A", "dont trim", 0, 100, "M", 100, "0001"]
-        + [True, False, 12],
-        ["210", "A", "dont trim", 0, 100, "N", 100, "0001"]
-        + [False, False, 13],
-        ["210", "A", "dont trim", 0, 100, "O", 100, "0001"]
-        + [False, True, 14],
-        ["210", "A", "dont trim", 0, 100, "P", 100, "0001"]
-        + [False, True, 15],
-        ["210", "B", "dont trim", 1, 100, "Q", 100, "0001"]
-        + [False, False, 16],
-        ["211", "B", "dont trim", 1, 100, "R", 100, "0001"]
-        + [False, False, 17],
-        ["210", "C", "dont trim", 1, 100, "S", 100, "0001"]
-        + [False, False, 18],
-        ["211", "C", "dont trim", 1, 100, "T", 100, "0001"]
-        + [False, False, 19],
+        ["210", "A", "dont trim", None, 100, "A", 100, "0001", None, True, 0],
+        ["210", "A", "dont trim", 100, 100, "B", 100, "0001", False, True, 1],
+        ["210", "A", "dont trim", 100, 100, "C", 100, "0001", True, False, 2],
+        ["210", "A", "dont trim", 9, 100, "D", 100, "0001", False, False, 3],
+        ["210", "A", "dont trim", 1, 100, "E", 100, "0001", False, False, 4],
+        ["210", "A", "dont trim", 1, 100, "F", 100, "0001", False, False, 5],
+        ["210", "A", "dont trim", 1, 100, "G", 100, "0001", False, False, 6],
+        ["210", "A", "dont trim", 1, 100, "H", 100, "0001", False, False, 7],
+        ["210", "A", "dont trim", 1, 100, "I", 100, "0001", False, False, 8],
+        ["210", "A", "dont trim", 1, 100, "J", 100, "0001", False, False, 9],
+        ["210", "A", "dont trim", 1, 100, "K", 100, "0001", False, False, 10],
+        ["210", "A", "dont trim", 1, 100, "L", 100, "0001", False, False, 11],
+        ["210", "A", "dont trim", 0, 100, "M", 100, "0001", True, False, 12],
+        ["210", "A", "dont trim", 0, 100, "N", 100, "0001", False, False, 13],
+        ["210", "A", "dont trim", 0, 100, "O", 100, "0001", False, True, 14],
+        ["210", "A", "dont trim", 0, 100, "P", 100, "0001", False, True, 15],
+        ["210", "B", "dont trim", 1, 100, "Q", 100, "0001", False, False, 16],
+        ["211", "B", "dont trim", 1, 100, "R", 100, "0001", False, False, 17],
+        ["210", "C", "dont trim", 1, 100, "S", 100, "0001", False, False, 18],
+        ["211", "C", "dont trim", 1, 100, "T", 100, "0001", False, False, 19],
     ]
 
     expected_result_df = pd.DataFrame(data=expected_result_data, columns=expected_cols)
