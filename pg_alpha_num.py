@@ -15,8 +15,11 @@ map_df = pd.read_csv(
         usecols=usecols,
        )
 map_df.columns = names
-
-df = map_df.drop_duplicates()
+#%%
+df = map_df.groupby(["pg_alpha"]).agg({'pg_alpha': 'min', 'pg_numeric': 'min'}) 
+  
+#%%
+#df = map_df.drop_duplicates()
 df.to_csv(
         r"R:\BERD Results System Development 2023\DAP_emulation\mappers\pg_alpha_num.csv",
         index=None

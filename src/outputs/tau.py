@@ -58,7 +58,7 @@ def run_tau(
     df = map_o.join_pg_numeric(df, mapper_df, cols_pg=["201"])
 
     # Map to the CORA statuses from the statusencoded column
-    #estimated_df = map_o.create_cora_status_col(estimated_df, cora_mapper)
+    df = map_o.create_cora_status_col(df, cora_mapper)
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
@@ -68,13 +68,24 @@ def run_tau(
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
+
+    # Create C_lnd_bl
+    df["C_lnd_bl"] = df["219"] + df["220"]    
+
+    # Create ovss_oth
+    df["ovss_oth"] = df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+
+    # Create oth_sc
+    df["oth_sc"] = df["242"] + df["248"] + df["250"]
+
+
     
     # for debugging
     import os
     mydir = r"D:\data\res_dev\outputs"
     myfile = "tau_output_raw.csv"
     mypath = os.path.join(mydir, myfile)
-    #df.to_csv(mypath, index=None)
+    df.to_csv(mypath, index=None)
     # End of debugging
     
     # Create tau output dataframe with required columns from schema
