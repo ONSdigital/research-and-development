@@ -22,9 +22,6 @@ def evaluate_imputed_ixx(
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
-    # Make list of imputed column names
-    imp_cols = [f"{col}_imputed" for col in bd_cols]
-
     # Sum the master column, e.g. "211" or "305" for the clear responders
     clear_statuses = ["210", "211"]
     clear_mask = group["statusencoded"].isin(clear_statuses)
@@ -33,7 +30,7 @@ def evaluate_imputed_ixx(
     # Calculate the imputation columns for the breakdown questions
     # group[imp_cols] = ((bds_summed.values / sum_master_q) * master_col_imputed).values
     ExpansionLogger.debug(f"Processing group: {group['imp_class'].values[0]}")
-    for imp_col, bd_col in zip(imp_cols, bd_cols):
+    for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
         sum_breakdown_q = group.loc[clear_mask][bd_col].sum()
 
@@ -47,7 +44,7 @@ def evaluate_imputed_ixx(
         # i.e. for non-responders
         unclear_statuses = ["100", "201"]
         unclear_mask = group["statusencoded"].isin(unclear_statuses)
-        group.loc[unclear_mask][imp_col] = (
+        group.loc[unclear_mask][bd_col] = (
             sum_breakdown_q / sum_master_q
         ) * sum_master_imp
 
