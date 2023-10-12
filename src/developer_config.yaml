@@ -22,11 +22,11 @@ runlog_writer:
     write_hdf5: False # Write the runlog to an HDF5 file
     write_sql: False # Write the runlog to a SQL database
     display: False # Display the runlog in the terminal
-    log_path: "data/log"
+    log_path: "/ons/rdbe_dev/"
 hdfs_paths:
-  root: None
+  root: "/ons/rdbe_dev/"
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
-  snapshot_path: "/ons/rdbe_dev/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   pg_mapper_path: "/ons/rdbe_dev/mappers/2023/SIC_to_PG_UTF-8.csv"
@@ -34,13 +34,18 @@ hdfs_paths:
   cora_mapper_path: "/ons/rdbe_dev/mappers/2023/cora_mapper.csv"
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   output_path:  "/ons/rdbe_dev/outputs"
-  cellno_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
+  cellno_path: '/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv'
   itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
-  outliers_path: None
+  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+  imputation_path: "/ons/rdbe_dev/imputation"
+  outliers_path: "/ons/rdbe_dev/outliers"
+  estimation_path:  "/ons/rdbe_dev/estimation"
+  short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
+  export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
-  root: None
+  root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
@@ -57,6 +62,7 @@ network_paths:
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
+  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
 schema_paths:
@@ -65,6 +71,8 @@ outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
     flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
+devtest:
+    seltype_list: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19, 21, 22, 23, 25, 26, 27, 29, 30, 31, 33, 34, 35, 37, 38, 39]
 csv_filenames:
     main: "main_runlog.csv"
     configs: "configs_runlog.csv"
@@ -72,4 +80,3 @@ csv_filenames:
 run_log_sql:
     log_db: "test_runlog"
     log_mode: "append"
-
