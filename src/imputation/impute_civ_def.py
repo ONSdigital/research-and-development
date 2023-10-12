@@ -165,6 +165,7 @@ def apply_civdev_imputation(
     Returns:
         pd.DataFrame: The same dataframe with R&D type imputed.
     '"""
+    df["200_original"] = df["200"]
     df["200_imputed"] = df["200"]
     df["200_imp_marker"] = "N/A"
 
