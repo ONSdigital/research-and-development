@@ -41,8 +41,10 @@ def evaluate_imputed_ixx(
         if sum_master_imp.values.any():
             sum_master_imp = sum_master_imp.values[0]  # get a single value
         else:
-            ExpansionLogger.info(f"{imp_class}: no master question imputed value")
-            ExpansionLogger.info(f"Assigning nan to {master_col}_imputed")
+            ExpansionLogger.info(
+                f"Group {imp_class} has no master question imputed value"
+            )
+            ExpansionLogger.info(f"Assigning nan as {master_col}_imputed value")
             sum_master_imp = float("nan")  # assigns nan where there are no values
 
         # Update the imputation column for status encoded 100 and 201
