@@ -2,14 +2,14 @@ global:
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-  postcode_csv_check: True
+  postcode_csv_check: False
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_short_form: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
@@ -62,6 +62,7 @@ network_paths:
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+  pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'  
 schema_paths:
   frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
 outliers:
