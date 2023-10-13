@@ -1,6 +1,5 @@
 """The main file for the staging and validation module."""
 import logging
-import pandas as pd
 from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
@@ -21,7 +20,7 @@ def run_staging(
     read_csv: Callable,
     write_csv: Callable,
     run_id: int,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> Tuple:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -43,7 +42,15 @@ def run_staging(
             This will be the hdfs or network version depending on settings.
         run_id (int): The run id for this run.
     Returns:
-        pd.DataFrame: The staged and vaildated snapshot data.
+        tuple
+            full_responses (pd.DataFrame): The staged and vaildated snapshot data,
+            manual_outliers (pd.DataFrame): Data with column for manual outliers,
+            pg_mapper (pd.DataFrame): Product grouo mapper,
+            ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
+            cora_mapper (pd.DataFrame): CORA status mapper,
+            cellno_df (pd.DataFrame): Cell numbers mapper,
+            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
