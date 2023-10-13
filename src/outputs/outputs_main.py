@@ -29,6 +29,7 @@ def run_outputs(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
+    pg_alpha_num: pd.DataFrame
 ):
     """Run the outputs module.
 
