@@ -60,11 +60,9 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 
     df["200"] = df["200"].astype("category")
 
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for q604 = No or status = "Form sent out"
-    filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
+    filtered_data = df.loc[
+        (df["status"] == "Form sent out") | (df["604"] == "No")
     ]
 
     filtered_data = sic_to_pg_mapper(
@@ -145,11 +143,8 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean"""
 
-    # Filter for long form data
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for instance is not 0
-    filtered_df = long_df.loc[long_df["instance"] != 0]
+    filtered_df = df.loc[df["instance"] != 0]
 
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
@@ -291,7 +286,6 @@ def create_mean_dict(df, target_variable_list):
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -381,8 +375,8 @@ def apply_tmi(df, target_variables, mean_dict):
 def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
-    longform_df = full_df.copy().loc[full_df["formtype"] == "0001", :]
-    shortform_df = full_df.copy().loc[full_df["formtype"] != "0001", :]
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
 
     longform_df = instance_fix(longform_df)
     longform_df = duplicate_rows(longform_df)

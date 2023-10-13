@@ -27,12 +27,10 @@ def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
         ("headcount_civil", "headcount_defence", "headcount_total"),
     ]
 
-    civil_df = df.loc[
-        df["formtype"] == "0006",
-    ].copy()
+    civil_df = df.loc[df["formtype"] == "0006"].copy()
     defence_df = civil_df.copy()
 
-    df.loc[:, "instance"] = 0
+    df.loc[df["formtype"] == "0006", "instance"] = 0
 
     civil_df.loc[:, "200"] = "C"
     civil_df.loc[:, "instance"] = 1
