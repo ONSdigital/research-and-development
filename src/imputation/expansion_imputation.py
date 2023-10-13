@@ -14,7 +14,6 @@ def evaluate_imputed_ixx(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     break_down_cols: List[Union[str, int]],
-    qa_dict: dict,
 ) -> pd.DataFrame:
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 or 305 values, multiplied by the imputed 211."""
@@ -26,8 +25,8 @@ def evaluate_imputed_ixx(
     bd_cols = [str(col) for col in break_down_cols]
 
     # Sum the master column, e.g. "211" or "305" for the clear responders
-    clear_statuses = ["210", "211"]
-    clear_mask = group["statusencoded"].isin(clear_statuses)
+    clear_statuses = ["Clear", "Clear - overridden"]
+    clear_mask = group["status"].isin(clear_statuses)
     sum_master_q = group.loc[clear_mask][master_col].sum()  # scalar
 
     # Calculate the imputation columns for the breakdown questions
@@ -48,19 +47,19 @@ def evaluate_imputed_ixx(
             ExpansionLogger.info(f"Assigning nan as {master_col}_imputed value")
             sum_master_imp = float("nan")  # assigns nan where there are no values
 
+        # Make imputation col equal to original column
+        group[f"{bd_col}_imputed"] = group[bd_col]
+
         # Update the imputation column for status encoded 100 and 201
         # i.e. for non-responders
-        unclear_statuses = ["100", "201"]
-        unclear_mask = group["statusencoded"].isin(unclear_statuses)
+        unclear_statuses = ["Form sent out", "Check needed"]
+        unclear_mask = group["status"].isin(unclear_statuses)
         imputed_value = (sum_breakdown_q / sum_master_q) * sum_master_imp
         # Write imputed value to the non-responder records
-        group.loc[unclear_mask][bd_col] = imputed_value
-
-        # Update the QA dict with the imputed value for this imp_class + breakdown_q
-        qa_dict[imp_class][f"{bd_col}_imputed"] = imputed_value
+        group.loc[unclear_mask][f"{bd_col}_imputed"] = imputed_value
 
     # Returning updated group and updated QA dict
-    return group, qa_dict
+    return group
 
 
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
@@ -89,12 +88,9 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Trimmed groups
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
 
-    # Create dict for QA output
-    qa_dict = {}
-
     # Calculate the imputation values for 2xx questions
     breakdown_qs_2xx = config["breakdowns"]["2xx"]
-    result_211_df, qa_dict = non_trim_grouped.apply(
+    result_211_df = non_trim_grouped.apply(
         evaluate_imputed_ixx, "211", break_down_cols=breakdown_qs_2xx
     )
 
@@ -112,17 +108,12 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Groupby imp_class again
     non_trim_grouped = result_211_df.groupby("imp_class")
 
-    result_211_305_df, qa_dict = non_trim_grouped.apply(
+    result_211_305_df = non_trim_grouped.apply(
         evaluate_imputed_ixx, "305", break_down_cols=breakdown_qs_3xx
     )
 
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records
     expanded_result_df = pd.concat([result_211_305_df, trimmed_df], axis=0)
-
-    # Make the QA dataframe and output it
-    ExpansionLogger.info("Outputting Expansion QA csv")
-    qa_df = pd.Dataframe(qa_dict).T
-    qa_df.to_csv("some/path/to/QA/expansion_QA.csv")
 
     return expanded_result_df

@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 from src.staging.pg_conversion import sic_to_pg_mapper
 
-formtype_long  = "0001"
+formtype_long = "0001"
 formtype_short = "0006"
+
 
 def apply_to_original(filtered_df, original_df):
     """Overwrites a dataframe with updated row values"""
@@ -239,7 +240,7 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-        
+
         df[f"{variable}_trim"] = True
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
