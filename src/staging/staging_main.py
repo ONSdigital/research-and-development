@@ -94,11 +94,12 @@ def run_staging(
     # Check if feather file exists in snapshot path
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
-    feather_files = [f for f in os.listdir(feather_path) if f.endswith(".feather")]
+    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    feather_files_exist = check_file_exists(feather_file)
+    #  feather_files = [f for f in os.listdir(feather_path) if f.endswith(".feather")]
 
-    if bool(feather_files) & load_from_feather:
+    if feather_files_exist & load_from_feather:
         # Load data from first feather file found
-        feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
@@ -109,16 +110,6 @@ def run_staging(
         snapdata = load_json(snapshot_path)
 
         contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
-
-        StagingMainLogger.info("Writing contributors and responses to feather")
-        write_feather(
-            os.path.join(feather_path, f"{snapshot_name}_contributors.feather"),
-            contributors_df,
-        )
-        write_feather(
-            os.path.join(feather_path, f"{snapshot_name}_responses.feather"),
-            responses_df,
-        )
 
         # the anonymised snapshot data we use in the DevTest environment
         # does not include the instance column. This fix should be removed
