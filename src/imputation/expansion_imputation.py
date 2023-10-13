@@ -112,5 +112,8 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records
     expanded_result_df = pd.concat([result_211_305_df, trimmed_df], axis=0)
+    expanded_result_df = expanded_result_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
 
     return expanded_result_df
