@@ -19,7 +19,7 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
 
-    keyvars = [
+    target_vars = [
         "211",
         "305",
         "emp_researcher",
@@ -35,7 +35,7 @@ def run_imputation(
 
     df = run_apportionment(df)
 
-    imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
+    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper)
 
     imputed_df = ximp.run_expansion(imputed_df, config)
 
@@ -52,5 +52,18 @@ def run_imputation(
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_output_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
+
+    # Get the breakdown columns from the config
+    bd_cols = config["breakdowns"]["2xx"] + config["breakdowns"]["3xx"]
+    orig_cols = bd_cols + target_vars
+
+    # Create names for imputed cols
+    imp_cols = [f"{col}_imputed" for col in orig_cols]
+
+    # Update the original breakdown questions and target variables with the imputed
+    imputed_df[orig_cols] = imputed_df[imp_cols]
+
+    # Drop imputed values from df
+    imputed_df = imputed_df.drop(columns=imp_cols)
 
     return imputed_df
