@@ -1,12 +1,8 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-from datetime import datetime
 from typing import Callable, Dict, Any
 import toml
-
-import src.outputs.short_form_out as short
-import src.outputs.map_output_cols as map_o
 
 from src.outputs.short_form import run_short_form
 from src.outputs.tau import run_tau
@@ -20,6 +16,7 @@ short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schem
 # Get the Tau Argus output schema
 tau_schema = toml.load("src/outputs/output_schemas/tau_schema.toml")
 
+
 def run_outputs(
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
@@ -31,6 +28,7 @@ def run_outputs(
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame
 ):
+
     """Run the outputs module.
 
     Args:
@@ -70,5 +68,6 @@ def run_outputs(
             ultfoc_mapper,
             cora_mapper,
             postcode_itl_mapper,
+            pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")

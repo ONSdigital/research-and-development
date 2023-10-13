@@ -81,8 +81,8 @@ def validate_post_col(
         f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
     )
     validation_logger.warning(
-        f"Number of invalid pattern postcodes found: {len(invalid_pattern_postcodes.to_list())}"
-    )
+        f"Number of invalid pattern postcodes found: \
+            {len(invalid_pattern_postcodes.to_list())}")
 
     # Remove the invalid pattern postcodes before checking if they are real
     val_df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
@@ -472,7 +472,7 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
         df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
 
         # check any unexpected contents
-        if (df["contents_check"] == False).any():
+        if (not df["contents_check"]).any():
             raise ValueError("Unexpected format within 'ultfoc' column contents")
 
         df.drop(columns=["contents_check"], inplace=True)

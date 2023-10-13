@@ -4,11 +4,8 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 import toml
-import pandas as pd
 
-import src.outputs.short_form_out as short
 import src.outputs.map_output_cols as map_o
-from src.staging.validation import load_schema, validate_data_with_schema
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -16,6 +13,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 # Get the shortform schema
 short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
+
 
 def run_tau(
     weighted_df: pd.DataFrame,
@@ -25,6 +23,7 @@ def run_tau(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
+    pg_alpha_num: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -36,7 +35,7 @@ def run_tau(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-
+        pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
     """
 
@@ -50,12 +49,7 @@ def run_tau(
     df = map_o.join_fgn_ownership(weighted_df, ultfoc_mapper)
 
     # Create a columns for numeric product grouo
-
-    # debugging begin
-    mapper_df = pd.read_csv(r"R:\BERD Results System Development 2023\DAP_emulation\mappers\pg_alpha_num.csv")
-    # debugging end
-
-    df = map_o.join_pg_numeric(df, mapper_df, cols_pg=["201"])
+    df = map_o.join_pg_numeric(df, pg_alpha_num, cols_pg=["201"])
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
@@ -70,36 +64,25 @@ def run_tau(
     df = map_o.map_to_numeric(df)
 
     # Create C_lnd_bl
-    df["C_lnd_bl"] = df["219"] + df["220"]    
+    df["C_lnd_bl"] = df["219"] + df["220"]
 
     # Create ovss_oth
-    df["ovss_oth"] = df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+    df["ovss_oth"] = (
+        df["243"] +
+        df["244"] +
+        df["245"] +
+        df["246"] +
+        df["247"] +
+        df["249"])
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
 
-
-    
-    # for debugging
-    # import os
-    # mydir = r"D:\data\res_dev\outputs"
-    # myfile = "tau_output_raw.csv"
-    # mypath = os.path.join(mydir, myfile)
-    # df.to_csv(mypath, index=None)
-    # End of debugging
-    
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]
     tau_output = create_output_df(df, schema_path)
 
-    # debugging start
-    # myfile = "tau_output_out.csv"
-    # mypath = os.path.join(mydir, myfile)
-    # tau_output.to_csv(mypath, index=None)
-    # debugging end
-  
-
+    # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"output_tau_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_tau/{filename}", tau_output)
-
