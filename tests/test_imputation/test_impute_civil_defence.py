@@ -132,32 +132,23 @@ class TestPrepCDImpClasses:
         """Create an input dataframe for the test."""
         input_cols = [
             "reference",
-            "instance",
-            "200",
             "201",
-            "202",
-            "statusencoded",
+            "rusic",
             "cellnumber",
-            "rusic"]
+            "statusencoded",
+            "200",]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234"],
-            [1001, 1, "C", "AC", 100, "211", "800", "1234"],
-            [1001, 2, "C", "AC", 200, "211", "800", "1234"],
-            [1001, 3, "D", "AC", 50, "211", "800", "1234"],
-            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234"],
-            [1002, 1, "C", "AC", 100, "211", "800", "1234"],
-            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444"],
-            [2002, 1, np.nan, "AC", 200, "211", "800", "444"],
-            [2002, 2, "D", "AC", 200, "999", "800", "444"],
-            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234"],
-            [3003, 1, "C",  "ZZ", 230, "211", "800", "12"],
-            [3003, 2, "C",  "ZZ", 59, "211", "800", "12"],
-            [3003, 3, "D",  "ZZ", 805, "211", "800", "12"],
-            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12"],
-            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12"],
-            [3003, 6, np.nan, np.nan, 0, "211", "800", "12"],
-        ]
+            [1, "A", "12", "800", "211", "C"], #test keep 210 and 211 and test keep "C"
+            [2, "A", "12", "800", "210", "D"], #test keep 210 and 211 and test keep "D"
+            [3, "A", "12", "800", "not_210_211", "C"], #test flag not_210_211
+            [4, "A", "12", "800", "211", np.nan], #test flag np.nan
+            [5, "B", "12", "800", "211", np.nan], #test flag np.nan with B
+            [6, "B", "12", "800", "not_210_211", "C"], #test flag not_210_211 with B
+            [6, "B", "12", "800", "not_210_211", np.nan], #test flag with both
+            [1, np.nan, "12", "800", "211", "C"], #test flag  np.nan
+            [1, "A", np.nan, "800", "211", "C"] #test flag np.nan
+            ]
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -166,36 +157,27 @@ class TestPrepCDImpClasses:
         """Create an expected output dataframe for the test."""
         output_cols = [
             "reference",
-            "instance",
-            "200",
             "201",
-            "202",
-            "statusencoded",
-            "cellnumber",
             "rusic",
+            "cellnumber",
+            "statusencoded",
+            "200",
             "pg_sic_class",
             "empty_pgsic_group",
             "pg_class",
             "empty_pg_group"]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
-            [1001, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
-            [1001, 2, "C", "AC", 200, "211", "800", "1234", "AC_1234", False, "AC", False],
-            [1001, 3, "D", "AC", 50, "211", "800", "1234", "AC_1234", False, "AC", False],
-            [1002, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
-            [1002, 1, "C", "AC", 100, "211", "800", "1234", "AC_1234", False, "AC", False],
-            [2002, 0, np.nan, np.nan, np.nan, "211", "800", "444", "nan_444", False, "nan", False],
-            [2002, 1, np.nan, "AC", 200, "211", "800", "444", "AC_444", True, "AC", False],
-            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False],
-            [3003, 0, np.nan, np.nan, 0, "211", "800", "1234", "nan_1234", False, "nan", False],
-            [3003, 1, "C",  "ZZ", 230, "211", "800", "12", "ZZ_12", False, "ZZ", False],
-            [3003, 2, "C",  "ZZ", 59, "211", "800", "12", "ZZ_12", False, "ZZ", False],
-            [3003, 3, "D",  "ZZ", 805, "211", "800", "12", "ZZ_12", False, "ZZ", False],
-            [3003, 4, "C",  "ZZ", 33044, "211", "800", "12", "ZZ_12", False, "ZZ", False],
-            [3003, 5, "D",  "ZZ", 4677, "211", "800", "12", "ZZ_12", False, "ZZ", False],
-            [3003, 6, np.nan, np.nan, 0, "211", "800", "12", "nan_12", False, "nan", False],
-        ]
+            [1, "A", "12", "800", "211", "C", "A_12", False, "A", False], #test keep 210 and 211 and test keep "C"
+            [2, "A", "12", "800", "210", "D", "A_12", False, "A", False], #test keep 210 and 211 and test keep "D"
+            [3, "A", "12", "800", "not_210_211", "C", "A_12", True, "A", True], #test flag not_210_211
+            [4, "A", "12", "800", "211", np.nan, "A_12", True, "A", True], #test flag np.nan
+            [5, "B", "12", "800", "211", np.nan, "B_12", True, "B", True], #test flag np.nan with B
+            [6, "B", "12", "800", "not_210_211", "C", "B_12", True, "B", True], #test flag not_210_211 with B
+            [6, "B", "12", "800", "not_210_211", np.nan, "B_12", True, "B", True], #test flag with both
+            [1, np.nan, "12", "800", "211", "C", "nan_12", True, "nan", True], #test flag  np.nan
+            [1, "A", np.nan, "800", "211", "C", "A_nan", True, "A", False] #test flag np.nan
+            ]
 
         output_df = pandasDF(data=data, columns=output_cols)
         return output_df

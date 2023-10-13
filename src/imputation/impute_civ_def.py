@@ -83,19 +83,18 @@ def calc_empty_group(
 ) -> pd.DataFrame:
     """Add a new bool column flagging empty groups."""
 
-    clear_status_cond = df["statusencoded"].isin(["210", "211"])
-    df["valid_civdef_val"] = ~df["200"].isnull() & clear_status_cond
+    not_null_cond = df["200"].isnull()
+    clear_status_cond = ~df["statusencoded"].isin(["210", "211"])
+    valid_class_cond = df[class_name].str.contains("nan")
+    df[new_col_name] = not_null_cond | clear_status_cond | valid_class_cond
 
-    # calculate the number of valid entries in the class for column 200 
-    num_valid = df.groupby(class_name)["valid_civdef_val"].transform(sum)
+    # # calculate the number of valid entries in the class for column 200 
+    # num_valid = df.groupby(class_name)["valid_civdef_val"].transform(sum)
 
-    # exclude classes that are not valid
-    valid_class_cond = ~(df[class_name].str.contains("nan"))
+    # # create new bool column to flag empty classes
+    # df[new_col_name] = valid_class_cond &  (num_valid == 0) 
 
-    # create new bool column to flag empty classes
-    df[new_col_name] = valid_class_cond &  (num_valid == 0) 
-
-    df = df.drop("valid_civdef_val", axis=1)
+    # df = df.drop("valid_civdef_val", axis=1)
 
     return df
 
