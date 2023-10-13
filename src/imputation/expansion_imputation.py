@@ -74,6 +74,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Step 4: Expansion imputation for breakdown questions
     # TODO: remove this temporary fix to cast Nans to False
     df["211_trim"].fillna(False, inplace=True)
+    df["305_trim"].fillna(False, inplace=True)
 
     # Filter to exclude the same rows trimmed for 211_trim == False
     trimmed_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
