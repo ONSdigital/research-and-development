@@ -4,8 +4,8 @@ import pandas as pd
 from typing import Callable, Dict, Any
 import toml
 
-from src.outputs.short_form import run_short_form
-from src.outputs.tau import run_tau
+from src.outputs.short_form import output_short_form
+from src.outputs.tau import output_tau
 
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def run_outputs(
     # Running short form output
     if config["global"]["output_short_form"]:
         OutputMainLogger.info("Starting short form output...")
-        run_short_form(
+        output_short_form(
             estimated_df,
             config,
             write_csv,
@@ -60,7 +60,7 @@ def run_outputs(
     # Running TAU output
     if config["global"]["output_tau"]:
         OutputMainLogger.info("Starting TAU output...")
-        run_tau(
+        output_tau(
             weighted_df,
             config,
             write_csv,

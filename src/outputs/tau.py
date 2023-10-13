@@ -11,12 +11,9 @@ from src.outputs.outputs_helpers import create_output_df
 
 OutputMainLogger = logging.getLogger(__name__)
 
-# Get the shortform schema
-short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
 
-
-def run_tau(
-    weighted_df: pd.DataFrame,
+def output_tau(
+    df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -28,7 +25,7 @@ def run_tau(
     """Run the outputs module.
 
     Args:
-        weighted_df (pd.DataFrame): The dataset with weights not applied
+        df (pd.DataFrame): The dataset main with weights not applied
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -46,7 +43,7 @@ def run_tau(
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(weighted_df, ultfoc_mapper)
+    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Create a columns for numeric product grouo
     df = map_o.join_pg_numeric(df, pg_alpha_num, cols_pg=["201"])

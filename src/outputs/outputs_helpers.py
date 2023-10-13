@@ -1,5 +1,5 @@
 import pandas as pd
-from src.staging.validation import load_schema, validate_data_with_schema
+from src.staging.validation import load_schema
 
 
 def create_output_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
@@ -26,7 +26,7 @@ def create_output_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
     }
 
     # Create subset dataframe with only the required outputs
-    output_df = df[df.columns.intersection(colname_dict.keys())]
+    output_df = df[df.columns.intersection(colname_dict.keys())].copy()
 
     # Rename columns to match the output specification
     output_df.rename(
@@ -35,8 +35,5 @@ def create_output_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
 
     # Rearrange to match user defined output order
     output_df = output_df[colname_dict.values()]
-
-    # Validate datatypes before output
-    validate_data_with_schema(output_df, schema)
 
     return output_df

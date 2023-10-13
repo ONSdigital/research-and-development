@@ -12,7 +12,7 @@ class TestSelectCols(unittest.TestCase):
     def data_frame(self):
         # create sample data
         data = {
-            "reference": ["1234"],
+            "reference": [1234],
             "period": [202201],
             "unused": [0]}
 

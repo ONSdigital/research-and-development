@@ -10,7 +10,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: False
+  output_short_form: True
   output_tau: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)

@@ -1,23 +1,110 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from typing import Callable, Dict, Any
-import toml
 
-import src.outputs.short_form_out as short
 import src.outputs.map_output_cols as map_o
-from src.staging.validation import load_schema, validate_data_with_schema
 from src.outputs.outputs_helpers import create_output_df
 
 
 OutputMainLogger = logging.getLogger(__name__)
 
-# Get the shortform schema
-short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
 
-def run_short_form(
-    estimated_df: pd.DataFrame,
+def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
+    """Created year column for short form output
+
+    The 'period_year' column is added containing the year in form 'YYYY'.
+
+    Args:
+        df (pd.DataFrame): The main dataframe to be used for short form output.
+
+    Returns:
+        pd.DataFrame: returns short form output data frame with added new col
+    """
+
+    # Extracted the year from period and crated new columns 'period_year'
+    df["period_year"] = df["period"].astype("str").str[:4]
+
+    return df
+
+
+def create_headcount_cols(
+    df: pd.DataFrame,
+    round_val: int = 4,
+) -> pd.DataFrame:
+    """Create new columns with headcounts for civil and defence.
+
+    Column '705' contains the total headcount value, and
+    from this the headcount values for civil and defence are calculated
+    based on the percentages of civil and defence in columns '706' (civil)
+    and '707' (defence). Note that columns '706' and '707' measure different
+    things to '705' so will not in general total to the '705' value.
+
+    Args:
+        df (pd.DataFrame): The survey dataframe being prepared for
+            short form output.
+        round_val (int): The number of decimal places for rounding.
+
+    Returns:
+        pd.DataFrame: The dataframe with extra columns for civil and
+            defence headcount values.
+    """
+    # Use np.where to avoid division by zero.
+    df["headcount_civil"] = np.where(
+        df["706"] + df["707"] != 0,  # noqa
+        df["705"] * df["706"] / (df["706"] + df["707"]),
+        0,
+    )
+
+    df["headcount_defence"] = np.where(
+        df["706"] + df["707"] != 0,  # noqa
+        df["705"] * df["707"] / (df["706"] + df["707"]),
+        0,
+    )
+
+    df["headcount_civil"] = round(df["headcount_civil"], round_val)
+    df["headcount_defence"] = round(df["headcount_defence"], round_val)
+
+    return df
+
+
+def run_shortform_prep(
+    df: pd.DataFrame,
+    round_val: int = 4,
+) -> pd.DataFrame:
+    """Prepare data for short form output.
+
+    Perform various steps to create new columns and modify existing
+    columns to prepare the main survey dataset for short form
+    micro data output.
+
+    Args:
+        df (pd.DataFrame): The survey dataframe being prepared for
+            short form output.
+        round_val (int): The number of decimal places for rounding.
+
+    Returns:
+        pd.DataFrame: The dataframe prepared for short form output.
+    """
+
+    # Filter for short-forms
+    df = df.loc[df["formtype"] == "0006"]
+
+    # Filter for CORA statuses [600, 800]
+    df = df.loc[df["form_status"].isin(["600", "800"])]
+
+    # Create a 'year' column
+    df = create_period_year(df)
+
+    # create columns for headcounts for civil and defense
+    df = create_headcount_cols(df, round_val)
+
+    return df
+
+def output_short_form(
+    df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -28,7 +115,7 @@ def run_short_form(
     """Run the outputs module.
 
     Args:
-        estimated_df (pd.DataFrame): The main dataset contains short form output
+        df (pd.DataFrame): The main dataset for short form output
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -46,26 +133,26 @@ def run_short_form(
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
-    estimated_df = map_o.join_fgn_ownership(estimated_df, ultfoc_mapper)
+    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
-    estimated_df = map_o.create_cora_status_col(estimated_df, cora_mapper)
+    df = map_o.create_cora_status_col(df, cora_mapper)
 
     # Map the sizebands based on frozen employment
-    estimated_df = map_o.map_sizebands(estimated_df)
+    df = map_o.map_sizebands(df)
 
     # Map the itl regions using the postcodes
-    estimated_df = map_o.join_itl_regions(estimated_df, postcode_itl_mapper)
+    df = map_o.join_itl_regions(df, postcode_itl_mapper)
 
     # Map q713 and q714 to numeric format
-    estimated_df = map_o.map_to_numeric(estimated_df)
+    df = map_o.map_to_numeric(df)
 
     # Prepare the shortform output dataframe
-    short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
+    df = run_shortform_prep(df, round_val=4)
 
     # Create short form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_shortform_schema"]
-    shortform_output = create_output_df(short_form_df, schema_path)
+    shortform_output = create_output_df(df, schema_path)
 
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"output_short_form_{tdate}_v{run_id}.csv"
