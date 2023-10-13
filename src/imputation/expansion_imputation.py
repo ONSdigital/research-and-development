@@ -121,6 +121,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     expanded_result_df = pd.concat([result_211_305_df, trimmed_df], axis=0)
 
     # Make the QA dataframe and output it
+    ExpansionLogger.info("Outputting Expansion QA csv")
     qa_df = pd.Dataframe(qa_dict).T
     qa_df.to_csv("some/path/to/QA/expansion_QA.csv")
 
