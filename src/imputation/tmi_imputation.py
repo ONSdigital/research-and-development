@@ -433,51 +433,27 @@ def create_mean_dict(
     return mean_dict, df
 
 
-def apply_tmi(
-    df: pd.DataFrame, target_variables: list, mean_dict: dict
-) -> pd.DataFrame:
+def apply_tmi(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
-    for each imputation class
+    for each imputation class"""
 
-    Args:
-        df (pd.DataFrame): main data
-        target_variables (list): key variables
-        mean_dict (dict): dictionary containing means and counts
-        for each class and variable combination
-
-    Returns:
-        final_qa_df: dataframe with the imputed valued added
-        and counts columns
-    """
-
-    df = df.copy()
-
-    df["imp_marker"] = "N/A"
+    tmi_df = df.copy()
+    tmi_df["imp_marker"] = "N/A"
 
     for var in target_variables:
-        df[f"{var}_imputed"] = df[var]
-
-    for var in target_variables:
-        df[f"{var}_imputed_count"] = np.nan
-
-    for var in target_variables:
-        df[f"{var}_imputed_count_before_trim"] = np.nan
+        tmi_df[f"{var}_imputed"] = tmi_df[var]
 
     filtered_df = filter_by_column_content(
-        df, "status", ["Form sent out", "Check needed"]
+        tmi_df, "status", ["Form sent out", "Check needed"]
     )
 
-    # Filter out any cases where 200 or 201 are missing from the imp class
-    # This ensures means are calculated using only valid imputation classes
+    # Filter out any cases where 200 or 201 are missing from the imputation class
+    # This ensures that means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
-
-    # create dataframes for further QA ouput
-    qa_df = df.copy()
-    qa_filtered_df = filtered_df.copy()
 
     for var in target_variables:
         for imp_class_key in class_keys:
@@ -487,7 +463,6 @@ def apply_tmi(
 
             imp_class_df = imp_class_df.copy()
 
-            # add mean value
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
                 # Replace nulls with means
                 imp_class_df[f"{var}_imputed"] = float(
@@ -499,35 +474,90 @@ def apply_tmi(
                 imp_class_df[f"{var}_imputed"] = imp_class_df[var]
                 imp_class_df["imp_marker"] = "No mean found"
 
-            # repeat for count
+            # Apply changes to filtered_df
+            final_df = apply_to_original(imp_class_df, filtered_df)
+
+    final_df_m = apply_to_original(final_df, tmi_df)
+    
+    for var in target_variables:
+        final_df_m[f"{var}_count"] = np.nan
+
+    filtered_df = filter_by_column_content(
+        final_df_m, "status", ["Form sent out", "Check needed"]
+    )
+
+    # Filter out any cases where 200 or 201 are missing from the imputation class
+    # This ensures that means are calculated using only valid imputation classes
+    # Since imp_class is string type, any entry containing "nan" is excluded.
+    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+
+    grp = filtered_df.groupby("imp_class")
+
+    # repeat for count
+    for var in target_variables:
+        for imp_class_key in class_keys:
+
+            # Get grouped dataframe
+            imp_class_df = grp.get_group(imp_class_key)
+
+            imp_class_df = imp_class_df.copy()
+
             if f"{var}_{imp_class_key}_count" in mean_dict[var].keys():
                 # Replace nulls with counts
-                imp_class_df[f"{var}_imputed_count"] = float(
+                imp_class_df[f"{var}_count"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_count"]
                 )
-
             else:
                 imp_class_df[f"{var}_imputed_count"] = "No count found"
+
+
+            # Apply changes to filtered_df
+            final_df = apply_to_original(imp_class_df, final_df_m)
+
+    final_df_c = apply_to_original(final_df, final_df_m)
+
+    for var in target_variables:
+        final_df_c[f"{var}_count_before_trim"] = np.nan
+
+    filtered_df = filter_by_column_content(
+        final_df_c, "status", ["Form sent out", "Check needed"]
+    )
+
+    # Filter out any cases where 200 or 201 are missing from the imputation class
+    # This ensures that means are calculated using only valid imputation classes
+    # Since imp_class is string type, any entry containing "nan" is excluded.
+    filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
+
+    grp = filtered_df.groupby("imp_class")
+
+    # repeat for count before trim
+    for var in target_variables:
+        for imp_class_key in class_keys:
+
+            # Get grouped dataframe
+            imp_class_df = grp.get_group(imp_class_key)
+
+            imp_class_df = imp_class_df.copy()
 
             # repeat for count before trim
             count_before = f"{var}_{imp_class_key}_count_before_trim"
             if count_before in mean_dict[var].keys():
                 # Replace nulls with counts
-                imp_class_df[f"{var}_imputed_count_before_trim"] = float(
+                imp_class_df[f"{var}_count_before_trim"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_count_before_trim"]
                 )
-
             else:
                 imp_class_df[
                     f"{var}_imputed_count_before_trim"
                 ] = "No count before trim found"
 
-            # Apply changes to qa_filtered_df
-            final_qa = apply_to_original(imp_class_df, qa_filtered_df)
+            # Apply changes to filtered_df
+            final_df = apply_to_original(imp_class_df, final_df_c)
 
-    final_qa_df = apply_to_original(final_qa, qa_df)
+    final_df_b = apply_to_original(final_df, final_df_c)
 
-    return final_qa_df
+
+    return final_df_b
 
 
 def run_tmi(

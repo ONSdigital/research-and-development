@@ -135,45 +135,52 @@ def test_apply_tmi():
             "other",
         ],
         "imp_class": ["A", "A", "B", "B", "B"],
-        "Value": [5, None, 15, None, None],
+        "Value1": [5, None, 15, None, None],
+        "Value2": [5, None, 15, None, None],
     }
     df = pd.DataFrame(data)
 
     # Define target_variables and mean_dict for testing
-    target_variables = ["Value"]
-    mean_dict = {"Value": {"Value_A_mean": 4.0,
-                           "Value_A_count": 2.0,
-                           "Value_A_count_before_trim": 2.0,
-                           "Value_B_mean": 12.0,
-                           "Value_B_count": 2.0,
-                           "Value_B_count_before_trim": 2.0}}
+    target_variables = ["Value1", "Value2"]
+    mean_dict = {"Value1": {"Value1_A_mean": 4.0,
+                           "Value1_A_count": 2.0,
+                           "Value1_A_count_before_trim": 2.0,
+                           "Value1_B_mean": 12.0,
+                           "Value1_B_count": 2.0,
+                           "Value1_B_count_before_trim": 2.0},
+                "Value2": {"Value2_A_mean": 4.0,
+                           "Value2_A_count": 2.0,
+                           "Value2_A_count_before_trim": 2.0,
+                           "Value2_B_mean": 12.0,
+                           "Value2_B_count": 2.0,
+                           "Value2_B_count_before_trim": 2.0}}
 
     # Call the function
     result_df = apply_tmi(df, target_variables, mean_dict)
 
+    expected_cols = ["status",
+                     "imp_class",
+                     "Value1",
+                     "Value2",
+                     "imp_marker",
+                     "Value1_imputed",
+                     "Value2_imputed",
+                     "Value1_count",
+                     "Value2_count",
+                     "Value1_count_before_trim",
+                     "Value2_count_before_trim",
+                     ]
+    
     # Define the expected result DataFrame
-    expected_data = {
-        "status": [
-            "Form sent out",
-            "Form sent out",
-            "Check needed",
-            "Check needed",
-            "other",
-        ],
-        "imp_class": ["A", "A", "B", "B", "B"],
-        "Value": [5, None, 15, None, None],
-        "imp_marker": [
-            "TMI",
-            "TMI",
-            "TMI",
-            "TMI",
-            "N/A",
-        ],
-        "Value_imputed": [4.0, 4.0, 12.0, 12.0, None],
-        "Value_imputed_count": [2.0, 2.0, 2.0, 2.0, None],
-        "Value_imputed_count_before_trim": [2.0, 2.0, 2.0, 2.0, None],
-    }
-    expected_result_df = pd.DataFrame(expected_data)
+    expected_result_data = [
+        ["Form sent out", "A", 5, 5, "TMI", 4.0, 4.0, 2.0, 2.0, 2.0, 2.0],
+        ["Form sent out", "A", None, None, "TMI", 4.0, 4.0, 2.0, 2.0, 2.0, 2.0],
+        ["Check needed", "B", 15, 15, "TMI", 12.0, 12.0, 2.0, 2.0, 2.0, 2.0],
+        ["Check needed", "B", None, None, "TMI", 12.0, 12.0, 2.0, 2.0, 2.0, 2.0],
+        ["other", "B", None, None, "N/A", None, None, None, None, None, None],
+        ]
+    
+    expected_result_df = pd.DataFrame(data=expected_result_data, columns=expected_cols)
 
     # Assert that the result matches the expected result
     assert_frame_equal(result_df, expected_result_df)
