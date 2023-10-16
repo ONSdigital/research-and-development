@@ -35,7 +35,7 @@ def run_imputation(
 
     df = run_apportionment(df)
 
-    df = run_short_to_long(df)
+    df = run_short_to_long(df, selectiontype="C")
 
     imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
 
