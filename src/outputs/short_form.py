@@ -31,7 +31,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_headcount_cols(
-    df: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
+    df_in: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
@@ -45,7 +45,7 @@ def create_headcount_cols(
     hc_total will usually be 705.
 
     Args:
-        df (pd.DataFrame): The survey dataframe being prepared for
+        df_in (pd.DataFrame): The survey dataframe being prepared for
             short form output.
         fte_civil (str): Column containing percentage of civil employees.
         fte_defence (str): Column containing percentage of defence employees.
@@ -56,6 +56,9 @@ def create_headcount_cols(
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
+    # Deep copying to avoid "returning a vew versus a copy" warning
+    df= df_in.copy()
+
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
         df[fte_civil] + df[fte_defence] != 0,  # noqa
