@@ -58,7 +58,7 @@ def create_headcount_cols(
             defence headcount values.
     """
     # Deep copying to avoid "returning a vew versus a copy" warning
-    df= df_in.copy()
+    df = df_in.copy()
 
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
@@ -114,6 +114,7 @@ def run_shortform_prep(
     )
 
     return df
+
 
 def output_short_form(
     df: pd.DataFrame,

@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
     """Creates the dataframe for outputs with
     the required columns. The naming of the columns comes

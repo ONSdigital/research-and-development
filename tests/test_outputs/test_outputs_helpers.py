@@ -1,4 +1,3 @@
-from msilib import schema
 from src.outputs.outputs_helpers import create_output_df
 
 import pandas as pd
@@ -18,11 +17,11 @@ class TestSelectCols(unittest.TestCase):
 
         df = pd.DataFrame(data)
         return df
-    
+
     def schema(self):
         # create sample schema
         schema = {
-            'ref': {'old_name': 'reference', 'Deduced_Data_Type': 'int64'}, 
+            'ref': {'old_name': 'reference', 'Deduced_Data_Type': 'int64'},
             'period': {'old_name': 'period', 'Deduced_Data_Type': 'int64'}}
         return schema
 
