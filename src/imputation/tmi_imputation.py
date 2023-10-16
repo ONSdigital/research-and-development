@@ -418,9 +418,9 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     df = pd.concat([final_tmi_df, shortform_df])
 
-    final_df = df.sort_values(["reference", "instance"],
+    df = df.sort_values(["reference", "instance"],
                               ascending=[True, True]).reset_index(drop=True)
 
-    final_df = calculate_totals(final_df)
+    final_df = calculate_totals(df)
 
     return final_df, qa_df
