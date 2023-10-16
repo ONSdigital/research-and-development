@@ -160,10 +160,8 @@ def apply_civdev_imputation(
     Returns:
         pd.DataFrame: The same dataframe with R&D type imputed.
     '"""
-    df["200_original"] = df["200"]
+    # create temporary column for the imputed value
     df["200_imputed"] = df["200"]
-    df["200_imp_marker"] = "no_imputation"
-
     # Create logic conditions for filtering
     clear_mask = df["status"].isin(clear_statuses)
     to_impute_mask = (df["status"] == "Form sent out") | (df["604"] == "No")
@@ -235,6 +233,13 @@ def impute_civil_defence(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The original dataframe with imputed values for
             R&D type (civil or defence)
     """
+    # create temp QA columns
+    df["200_original"] = df["200"]
+    df["pg_sic_class"] = "nan_nan"
+    df["empty_pgsic_group"] = False
+    df["empty_pg_group"] = False
+    df["200_imp_marker"] = "no_imputation"
+
     filtered_df = df.loc[df["instance"] != 0].copy()
     filtered_df = prep_cd_imp_classes(filtered_df)
 

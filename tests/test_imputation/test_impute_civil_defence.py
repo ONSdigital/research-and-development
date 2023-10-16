@@ -209,3 +209,71 @@ class TestPrepCDImpClasses:
         result_df = prep_cd_imp_classes(input_df)
 
         assert_frame_equal(result_df, expected_df)
+
+class TestPrepCDImpClasses2:
+    """Unit tests for calc_cd_proportions function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "201",
+            "rusic",
+            "cellnumber",
+            "status",
+            "200",]
+
+        data = [
+            [1, "A", "12", "800", "Clear", "C"], # test valid (statusencoded=211) row with no nans in class name
+            [2, "A", "12", "800", "Clear - overridden", "D"], #  test valid (statusencoded=210, 200 not null) row with no nans in class name
+            [3, "A", "12", "800", "other", "C"], #  test other but still valid rows within class
+            [4, "A", "12", "800", "Clear", np.nan], #  test np.nan in 200 but still valid rows within class
+            [5, "B", "12", "800", "Clear", np.nan], #  test np.nan in 200 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", "C"], #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", np.nan], #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
+            [6, np.nan, "122", "800", "other", np.nan], #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
+            [1, np.nan, "12", "800", "Clear", "C"], #  nan in class name
+            [1, "A", np.nan, "800", "Clear", "C"] #  nan in class name
+            ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_exp_output_df(self):
+        """Create an expected output dataframe for the test."""
+        output_cols = [
+            "reference",
+            "201",
+            "rusic",
+            "cellnumber",
+            "status",
+            "200",
+            "pg_sic_class",
+            "empty_pgsic_group",
+            "pg_class",
+            "empty_pg_group"]
+
+        data = [
+            [1, "A", "12", "800", "Clear", "C", "A_12", False, "A", False], # test valid (statusencoded=211) row with no nans in class name
+            [2, "A", "12", "800", "Clear - overridden", "D", "A_12", False, "A", False], #  test valid (statusencoded=210, 200 not null) row with no nans in class name
+            [3, "A", "12", "800", "other", "C", "A_12", False, "A", False], #  test other but still valid rows within class
+            [4, "A", "12", "800", "Clear", np.nan, "A_12", False, "A", False], #  test np.nan in 200 but still valid rows within class
+            [5, "B", "12", "800", "Clear", np.nan, "B_12", True, "B", True], #  test np.nan in 200 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", "C", "B_12", True, "B", True], #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", np.nan, "B_12", True, "B", True], #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
+            [6, np.nan, "122", "800", "other", np.nan, "nan_122", False, "nan", False], #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
+            [1, np.nan, "12", "800", "Clear", "C", "nan_12", False, "nan", False], #  nan in class name
+            [1, "A", np.nan, "800", "Clear", "C", "A_nan", False, "A", False] #  nan in class name
+            ]
+
+        output_df = pandasDF(data=data, columns=output_cols)
+        return output_df
+
+    def test_prep_cd_imp_classes2(self):
+        """Test for prep_imp_classes function"""
+        input_df = self.create_input_df()
+        expected_df = self.create_exp_output_df()
+
+        result_df = prep_cd_imp_classes(input_df)
+
+        assert_frame_equal(result_df, expected_df)
