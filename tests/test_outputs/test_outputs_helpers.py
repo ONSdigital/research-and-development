@@ -1,9 +1,9 @@
+from msilib import schema
 from src.outputs.outputs_helpers import create_output_df
 
 import pandas as pd
 import unittest
 from pandas._testing import assert_frame_equal
-import os
 
 
 class TestSelectCols(unittest.TestCase):
@@ -22,9 +22,7 @@ class TestSelectCols(unittest.TestCase):
     def test_select_cols(self):
         # Call the create_output_df funtion
         df_input = self.data_frame()
-        mydir = r"D:\repos\research-and-development\tests\test_outputs"
-        myfile = "test_outputs_helpers.toml"
-        schema = os.path.join(mydir, myfile)
+        schema = "./tests/test_outputs/test_outputs_helpers.toml"
         actual_result = create_output_df(df_input, schema)
         expected_result = pd.DataFrame(
             {
