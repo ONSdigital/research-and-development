@@ -6,10 +6,11 @@ from typing import Dict, List, Tuple
 from src.staging.pg_conversion import sic_to_pg_mapper
 from src.imputation.impute_civ_def import impute_civil_defence
 
-formtype_long  = "0001"
+formtype_long = "0001"
 formtype_short = "0006"
 
 TMILogger = logging.getLogger(__name__)
+
 
 def apply_to_original(filtered_df, original_df):
     """Overwrite a dataframe with updated row values."""
@@ -47,10 +48,7 @@ def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
     return updated_df
 
 
-def impute_pg_by_sic(
-    df: pd.DataFrame, 
-    sic_mapper: pd.DataFrame
-    ) -> pd.DataFrame:
+def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"
     using the SIC number ('rusic').
@@ -68,12 +66,8 @@ def impute_pg_by_sic(
 
     df["200"] = df["200"].astype("category")
 
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for q604 = No or status = "Form sent out"
-    filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
-    ]
+    filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
 
     filtered_data = sic_to_pg_mapper(
         filtered_data, sic_mapper, target_col="201", formtype=formtype_long
@@ -91,8 +85,8 @@ def create_imp_class_col(
     class_name: str = "imp_class",
 ) -> pd.DataFrame:
     """Creates a column for the imputation class.
-    
-    This is done by concatenating the R&D business type, C or D from  q200 
+
+    This is done by concatenating the R&D business type, C or D from  q200
     and the product group from  q201.
 
     special case for cell number 817 is added as a suffix.
@@ -249,7 +243,7 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-        
+
         df[f"{variable}_trim"] = True
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
@@ -264,16 +258,16 @@ def calculate_mean(
     """Calculate the mean of the given target variable and imputation class.
 
     Dictionary values are created for the mean of the given target variable for
-    the given imputation class, and also for the 'count' or number of values 
+    the given imputation class, and also for the 'count' or number of values
     used to calculate the mean.
-    
+
     Args:
-        df (pd.DataFrame): The dataframe of 'clear' responses for the given 
+        df (pd.DataFrame): The dataframe of 'clear' responses for the given
             imputation class
         imp_class (str): The given imputation class
-        target_variable (str): The given target variable for which the mean is 
+        target_variable (str): The given target variable for which the mean is
             to be evaluated.
-    
+
     Returns:
         Dict[str, float]
     """
@@ -299,9 +293,8 @@ def calculate_mean(
 
 
 def create_mean_dict(
-    df: pd.DataFrame, 
-    target_variable_list: List[str]
-    ) -> Tuple[Dict, pd.DataFrame]: 
+    df: pd.DataFrame, target_variable_list: List[str]
+) -> Tuple[Dict, pd.DataFrame]:
     """Calculate trimmed mean values for each target variable and imputation class.
 
     Returns a dictionary of mean values and counts for each unique class and variable
@@ -309,8 +302,8 @@ def create_mean_dict(
 
     Args:
         df (pd.DataFrame): The dataframe for imputation
-        target_variable List(str): List of target variables for which the mean is 
-            to be evaluated.        
+        target_variable List(str): List of target variables for which the mean is
+            to be evaluated.
     Returns:
         Tuple[Dict[str, float], pd.DataFrame]
     """
@@ -325,7 +318,6 @@ def create_mean_dict(
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    # filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -348,7 +340,7 @@ def create_mean_dict(
 
             df_list.append(tr_df)
             # Create a dictionary with the target variable as the key
-            # and a dictionary containing the 
+            # and a dictionary containing the
             means = calculate_mean(trimmed_df, k, var)
 
             # Update full dict with values
@@ -369,7 +361,7 @@ def apply_tmi(df, target_variables, mean_dict):
     for each imputation class"""
 
     df = df.copy()
-    df["imp_marker"] = "N/A"
+    df["imp_marker"] = "no_imputation"
 
     for var in target_variables:
         df[f"{var}_imputed"] = df[var]
@@ -417,17 +409,16 @@ def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
     TMILogger.info("Starting TMI imputation.")
-    copy_df = full_df.copy()
 
-    # Filter for long form data
-    long_df = filter_by_column_content(copy_df, "formtype", [formtype_long])
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
-    long_df = instance_fix(long_df)
-    long_df = duplicate_rows(long_df)
+    longform_df = instance_fix(longform_df)
+    longform_df = duplicate_rows(longform_df)
 
     # TMI Step 1: impute the Product Group
-    df = impute_pg_by_sic(long_df, sic_mapper)
+    df = impute_pg_by_sic(longform_df, sic_mapper)
 
     TMILogger.info("Imputing for R&D type (civil or defence).")
     df = impute_civil_defence(df)
@@ -441,10 +432,16 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = apply_tmi(df, target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
 
-    final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    df = pd.concat([final_tmi_df, shortform_df])
+
+    final_df = df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
 
     TMILogger.info("TMI imputation completed.")
     return final_df, qa_df
