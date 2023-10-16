@@ -31,20 +31,25 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_headcount_cols(
-    df: pd.DataFrame,
-    round_val: int = 4,
+    df: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
-    Column '705' contains the total headcount value, and
+    The column represented by hc_total contains the total headcount value, and
     from this the headcount values for civil and defence are calculated
-    based on the percentages of civil and defence in columns '706' (civil)
-    and '707' (defence). Note that columns '706' and '707' measure different
-    things to '705' so will not in general total to the '705' value.
+    based on the percentages of civil and defence in fte_civil (civil)
+    fte_defence (defence). Note that fte_civil and fte_defence measure different
+    things to hc_total so will not in general total to the hc_total value.
+
+    fte_civil will usually be 706, fte_defence will usually be 707, and
+    hc_total will usually be 705.
 
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
+        fte_civil (str): Column containing percentage of civil employees.
+        fte_defence (str): Column containing percentage of defence employees.
+        hc_total (str): Column containing total headcount value.
         round_val (int): The number of decimal places for rounding.
 
     Returns:
@@ -53,14 +58,14 @@ def create_headcount_cols(
     """
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["706"] / (df["706"] + df["707"]),
+        df[fte_civil] + df[fte_defence] != 0,  # noqa
+        df[hc_total] * df[fte_civil] / (df[fte_civil] + df[fte_defence]),
         0,
     )
 
     df["headcount_defence"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["707"] / (df["706"] + df["707"]),
+        df[fte_civil] + df[fte_defence] != 0,  # noqa
+        df[hc_total] * df[fte_defence] / (df[fte_civil] + df[fte_defence]),
         0,
     )
 
@@ -89,17 +94,20 @@ def run_shortform_prep(
         pd.DataFrame: The dataframe prepared for short form output.
     """
 
-    # Filter for short-forms
-    df = df.loc[df["formtype"] == "0006"]
-
-    # Filter for CORA statuses [600, 800]
-    df = df.loc[df["form_status"].isin(["600", "800"])]
+    # Filter for short-forms, CORA statuses and instance
+    df = df.loc[
+        (df["formtype"] == "0006")
+        & (df["form_status"].isin(["600", "800"]))
+        & (df["instance"] == 0)
+    ]
 
     # Create a 'year' column
     df = create_period_year(df)
 
     # create columns for headcounts for civil and defense
-    df = create_headcount_cols(df, round_val)
+    df = create_headcount_cols(
+        df, "706_estimated", "707_estimated", "705_estimated", round_val
+    )
 
     return df
 

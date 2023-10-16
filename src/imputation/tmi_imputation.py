@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 from src.staging.pg_conversion import sic_to_pg_mapper
 
-formtype_long  = "0001"
+formtype_long = "0001"
 formtype_short = "0006"
+
 
 def apply_to_original(filtered_df, original_df):
     """Overwrites a dataframe with updated row values"""
@@ -59,11 +60,9 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame):
 
     df["200"] = df["200"].astype("category")
 
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for q604 = No or status = "Form sent out"
-    filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
+    filtered_data = df.loc[
+        (df["status"] == "Form sent out") | (df["604"] == "No")
     ]
 
     filtered_data = sic_to_pg_mapper(
@@ -144,11 +143,8 @@ def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean"""
 
-    # Filter for long form data
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for instance is not 0
-    filtered_df = long_df.loc[long_df["instance"] != 0]
+    filtered_df = df.loc[df["instance"] != 0]
 
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
@@ -239,7 +235,7 @@ def trim_bounds(
 
         # create trim tag (distinct from trim_check)
         # to mark which to trim for mean growth ratio
-        
+
         df[f"{variable}_trim"] = True
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
@@ -290,7 +286,6 @@ def create_mean_dict(df, target_variable_list):
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -380,12 +375,13 @@ def apply_tmi(df, target_variables, mean_dict):
 def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
-    copy_df = full_df.copy()
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
 
-    copy_df = instance_fix(copy_df)
-    copy_df = duplicate_rows(copy_df)
+    longform_df = instance_fix(longform_df)
+    longform_df = duplicate_rows(longform_df)
 
-    df = impute_pg_by_sic(copy_df, sic_mapper)
+    df = impute_pg_by_sic(longform_df, sic_mapper)
 
     df = tmi_pre_processing(df, target_variables)
 
@@ -395,9 +391,14 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_df = apply_tmi(df, target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
 
-    final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    df = pd.concat([final_tmi_df, shortform_df])
+
+    final_df = df.sort_values(["reference", "instance"],
+                              ascending=[True, True]).reset_index(drop=True)
 
     return final_df, qa_df
