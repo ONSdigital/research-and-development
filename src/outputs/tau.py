@@ -3,9 +3,9 @@ import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
-import toml
 
 import src.outputs.map_output_cols as map_o
+from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -77,7 +77,8 @@ def output_tau(
 
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]
-    tau_output = create_output_df(df, schema_path)
+    schema_dict = load_schema(schema_path)
+    tau_output = create_output_df(df, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")

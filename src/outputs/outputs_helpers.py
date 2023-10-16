@@ -1,23 +1,19 @@
 import pandas as pd
-from src.staging.validation import load_schema
 
-
-def create_output_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
+def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
     """Creates the dataframe for outputs with
     the required columns. The naming of the columns comes
     from the schema provided.
 
     Args:
         df (pd.DataFrame): Dataframe containing all columns
-        schema (str): Toml schema containing the old and new
+        output_schema (str): Toml schema containing the old and new
         column names for the outputs
 
     Returns:
         (pd.DataFrame): A dataframe consisting of only the
         required short form output data
     """
-    # Load schema using pre-built function
-    output_schema = load_schema(schema)
 
     # Create dict of current and required column names
     colname_dict = {

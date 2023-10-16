@@ -18,11 +18,18 @@ class TestSelectCols(unittest.TestCase):
 
         df = pd.DataFrame(data)
         return df
+    
+    def schema(self):
+        # create sample schema
+        schema = {
+            'ref': {'old_name': 'reference', 'Deduced_Data_Type': 'int64'}, 
+            'period': {'old_name': 'period', 'Deduced_Data_Type': 'int64'}}
+        return schema
 
     def test_select_cols(self):
         # Call the create_output_df funtion
         df_input = self.data_frame()
-        schema = "./tests/test_outputs/test_outputs_helpers.toml"
+        schema = self.schema()
         actual_result = create_output_df(df_input, schema)
         expected_result = pd.DataFrame(
             {

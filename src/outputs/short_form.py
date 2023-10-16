@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
+from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -163,7 +164,8 @@ def output_short_form(
 
     # Create short form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_shortform_schema"]
-    shortform_output = create_output_df(df, schema_path)
+    schema_dict = load_schema(schema_path)
+    shortform_output = create_output_df(df, schema_dict)
 
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"output_short_form_{tdate}_v{run_id}.csv"
