@@ -1,14 +1,19 @@
+import logging
 import pandas as pd
 import numpy as np
+from typing import Dict, List, Tuple
 from typing import Tuple
+
 from src.staging.pg_conversion import sic_to_pg_mapper
 
 formtype_long = "0001"
 formtype_short = "0006"
 
+TMILogger = logging.getLogger(__name__)
+
 
 def apply_to_original(filtered_df: pd.DataFrame, original_df) -> pd.DataFrame:
-    """Overwrites a dataframe with updated row values
+    """Overwrite a dataframe with updated row values
 
     Args:
         filtered_df (pd.DataFrame): dataframe with
@@ -85,7 +90,7 @@ def impute_pg_by_sic(
     using the SIC number ('rusic').
 
     Args:
-        df (pd.DataFrame): initial dataframe from staging
+        df (pd.DataFrame): SPP dataframe from staging
         sic_mapper (pd.DataFrame): SIC to PG mapper
 
     Returns:
@@ -119,8 +124,9 @@ def create_imp_class_col(
     col_second_half: str,
     class_name: str = "imp_class",
 ) -> pd.DataFrame:
-    """Creates a column for the imputation class by concatenating
-    the business type "200" and product group "201" columns. The
+    """Creates a column for the imputation class.
+    This is done by concatenating the R&D business type, C or D from  q200
+    and the product group from  q201.
     special case for cell number 817 is added as a suffix.
 
     Args:
@@ -308,18 +314,19 @@ def trim_bounds(
 
 def calculate_mean(
     df: pd.DataFrame, unique_item: str, target_variable: str
-) -> pd.DataFrame:
-    """Calculate the mean and count for each target and imputation
+) -> Dict[str, float]:
+    """Calculate the mean and counts for each target and imputation
     class combination
     Returns a dictionary.
 
     Args:
-        df (pd.DataFrame): main data
+        df (pd.DataFrame): The dataframe of 'clear' responses for
+        the given imputation class target variable combination
         unique_item (str): unique class
         target_variable (str): each key variable col of interest
 
     Returns:
-        pd.DataFrame: dictionary with mean, count and count before trimming
+        dict: dictionary with mean, count and count before trimming
         for each class and target variable combination
     """
 
@@ -331,36 +338,37 @@ def calculate_mean(
     # convert to floats for mean calculation
     trimmed_df[target_variable] = trimmed_df[target_variable].astype("float")
 
-    dict_mean_growth_ratio = {}
+    dict_trimmed_mean = {}
 
     # Add mean and count to dictionary
     mean_key = f"{target_variable}_{unique_item}_mean"
-    dict_mean_growth_ratio[mean_key] = trimmed_df[target_variable].mean()
+    dict_trimmed_mean[mean_key] = trimmed_df[target_variable].mean()
 
     # Count is the number of items in the trimmed class
     count_key = f"{target_variable}_{unique_item}_count"
-    dict_mean_growth_ratio[count_key] = len(trimmed_df[target_variable])
+    dict_trimmed_mean[count_key] = len(trimmed_df[target_variable])
 
     # Count before trimming is applied
     count_before = f"{target_variable}_{unique_item}_count_before_trim"
-    dict_mean_growth_ratio[count_before] = len(df)
+    dict_trimmed_mean[count_before] = len(df)
 
-    return dict_mean_growth_ratio
+    return dict_trimmed_mean
 
 
 def create_mean_dict(
     df: pd.DataFrame, target_variable_list: list
 ) -> Tuple[dict, pd.DataFrame]:
-    """Function to apply multiple steps to calculate the means for each target
-    variable.
-    Returns a dictionary of mean values and counts for each unique class
-    and variable
+    """Calculate trimmed mean values for each target variable and
+    imputation class.
+    Returns a dictionary of mean values and counts (before and after trimming)
+    for each unique class and variable.
     Also returns a QA dataframe containing information on how trimming
-    was applied
+    was applied.
 
     Args:
-        df (pd.DataFrame): main data
-        target_variable_list (list): key variables
+        df (pd.DataFrame): main data for imputation
+        target_variable_list (list): List of target variables for which
+        the mean is to be evaluated.
 
     Returns:
         Tuple[dict, pd.DataFrame]: dictionary containing means and counts
@@ -417,7 +425,8 @@ def create_mean_dict(
             tr_df = trimmed_df.set_index("pre_index")
 
             dfs_list.append(tr_df)
-            # Calculate mean and count # TODO: Rename this
+
+            # Calculate mean and counts
             means = calculate_mean(trimmed_df, k, var)
 
             # Update full dict with values
@@ -438,7 +447,7 @@ def apply_tmi(df, target_variables, mean_dict):
     for each imputation class"""
 
     tmi_df = df.copy()
-    tmi_df["imp_marker"] = "N/A"
+    tmi_df["imp_marker"] = "no_imputation"
 
     for var in target_variables:
         tmi_df[f"{var}_imputed"] = tmi_df[var]
@@ -464,7 +473,8 @@ def apply_tmi(df, target_variables, mean_dict):
             imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
-                # Replace nulls with means
+
+                # Create new column with the imputed value
                 imp_class_df[f"{var}_imputed"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_mean"]
                 )
@@ -576,22 +586,30 @@ def run_tmi(
         and counts columns
         qa_df: qa dataframe
     """
-    copy_df = full_df.copy()
+    TMILogger.info("Starting TMI imputation.")
+    
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
 
-    copy_df = instance_fix(copy_df)
-    copy_df = duplicate_rows(copy_df)
+    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
+    longform_df = instance_fix(longform_df)
+    longform_df = duplicate_rows(longform_df)
 
-    df = impute_pg_by_sic(copy_df, sic_mapper)
+    # TMI Step 1: impute the Product Group
+    df = impute_pg_by_sic(longform_df, sic_mapper)
 
+    TMILogger.info("Calculating the trimmed mean for target variables")
     df = tmi_pre_processing(df, target_variables)
 
     mean_dict, qa_df = create_mean_dict(df, target_variables)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
-    final_df = apply_tmi(df, target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
 
-    final_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    return final_df, qa_df
+    df = pd.concat([final_tmi_df, shortform_df])
+
+    return final_tmi_df, qa_df

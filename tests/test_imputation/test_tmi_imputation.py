@@ -177,7 +177,7 @@ def test_apply_tmi():
         ["Form sent out", "A", None, None, "TMI", 4.0, 4.0, 2.0, 2.0, 2.0, 2.0],
         ["Check needed", "B", 15, 15, "TMI", 12.0, 12.0, 2.0, 2.0, 2.0, 2.0],
         ["Check needed", "B", None, None, "TMI", 12.0, 12.0, 2.0, 2.0, 2.0, 2.0],
-        ["other", "B", None, None, "N/A", None, None, None, None, None, None],
+        ["other", "B", None, None, "no_imputation", None, None, None, None, None, None],
         ]
     
     expected_result_df = pd.DataFrame(data=expected_result_data, columns=expected_cols)
