@@ -3,11 +3,15 @@ import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
+import toml
 
 import src.outputs.short_form_out as short
 import src.outputs.map_output_cols as map_o
 
 OutputMainLogger = logging.getLogger(__name__)
+
+# Get the shortform schema
+short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
 
 
 def run_output(
@@ -18,6 +22,7 @@ def run_output(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
+    pg_alpha_num: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -27,14 +32,17 @@ def run_output(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
+        ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
 
 
     """
+
     OutputMainLogger.info("Starting short form output...")
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    paths = config[f"{NETWORK_OR_HDFS}_paths"]
+    output_path = paths["output_path"]
 
     # Prepare the columns needed for outputs:
 
