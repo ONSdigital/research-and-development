@@ -2,7 +2,7 @@ global:
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-  postcode_csv_check: True
+  postcode_csv_check: False
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False
@@ -44,6 +44,7 @@ hdfs_paths:
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
+  feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
@@ -65,6 +66,7 @@ network_paths:
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
+  pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
 schema_paths:
   frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
 outliers:

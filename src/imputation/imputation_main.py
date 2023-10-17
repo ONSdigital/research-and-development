@@ -7,6 +7,7 @@ from datetime import datetime
 from src.imputation import tmi_imputation as tmi
 from src.imputation import expansion_imputation as ximp
 from src.imputation.apportionment import run_apportionment
+from src.imputation.short_to_long import run_short_to_long
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -35,11 +36,11 @@ def run_imputation(
 
     df = run_apportionment(df)
 
+    df = run_short_to_long(df)
+
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper)
 
     imputed_df = ximp.run_expansion(imputed_df, config)
-
-    imputed_output_df = imputed_df.loc[imputed_df["formtype"] == "0001"]
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
@@ -50,7 +51,7 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
-        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_output_df)
+        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # Get the breakdown columns from the config

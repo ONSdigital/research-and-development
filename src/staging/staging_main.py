@@ -1,6 +1,5 @@
 """The main file for the staging and validation module."""
 import logging
-import pandas as pd
 from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
@@ -24,7 +23,7 @@ def run_staging(
     read_feather: Callable,
     write_feather: Callable,
     run_id: int,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> Tuple:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -46,7 +45,15 @@ def run_staging(
             This will be the hdfs or network version depending on settings.
         run_id (int): The run id for this run.
     Returns:
-        pd.DataFrame: The staged and vaildated snapshot data.
+        tuple
+            full_responses (pd.DataFrame): The staged and vaildated snapshot data,
+            manual_outliers (pd.DataFrame): Data with column for manual outliers,
+            pg_mapper (pd.DataFrame): Product grouo mapper,
+            ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
+            cora_mapper (pd.DataFrame): CORA status mapper,
+            cellno_df (pd.DataFrame): Cell numbers mapper,
+            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -54,6 +61,7 @@ def run_staging(
     # Conditionally load paths
     paths = config[f"{network_or_hdfs}_paths"]
     snapshot_path = paths["snapshot_path"]
+    snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
 
     # Load historic data
     if config["global"]["load_historic_data"]:
@@ -90,14 +98,16 @@ def run_staging(
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
-
     # Check if feather file exists in snapshot path
-    snapshot_dir = os.path.dirname(snapshot_path)
+    feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
-    feather_files = [f for f in os.listdir(snapshot_dir) if f.endswith(".feather")]
-    if bool(feather_files) & load_from_feather:
+    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    feather_files_exist = check_file_exists(feather_file)
+
+    is_network = (network_or_hdfs == "network")
+    # Only read from feather if feather files exist and we are on network
+    if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found
-        feather_file = os.path.join(snapshot_dir, feather_files[0])
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
@@ -106,18 +116,22 @@ def run_staging(
         StagingMainLogger.info("Loading SPP snapshot data from json file")
         # Load data from JSON file
         snapdata = load_json(snapshot_path)
-    # the anonymised snapshot data we use in the DevTest environment
-    # does not include data in several columns. This fix should be removed
-    # when new anonymised data is given.
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+
         contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
-        responses_df["instance"] = 0
-        # In the anonymised data the selectiontype is always 'L'
-        col_size = contributors_df.shape[0]
-        random.seed(seed=42)
-        contributors_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
-        cellno_list = config["devtest"]["seltype_list"]
-        contributors_df["cellnumber"] = random.choice(cellno_list, size=col_size)
+
+        # the anonymised snapshot data we use in the DevTest environment
+        # does not include the instance column. This fix should be removed
+        # when new anonymised data is given.
+        if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+            responses_df["instance"] = 0
+            # In the anonymised data the selectiontype is always 'L'
+            col_size = contributors_df.shape[0]
+            random.seed(seed=42)
+            contributors_df["selectiontype"] = random.choice(
+                ["P", "C", "L"], size=col_size
+            )
+            cellno_list = config["devtest"]["seltype_list"]
+            contributors_df["cellnumber"] = random.choice(cellno_list, size=col_size)
         StagingMainLogger.info("Finished Data Ingest...")
 
         val.validate_data_with_schema(
@@ -140,17 +154,23 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-        # Get response rate
-        processing.response_rate(contributors_df, responses_df)
-
         # Write feather file to snapshot path
-        snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
-        feather_file = os.path.join(snapshot_dir, f"{snapshot_name}.feather")
-        write_feather(feather_file, full_responses)
+        if is_network:
+            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+            write_feather(feather_file, full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
+        contributors_df = read_feather(
+            os.path.join(feather_path, f"{snapshot_name}_contributors.feather")
+        )
+        responses_df = read_feather(
+            os.path.join(feather_path, f"{snapshot_name}_responses.feather")
+        )
         full_responses = snapdata
+
+    # Get response rate
+    processing.response_rate(contributors_df, responses_df)
 
     # Data validation
     val.check_data_shape(full_responses)
@@ -230,6 +250,14 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_alpha_num_path = paths["pg_alpha_num_path"]
+    check_file_exists(pg_alpha_num_path)
+    pg_alpha_num = read_csv(pg_alpha_num_path)
+    val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -249,4 +277,5 @@ def run_staging(
         cora_mapper,
         cellno_df,
         postcode_df,
+        pg_alpha_num,
     )

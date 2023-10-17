@@ -72,6 +72,6 @@ class TestCreateHeadcountCols:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df = create_headcount_cols(input_df, 4)
+        result_df = create_headcount_cols(input_df, "706", "707", "705", 4)
 
         assert_frame_equal(result_df, expected_df)

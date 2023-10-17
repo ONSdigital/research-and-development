@@ -65,8 +65,6 @@ def run_pipeline(start, config_path):
         MainLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
 
-    MainLogger.info(f"Using the {network_or_hdfs} file system as data source.")
-
     # Set up the run logger
     global_config = config["global"]
     runlog_obj = runlog.RunLog(
@@ -95,6 +93,7 @@ def run_pipeline(start, config_path):
         cora_mapper,
         cellno_df,
         postcode_itl_mapper,
+        pg_alpha_num,
     ) = run_staging(
         config,
         check_file_exists,
@@ -147,6 +146,7 @@ def run_pipeline(start, config_path):
         ultfoc_mapper,
         cora_mapper,
         postcode_itl_mapper,
+        pg_alpha_num,
     )
     MainLogger.info("Finished Output module.")
 

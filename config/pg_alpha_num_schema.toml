@@ -1,0 +1,5 @@
+[pg_alpha]
+Deduced_Data_Type = "str"
+
+[pg_numeric]
+Deduced_Data_Type = "Int64"
