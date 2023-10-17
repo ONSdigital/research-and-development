@@ -89,6 +89,7 @@ def run_pipeline(start, config_path):
         cora_mapper,
         cellno_df,
         postcode_itl_mapper,
+        pg_alpha_num,
     ) = run_staging(config, check_file_exists, load_json, read_csv, write_csv, run_id)
     MainLogger.info("Finished Data Ingest...")
 
@@ -132,6 +133,7 @@ def run_pipeline(start, config_path):
         ultfoc_mapper,
         cora_mapper,
         postcode_itl_mapper,
+        pg_alpha_num,
     )
     MainLogger.info("Finished Output module.")
 

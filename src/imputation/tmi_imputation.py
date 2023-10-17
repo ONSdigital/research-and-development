@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple
 from typing import Tuple
 
 from src.staging.pg_conversion import sic_to_pg_mapper
+from src.imputation.impute_civ_def import impute_civil_defence
 
 formtype_long = "0001"
 formtype_short = "0006"
@@ -102,12 +103,8 @@ def impute_pg_by_sic(
 
     df["200"] = df["200"].astype("category")
 
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
     # Filter for q604 = No or status = "Form sent out"
-    filtered_data = long_df.loc[
-        (long_df["status"] == "Form sent out") | (long_df["604"] == "No")
-    ]
+    filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
 
     filtered_data = sic_to_pg_mapper(
         filtered_data, sic_mapper, target_col="201", formtype=formtype_long
@@ -145,9 +142,12 @@ def create_imp_class_col(
     df = df.copy()
 
     # Create class col with concatenation
-    df[class_name] = (
-        df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
-    )
+    if col_second_half:
+        df[class_name] = (
+            df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
+        )
+    else:
+        df[class_name] = df[col_first_half].astype(str)
 
     fil_df = filter_by_column_content(df, "cellnumber", [817])
     # Create class col with concatenation + 817
@@ -158,7 +158,7 @@ def create_imp_class_col(
     return df
 
 
-def fill_zeros(df: pd.DataFrame, column: str):
+def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Fills null values with zeros in a given column."""
     return df[column].fillna(0).astype("float")
 
@@ -212,12 +212,9 @@ def tmi_pre_processing(
     Returns:
         pd.DataFrame: data with preprocessing complete
     """
-
-    # Filter for long form data
-    long_df = filter_by_column_content(df, "formtype", [formtype_long])
-
+    #TODO check decision to remove form filterring correct
     # Filter for instance is not 0
-    filtered_df = long_df.loc[long_df["instance"] != 0]
+    filtered_df = df.loc[df["instance"] != 0]
 
     # Filter for clear statuses
     clear_statuses = ["210", "211"]
@@ -343,7 +340,7 @@ def calculate_mean(
     # Add mean and count to dictionary
     mean_key = f"{target_variable}_{unique_item}_mean"
     dict_trimmed_mean[mean_key] = trimmed_df[target_variable].mean()
-
+    #TODO check removal of ~isnull 
     # Count is the number of items in the trimmed class
     count_key = f"{target_variable}_{unique_item}_count"
     dict_trimmed_mean[count_key] = len(trimmed_df[target_variable])
@@ -386,7 +383,6 @@ def create_mean_dict(
 
     # Filter out imputation classes that are missing either "200" or "201"
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    filtered_df = filtered_df[filtered_df["formtype"] == formtype_long]
 
     # Group by imp_class
     grp = filtered_df.groupby("imp_class")
@@ -473,7 +469,6 @@ def apply_tmi(df, target_variables, mean_dict):
             imp_class_df = imp_class_df.copy()
 
             if f"{var}_{imp_class_key}_mean" in mean_dict[var].keys():
-
                 # Create new column with the imputed value
                 imp_class_df[f"{var}_imputed"] = float(
                     mean_dict[var][f"{var}_{imp_class_key}_mean"]
@@ -612,4 +607,9 @@ def run_tmi(
 
     df = pd.concat([final_tmi_df, shortform_df])
 
-    return final_tmi_df, qa_df
+    final_df = df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
+    TMILogger.info("TMI imputation completed.")
+    return final_df, qa_df
