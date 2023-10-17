@@ -11,7 +11,7 @@ from src.imputation.apportionment import (
 
 
 class TestCalc202Totals:
-    """Unit tests for flag_outliers functtion."""
+    """Unit tests for calc_202_totals function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
