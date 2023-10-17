@@ -97,15 +97,9 @@ def run_staging(
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
     feather_files_exist = check_file_exists(feather_file)
 
+    is_network = (network_or_hdfs == "network")
     # Only read from feather if feather files exist and we are on network
     if feather_files_exist & load_from_feather:
-        # Temporary warning due to issues with reading from DevTest
-        if network_or_hdfs != "network":
-            StagingMainLogger.warning(
-                """Reading from feather not supported (due to test data) on DevTest, and
-                is untested in prod.
-                """
-            )
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
@@ -154,8 +148,9 @@ def run_staging(
         )
 
         # Write feather file to snapshot path
-        feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
-        write_feather(feather_file, full_responses)
+        if not is_network:
+            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+            write_feather(feather_file, full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:

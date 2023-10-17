@@ -11,8 +11,8 @@ global:
   output_estimation_qa: False
   output_imputation_qa: True
   output_short_form: True
-  dev_test : True
-  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
+  dev_test : False
+  network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
 years:
   current_year: 2022 # TODO: put this in the userconfig
