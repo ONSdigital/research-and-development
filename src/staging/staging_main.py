@@ -99,7 +99,7 @@ def run_staging(
 
     is_network = (network_or_hdfs == "network")
     # Only read from feather if feather files exist and we are on network
-    if feather_files_exist & load_from_feather:
+    if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
@@ -148,7 +148,7 @@ def run_staging(
         )
 
         # Write feather file to snapshot path
-        if not is_network:
+        if is_network:
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
             write_feather(feather_file, full_responses)
         READ_FROM_FEATHER = False
