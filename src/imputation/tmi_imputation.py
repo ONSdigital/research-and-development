@@ -310,7 +310,7 @@ def trim_bounds(
 
 
 def calculate_mean(
-    df: pd.DataFrame, unique_item: str, target_variable: str
+    df: pd.DataFrame, imp_class: str, target_variable: str
 ) -> Dict[str, float]:
     """Calculate the mean and counts for each target and imputation
     class combination
@@ -319,7 +319,7 @@ def calculate_mean(
     Args:
         df (pd.DataFrame): The dataframe of 'clear' responses for
         the given imputation class target variable combination
-        unique_item (str): unique class
+        imp_class (str): unique class
         target_variable (str): each key variable col of interest
 
     Returns:
@@ -338,16 +338,20 @@ def calculate_mean(
     dict_trimmed_mean = {}
 
     # Add mean and count to dictionary
-    mean_key = f"{target_variable}_{unique_item}_mean"
+    mean_key = f"{target_variable}_{imp_class}_mean"
     dict_trimmed_mean[mean_key] = trimmed_df[target_variable].mean()
     #TODO check removal of ~isnull 
     # Count is the number of items in the trimmed class
-    count_key = f"{target_variable}_{unique_item}_count"
-    dict_trimmed_mean[count_key] = len(trimmed_df[target_variable])
+    count_key = f"{target_variable}_{imp_class}_count"
+    dict_trimmed_mean[count_key] = len(
+        trimmed_df.loc[~trimmed_df[target_variable].isnull()]
+    )
 
     # Count before trimming is applied
-    count_before = f"{target_variable}_{unique_item}_count_before_trim"
-    dict_trimmed_mean[count_before] = len(df)
+    count_before = f"{target_variable}_{imp_class}_count_before_trim"
+    dict_trimmed_mean[count_before] = len(
+        df.loc[~df[target_variable].isnull()]
+    )
 
     return dict_trimmed_mean
 
@@ -397,19 +401,18 @@ def create_mean_dict(
             if (
                 subgrp[var].isna().any()
                 or subgrp[var].eq("nan").any()
-                or subgrp[var].eq("").any()
             ):
                 print(
-                    "Warning: NaNs, 'nan', Nones, or "
-                    f"empty strings found in the {var} column."
+                    "Warning: NaNs, 'nan' or Nones "
+                    f"found in the {var} column."
                 )
 
             # replace "nan" with actual nan values
             filter_nans = subgrp.copy()
             filter_nans[var] = filter_nans[var].replace("nan", np.nan)
 
-            # Filter rows that do not contain NaNs, Nones, blanks
-            # or empty strings in the "var" column
+            # Filter rows that do not contain NaNs, Nones
+            # in the "var" column
             filter_nans = filter_nans.dropna(subset=[var])
 
             # Sort by target_variable, df['employees'], reference
@@ -601,9 +604,6 @@ def run_tmi(
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
     final_tmi_df = apply_tmi(df, target_variables, mean_dict)
-
-    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
     df = pd.concat([final_tmi_df, shortform_df])
 
