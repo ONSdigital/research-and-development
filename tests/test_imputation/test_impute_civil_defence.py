@@ -62,7 +62,7 @@ class TestCalcCDPorportions:
         
 
 class TestCreateCivdefDict:
-    """Unit tests for calc_cd_proportions function."""
+    """Unit tests for create_civdef_dict function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -114,7 +114,7 @@ class TestCreateCivdefDict:
         assert pgsic_dict == exp_pgsic_dict
 
 
-    def test_create_civdef_dict(self):
+    def test_create_civdef_dict2(self):
         "Test the pg only dict calcuclation in create_civdef_dict function."
         input_df = self.create_input_df()
 
@@ -126,7 +126,7 @@ class TestCreateCivdefDict:
 
 
 class TestPrepCDImpClasses:
-    """Unit tests for calc_cd_proportions function."""
+    """Unit tests for prep_cd_imp_classes function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
