@@ -14,7 +14,7 @@ from src.utils.local_file_mods import (
     check_file_exists,
     local_mkdir,
     local_open,
-    local_file_write_feather,
+    local_write_feather,
 )
 
 
@@ -143,7 +143,7 @@ def test_local_open(tmp_path):
 def test_local_file_write_feather(tmp_path, input_data, expout_data):
     # Set up path and write data to feather
     filepath = tmp_path / "test.feather"
-    local_file_write_feather(str(filepath), input_data)
+    local_write_feather(str(filepath), input_data)
 
     # Make sure the file has been created
     assert os.path.exists(filepath)
