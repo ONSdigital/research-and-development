@@ -32,7 +32,7 @@ def run_short_to_long(df,
     convert_short_to_long = [
         ("701", "702", "211"),
         ("703", "704", "305"),
-        ("706", "707", "employment_total"),
+        ("706", "707", "emp_total"),
         ("headcount_civil", "headcount_defence", "headcount_total"),
     ]
 
@@ -56,6 +56,6 @@ def run_short_to_long(df,
     df = df.sort_values(["reference", "instance"],
                         ascending=[True, True]).reset_index(drop=True)
 
-    df = df.drop(["headcount_civil", "headcount_defence", "employment_total"], axis=1)
+    df = df.drop(["headcount_civil", "headcount_defence"], axis=1)
 
     return df
