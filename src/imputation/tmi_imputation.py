@@ -419,7 +419,7 @@ def run_tmi(full_df, target_variables, sic_mapper):
     df = pd.concat([final_tmi_df, shortform_df])
 
     df = df.sort_values(["reference", "instance"],
-                              ascending=[True, True]).reset_index(drop=True)
+                         ascending=[True, True]).reset_index(drop=True)
 
     final_df = calculate_totals(df)
 
