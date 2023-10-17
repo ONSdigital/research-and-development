@@ -235,5 +235,5 @@ def run_staging(
         cora_mapper,
         cellno_df,
         postcode_df,
-        pg_alpha_num
+        pg_alpha_num,
     )
