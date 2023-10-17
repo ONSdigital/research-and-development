@@ -52,7 +52,7 @@ def evaluate_imputed_ixx(
         unclear_mask = group["status"].isin(unclear_statuses)
         imputed_value = (sum_breakdown_q / sum_master_q) * sum_master_imp
         # Write imputed value to the non-responder records
-        group.loc[unclear_mask][f"{bd_col}_imputed"] = imputed_value
+        group.loc[unclear_mask, f"{bd_col}_imputed"] = imputed_value
 
     # Returning updated group and updated QA dict
     return group
