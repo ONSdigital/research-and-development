@@ -19,7 +19,6 @@ def evaluate_imputed_ixx(
     over the sum of all 211 or 305 values, multiplied by the imputed 211."""
 
     imp_class = group["imp_class"].values[0]
-    ExpansionLogger.debug(f"Processing group: {imp_class}")
 
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
@@ -37,11 +36,11 @@ def evaluate_imputed_ixx(
         # Master col imputed, e.g. 211_imputed or 305_imputed
         # Sum the breakdown master q imputed for TMI records
         TMI_mask = group["imp_marker"] == "TMI"
-        sum_master_imp = group.loc[TMI_mask][f"{master_col}_imputed"]
-        if sum_master_imp.values.any():
-            sum_master_imp = sum_master_imp.values[0]  # get a single value
+        master_imp_val = group.loc[TMI_mask][f"{master_col}_imputed"]
+        if master_imp_val.values.any():
+            master_imp_val = master_imp_val.values[0]  # get a single value
         else:
-            sum_master_imp = float("nan")  # assigns nan where there are no values
+            master_imp_val = float("nan")  # assigns nan where there are no values
 
         # Make imputation col equal to original column
         group[f"{bd_col}_imputed"] = group[bd_col]
@@ -50,7 +49,7 @@ def evaluate_imputed_ixx(
         # i.e. for non-responders
         unclear_statuses = ["Form sent out", "Check needed"]
         unclear_mask = group["status"].isin(unclear_statuses)
-        imputed_value = (sum_breakdown_q / sum_master_q) * sum_master_imp
+        imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val
         # Write imputed value to the non-responder records
         group.loc[unclear_mask, f"{bd_col}_imputed"] = imputed_value
 
@@ -77,7 +76,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     df["305_trim"].fillna(False, inplace=True)
 
     # Filter to exclude the same rows trimmed for 211_trim == False
-    trimmed_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
+    trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
     ExpansionLogger.debug(
         f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df"
     )
@@ -91,6 +90,10 @@ def run_expansion(df: pd.DataFrame, config: dict):
         evaluate_imputed_ixx, "211", break_down_cols=breakdown_qs_2xx
     )
 
+     # Join the 211 expanded df (processed from untrimmed records) back on to
+    # 211 trimmed records
+    result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)   
+
     # Calculate the imputation values for 3xx questions
     breakdown_qs_3xx = config["breakdowns"]["3xx"]
 
@@ -102,8 +105,15 @@ def run_expansion(df: pd.DataFrame, config: dict):
         :, breakdown_qs_3xx
     ].astype(int)
 
+
+    # Filter to exclude the same rows trimmed for 305_trim == False
+    trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
+    ExpansionLogger.debug(
+        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df"
+    )
+
     # Groupby imp_class again
-    non_trim_grouped = result_211_df.groupby("imp_class")
+    non_trim_grouped = nontrimmed_df.groupby("imp_class")
 
     result_211_305_df = non_trim_grouped.apply(
         evaluate_imputed_ixx, "305", break_down_cols=breakdown_qs_3xx
@@ -111,7 +121,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records
-    expanded_result_df = pd.concat([result_211_305_df, trimmed_df], axis=0)
+    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df], axis=0)
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)

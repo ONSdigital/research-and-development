@@ -1,10 +1,11 @@
 import logging
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 
 from src.staging.pg_conversion import sic_to_pg_mapper
 from src.imputation.impute_civ_def import impute_civil_defence
+from src.imputation import expansion_imputation as ximp
 
 formtype_long = "0001"
 formtype_short = "0006"
@@ -425,9 +426,25 @@ def calculate_totals(df):
     return df
 
 
-def run_tmi(full_df, target_variables, sic_mapper):
+def run_tmi(
+    full_df: pd.DataFrame, 
+    target_variables: List[str], 
+    sic_mapper: pd.DataFrame, 
+    config: Dict[str,Any]
+) -> pd.DataFrame:
     """Function to run imputation end to end and returns the final
-    dataframe back to the pipeline"""
+    dataframe back to the pipeline
+        dataframe back to the pipeline
+    Args:
+        full_df (pd.DataFrame): main data
+        target_variables (list): key variables
+        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+        config (Dict): the configuration settings
+    Returns:
+        final_df: dataframe with the imputed valued added
+        and counts columns
+        qa_df: qa dataframe
+    """
     TMILogger.info("Starting TMI imputation.")
 
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
@@ -459,12 +476,15 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     df = pd.concat([final_tmi_df, shortform_df])
 
+    # TMI Step 4: expansion imputation
+    expanded_df = ximp.run_expansion(df, config)
+
+    # TMI Step 5: Calculate headcount and employment totals
+    final_df = calculate_totals(expanded_df)
+
     df = df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
-
-    # TMI Step 5: Calculate headcount and employment totals
-    final_df = calculate_totals(df)
 
     TMILogger.info("TMI imputation completed.")
     return final_df, qa_df

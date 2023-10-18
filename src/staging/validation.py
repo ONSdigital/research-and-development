@@ -11,7 +11,6 @@ from src.utils.wrappers import time_logger_wrap, exception_wrap
 validation_logger = logging.getLogger(__name__)
 
 
-@time_logger_wrap
 def validate_postcode_pattern(pcode: str) -> bool:
     """A function to validate UK postcodes which uses the postcodes_uk package
     to verify the pattern of a postcode by using regex.

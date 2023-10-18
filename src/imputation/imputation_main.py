@@ -5,7 +5,6 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 
 from src.imputation import tmi_imputation as tmi
-from src.imputation import expansion_imputation as ximp
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 
@@ -34,13 +33,20 @@ def run_imputation(
         "headcount_oth_f",
     ]
 
+    sum_cols = [
+        "emp_total", 
+        "headcount_tot_m", 
+        "headcount_tot_f", 
+        "headcount_total"
+    ]
+
     df = run_apportionment(df)
 
     df = run_short_to_long(df)
 
-    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper)
+    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
 
-    imputed_df = ximp.run_expansion(imputed_df, config)
+
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
@@ -56,7 +62,8 @@ def run_imputation(
 
     # Get the breakdown columns from the config
     bd_cols = config["breakdowns"]["2xx"] + config["breakdowns"]["3xx"]
-    orig_cols = bd_cols + target_vars
+
+    orig_cols = bd_cols + target_vars + sum_cols
 
     # Create names for imputed cols
     imp_cols = [f"{col}_imputed" for col in orig_cols]
