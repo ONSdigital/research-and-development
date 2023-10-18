@@ -3,27 +3,36 @@ import pandas as pd
 from src.outputs.short_form_out import create_headcount_cols
 
 
-def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
+def run_short_to_long(df,
+                      selectiontype=["P", "C"],
+                      fte_civil="706",
+                      fte_defence="707",
+                      hc_total="705"):
     """Implement short form to long form conversion.
 
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
+        selectiontype (list): Selection type(s) included in short to long conversion.
         fte_civil (str): Column containing percentage of civil employees.
         fte_defence (str): Column containing percentage of defence employees.
         hc_total (str): Column containing total headcount value.
+
 
     Returns:
         pd.DataFrame: The dataframe with additional instances for civil and
             defence short form responses, in long form format.
     """
 
-    df = create_headcount_cols(df, fte_civil, fte_defence, hc_total)
+    short_to_long_df = df.copy().loc[df["selectiontype"].isin(selectiontype)]
+    not_short_to_long_df = df.copy().loc[~df["selectiontype"].isin(selectiontype)]
+
+    df = create_headcount_cols(short_to_long_df, fte_civil, fte_defence, hc_total)
 
     convert_short_to_long = [
         ("701", "702", "211"),
         ("703", "704", "305"),
-        ("706", "707", "Employment total"),
+        ("706", "707", "emp_total"),
         ("headcount_civil", "headcount_defence", "headcount_total"),
     ]
 
@@ -42,11 +51,10 @@ def run_short_to_long(df, fte_civil="706", fte_defence="707", hc_total="705"):
         civil_df[each[2]] = civil_df[each[0]]
         defence_df[each[2]] = defence_df[each[1]]
 
-    df = pd.concat([df, civil_df, defence_df])
+    df = pd.concat([df, civil_df, defence_df, not_short_to_long_df])
 
-    df = df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(
-        drop=True
-    )
+    df = df.sort_values(["reference", "instance"],
+                        ascending=[True, True]).reset_index(drop=True)
 
     df = df.drop(["headcount_civil", "headcount_defence"], axis=1)
 
