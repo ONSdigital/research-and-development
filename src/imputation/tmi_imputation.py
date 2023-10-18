@@ -405,6 +405,26 @@ def apply_tmi(df, target_variables, mean_dict):
     return final_df
 
 
+def calculate_totals(df):
+
+    df['emp_total_imputed'] = (df['emp_researcher_imputed']
+                               + df['emp_technician_imputed']
+                               + df['emp_other_imputed'])
+
+    df['headcount_tot_m_imputed'] = (df['headcount_res_m_imputed']
+                                     + df['headcount_tec_m_imputed']
+                                     + df['headcount_oth_m_imputed'])
+
+    df['headcount_tot_f_imputed'] = (df['headcount_res_f_imputed']
+                                     + df['headcount_tec_f_imputed']
+                                     + df['headcount_oth_f_imputed'])
+
+    df['headcount_total_imputed'] = (df['headcount_tot_m_imputed']
+                                     + df['headcount_tot_f_imputed'])
+
+    return df
+
+
 def run_tmi(full_df, target_variables, sic_mapper):
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline"""
@@ -439,9 +459,12 @@ def run_tmi(full_df, target_variables, sic_mapper):
 
     df = pd.concat([final_tmi_df, shortform_df])
 
-    final_df = df.sort_values(
+    df = df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
+
+    # TMI Step 5: Calculate headcount and employment totals
+    final_df = calculate_totals(df)
 
     TMILogger.info("TMI imputation completed.")
     return final_df, qa_df
