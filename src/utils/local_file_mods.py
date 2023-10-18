@@ -8,6 +8,8 @@ from typing import List
 import hashlib
 import shutil
 
+from src.utils.wrappers import time_logger_wrap
+
 
 # Set up logger
 lfmod_logger = logging.getLogger(__name__)
@@ -152,7 +154,8 @@ def local_open(filepath, mode):
     return file
 
 
-def local_file_write_feather(filepath, df):
+@time_logger_wrap
+def local_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
     Args:
@@ -301,3 +304,17 @@ def local_search_file(dir_path, ending):
                 target_file = str(file)
 
     return target_file
+
+
+@time_logger_wrap
+def local_read_feather(filepath):
+    """Reads a feather file from a local network drive into a Pandas DataFrame
+
+    Args:
+        filepath (str): Filepath
+
+    Returns:
+        pd.DataFrame: Dataframe created from feather file
+    """
+    df = pd.read_feather(filepath)
+    return df
