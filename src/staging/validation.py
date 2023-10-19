@@ -483,3 +483,46 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
+
+
+@time_logger_wrap
+@exception_wrap
+def validate_many_to_one(
+    mapper: pd.DataFrame,
+    col_many: str,
+    col_one: str) -> pd.DataFrame:
+    """
+
+    Validates a many to one mapper:
+    1. Checks if the mapper has two columns col_many and col_one.
+    2. Salects and deduplicates col_many and col_one.
+    3. Checks that for each entry in col_many there is exactly one entry in
+    col_one.
+    
+    Args:
+        df (pd.DataFrame): The input mapper
+        col_many (str): name of the column with many entries
+        col_one (str): name of the column with one entry
+    """
+    try:
+        # Check that expected column are present
+        cols = mapper.columns
+        if not ((col_many in cols) and (col_one in cols)):
+            raise ValueError(f"Mapper must have columns {col_many} and {col_one}")
+
+        # Selects the columns we need and deduplicates
+        df = mapper[[col_many, col_one]].drop_duplicates()
+
+        # Check the count of col_one
+        df_count = (df
+            .groupby(col_many)
+            .agg({col_one:'count'})
+            .reset_index()
+            .rename(columns={col_one:'code_count'}))
+        df_bad = df_count[df_count['code_count'] > 1]
+        if not df_bad.empty:
+            raise ValueError(f"Mapper is many to many")
+        return df
+
+    except ValueError as ve:
+        raise ValueError("Many-to-one mapper validation failed: " + str(ve))

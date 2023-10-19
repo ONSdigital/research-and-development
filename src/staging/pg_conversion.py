@@ -74,7 +74,6 @@ def pg_to_pg_mapper(
 
     return df
 
-
 def sic_to_pg_mapper(
     df: pd.DataFrame,
     sicmapper: pd.DataFrame,
@@ -96,6 +95,75 @@ def sic_to_pg_mapper(
         target_col (str, optional): The column we output the
         mapped values to (product_group).
         sic_column (str, optional): The column containing the SIC numbers.
+        from_col (str, optional): The column in the mapper that is used to map from.
+        to_col (str, optional): The column in the mapper that is used to map to.
+
+    Returns:
+        pd.DataFrame: A dataframe with all target column values mapped
+    """
+
+    filtered_df = df.copy()
+
+    formtype_cond = filtered_df["formtype"] == formtype
+    filtered_df = filtered_df[formtype_cond]
+    # Create list of SIC numbers that have one-to-many cardinality
+    mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
+    map_errors = (
+        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
+    )
+    # Log the conflicts for the user to fix
+    if map_errors:
+        PgLogger.error(
+            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
+        )
+    # Create a mapping dictionary from the 2 columns
+    map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
+    # Flag all SIC numbers that don't have a corresponding map value
+    mapless_errors = []
+    for key, value in map_dict.items():
+        if str(value) == "nan":
+            mapless_errors.append(key)
+
+    if mapless_errors:
+        PgLogger.error(
+            f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
+        )
+    # Map to the target column using the dictionary taking into account the null values.
+    # Then convert to categorigal datatype
+    filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
+    filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
+    filtered_df[target_col] = filtered_df[target_col].astype("category")
+
+    df = df.copy()
+
+    df.loc[
+        filtered_df.index,
+        f"{target_col}",
+    ] = filtered_df[target_col]
+
+    PgLogger.info("SIC numbers successfully mapped to PG letters")
+
+    return df
+
+
+
+def sic_to_pg_alpha(
+    df: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
+    sic_column: str = "rusic",
+    target_col: str = "pg_alpha",
+    from_col: str = "sic",
+    to_col: str = "pg_alpha",
+    formtype: str = "0006",
+):
+    """Maps SIC codes coming from IDBR to alpha PG codes for short forms.
+
+    Args:
+        df (pd.DataFrame): The dataset containing all the PG numbers.
+        sic_pg_alpha (pd.DataFrame): SIC to PG alpha mapper.
+        sic_column (str, optional): The column in SPP snapshot containing the SIC codes.
+        target_col (str, optional): The column we output the
+        mapped values to (pg_alpha).
         from_col (str, optional): The column in the mapper that is used to map from.
         to_col (str, optional): The column in the mapper that is used to map to.
 

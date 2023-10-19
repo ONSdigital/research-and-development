@@ -258,6 +258,10 @@ def run_staging(
     check_file_exists(pg_alpha_num_path)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    pg_alpha_num = val.validate_many_to_one(
+        pg_alpha_num, 
+        col_many="pg_alpha", 
+        col_one="pg_numeric")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Loading PG numeric to alpha mapper
