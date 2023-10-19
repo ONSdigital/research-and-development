@@ -32,34 +32,31 @@ def expansion_impute(
     clear_statuses = ["Clear", "Clear - overridden"]
     responder_mask = group["status"].isin(clear_statuses)
 
-    # Get long forms only for summing master_col
+    # Combination masks to select correct records for summing
     long_form_responder_mask = responder_mask & long_mask
+    short_form_responder_mask = responder_mask & short_mask
+
+    # Get long forms only for summing master_col
     sum_master_q_lng = group.loc[long_form_responder_mask][master_col].sum()  # scalar
+
+    # Calculate the master returned value for each responder (will be a vector)
+    master_return_vals = group[short_form_responder_mask][master_col].sum()  # vector
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
         sum_breakdown_q = group.loc[long_form_responder_mask][bd_col].sum()
 
-        # Master col imputed, e.g. 211_imputed or 305_imputed
-        # Sum the breakdown master q imputed for TMI records
-        TMI_mask = group["imp_marker"] == "TMI"
-        master_imp_val = group.loc[TMI_mask][f"{master_col}_imputed"]
-        if master_imp_val.values.any():
-            master_imp_val = master_imp_val.values[0]  # get a single value
-        else:
-            master_imp_val = float("nan")  # assign nan where there are no vals
-
         # Make imputation col equal to original column
         group[f"{bd_col}_imputed"] = group[bd_col]
 
         # Update the imputation column for status encoded 100 and 201
         # i.e. for non-responders
-        unclear_statuses = ["Form sent out", "Check needed"]
-        unclear_mask = group["status"].isin(unclear_statuses)
-        imputed_value = (sum_breakdown_q / sum_master_q_lng) * master_imp_val
+        # unclear_statuses = ["Form sent out", "Check needed"]
+        # unclear_mask = group["status"].isin(unclear_statuses)
+        imputed_values = (sum_breakdown_q / sum_master_q_lng) * master_return_vals
         # Write imputed value to the non-responder records
-        group.loc[(unclear_mask & short_mask), f"{bd_col}_imputed"] = imputed_value
+        group.loc[short_form_responder_mask, f"{bd_col}_imputed"] = imputed_values
 
     # Returning updated group and updated QA dict
     return group
