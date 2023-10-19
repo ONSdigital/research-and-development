@@ -5,13 +5,12 @@ from typing import List, Union
 import pandas as pd
 
 
-def evaluate_imputed_ixx(
+def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     break_down_cols: List[Union[str, int]],
 ) -> pd.DataFrame:
-    """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
-    over the sum of all 211 or 305 values, multiplied by the imputed 211."""
+    """Calculate the expansion imputated values for short forms using long form data"""
 
     imp_class = group["imp_class"].values[0]
     print(imp_class)
@@ -51,3 +50,18 @@ def evaluate_imputed_ixx(
 
     # Returning updated group and updated QA dict
     return group
+
+
+# make a
+df = pd.DataFrame([1, 2, 3, 4])
+
+# Exclude the records from the reference list
+refence_list = ["817"]
+ref_list_excluded_df = df[~df.cellno.str.isin(refence_list)]
+
+# Groupby imputation class
+grouped_by_impclass = df.groupby("imp_class")
+
+grouped_by_impclass.apply(
+    expansion_impute,
+)
