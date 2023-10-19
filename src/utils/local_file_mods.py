@@ -166,6 +166,20 @@ def local_write_feather(filepath, df):
     return True
 
 
+@time_logger_wrap
+def local_read_feather(filepath):
+    """Reads a feather file from a local network drive into a Pandas DataFrame
+
+    Args:
+        filepath (str): Filepath
+
+    Returns:
+        pd.DataFrame: Dataframe created from feather file
+    """
+    df = pd.read_feather(filepath)
+    return df
+
+
 def local_delete_file(path: str):
     """
     Delete a file on the local file system.

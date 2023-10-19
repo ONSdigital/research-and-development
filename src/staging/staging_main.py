@@ -94,7 +94,7 @@ def run_staging(
         StagingMainLogger.info("Skipping loading historic data...")
 
     # Check data file exists, raise an error if it does not.
-    StagingMainLogger.info("Loading SPP snapshot data...")
+
     check_file_exists(snapshot_path)
 
     # load and parse the snapshot data json file
@@ -174,11 +174,6 @@ def run_staging(
 
     # Data validation
     val.check_data_shape(full_responses)
-
-    processing.response_rate(contributors_df, responses_df)
-    StagingMainLogger.info(
-        "Finished Data Transmutation and validation of full responses dataframe"
-    )
 
     # Stage, validate and harmonise the postcode column
     StagingMainLogger.info("Starting PostCode Validation")
