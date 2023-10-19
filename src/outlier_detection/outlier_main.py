@@ -44,6 +44,8 @@ def run_outliers(
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
 
+    # first take only the 
+
     network_or_hdfs = config["global"]["network_or_hdfs"]
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]

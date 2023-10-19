@@ -48,6 +48,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
 
     Outliers are only computed from valid, positive responses
     of PRN sampled data (selectiontype = P).
+    Short to long form conversion has been done, so only use instance 0.
     Valid responses have statuses of Clear or Clear Overridden
     (statusencoded = 210 or 211).
 
@@ -67,9 +68,10 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         )
         raise ValueError
     status_cond = df.statusencoded.isin(["210", "211"])
-    positive_cond = df[value_col] > 0
+    pos_cond = df[value_col] > 0
+    ins_cond = df["instance"] == 0
 
-    filtered_df = df[sample_cond & status_cond & positive_cond].copy()
+    filtered_df = df[sample_cond & status_cond & pos_cond & ins_cond].copy()
 
     if filtered_df.empty:
         AutoOutlierLogger.error(
@@ -281,8 +283,9 @@ def apply_short_form_filters(
 ):
     """Apply a filter for only short forms with selection type 'P'."""
     # Filter to the correct form type
-    filtered_df = df[
-        (df["formtype"] == form_type_no) & (df["selectiontype"] == sel_type)
-    ]
+    form_cond = df["formtype"] == form_type_no
+    sel_cond = df["selectiontype"] == sel_type
+    ins_cond = df["instance"] == 0
+    filtered_df = df[form_cond & sel_cond & ins_cond]
 
     return filtered_df
