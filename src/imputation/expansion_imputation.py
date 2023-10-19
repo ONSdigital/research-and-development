@@ -40,7 +40,7 @@ def evaluate_imputed_ixx(
         if master_imp_val.values.any():
             master_imp_val = master_imp_val.values[0]  # get a single value
         else:
-            master_imp_val = float("nan")  # assigns nan where there are no values
+            master_imp_val = float("nan")  # assign nan where there are no vals
 
         # Make imputation col equal to original column
         group[f"{bd_col}_imputed"] = group[bd_col]
@@ -128,9 +128,5 @@ def run_expansion(df: pd.DataFrame, config: dict):
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
-
-    ExpansionLogger.debug(
-        f"There are {expanded_result_df.shape[0]} rows in expanded_resultfinal__df"
-    )
 
     return expanded_result_df
