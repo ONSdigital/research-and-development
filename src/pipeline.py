@@ -94,6 +94,8 @@ def run_pipeline(start, config_path):
         cellno_df,
         postcode_itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
     ) = run_staging(
         config,
         check_file_exists,
@@ -138,7 +140,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
-    
+
     # Run short frozen form output
     run_outputs(
         estimated_responses,
@@ -150,9 +152,10 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
     )
 
-    
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")

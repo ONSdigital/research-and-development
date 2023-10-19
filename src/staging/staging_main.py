@@ -54,6 +54,8 @@ def run_staging(
             cellno_df (pd.DataFrame): Cell numbers mapper,
             postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
+            pg_num_alpha (pd.DataFrame): Product group numeric to alpha mapper.
+            sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -250,12 +252,28 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
-    # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    # Loading PG alpha to numeric mapper - possibly, deprecated
+    StagingMainLogger.info("Loading PG alpha to numeric File...")
     pg_alpha_num_path = paths["pg_alpha_num_path"]
     check_file_exists(pg_alpha_num_path)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_num_alpha_path = paths["pg_num_alpha_path"]
+    check_file_exists(pg_num_alpha_path)
+    pg_num_alpha = read_csv(pg_num_alpha_path)
+    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading SIC to PG to alpha mapper
+    StagingMainLogger.info("Loading SIC to PG to alpha File...")
+    sic_pg_alpha_path = paths["sic_pg_alpha_path"]
+    check_file_exists(sic_pg_alpha_path)
+    sic_pg_alpha = read_csv(sic_pg_alpha_path)
+    val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
@@ -278,4 +296,6 @@ def run_staging(
         cellno_df,
         postcode_df,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
     )

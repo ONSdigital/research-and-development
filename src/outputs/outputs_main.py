@@ -20,6 +20,8 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -62,5 +64,7 @@ def run_outputs(
             cora_mapper,
             postcode_itl_mapper,
             pg_alpha_num,
+            pg_num_alpha,
+            sic_pg_alpha,
         )
         OutputMainLogger.info("Finished TAU output.")
