@@ -78,7 +78,9 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Filter to exclude the same rows trimmed for 211_trim == False
     trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
     ExpansionLogger.debug(
-        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df"
+        f"There are {df.shape[0]} rows in the original df \n"
+        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
+        f"There are {trimmed_211_df.shape[0]} rows in the trimmed_211_df"
     )
 
     # Trimmed groups
@@ -109,6 +111,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     # Filter to exclude the same rows trimmed for 305_trim == False
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
     ExpansionLogger.debug(
+        f"There are {result_211_df.shape[0]} rows in the result_211_df \n"
         f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df"
     )
 
@@ -125,5 +128,9 @@ def run_expansion(df: pd.DataFrame, config: dict):
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
+
+    ExpansionLogger.debug(
+        f"There are {expanded_result_df.shape[0]} rows in expanded_resultfinal__df"
+    )
 
     return expanded_result_df

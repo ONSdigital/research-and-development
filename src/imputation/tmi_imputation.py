@@ -474,15 +474,15 @@ def run_tmi(
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
-    df = pd.concat([final_tmi_df, shortform_df])
-
     # TMI Step 4: expansion imputation
-    expanded_df = ximp.run_expansion(df, config)
+    expanded_df = ximp.run_expansion(final_tmi_df, config)
+
+    full_df = pd.concat([expanded_df, shortform_df])
 
     # TMI Step 5: Calculate headcount and employment totals
-    final_df = calculate_totals(expanded_df)
+    final_df = calculate_totals(full_df)
 
-    df = df.sort_values(
+    final_df = final_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
