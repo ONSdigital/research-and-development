@@ -12,7 +12,7 @@ from src.staging.staging_main import run_staging
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
-from src.outputs.outputs_main import run_output
+from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ def run_pipeline(start, config_path):
     # Data processing: Estimation
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses = run_estimation(
+    estimated_responses, weighted_responses = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
     print(estimated_responses.sample(10))
@@ -137,9 +137,12 @@ def run_pipeline(start, config_path):
     # Data output: Disclosure Control
 
     # Data output: File Outputs
-    MainLogger.info("Starting Output...")
-    run_output(
+    MainLogger.info("Starting Outputs...")
+    
+    # Run short frozen form output
+    run_outputs(
         estimated_responses,
+        weighted_responses,
         config,
         write_csv,
         run_id,
@@ -148,7 +151,9 @@ def run_pipeline(start, config_path):
         postcode_itl_mapper,
         pg_alpha_num,
     )
-    MainLogger.info("Finished Output module.")
+
+    
+    MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
 

@@ -1,21 +1,18 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-from datetime import datetime
 from typing import Callable, Dict, Any
-import toml
 
-import src.outputs.short_form_out as short
-import src.outputs.map_output_cols as map_o
+from src.outputs.short_form import output_short_form
+from src.outputs.tau import output_tau
+
 
 OutputMainLogger = logging.getLogger(__name__)
 
-# Get the shortform schema
-short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
 
-
-def run_output(
+def run_outputs(
     estimated_df: pd.DataFrame,
+    weighted_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -24,10 +21,12 @@ def run_output(
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
 ):
+
     """Run the outputs module.
 
     Args:
         estimated_df (pd.DataFrame): The main dataset contains short form output
+        weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -37,39 +36,31 @@ def run_output(
 
 
     """
-
-    OutputMainLogger.info("Starting short form output...")
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
-
-    # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    estimated_df = map_o.join_fgn_ownership(estimated_df, ultfoc_mapper)
-
-    # Map to the CORA statuses from the statusencoded column
-    estimated_df = map_o.create_cora_status_col(estimated_df, cora_mapper)
-
-    # Map the sizebands based on frozen employment
-    estimated_df = map_o.map_sizebands(estimated_df)
-
-    # Map the itl regions using the postcodes
-    estimated_df = map_o.join_itl_regions(estimated_df, postcode_itl_mapper)
-
-    # Map q713 and q714 to numeric format
-    estimated_df = map_o.map_to_numeric(estimated_df)
-
-    # Prepare the shortform output dataframe
-    short_form_df = short.run_shortform_prep(estimated_df, round_val=4)
-
-    # Create short form output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["frozen_shortform_schema"]
-    shortform_output = short.create_shortform_df(short_form_df, schema_path)
-
+    # Running short form output
     if config["global"]["output_short_form"]:
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        filename = f"output_short_form_{tdate}_v{run_id}.csv"
-        write_csv(f"{output_path}/output_short_form/{filename}", shortform_output)
-    OutputMainLogger.info("Finished short form output.")
+        OutputMainLogger.info("Starting short form output...")
+        output_short_form(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_itl_mapper,
+        )
+        OutputMainLogger.info("Finished short form output.")
+
+    # Running TAU output
+    if config["global"]["output_tau"]:
+        OutputMainLogger.info("Starting TAU output...")
+        output_tau(
+            weighted_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_itl_mapper,
+            pg_alpha_num,
+        )
+        OutputMainLogger.info("Finished TAU output.")
