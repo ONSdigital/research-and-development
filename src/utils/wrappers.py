@@ -2,6 +2,7 @@ import logging
 from functools import wraps
 from time import perf_counter
 import traceback
+import pandas as pd
 from table_logger import TableLogger
 import logging.config
 
@@ -133,7 +134,7 @@ def exception_wrap(func):
     return wrapper
 
 
-def df_change_wrap(func):
+def df_change_class_wrap(func):
     """This wrapper logs the change in a dataframe's columns
     and rows. It can only wrap around the main method of a class.
     The class must have attribute self.vf_df which is the current state of
@@ -196,6 +197,61 @@ def df_measure_change(df, rows_before, cols_before, table_config):
             """Trouble at mill!!! Mistake in config.
                           Either 'Table' or 'SingleLine' must be specified."""
         )
+
+
+def df_change_func_wrap(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Extract the dataframe arg
+        df_arg = None
+        for arg in args:
+            if isinstance(arg, pd.DataFrame):
+                df_arg = arg
+                break
+
+        if df_arg is None:
+            raise ValueError("No dataframe found in arguments")
+
+        # Get shape
+        before_shape = df_arg.shape
+
+        # Apply the function
+        result = func(*args, **kwargs)
+
+        # Get shape after function
+        after_shape = result.shape
+
+        # Extract rows and col
+        rows_before = before_shape[0]
+        rows_after = after_shape[0]
+
+        cols_before = before_shape[1]
+        cols_after = after_shape[1]
+
+        rows_diff = rows_after - rows_before
+        cols_diff = cols_after - cols_before
+
+        def _change_direction(before, after):
+            """Get the direction of the change."""
+            # Evalutate the direction of change
+            change = ["gained", "removed"][after < before]
+
+            return change
+
+        # Get direction of change
+        row_change = _change_direction(rows_before, rows_after)
+        col_change = _change_direction(cols_before, cols_after)
+
+        if rows_diff == 0 and cols_diff == 0:
+            logger.info("There has been no change in the dataframe")
+        else:
+            logger.info("Changes to the dataframe are as follows")
+            logger.info(f"{abs(rows_diff)} rows were {row_change}")
+            logger.info(f"{abs(cols_diff)} columns were {col_change}")
+
+        return result
+
+    return wrapper
 
 
 def validate_dataframe_not_empty(func):

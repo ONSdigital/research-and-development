@@ -19,7 +19,7 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
 
-    keyvars = [
+    target_vars = [
         "211",
         "305",
         "emp_researcher",
@@ -33,11 +33,20 @@ def run_imputation(
         "headcount_oth_f",
     ]
 
+    sum_cols = [
+        "emp_total", 
+        "headcount_tot_m", 
+        "headcount_tot_f", 
+        "headcount_total"
+    ]
+
     df = run_apportionment(df)
 
     df = run_short_to_long(df)
 
-    imputed_df, qa_df = tmi.run_tmi(df, keyvars, mapper)
+    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+
+
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
@@ -50,5 +59,19 @@ def run_imputation(
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
+
+    # Get the breakdown columns from the config
+    bd_cols = config["breakdowns"]["2xx"] + config["breakdowns"]["3xx"]
+
+    orig_cols = bd_cols + target_vars + sum_cols
+
+    # Create names for imputed cols
+    imp_cols = [f"{col}_imputed" for col in orig_cols]
+
+    # Update the original breakdown questions and target variables with the imputed
+    imputed_df[orig_cols] = imputed_df[imp_cols]
+
+    # Drop imputed values from df
+    imputed_df = imputed_df.drop(columns=imp_cols)
 
     return imputed_df
