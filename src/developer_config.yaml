@@ -8,8 +8,8 @@ global:
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
-  output_imputation_qa: True
+  output_estimation_qa: True
+  output_imputation_qa: False
   output_short_form: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
@@ -120,3 +120,14 @@ breakdowns:
     - "302"
     - "303"
     - "304"
+  emp_xx:
+    - "emp_researcher"
+    - "emp_technician"
+    - "emp_other"
+  headcount_xx:
+    - "headcount_res_m"
+    - "headcount_res_f "
+    - "headcount_tec_m"
+    - "headcount_tec_f"
+    - "headcount_oth_m"
+    - "headcount_oth_f"
