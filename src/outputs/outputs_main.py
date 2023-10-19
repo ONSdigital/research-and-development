@@ -2,19 +2,12 @@
 import logging
 import pandas as pd
 from typing import Callable, Dict, Any
-import toml
 
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
 
 
 OutputMainLogger = logging.getLogger(__name__)
-
-# Get the shortform schema
-short_form_schema = toml.load("src/outputs/output_schemas/frozen_shortform_schema.toml")
-
-# Get the Tau Argus output schema
-tau_schema = toml.load("src/outputs/output_schemas/tau_schema.toml")
 
 
 def run_outputs(

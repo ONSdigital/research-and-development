@@ -32,7 +32,7 @@ def output_tau(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-        postcode_itl_mapper (pd.DataFrame): maps the postcode to region code 
+        postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
     """
