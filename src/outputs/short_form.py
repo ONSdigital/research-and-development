@@ -1,7 +1,16 @@
-"""Prepare the survey data for short form microdata output."""
+"""The main file for the Outputs module."""
+import logging
 import pandas as pd
 import numpy as np
-from src.staging.validation import load_schema, validate_data_with_schema
+from datetime import datetime
+from typing import Callable, Dict, Any
+
+import src.outputs.map_output_cols as map_o
+from src.staging.validation import load_schema
+from src.outputs.outputs_helpers import create_output_df
+
+
+OutputMainLogger = logging.getLogger(__name__)
 
 
 def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
@@ -23,7 +32,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_headcount_cols(
-    df: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
+    df_in: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
@@ -37,7 +46,7 @@ def create_headcount_cols(
     hc_total will usually be 705.
 
     Args:
-        df (pd.DataFrame): The survey dataframe being prepared for
+        df_in (pd.DataFrame): The survey dataframe being prepared for
             short form output.
         fte_civil (str): Column containing percentage of civil employees.
         fte_defence (str): Column containing percentage of defence employees.
@@ -48,6 +57,9 @@ def create_headcount_cols(
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
+    # Deep copying to avoid "returning a vew versus a copy" warning
+    df = df_in.copy()
+
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
         df[fte_civil] + df[fte_defence] != 0,  # noqa
@@ -104,41 +116,58 @@ def run_shortform_prep(
     return df
 
 
-def create_shortform_df(df: pd.DataFrame, schema: str) -> pd.DataFrame:
-    """Creates the shortform dataframe for outputs with
-    the required columns. The naming of the columns comes
-    from the schema provided.
+def output_short_form(
+    df: pd.DataFrame,
+    config: Dict[str, Any],
+    write_csv: Callable,
+    run_id: int,
+    ultfoc_mapper: pd.DataFrame,
+    cora_mapper: pd.DataFrame,
+    postcode_itl_mapper: pd.DataFrame,
+):
+    """Run the outputs module.
 
     Args:
-        df (pd.DataFrame): Dataframe containing all columns
-        schema (str): Toml schema containing the old and new
-        column names for the outputs
+        df (pd.DataFrame): The main dataset for short form output
+        config (dict): The configuration settings.
+        write_csv (Callable): Function to write to a csv file.
+         This will be the hdfs or network version depending on settings.
+        run_id (int): The current run id
+        ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
+        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
 
-    Returns:
-        (pd.DataFrame): A dataframe consisting of only the
-        required short form output data
+
     """
-    # Load schema using pre-built function
-    output_schema = load_schema(schema)
 
-    # Create dict of current and required column names
-    colname_dict = {
-        output_schema[column_nm]["old_name"]: column_nm
-        for column_nm in output_schema.keys()
-    }
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    paths = config[f"{NETWORK_OR_HDFS}_paths"]
+    output_path = paths["output_path"]
 
-    # Create subset dataframe with only the required outputs
-    output_df = df[df.columns.intersection(colname_dict.keys())]
+    # Prepare the columns needed for outputs:
 
-    # Rename columns to match the output specification
-    output_df.rename(
-        columns={key: colname_dict[key] for key in colname_dict}, inplace=True
-    )
+    # Join foriegn ownership column using ultfoc mapper
+    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
-    # Rearrange to match user defined output order
-    output_df = output_df[colname_dict.values()]
+    # Map to the CORA statuses from the statusencoded column
+    df = map_o.create_cora_status_col(df, cora_mapper)
 
-    # Validate datatypes before output
-    validate_data_with_schema(output_df, schema)
+    # Map the sizebands based on frozen employment
+    df = map_o.map_sizebands(df)
 
-    return output_df
+    # Map the itl regions using the postcodes
+    df = map_o.join_itl_regions(df, postcode_itl_mapper)
+
+    # Map q713 and q714 to numeric format
+    df = map_o.map_to_numeric(df)
+
+    # Prepare the shortform output dataframe
+    df = run_shortform_prep(df, round_val=4)
+
+    # Create short form output dataframe with required columns from schema
+    schema_path = config["schema_paths"]["frozen_shortform_schema"]
+    schema_dict = load_schema(schema_path)
+    shortform_output = create_output_df(df, schema_dict)
+
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    filename = f"output_short_form_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_short_form/{filename}", shortform_output)
