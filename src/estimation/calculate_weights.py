@@ -75,9 +75,8 @@ def calculate_weighting_factor(
     sample_cond = df["selectiontype"] == "P"
     status_cond = df.statusencoded.isin(["210", "211"])
     formtype_cond = df["formtype"] == "0006"
-    ins_cond = df["instance"] == 0
 
-    filtered_df = df[formtype_cond & sample_cond & status_cond & ins_cond]
+    filtered_df = df[formtype_cond & sample_cond & status_cond]
     filtered_df = filtered_df.dropna(subset=[exp_col])
 
     # Create small QA dataframe
@@ -113,7 +112,7 @@ def calculate_weighting_factor(
         # Put the weight into the column just for this cell number and filters
         cell_cond = df["cellnumber"] == cell_number
         df.loc[
-            formtype_cond & sample_cond & status_cond & cell_cond & ins_cond,
+            formtype_cond & sample_cond & status_cond & cell_cond,
             "a_weight",
         ] = a_weight
 
