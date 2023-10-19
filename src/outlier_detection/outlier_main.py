@@ -98,7 +98,8 @@ def run_outliers(
     if config["global"]["output_outlier_qa"]:
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         filename = f"outliers_qa_{tdate}_v{run_id}.csv"
-        write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
+        filtered_df = auto.apply_short_form_filters(flagged_outlier_df)
+        write_csv(f"{outlier_path}/outliers_qa/{filename}", filtered_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
     else:
         OutlierMainLogger.info("Skipping output of Outlier QA data...")
