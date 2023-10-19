@@ -5,10 +5,16 @@ from typing import List, Union
 import pandas as pd
 
 
+formtype_long = "0001"
+formtype_short = "0006"
+
+
 def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     break_down_cols: List[Union[str, int]],
+    formtype_long,
+    formtype_short,
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
 
@@ -18,15 +24,22 @@ def expansion_impute(
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
+    # Make long and short masks
+    long_mask = df["formtype"] == formtype_long
+    short_mask = df["formtype"] == formtype_short
+
     # Sum the master column, e.g. "211" or "305" for the clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
-    clear_mask = group["status"].isin(clear_statuses)
-    sum_master_q = group.loc[clear_mask][master_col].sum()  # scalar
+    responder_mask = group["status"].isin(clear_statuses)
+
+    # Get long forms only for summing master_col
+    long_form_responder_mask = responder_mask & long_mask
+    sum_master_q_lng = group.loc[long_form_responder_mask][master_col].sum()  # scalar
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
-        sum_breakdown_q = group.loc[clear_mask][bd_col].sum()
+        sum_breakdown_q = group.loc[long_form_responder_mask][bd_col].sum()
 
         # Master col imputed, e.g. 211_imputed or 305_imputed
         # Sum the breakdown master q imputed for TMI records
@@ -44,15 +57,17 @@ def expansion_impute(
         # i.e. for non-responders
         unclear_statuses = ["Form sent out", "Check needed"]
         unclear_mask = group["status"].isin(unclear_statuses)
-        imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val
+        imputed_value = (sum_breakdown_q / sum_master_q_lng) * master_imp_val
         # Write imputed value to the non-responder records
-        group.loc[unclear_mask, f"{bd_col}_imputed"] = imputed_value
+        group.loc[(unclear_mask & short_mask), f"{bd_col}_imputed"] = imputed_value
 
     # Returning updated group and updated QA dict
     return group
 
 
-# make a
+config = "dummy"
+
+# make a dummy dataframe
 df = pd.DataFrame([1, 2, 3, 4])
 
 # Exclude the records from the reference list
@@ -60,8 +75,9 @@ refence_list = ["817"]
 ref_list_excluded_df = df[~df.cellno.str.isin(refence_list)]
 
 # Groupby imputation class
-grouped_by_impclass = df.groupby("imp_class")
+grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
 
-grouped_by_impclass.apply(
-    expansion_impute,
-)
+# Get the breakdown qs from the config
+breakdown_qs_2xx = config["breakdowns"]["2xx"]
+
+grouped_by_impclass.apply(expansion_impute, "211", breakdown_qs_2xx)
