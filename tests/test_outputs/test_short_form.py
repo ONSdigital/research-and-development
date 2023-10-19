@@ -3,7 +3,7 @@ import pandas as pd
 import unittest
 from pandas._testing import assert_frame_equal
 
-from src.outputs.short_form_out import create_period_year, create_headcount_cols
+from src.outputs.short_form import create_period_year, create_headcount_cols
 
 
 class TestCreateNewCols(unittest.TestCase):

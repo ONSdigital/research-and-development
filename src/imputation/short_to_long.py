@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.outputs.short_form_out import create_headcount_cols
+from src.outputs.short_form import create_headcount_cols
 
 
 def run_short_to_long(df,
