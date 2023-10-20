@@ -10,8 +10,8 @@ def pg_to_pg_mapper(
     mapper: pd.DataFrame,
     target_col: str = "product_group",
     pg_column: str = "201",
-    from_col: str = "2016 > Form PG",
-    to_col: str = "2016 > Pub PG",
+    from_col: str = "pg_numeric",
+    to_col: str = "pg_alpha",
 ):
     """This function maps all values in one column to another column
     using a mapper file. This is applied to long forms only.
@@ -35,18 +35,7 @@ def pg_to_pg_mapper(
     formtype_cond = filtered_df["formtype"] == "0001"
     filtered_df = filtered_df[formtype_cond]
     # Create list of PGs that have one-to-many cardinality
-    mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = (
-        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
-    )
-    # Log the conflicts for the user to fix
-    if map_errors:
-        PgLogger.error(
-            (
-                f"The following product groups are trying to map to multiple letters: "
-                f"{map_errors}"
-            )
-        )
+
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     # Flag all PGs that don't have a corresponding map value
@@ -73,6 +62,7 @@ def pg_to_pg_mapper(
     PgLogger.info("Product groups successfully mapped to letters")
 
     return df
+
 
 def sic_to_pg_mapper(
     df: pd.DataFrame,
@@ -106,12 +96,7 @@ def sic_to_pg_mapper(
 
     formtype_cond = filtered_df["formtype"] == formtype
     filtered_df = filtered_df[formtype_cond]
-    # Create list of SIC numbers that have one-to-many cardinality
-    mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = (
-        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
-    )
-    
+
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
     # Flag all SIC numbers that don't have a corresponding map value
@@ -138,110 +123,5 @@ def sic_to_pg_mapper(
     ] = filtered_df[target_col]
 
     PgLogger.info("SIC numbers successfully mapped to PG letters")
-
-    return df
-
-
-
-def sic_to_pg_alpha(
-    df: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
-    sic_column: str = "rusic",
-    target_col: str = "pg_alpha",
-    from_col: str = "sic",
-    to_col: str = "pg_alpha",
-    formtype: str = "0006",
-):
-    """Maps SIC codes coming from IDBR to alpha PG codes for short forms.
-
-    Args:
-        df (pd.DataFrame): The dataset containing all the PG numbers.
-        sic_pg_alpha (pd.DataFrame): SIC to PG alpha mapper.
-        sic_column (str, optional): The column in SPP snapshot containing the SIC codes.
-        target_col (str, optional): The column we output the
-        mapped values to (pg_alpha).
-        from_col (str, optional): The column in the mapper that is used to map from.
-        to_col (str, optional): The column in the mapper that is used to map to.
-
-    Returns:
-        pd.DataFrame: A dataframe with all target column values mapped
-    """
-
-    filtered_df = df.copy()
-
-    formtype_cond = filtered_df["formtype"] == formtype
-    filtered_df = filtered_df[formtype_cond]
-    # Create list of SIC numbers that have one-to-many cardinality
-    mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = (
-        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
-    )
-    # Log the conflicts for the user to fix
-    if map_errors:
-        PgLogger.error(
-            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
-        )
-    # Create a mapping dictionary from the 2 columns
-    map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
-    # Flag all SIC numbers that don't have a corresponding map value
-    mapless_errors = []
-    for key, value in map_dict.items():
-        if str(value) == "nan":
-            mapless_errors.append(key)
-
-    if mapless_errors:
-        PgLogger.error(
-            f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
-        )
-    # Map to the target column using the dictionary taking into account the null values.
-    # Then convert to categorigal datatype
-    filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
-    filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
-    filtered_df[target_col] = filtered_df[target_col].astype("category")
-
-    df = df.copy()
-
-    df.loc[
-        filtered_df.index,
-        f"{target_col}",
-    ] = filtered_df[target_col]
-
-    PgLogger.info("SIC numbers successfully mapped to PG letters")
-
-    return df
-
-
-def run_pg_conversion(
-    df: pd.DataFrame, mapper: pd.DataFrame, target_col: str = "product_group"
-):
-    """Run the product group mapping functions and return a
-    dataframe with the correct mapping for each formtype.
-
-    Args:
-        df (pd.DataFrame): Dataframe of full responses data
-        mapper (pd.DataFrame): The mapper file used for PG conversion
-        target_col (str, optional): The column to be created
-        which stores mapped values.
-
-    Returns:
-        (pd.DataFrame): Dataframe with mapped values
-    """
-
-    if target_col == "201":
-        target_col = "201_mapping"
-    else:
-        # Create a new column to store PGs
-        df[target_col] = np.nan
-
-    # SIC mapping for short forms
-    df = sic_to_pg_mapper(df, mapper, target_col=target_col)
-
-    # PG mapping for long forms
-    df = pg_to_pg_mapper(df, mapper, target_col=target_col)
-
-    # Overwrite the 201 column if target_col = 201
-    if target_col == "201_mapping":
-        df["201"] = df[target_col]
-        df = df.drop(columns=[target_col])
 
     return df
