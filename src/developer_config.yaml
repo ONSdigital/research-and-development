@@ -2,7 +2,7 @@ global:
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-  postcode_csv_check: False
+  postcode_csv_check: True
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False

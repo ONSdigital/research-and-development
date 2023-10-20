@@ -104,7 +104,7 @@ def run_staging(
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
     feather_files_exist = check_file_exists(feather_file)
 
-    is_network = (network_or_hdfs == "network")
+    is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found
@@ -181,16 +181,12 @@ def run_staging(
     check_file_exists(postcode_masterlist)
     postcode_df = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_df["pcd2"]
-    invalid_df, unreal_df = val.validate_post_col(
-        full_responses, postcode_masterlist, config
-    )
+    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%Y-%m-%d")
     invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
-    unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-    write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
     StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:

@@ -59,20 +59,34 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    # Can only validate not null postcodes
-    val_df = df.loc[~df["601"].isnull()]
+    # Create new column and fill with "601" and the nulls with "referencepostcode"
+    df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
+
+    validation_df = df.copy()
+    validation_df["postcode_source"] = validation_df.apply(
+        lambda row: "col_601" if pd.notna(row["601"]) else "col_referencepostcode",
+        axis=1,
+    )
 
     # Apply the pattern validation function
-    invalid_pattern_postcodes = val_df.loc[
-        ~val_df["601"].apply(validate_postcode_pattern), "601"
+    invalid_pattern_postcodes = validation_df.loc[
+        ~validation_df["postcodes_harmonised"].apply(validate_postcode_pattern),
+        "postcodes_harmonised",
     ]
 
     # Save to df
     invalid_df = pd.DataFrame(
         {
-            "reference": df.loc[invalid_pattern_postcodes.index, "reference"],
-            "instance": df.loc[invalid_pattern_postcodes.index, "instance"],
-            "invalid_pattern_pcodes": invalid_pattern_postcodes,
+            "reference": validation_df.loc[
+                invalid_pattern_postcodes.index, "reference"
+            ],
+            "instance": validation_df.loc[invalid_pattern_postcodes.index, "instance"],
+            "formtype": validation_df.loc[invalid_pattern_postcodes.index, "formtype"],
+            "postcode_issue": "invalid",
+            "incorrect_postcode": invalid_pattern_postcodes,
+            "postcode_source": validation_df.loc[
+                invalid_pattern_postcodes.index, "postcode_source"
+            ],
         }
     )
 
@@ -86,34 +100,32 @@ def validate_post_col(
     )
 
     # Remove the invalid pattern postcodes before checking if they are real
-    val_df = df.loc[~df.index.isin(invalid_pattern_postcodes.index.to_list())]
+    val_df = validation_df.loc[
+        ~validation_df.index.isin(invalid_pattern_postcodes.index.to_list())
+    ]
 
-    # Clean and harmonise the "601" postcodes to match the masterlist
-    check_real_df = clean_postcodes(val_df, "601")
+    # Clean postcodes to match the masterlist
+    check_real_df = clean_postcodes(val_df, "postcodes_harmonised")
 
     # Only validate not null postcodes for the column "601"
-    check_real_df = check_real_df.loc[~check_real_df["601"].isnull()]
+    check_real_df = check_real_df.loc[~check_real_df["postcodes_harmonised"].isnull()]
 
-    # Create a list of not real postcodes not found in masterlist for the column "601"
-    unreal_postcodes = check_pcs_real(df, check_real_df, postcode_masterlist, config)
-
-    # Create empty column for harmonised postcodes
-    df["postcodes_harmonised"] = np.nan
-
-    # Return harmonised postcodes for all rows of postcodes
-    # (either "601" or "referencepostcode")
-    harmonised_df = clean_postcodes(val_df, "postcodes_harmonised")
-    # Fill the harmonised postcodes into the full dataframe
-    df.loc[harmonised_df.index, "postcodes_harmonised"] = harmonised_df[
-        "postcodes_harmonised"
-    ]
+    # Create a list of not real postcodes not found in masterlist for the column "postcodes_harmonised"
+    unreal_postcodes = check_pcs_real(
+        val_df, check_real_df, postcode_masterlist, config
+    )
 
     # Save to df
     unreal_df = pd.DataFrame(
         {
-            "reference": df.loc[unreal_postcodes.index, "reference"],
-            "instance": df.loc[unreal_postcodes.index, "instance"],
-            "not_real_pcodes": unreal_postcodes,
+            "reference": validation_df.loc[unreal_postcodes.index, "reference"],
+            "instance": validation_df.loc[unreal_postcodes.index, "instance"],
+            "formtype": validation_df.loc[unreal_postcodes.index, "formtype"],
+            "postcode_issue": "not real",
+            "incorrect_postcode": unreal_postcodes,
+            "postcode_source": validation_df.loc[
+                unreal_postcodes.index, "postcode_source"
+            ],
         }
     )
 
@@ -141,9 +153,24 @@ def validate_post_col(
             f"Total count of unique invalid postcodes found: {len(combined_invalid_postcodes.to_list())}"  # noqa
         )
 
+    # Combine and sort two dataframes
+    combined_invalid_postcodes_df = pd.concat([invalid_df, unreal_df])
+
+    combined_invalid_postcodes_df = combined_invalid_postcodes_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
+    # update df
+    df["postcodes_harmonised"] = df["postcodes_harmonised"].where(
+        ~df["postcodes_harmonised"].isin(
+            combined_invalid_postcodes_df["incorrect_postcode"]
+        ),
+        other=None,
+    )
+
     validation_logger.info("All postcodes validated....")
 
-    return invalid_df, unreal_df
+    return combined_invalid_postcodes_df
 
 
 def insert_space(postcode, position):
@@ -178,12 +205,6 @@ def clean_postcodes(df, column):
 
     # Create a copy df to manipulate
     check_real_df = df.copy()
-
-    # Fill the new column with "601" and the nulls with "referencepostcode"
-    if column == "postcodes_harmonised":
-        check_real_df[column] = check_real_df["601"].fillna(
-            check_real_df["referencepostcode"]
-        )
 
     # Convert to uppercase and strip whitespaces at start/end
     check_real_df[column] = check_real_df[column].str.upper()
@@ -258,12 +279,16 @@ def check_pcs_real(
         master_series = get_masterlist(postcode_masterlist)
 
         # Check if postcode are real
-        check = check_real_df[~check_real_df["601"].isin(master_series)]
-        unreal_postcodes = df.loc[check.index, "601"]
+        check = check_real_df[
+            ~check_real_df["postcodes_harmonised"].isin(master_series)
+        ]
+        unreal_postcodes = df.loc[check.index, "postcodes_harmonised"]
 
     else:
-        emptydf = pd.DataFrame(columns=["601"])
-        unreal_postcodes = emptydf.loc[~emptydf["601"], "601"]
+        emptydf = pd.DataFrame(columns=["postcodes_harmonised"])
+        unreal_postcodes = emptydf.loc[
+            ~emptydf["postcodes_harmonised"], "postcodes_harmonised"
+        ]
 
     return unreal_postcodes
 
