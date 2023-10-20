@@ -64,3 +64,18 @@ def run_outputs(
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
+
+# Running GB SAS output
+    if config["global"]["output_gb_sas"]:
+        OutputMainLogger.info("Starting GB SAS output...")
+        output_gb_sas(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_itl_mapper,
+            pg_alpha_num,
+        )
+        OutputMainLogger.info("Finished GB SAS output.")

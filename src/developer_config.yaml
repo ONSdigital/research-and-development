@@ -11,7 +11,8 @@ global:
   output_estimation_qa: False
   output_imputation_qa: True
   output_short_form: True
-  output_tau: True
+  output_tau: False
+  output_gb_sas: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
