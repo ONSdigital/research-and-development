@@ -79,8 +79,8 @@ def sic_to_pg_mapper(
     sicmapper: pd.DataFrame,
     target_col: str = "product_group",
     sic_column: str = "rusic",
-    from_col: str = "SIC 2007_CODE",
-    to_col: str = "2016 > Pub PG",
+    from_col: str = "sic",
+    to_col: str = "pg_alpha",
     formtype: str = "0006",
 ):
     """This function maps all values in one column to another column
@@ -111,11 +111,7 @@ def sic_to_pg_mapper(
     map_errors = (
         mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
     )
-    # Log the conflicts for the user to fix
-    if map_errors:
-        PgLogger.error(
-            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
-        )
+    
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
     # Flag all SIC numbers that don't have a corresponding map value

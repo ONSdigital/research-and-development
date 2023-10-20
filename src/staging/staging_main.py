@@ -215,9 +215,6 @@ def run_staging(
     check_file_exists(pg_mapper)
     pg_mapper = read_csv(pg_mapper)
 
-    # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
-
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
@@ -287,6 +284,10 @@ def run_staging(
         col_many="sic",
         col_one="pg_alpha")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+    
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(full_responses, sic_pg_alpha, target_col="201")
+
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:

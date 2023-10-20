@@ -110,7 +110,7 @@ def run_pipeline(start, config_path):
 
     # Imputation module
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
+    imputed_df = run_imputation(full_responses, sic_pg_alpha, config, write_csv, run_id)
     MainLogger.info("Finished  Imputation...")
     print(imputed_df.sample(10))
 
