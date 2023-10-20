@@ -259,8 +259,8 @@ def run_staging(
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
     pg_alpha_num = val.validate_many_to_one(
-        pg_alpha_num, 
-        col_many="pg_alpha", 
+        pg_alpha_num,
+        col_many="pg_alpha",
         col_one="pg_numeric")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
@@ -270,6 +270,10 @@ def run_staging(
     check_file_exists(pg_num_alpha_path)
     pg_num_alpha = read_csv(pg_num_alpha_path)
     val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    pg_num_alpha = val.validate_many_to_one(
+        pg_num_alpha,
+        col_many="pg_numeric",
+        col_one="pg_alpha")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Loading SIC to PG to alpha mapper
@@ -278,6 +282,10 @@ def run_staging(
     check_file_exists(sic_pg_alpha_path)
     sic_pg_alpha = read_csv(sic_pg_alpha_path)
     val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
+    sic_pg_alpha = val.validate_many_to_one(
+        sic_pg_alpha,
+        col_many="sic",
+        col_one="pg_alpha")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.

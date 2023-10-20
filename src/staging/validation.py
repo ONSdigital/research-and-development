@@ -490,7 +490,8 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 def validate_many_to_one(
     mapper: pd.DataFrame,
     col_many: str,
-    col_one: str) -> pd.DataFrame:
+    col_one: str
+) -> pd.DataFrame:
     """
 
     Validates a many to one mapper:
@@ -498,7 +499,7 @@ def validate_many_to_one(
     2. Salects and deduplicates col_many and col_one.
     3. Checks that for each entry in col_many there is exactly one entry in
     col_one.
-    
+
     Args:
         df (pd.DataFrame): The input mapper
         col_many (str): name of the column with many entries
@@ -514,13 +515,16 @@ def validate_many_to_one(
         df = mapper[[col_many, col_one]].drop_duplicates()
 
         # Check the count of col_one
-        df_count = (df
+        df_count = (
+            df
             .groupby(col_many)
-            .agg({col_one:'count'})
+            .agg({col_one: 'count'})
             .reset_index()
-            .rename(columns={col_one:'code_count'}))
+            .rename(columns={col_one: 'code_count'}))
         df_bad = df_count[df_count['code_count'] > 1]
         if not df_bad.empty:
+            validation_logger.info(
+                "The following codes have multile mapping: \n {df_bad}")
             raise ValueError(f"Mapper is many to many")
         return df
 
