@@ -34,3 +34,23 @@ def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
     output_df = output_df[colname_dict.values()]
 
     return output_df
+
+
+def regions() -> dict:
+    """Creates a dictionary of UK regions.
+
+    Args:
+        None
+
+    Returns:
+        (dict): A dictionary of region codes for four UK counties, GB and UK
+    """
+    regions = {
+        "England": ["AA", "BA", "BB", "DC", "ED", "FE", "GF", "GG", "HH", "JG", "KJ"],
+        "Wales": ["WW"],
+        "Scotland": ["XX"],
+        "NI": ["YY"], }
+
+    regions["GB"] = regions["England"] + regions["Wales"] + regions["Scotland"]
+    regions["UK"] = regions["GB"] + regions["NI"]
+    return regions

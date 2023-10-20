@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
-from src.outputs.outputs_helpers import create_output_df
+from src.outputs.outputs_helpers import (create_output_df, regions)
 
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -40,6 +40,9 @@ def output_gb_sas(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
+
+    # Filter regions for GB only
+    df = df[df["region"].isin(regions()["GB"])]
 
     # Prepare the columns needed for outputs:
 
@@ -77,11 +80,11 @@ def output_gb_sas(
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
 
     # Create tau output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["tau_schema"]
+    schema_path = config["schema_paths"]["gb_sas_schema"]
     schema_dict = load_schema(schema_path)
-    tau_output = create_output_df(df, schema_dict)
+    output = create_output_df(df, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_tau_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_tau/{filename}", tau_output)
+    filename = f"output_gb_sas_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_gb_sas/{filename}", output)

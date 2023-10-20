@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
+from src.outputs.gb_sas import output_gb_sas
 
 
 OutputMainLogger = logging.getLogger(__name__)

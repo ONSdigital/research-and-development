@@ -138,7 +138,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
-    
+
     # Run short frozen form output
     run_outputs(
         estimated_responses,
@@ -152,7 +152,6 @@ def run_pipeline(start, config_path):
         pg_alpha_num,
     )
 
-    
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
