@@ -48,7 +48,6 @@ def run_staging(
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
-            pg_mapper (pd.DataFrame): Product grouo mapper,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
@@ -210,11 +209,6 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
-    # Load the PG mapper
-    pg_mapper = paths["pg_mapper_path"]
-    check_file_exists(pg_mapper)
-    pg_mapper = read_csv(pg_mapper)
-
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
@@ -306,7 +300,6 @@ def run_staging(
     return (
         full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
         cora_mapper,
         cellno_df,

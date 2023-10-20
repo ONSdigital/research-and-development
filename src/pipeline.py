@@ -88,7 +88,6 @@ def run_pipeline(start, config_path):
     (
         full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
         cora_mapper,
         cellno_df,
