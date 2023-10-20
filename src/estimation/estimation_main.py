@@ -58,4 +58,4 @@ def run_estimation(
         write_csv(f"{est_path}/estimation_qa/{full_qa_filename}", estimated_df)
     EstMainLogger.info("Finished estimation weights calculation.")
 
-    return estimated_df
+    return estimated_df, weighted_df
