@@ -49,8 +49,6 @@ def run_estimation(
     # apply the weights to the dataframe and apply the specified rounding
     estimated_df = appweights.apply_weights(weighted_df, 4)
 
-
-
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")
         tdate = datetime.now().strftime("%Y-%m-%d")
