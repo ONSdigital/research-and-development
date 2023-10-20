@@ -208,6 +208,21 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
+    if config['global']['load_backdata']:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Backdata File")
+        backdata_path = paths["backdata_path"]
+        check_file_exists(backdata_path)
+        backdata = read_csv(backdata_path)
+        # To be added once schema is defined
+        # val.validate_data_with_schema(
+        #     backdata_path, "./config/backdata_schema.toml"
+        # )
+        StagingMainLogger.info("Backdata File Loaded Successfully...")
+    else:
+        backdata = None
+        StagingMainLogger.info("Loading of Backdata File skipped")
+
     # Load the PG mapper
     pg_mapper = paths["pg_mapper_path"]
     check_file_exists(pg_mapper)
@@ -278,4 +293,5 @@ def run_staging(
         cellno_df,
         postcode_df,
         pg_alpha_num,
+        backdata
     )

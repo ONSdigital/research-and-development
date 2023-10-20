@@ -94,6 +94,7 @@ def run_pipeline(start, config_path):
         cellno_df,
         postcode_itl_mapper,
         pg_alpha_num,
+        backdata
     ) = run_staging(
         config,
         check_file_exists,
