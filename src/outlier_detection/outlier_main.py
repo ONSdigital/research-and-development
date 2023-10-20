@@ -44,21 +44,12 @@ def run_outliers(
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
 
-    # first take only the 
-
     network_or_hdfs = config["global"]["network_or_hdfs"]
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
     outlier_path = config[f"{network_or_hdfs}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
-
-    # Fix for annonymised data on Dev/Test
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        # In the anonymised data the selectiontype is always 'L'
-        col_size = df["selectiontype"].shape[0]
-        random.seed(seed=42)
-        df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
 
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
