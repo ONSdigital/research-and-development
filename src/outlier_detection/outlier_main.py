@@ -53,13 +53,6 @@ def run_outliers(
     outlier_path = config[f"{network_or_hdfs}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
 
-    # Fix for annonymised data on Dev/Test
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        # In the anonymised data the selectiontype is always 'L'
-        col_size = df["selectiontype"].shape[0]
-        random.seed(seed=42)
-        df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
-
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
@@ -89,7 +82,7 @@ def run_outliers(
     OutlierMainLogger.info("Starting Manual Outlier Application")
     df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
     outlier_df = df_auto_flagged.merge(
-        df_manual_supplied, on=["reference", "instance"], how="left"
+        df_manual_supplied, on=["reference"], how="left"
     )
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")
