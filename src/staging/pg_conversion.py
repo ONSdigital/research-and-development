@@ -127,7 +127,10 @@ def sic_to_pg_mapper(
 
 
 def run_pg_conversion(
-    df: pd.DataFrame, mapper: pd.DataFrame, target_col: str = "product_group"
+    df: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
+    target_col: str = "product_group"
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
@@ -149,10 +152,10 @@ def run_pg_conversion(
         df[target_col] = np.nan
 
     # SIC mapping for short forms
-    df = sic_to_pg_mapper(df, mapper, target_col=target_col)
+    df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col)
 
     # PG mapping for long forms
-    df = pg_to_pg_mapper(df, mapper, target_col=target_col)
+    df = pg_to_pg_mapper(df, pg_num_alpha, target_col=target_col)
 
     # Overwrite the 201 column if target_col = 201
     if target_col == "201_mapping":

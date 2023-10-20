@@ -284,10 +284,13 @@ def run_staging(
         col_many="sic",
         col_one="pg_alpha")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
-    
-    # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(full_responses, sic_pg_alpha, target_col="201")
 
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(
+        full_responses,
+        pg_num_alpha,
+        sic_pg_alpha,
+        target_col="201")
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
