@@ -427,10 +427,10 @@ def calculate_totals(df):
 
 
 def run_tmi(
-    full_df: pd.DataFrame,
-    target_variables: List[str],
-    sic_mapper: pd.DataFrame,
-    config: Dict[str, Any],
+    full_df: pd.DataFrame, 
+    target_variables: List[str], 
+    sic_mapper: pd.DataFrame, 
+    config: Dict[str,Any]
 ) -> pd.DataFrame:
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline

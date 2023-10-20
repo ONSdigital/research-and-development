@@ -34,7 +34,6 @@ def pg_to_pg_mapper(
 
     formtype_cond = filtered_df["formtype"] == "0001"
     filtered_df = filtered_df[formtype_cond]
-    # Create list of PGs that have one-to-many cardinality
 
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
@@ -123,5 +122,41 @@ def sic_to_pg_mapper(
     ] = filtered_df[target_col]
 
     PgLogger.info("SIC numbers successfully mapped to PG letters")
+
+    return df
+
+
+def run_pg_conversion(
+    df: pd.DataFrame, mapper: pd.DataFrame, target_col: str = "product_group"
+):
+    """Run the product group mapping functions and return a
+    dataframe with the correct mapping for each formtype.
+
+    Args:
+        df (pd.DataFrame): Dataframe of full responses data
+        mapper (pd.DataFrame): The mapper file used for PG conversion
+        target_col (str, optional): The column to be created
+        which stores mapped values.
+
+    Returns:
+        (pd.DataFrame): Dataframe with mapped values
+    """
+
+    if target_col == "201":
+        target_col = "201_mapping"
+    else:
+        # Create a new column to store PGs
+        df[target_col] = np.nan
+
+    # SIC mapping for short forms
+    df = sic_to_pg_mapper(df, mapper, target_col=target_col)
+
+    # PG mapping for long forms
+    df = pg_to_pg_mapper(df, mapper, target_col=target_col)
+
+    # Overwrite the 201 column if target_col = 201
+    if target_col == "201_mapping":
+        df["201"] = df[target_col]
+        df = df.drop(columns=[target_col])
 
     return df
