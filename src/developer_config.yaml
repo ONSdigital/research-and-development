@@ -85,7 +85,7 @@ run_log_sql:
     log_db: "test_runlog"
     log_mode: "append"
 breakdowns:
-  2xx:
+  "211":
     - "202"
     - "203"
     - "204"
@@ -118,15 +118,15 @@ breakdowns:
     - "248"
     - "249"
     - "250"
-  3xx:
+  "305":
     - "302"
     - "303"
     - "304"
-  emp_xx:
+  emp_total:
     - "emp_researcher"
     - "emp_technician"
     - "emp_other"
-  headcount_xx:
+  headcount_total:
     - "headcount_res_m"
     - "headcount_res_f "
     - "headcount_tec_m"
