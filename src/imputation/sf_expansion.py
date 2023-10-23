@@ -69,7 +69,7 @@ def run_sf_expansion(df: pd.DataFrame) -> pd.DataFrame:
 
     # Exclude the records from the reference list
     refence_list = ["817"]
-    ref_list_excluded_df = df[~df.cellno.str.isin(refence_list)]
+    ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
 
     # Groupby imputation class
     grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
