@@ -27,8 +27,10 @@ def test_data_dict():
     return {
         "reference": [1, 2, 3, 4],
         "instance": [0, 0, 0, 0],
+        "formtype": [0, 0, 0, 0],
         "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
         "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+        "postcodes_harmonised": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
 
 
@@ -75,20 +77,26 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
+            "formtype": [0, 0, 0],
             "601": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
             "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+            "postcodes_harmonised": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
     df_result = validate_post_col(df_valid, fake_path, config)
     exp_output1 = pd.DataFrame(
-        columns=["reference", "instance", "invalid_pattern_pcodes"]
+        columns=[
+            "reference",
+            "instance",
+            "formtype",
+            "postcode_issue",
+            "incorrect_postcode",
+            "postcode_source",
+        ]
     )
-    exp_output2 = pd.DataFrame(columns=["reference", "instance", "not_real_pcodes"])
+
     pd.testing.assert_frame_equal(
-        df_result[0], exp_output1, check_dtype=False, check_index_type=False
-    )
-    pd.testing.assert_frame_equal(
-        df_result[1], exp_output2, check_dtype=False, check_index_type=False
+        df_result, exp_output1, check_dtype=False, check_index_type=False
     )
 
     # Invalid postcodes
@@ -96,8 +104,10 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2],
             "instance": [0, 0],
+            "formtype": [0, 0],
             "601": ["EFG 456", "HIJ 789"],
             "referencepostcode": ["EFG 456", "HIJ 789"],
+            "postcodes_harmonised": ["EFG 456", "HIJ 789"],
         }
     )
     validate_post_col(df_invalid, fake_path, config)
@@ -152,16 +162,20 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
-    check_real_df = clean_postcodes(test_data_df, "601")
+    check_real_df = clean_postcodes(test_data_df, "postcodes_harmonised")
 
     # Call the function under test
     result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
-        expected_unreal_postcodes = pd.Series(["HIJ 789", "KL1M 2NO"], name="601")
+        expected_unreal_postcodes = pd.Series(
+            ["HIJ 789", "KL1M 2NO"], name="postcodes_harmonised"
+        )
     else:
-        expected_unreal_postcodes = pd.Series([], name="601", dtype=object)
+        expected_unreal_postcodes = pd.Series(
+            [], name="postcodes_harmonised", dtype=object
+        )
 
     pd.testing.assert_series_equal(
         result_df, expected_unreal_postcodes
@@ -177,7 +191,7 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
-    check_real_df = clean_postcodes(test_data_df, "601")
+    check_real_df = clean_postcodes(test_data_df, "postcodes_harmonised")
 
     # Call the function under test
     unreal_postcodes = check_pcs_real(

@@ -113,7 +113,7 @@ def validate_post_col(
     # Only validate not null postcodes for the column "601"
     check_real_df = check_real_df.loc[~check_real_df["postcodes_harmonised"].isnull()]
 
-    # Create a list of not real postcodes not found in masterlist for the column "postcodes_harmonised"
+    # Create a list of postcodes not found in masterlist in col "postcodes_harmonised"
     unreal_postcodes = check_pcs_real(
         val_df, check_real_df, postcode_masterlist, config
     )
