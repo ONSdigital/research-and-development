@@ -60,13 +60,6 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         pd.DataFrame: The filtered dataframe
     """
     sample_cond = df.selectiontype == "P"
-    if df[sample_cond].empty:
-        AutoOutlierLogger.error(
-            "This data does not contain value 'P' in "
-            "column 'selectiontype'. \n Note that outliering cannot be "
-            "performed on the current anonomysed spp snapshot data."
-        )
-        raise ValueError
     status_cond = df.statusencoded.isin(["210", "211"])
     pos_cond = df[value_col] > 0
     ins_cond = df["instance"] == 0
@@ -123,8 +116,8 @@ def flag_outliers(
             return f + 1
 
     # Add group count - how many RU refs there are in a cell, perod
-    filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform(
-        "count"
+    filtered_df["group_count"] = (
+        filtered_df.groupby(groupby_cols)[value_col].transform("count")
     )
 
     # Rank margins
@@ -132,7 +125,9 @@ def flag_outliers(
     filtered_df["high_rounded"] = filtered_df.apply(
         lambda row: _normal_round(row["high"]), axis=1
     )
-    filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
+    filtered_df["upper_band"] = (
+        filtered_df["group_count"] - filtered_df["high_rounded"]
+    )
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(
@@ -140,8 +135,10 @@ def flag_outliers(
     )
 
     # Ranks of RU refs in each group, depending on their value
-    filtered_df["group_rank"] = filtered_df.groupby(groupby_cols)[value_col].rank(
-        method="first", ascending=True
+    filtered_df["group_rank"] = (
+        filtered_df.groupby(groupby_cols)[value_col].rank(
+            method="first", ascending=True
+        )
     )
 
     # Outlier conditions

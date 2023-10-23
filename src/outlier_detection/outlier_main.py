@@ -80,7 +80,7 @@ def run_outliers(
     OutlierMainLogger.info("Starting Manual Outlier Application")
     df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
     outlier_df = df_auto_flagged.merge(
-        df_manual_supplied, on=["reference", "instance"], how="left"
+        df_manual_supplied, on=["reference"], how="left"
     )
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")

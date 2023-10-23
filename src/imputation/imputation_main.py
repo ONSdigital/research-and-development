@@ -40,15 +40,16 @@ def run_imputation(
         "headcount_total"
     ]
 
+    # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
-    # the short to long form conversion will be added in when
-    # updates to estimation module are ready
-    
-    # df = run_short_to_long(df)
+    # Convert shortform responses to longform format
+    df = run_short_to_long(df)
 
+    # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
 
+    # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
