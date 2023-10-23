@@ -4,8 +4,6 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.imputation import sf_expansion as sf_exp
-from src.imputation import short_to_long as sh_long
 from src.estimation import calculate_weights as weights
 from src.estimation import apply_weights as appweights
 from src.estimation import cellno_mapper as cmap
@@ -50,17 +48,6 @@ def run_estimation(
 
     # apply the weights to the dataframe and apply the specified rounding
     estimated_df = appweights.apply_weights(weighted_df, 4)
-
-    # convert the estimated values to longform format
-    estimated_df = sh_long.run_short_to_long(
-        df,
-        selectiontype=["P"],
-        fte_civil="706_estimated",
-        fte_defence="707_estimated",
-        hc_total="705_estimated"
-    )
-
-    estimated_df = sf_exp.run_sf_expansion(estimated_df)
 
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")
