@@ -185,7 +185,7 @@ def run_staging(
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
+    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
     StagingMainLogger.info("Finished PostCode Validation")
 
