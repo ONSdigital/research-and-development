@@ -198,7 +198,7 @@ def run_staging(
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = paths["manual_outliers_path"]
         check_file_exists(manual_path)
-        wanted_cols = ["reference", "instance", "manual_outlier"]
+        wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
         val.validate_data_with_schema(
             manual_outliers, "./config/manual_outliers_schema.toml"

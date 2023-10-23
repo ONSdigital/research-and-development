@@ -23,16 +23,19 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
     # Overwriting auto-outliers with manual outliers
     df["outlier"] = df["manual_outlier"].combine_first(df["auto_outlier"])
 
-    # Log the number of manually applied True flags
+    # Log the number of manually applied True flags (only count for instance 0)
+
+    filtered_df = df[df["instance"] == 0]
+    
     t_outlier_diff = len(
-        df.loc[(df["auto_outlier"].isin([False])) & (df["outlier"].isin([True]))]
+        filtered_df.loc[(filtered_df["auto_outlier"].isin([False])) & (filtered_df["outlier"].isin([True]))]
     )
     msg = f"{t_outlier_diff} record(s) have been manually updated as True."
     ManualOutlierLogger.info(msg)
 
     # Log the number of manually applied False flags
     f_outlier_diff = len(
-        df.loc[(df["auto_outlier"].isin([True])) & (df["outlier"].isin([False]))]
+        filtered_df.loc[(filtered_df["auto_outlier"].isin([True])) & (filtered_df["outlier"].isin([False]))]
     )
     msg = f"{f_outlier_diff} record(s) have been manually updated as False."
     ManualOutlierLogger.info(msg)
