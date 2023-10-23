@@ -7,6 +7,7 @@ from datetime import datetime
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
+from src.imputation.sf_expansion import run_sf_expansion
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -48,6 +49,9 @@ def run_imputation(
 
     # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+
+    # Run short form expansion
+    imputed_df = run_sf_expansion(imputed_df, config)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
