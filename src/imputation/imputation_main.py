@@ -7,6 +7,7 @@ from datetime import datetime
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
+from src.imputation.MoR import run_mor
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
+    backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -41,11 +43,12 @@ def run_imputation(
     ]
 
     df = run_apportionment(df)
+    
+    df = run_mor(df, backdata, target_vars)
 
     df = run_short_to_long(df)
 
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
-
 
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
