@@ -72,11 +72,11 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     breakdown_qs_head = breakdown_dict["headcount_total"]
 
     # Exclude the records from the reference list
-    refence_list = ["817"]
-    ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
+    # refence_list = ["817"]
+    # ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
 
-    # Groupby imputation class
-    grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
+    # # Groupby imputation class
+    # grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
 
     # Set up a dictio
 
