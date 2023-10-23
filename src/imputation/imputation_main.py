@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
+from itertools import chain
 
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
@@ -34,12 +35,7 @@ def run_imputation(
         "headcount_oth_f",
     ]
 
-    sum_cols = [
-        "emp_total", 
-        "headcount_tot_m", 
-        "headcount_tot_f", 
-        "headcount_total"
-    ]
+    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
@@ -67,7 +63,8 @@ def run_imputation(
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # Get the breakdown columns from the config
-    bd_cols = config["breakdowns"]["2xx"] + config["breakdowns"]["3xx"]
+    bd_qs_lists = list(config["breakdowns"].values())
+    bd_cols = list(chain(*bd_qs_lists))
 
     orig_cols = bd_cols + target_vars + sum_cols
 
