@@ -61,20 +61,22 @@ def expansion_impute(
     # Returning updated group and updated QA dict
     return group
 
+def run_sf_expansion(df: pd.DataFrame) -> pd.DataFrame:
+    config = "dummy"
 
-config = "dummy"
+    # make a dummy dataframe
+    # df = pd.DataFrame([1, 2, 3, 4])
 
-# make a dummy dataframe
-df = pd.DataFrame([1, 2, 3, 4])
+    # Exclude the records from the reference list
+    refence_list = ["817"]
+    ref_list_excluded_df = df[~df.cellno.str.isin(refence_list)]
 
-# Exclude the records from the reference list
-refence_list = ["817"]
-ref_list_excluded_df = df[~df.cellno.str.isin(refence_list)]
+    # Groupby imputation class
+    grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
 
-# Groupby imputation class
-grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
+    # Get the breakdown qs from the config
+    breakdown_qs_2xx = config["breakdowns"]["2xx"]
 
-# Get the breakdown qs from the config
-breakdown_qs_2xx = config["breakdowns"]["2xx"]
+    grouped_by_impclass.apply(expansion_impute, "211", breakdown_qs_2xx)
 
-grouped_by_impclass.apply(expansion_impute, "211", breakdown_qs_2xx)
+    return df
