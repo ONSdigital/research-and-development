@@ -66,10 +66,6 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Get the breakdowns dict
     breakdown_dict = config["breakdowns"]
-    breakdown_qs_2xx = breakdown_dict["211"]
-    breakdown_qs_3xx = breakdown_dict["305"]
-    breakdown_qs_emp = breakdown_dict["emp_total"]
-    breakdown_qs_head = breakdown_dict["headcount_total"]
 
     # Exclude the records from the reference list
     refence_list = ["817"]
@@ -77,13 +73,41 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Groupby imputation class
     grouped_by_impclass = ref_list_excluded_df.groupby("imp_class")
+    print(grouped_by_impclass)
 
-    # Set up a dictio
+    # Set up a list to grab the dataframes
+    impute_df_lst = []
 
-    exp_imp_211_df = grouped_by_impclass.apply(
-        expansion_impute, "211", breakdown_qs_2xx, formtype_long, formtype_short
-    )
+    # Get master keys
+    master_keys = breakdown_dict.keys()
+    print(master_keys)
 
-    print(breakdown_qs_3xx, breakdown_qs_emp, breakdown_qs_head)
+    # for master_key in master_keys:
+    #     breakdown_qs = breakdown_dict[master_key]
 
-    return exp_imp_211_df
+    #     imputed_df = grouped_by_impclass.apply(
+    #     expansion_impute,
+    #     master_key,
+    #     breakdown_qs,
+    #     formtype_long,
+    #     formtype_short
+    # )
+    #     impute_df_lst.append(imputed_df)
+
+    # 211 trim - split
+
+    # concat back on trimmed records
+
+    # 305 trim - split
+
+    # concat back on trimmed records
+
+    # emp_total headcount_total no trimming
+
+    # Combine imputed dataframes, dropping dupe columns
+    imputed_df = pd.concat(impute_df_lst, axis=1)
+
+    # Drop columns
+    imputed_df = imputed_df.loc[:, ~imputed_df.columns.duplicated()]
+
+    return imputed_df
