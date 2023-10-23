@@ -53,8 +53,8 @@ def validate_post_col(
         config (dict): The postcode settings from the config settings
 
     Returns:
-        invalid_df (pd.DataFrame): A dataframe of postcodes with the incorrect pattern
-        unreal_df (pd.DataFrame): A dataframe of postcodes not found in the masterlist
+        invalid_df (pd.DataFrame): A dataframe of invalid postcodes, either with the
+        incorrect pattern or not found in the masterlist
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
@@ -62,9 +62,12 @@ def validate_post_col(
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
 
+    # Create a copy to work from and add temp "postcode_source" column
     validation_df = df.copy()
     validation_df["postcode_source"] = validation_df.apply(
-        lambda row: "col_601" if pd.notna(row["601"]) else "col_referencepostcode",
+        lambda row: "column '601'"
+        if pd.notna(row["601"])
+        else "column 'referencepostcode' (IDBR)",
         axis=1,
     )
 
@@ -82,7 +85,7 @@ def validate_post_col(
             ],
             "instance": validation_df.loc[invalid_pattern_postcodes.index, "instance"],
             "formtype": validation_df.loc[invalid_pattern_postcodes.index, "formtype"],
-            "postcode_issue": "invalid",
+            "postcode_issue": "invalid pattern / format",
             "incorrect_postcode": invalid_pattern_postcodes,
             "postcode_source": validation_df.loc[
                 invalid_pattern_postcodes.index, "postcode_source"
@@ -121,7 +124,7 @@ def validate_post_col(
             "reference": validation_df.loc[unreal_postcodes.index, "reference"],
             "instance": validation_df.loc[unreal_postcodes.index, "instance"],
             "formtype": validation_df.loc[unreal_postcodes.index, "formtype"],
-            "postcode_issue": "not real",
+            "postcode_issue": "not found in masterlist",
             "incorrect_postcode": unreal_postcodes,
             "postcode_source": validation_df.loc[
                 unreal_postcodes.index, "postcode_source"
@@ -138,7 +141,7 @@ def validate_post_col(
         f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
     )
 
-    # Combine the two lists
+    # Combine the two lists for logging
     combined_invalid_postcodes = pd.concat(
         [unreal_postcodes, invalid_pattern_postcodes]
     )
@@ -153,14 +156,14 @@ def validate_post_col(
             f"Total count of unique invalid postcodes found: {len(combined_invalid_postcodes.to_list())}"  # noqa
         )
 
-    # Combine and sort two dataframes
+    # Combine and sort the two dataframes for output
     combined_invalid_postcodes_df = pd.concat([invalid_df, unreal_df])
 
     combined_invalid_postcodes_df = combined_invalid_postcodes_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    # update df
+    # update df to exclude any invalid postcode entries
     df["postcodes_harmonised"] = df["postcodes_harmonised"].where(
         ~df["postcodes_harmonised"].isin(
             combined_invalid_postcodes_df["incorrect_postcode"]
@@ -266,6 +269,8 @@ def check_pcs_real(
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
+        check_real_df (pd.DataFrame): The DataFrame excluding invalid postcodes, to
+        run the comparison against
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
         postocdes to check against
 
