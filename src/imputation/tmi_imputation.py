@@ -362,10 +362,6 @@ def apply_tmi(df, target_variables, mean_dict):
     for each imputation class"""
 
     df = df.copy()
-    df["imp_marker"] = "no_imputation"
-
-    for var in target_variables:
-        df[f"{var}_imputed"] = df[var]
 
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
@@ -477,14 +473,15 @@ def run_tmi(
     # TMI Step 4: expansion imputation
     expanded_df = ximp.run_expansion(final_tmi_df, config)
 
-    full_df = pd.concat([expanded_df, shortform_df])
-
     # TMI Step 5: Calculate headcount and employment totals
-    final_df = calculate_totals(full_df)
+    final_df = calculate_totals(expanded_df)
 
-    final_df = final_df.sort_values(
+    # add short forms back to dataframe
+    full_df = pd.concat([final_df, shortform_df])
+
+    full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
     TMILogger.info("TMI imputation completed.")
-    return final_df, qa_df
+    return full_df, qa_df

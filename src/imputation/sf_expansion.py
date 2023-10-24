@@ -65,25 +65,13 @@ def expansion_impute(
     return group
 
 
-def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-
-    # Get the breakdowns dict
-    breakdown_dict = config["breakdowns"]
-
-    # Exclude the records from the reference list
-    refence_list = ["817"]
-    ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
-    ref_list_only_df = df[df.cellnumber.isin(refence_list)]
-
-    # Get master keys
-    master_values = breakdown_dict.keys()
-
+def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
     for master_value in master_values:
+
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
-        # Filter to exclude the same rows trimmed for 211_trim == False
-        trimmed_df, nontrimmed_df = split_df_on_trim(
-            ref_list_excluded_df, f"{master_value}_trim"
-        )
+
+        # Filter to exclude the same rows trimmed for {master}_trim == False
+        trimmed_df, nontrimmed_df = split_df_on_trim(df, f"{master_value}_trim")
         SFExpansionLogger.debug(
             f"There are {df.shape[0]} rows in the original df \n"
             f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
@@ -101,10 +89,29 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         )
 
         # Concat the expanded df (processed from untrimmed records) back on to
-        # trimmed records
-        result_df = pd.concat([expanded_df, trimmed_df], axis=0)
+        # trimmed records. Reassigning to `df` to feed back into for-loop
+        combined_df = pd.concat([expanded_df, trimmed_df], axis=0)
+
+        return combined_df
+
+
+def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+
+    # Get the breakdowns dict
+    breakdown_dict = config["breakdowns"]
+
+    # Exclude the records from the reference list
+    refence_list = ["817"]
+    ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
+    ref_list_only_df = df[df.cellnumber.isin(refence_list)]
+
+    # Get master keys
+    master_values = breakdown_dict.keys()
+
+    # Run the `expansion_impute` function in a for-loop
+    expanded_df = apply_expansion(ref_list_excluded_df, master_values, breakdown_dict)
 
     # Re-include those records from the reference list before returning df
-    result_df = pd.concat([result_df, ref_list_only_df], axis=0)
+    result_df = pd.concat([expanded_df, ref_list_only_df], axis=0)
 
     return result_df

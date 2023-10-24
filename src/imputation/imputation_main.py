@@ -37,13 +37,24 @@ def run_imputation(
 
     sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
+    # Get the breakdown columns from the config
+    bd_qs_lists = list(config["breakdowns"].values())
+    bd_cols = list(chain(*bd_qs_lists))
+
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
-    # run TMI for long forms
+    df["imp_marker"] = "no_imputation"
+
+    # Create new columns to hold the imputed values
+    orig_cols = target_vars + bd_cols + sum_cols
+    for col in orig_cols:
+        df[f"{col}_imputed"] = df[col]
+
+    # Run TMI for long forms
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
 
     # Run short form expansion
@@ -61,12 +72,6 @@ def run_imputation(
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
-
-    # Get the breakdown columns from the config
-    bd_qs_lists = list(config["breakdowns"].values())
-    bd_cols = list(chain(*bd_qs_lists))
-
-    orig_cols = bd_cols + target_vars + sum_cols
 
     # Create names for imputed cols
     imp_cols = [f"{col}_imputed" for col in orig_cols]
