@@ -105,6 +105,6 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         result_df = pd.concat([expanded_df, trimmed_df], axis=0)
 
     # Re-include those records from the reference list before returning df
-    result_df = pd.concat(result_df, ref_list_only_df)
+    result_df = pd.concat([result_df, ref_list_only_df], axis=0)
 
     return result_df
