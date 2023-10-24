@@ -17,8 +17,8 @@ def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     break_down_cols: List[Union[str, int]],
-    formtype_lng,
-    formtype_shrt,
+    long_code=formtype_long,
+    short_code=formtype_short,
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
 
@@ -30,14 +30,12 @@ def expansion_impute(
     bd_cols = [str(col) for col in break_down_cols]
 
     # Make long and short masks
-    long_mask = group["formtype"] == formtype_lng
-    short_mask = group["formtype"] == formtype_shrt
+    long_mask = group["formtype"] == long_code
+    short_mask = group["formtype"] == short_code
 
     # Sum the master column, e.g. "211" or "305" for the clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
-    responder_mask = (
-        group["status"].isin(clear_statuses) or group["imp_marker"] == "TMI"
-    )
+    responder_mask = group["status"].isin(clear_statuses) | group["imp_marker"] == "TMI"
 
     # Combination masks to select correct records for summing
     long_form_responder_mask = responder_mask & long_mask
@@ -99,7 +97,7 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         expanded_df = non_trim_grouped.apply(
             expansion_impute,
             master_value,
-            break_down_cols=breakdown_dict["master_value"],
+            break_down_cols=breakdown_dict[master_value],
         )
 
         # Concat the expanded df (processed from untrimmed records) back on to
