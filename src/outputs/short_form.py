@@ -26,7 +26,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Extracted the year from period and crated new columns 'period_year'
-    df["period_year"] = df["period"].copy().astype("str").str[:4]
+    df["period_year"] = df["period"].astype("str").str[:4]
 
     return df
 
@@ -97,9 +97,6 @@ def run_shortform_prep(
         & (df["instance"] == 0)
     ]
 
-    # Create a 'year' column
-    df = create_period_year(df)
-
     # create columns for headcounts for civil and defense
     df = create_headcount_cols(df, round_val)
 
@@ -133,9 +130,9 @@ def output_short_form(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Prepare the shortform output dataframe
-    df = run_shortform_prep(df, round_val=4)
-    
+    # Create a 'year' column
+    df = create_period_year(df)
+
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
@@ -150,6 +147,9 @@ def output_short_form(
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
+
+    # Prepare the shortform output dataframe
+    df = run_shortform_prep(df, round_val=4)
 
     # Create short form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_shortform_schema"]
