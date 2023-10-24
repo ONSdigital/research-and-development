@@ -6,8 +6,8 @@ global:
   load_historic_data: False
   load_manual_outliers: True
   output_full_responses: False
-  output_auto_outliers: True
-  output_outlier_qa : True
+  output_auto_outliers: False
+  output_outlier_qa : False
   output_estimation_qa: True
   output_imputation_qa: False
   output_short_form: True
@@ -84,6 +84,8 @@ csv_filenames:
 run_log_sql:
     log_db: "test_runlog"
     log_mode: "append"
+estimation:
+  numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 breakdowns:
   2xx:
     - "202"
@@ -122,3 +124,14 @@ breakdowns:
     - "302"
     - "303"
     - "304"
+  emp_total:
+    - "emp_researcher"
+    - "emp_technician"
+    - "emp_other"
+  headcount_total:
+    - "headcount_res_m"
+    - "headcount_res_f"
+    - "headcount_tec_m"
+    - "headcount_tec_f"
+    - "headcount_oth_m"
+    - "headcount_oth_f"

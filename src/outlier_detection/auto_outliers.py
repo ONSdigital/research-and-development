@@ -191,10 +191,11 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
         df (pd.DataFrame): The dataframe used for finding outliers
         value_col (str): The name of the col outliers are calculated for
     """
-    flag_col = f"{value_col}_outlier_flag"
-    num_flagged = df[df[flag_col]][flag_col].count()
-
     filtered_df = filter_valid(df, value_col)
+
+    flag_col = f"{value_col}_outlier_flag"
+
+    num_flagged = filtered_df[filtered_df[flag_col]][flag_col].count()
     tot_nonzero = filtered_df[value_col].count()
 
     msg = (
