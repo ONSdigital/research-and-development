@@ -3,21 +3,13 @@ import pandas as pd
 from src.outputs.short_form import create_headcount_cols
 
 
-def run_short_to_long(df,
-                      selectiontype=["P", "C"],
-                      fte_civil="706",
-                      fte_defence="707",
-                      hc_total="705"):
+def run_short_to_long(df, selectiontype=["P", "C"]):
     """Implement short form to long form conversion.
 
     Args:
         df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
         selectiontype (list): Selection type(s) included in short to long conversion.
-        fte_civil (str): Column containing percentage of civil employees.
-        fte_defence (str): Column containing percentage of defence employees.
-        hc_total (str): Column containing total headcount value.
-
 
     Returns:
         pd.DataFrame: The dataframe with additional instances for civil and
@@ -31,7 +23,7 @@ def run_short_to_long(df,
     short_to_long_df = df.copy().loc[ins_cond & sel_cond]
     not_short_to_long_df = df.copy().loc[~sel_cond]
 
-    df = create_headcount_cols(short_to_long_df, fte_civil, fte_defence, hc_total)
+    df = create_headcount_cols(short_to_long_df)
 
     convert_short_to_long = [
         ("701", "702", "211"),
