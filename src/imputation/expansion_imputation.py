@@ -70,6 +70,9 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
         )
         return pd.DataFrame(), df
 
+    # TODO: remove this temporary fix to cast Nans to False
+    df[trim_bool_col].fillna(False, inplace=True)
+
     df_not_trimmed = df.loc[~df[trim_bool_col]]
     df_trimmed = df.loc[df[trim_bool_col]]
 
@@ -86,10 +89,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
     breakdown_dict = config["breakdowns"]
     breakdown_qs_2xx = breakdown_dict["211"]
     breakdown_qs_3xx = breakdown_dict["305"]
-
-    # TODO: remove this temporary fix to cast Nans to False
-    df["211_trim"].fillna(False, inplace=True)
-    df["305_trim"].fillna(False, inplace=True)
 
     # Filter to exclude the same rows trimmed for 211_trim == False
     trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
