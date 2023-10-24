@@ -128,7 +128,7 @@ breakdowns:
     - "emp_other"
   headcount_total:
     - "headcount_res_m"
-    - "headcount_res_f "
+    - "headcount_res_f"
     - "headcount_tec_m"
     - "headcount_tec_f"
     - "headcount_oth_m"
