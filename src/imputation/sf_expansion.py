@@ -37,7 +37,7 @@ def expansion_impute(
     # Create mask for clear responders and responders which have had
     # TMI imputation applied
     clear_statuses = ["Clear", "Clear - overridden"]
-    responder_mask = group["status"].isin(clear_statuses) | group["imp_marker"] == "TMI"
+    responder_mask = group["status"].isin(clear_statuses) | (group["imp_marker"] == "TMI")
 
     # Combination masks to select correct records for summing
     long_form_responder_mask = responder_mask & long_mask
