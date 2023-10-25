@@ -9,7 +9,6 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
-from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -104,7 +103,7 @@ def run_staging(
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
     feather_files_exist = check_file_exists(feather_file)
 
-    is_network = (network_or_hdfs == "network")
+    is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found
@@ -223,7 +222,7 @@ def run_staging(
     cora_mapper = read_csv(cora_mapper_path)
     # validates and updates from int64 to string type
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
-    cora_mapper = validate_cora_df(cora_mapper)
+    cora_mapper = val.validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
 
     # Load ultfoc (Foreign Ownership) mapper

@@ -16,11 +16,8 @@ def evaluate_imputed_ixx(
     break_down_cols: List[Union[str, int]],
 ) -> pd.DataFrame:
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
-    over the sum of all 211 or 305 values, multiplied by the imputed 211."""
-
-    imp_class = group["imp_class"].values[0]
-    ExpansionLogger.debug(f"Imputation class: {imp_class}")
-
+    over the sum of all 211 or 305 values, multiplied by the imputed 211.
+    """
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
