@@ -126,7 +126,7 @@ def flag_outliers(
         lambda row: _normal_round(row["high"]), axis=1
     )
     filtered_df["upper_band"] = (
-        filtered_df["group_count"] - filtered_df["high_rounded"] #
+        filtered_df["group_count"] - filtered_df["high_rounded"]
     )
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
@@ -136,8 +136,9 @@ def flag_outliers(
 
     # Ranks of RU refs in each group, depending on their value
     filtered_df["group_rank"] = (
-        filtered_df.groupby(groupby_cols)[value_col].rank( # noqa
-        method="first", ascending=True # noqa
+        filtered_df.groupby(groupby_cols)[value_col].rank( 
+            method="first", 
+            ascending=True 
         )
     )
 

@@ -52,6 +52,7 @@ def create_headcount_cols(
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
+    df = df.copy()
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
         df["706"] + df["707"] != 0,  # noqa
