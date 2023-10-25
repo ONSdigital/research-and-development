@@ -126,7 +126,7 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     short_form_df = create_imp_class_col(short_form_df, "200", "201", "imp_class")
 
     # TODO: This fixes the output of create_imp_class_col. Maybe replace or delete it
-    short_form_df["imp_class"].str.replace("<NA>", "nan", inplace=True)
+    short_form_df["imp_class"] = short_form_df["imp_class"].str.replace("<NA>", "nan")
 
     # Re-joining the output of create_imp_class_col to original df
     df = apply_to_original(short_form_df, df)
