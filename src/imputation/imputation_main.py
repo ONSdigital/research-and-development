@@ -34,12 +34,7 @@ def run_imputation(
         "headcount_oth_f",
     ]
 
-    sum_cols = [
-        "emp_total", 
-        "headcount_tot_m", 
-        "headcount_tot_f", 
-        "headcount_total"
-    ]
+    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
     # Get the breakdown columns from the config
     bd_qs_lists = list(config["breakdowns"].values())
@@ -52,7 +47,7 @@ def run_imputation(
     df = run_short_to_long(df)
 
     df["imp_marker"] = "no_imputation"
-    
+
     # Create new columns to hold the imputed values
     orig_cols = target_vars + bd_cols + sum_cols
     for col in orig_cols:

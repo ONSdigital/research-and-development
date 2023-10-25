@@ -104,7 +104,7 @@ def run_staging(
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
     feather_files_exist = check_file_exists(feather_file)
 
-    is_network = (network_or_hdfs == "network")
+    is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found

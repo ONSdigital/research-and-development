@@ -46,7 +46,7 @@ def run_short_to_long(df, selectiontype=["P", "C"]):
     df = pd.concat([df, civil_df, defence_df, not_short_to_long_df])
 
     df = df.sort_values(["reference", "instance"],
-                        ascending=[True, True]).reset_index(drop=True)
+        ascending=[True, True]).reset_index(drop=True)
 
     df = df.drop(["headcount_civil", "headcount_defence"], axis=1)
 

@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
-from numpy import random
 
 from src.outlier_detection import auto_outliers as auto
 from src.outlier_detection import manual_outliers as manual
@@ -79,9 +78,7 @@ def run_outliers(
     # update outlier flag column with manual outliers
     OutlierMainLogger.info("Starting Manual Outlier Application")
     df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
-    outlier_df = df_auto_flagged.merge(
-        df_manual_supplied, on=["reference"], how="left"
-    )
+    outlier_df = df_auto_flagged.merge(df_manual_supplied, on=["reference"], how="left")
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")
 

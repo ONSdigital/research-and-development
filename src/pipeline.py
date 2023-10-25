@@ -112,7 +112,7 @@ def run_pipeline(start, config_path):
     MainLogger.info("Finished  Imputation...")
     print(imputed_df.sample(10))
 
-    # Outlier detection module 
+    # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
         imputed_df, manual_outliers, config, write_csv, run_id
@@ -137,7 +137,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
-    
+
     # Run short frozen form output
     run_outputs(
         estimated_responses,
@@ -151,7 +151,6 @@ def run_pipeline(start, config_path):
         pg_alpha_num,
     )
 
-    
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
