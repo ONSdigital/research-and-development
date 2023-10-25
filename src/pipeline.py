@@ -110,7 +110,6 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
     MainLogger.info("Finished  Imputation...")
-    print(imputed_df.sample(10))
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
@@ -124,7 +123,6 @@ def run_pipeline(start, config_path):
     estimated_responses, weighted_responses = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
-    print(estimated_responses.sample(10))
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
