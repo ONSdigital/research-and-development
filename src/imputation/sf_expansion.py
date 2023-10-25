@@ -95,23 +95,37 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         return combined_df
 
 
+def split_df_on_imp_class(df: pd.DataFrame, exlusion_list: List = ["817", "nan"]):
+
+    # Exclude the records from the reference list
+    exclusion_str = "|".join(exlusion_list)
+
+    # Create the filter
+    exclusion_filter = df["imp_class"].str.contains(exclusion_str)
+
+    # Filter out imputation classes that include "817" or "nan"
+    filtered_df = df[~exclusion_filter]  # df has 817 and nan filtered out
+    excluded_df = df[exclusion_filter]  # df only has 817 and nan records
+
+    return filtered_df, excluded_df
+
+
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Get the breakdowns dict
     breakdown_dict = config["breakdowns"]
 
-    # Exclude the records from the reference list
-    refence_list = ["817"]
-    ref_list_excluded_df = df[~df.cellnumber.isin(refence_list)]
-    ref_list_only_df = df[df.cellnumber.isin(refence_list)]
+    # Remove records that have the reference list variables
+    # and those that have "nan" in the imp class
+    filtered_df, excluded_df = split_df_on_imp_class(df)
 
     # Get master keys
     master_values = breakdown_dict.keys()
 
     # Run the `expansion_impute` function in a for-loop
-    expanded_df = apply_expansion(ref_list_excluded_df, master_values, breakdown_dict)
+    expanded_df = apply_expansion(filtered_df, master_values, breakdown_dict)
 
     # Re-include those records from the reference list before returning df
-    result_df = pd.concat([expanded_df, ref_list_only_df], axis=0)
+    result_df = pd.concat([expanded_df, excluded_df], axis=0)
 
     return result_df
