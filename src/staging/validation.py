@@ -53,8 +53,8 @@ def validate_post_col(
         config (dict): The postcode settings from the config settings
 
     Returns:
-        invalid_df (pd.DataFrame): A dataframe of invalid postcodes, either with the
-        incorrect pattern or not found in the masterlist
+        combined_invalid_postcodes_df (pd.DataFrame): A dataframe of invalid postcodes,
+        either with the incorrect pattern or not found in the masterlist
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
