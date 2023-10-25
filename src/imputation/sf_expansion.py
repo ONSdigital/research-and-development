@@ -6,6 +6,7 @@ import pandas as pd
 import logging
 
 from src.imputation.expansion_imputation import split_df_on_trim
+from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
 
 SFExpansionLogger = logging.getLogger(__name__)
 
@@ -33,7 +34,8 @@ def expansion_impute(
     long_mask = group["formtype"] == long_code
     short_mask = group["formtype"] == short_code
 
-    # Sum the master column, e.g. "211" or "305" for the clear responders
+    # Create mask for clear responders and responders which have had
+    # TMI imputation applied
     clear_statuses = ["Clear", "Clear - overridden"]
     responder_mask = group["status"].isin(clear_statuses) | group["imp_marker"] == "TMI"
 
@@ -95,13 +97,17 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         return combined_df
 
 
-def split_df_on_imp_class(df: pd.DataFrame, exlusion_list: List = ["817", "nan"]):
+def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
 
     # Exclude the records from the reference list
-    exclusion_str = "|".join(exlusion_list)
+    exclusion_str = "|".join(exclusion_list)
 
     # Create the filter
     exclusion_filter = df["imp_class"].str.contains(exclusion_str)
+    # Where imputation class is null, `NaN` is returned by the
+    # .str.contains(exclusion_str) so we need to swap out the
+    # returned `NaN`s with True, so it gets filtered out
+    exclusion_filter = exclusion_filter.fillna(True)
 
     # Filter out imputation classes that include "817" or "nan"
     filtered_df = df[~exclusion_filter]  # df has 817 and nan filtered out
@@ -115,6 +121,11 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # Get the breakdowns dict
     breakdown_dict = config["breakdowns"]
 
+    # TODO: Move this imp_class step to census TMI
+    short_form_df = df.loc[df["formtype"] == "0006"]
+    short_form_df = create_imp_class_col(short_form_df)
+    df = apply_to_original(short_form_df, df)
+
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class
     filtered_df, excluded_df = split_df_on_imp_class(df)
@@ -122,7 +133,7 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # Get master keys
     master_values = breakdown_dict.keys()
 
-    # Run the `expansion_impute` function in a for-loop
+    # Run the `expansion_impute` function in a for-loop via `apply_expansion`
     expanded_df = apply_expansion(filtered_df, master_values, breakdown_dict)
 
     # Re-include those records from the reference list before returning df

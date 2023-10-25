@@ -47,6 +47,7 @@ def run_imputation(
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
+    # Initialise imp_marker column, default value "no_imputation"
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
