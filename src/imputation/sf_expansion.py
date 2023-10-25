@@ -122,11 +122,8 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     breakdown_dict = config["breakdowns"]
 
     # TODO: Move this imp_class step to census TMI
-    short_form_df = df.loc[df["formtype"] == "0006"]
+    short_form_df = df.loc[(df["formtype"] == "0006") & (df["instance"] != 0)]
     short_form_df = create_imp_class_col(short_form_df, "200", "201", "imp_class")
-
-    # TODO: This fixes the output of create_imp_class_col. Maybe replace or delete it
-    short_form_df["imp_class"] = short_form_df["imp_class"].str.replace("<NA>", "nan")
 
     # Re-joining the output of create_imp_class_col to original df
     df = apply_to_original(short_form_df, df)
