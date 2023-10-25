@@ -47,6 +47,7 @@ def run_staging(
     Returns:
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
+            secondary_responses (pd.Dataframe): TODO
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             pg_mapper (pd.DataFrame): Product grouo mapper,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
@@ -62,6 +63,10 @@ def run_staging(
     paths = config[f"{network_or_hdfs}_paths"]
     snapshot_path = paths["snapshot_path"]
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
+    # TODO START
+    secondary_snapshot_path = paths["secondary_snapshot_path"]
+    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
+    # TODO END
 
     # Load historic data
     if config["global"]["load_historic_data"]:
@@ -96,6 +101,9 @@ def run_staging(
     # Check data file exists, raise an error if it does not.
 
     check_file_exists(snapshot_path)
+    # TODO START
+    check_file_exists(secondary_snapshot_path)
+    # TODO END
 
     # load and parse the snapshot data json file
     # Check if feather file exists in snapshot path
@@ -103,6 +111,10 @@ def run_staging(
     load_from_feather = config["global"]["load_from_feather"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
     feather_files_exist = check_file_exists(feather_file)
+    # TODO START
+    secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+    secondary_feather_files_exist = check_file_exists(secondary_feather_file)
+    # TODO END
 
     is_network = (network_or_hdfs == "network")
     # Only read from feather if feather files exist and we are on network
