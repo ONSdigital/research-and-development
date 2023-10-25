@@ -135,6 +135,7 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
     filtered_df = filtered_df.loc[filtered_df["instance"] != 0]
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
+    filtered_df["305_imputed"] = fill_zeros(filtered_df, "305_imputed")
     df = apply_to_original(filtered_df, df)
 
     # Replace Nan with zero for companies with NO R&D Q604 = "No"
@@ -143,7 +144,7 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
     no_rd = no_rd.loc[no_rd["instance"] != 0]
     for i in target_variables:
         no_rd[i] = fill_zeros(no_rd, i)
-
+        no_rd[f"{i}_imputed"] = fill_zeros(no_rd, f"{i}_imputed")
     df = apply_to_original(no_rd, df)
 
     # Return cleaned original dataset
