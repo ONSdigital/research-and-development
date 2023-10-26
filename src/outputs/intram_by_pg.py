@@ -15,6 +15,7 @@ def output_intram_by_pg(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    pg_detailed,
 ):
     """Run the outputs module.
 
@@ -44,10 +45,6 @@ def output_intram_by_pg(
     df_agg = pd.concat([df_agg, df_tot])
 
     # Merge with labels and ranks
-    # For debugging - begin
-    mypath = (r"R:\BERD Results System Development 2023\DAP_emulation\mappers\pg_detailed.csv")
-    pg_detailed = pd.read_csv(mypath)
-    # For debugging - end
     df_merge = pg_detailed.merge(
         df_agg,
         how="left",
@@ -56,9 +53,9 @@ def output_intram_by_pg(
     df_merge[value_col] = df_merge[value_col].fillna(0)
 
     # Sort by rank
-    df_merge.sort_values("rank", axis=0, ascending=True)
+    df_merge.sort_values("ranking", axis=0, ascending=True)
 
-    # Select and rename the correct coluns
+    # Select and rename the correct columns
     detail = "Detailed product groups (Alphabetical product groups A-AH)"
     notes = "Notes"
     value_title = "2023 (Current period)"

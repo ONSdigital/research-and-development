@@ -20,6 +20,7 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
+    pg_detailed: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -33,6 +34,9 @@ def run_outputs(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
+        postcode_itl_mapper (pd.DataFrame): Links postcode to region code
+        pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
+        pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
 
 
     """
@@ -73,5 +77,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
+            pg_detailed,
         )
         OutputMainLogger.info("Finished  Intram by PG output.")

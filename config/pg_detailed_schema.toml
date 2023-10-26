@@ -1,0 +1,11 @@
+[ranking]
+Deduced_Data_Type = "Int64"
+
+[pg_alpha]
+Deduced_Data_Type = "str"
+
+["Detailed product groups (Alphabetical product groups A-AH)"]
+Deduced_Data_Type = "str"
+
+[Notes]
+Deduced_Data_Type = "str"
