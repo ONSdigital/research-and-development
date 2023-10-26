@@ -32,44 +32,37 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_headcount_cols(
-    df_in: pd.DataFrame, fte_civil, fte_defence, hc_total, round_val=4
+    df: pd.DataFrame,
+    round_val: int = 4,
 ) -> pd.DataFrame:
     """Create new columns with headcounts for civil and defence.
 
-    The column represented by hc_total contains the total headcount value, and
+    Column '705' contains the total headcount value, and
     from this the headcount values for civil and defence are calculated
-    based on the percentages of civil and defence in fte_civil (civil)
-    fte_defence (defence). Note that fte_civil and fte_defence measure different
-    things to hc_total so will not in general total to the hc_total value.
-
-    fte_civil will usually be 706, fte_defence will usually be 707, and
-    hc_total will usually be 705.
+    based on the percentages of civil and defence in columns '706' (civil)
+    and '707' (defence). Note that columns '706' and '707' measure different
+    things to '705' so will not in general total to the '705' value.
 
     Args:
-        df_in (pd.DataFrame): The survey dataframe being prepared for
+        df (pd.DataFrame): The survey dataframe being prepared for
             short form output.
-        fte_civil (str): Column containing percentage of civil employees.
-        fte_defence (str): Column containing percentage of defence employees.
-        hc_total (str): Column containing total headcount value.
         round_val (int): The number of decimal places for rounding.
 
     Returns:
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
-    # Deep copying to avoid "returning a vew versus a copy" warning
-    df = df_in.copy()
-
+    df = df.copy()
     # Use np.where to avoid division by zero.
     df["headcount_civil"] = np.where(
-        df[fte_civil] + df[fte_defence] != 0,  # noqa
-        df[hc_total] * df[fte_civil] / (df[fte_civil] + df[fte_defence]),
+        df["706"] + df["707"] != 0,  # noqa
+        df["705"] * df["706"] / (df["706"] + df["707"]),
         0,
     )
 
     df["headcount_defence"] = np.where(
-        df[fte_civil] + df[fte_defence] != 0,  # noqa
-        df[hc_total] * df[fte_defence] / (df[fte_civil] + df[fte_defence]),
+        df["706"] + df["707"] != 0,  # noqa
+        df["705"] * df["707"] / (df["706"] + df["707"]),
         0,
     )
 
@@ -105,13 +98,8 @@ def run_shortform_prep(
         & (df["instance"] == 0)
     ]
 
-    # Create a 'year' column
-    df = create_period_year(df)
-
     # create columns for headcounts for civil and defense
-    df = create_headcount_cols(
-        df, "706_estimated", "707_estimated", "705_estimated", round_val
-    )
+    df = create_headcount_cols(df, round_val)
 
     return df
 
@@ -143,7 +131,8 @@ def output_short_form(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Prepare the columns needed for outputs:
+    # Create a 'year' column
+    df = create_period_year(df)
 
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)

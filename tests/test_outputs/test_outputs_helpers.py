@@ -10,10 +10,7 @@ class TestSelectCols(unittest.TestCase):
 
     def data_frame(self):
         # create sample data
-        data = {
-            "reference": [1234],
-            "period": [202201],
-            "unused": [0]}
+        data = {"reference": [1234], "period": [202201], "unused": [0]}
 
         df = pd.DataFrame(data)
         return df
@@ -21,8 +18,9 @@ class TestSelectCols(unittest.TestCase):
     def schema(self):
         # create sample schema
         schema = {
-            'ref': {'old_name': 'reference', 'Deduced_Data_Type': 'int64'},
-            'period': {'old_name': 'period', 'Deduced_Data_Type': 'int64'}}
+            "ref": {"old_name": "reference", "Deduced_Data_Type": "int64"},
+            "period": {"old_name": "period", "Deduced_Data_Type": "int64"},
+        }
         return schema
 
     def test_select_cols(self):
@@ -40,5 +38,5 @@ class TestSelectCols(unittest.TestCase):
         assert_frame_equal(actual_result, expected_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

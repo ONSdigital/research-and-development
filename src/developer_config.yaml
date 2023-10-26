@@ -9,7 +9,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_short_form: True
   output_tau: True
   dev_test : False
@@ -69,8 +69,8 @@ network_paths:
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
 schema_paths:
-  frozen_shortform_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  tau_schema: "src/outputs/output_schemas/tau_schema.toml"
+  frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
+  tau_schema: "config/output_schemas/tau_schema.toml"
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
@@ -84,6 +84,8 @@ csv_filenames:
 run_log_sql:
     log_db: "test_runlog"
     log_mode: "append"
+estimation:
+  numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 breakdowns:
   2xx:
     - "202"
@@ -122,3 +124,14 @@ breakdowns:
     - "302"
     - "303"
     - "304"
+  emp_total:
+    - "emp_researcher"
+    - "emp_technician"
+    - "emp_other"
+  headcount_total:
+    - "headcount_res_m"
+    - "headcount_res_f"
+    - "headcount_tec_m"
+    - "headcount_tec_f"
+    - "headcount_oth_m"
+    - "headcount_oth_f"
