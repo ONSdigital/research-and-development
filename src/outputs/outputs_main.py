@@ -66,7 +66,7 @@ def run_outputs(
         OutputMainLogger.info("Finished TAU output.")
 
     # Running Intram by PG output
-    if config["global"]["intram_by_pg"]:
+    if config["global"]["output_intram_by_pg"]:
         OutputMainLogger.info("Starting  Intram by PG output...")
         output_intram_by_pg(
             estimated_df,
