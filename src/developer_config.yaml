@@ -11,6 +11,7 @@ global:
   output_estimation_qa: False
   output_imputation_qa: False
   output_short_form: True
+  output_long_form: True
   output_tau: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
@@ -44,6 +45,8 @@ hdfs_paths:
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
+  # TODO check below - copied from above but folder not found
+  long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
@@ -70,6 +73,7 @@ network_paths:
   pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
+  frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05

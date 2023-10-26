@@ -50,6 +50,20 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished short form output.")
 
+    # Running long form output
+    if config["global"]["output_long_form"]:
+        OutputMainLogger.info("Starting long form output...")
+        output_short_form(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper, # check
+            cora_mapper, # check
+            postcode_itl_mapper, # check
+        )
+        OutputMainLogger.info("Finished short form output.")
+
     # Running TAU output
     if config["global"]["output_tau"]:
         OutputMainLogger.info("Starting TAU output...")
