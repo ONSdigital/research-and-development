@@ -25,7 +25,10 @@ def expansion_impute(
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
 
-    imp_class = group["imp_class"].values[0]
+    # Create a copy of the group dataframe
+    group_copy = group.copy()
+
+    imp_class = group_copy["imp_class"].values[0]
     SFExpansionLogger.debug(f"Imputation class: {imp_class}.")
     SFExpansionLogger.debug(f"Master column: {master_col}.")
 
@@ -33,43 +36,43 @@ def expansion_impute(
     bd_cols = [str(col) for col in break_down_cols]
 
     # Make long and short masks
-    long_mask = group["formtype"] == long_code
-    short_mask = group["formtype"] == short_code
+    long_mask = group_copy["formtype"] == long_code
+    short_mask = group_copy["formtype"] == short_code
 
     # Create mask for clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
-    clear_mask = group["status"].isin(clear_statuses)
+    clear_mask = group_copy["status"].isin(clear_statuses)
 
     # create a mask for responders that are either clear or have had
     # TMI applied
-    responder_mask = clear_mask | (group["imp_marker"] == "TMI")
+    responder_mask = clear_mask | (group_copy["imp_marker"] == "TMI")
 
     # Combination masks to select correct records for summing
     long_form_responder_mask = clear_mask & long_mask
     short_form_responder_mask = responder_mask & short_mask
 
     # Get long forms only for summing master_col
-    sum_master_q_lng = group.loc[long_form_responder_mask, master_col].sum()  # scalar
+    sum_master_q_lng = group_copy.loc[long_form_responder_mask, master_col].sum()  # scalar
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group[short_form_responder_mask][master_col]  # vector
+    returned_master_vals = group_copy[short_form_responder_mask][master_col]  # vector
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
-        sum_breakdown_q = group.loc[long_form_responder_mask][bd_col].sum()
+        sum_breakdown_q = group_copy.loc[long_form_responder_mask][bd_col].sum()
 
         # Make imputation col equal to original column
-        group[f"{bd_col}_imputed"] = group[bd_col]
+        group_copy[f"{bd_col}_imputed"] = group_copy[bd_col]
 
         # Update the imputation column for status encoded 100 and 201
         # i.e. for non-responders
         imputed_sf_vals = (sum_breakdown_q / sum_master_q_lng) * returned_master_vals
         # Write imputed value to the non-responder records
-        group.loc[short_form_responder_mask, f"{bd_col}_imputed"] = imputed_sf_vals
+        group_copy.loc[short_form_responder_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
     # Returning updated group and updated QA dict
-    return group
+    return group_copy
 
 
 # @df_change_func_wrap
