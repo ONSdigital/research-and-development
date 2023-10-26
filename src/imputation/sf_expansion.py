@@ -36,15 +36,16 @@ def expansion_impute(
     long_mask = group["formtype"] == long_code
     short_mask = group["formtype"] == short_code
 
-    # Create mask for clear responders and responders which have had
-    # TMI imputation applied
+    # Create mask for clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
-    responder_mask = group["status"].isin(clear_statuses) | (
-        group["imp_marker"] == "TMI"
-    )
+    clear_mask = group["status"].isin(clear_statuses)
+
+    # create a mask for responders that are either clear or have had
+    # TMI applied
+    responder_mask = clear_mask | (group["imp_marker"] == "TMI")
 
     # Combination masks to select correct records for summing
-    long_form_responder_mask = responder_mask & long_mask
+    long_form_responder_mask = clear_mask & long_mask
     short_form_responder_mask = responder_mask & short_mask
 
     # Get long forms only for summing master_col
@@ -71,7 +72,7 @@ def expansion_impute(
     return group
 
 
-@df_change_func_wrap
+# @df_change_func_wrap
 def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
     # Filter to exclude the 211 trimming, the excluded rows are in trimmed_211_df
     # and the dataframe after trimming in nontrimmed_df
@@ -81,6 +82,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
         f"There are {trimmed_211_df.shape[0]} rows in the trimmed_211_df"
     )
+    expanded_df = nontrimmed_df
 
     for master_value in master_values:
         # exclude the "305" case which will be based on different trimming
@@ -90,14 +92,14 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
         # Create group_by obj of the trimmed df
-        non_trim_grouped = nontrimmed_df.groupby("imp_class")
+        non_trim_grouped = expanded_df.groupby("imp_class") # groupby object
 
         # Calculate the imputation values for master question
         expanded_df = non_trim_grouped.apply(
             expansion_impute,
             master_value,
             break_down_cols=breakdown_dict[master_value],
-        )
+        ) # returns a dataframe
 
     # Concat the expanded df (processed from untrimmed records) back on to
     # trimmed records. Reassigning to `df` to feed back into for-loop
@@ -130,7 +132,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     return combined_df
 
 
-@df_change_func_wrap
+# @df_change_func_wrap
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
 
     # Exclude the records from the reference list
@@ -150,7 +152,7 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     return filtered_df, excluded_df
 
 
-@df_change_func_wrap
+# @df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Get the breakdowns dict
