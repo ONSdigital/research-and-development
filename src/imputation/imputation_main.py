@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
+from itertools import chain
 
 from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
@@ -33,21 +34,29 @@ def run_imputation(
         "headcount_oth_f",
     ]
 
-    sum_cols = [
-        "emp_total", 
-        "headcount_tot_m", 
-        "headcount_tot_f", 
-        "headcount_total"
-    ]
+    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
+    # Get the breakdown columns from the config
+    bd_qs_lists = list(config["breakdowns"].values())
+    bd_cols = list(chain(*bd_qs_lists))
+
+    # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
+    # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
+    df["imp_marker"] = "no_imputation"
+
+    # Create new columns to hold the imputed values
+    orig_cols = target_vars + bd_cols + sum_cols
+    for col in orig_cols:
+        df[f"{col}_imputed"] = df[col]
+
+    # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
 
-
-
+    # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
@@ -59,11 +68,6 @@ def run_imputation(
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
-
-    # Get the breakdown columns from the config
-    bd_cols = config["breakdowns"]["2xx"] + config["breakdowns"]["3xx"]
-
-    orig_cols = bd_cols + target_vars + sum_cols
 
     # Create names for imputed cols
     imp_cols = [f"{col}_imputed" for col in orig_cols]
