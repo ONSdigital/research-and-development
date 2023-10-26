@@ -7,6 +7,8 @@ import logging
 
 from src.imputation.expansion_imputation import split_df_on_trim
 from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
+from src.utils.wrappers import df_change_func_wrap
+
 
 SFExpansionLogger = logging.getLogger(__name__)
 
@@ -37,7 +39,9 @@ def expansion_impute(
     # Create mask for clear responders and responders which have had
     # TMI imputation applied
     clear_statuses = ["Clear", "Clear - overridden"]
-    responder_mask = group["status"].isin(clear_statuses) | (group["imp_marker"] == "TMI")
+    responder_mask = group["status"].isin(clear_statuses) | (
+        group["imp_marker"] == "TMI"
+    )
 
     # Combination masks to select correct records for summing
     long_form_responder_mask = responder_mask & long_mask
@@ -67,6 +71,7 @@ def expansion_impute(
     return group
 
 
+@df_change_func_wrap
 def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
     for master_value in master_values:
 
@@ -97,6 +102,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         return combined_df
 
 
+@df_change_func_wrap
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
 
     # Exclude the records from the reference list
@@ -116,6 +122,7 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     return filtered_df, excluded_df
 
 
+@df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Get the breakdowns dict
