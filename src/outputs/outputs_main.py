@@ -5,7 +5,7 @@ from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
-
+from src.outputs.intram_by_pg import output_intram_by_pg
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -64,3 +64,14 @@ def run_outputs(
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
+
+    # Running Intram by PG output
+    if config["global"]["intram_by_pg"]:
+        OutputMainLogger.info("Starting  Intram by PG output...")
+        output_intram_by_pg(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished  Intram by PG output.")
