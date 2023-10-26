@@ -15,13 +15,8 @@ def run_short_to_long(df, selectiontype=["P", "C"]):
         pd.DataFrame: The dataframe with additional instances for civil and
             defence short form responses, in long form format.
     """
-    # In the pipeline we need to apply short to long form conversion twice.
-    # we therefore filter for instance 0 only.
-    ins_cond = df["instance"] == 0
-    sel_cond = df["selectiontype"].isin(selectiontype)
-
-    short_to_long_df = df.copy().loc[ins_cond & sel_cond]
-    not_short_to_long_df = df.copy().loc[~sel_cond]
+    short_to_long_df = df.copy().loc[df["selectiontype"].isin(selectiontype)]
+    not_short_to_long_df = df.copy().loc[~df["selectiontype"].isin(selectiontype)]
 
     df = create_headcount_cols(short_to_long_df)
 
