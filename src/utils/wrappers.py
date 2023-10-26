@@ -253,6 +253,60 @@ def df_change_func_wrap(func):
 
     return wrapper
 
+def count_split_records_wrap(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Extract the dataframe arg
+        df_arg = None
+        for arg in args:
+            if isinstance(arg, pd.DataFrame):
+                df_arg = arg
+                break
+
+        if df_arg is None:
+            raise ValueError("No dataframe found in arguments")
+
+        # Get shape
+        before_shape = df_arg.shape
+
+        # Apply the function
+        filtered_df, excluded_df = func(*args, **kwargs)
+
+        # Get shape after function
+        after_shape = filtered_df.shape
+
+        # Extract rows and col
+        rows_before = before_shape[0]
+        rows_after = filtered_df.shape[0] + excluded_df.shape[0]
+
+        cols_before = before_shape[1]
+        cols_after = after_shape[1]
+
+        rows_diff = rows_after - rows_before
+        cols_diff = cols_after - cols_before
+
+        def _change_direction(before, after):
+            """Get the direction of the change."""
+            # Evalutate the direction of change
+            change = ["gained", "removed"][after < before]
+
+            return change
+
+        # Get direction of change
+        row_change = _change_direction(rows_before, rows_after)
+        col_change = _change_direction(cols_before, cols_after)
+
+        if rows_diff == 0 and cols_diff == 0:
+            logger.info("There has been no change in the dataframe")
+        else:
+            logger.info("Changes to the dataframe are as follows")
+            logger.info(f"{abs(rows_diff)} rows were {row_change}")
+            logger.info(f"{abs(cols_diff)} columns were {col_change}")
+
+        return filtered_df, excluded_df
+
+    return wrapper
+
 
 def validate_dataframe_not_empty(func):
     def wrapper(df, *args, **kwargs):
