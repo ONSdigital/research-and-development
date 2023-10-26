@@ -58,15 +58,6 @@ def evaluate_imputed_ixx(
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Splits the dataframe in based on if it was trimmed or not"""
 
-    # Add clause to return original df and empty df if there is no trim column
-    if trim_bool_col not in df:
-        if trim_bool_col == "211_trim" or trim_bool_col == "305_trim":
-            raise ValueError(f"Failure: {trim_bool_col} is missing")
-        ExpansionLogger.info(
-            f"No trim column '{trim_bool_col}' found. No splitting applied"
-        )
-        return pd.DataFrame(), df
-
     # TODO: remove this temporary fix to cast Nans to False
     df[trim_bool_col].fillna(False, inplace=True)
 

@@ -68,17 +68,21 @@ def expansion_impute(
 
 
 def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
+    # Filter to exclude the 211 trimming, the excluded rows are in trimmed_211_df
+    # and the dataframe after trimming in nontrimmed_df
+    trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
+    SFExpansionLogger.debug(
+        f"There are {df.shape[0]} rows in the original df \n"
+        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
+        f"There are {trimmed_211_df.shape[0]} rows in the trimmed_211_df"
+    )
+
     for master_value in master_values:
-
+        # exclude the "305" case which will be based on different trimming
+        if master_value == "305":
+            continue
+        
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
-
-        # Filter to exclude the same rows trimmed for {master}_trim == False
-        trimmed_df, nontrimmed_df = split_df_on_trim(df, f"{master_value}_trim")
-        SFExpansionLogger.debug(
-            f"There are {df.shape[0]} rows in the original df \n"
-            f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
-            f"There are {trimmed_df.shape[0]} rows in the {master_value} trimmed_df"
-        )
 
         # Create group_by obj of the trimmed df
         non_trim_grouped = nontrimmed_df.groupby("imp_class")
@@ -90,11 +94,35 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
             break_down_cols=breakdown_dict[master_value],
         )
 
-        # Concat the expanded df (processed from untrimmed records) back on to
-        # trimmed records. Reassigning to `df` to feed back into for-loop
-        combined_df = pd.concat([expanded_df, trimmed_df], axis=0)
+    # Concat the expanded df (processed from untrimmed records) back on to
+    # trimmed records. Reassigning to `df` to feed back into for-loop
+    combined_df = pd.concat([expanded_df, trimmed_211_df], axis=0)
 
-        return combined_df
+    # now filter on the 305 trimming- the excluded rows are in trimmed_305_df
+    # and the dataframe after trimming in nontrimmed_df
+    trimmed_305_df, nontrimmed_df = split_df_on_trim(combined_df, "305_trim")
+    SFExpansionLogger.debug(
+        f"There are {df.shape[0]} rows in the original df \n"
+        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
+        f"There are {trimmed_305_df.shape[0]} rows in the trimmed_305_df"
+    )
+
+    SFExpansionLogger.debug(f"Processing exansion imputation for 305")
+
+    # Create group_by obj of the trimmed df
+    non_trim_grouped = nontrimmed_df.groupby("imp_class")
+
+    # Calculate the imputation values for master question
+    expanded_305_df = non_trim_grouped.apply(
+        expansion_impute,
+        master_value,
+        break_down_cols=breakdown_dict[master_value],
+    ) 
+    # Concat the expanded df (processed from untrimmed records) back on to
+    # trimmed records. Reassigning to `df` to feed back into for-loop
+    combined_df = pd.concat([expanded_305_df, trimmed_305_df], axis=0)
+
+    return combined_df
 
 
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):

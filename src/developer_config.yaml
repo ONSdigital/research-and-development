@@ -9,7 +9,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_short_form: True
   output_tau: True
   dev_test : False
