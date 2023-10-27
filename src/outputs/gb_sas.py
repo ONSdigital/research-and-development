@@ -79,7 +79,7 @@ def output_gb_sas(
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
 
-    # Create tau output dataframe with required columns from schema
+    # Create GB SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["gb_sas_schema"]
     schema_dict = load_schema(schema_path)
     output = create_output_df(df, schema_dict)
