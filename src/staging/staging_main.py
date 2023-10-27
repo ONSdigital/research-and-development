@@ -51,7 +51,7 @@ def run_staging(
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
-            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
     """
     # Check the environment switch
@@ -178,8 +178,8 @@ def run_staging(
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist)
-    postcode_df = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_df["pcd2"]
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
     invalid_df, unreal_df = val.validate_post_col(
         full_responses, postcode_masterlist, config
     )
@@ -292,7 +292,7 @@ def run_staging(
         itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_df,
+        postcode_mapper,
         pg_alpha_num,
         pg_detailed,
         itl1_detailed,

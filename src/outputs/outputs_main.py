@@ -6,6 +6,7 @@ from typing import Callable, Dict, Any
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
 from src.outputs.intram_by_pg import output_intram_by_pg
+from src.outputs.intram_by_itl1 import output_intram_by_itl1
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -18,7 +19,8 @@ def run_outputs(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
-    postcode_itl_mapper: pd.DataFrame,
+    postcode_mapper: pd.DataFrame,
+    itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
@@ -35,7 +37,8 @@ def run_outputs(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-        postcode_itl_mapper (pd.DataFrame): Links postcode to region code
+        postcode_mapper (pd.DataFrame): Links postcode to region code
+        itl1_mapper (pd.DataFrame): Links region to ITL codes
         pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
@@ -52,7 +55,7 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
-            postcode_itl_mapper,
+            postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
 
@@ -66,7 +69,7 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
-            postcode_itl_mapper,
+            postcode_mapper,
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
@@ -91,7 +94,8 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            postcode_itl_mapper,
+            postcode_mapper,
+            itl_mapper,
             itl1_detailed,
         )
         OutputMainLogger.info("Finished  Intram by ITL1 output.")
