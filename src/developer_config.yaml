@@ -6,6 +6,7 @@ global:
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False
+  output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
