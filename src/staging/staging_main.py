@@ -289,6 +289,7 @@ def run_staging(
         manual_outliers,
         pg_mapper,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
         postcode_df,

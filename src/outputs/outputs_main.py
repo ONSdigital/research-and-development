@@ -82,3 +82,16 @@ def run_outputs(
             pg_detailed,
         )
         OutputMainLogger.info("Finished  Intram by PG output.")
+
+    # Running Intram by ITL1
+    if config["global"]["output_intram_by_itl1"]:
+        OutputMainLogger.info("Starting  Intram by ITL1 output...")
+        output_intram_by_itl1(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            postcode_itl_mapper,
+            itl1_detailed,
+        )
+        OutputMainLogger.info("Finished  Intram by ITL1 output.")
