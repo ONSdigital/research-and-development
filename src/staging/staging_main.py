@@ -207,7 +207,7 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
-    if config['global']['load_backdata']:
+    if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
         backdata_path = paths["backdata_path"]

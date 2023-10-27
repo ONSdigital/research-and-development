@@ -44,7 +44,7 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-    
+
     df = run_mor(df, backdata, target_vars)
 
     # Convert shortform responses to longform format

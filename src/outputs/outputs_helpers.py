@@ -37,10 +37,11 @@ def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
 
 
 def aggregate_output(
-        df: pd.DataFrame,
-        key_cols: list,
-        value_cols: list,
-        agg_method: str = "sum",) -> pd.DataFrame:
+    df: pd.DataFrame,
+    key_cols: list,
+    value_cols: list,
+    agg_method: str = "sum",
+) -> pd.DataFrame:
 
     """Groups the datadrame by key columns and aggregates the value columns
     using a specified aggregation method.
