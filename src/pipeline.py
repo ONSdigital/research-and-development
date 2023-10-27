@@ -94,7 +94,8 @@ def run_pipeline(start, config_path):
         cellno_df,
         postcode_itl_mapper,
         pg_alpha_num,
-        backdata
+        backdata,
+        pg_detailed,
     ) = run_staging(
         config,
         check_file_exists,
@@ -111,22 +112,19 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(full_responses, pg_mapper, backdata, config, write_csv, run_id)
     MainLogger.info("Finished  Imputation...")
-    print(imputed_df.sample(10))
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses = run_outliers(
-        full_responses, manual_outliers, config, write_csv, run_id
+        imputed_df, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
-    # Data processing: Estimation
     # Estimation module
     MainLogger.info("Starting Estimation...")
     estimated_responses, weighted_responses = run_estimation(
         outliered_responses, cellno_df, config, write_csv, run_id
     )
-    print(estimated_responses.sample(10))
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Regional Apportionment
@@ -139,7 +137,7 @@ def run_pipeline(start, config_path):
 
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
-    
+
     # Run short frozen form output
     run_outputs(
         estimated_responses,
@@ -151,9 +149,9 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_itl_mapper,
         pg_alpha_num,
+        pg_detailed,
     )
 
-    
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")

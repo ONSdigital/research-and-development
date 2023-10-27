@@ -4,12 +4,9 @@ import pandas as pd
 import numpy as np
 
 
-
 def join_pg_numeric(
-    main_df: pd.DataFrame, 
-    mapper_df: pd.DataFrame,
-    cols_pg: list=["201"]
-    ) -> pd.DataFrame:
+    main_df: pd.DataFrame, mapper_df: pd.DataFrame, cols_pg: list = ["201"]
+) -> pd.DataFrame:
     """
     Add a new column with numeric PD using a mapper.
 
@@ -26,7 +23,7 @@ def join_pg_numeric(
             # Perform left join
             combined_df = main_df.merge(
                 mapper_df, how="left", left_on=mycol, right_on="pg_alpha"
-                )
+            )
             combined_df.rename(columns={"pg_numeric": mycol + "_numeric"}, inplace=True)
             combined_df = combined_df.drop(columns=["pg_alpha"])
 
@@ -35,7 +32,6 @@ def join_pg_numeric(
                 "An error occurred while combining main_df and mapper_df: " + str(e)
             )
     return combined_df
-
 
 
 def join_fgn_ownership(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:

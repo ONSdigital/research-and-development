@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal
