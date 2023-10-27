@@ -58,7 +58,7 @@ Min_values = "nan"
 Max_values = "nan"
 Possible_Categorical_Values = ["nan"]
 
-[q211]
+[211]
 Description = "Total Inhouse Expenditure"
 Deduced_Data_Type = "float64"
 Nullable = "No"
@@ -68,25 +68,3 @@ Max_values = 1000000
 Possible_categorical_Values = []
 q_code = "q211"
 old_ref = "intram"
-
-[q200]
-Description = "Business type: Civil or Defence"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "c_or_d"
-
-[q201]
-Description = "Published Product Group"
-Deduced_Data_Type = "Int64"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = ""
-old_ref = "selgrpno"

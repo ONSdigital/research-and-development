@@ -93,7 +93,7 @@ def calculate_links(df, backdata, target_vars):
         df (_type_): _description_
         backdata (_type_): _description_
     """
-    df = df.copy().loc[df['status'].isin(good_statuses), :]
+    df = df.copy().loc[df['status'].isin(good_statuses)]
     
     df = pd.merge(df,
                   backdata, 

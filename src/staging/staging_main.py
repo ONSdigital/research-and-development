@@ -207,11 +207,6 @@ def run_staging(
     else:
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
-    
-    # Load the PG mapper
-    pg_mapper = paths["pg_mapper_path"]
-    check_file_exists(pg_mapper)
-    pg_mapper = read_csv(pg_mapper)
 
     if config['global']['load_backdata']:
         # Stage the manual outliers file
@@ -220,16 +215,18 @@ def run_staging(
         check_file_exists(backdata_path)
         backdata = read_csv(backdata_path)
         # To be added once schema is defined
-        val.validate_data_with_schema(
-            backdata, "./config/backdata_schema.toml"
-        )
-        backdata['formtype'] = '0001'
-        # backdata = pg.run_pg_conversion(backdata, pg_mapper, target_col="201")
+        # val.validate_data_with_schema(
+        #     backdata_path, "./config/backdata_schema.toml"
+        # )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
+    # Load the PG mapper
+    pg_mapper = paths["pg_mapper_path"]
+    check_file_exists(pg_mapper)
+    pg_mapper = read_csv(pg_mapper)
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
