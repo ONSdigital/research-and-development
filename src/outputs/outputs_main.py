@@ -5,7 +5,7 @@ from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
-
+from src.outputs.intram_by_pg import output_intram_by_pg
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
+    pg_detailed: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -33,6 +34,9 @@ def run_outputs(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
+        postcode_itl_mapper (pd.DataFrame): Links postcode to region code
+        pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
+        pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
 
 
     """
@@ -64,3 +68,15 @@ def run_outputs(
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
+
+    # Running Intram by PG output
+    if config["global"]["output_intram_by_pg"]:
+        OutputMainLogger.info("Starting  Intram by PG output...")
+        output_intram_by_pg(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            pg_detailed,
+        )
+        OutputMainLogger.info("Finished  Intram by PG output.")
