@@ -266,7 +266,7 @@ def run_staging(
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
 
     # Loading ITL1 detailed mapper
-    StagingMainLogger.info("Loading PG detailed mapper File...")
+    StagingMainLogger.info("Loading ITL1 detailed mapper File...")
     itl1_detailed_path = paths["itl1_detailed_path"]
     check_file_exists(itl1_detailed_path)
     itl1_detailed = read_csv(itl1_detailed_path)

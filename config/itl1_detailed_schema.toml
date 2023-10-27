@@ -1,11 +1,14 @@
 [ranking]
 Deduced_Data_Type = "Int64"
 
-[itl1_code]
+["Area Code (ITL1)"]
 Deduced_Data_Type = "str"
 
-[itl1_text]
+["Country or region (ITL1)"]
 Deduced_Data_Type = "str"
 
-[notes]
+[Notes]
+Deduced_Data_Type = "str"
+
+[ITL121CD]
 Deduced_Data_Type = "str"
