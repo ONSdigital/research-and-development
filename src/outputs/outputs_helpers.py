@@ -43,7 +43,7 @@ def regions() -> dict:
         None
 
     Returns:
-        (dict): A dictionary of region codes for four UK counties, GB and UK
+        (dict): A dictionary of region codes for England, Wales, Scotland, GB and UK
     """
     regions = {
         "England": ["AA", "BA", "BB", "DC", "ED", "FE", "GF", "GG", "HH", "JG", "KJ"],
