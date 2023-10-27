@@ -135,6 +135,7 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
     filtered_df = filtered_df.loc[filtered_df["instance"] != 0]
     # Replace 305 nulls with zeros
     filtered_df["305"] = fill_zeros(filtered_df, "305")
+    filtered_df["305_imputed"] = fill_zeros(filtered_df, "305_imputed")
     df = apply_to_original(filtered_df, df)
 
     # Replace Nan with zero for companies with NO R&D Q604 = "No"
@@ -143,7 +144,7 @@ def apply_fill_zeros(filtered_df, df, target_variables: list):
     no_rd = no_rd.loc[no_rd["instance"] != 0]
     for i in target_variables:
         no_rd[i] = fill_zeros(no_rd, i)
-
+        no_rd[f"{i}_imputed"] = fill_zeros(no_rd, f"{i}_imputed")
     df = apply_to_original(no_rd, df)
 
     # Return cleaned original dataset
@@ -362,10 +363,6 @@ def apply_tmi(df, target_variables, mean_dict):
     for each imputation class"""
 
     df = df.copy()
-    df["imp_marker"] = "no_imputation"
-
-    for var in target_variables:
-        df[f"{var}_imputed"] = df[var]
 
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
@@ -408,29 +405,36 @@ def apply_tmi(df, target_variables, mean_dict):
 
 def calculate_totals(df):
 
-    df['emp_total_imputed'] = (df['emp_researcher_imputed']
-                               + df['emp_technician_imputed']
-                               + df['emp_other_imputed'])
+    df["emp_total_imputed"] = (
+        df["emp_researcher_imputed"]
+        + df["emp_technician_imputed"]
+        + df["emp_other_imputed"]
+    )
 
-    df['headcount_tot_m_imputed'] = (df['headcount_res_m_imputed']
-                                     + df['headcount_tec_m_imputed']
-                                     + df['headcount_oth_m_imputed'])
+    df["headcount_tot_m_imputed"] = (
+        df["headcount_res_m_imputed"]
+        + df["headcount_tec_m_imputed"]
+        + df["headcount_oth_m_imputed"]
+    )
 
-    df['headcount_tot_f_imputed'] = (df['headcount_res_f_imputed']
-                                     + df['headcount_tec_f_imputed']
-                                     + df['headcount_oth_f_imputed'])
+    df["headcount_tot_f_imputed"] = (
+        df["headcount_res_f_imputed"]
+        + df["headcount_tec_f_imputed"]
+        + df["headcount_oth_f_imputed"]
+    )
 
-    df['headcount_total_imputed'] = (df['headcount_tot_m_imputed']
-                                     + df['headcount_tot_f_imputed'])
+    df["headcount_total_imputed"] = (
+        df["headcount_tot_m_imputed"] + df["headcount_tot_f_imputed"]
+    )
 
     return df
 
 
 def run_tmi(
-    full_df: pd.DataFrame, 
-    target_variables: List[str], 
-    sic_mapper: pd.DataFrame, 
-    config: Dict[str,Any]
+    full_df: pd.DataFrame,
+    target_variables: List[str],
+    sic_mapper: pd.DataFrame,
+    config: Dict[str, Any],
 ) -> pd.DataFrame:
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline
@@ -477,14 +481,15 @@ def run_tmi(
     # TMI Step 4: expansion imputation
     expanded_df = ximp.run_expansion(final_tmi_df, config)
 
-    full_df = pd.concat([expanded_df, shortform_df])
-
     # TMI Step 5: Calculate headcount and employment totals
-    final_df = calculate_totals(full_df)
+    final_df = calculate_totals(expanded_df)
 
-    final_df = final_df.sort_values(
+    # add short forms back to dataframe
+    full_df = pd.concat([final_df, shortform_df])
+
+    full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
     TMILogger.info("TMI imputation completed.")
-    return final_df, qa_df
+    return full_df, qa_df
