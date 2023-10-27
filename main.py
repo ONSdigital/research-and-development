@@ -1,7 +1,6 @@
 from importlib import reload
 import time
 import os
-import postcodes_uk
 import src.pipeline as src
 
 # reload the pipeline module to implement any changes

@@ -20,12 +20,9 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
-<<<<<<< HEAD
     pg_num_alpha: pd.DataFrame,
     sic_pg_alpha: pd.DataFrame,
-=======
     pg_detailed: pd.DataFrame,
->>>>>>> origin/develop
 ):
 
     """Run the outputs module.
