@@ -25,7 +25,8 @@ Deduced_Data_Type = "Int64"
 [frozensic]
 Deduced_Data_Type = "Int64"
 
-[ultfoc]
+[foreign_owner]
+old_name = "ultfoc"
 Deduced_Data_Type = "str"
 
 [200]
@@ -73,12 +74,8 @@ Deduced_Data_Type = "float64"
 [214]
 Deduced_Data_Type = "float64"
 
-# [215]
-
 [216]
 Deduced_Data_Type = "float64"
-
-# [217]
 
 [218]
 Deduced_Data_Type = "float64"
@@ -98,8 +95,6 @@ Deduced_Data_Type = "float64"
 [223]
 Deduced_Data_Type = "float64"
 
-# [224]
-
 [225]
 Deduced_Data_Type = "float64"
 
@@ -115,21 +110,8 @@ Deduced_Data_Type = "float64"
 [229]
 Deduced_Data_Type = "float64"
 
-# [230]
-# [231]
-# [232]
-# [233]
-# [234]
-# [235]
-# [236]
-
 [237]
 Deduced_Data_Type = "float64"
-
-# [238]
-# [239]
-# [240]
-# [241]
 
 [242]
 Deduced_Data_Type = "float64"
