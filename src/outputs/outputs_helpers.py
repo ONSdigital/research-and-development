@@ -36,7 +36,6 @@ def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
     return output_df
 
 
-<<<<<<< HEAD
 def regions() -> dict:
     """Creates a dictionary of UK regions.
 
@@ -55,7 +54,8 @@ def regions() -> dict:
     regions["GB"] = regions["England"] + regions["Wales"] + regions["Scotland"]
     regions["UK"] = regions["GB"] + regions["NI"]
     return regions
-=======
+
+
 def aggregate_output(
         df: pd.DataFrame,
         key_cols: list,
@@ -87,4 +87,3 @@ def aggregate_output(
     df_agg = df.groupby(my_keys).agg(agg_dict).reset_index()
 
     return df_agg
->>>>>>> origin/develop
