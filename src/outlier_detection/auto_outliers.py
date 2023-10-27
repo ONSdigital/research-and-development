@@ -48,6 +48,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
 
     Outliers are only computed from valid, positive responses
     of PRN sampled data (selectiontype = P).
+    Short to long form conversion has been done, so only use instance 0.
     Valid responses have statuses of Clear or Clear Overridden
     (statusencoded = 210 or 211).
 
@@ -59,17 +60,11 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         pd.DataFrame: The filtered dataframe
     """
     sample_cond = df.selectiontype == "P"
-    if df[sample_cond].empty:
-        AutoOutlierLogger.error(
-            "This data does not contain value 'P' in "
-            "column 'selectiontype'. \n Note that outliering cannot be "
-            "performed on the current anonomysed spp snapshot data."
-        )
-        raise ValueError
     status_cond = df.statusencoded.isin(["210", "211"])
-    positive_cond = df[value_col] > 0
+    pos_cond = df[value_col] > 0
+    ins_cond = df["instance"] == 0
 
-    filtered_df = df[sample_cond & status_cond & positive_cond].copy()
+    filtered_df = df[sample_cond & status_cond & pos_cond & ins_cond].copy()
 
     if filtered_df.empty:
         AutoOutlierLogger.error(
@@ -121,8 +116,8 @@ def flag_outliers(
             return f + 1
 
     # Add group count - how many RU refs there are in a cell, perod
-    filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform(
-        "count"
+    filtered_df["group_count"] = (
+        filtered_df.groupby(groupby_cols)[value_col].transform("count") # noqa
     )
 
     # Rank margins
@@ -130,7 +125,9 @@ def flag_outliers(
     filtered_df["high_rounded"] = filtered_df.apply(
         lambda row: _normal_round(row["high"]), axis=1
     )
-    filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
+    filtered_df["upper_band"] = (
+        filtered_df["group_count"] - filtered_df["high_rounded"]
+    )
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(
@@ -138,8 +135,11 @@ def flag_outliers(
     )
 
     # Ranks of RU refs in each group, depending on their value
-    filtered_df["group_rank"] = filtered_df.groupby(groupby_cols)[value_col].rank(
-        method="first", ascending=True
+    filtered_df["group_rank"] = (
+        filtered_df.groupby(groupby_cols)[value_col].rank( 
+            method="first", 
+            ascending=True 
+        )
     )
 
     # Outlier conditions
@@ -192,10 +192,11 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
         df (pd.DataFrame): The dataframe used for finding outliers
         value_col (str): The name of the col outliers are calculated for
     """
-    flag_col = f"{value_col}_outlier_flag"
-    num_flagged = df[df[flag_col]][flag_col].count()
-
     filtered_df = filter_valid(df, value_col)
+
+    flag_col = f"{value_col}_outlier_flag"
+
+    num_flagged = filtered_df[filtered_df[flag_col]][flag_col].count()
     tot_nonzero = filtered_df[value_col].count()
 
     msg = (
@@ -281,8 +282,9 @@ def apply_short_form_filters(
 ):
     """Apply a filter for only short forms with selection type 'P'."""
     # Filter to the correct form type
-    filtered_df = df[
-        (df["formtype"] == form_type_no) & (df["selectiontype"] == sel_type)
-    ]
+    form_cond = df["formtype"] == form_type_no
+    sel_cond = df["selectiontype"] == sel_type
+    ins_cond = df["instance"] == 0
+    filtered_df = df[form_cond & sel_cond & ins_cond]
 
     return filtered_df

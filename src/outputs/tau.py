@@ -1,4 +1,4 @@
-"""The main file for the Outputs module."""
+"""The main file for the Tau output module."""
 import logging
 import pandas as pd
 from datetime import datetime
@@ -66,12 +66,8 @@ def output_tau(
 
     # Create ovss_oth
     df["ovss_oth"] = (
-        df["243"] +
-        df["244"] +
-        df["245"] +
-        df["246"] +
-        df["247"] +
-        df["249"])
+        df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+    )
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
