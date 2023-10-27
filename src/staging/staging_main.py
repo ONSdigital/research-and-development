@@ -270,7 +270,7 @@ def run_staging(
     itl1_detailed_path = paths["itl1_detailed_path"]
     check_file_exists(itl1_detailed_path)
     itl1_detailed = read_csv(itl1_detailed_path)
-    val.validate_data_with_schema(pg_detailed, "./config/itl1_detailed_schema.toml")
+    val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.

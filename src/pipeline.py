@@ -147,9 +147,11 @@ def run_pipeline(start, config_path):
         run_id,
         ultfoc_mapper,
         cora_mapper,
+        postcode_df,
         postcode_itl_mapper,
         pg_alpha_num,
         pg_detailed,
+        itl1_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")

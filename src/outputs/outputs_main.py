@@ -21,6 +21,7 @@ def run_outputs(
     postcode_itl_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
+    itl1_detailed: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -37,6 +38,7 @@ def run_outputs(
         postcode_itl_mapper (pd.DataFrame): Links postcode to region code
         pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
+        itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
 
 
     """
