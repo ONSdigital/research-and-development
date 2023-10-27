@@ -265,6 +265,14 @@ def run_staging(
     val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
 
+    # Loading ITL1 detailed mapper
+    StagingMainLogger.info("Loading PG detailed mapper File...")
+    itl1_detailed_path = paths["itl1_detailed_path"]
+    check_file_exists(itl1_detailed_path)
+    itl1_detailed = read_csv(itl1_detailed_path)
+    val.validate_data_with_schema(pg_detailed, "./config/itl1_detailed_schema.toml")
+    StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -286,4 +294,5 @@ def run_staging(
         postcode_df,
         pg_alpha_num,
         pg_detailed,
+        itl1_detailed,
     )

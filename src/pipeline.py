@@ -95,6 +95,7 @@ def run_pipeline(start, config_path):
         postcode_itl_mapper,
         pg_alpha_num,
         pg_detailed,
+        itl1_detailed,
     ) = run_staging(
         config,
         check_file_exists,
