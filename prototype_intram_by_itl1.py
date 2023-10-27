@@ -3,7 +3,19 @@ import pandas as pd
 
 from src.outputs.outputs_helpers import aggregate_output
 
+#%% Inoputs
+df=pd.read_csv(r"D:\data\res_dev\estimation\estimated_df.csv")
 
+postcode_itl_mapper = pd.read_csv(r"R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv")
+
+itl_mapper = pd.read_csv(r"R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv")
+
+itl1_detailed  = pd.read_csv(r"R:\BERD Results System Development 2023\DAP_emulation\mappers\itl1_detailed.csv")
+
+
+
+
+#%% Running
 
 # Group by PG and aggregate intram
 key_col = "201"
