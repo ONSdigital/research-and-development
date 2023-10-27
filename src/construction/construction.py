@@ -10,22 +10,28 @@ from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv, hdfs_isfile
 construction_logger = logging.getLogger(__name__)
 
 
-def run_construction(main_snapshot, updated_snapshot, config, write_csv, run_id):
+def run_construction(main_snapshot, secondary_snapshot, config, write_csv, run_id):
     """Define placeholder construction main function."""
     # ! For now, we add the year column since neither file has it
     main_snapshot["year"] = 2022
-    updated_snapshot["year"] = 2022
+    secondary_snapshot["year"] = 2022
 
+    print ("=== INSIDE CONSTRUCTION MODULE ===")
+
+    additions_df = get_additions(main_snapshot, secondary_snapshot)
+    additions_df.info(verbose=True)
+
+    raise BaseException("=== TEST END ===")
     pass
 
 
-def get_amendments(main_snapshot, updated_snapshot):
+def get_amendments(main_snapshot, secondary_snapshot):
     """Create a dataframe of rows in the main snapshot that are updated in the updated snapshot."""
     key_cols = ["reference", "year", "instance"]
     numeric_cols = ["219", "220", "242", "243", "244", "245", "246", "247", "248", "249", "250"]
 
     # Inner join on the keys to select only records present in both
-    amendments_df = main_snapshot.join(updated_snapshot,
+    amendments_df = main_snapshot.join(secondary_snapshot,
                                        on = key_cols,
                                        how = "inner",
                                        lsuffix = "_original",
@@ -50,16 +56,25 @@ def get_amendments(main_snapshot, updated_snapshot):
     return amendments_df
 
 
-def get_additions(main_snapshot, updated_snapshot):
+def get_additions(main_snapshot, secondary_snapshot):
     """Create a dataframe of rows present in the updated snapshot that are not in the main snapshot."""
     key_cols = ["reference", "year", "instance"]
 
-    # ! This should be a right anti-join but was copied this from stackoverflow and hasn't been tested
-    outer = main_snapshot.join(updated_snapshot,
-                               on = key_cols,
-                               how = "outer")
-    additions_df = outer[(outer._merge=="left_only")].drop("_merge", axis=1)
+    # To do a right anti-join, we need to do a full outer join first, then
+    # take only rows that were marked as right-only by the indicator. After
+    # that, there will be copies of every column in both, but for the
+    # right-only rows the columns from the left df will be null, so they're
+    # all dropped afterwards.
+    outer_join = pd.merge(main_snapshot,
+                          secondary_snapshot,
+                          on=key_cols,
+                          how="outer",
+                          suffixes=("_old", ""),
+                          indicator=True)
+    additions_df = outer_join[(outer_join._merge=="right_only")].drop("_merge", axis=1)
+    additions_df = additions_df[additions_df.columns[~additions_df.columns.str.endswith('_old')]]
 
+    # Add markers
     additions_df["is_constructed"] = True
     additions_df["accept_changes"] = False
 
