@@ -129,7 +129,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         f"There are {trimmed_305_df.shape[0]} rows in the trimmed_305_df"
     )
 
-    SFExpansionLogger.debug(f"Processing expansion imputation for {305}")
+    SFExpansionLogger.debug(f"Processing expansion imputation for {master_value}")
 
     # Create group_by obj of the trimmed df
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
