@@ -5,14 +5,13 @@ global:
   postcode_csv_check: False
   load_historic_data: False
   load_manual_outliers: False
-  output_full_responses: False
-  output_auto_outliers: False
+  output_full_responses: True
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: True
+  output_short_form: False
   output_long_form: True
-  output_tau: True
+  output_tau: False
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True

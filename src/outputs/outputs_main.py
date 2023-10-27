@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
+from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
 
 
@@ -53,7 +54,7 @@ def run_outputs(
     # Running long form output
     if config["global"]["output_long_form"]:
         OutputMainLogger.info("Starting long form output...")
-        output_short_form(
+        output_long_form(
             estimated_df,
             config,
             write_csv,
@@ -62,7 +63,7 @@ def run_outputs(
             cora_mapper, # check
             postcode_itl_mapper, # check
         )
-        OutputMainLogger.info("Finished short form output.")
+        OutputMainLogger.info("Finished long form output.")
 
     # Running TAU output
     if config["global"]["output_tau"]:

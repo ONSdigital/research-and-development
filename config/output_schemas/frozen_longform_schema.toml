@@ -1,0 +1,237 @@
+[period_year]
+Deduced_Data_Type = "Int64"
+
+[reference]
+Deduced_Data_Type = "Int64"
+
+[formtype]
+Deduced_Data_Type = "category"
+
+[form_status]
+Deduced_Data_Type = "category"
+
+[instance]
+Deduced_Data_Type = "Int64"
+
+[period]
+Deduced_Data_Type = "Int64"
+
+[frozenemployment]
+Deduced_Data_Type = "Int64"
+
+[wowenterprisereference]
+Deduced_Data_Type = "Int64"
+
+[frozensic]
+Deduced_Data_Type = "Int64"
+
+[ultfoc]
+Deduced_Data_Type = "str"
+
+[200]
+Deduced_Data_Type = "str"
+
+[201]
+Deduced_Data_Type = "str"
+
+[202]
+Deduced_Data_Type = "float64"
+
+[203]
+Deduced_Data_Type = "float64"
+
+[204]
+Deduced_Data_Type = "float64"
+
+[205]
+Deduced_Data_Type = "float64"
+
+[206]
+Deduced_Data_Type = "float64"
+
+[207]
+Deduced_Data_Type = "float64"
+
+[208]
+Deduced_Data_Type = "float64"
+
+[209]
+Deduced_Data_Type = "float64"
+
+[210]
+Deduced_Data_Type = "float64"
+
+[211]
+Deduced_Data_Type = "float64"
+
+[212]
+Deduced_Data_Type = "float64"
+
+[213]
+Deduced_Data_Type = "float64"
+
+[214]
+Deduced_Data_Type = "float64"
+
+# [215]
+
+[216]
+Deduced_Data_Type = "float64"
+
+# [217]
+
+[218]
+Deduced_Data_Type = "float64"
+
+[219]
+Deduced_Data_Type = "float64"
+
+[220]
+Deduced_Data_Type = "float64"
+
+[221]
+Deduced_Data_Type = "float64"
+
+[222]
+Deduced_Data_Type = "float64"
+
+[223]
+Deduced_Data_Type = "float64"
+
+# [224]
+
+[225]
+Deduced_Data_Type = "float64"
+
+[226]
+Deduced_Data_Type = "float64"
+
+[227]
+Deduced_Data_Type = "float64"
+
+[228]
+Deduced_Data_Type = "float64"
+
+[229]
+Deduced_Data_Type = "float64"
+
+# [230]
+# [231]
+# [232]
+# [233]
+# [234]
+# [235]
+# [236]
+
+[237]
+Deduced_Data_Type = "float64"
+
+# [238]
+# [239]
+# [240]
+# [241]
+
+[242]
+Deduced_Data_Type = "float64"
+
+[243]
+Deduced_Data_Type = "float64"
+
+[244]
+Deduced_Data_Type = "float64"
+
+[245]
+Deduced_Data_Type = "float64"
+
+[246]
+Deduced_Data_Type = "float64"
+
+[247]
+Deduced_Data_Type = "float64"
+
+[248]
+Deduced_Data_Type = "float64"
+
+[249]
+Deduced_Data_Type = "float64"
+
+[300]
+Deduced_Data_Type = "float64"
+
+[301]
+Deduced_Data_Type = "float64"
+
+[302]
+Deduced_Data_Type = "float64"
+
+[303]
+Deduced_Data_Type = "float64"
+
+[304]
+Deduced_Data_Type = "float64"
+
+[305]
+Deduced_Data_Type = "float64"
+
+[405]
+Deduced_Data_Type = "Int64"
+
+[406]
+Deduced_Data_Type = "Int64"
+
+[407]
+Deduced_Data_Type = "Int64"
+
+[408]
+Deduced_Data_Type = "Int64"
+
+[409]
+Deduced_Data_Type = "Int64"
+
+[410]
+Deduced_Data_Type = "Int64"
+
+[411]
+Deduced_Data_Type = "Int64"
+
+[412]
+Deduced_Data_Type = "Int64"
+
+[501]
+Deduced_Data_Type = "Int64"
+
+[502]
+Deduced_Data_Type = "Int64"
+
+[503]
+Deduced_Data_Type = "Int64"
+
+[504]
+Deduced_Data_Type = "Int64"
+
+[505]
+Deduced_Data_Type = "Int64"
+
+[506]
+Deduced_Data_Type = "Int64"
+
+[507]
+Deduced_Data_Type = "Int64"
+
+[508]
+Deduced_Data_Type = "Int64"
+
+[250]
+Deduced_Data_Type = "float64"
+
+[251]
+Deduced_Data_Type = "str"
+
+[307]
+Deduced_Data_Type = "float64"
+
+[308]
+Deduced_Data_Type = "float64"
+
+[309]
+Deduced_Data_Type = "float64"

@@ -106,6 +106,10 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Data Ingest...")
 
+
+    raise KeyError
+
+
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
