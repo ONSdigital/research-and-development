@@ -117,12 +117,8 @@ def run_pipeline(start, config_path):
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
-<<<<<<< HEAD
     MainLogger.info("Finished Imputation...")
     print(imputed_df.sample(10))
-=======
-    MainLogger.info("Finished  Imputation...")
->>>>>>> origin/develop
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
