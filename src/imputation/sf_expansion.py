@@ -61,7 +61,7 @@ def expansion_impute(
         # i.e. for non-responders
         imputed_sf_vals = (sum_breakdown_q / sum_master_q_lng) * returned_master_vals
 
-        # Write imputed value to all records 
+        # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
     # Returning updated group and updated QA dict
