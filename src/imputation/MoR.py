@@ -2,7 +2,6 @@
 import pandas as pd
 import re
 
-from src.imputation.tmi_imputation import apply_to_original
 from src.imputation.apportionment import run_apportionment
 
 good_statuses = ["Clear", "Clear - overridden"]
@@ -24,14 +23,13 @@ def run_mor(df, backdata, target_vars):
     Returns:
         pd.DataFrame: df with MoR applied
     """
-    to_impute_df, backdata = mor_preprocessing(df, backdata)
+    to_impute_df, remainder_df, backdata = mor_preprocessing(df, backdata)
 
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, target_vars)
-    carried_forwards_df["imp_marker"] = "CF"
 
     # TODO Remove the `XXX_prev` columns (left in for QA)
-    return apply_to_original(carried_forwards_df, df)
+    return pd.concat([remainder_df, carried_forwards_df])
 
 
 def mor_preprocessing(df, backdata):
@@ -41,15 +39,15 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
+    # TODO move this to imputation main
     # Select only values to be imputed and remove duplicate instances
-    to_impute_df = df.copy().loc[
-        (
-            (df["formtype"] == "0001")
-            & (df["status"].isin(bad_statuses))
-            & (df["instance"] == 0 | pd.isnull(df["instance"]))
-        ),
-        :,
-    ]
+    imputation_condition = (
+        (df["formtype"] == "0001")
+        & (df["status"].isin(bad_statuses))
+        & (df["instance"] == 0 | pd.isnull(df["instance"]))
+    )
+    to_impute_df = df.copy().loc[imputation_condition, :]
+    remainder_df = df.copy().loc[~imputation_condition, :]
 
     # Convert backdata column names from qXXX to XXX
     p = re.compile(r"q\d{3}")
@@ -61,7 +59,7 @@ def mor_preprocessing(df, backdata):
     # Only pick up useful backdata
     backdata = backdata.loc[(backdata["status"].isin(good_statuses)), :]
 
-    return to_impute_df, backdata
+    return to_impute_df, remainder_df, backdata
 
 
 def carry_forwards(df, backdata, target_vars):
@@ -78,8 +76,23 @@ def carry_forwards(df, backdata, target_vars):
     Returns:
         pd.DataFrame: df with values carried forwards
     """
-    df = pd.merge(df, backdata, how="left", on="reference", suffixes=("", "_prev"))
-    for var in target_vars:
-        df[var] = df.loc[:, f"{var}_prev"]
+    df = pd.merge(df,
+                  backdata,
+                  how="left",
+                  on="reference",
+                  suffixes=("", "_prev"),
+                  indicator=True)
+    copy_vars = target_vars
 
+    # Copy values from relevant columns where references match
+    match_condition = df["_merge"] == "both"
+    for var in copy_vars:
+        df.loc[match_condition, f"{var}_imputed"] = df.loc[match_condition, f"{var}_prev"]
+    df.loc[match_condition, "imp_marker"] = "CF"
+    df.loc[match_condition, "instance"] = df.loc[match_condition, "instance_prev"]
+    
+    # Drop merge related columns
+    to_drop = [column for column in df.columns if column.endswith('_prev')]
+    to_drop += ['_merge']
+    df = df.drop(to_drop, axis=1)
     return df

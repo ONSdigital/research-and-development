@@ -45,8 +45,6 @@ def run_imputation(
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
-    df = run_mor(df, backdata, target_vars)
-
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
@@ -56,6 +54,9 @@ def run_imputation(
     orig_cols = target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
+
+    # Run MoR
+    df = run_mor(df, backdata, target_vars)
 
     # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)

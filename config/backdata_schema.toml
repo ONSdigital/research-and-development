@@ -46,7 +46,7 @@ Current_Data_Type = "str"
 Length = ">=1"
 Min_values = "nan"
 Max_values = "nan"
-Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Clear - overridden SE", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
+Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
 
 [instance]
 Description = "nan"
