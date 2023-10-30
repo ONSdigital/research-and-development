@@ -14,7 +14,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_short_form: True
   output_tau: True
   output_gb_sas: True
@@ -99,7 +99,7 @@ run_log_sql:
 estimation:
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 breakdowns:
-  2xx:
+  "211":
     - "202"
     - "203"
     - "204"
@@ -132,7 +132,7 @@ breakdowns:
     - "248"
     - "249"
     - "250"
-  3xx:
+  "305":
     - "302"
     - "303"
     - "304"

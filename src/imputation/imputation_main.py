@@ -5,9 +5,10 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
-from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
+from src.imputation.sf_expansion import run_sf_expansion
+from src.imputation import tmi_imputation as tmi
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ def run_imputation(
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
+    # Initialise imp_marker column, default value "no_imputation"
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
@@ -53,8 +55,11 @@ def run_imputation(
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
-    # run TMI
+    # Run TMI for long forms
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+
+    # Run short form expansion
+    imputed_df = run_sf_expansion(imputed_df, config)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
