@@ -43,38 +43,28 @@ def expansion_impute(
     clear_statuses = ["Clear", "Clear - overridden"]
     clear_mask = group_copy["status"].isin(clear_statuses)
 
-    # create a mask for responders that are either clear or have had
-    # TMI applied
-    tmi_mask = group_copy["imp_marker"] == "TMI"
-    long_responder_mask = clear_mask | tmi_mask
-
     # Combination masks to select correct records for summing
-    long_form_responder_mask = long_responder_mask & long_mask
-    short_form_responder_mask = clear_mask & short_mask
+    # NOTE: we only use clear responders in calculations
+    long_responder_mask = clear_mask & long_mask
+    short_responder_mask = clear_mask & short_mask
 
-    # Get long forms only for summing master_col
-    sum_master_q_lng = group_copy.loc[
-        long_form_responder_mask, master_col
-    ].sum()  # scalar
+    # Get long forms only for summing master_col (scalar value)
+    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group_copy[short_form_responder_mask][master_col]  # vector
+    returned_master_vals = group_copy[short_responder_mask][master_col]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
-        sum_breakdown_q = group_copy.loc[long_form_responder_mask][
-            bd_col
-        ].sum()  # scalar
-
-        # Make imputation col equal to original column
-        group_copy[f"{bd_col}_imputed"] = group_copy.loc[:, bd_col]
+        sum_breakdown_q = group_copy.loc[long_responder_mask, bd_col].sum()
 
         # Update the imputation column for status encoded 100 and 201
         # i.e. for non-responders
         imputed_sf_vals = (sum_breakdown_q / sum_master_q_lng) * returned_master_vals
-        # Write imputed value to the non-responder records
-        group_copy.loc[short_form_responder_mask, f"{bd_col}_imputed"] = imputed_sf_vals
+
+        # Write imputed value to all records 
+        group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
     # Returning updated group and updated QA dict
     return group_copy
