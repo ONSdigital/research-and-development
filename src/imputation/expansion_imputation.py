@@ -16,10 +16,8 @@ def evaluate_imputed_ixx(
     break_down_cols: List[Union[str, int]],
 ) -> pd.DataFrame:
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
-    over the sum of all 211 or 305 values, multiplied by the imputed 211."""
-
-    imp_class = group["imp_class"].values[0]
-
+    over the sum of all 211 or 305 values, multiplied by the imputed 211.
+    """
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
@@ -92,9 +90,9 @@ def run_expansion(df: pd.DataFrame, config: dict):
         evaluate_imputed_ixx, "211", break_down_cols=breakdown_qs_2xx
     )
 
-     # Join the 211 expanded df (processed from untrimmed records) back on to
+    # Join the 211 expanded df (processed from untrimmed records) back on to
     # 211 trimmed records
-    result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)   
+    result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)
 
     # Calculate the imputation values for 3xx questions
     breakdown_qs_3xx = config["breakdowns"]["3xx"]
@@ -106,7 +104,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
     result_211_df.loc[:, breakdown_qs_3xx] = result_211_df.loc[
         :, breakdown_qs_3xx
     ].astype(int)
-
 
     # Filter to exclude the same rows trimmed for 305_trim == False
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")

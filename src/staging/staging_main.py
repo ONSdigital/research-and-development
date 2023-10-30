@@ -9,7 +9,6 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
-from src.staging.cora_mapper_validation_temp_delete import validate_cora_df
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -47,6 +46,7 @@ def run_staging(
     Returns:
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
+            secondary_full_responses (pd.Dataframe): The staged and validated updated snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             pg_mapper (pd.DataFrame): Product grouo mapper,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
@@ -62,6 +62,8 @@ def run_staging(
     paths = config[f"{network_or_hdfs}_paths"]
     snapshot_path = paths["snapshot_path"]
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
+    secondary_snapshot_path = paths["secondary_snapshot_path"]
+    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
 
     # Load historic data
     if config["global"]["load_historic_data"]:
@@ -102,8 +104,19 @@ def run_staging(
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
-    feather_files_exist = check_file_exists(feather_file)
 
+<<<<<<< HEAD
+=======
+    # Check if the secondary snapshot exists
+    load_updated_snapshot = config["global"]["load_updated_snapshot"]
+    if load_updated_snapshot:
+        check_file_exists(secondary_snapshot_path)
+        secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+        feather_files_exist = check_file_exists(feather_file) and check_file_exists(secondary_feather_file) # ? Should only be true if both exist?
+    else: 
+        feather_files_exist = check_file_exists(feather_file)
+
+>>>>>>> origin/develop
     is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
@@ -111,6 +124,9 @@ def run_staging(
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
+        if load_updated_snapshot:
+            secondary_snapdata = read_feather(secondary_feather_file)
+            StagingMainLogger.info(f"{secondary_feather_file} loaded")
         READ_FROM_FEATHER = True
     else:
         StagingMainLogger.info("Loading SPP snapshot data from json file")
@@ -154,10 +170,23 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
+
+        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
+        if load_updated_snapshot:
+            secondary_snapdata = load_json(secondary_snapshot_path)
+            secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(secondary_snapdata)
+            secondary_responses_df["instance"] = 0
+            val.validate_data_with_schema(secondary_contributors_df, "./config/contributors_schema.toml")
+            val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
+            secondary_full_responses = processing.full_responses(secondary_contributors_df, secondary_responses_df)
+            val.combine_schemas_validate_full_df(secondary_full_responses, "./config/contributors_schema.toml", "./config/wide_responses.toml")
+
         # Write feather file to snapshot path
         if is_network:
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
             write_feather(feather_file, full_responses)
+            secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+            write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
@@ -168,6 +197,7 @@ def run_staging(
             os.path.join(feather_path, f"{snapshot_name}_responses.feather")
         )
         full_responses = snapdata
+        secondary_full_responses = secondary_snapdata
 
     # Get response rate
     processing.response_rate(contributors_df, responses_df)
@@ -194,7 +224,7 @@ def run_staging(
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = paths["manual_outliers_path"]
         check_file_exists(manual_path)
-        wanted_cols = ["reference", "instance", "manual_outlier"]
+        wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
         val.validate_data_with_schema(
             manual_outliers, "./config/manual_outliers_schema.toml"
@@ -219,7 +249,7 @@ def run_staging(
     cora_mapper = read_csv(cora_mapper_path)
     # validates and updates from int64 to string type
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
-    cora_mapper = validate_cora_df(cora_mapper)
+    cora_mapper = val.validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
 
     # Load ultfoc (Foreign Ownership) mapper
@@ -254,6 +284,14 @@ def run_staging(
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
+    # Loading PG detailed mapper
+    StagingMainLogger.info("Loading PG detailed mapper File...")
+    pg_detailed_path = paths["pg_detailed_path"]
+    check_file_exists(pg_detailed_path)
+    pg_detailed = read_csv(pg_detailed_path)
+    val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
+    StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -267,6 +305,7 @@ def run_staging(
 
     return (
         full_responses,
+        secondary_full_responses,
         manual_outliers,
         pg_mapper,
         ultfoc_mapper,
@@ -274,4 +313,5 @@ def run_staging(
         cellno_df,
         postcode_df,
         pg_alpha_num,
+        pg_detailed,
     )

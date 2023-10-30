@@ -3,7 +3,7 @@ doesn't impact on the readability of the existing code. """
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 from src.imputation import tmi_imputation as tmi
 
