@@ -21,7 +21,7 @@ def output_long_form(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
 ):
-    """Run the outputs module.
+    """Prepare and run the outputs module on long forms.
 
     Args:
         df (pd.DataFrame): The main dataset for long form output
