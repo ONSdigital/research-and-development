@@ -51,7 +51,7 @@ def run_staging(
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
-            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
             pg_num_alpha (pd.DataFrame): Product group numeric to alpha mapper.
             sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
@@ -207,8 +207,8 @@ def run_staging(
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist)
-    postcode_df = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_df["pcd2"]
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
     invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
@@ -316,6 +316,14 @@ def run_staging(
     val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
 
+    # Loading ITL1 detailed mapper
+    StagingMainLogger.info("Loading ITL1 detailed mapper File...")
+    itl1_detailed_path = paths["itl1_detailed_path"]
+    check_file_exists(itl1_detailed_path)
+    itl1_detailed = read_csv(itl1_detailed_path)
+    val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
+    StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -332,11 +340,13 @@ def run_staging(
         secondary_full_responses,
         manual_outliers,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_df,
+        postcode_mapper,
         pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
         pg_detailed,
+        itl1_detailed,
     )
