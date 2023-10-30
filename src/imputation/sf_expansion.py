@@ -200,6 +200,6 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    TMILogger.info("Short-form expansion imputation completed.")
+    SFExpansionLogger.info("Short-form expansion imputation completed.")
 
     return result_df
