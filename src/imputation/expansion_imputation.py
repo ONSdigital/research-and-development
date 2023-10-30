@@ -58,6 +58,9 @@ def evaluate_imputed_ixx(
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Splits the dataframe in based on if it was trimmed or not"""
 
+    # TODO: remove this temporary fix to cast Nans to False
+    df[trim_bool_col].fillna(False, inplace=True)
+
     df_not_trimmed = df.loc[~df[trim_bool_col]]
     df_trimmed = df.loc[df[trim_bool_col]]
 
@@ -69,9 +72,11 @@ def run_expansion(df: pd.DataFrame, config: dict):
     """The main 'entry point' function to run the expansion imputation."""
 
     # Step 4: Expansion imputation for breakdown questions
-    # TODO: remove this temporary fix to cast Nans to False
-    df["211_trim"].fillna(False, inplace=True)
-    df["305_trim"].fillna(False, inplace=True)
+
+    # Get the breakdowns dict
+    breakdown_dict = config["breakdowns"]
+    breakdown_qs_2xx = breakdown_dict["211"]
+    breakdown_qs_3xx = breakdown_dict["305"]
 
     # Filter to exclude the same rows trimmed for 211_trim == False
     trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
@@ -85,7 +90,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
 
     # Calculate the imputation values for 2xx questions
-    breakdown_qs_2xx = config["breakdowns"]["2xx"]
     result_211_df = non_trim_grouped.apply(
         evaluate_imputed_ixx, "211", break_down_cols=breakdown_qs_2xx
     )
@@ -95,7 +99,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
     result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)
 
     # Calculate the imputation values for 3xx questions
-    breakdown_qs_3xx = config["breakdowns"]["3xx"]
 
     # TODO: Fix datatypes and remove this temp-fix
     result_211_df.loc[:, breakdown_qs_3xx] = result_211_df.loc[
