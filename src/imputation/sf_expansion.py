@@ -134,6 +134,21 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     # trimmed records. Reassigning to `df` to feed back into for-loop
     combined_df = pd.concat([expanded_305_df, trimmed_305_df], axis=0)
 
+    # Calculate the headcount_m and headcount_f imputed values by summing
+    short_mask = combined_df["formtype"] == short_code
+
+    combined_df.loc[short_mask, "headcount_tot_m_imputed"] = (
+        combined_df["headcount_res_m_imputed"]
+        + combined_df["headcount_tec_m_imputed"]
+        + combined_df["headcount_oth_m_imputed"]
+    )
+
+    combined_df.loc[short_mask, "headcount_tot_f_imputed"] = (
+        combined_df["headcount_res_f_imputed"]
+        + combined_df["headcount_tec_f_imputed"]
+        + combined_df["headcount_oth_f_imputed"]
+    )
+
     return combined_df
 
 
@@ -182,5 +197,11 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Re-include those records from the reference list before returning df
     result_df = pd.concat([expanded_df, excluded_df], axis=0)
+
+    result_df = result_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
+    TMILogger.info("Short-form expansion imputation completed.")
 
     return result_df
