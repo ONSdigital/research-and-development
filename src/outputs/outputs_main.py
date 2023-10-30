@@ -69,8 +69,6 @@ def run_outputs(
             cora_mapper,
             postcode_itl_mapper,
             pg_alpha_num,
-            pg_num_alpha,
-            sic_pg_alpha,
         )
         OutputMainLogger.info("Finished TAU output.")
 
