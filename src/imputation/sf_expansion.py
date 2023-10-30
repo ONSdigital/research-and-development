@@ -20,8 +20,6 @@ def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     break_down_cols: List[Union[str, int]],
-    long_code=formtype_long,
-    short_code=formtype_short,
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
 
@@ -36,8 +34,8 @@ def expansion_impute(
     bd_cols = [str(col) for col in break_down_cols]
 
     # Make long and short masks
-    long_mask = group_copy["formtype"] == long_code
-    short_mask = group_copy["formtype"] == short_code
+    long_mask = group_copy["formtype"] == formtype_long
+    short_mask = group_copy["formtype"] == formtype_short
 
     # Create mask for clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
@@ -135,7 +133,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     combined_df = pd.concat([expanded_305_df, trimmed_305_df], axis=0)
 
     # Calculate the headcount_m and headcount_f imputed values by summing
-    short_mask = combined_df["formtype"] == short_code
+    short_mask = combined_df["formtype"] == formtype_short
 
     combined_df.loc[short_mask, "headcount_tot_m_imputed"] = (
         combined_df["headcount_res_m_imputed"]
