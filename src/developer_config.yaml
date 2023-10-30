@@ -2,12 +2,8 @@ global:
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-<<<<<<< HEAD
-  postcode_csv_check: True
-=======
   postcode_csv_check: False
   load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
->>>>>>> origin/develop
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False
