@@ -39,7 +39,7 @@ def run_outputs(
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): Links postcode to region code
-        itl1_mapper (pd.DataFrame): Links region to ITL codes
+        itl_mapper (pd.DataFrame): Links region to ITL codes
         pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
@@ -85,7 +85,7 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
-            postcode_itl_mapper,
+            postcode_mapper,
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")

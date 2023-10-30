@@ -206,8 +206,8 @@ def run_staging(
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist)
-    postcode_df = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_df["pcd2"]
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
     invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
