@@ -42,9 +42,15 @@ def validate_post_col(
         are valid UK postcodes. It uses the `validate_postcode_pattern` function to
         perform the validation.
 
-        This is done in 2 steps:
+        - A `postcodes_harmonised` column is created using the value in col `601`,
+        or the value in col `postcodereference` (IDBR) where col `601` is blank.
+        - Validation checks run on `postcodes_harmonised`
         First we validate the pattern of the postcode.
         Secondly if a postcode is valid, we validate that the postcodes are real
+        - One dataframe containing any invalid postcodes outputted with relevant
+        record information (inc. postcode source).
+        - Any invalid postcodes removed from the `postcodes_harmonised`
+        column in dataframe.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
