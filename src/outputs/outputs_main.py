@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
 from src.outputs.tau import output_tau
+from src.outputs.gb_sas import output_gb_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -68,6 +69,21 @@ def run_outputs(
             pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
+
+# Running GB SAS output
+    if config["global"]["output_gb_sas"]:
+        OutputMainLogger.info("Starting GB SAS output...")
+        output_gb_sas(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_itl_mapper,
+            pg_alpha_num,
+        )
+        OutputMainLogger.info("Finished GB SAS output.")
 
     # Running Intram by PG output
     if config["global"]["output_intram_by_pg"]:
