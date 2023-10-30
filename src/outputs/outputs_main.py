@@ -59,9 +59,8 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper, # check
-            cora_mapper, # check
-            postcode_itl_mapper, # check
+            ultfoc_mapper,
+            cora_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
 

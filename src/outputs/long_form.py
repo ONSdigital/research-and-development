@@ -20,7 +20,6 @@ def output_long_form(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
-    postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -43,11 +42,10 @@ def output_long_form(
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
 
-    # Filter for long-forms, CORA statuses and instance
+    # Filter for long-forms/NI and CORA statuses
     df = df.loc[
-        (df["formtype"] == "0001")
+        ((df["formtype"] == "0001") | (df["formtype"] == "0003"))
         & (df["form_status"].isin(["600", "800"]))
-        & (df["instance"] == 0)
     ]
 
     # Create a 'year' column
@@ -55,8 +53,6 @@ def output_long_form(
 
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
-
-    # TODO Order using schema
 
     # Create long form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_longform_schema"]
