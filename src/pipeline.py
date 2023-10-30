@@ -90,12 +90,13 @@ def run_pipeline(start, config_path):
         full_responses,
         secondary_full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
         cora_mapper,
         cellno_df,
         postcode_itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
         pg_detailed,
     ) = run_staging(
         config,
@@ -116,9 +117,8 @@ def run_pipeline(start, config_path):
 
     # Imputation module
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
-    MainLogger.info("Finished Imputation...")
-    print(imputed_df.sample(10))
+    imputed_df = run_imputation(full_responses, sic_pg_alpha, config, write_csv, run_id)
+    MainLogger.info("Finished  Imputation...")
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
@@ -156,6 +156,8 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
         pg_detailed,
     )
 
