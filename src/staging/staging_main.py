@@ -48,12 +48,13 @@ def run_staging(
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
             secondary_full_responses (pd.Dataframe): The staged and validated updated snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
-            pg_mapper (pd.DataFrame): Product grouo mapper,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
             postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
+            pg_num_alpha (pd.DataFrame): Product group numeric to alpha mapper.
+            sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -105,8 +106,6 @@ def run_staging(
     load_from_feather = config["global"]["load_from_feather"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
-<<<<<<< HEAD
-=======
     # Check if the secondary snapshot exists
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
     if load_updated_snapshot:
@@ -116,7 +115,6 @@ def run_staging(
     else: 
         feather_files_exist = check_file_exists(feather_file)
 
->>>>>>> origin/develop
     is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
@@ -234,14 +232,6 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
-    # Load the PG mapper
-    pg_mapper = paths["pg_mapper_path"]
-    check_file_exists(pg_mapper)
-    pg_mapper = read_csv(pg_mapper)
-
-    # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
-
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
@@ -276,14 +266,48 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
-    # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    # Loading PG alpha to numeric mapper - possibly, deprecated
+    StagingMainLogger.info("Loading PG alpha to numeric File...")
     pg_alpha_num_path = paths["pg_alpha_num_path"]
     check_file_exists(pg_alpha_num_path)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    pg_alpha_num = val.validate_many_to_one(
+        pg_alpha_num,
+        col_many="pg_alpha",
+        col_one="pg_numeric")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_num_alpha_path = paths["pg_num_alpha_path"]
+    check_file_exists(pg_num_alpha_path)
+    pg_num_alpha = read_csv(pg_num_alpha_path)
+    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    pg_num_alpha = val.validate_many_to_one(
+        pg_num_alpha,
+        col_many="pg_numeric",
+        col_one="pg_alpha")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading SIC to PG to alpha mapper
+    StagingMainLogger.info("Loading SIC to PG to alpha File...")
+    sic_pg_alpha_path = paths["sic_pg_alpha_path"]
+    check_file_exists(sic_pg_alpha_path)
+    sic_pg_alpha = read_csv(sic_pg_alpha_path)
+    val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
+    sic_pg_alpha = val.validate_many_to_one(
+        sic_pg_alpha,
+        col_many="sic",
+        col_one="pg_alpha")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(
+        full_responses,
+        pg_num_alpha,
+        sic_pg_alpha,
+        target_col="201")
     # Loading PG detailed mapper
     StagingMainLogger.info("Loading PG detailed mapper File...")
     pg_detailed_path = paths["pg_detailed_path"]
@@ -307,11 +331,12 @@ def run_staging(
         full_responses,
         secondary_full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
         cora_mapper,
         cellno_df,
         postcode_df,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
         pg_detailed,
     )
