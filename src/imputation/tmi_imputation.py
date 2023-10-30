@@ -430,12 +430,12 @@ def calculate_totals(df):
     return df
 
 
-def run_tmi(
+def run_longform_tmi(
     full_df: pd.DataFrame,
     target_variables: List[str],
     sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline
         dataframe back to the pipeline
@@ -449,10 +449,7 @@ def run_tmi(
         and counts columns
         qa_df: qa dataframe
     """
-    TMILogger.info("Starting TMI imputation.")
-
-    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
-    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
+    TMILogger.info("Starting TMI long form imputation.")
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     longform_df = instance_fix(longform_df)
@@ -484,8 +481,71 @@ def run_tmi(
     # TMI Step 5: Calculate headcount and employment totals
     final_df = calculate_totals(expanded_df)
 
+    TMILogger.info("TMI long form imputation completed.")
+    return final_df, qa_df
+
+
+def run_shortform_tmi(
+    full_df: pd.DataFrame,
+    sf_target_variables: List[str],
+    config: Dict[str, Any],
+) -> pd.DataFrame:
+    """Function to run imputation end to end and returns the final
+    dataframe back to the pipeline
+        dataframe back to the pipeline
+    Args:
+        full_df (pd.DataFrame): main data after TMI longform imputation
+        sf_target_variables (list): key variables for short forms
+        config (Dict): the configuration settings
+    Returns:
+        final_df: dataframe with the imputed valued added
+    """
+    TMILogger.info("Starting TMI short form imputation.")
+
+    TMILogger.info("Calculating the trimmed mean for target variables")
+    df = tmi_pre_processing(shortform_df, sf_target_variables)
+
+    mean_dict, qa_df = create_mean_dict(df, sf_target_variables)
+
+    qa_df.set_index("qa_index", drop=True, inplace=True)
+
+    qa_df = qa_df.drop("trim_check", axis=1)
+
+    shortform_tmi_df = apply_tmi(df, target_variables, mean_dict)
+
+    TMILogger.info("TMI imputation completed.")
+    return shortform_tmi_df
+
+
+def run_tmi(
+    full_df: pd.DataFrame,
+    target_variables: List[str],
+    sic_mapper: pd.DataFrame,
+    config: Dict[str, Any],
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Function to run imputation end to end and returns the final
+    dataframe back to the pipeline
+        dataframe back to the pipeline
+    Args:
+        full_df (pd.DataFrame): main data
+        target_variables (list): key variables
+        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+        config (Dict): the configuration settings
+    Returns:
+        final_df: dataframe with the imputed valued added
+        and counts columns
+        qa_df: qa dataframe
+    """
+
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
+
+    longform_tmi_df, qa_df = run_longform_tmi(longform_df, target_variables, sic_mapper, config)
+
+    shortform_tmi_df = run_shortform_tmi(shortform_df, sf_target_variables)
+
     # add short forms back to dataframe
-    full_df = pd.concat([final_df, shortform_df])
+    full_df = pd.concat([longform_tmi_df, shortform_tmi_df])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
