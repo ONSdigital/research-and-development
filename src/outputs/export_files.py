@@ -93,9 +93,12 @@ def get_file_choice(config: dict = config):
         
     # Get the user's choices from config
     export_choices = config.get('export_choices', {})
+    
+    paths = config[f"{config['global']['network_or_hdfs']}_paths"]
+    output_path = paths['output_path']
         
     # Use list comprehension to create the selection list
-    selection_list = [Path(f"{config['output_path']}/{dir}/{file}").with_suffix('.csv') 
+    selection_list = [Path(f"{output_path}/{dir}/{file}").with_suffix('.csv') 
                       for dir, file in export_choices.items() 
                       if file is not None]
 
@@ -124,7 +127,7 @@ def check_files_exist(output_dirs: str, file_list: List):
 def run_export():
     """Main function to run the data export pipeline."""
     # Get list of files to transfer from user
-    file_list = get_file_choice(short_form_output)
+    file_list = get_file_choice()
 
     # Check that files exist
     check_files_exist(short_form_output, file_list)

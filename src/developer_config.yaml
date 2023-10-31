@@ -82,16 +82,11 @@ schema_paths:
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
 # Export config for users
 export_choices:
-  output_short_form:
-    - "output_short_form_2023-10-11_v12"
-  output_tau:
-    - "output_tau_2023-10-11_v12"
-  output_gb_sas:
-    - "output_gb_sas_2023-10-27_v39"
-  output_intram_by_pg:
-    - "output_intram_by_pg_2023-10-30_v52"
-  output_intram_by_itl1:
-    - "output_intram_by_itl1_2023-10-30_v52"
+  output_short_form: "output_short_form_2023-10-11_v12"
+  output_tau: "output_tau_2023-10-11_v12"
+  output_gb_sas: "output_gb_sas_2023-10-27_v39"
+  output_intram_by_pg: "output_intram_by_pg_2023-10-30_v52"
+  output_intram_by_itl1: "output_intram_by_itl1_2023-10-30_v52"
 
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
