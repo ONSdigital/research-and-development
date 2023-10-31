@@ -91,7 +91,7 @@ class Manifest:
         column_header
             the exact column header string
         """
-        if ".." in relative_file_path:
+        if "outputs" not in str(relative_file_path):
             raise ManifestError(
                 (
                     f"""File must be in a subdirectory of the outgoing directory:
