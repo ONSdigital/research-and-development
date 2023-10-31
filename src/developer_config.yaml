@@ -80,6 +80,22 @@ schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
+# Export config for users
+export:
+  short_form_name:
+    - "berd_2022_short_form"
+  tau_name:
+    - "berd_2022_tau"
+  gb_sas_name:
+    - "berd_2022_gb_sas"
+  intram_by_pg_name:
+    - "berd_2022_intram_by_pg"
+  intram_by_itl1_name:
+    - "berd_2022_intram_by_itl1"
+  postcode_validation:
+    - "berd_2022_postcode_validation"
+
+
 
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
