@@ -300,10 +300,6 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    # ! If there was no updated snapshot, define it as null for the return
-    # if load_updated_snapshot is False:
-    #     secondary_full_responses = None
-
     return (
         full_responses,
         secondary_full_responses,
