@@ -112,15 +112,20 @@ def check_files_exist(output_dirs: str, file_list: List):
     """Check that all the files in the file list exist using
     the imported isfile function."""
     
+    # Check if the output dirs supplied are string, change to list if so
+    if isinstance(output_dirs, str):
+        output_dirs = [output_dirs]
+    
+       
     # Get all files listed in all the output directories
-    file_list = []
-    file_list.append(list_files(dir) for dir in output_dirs)
-    
-    
+    all_files = []
+    for dir in output_dirs:
+        all_files.extend(list_files(dir))
+
     for file in file_list:
-        file_path = os.path.join(output_dirs, file)
-        if not isfile(file_path):
-            OutgoingLogger.error(f"File {file} does not existin {file_list}.")
+        file_path = Path(file)
+        if not file_path.is_file():
+            OutgoingLogger.error(f"File {file} does not exist in {all_files}.")
             raise FileNotFoundError
 
 
