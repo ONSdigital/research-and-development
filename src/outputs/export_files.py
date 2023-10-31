@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 import toml
 from typing import List
+from pathlib import Path
 
 from src.utils.helpers import Config_settings
 from src.outputs.manifest_output import Manifest
@@ -84,34 +85,29 @@ schema_columns_str = ",".join(short_form_headers)
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice(output_path: str):
-    """Prompt user to select a files to transfer.
+def get_file_choice(output_path: str, config: dict):
+    """Get files to transfer from the 'export_choices' section of the config.
 
     Returns:
-        selction_list (list): A list of the files to transfer."""
+        selection_list (list): A list of the files to transfer."""
     file_list = list_files(output_path)
-    choices = []
-    print("Select a file to transfer:")
-    for i, file in enumerate(file_list):
-        print(f"{i+1}. {file}")
-    file_num = "X"  # initialize file_num to a non-integer value
-    while True:
-        file_num = input("Enter file number or press 'Q' to quit: ")
-        if file_num.lower() == "q":
-            break
-        try:
-            file_num = int(file_num)
-            choices.append(file_num - 1)
-            if file_num < 1 or file_num > len(file_list):
-                print("Invalid input. Please enter a valid file number.")
-                continue
-        except ValueError:
-            print("Invalid input. Please enter a valid file number.")
-    selction_list = [file_list[num] for num in choices]
+    export_choices = config.get('export_choices', {})
 
-    print(f"These are the file selected: \n {[file for file in selction_list]}")
+    # Use list comprehension to create the selection list
+    selection_list = [
+        str(Path(file_name).with_suffix('.csv'))
+        for value in export_choices.values()
+        for file_name in value
+        if file_name is not None and str(Path(file_name).with_suffix('.csv')) in file_list
+    ]
 
-    return selction_list
+    # Check the files that were not found
+    check_files_exist(output_path, selection_list)
+
+    # Log the files being exported
+    logging.info(f"These are the files being exported: {selection_list}")
+
+    return selection_list
 
 
 def check_files_exist(dir: str, file_list: List):
@@ -120,7 +116,7 @@ def check_files_exist(dir: str, file_list: List):
     for file in file_list:
         file_path = os.path.join(dir, file)
         if not isfile(file_path):
-            OutgoingLogger.error(f"File {file} does not exist.")
+            OutgoingLogger.error(f"File {file} does not existin {file_list}.")
             raise FileNotFoundError
 
 
