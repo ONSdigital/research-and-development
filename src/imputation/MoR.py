@@ -90,7 +90,7 @@ def carry_forwards(df, backdata, impute_vars):
     # replace the values of certain columns with the values from the back data
     # TODO: Check with methodology or BAU as to which other cols to take from backdata
     # TODO: By default, columns not updated will contain the current data, instance 0.
-    replace_cols = ["instance", "200", "201"]
+    replace_vars = ["instance", "200", "201"]
     for var in replace_vars:
         df.loc[match_condition, var] = df.loc[match_condition, f"{var}_prev"]
     for var in impute_vars:

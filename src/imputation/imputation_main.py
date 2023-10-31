@@ -5,10 +5,10 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
+from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
-from src.imputation.sf_expansion import run_sf_expansion
-from src.imputation import tmi_imputation as tmi
+from src.imputation.MoR import run_mor
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
+    backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -37,7 +38,7 @@ def run_imputation(
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
-    orig_cols = target_vars + bd_cols + sum_cols
+    orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
@@ -45,7 +46,7 @@ def run_imputation(
     df = run_mor(df, backdata, orig_cols)
 
     # run TMI
-    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+    imputed_df, qa_df = tmi.run_tmi(df, lf_target_vars, mapper, config)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
