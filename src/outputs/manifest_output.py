@@ -38,6 +38,7 @@ class Manifest:
         read_header_func: callable,
         string_to_file_func: callable,
         dry_run: bool = False,
+        delete_on_fail = False,
     ):
         self.outgoing_directory = outgoing_directory
         self.export_directory = export_directory
@@ -63,6 +64,7 @@ class Manifest:
         self.written = False
         self.invalid_headers: list = []
         self.dry_run = dry_run
+        self.delete_on_fail = delete_on_fail
 
         # Functions
         self.delete_file = delete_file_func
@@ -169,7 +171,7 @@ class Manifest:
         """
         any_invalid_headers = len(self.invalid_headers) > 0
 
-        if any_invalid_headers:
+        if any_invalid_headers and self.delete_on_fail:
             self._delete_files_after_fail()
             raise ManifestError("\n".join(self.invalid_headers))
 
