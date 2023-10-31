@@ -5,30 +5,6 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
-from src.imputation import tmi_imputation as tmi
-from src.imputation.apportionment import run_apportionment
-from src.imputation.short_to_long import run_short_to_long
-from src.imputation.MoR import run_mor
-
-ImputationMainLogger = logging.getLogger(__name__)
-
-
-def run_imputation(
-    df: pd.DataFrame,
-    mapper: pd.DataFrame,
-    backdata: pd.DataFrame,
-    config: Dict[str, Any],
-    write_csv: Callable,
-    run_id: int,
-) -> pd.DataFrame:
-
-"""The main file for the Imputation module."""
-import logging
-import pandas as pd
-from typing import Callable, Dict, Any
-from datetime import datetime
-from itertools import chain
-
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.sf_expansion import run_sf_expansion

@@ -7,7 +7,6 @@ from src.imputation.apportionment import run_apportionment
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
-
 def run_mor(df, backdata, impute_vars):
     """Function to implement Mean of Ratios method.
 
