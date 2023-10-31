@@ -29,8 +29,8 @@ def run_imputation(
     df = run_short_to_long(df)
 
     # Get the column names needed for imputation from the config
-    lf_target_vars = config["lf_target_vars"]
-    sum_cols = config["sum_cols"]
+    lf_target_vars = config["imputation"]["lf_target_vars"]
+    sum_cols = config["imputation"]["sum_cols"]
     bd_qs_lists = list(config["breakdowns"].values())
     bd_cols = list(chain(*bd_qs_lists))
 
