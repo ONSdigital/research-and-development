@@ -85,24 +85,19 @@ schema_columns_str = ",".join(short_form_headers)
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice(output_path: str, config: dict):
+def get_file_choice(config: dict = config):
     """Get files to transfer from the 'export_choices' section of the config.
 
     Returns:
         selection_list (list): A list of the files to transfer."""
-    file_list = list_files(output_path)
+    
+    # Get the user's choices from config
     export_choices = config.get('export_choices', {})
-
+    
     # Use list comprehension to create the selection list
-    selection_list = [
-        str(Path(file_name).with_suffix('.csv'))
-        for value in export_choices.values()
-        for file_name in value
-        if file_name is not None and str(Path(file_name).with_suffix('.csv')) in file_list
-    ]
-
-    # Check the files that were not found
-    check_files_exist(output_path, selection_list)
+    selection_list = [Path(f"{config['output_path']}/{dir}/{file}").with_suffix('.csv') 
+                      for dir, file in export_choices.items() 
+                      if file not None]
 
     # Log the files being exported
     logging.info(f"These are the files being exported: {selection_list}")
@@ -110,11 +105,17 @@ def get_file_choice(output_path: str, config: dict):
     return selection_list
 
 
-def check_files_exist(dir: str, file_list: List):
+def check_files_exist(output_dirs: str, file_list: List):
     """Check that all the files in the file list exist using
     the imported isfile function."""
+    
+    # Get all files listed in all the output directories
+    file_list = []
+    file_list.append(list_files(dir) for dir in output_dirs)
+    
+    
     for file in file_list:
-        file_path = os.path.join(dir, file)
+        file_path = os.path.join(output_dirs, file)
         if not isfile(file_path):
             OutgoingLogger.error(f"File {file} does not existin {file_list}.")
             raise FileNotFoundError
