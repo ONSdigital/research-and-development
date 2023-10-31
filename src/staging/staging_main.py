@@ -103,7 +103,7 @@ def run_staging(
     # Check if feather file exists in snapshot path
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
-    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
 
     # Check if the secondary snapshot exists
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
@@ -180,7 +180,7 @@ def run_staging(
 
         # Write feather file to snapshot path
         if is_network:
-            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+            feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
             write_feather(feather_file, full_responses)
             secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
             write_feather(secondary_feather_file, secondary_full_responses)

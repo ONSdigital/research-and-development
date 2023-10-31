@@ -22,25 +22,28 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
 
-    target_vars = [
-        "211",
-        "305",
-        "emp_researcher",
-        "emp_technician",
-        "emp_other",
-        "headcount_res_m",
-        "headcount_res_f",
-        "headcount_tec_m",
-        "headcount_tec_f",
-        "headcount_oth_m",
-        "headcount_oth_f",
-    ]
+"""The main file for the Imputation module."""
+import logging
+import pandas as pd
+from typing import Callable, Dict, Any
+from datetime import datetime
+from itertools import chain
 
-    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
+from src.imputation.apportionment import run_apportionment
+from src.imputation.short_to_long import run_short_to_long
+from src.imputation.sf_expansion import run_sf_expansion
+from src.imputation import tmi_imputation as tmi
 
-    # Get the breakdown columns from the config
-    bd_qs_lists = list(config["breakdowns"].values())
-    bd_cols = list(chain(*bd_qs_lists))
+ImputationMainLogger = logging.getLogger(__name__)
+
+
+def run_imputation(
+    df: pd.DataFrame,
+    mapper: pd.DataFrame,
+    config: Dict[str, Any],
+    write_csv: Callable,
+    run_id: int,
+) -> pd.DataFrame:
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
@@ -48,6 +51,13 @@ def run_imputation(
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
+    # Get the column names needed for imputation from the config
+    lf_target_vars = config["lf_target_vars"]
+    sum_cols = config["sum_cols"]
+    bd_qs_lists = list(config["breakdowns"].values())
+    bd_cols = list(chain(*bd_qs_lists))
+
+    # TODO: imp_marker should be 'R' for clear responders
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
@@ -56,7 +66,7 @@ def run_imputation(
         df[f"{col}_imputed"] = df[col]
 
     # Run MoR
-    df = run_mor(df, backdata, target_vars)
+    df = run_mor(df, backdata, orig_cols)
 
     # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
