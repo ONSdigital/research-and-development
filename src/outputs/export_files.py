@@ -29,7 +29,7 @@ network_or_hdfs = config["global"]["network_or_hdfs"]
 if network_or_hdfs == "network":
 
     from src.utils.local_file_mods import local_list_files as list_files
-    from src.utils.local_file_mods import local_copy_file as copy_files
+    from src.utils.local_file_mods import local_copy_file as move_files
     from src.utils.local_file_mods import local_move_file as move_files
     from src.utils.local_file_mods import local_search_file as search_files
     from src.utils.local_file_mods import local_isfile as isfile
@@ -45,7 +45,7 @@ if network_or_hdfs == "network":
 elif network_or_hdfs == "hdfs":
 
     from src.utils.hdfs_mods import hdfs_list_files as list_files
-    from src.utils.hdfs_mods import hdfs_copy_file as copy_files
+    from src.utils.hdfs_mods import hdfs_copy_file as move_files
     from src.utils.hdfs_mods import hdfs_move_file as move_files
     from src.utils.hdfs_mods import hdfs_search_file as search_files
     from src.utils.hdfs_mods import hdfs_isfile as isfile
@@ -74,10 +74,18 @@ export_folder = paths["export_path"]
 s_f_schema_path = config["schema_paths"]["frozen_shortform_schema"]
 short_form_schema = toml.load(s_f_schema_path)
 
-
-# Get the headers from the short form schema
-short_form_headers = short_form_schema.keys()
-schema_columns_str = ",".join(short_form_headers)
+def get_schema_headers(file_path_dict: dict, config: dict = config):
+    
+    schema_paths = config['schema_paths']
+    
+    schema_paths = {output_name[7:]: schema_paths[f"{output_name[7:]}_schema"] 
+                    for output_name in file_path_dict.keys()]
+    
+    ### *** GOT HERE WIP
+    
+    # Get the headers from the short form schema
+    short_form_headers = short_form_schema.keys()
+    schema_columns_str = ",".join(short_form_headers)
 
 
 # Create a datetime object for the pipeline run - TODO: replace this with
@@ -101,11 +109,14 @@ def get_file_choice(config: dict = config):
     selection_list = [Path(f"{output_path}/{dir}/{file}").with_suffix('.csv') 
                       for dir, file in export_choices.items() 
                       if file is not None]
+    
+    selection_dict = {dir[7:]:file_path for dir,file_path
+                    in zip(export_choices.keys(), selection_list)}
 
     # Log the files being exported
     logging.info(f"These are the files being exported: {selection_list}")
 
-    return selection_list
+    return selection_dict
 
 
 def check_files_exist(output_dirs: str, file_list: List):
@@ -116,7 +127,6 @@ def check_files_exist(output_dirs: str, file_list: List):
     if isinstance(output_dirs, str):
         output_dirs = [output_dirs]
     
-       
     # Get all files listed in all the output directories
     all_files = []
     for dir in output_dirs:
@@ -132,10 +142,10 @@ def check_files_exist(output_dirs: str, file_list: List):
 def run_export():
     """Main function to run the data export pipeline."""
     # Get list of files to transfer from user
-    file_list = get_file_choice()
+    file_select_dict = get_file_choice()
 
     # Check that files exist
-    check_files_exist(short_form_output, file_list)
+    check_files_exist(short_form_output, list(file_select_dict.values))
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
@@ -151,11 +161,11 @@ def run_export():
         read_header_func=read_header,
         string_to_file_func=write_string_to_file,
     )
-
-    file_paths = [f"{output_path}/output_short_form/{file}" for file in file_list]
+    
+    schemas_header = get_schema_headers(file_select_dict)
 
     # Add the short form output file to the manifest object
-    for file_path in file_paths:
+    for file_path in file_select_dict:
         manifest.add_file(
             file_path,
             column_header=schema_columns_str,
@@ -173,9 +183,9 @@ def run_export():
     move_files(manifest_path, manifest.export_directory)
 
     # Copy files to outgoing folder
-    for file_path in file_paths:
+    for file_path in file_select_dict:
         file_path = os.path.join(file_path)
-        copy_files(file_path, manifest.export_directory)
+        move_files(file_path, manifest.export_directory)
 
     # Log success message
     OutgoingLogger.info("Files transferred successfully.")
