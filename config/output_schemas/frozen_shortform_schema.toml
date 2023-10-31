@@ -2,15 +2,15 @@
 old_name = "period_year"
 Deduced_Data_Type = "Int64"
 
-[ru_ref]
+[reference]
 old_name = "reference"
 Deduced_Data_Type = "Int64"
 
-[form_type]
+[formtype]
 old_name = "formtype"
 Deduced_Data_Type = "category"
 
-[form_status]
+[status]
 old_name = "form_status"
 Deduced_Data_Type = "category"
 
@@ -18,15 +18,15 @@ Deduced_Data_Type = "category"
 old_name = "itl"
 Deduced_Data_Type = "str"
 
-[employee_count]
+[employment]
 old_name = "employment"
 Deduced_Data_Type = "Int64"
 
-[wowentref]
+[wowenterprisereference]
 old_name = "wowenterprisereference"
 Deduced_Data_Type = "Int64"
 
-[current_sic]
+[rusic]
 old_name = "rusic"
 Deduced_Data_Type = "Int64"
 
@@ -34,7 +34,7 @@ Deduced_Data_Type = "Int64"
 old_name = "ultfoc"
 Deduced_Data_Type = "str"
 
-[product_group]
+[q201]
 old_name = "201"
 Deduced_Data_Type = "str"
 
@@ -86,7 +86,7 @@ Deduced_Data_Type = "float64"
 old_name = "headcount_defence"
 Deduced_Data_Type = "float64"
 
-[post_code]
+[q601]
 old_name = "601"
 Deduced_Data_Type = "str"
 

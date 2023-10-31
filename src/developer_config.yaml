@@ -10,7 +10,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: False
+  output_short_form: True
   output_long_form: True
   output_tau: False
   dev_test : False

@@ -22,8 +22,8 @@ Deduced_Data_Type = "Int64"
 old_name = "period"
 Deduced_Data_Type = "Int64"
 
-[frozenemployment]
-old_name = "frozenemployment"
+[employment]
+old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [wowenterprisereference]
