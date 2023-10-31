@@ -431,7 +431,7 @@ def calculate_totals(df):
 
 
 def run_longform_tmi(
-    full_df: pd.DataFrame,
+    longform_df: pd.DataFrame,
     sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -439,7 +439,7 @@ def run_longform_tmi(
     dataframe back to the pipeline
         dataframe back to the pipeline
     Args:
-        full_df (pd.DataFrame): main data
+        longform_df (pd.DataFrame): the dataset filtered for long form entries
         target_variables (list): key variables
         sic_mapper (pd.DataFrame): dataframe with sic mapper info
         config (Dict): the configuration settings
@@ -460,7 +460,7 @@ def run_longform_tmi(
     TMILogger.info("Imputing for R&D type (civil or defence).")
     df = impute_civil_defence(df)
 
-    lf_target_variables = config["lf_target_vars"]
+    lf_target_variables = config["imputation"]["lf_target_vars"]
     df = tmi_pre_processing(df, lf_target_variables)
 
     mean_dict, qa_df = create_mean_dict(df, lf_target_variables)
@@ -485,14 +485,14 @@ def run_longform_tmi(
 
 
 def run_shortform_tmi(
-    full_df: pd.DataFrame,
+    shortform_df: pd.DataFrame,
     config: Dict[str, Any],
 ) -> pd.DataFrame:
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline
         dataframe back to the pipeline
     Args:
-        full_df (pd.DataFrame): main data after TMI longform imputation
+        shortform_df (pd.DataFrame): the dataset filtered for long form entries
         config (Dict): the configuration settings
     Returns:
         pd.DataFrame: dataframe with the imputed valued added

@@ -10,11 +10,11 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
-  output_short_form: True
-  output_tau: True
-  output_gb_sas: True
-  output_intram_by_pg: True
+  output_imputation_qa: False
+  output_short_form: False
+  output_tau: False
+  output_gb_sas: False
+  output_intram_by_pg: False
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
@@ -94,19 +94,27 @@ run_log_sql:
     log_mode: "append"
 estimation:
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
-lf_target_vars: 
-  - "211"
-  - "305"
-  - "emp_researcher"
-  - "emp_technician"
-  - "emp_other"
-  - "headcount_res_m"
-  - "headcount_res_f"
-  - "headcount_tec_m"
-  - "headcount_tec_f"
-  - "headcount_oth_m"
-  - "headcount_oth_f"
-sum_cols: ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
+imputation:
+  lower_trim_perc: 15
+  upper_trim_perc: 15
+  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
+  lf_target_vars:
+    - "211"
+    - "305"
+    - "emp_researcher"
+    - "emp_technician"
+    - "emp_other"
+    - "headcount_res_m"
+    - "headcount_res_f"
+    - "headcount_tec_m"
+    - "headcount_tec_f"
+    - "headcount_oth_m"
+    - "headcount_oth_f"
+  sum_cols: 
+    - "emp_total"
+    - "headcount_tot_m"
+    - "headcount_tot_f"
+    - "headcount_total"
 breakdowns:
   "211":
     - "202"

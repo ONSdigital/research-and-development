@@ -22,8 +22,8 @@ def run_imputation(
 ) -> pd.DataFrame:
 
 
-    lf_target_vars = config["lf_target_vars"]
-    sum_cols = config["sum_cols"]
+    lf_target_vars = config["imputation"]["lf_target_vars"]
+    sum_cols = config["imputation"]["sum_cols"]
 
     # Get the breakdown columns from the config
     bd_qs_lists = list(config["breakdowns"].values())
