@@ -31,6 +31,8 @@ def run_pipeline(start, config_path):
     conf_obj = Config_settings(config_path)
     config = conf_obj.config_dict
 
+    print(config["lf_target_vars"])
+
     # import yaml
     # with open(config_path, "r") as file:
     #     config = yaml.safe_load(file)

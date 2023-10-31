@@ -21,21 +21,9 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
 
-    target_vars = [
-        "211",
-        "305",
-        "emp_researcher",
-        "emp_technician",
-        "emp_other",
-        "headcount_res_m",
-        "headcount_res_f",
-        "headcount_tec_m",
-        "headcount_tec_f",
-        "headcount_oth_m",
-        "headcount_oth_f",
-    ]
 
-    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
+    lf_target_vars = config["lf_target_vars"]
+    sum_cols = config["sum_cols"]
 
     # Get the breakdown columns from the config
     bd_qs_lists = list(config["breakdowns"].values())
@@ -51,12 +39,12 @@ def run_imputation(
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
-    orig_cols = target_vars + bd_cols + sum_cols
+    orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
     # Run TMI for long forms
-    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+    imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)

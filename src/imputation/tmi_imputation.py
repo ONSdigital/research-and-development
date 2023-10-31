@@ -432,7 +432,6 @@ def calculate_totals(df):
 
 def run_longform_tmi(
     full_df: pd.DataFrame,
-    target_variables: List[str],
     sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -461,16 +460,16 @@ def run_longform_tmi(
     TMILogger.info("Imputing for R&D type (civil or defence).")
     df = impute_civil_defence(df)
 
-    TMILogger.info("Calculating the trimmed mean for target variables")
-    df = tmi_pre_processing(df, target_variables)
+    lf_target_variables = config["lf_target_vars"]
+    df = tmi_pre_processing(df, lf_target_variables)
 
-    mean_dict, qa_df = create_mean_dict(df, target_variables)
+    mean_dict, qa_df = create_mean_dict(df, lf_target_variables)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict)
 
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
@@ -487,7 +486,6 @@ def run_longform_tmi(
 
 def run_shortform_tmi(
     full_df: pd.DataFrame,
-    sf_target_variables: List[str],
     config: Dict[str, Any],
 ) -> pd.DataFrame:
     """Function to run imputation end to end and returns the final
@@ -495,14 +493,14 @@ def run_shortform_tmi(
         dataframe back to the pipeline
     Args:
         full_df (pd.DataFrame): main data after TMI longform imputation
-        sf_target_variables (list): key variables for short forms
         config (Dict): the configuration settings
     Returns:
-        final_df: dataframe with the imputed valued added
+        pd.DataFrame: dataframe with the imputed valued added
     """
     TMILogger.info("Starting TMI short form imputation.")
 
-    TMILogger.info("Calculating the trimmed mean for target variables")
+    sf_target_variables = list(config["breakdowns"])
+
     df = tmi_pre_processing(shortform_df, sf_target_variables)
 
     mean_dict, qa_df = create_mean_dict(df, sf_target_variables)
@@ -511,7 +509,7 @@ def run_shortform_tmi(
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    shortform_tmi_df = apply_tmi(df, target_variables, mean_dict)
+    shortform_tmi_df = apply_tmi(df, sf_target_variables, mean_dict)
 
     TMILogger.info("TMI imputation completed.")
     return shortform_tmi_df
@@ -519,7 +517,6 @@ def run_shortform_tmi(
 
 def run_tmi(
     full_df: pd.DataFrame,
-    target_variables: List[str],
     sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -528,21 +525,19 @@ def run_tmi(
         dataframe back to the pipeline
     Args:
         full_df (pd.DataFrame): main data
-        target_variables (list): key variables
         sic_mapper (pd.DataFrame): dataframe with sic mapper info
         config (Dict): the configuration settings
     Returns:
-        final_df: dataframe with the imputed valued added
-        and counts columns
+        final_df: dataframe with the imputed valued added and counts columns
         qa_df: qa dataframe
     """
 
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
     shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
 
-    longform_tmi_df, qa_df = run_longform_tmi(longform_df, target_variables, sic_mapper, config)
+    longform_tmi_df, qa_df = run_longform_tmi(longform_df, sic_mapper, config)
 
-    shortform_tmi_df = run_shortform_tmi(shortform_df, sf_target_variables)
+    shortform_tmi_df = run_shortform_tmi(shortform_df, config)
 
     # add short forms back to dataframe
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df])
