@@ -168,8 +168,7 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-
-        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
+        # ! This might not work for anonymised HDFS data since we've not reproduced the fix above
         if load_updated_snapshot:
             secondary_snapdata = load_json(secondary_snapshot_path)
             secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(secondary_snapdata)
@@ -183,8 +182,9 @@ def run_staging(
         if is_network:
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
             write_feather(feather_file, full_responses)
-            secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
-            write_feather(secondary_feather_file, secondary_full_responses)
+            if load_updated_snapshot:
+                secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+                write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
@@ -195,7 +195,10 @@ def run_staging(
             os.path.join(feather_path, f"{snapshot_name}_responses.feather")
         )
         full_responses = snapdata
-        secondary_full_responses = secondary_snapdata
+        if load_updated_snapshot:
+            secondary_full_responses = secondary_snapdata
+        else:
+            secondary_full_responses = None
 
     # Get response rate
     processing.response_rate(contributors_df, responses_df)
@@ -296,6 +299,10 @@ def run_staging(
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
+
+    # ! If there was no updated snapshot, define it as null for the return
+    # if load_updated_snapshot is False:
+    #     secondary_full_responses = None
 
     return (
         full_responses,
