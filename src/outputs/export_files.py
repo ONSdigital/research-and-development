@@ -90,14 +90,14 @@ def get_file_choice(config: dict = config):
 
     Returns:
         selection_list (list): A list of the files to transfer."""
-    
+        
     # Get the user's choices from config
     export_choices = config.get('export_choices', {})
-    
+        
     # Use list comprehension to create the selection list
     selection_list = [Path(f"{config['output_path']}/{dir}/{file}").with_suffix('.csv') 
                       for dir, file in export_choices.items() 
-                      if file not None]
+                      if file is not None]
 
     # Log the files being exported
     logging.info(f"These are the files being exported: {selection_list}")
