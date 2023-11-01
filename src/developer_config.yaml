@@ -6,16 +6,17 @@ global:
   load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
   load_manual_outliers: False
-  output_full_responses: True
+  output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: False
+  output_short_form: True
+  output_long_form: True
   output_tau: False
   output_gb_sas: False
   output_intram_by_pg: False
-  output_intram_by_itl1: True
+  output_intram_by_itl1: False
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
@@ -48,7 +49,8 @@ hdfs_paths:
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  export_path: "/ons/rdbe_dev/outgoing_export"
+  long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
+  export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
@@ -78,6 +80,7 @@ network_paths:
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
+  frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
 
