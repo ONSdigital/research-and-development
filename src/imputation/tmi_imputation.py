@@ -358,7 +358,7 @@ def create_mean_dict(
     return mean_dict, df
 
 
-def apply_tmi(df, target_variables, mean_dict):
+def apply_tmi(df, target_variables, mean_dict, form_type):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
 
@@ -367,6 +367,12 @@ def apply_tmi(df, target_variables, mean_dict):
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
     )
+
+    # For short forms, imputation is only applied to Census references
+    if form_type == formtype_short:
+        filtered_df = filter_by_column_content(
+            filtered_df, "selectiontype", ["C"]
+        )
 
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes
@@ -469,7 +475,7 @@ def run_longform_tmi(
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict)
+    final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict, formtype_long)
 
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
@@ -505,14 +511,14 @@ def run_shortform_tmi(
 
     mean_dict, qa_df = create_mean_dict(df, sf_target_variables)
 
-    qa_df.set_index("qa_index", drop=True, inplace=True)
+    # qa_df.set_index("qa_index", drop=True, inplace=True)
 
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    shortform_tmi_df = apply_tmi(df, sf_target_variables, mean_dict)
+    shortform_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
 
     TMILogger.info("TMI imputation completed.")
-    return shortform_tmi_df
+    return shortform_tmi_df, qa_df
 
 
 def run_tmi(
@@ -535,16 +541,21 @@ def run_tmi(
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
     shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
 
-    longform_tmi_df, qa_df = run_longform_tmi(longform_df, sic_mapper, config)
+    longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, sic_mapper, config)
 
-    shortform_tmi_df = run_shortform_tmi(shortform_df, config)
+    shortform_tmi_df, qa_df_short = run_shortform_tmi(shortform_df, config)
 
-    # add short forms back to dataframe
+    # concatinate the short and long form dataframes and qa
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df])
+    full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    full_qa_df = full_qa_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
     TMILogger.info("TMI imputation completed.")
-    return full_df, qa_df
+    return full_df, full_qa_df

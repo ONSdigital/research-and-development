@@ -43,7 +43,7 @@ def run_imputation(
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
-    # Run TMI for long forms
+    # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
     # Run short form expansion
