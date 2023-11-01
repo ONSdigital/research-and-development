@@ -15,6 +15,7 @@ def output_intram_by_civil_defence(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    civil_defence_detailed
 ):
     """Run the outputs module.
 
@@ -40,6 +41,18 @@ def output_intram_by_civil_defence(
 
     print(df_agg)
 
+    # Merge with labels and ranks
+    df_merge = civil_defence_detailed.merge(
+        df_agg,
+        how="left",
+        left_on="c_d",
+        right_on=key_col)
+    df_merge[value_col] = df_merge[value_col].fillna(0)
+
+    #! replace period and value
+
+    print(df_merge.head())
+
     # # Select and rename the correct columns
     # detail = "Total Intramural Expenditure"
     # notes = "Notes"
@@ -52,5 +65,5 @@ def output_intram_by_civil_defence(
 
     # # Outputting the CSV file with timestamp and run_id
     # tdate = datetime.now().strftime("%Y-%m-%d")
-    # filename = f"output_intram_by_pg_{tdate}_v{run_id}.csv"
+    # filename = f"output_intram_by_civil_defence{tdate}_v{run_id}.csv"
     # write_csv(f"{output_path}/output_intram_by_civil_defence/{filename}", df_merge)

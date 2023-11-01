@@ -28,6 +28,7 @@ def run_outputs(
     sic_pg_alpha: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
+    civil_defence_detailed,
 ):
 
     """Run the outputs module.
@@ -127,5 +128,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
+            civil_defence_detailed,
         )
         OutputMainLogger.info("Finished Intram by civil or defence output.")

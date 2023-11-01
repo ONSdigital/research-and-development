@@ -112,7 +112,7 @@ def run_staging(
         check_file_exists(secondary_snapshot_path)
         secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
         feather_files_exist = check_file_exists(feather_file) and check_file_exists(secondary_feather_file) # ? Should only be true if both exist?
-    else: 
+    else:
         feather_files_exist = check_file_exists(feather_file)
 
     is_network = network_or_hdfs == "network"
@@ -308,6 +308,7 @@ def run_staging(
         pg_num_alpha,
         sic_pg_alpha,
         target_col="201")
+
     # Loading PG detailed mapper
     StagingMainLogger.info("Loading PG detailed mapper File...")
     pg_detailed_path = paths["pg_detailed_path"]
@@ -323,6 +324,15 @@ def run_staging(
     itl1_detailed = read_csv(itl1_detailed_path)
     val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
+
+    # Loading Civil or Defence detailed mapper
+    StagingMainLogger.info("Loading Civil or Defence detailed mapper File...")
+    civil_defence_detailed_path = paths["civil_defence_detailed_path"]
+    check_file_exists(civil_defence_detailed_path)
+    civil_defence_detailed = read_csv(civil_defence_detailed_path)
+    # val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
+    StagingMainLogger.info("Civil or Defence detailed mapper File Loaded Successfully...")
+
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
@@ -349,4 +359,5 @@ def run_staging(
         sic_pg_alpha,
         pg_detailed,
         itl1_detailed,
+        civil_defence_detailed,
     )

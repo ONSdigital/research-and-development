@@ -100,6 +100,7 @@ def run_pipeline(start, config_path):
         sic_pg_alpha,
         pg_detailed,
         itl1_detailed,
+        civil_defence_detailed,
     ) = run_staging(
         config,
         check_file_exists,
@@ -163,6 +164,7 @@ def run_pipeline(start, config_path):
         sic_pg_alpha,
         pg_detailed,
         itl1_detailed,
+        civil_defence_detailed
     )
 
     MainLogger.info("Finished All Output modules.")
