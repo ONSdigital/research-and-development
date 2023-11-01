@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
-from numpy import random
 
 from src.outlier_detection import auto_outliers as auto
 from src.outlier_detection import manual_outliers as manual
@@ -51,13 +50,6 @@ def run_outliers(
     outlier_path = config[f"{network_or_hdfs}_paths"]["outliers_path"]
     auto_outlier_path = outlier_path + "/auto_outliers"
 
-    # Fix for annonymised data on Dev/Test
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        # In the anonymised data the selectiontype is always 'L'
-        col_size = df["selectiontype"].shape[0]
-        random.seed(seed=42)
-        df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
-
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
 
@@ -78,7 +70,7 @@ def run_outliers(
     # continue to run, we set the manual file to be equal to the auto output and filter
     # the relevant columns. This way we don't filter out any manual outliers.
     if not config["global"]["load_manual_outliers"]:
-        df_manual_supplied = filtered_df[["reference", "instance", "manual_outlier"]]
+        df_manual_supplied = filtered_df[["reference", "manual_outlier"]]
         OutlierMainLogger.info(
             "Skipping loading of manual outliers. manual_outlier column treated as NaN"
         )
@@ -86,9 +78,7 @@ def run_outliers(
     # update outlier flag column with manual outliers
     OutlierMainLogger.info("Starting Manual Outlier Application")
     df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
-    outlier_df = df_auto_flagged.merge(
-        df_manual_supplied, on=["reference", "instance"], how="left"
-    )
+    outlier_df = df_auto_flagged.merge(df_manual_supplied, on=["reference"], how="left")
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")
 

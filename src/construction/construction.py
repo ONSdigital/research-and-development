@@ -10,13 +10,14 @@ from datetime import datetime
 construction_logger = logging.getLogger(__name__)
 
 
-def run_construction(main_snapshot: pd.DataFrame,
-                     secondary_snapshot: pd.DataFrame,
-                     config: dict,
-                     check_file_exists: Callable,
-                     write_csv: Callable,
-                     read_csv: Callable,
-                     run_id: int
+def run_construction(
+    main_snapshot: pd.DataFrame,
+    secondary_snapshot: pd.DataFrame,
+    config: dict,
+    check_file_exists: Callable,
+    write_csv: Callable,
+    read_csv: Callable,
+    run_id: int
 ) -> pd.DataFrame:
     """Run the construction module.
 

@@ -10,8 +10,8 @@ def pg_to_pg_mapper(
     mapper: pd.DataFrame,
     target_col: str = "product_group",
     pg_column: str = "201",
-    from_col: str = "2016 > Form PG",
-    to_col: str = "2016 > Pub PG",
+    from_col: str = "pg_numeric",
+    to_col: str = "pg_alpha",
 ):
     """This function maps all values in one column to another column
     using a mapper file. This is applied to long forms only.
@@ -34,19 +34,7 @@ def pg_to_pg_mapper(
 
     formtype_cond = filtered_df["formtype"] == "0001"
     filtered_df = filtered_df[formtype_cond]
-    # Create list of PGs that have one-to-many cardinality
-    mapdf = mapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = (
-        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
-    )
-    # Log the conflicts for the user to fix
-    if map_errors:
-        PgLogger.error(
-            (
-                f"The following product groups are trying to map to multiple letters: "
-                f"{map_errors}"
-            )
-        )
+
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
     # Flag all PGs that don't have a corresponding map value
@@ -80,8 +68,8 @@ def sic_to_pg_mapper(
     sicmapper: pd.DataFrame,
     target_col: str = "product_group",
     sic_column: str = "rusic",
-    from_col: str = "SIC 2007_CODE",
-    to_col: str = "2016 > Pub PG",
+    from_col: str = "sic",
+    to_col: str = "pg_alpha",
     formtype: str = "0006",
 ):
     """This function maps all values in one column to another column
@@ -107,16 +95,7 @@ def sic_to_pg_mapper(
 
     formtype_cond = filtered_df["formtype"] == formtype
     filtered_df = filtered_df[formtype_cond]
-    # Create list of SIC numbers that have one-to-many cardinality
-    mapdf = sicmapper.drop_duplicates(subset=[from_col, to_col], keep="first")
-    map_errors = (
-        mapdf[from_col][mapdf[from_col].duplicated(keep=False)].unique().tolist()
-    )
-    # Log the conflicts for the user to fix
-    if map_errors:
-        PgLogger.error(
-            f"The following SIC numbers are trying to map to multiple letters: {map_errors}"  # noqa
-        )
+
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
     # Flag all SIC numbers that don't have a corresponding map value
@@ -148,7 +127,10 @@ def sic_to_pg_mapper(
 
 
 def run_pg_conversion(
-    df: pd.DataFrame, mapper: pd.DataFrame, target_col: str = "product_group"
+    df: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
+    target_col: str = "product_group"
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
@@ -170,10 +152,10 @@ def run_pg_conversion(
         df[target_col] = np.nan
 
     # SIC mapping for short forms
-    df = sic_to_pg_mapper(df, mapper, target_col=target_col)
+    df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col)
 
     # PG mapping for long forms
-    df = pg_to_pg_mapper(df, mapper, target_col=target_col)
+    df = pg_to_pg_mapper(df, pg_num_alpha, target_col=target_col)
 
     # Overwrite the 201 column if target_col = 201
     if target_col == "201_mapping":

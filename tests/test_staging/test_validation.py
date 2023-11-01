@@ -1,6 +1,8 @@
 import pandas as pd
+from pandas._testing import assert_frame_equal
 import numpy as np
 import pytest
+import unittest
 
 
 # from unittest.mock import MagicMock, patch
@@ -11,6 +13,7 @@ from src.staging.validation import (
     check_pcs_real,
     validate_data_with_schema,
     combine_schemas_validate_full_df,
+    validate_many_to_one,
 )
 
 
@@ -27,8 +30,10 @@ def test_data_dict():
     return {
         "reference": [1, 2, 3, 4],
         "instance": [0, 0, 0, 0],
+        "formtype": [0, 0, 0, 0],
         "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
         "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+        "postcodes_harmonised": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
 
 
@@ -75,20 +80,26 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
+            "formtype": [0, 0, 0],
             "601": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
             "referencepostcode": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
+            "postcodes_harmonised": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
     df_result = validate_post_col(df_valid, fake_path, config)
     exp_output1 = pd.DataFrame(
-        columns=["reference", "instance", "invalid_pattern_pcodes"]
+        columns=[
+            "reference",
+            "instance",
+            "formtype",
+            "postcode_issue",
+            "incorrect_postcode",
+            "postcode_source",
+        ]
     )
-    exp_output2 = pd.DataFrame(columns=["reference", "instance", "not_real_pcodes"])
+
     pd.testing.assert_frame_equal(
-        df_result[0], exp_output1, check_dtype=False, check_index_type=False
-    )
-    pd.testing.assert_frame_equal(
-        df_result[1], exp_output2, check_dtype=False, check_index_type=False
+        df_result, exp_output1, check_dtype=False, check_index_type=False
     )
 
     # Invalid postcodes
@@ -96,8 +107,10 @@ def test_validate_post_col(test_data_df, monkeypatch, caplog):
         {
             "reference": [1, 2],
             "instance": [0, 0],
+            "formtype": [0, 0],
             "601": ["EFG 456", "HIJ 789"],
             "referencepostcode": ["EFG 456", "HIJ 789"],
+            "postcodes_harmonised": ["EFG 456", "HIJ 789"],
         }
     )
     validate_post_col(df_invalid, fake_path, config)
@@ -152,16 +165,20 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
-    check_real_df = clean_postcodes(test_data_df, "601")
+    check_real_df = clean_postcodes(test_data_df, "postcodes_harmonised")
 
     # Call the function under test
     result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
-        expected_unreal_postcodes = pd.Series(["HIJ 789", "KL1M 2NO"], name="601")
+        expected_unreal_postcodes = pd.Series(
+            ["HIJ 789", "KL1M 2NO"], name="postcodes_harmonised"
+        )
     else:
-        expected_unreal_postcodes = pd.Series([], name="601", dtype=object)
+        expected_unreal_postcodes = pd.Series(
+            [], name="postcodes_harmonised", dtype=object
+        )
 
     pd.testing.assert_series_equal(
         result_df, expected_unreal_postcodes
@@ -177,7 +194,7 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
 
     config = generate_config(True)
 
-    check_real_df = clean_postcodes(test_data_df, "601")
+    check_real_df = clean_postcodes(test_data_df, "postcodes_harmonised")
 
     # Call the function under test
     unreal_postcodes = check_pcs_real(
@@ -327,3 +344,55 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
     assert dumy_data[["instance", "q203"]].dtypes.all() == np.float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
     assert dumy_data["q307"].dtypes == np.bool
+
+
+class TestManyToOne(unittest.TestCase):
+    """Unittest for checking that the mapper is many to one"""
+
+    def mapper_good(self):
+        # Good mapper
+        return pd.DataFrame({
+            "child": ["AA", "AB", "AC"],
+            "parent": ["A", "A", "A"], })
+
+    def mapper_duplicates(self):
+        # Mapper with dulicates, but it should pass validation
+        return pd.DataFrame({
+            "child": ["AA", "AB", "AC", "AA"],
+            "parent": ["A", "A", "A", "A"], })
+
+    def mapper_many(self):
+        # Many-to-many mapper. should fail
+        return pd.DataFrame({
+            "child": ["AA", "AB", "AC", "AA"],
+            "parent": ["A", "A", "A", "B"], })
+
+    def test_good_mapper(self):
+        # Call the create_output_df funtion
+        df_input = self.mapper_good()
+        actual_result = validate_many_to_one(
+            df_input, col_many="child", col_one="parent")
+        expected_result = df_input
+        assert_frame_equal(actual_result, expected_result)
+
+    def test_duplicates(self):
+        # Call the create_output_df funtion
+        df_input = self.mapper_duplicates()
+        actual_result = validate_many_to_one(
+            df_input, col_many="child", col_one="parent")
+        expected_result = self.mapper_good()
+        assert_frame_equal(actual_result, expected_result)
+
+    def test_many(self):
+        # Validation should fail if the mapper is many to many
+        df_input = self.mapper_many()
+        with self.assertRaises(ValueError):
+            validate_many_to_one(
+                df_input, col_many="child", col_one="parent")
+
+    def test_names(self):
+        # Validation should fail if column names are wrong
+        df_input = self.mapper_good()
+        with self.assertRaises(ValueError):
+            validate_many_to_one(
+                df_input, col_many="dad", col_one="parent")
