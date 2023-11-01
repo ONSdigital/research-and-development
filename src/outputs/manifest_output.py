@@ -38,7 +38,7 @@ class Manifest:
         read_header_func: callable,
         string_to_file_func: callable,
         dry_run: bool = False,
-        delete_on_fail = False,
+        delete_on_fail=False,
     ):
         self.outgoing_directory = outgoing_directory
         self.export_directory = export_directory
