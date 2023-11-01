@@ -8,6 +8,7 @@ from src.outputs.tau import output_tau
 from src.outputs.gb_sas import output_gb_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
+from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -117,3 +118,14 @@ def run_outputs(
             itl1_detailed,
         )
         OutputMainLogger.info("Finished  Intram by ITL1 output.")
+
+    # Running Intram by civil or defence
+    if config["global"]["output_intram_by_civil_defence"]:
+        OutputMainLogger.info("Starting Intram by civil or defence output...")
+        output_intram_by_civil_defence(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished Intram by civil or defence output.")
