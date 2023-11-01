@@ -29,7 +29,6 @@ network_or_hdfs = config["global"]["network_or_hdfs"]
 if network_or_hdfs == "network":
 
     from src.utils.local_file_mods import local_list_files as list_files
-    from src.utils.local_file_mods import local_copy_file as move_files
     from src.utils.local_file_mods import local_move_file as move_files
     from src.utils.local_file_mods import local_search_file as search_files
     from src.utils.local_file_mods import local_isfile as isfile
@@ -45,7 +44,6 @@ if network_or_hdfs == "network":
 elif network_or_hdfs == "hdfs":
 
     from src.utils.hdfs_mods import hdfs_list_files as list_files
-    from src.utils.hdfs_mods import hdfs_copy_file as move_files
     from src.utils.hdfs_mods import hdfs_move_file as move_files
     from src.utils.hdfs_mods import hdfs_search_file as search_files
     from src.utils.hdfs_mods import hdfs_isfile as isfile
@@ -70,22 +68,28 @@ output_path = paths["output_path"]
 short_form_output = os.path.join(output_path, "output_short_form")
 export_folder = paths["export_path"]
 
+
 def get_schema_headers(file_path_dict: dict, config: dict = config):
 
-    schema_paths = config['schema_paths']
+    schema_paths = config["schema_paths"]
 
-    schema_paths = {output_name[7:]: schema_paths[f"{output_name[7:]}_schema"]
-                    for output_name in file_path_dict.keys()]
+    schema_paths = {
+        output_name: schema_paths[f"{output_name}_schema"]
+        for output_name in file_path_dict.keys()
+    }
 
     # Get the headers for each
-    schema_headers_dict = {output_name: toml.load(path) 
-                    for output_name, path 
-                    in schema_paths.items()}
+    schema_headers_dict = {
+        output_name: toml.load(path) for output_name, path in schema_paths.items()
+    }
 
     # Stringify the headers
-    schema_headers_dict.update({output_name: ",".join(keys) 
-                                for output_name, keys 
-                                in schema_headers_dict.items()})
+    schema_headers_dict.update(
+        {
+            output_name: ",".join(keys)
+            for output_name, keys in schema_headers_dict.items()
+        }
+    )
 
     return schema_headers_dict
 
@@ -102,18 +106,22 @@ def get_file_choice(config: dict = config):
         selection_list (list): A list of the files to transfer."""
 
     # Get the user's choices from config
-    export_choices = config.get('export_choices', {})
+    export_choices = config.get("export_choices", {})
 
     paths = config[f"{config['global']['network_or_hdfs']}_paths"]
-    output_path = paths['output_path']
+    output_path = paths["output_path"]
 
     # Use list comprehension to create the selection list
-    selection_list = [Path(f"{output_path}/{dir}/{file}").with_suffix('.csv')
-                      for dir, file in export_choices.items()
-                      if file is not None]
+    selection_list = [
+        Path(f"{output_path}/{dir}/{file}").with_suffix(".csv")
+        for dir, file in export_choices.items()
+        if file is not None
+    ]
 
-    selection_dict = {dir[7:]:file_path for dir,file_path
-                    in zip(export_choices.keys(), selection_list)}
+    selection_dict = {
+        dir[7:]: file_path
+        for dir, file_path in zip(export_choices.keys(), selection_list)
+    }
 
     # Log the files being exported
     logging.info(f"These are the files being exported: {selection_list}")
@@ -147,7 +155,7 @@ def run_export():
     file_select_dict = get_file_choice()
 
     # Check that files exist
-    check_files_exist(short_form_output, list(file_select_dict.values))
+    check_files_exist(short_form_output, list(file_select_dict.values()))
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
@@ -170,7 +178,7 @@ def run_export():
     for file_name, file_path in file_select_dict.items():
         manifest.add_file(
             file_path,
-            column_header=schemas_header_dict[file_name[7:]],
+            column_header=schemas_header_dict[file_name],
             validate_col_name_length=True,
             sep=",",
         )
@@ -184,8 +192,8 @@ def run_export():
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
     move_files(manifest_path, manifest.export_directory)
 
-    # Copy files to outgoing folder
-    for file_path in file_select_dict:
+    # Move files to outgoing folder
+    for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
         move_files(file_path, manifest.export_directory)
 
