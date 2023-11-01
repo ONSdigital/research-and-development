@@ -40,7 +40,7 @@ def mor_preprocessing(df, backdata):
     """
     # TODO move this to imputation main
     # Select only values to be imputed
-    # (for CF we only need instance 0 but we'll remove it later.)
+
     imputation_condition = (
         (df["formtype"] == "0001")
         & (df["status"].isin(bad_statuses))
@@ -75,8 +75,11 @@ def carry_forwards(df, backdata, impute_vars):
     Returns:
         pd.DataFrame: df with values carried forwards
     """
+    # log number of records before and after MoR
+
     # filter for instance 0 only before merging
-    df = df.copy()[df["instance"]==0]
+    keep_condition = (df["instance"] == 0) | pd.isnull(df["instance"])
+    df = df.copy().loc[keep_condition, :]
     df = pd.merge(df,
                   backdata,
                   how="left",

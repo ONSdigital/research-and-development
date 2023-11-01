@@ -368,6 +368,10 @@ def apply_tmi(df, target_variables, mean_dict):
         df, "status", ["Form sent out", "Check needed"]
     )
 
+    # Do not impute values that have had MoR applied
+    mor_mask = filtered_df["imp_marker"].isin(["CF", "MoR"])
+    filtered_df = filtered_df.copy().loc[~mor_mask, :]
+
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.

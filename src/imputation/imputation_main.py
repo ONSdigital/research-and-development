@@ -5,10 +5,11 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
-from src.imputation import tmi_imputation as tmi
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
+from src.imputation.sf_expansion import run_sf_expansion
+from src.imputation import tmi_imputation as tmi
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ def run_imputation(
     bd_cols = list(chain(*bd_qs_lists))
 
     # TODO: imp_marker should be 'R' for clear responders
+    # Initialise imp_marker column, default value "no_imputation"
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
@@ -47,6 +49,9 @@ def run_imputation(
 
     # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, lf_target_vars, mapper, config)
+
+    # Run short form expansion
+    imputed_df = run_sf_expansion(imputed_df, config)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]

@@ -90,14 +90,17 @@ def run_pipeline(start, config_path):
         full_responses,
         secondary_full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_itl_mapper,
+        postcode_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
         backdata,
         pg_detailed,
+        itl1_detailed,
     ) = run_staging(
         config,
         check_file_exists,
@@ -118,7 +121,7 @@ def run_pipeline(start, config_path):
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(
-        full_responses, pg_mapper, backdata, config, write_csv, run_id
+        full_responses, sic_pg_alpha, backdata, config, write_csv, run_id
     )
     MainLogger.info("Finished  Imputation...")
 
@@ -156,9 +159,13 @@ def run_pipeline(start, config_path):
         run_id,
         ultfoc_mapper,
         cora_mapper,
-        postcode_itl_mapper,
+        postcode_mapper,
+        itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
         pg_detailed,
+        itl1_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")

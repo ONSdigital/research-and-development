@@ -33,11 +33,13 @@ repos:
           - id: black
             name: black - consistent Python code formatting (auto-fixes)
             language_version: python # Should be a command that runs python3.6+
+            exclude: .*/tests/.*|^\.cruft\.json$|.*\tests\.*
     - repo: https://github.com/PyCQA/flake8
       rev: 5.0.4
       hooks:
           - id: flake8
             name: flake8 - Python linting
+            exclude: .*/tests*|^\.cruft\.json|.*\tests*$
     - repo: https://github.com/nbQA-dev/nbQA
       rev: 0.12.0
       hooks:
@@ -45,10 +47,12 @@ repos:
             name: nbqa-isort - Sort Python imports (notebooks; auto-fixes)
             args: [--nbqa-mutate]
             additional_dependencies: [isort==5.8.0]
+            exclude: .*/tests/.*|^\.cruft\.json$|.*\tests\.*
           - id: nbqa-black
             name: nbqa-black - consistent Python code formatting (notebooks; auto-fixes)
             args: [--nbqa-mutate]
             additional_dependencies: [black==21.5b2]
+            exclude: .*/tests/.*|^\.cruft\.json$|.*\tests\.*
           # TODO: Disabled for now until it's clear how to add noqa to specific cells of a Jupyter notebook
           #- id: nbqa-flake8
           #  name: nbqa-flake8 - Python linting (notebooks)
@@ -66,4 +70,4 @@ repos:
             name: Check commits for restricted file extensions
             entry: These file extensions are restricted. Data should be removed from the commit
             language: fail
-            files: .*\.(csv|feather|xlsx|zip|hdf5|h5|txt|json|xml|hd|parquet)|!requirements.txt
+            files: .*\.(csv|feather|xlsx|zip|hdf5|h5|txt|json|xml|hd|parquet)|!*requirements.txt

@@ -20,21 +20,21 @@ class TestCalcCDPorportions:
         input_cols = ["reference", "instance", "200", "202", "pg_sic_class"]
 
         data1 = [
-            [1001, 1, "C", 100, "AC_1234"],
-            [1001, 2, "C", 200, "AC_1234"],
-            [1001, 3, "D", 50, "AC_1234"],
-            [3003, 1, "C", 230, "AC_1234"],
-            [3003, 2, "C", 59, "AC_1234"],
-            [3003, 3, "D", 805, "AC_1234"],
-            [3003, 4, "C", 33044, "AC_1234"],
-            [3003, 5, "D", 4677, "AC_1234"],
-            [3003, 6, np.nan, 0, "AC_1234"],
+            [1001, 1, "C", 100, "AC_1234"], # noqa
+            [1001, 2, "C", 200, "AC_1234"], # noqa
+            [1001, 3, "D", 50, "AC_1234"], # noqa
+            [3003, 1, "C", 230, "AC_1234"], # noqa
+            [3003, 2, "C", 59, "AC_1234"], # noqa
+            [3003, 3, "D", 805, "AC_1234"], # noqa
+            [3003, 4, "C", 33044, "AC_1234"], # noqa
+            [3003, 5, "D", 4677, "AC_1234"], # noqa
+            [3003, 6, np.nan, 0, "AC_1234"], # noqa
         ]
 
         data2 = [
-            [1001, 1, "C", 100, "AC_1234"],
-            [1001, 2, "C", 200, "AC_1234"],
-            [3003, 6, np.nan, 0, "AC_1234"],
+            [1001, 1, "C", 100, "AC_1234"], # noqa
+            [1001, 2, "C", 200, "AC_1234"], # noqa
+            [3003, 6, np.nan, 0, "AC_1234"], # noqa
         ]
 
         input_df1 = pandasDF(data=data1, columns=input_cols)
@@ -77,204 +77,22 @@ class TestCreateCivdefDict:
         ]
 
         data = [
-            [
-                1001,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                1001,
-                1,
-                "C",
-                "AC",
-                100,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1001,
-                2,
-                "C",
-                "AC",
-                200,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1001,
-                3,
-                "D",
-                "AC",
-                50,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1002,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                1002,
-                1,
-                "C",
-                "AC",
-                100,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                2002,
-                0,
-                np.nan,
-                np.nan,
-                np.nan,
-                "Clear",
-                "800",
-                "444",
-                "nan_444",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                2002,
-                1,
-                np.nan,
-                "AC",
-                200,
-                "Clear",
-                "800",
-                "444",
-                "AC_444",
-                True,
-                "AC",
-                False,
-            ],
-            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False],
-            [
-                3003,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                3003,
-                1,
-                "C",
-                "ZZ",
-                230,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [3003, 2, "C", "ZZ", 59, "Clear", "800", "12", "ZZ_12", False, "ZZ", False],
-            [
-                3003,
-                3,
-                "D",
-                "ZZ",
-                805,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                4,
-                "C",
-                "ZZ",
-                33044,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                5,
-                "D",
-                "ZZ",
-                4677,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                6,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "12",
-                "nan_12",
-                False,
-                "nan",
-                False,
-            ],
+            [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [1001, 1, "C", "AC", 100, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1001, 2, "C", "AC", 200, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1001, 3, "D", "AC", 50, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1002, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [1002, 1, "C", "AC", 100, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [2002, 0, np.nan, np.nan, np.nan, "Clear", "800", "444", "nan_444", False, "nan", False], # noqa
+            [2002, 1, np.nan, "AC", 200, "Clear", "800", "444", "AC_444", True, "AC", False], # noqa
+            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False], # noqa
+            [3003, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [3003, 1, "C",  "ZZ", 230, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 2, "C",  "ZZ", 59, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 3, "D",  "ZZ", 805, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 4, "C",  "ZZ", 33044, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 5, "D",  "ZZ", 4677, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 6, np.nan, np.nan, 0, "Clear", "800", "12", "nan_12", False, "nan", False], # noqa
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -318,22 +136,22 @@ class TestPrepCDImpClasses:
         ]
 
         data = [
-            [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234"],
-            [1001, 1, "C", "AC", 100, "Clear", "800", "1234"],
-            [1001, 2, "C", "AC", 200, "Clear", "800", "1234"],
-            [1001, 3, "D", "AC", 50, "Clear", "800", "1234"],
-            [1002, 0, np.nan, np.nan, 0, "Clear", "800", "1234"],
-            [1002, 1, "C", "AC", 100, "Clear", "800", "1234"],
-            [2002, 0, np.nan, np.nan, np.nan, "Clear", "800", "444"],
-            [2002, 1, np.nan, "AC", 200, "Clear", "800", "444"],
-            [2002, 2, "D", "AC", 200, "999", "800", "444"],
-            [3003, 0, np.nan, np.nan, 0, "Clear", "800", "1234"],
-            [3003, 1, "C", "ZZ", 230, "Clear", "800", "12"],
-            [3003, 2, "C", "ZZ", 59, "Clear", "800", "12"],
-            [3003, 3, "D", "ZZ", 805, "Clear", "800", "12"],
-            [3003, 4, "C", "ZZ", 33044, "Clear", "800", "12"],
-            [3003, 5, "D", "ZZ", 4677, "Clear", "800", "12"],
-            [3003, 6, np.nan, np.nan, 0, "Clear", "800", "12"],
+            [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234"], # noqa
+            [1001, 1, "C", "AC", 100, "Clear", "800", "1234"], # noqa
+            [1001, 2, "C", "AC", 200, "Clear", "800", "1234"], # noqa
+            [1001, 3, "D", "AC", 50, "Clear", "800", "1234"], # noqa
+            [1002, 0, np.nan, np.nan, 0, "Clear", "800", "1234"], # noqa
+            [1002, 1, "C", "AC", 100, "Clear", "800", "1234"], # noqa
+            [2002, 0, np.nan, np.nan, np.nan, "Clear", "800", "444"], # noqa
+            [2002, 1, np.nan, "AC", 200, "Clear", "800", "444"], # noqa
+            [2002, 2, "D", "AC", 200, "999", "800", "444"], # noqa
+            [3003, 0, np.nan, np.nan, 0, "Clear", "800", "1234"], # noqa
+            [3003, 1, "C",  "ZZ", 230, "Clear", "800", "12"], # noqa
+            [3003, 2, "C",  "ZZ", 59, "Clear", "800", "12"], # noqa
+            [3003, 3, "D",  "ZZ", 805, "Clear", "800", "12"], # noqa
+            [3003, 4, "C",  "ZZ", 33044, "Clear", "800", "12"], # noqa
+            [3003, 5, "D",  "ZZ", 4677, "Clear", "800", "12"], # noqa
+            [3003, 6, np.nan, np.nan, 0, "Clear", "800", "12"], # noqa
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -357,204 +175,22 @@ class TestPrepCDImpClasses:
         ]
 
         data = [
-            [
-                1001,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                1001,
-                1,
-                "C",
-                "AC",
-                100,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1001,
-                2,
-                "C",
-                "AC",
-                200,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1001,
-                3,
-                "D",
-                "AC",
-                50,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                1002,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                1002,
-                1,
-                "C",
-                "AC",
-                100,
-                "Clear",
-                "800",
-                "1234",
-                "AC_1234",
-                False,
-                "AC",
-                False,
-            ],
-            [
-                2002,
-                0,
-                np.nan,
-                np.nan,
-                np.nan,
-                "Clear",
-                "800",
-                "444",
-                "nan_444",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                2002,
-                1,
-                np.nan,
-                "AC",
-                200,
-                "Clear",
-                "800",
-                "444",
-                "AC_444",
-                True,
-                "AC",
-                False,
-            ],
-            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False],
-            [
-                3003,
-                0,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "1234",
-                "nan_1234",
-                False,
-                "nan",
-                False,
-            ],
-            [
-                3003,
-                1,
-                "C",
-                "ZZ",
-                230,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [3003, 2, "C", "ZZ", 59, "Clear", "800", "12", "ZZ_12", False, "ZZ", False],
-            [
-                3003,
-                3,
-                "D",
-                "ZZ",
-                805,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                4,
-                "C",
-                "ZZ",
-                33044,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                5,
-                "D",
-                "ZZ",
-                4677,
-                "Clear",
-                "800",
-                "12",
-                "ZZ_12",
-                False,
-                "ZZ",
-                False,
-            ],
-            [
-                3003,
-                6,
-                np.nan,
-                np.nan,
-                0,
-                "Clear",
-                "800",
-                "12",
-                "nan_12",
-                False,
-                "nan",
-                False,
-            ],
+            [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [1001, 1, "C", "AC", 100, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1001, 2, "C", "AC", 200, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1001, 3, "D", "AC", 50, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [1002, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [1002, 1, "C", "AC", 100, "Clear", "800", "1234", "AC_1234", False, "AC", False], # noqa
+            [2002, 0, np.nan, np.nan, np.nan, "Clear", "800", "444", "nan_444", False, "nan", False], # noqa
+            [2002, 1, np.nan, "AC", 200, "Clear", "800", "444", "AC_444", True, "AC", False], # noqa
+            [2002, 2, "D", "AC", 200, "999", "800", "444", "AC_444", True, "AC", False], # noqa
+            [3003, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
+            [3003, 1, "C",  "ZZ", 230, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 2, "C",  "ZZ", 59, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 3, "D",  "ZZ", 805, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 4, "C",  "ZZ", 33044, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 5, "D",  "ZZ", 4677, "Clear", "800", "12", "ZZ_12", False, "ZZ", False], # noqa
+            [3003, 6, np.nan, np.nan, 0, "Clear", "800", "12", "nan_12", False, "nan", False], # noqa
         ]
 
         output_df = pandasDF(data=data, columns=output_cols)
@@ -585,73 +221,17 @@ class TestPrepCDImpClasses2:
         ]
 
         data = [
-            [
-                1,
-                "A",
-                "12",
-                "800",
-                "Clear",
-                "C",
-            ],  # test valid (statusencoded=211) row with no nans in class name
-            [
-                2,
-                "A",
-                "12",
-                "800",
-                "Clear - overridden",
-                "D",
-            ],  #  test valid (statusencoded=210, 200 not null) row with no nans in class name
-            [
-                3,
-                "A",
-                "12",
-                "800",
-                "other",
-                "C",
-            ],  #  test other but still valid rows within class
-            [
-                4,
-                "A",
-                "12",
-                "800",
-                "Clear",
-                np.nan,
-            ],  #  test np.nan in 200 but still valid rows within class
-            [
-                5,
-                "B",
-                "12",
-                "800",
-                "Clear",
-                np.nan,
-            ],  #  test np.nan in 200 and no valid rows within class - FLAG
-            [
-                6,
-                "B",
-                "12",
-                "800",
-                "other",
-                "C",
-            ],  #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
-            [
-                6,
-                "B",
-                "12",
-                "800",
-                "other",
-                np.nan,
-            ],  #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
-            [
-                6,
-                np.nan,
-                "122",
-                "800",
-                "other",
-                np.nan,
-            ],  #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
-            [1, np.nan, "12", "800", "Clear", "C"],  #  nan in class name
-            [1, "A", np.nan, "800", "Clear", "C"],  #  nan in class name
-        ]
+            [1, "A", "12", "800", "Clear", "C"], # noqa # test valid (statusencoded=211) row with no nans in class name
+            [2, "A", "12", "800", "Clear - overridden", "D"], # noqa #  test valid (statusencoded=210, 200 not null) row with no nans in class name
+            [3, "A", "12", "800", "other", "C"], # noqa #  test other but still valid rows within class
+            [4, "A", "12", "800", "Clear", np.nan], # noqa #  test np.nan in 200 but still valid rows within class
+            [5, "B", "12", "800", "Clear", np.nan], # noqa #  test np.nan in 200 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", "C"], # noqa #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", np.nan], # noqa #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
+            [6, np.nan, "122", "800", "other", np.nan], # noqa #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
+            [1, np.nan, "12", "800", "Clear", "C"], # noqa #  nan in class name
+            [1, "A", np.nan, "800", "Clear", "C"] #  nan in class name
+            ]
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -672,127 +252,17 @@ class TestPrepCDImpClasses2:
         ]
 
         data = [
-            [
-                1,
-                "A",
-                "12",
-                "800",
-                "Clear",
-                "C",
-                "A_12",
-                False,
-                "A",
-                False,
-            ],  # test valid (statusencoded=211) row with no nans in class name
-            [
-                2,
-                "A",
-                "12",
-                "800",
-                "Clear - overridden",
-                "D",
-                "A_12",
-                False,
-                "A",
-                False,
-            ],  #  test valid (statusencoded=210, 200 not null) row with no nans in class name
-            [
-                3,
-                "A",
-                "12",
-                "800",
-                "other",
-                "C",
-                "A_12",
-                False,
-                "A",
-                False,
-            ],  #  test other but still valid rows within class
-            [
-                4,
-                "A",
-                "12",
-                "800",
-                "Clear",
-                np.nan,
-                "A_12",
-                False,
-                "A",
-                False,
-            ],  #  test np.nan in 200 but still valid rows within class
-            [
-                5,
-                "B",
-                "12",
-                "800",
-                "Clear",
-                np.nan,
-                "B_12",
-                True,
-                "B",
-                True,
-            ],  #  test np.nan in 200 and no valid rows within class - FLAG
-            [
-                6,
-                "B",
-                "12",
-                "800",
-                "other",
-                "C",
-                "B_12",
-                True,
-                "B",
-                True,
-            ],  #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
-            [
-                6,
-                "B",
-                "12",
-                "800",
-                "other",
-                np.nan,
-                "B_12",
-                True,
-                "B",
-                True,
-            ],  #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
-            [
-                6,
-                np.nan,
-                "122",
-                "800",
-                "other",
-                np.nan,
-                "nan_122",
-                False,
-                "nan",
-                False,
-            ],  #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
-            [
-                1,
-                np.nan,
-                "12",
-                "800",
-                "Clear",
-                "C",
-                "nan_12",
-                False,
-                "nan",
-                False,
-            ],  #  nan in class name
-            [
-                1,
-                "A",
-                np.nan,
-                "800",
-                "Clear",
-                "C",
-                "A_nan",
-                False,
-                "A",
-                False,
-            ],  #  nan in class name
-        ]
+            [1, "A", "12", "800", "Clear", "C", "A_12", False, "A", False], # noqa # test valid (statusencoded=211) row with no nans in class name
+            [2, "A", "12", "800", "Clear - overridden", "D", "A_12", False, "A", False], # noqa #  test valid (statusencoded=210, 200 not null) row with no nans in class name
+            [3, "A", "12", "800", "other", "C", "A_12", False, "A", False], # noqa #  test other but still valid rows within class
+            [4, "A", "12", "800", "Clear", np.nan, "A_12", False, "A", False], # noqa #  test np.nan in 200 but still valid rows within class
+            [5, "B", "12", "800", "Clear", np.nan, "B_12", True, "B", True], # noqa #  test np.nan in 200 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", "C", "B_12", True, "B", True], # noqa #  test statusencoded not 211 or 210 and no valid rows within class - FLAG
+            [6, "B", "12", "800", "other", np.nan, "B_12", True, "B", True], # noqa #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class - FLAG
+            [6, np.nan, "122", "800", "other", np.nan, "nan_122", False, "nan", False], # noqa #  test statusencoded not 211 or 210 and np.nan in 200 and no valid rows within class but nan in class name
+            [1, np.nan, "12", "800", "Clear", "C", "nan_12", False, "nan", False], # noqa #  nan in class name
+            [1, "A", np.nan, "800", "Clear", "C", "A_nan", False, "A", False] #  nan in class name
+            ]
 
         output_df = pandasDF(data=data, columns=output_cols)
         return output_df

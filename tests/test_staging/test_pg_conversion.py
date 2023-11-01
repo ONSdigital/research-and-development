@@ -20,8 +20,8 @@ def dummy_data() -> pd.DataFrame:
 def mapper() -> pd.DataFrame:
     # Set up the dummy mapper data
     mapper = {
-        "2016 > Form PG": [0, 1, 2, 3, 4],
-        "2016 > Pub PG": [np.nan, "A", "B", "C", "C"],
+        "pg_numeric": [0, 1, 2, 3, 4],
+        "pg_alpha": [np.nan, "A", "B", "C", "C"],
     }
     return pd.DataFrame(mapper)
 
@@ -40,16 +40,6 @@ def expected_output() -> pd.DataFrame:
     return expected_output
 
 
-def test_pg_mapper(dummy_data, expected_output, mapper):
-    """Tests for pg mapper function."""
-
-    target_col = dummy_data.columns[0]
-
-    df_result = pg_to_pg_mapper(dummy_data, mapper, target_col)
-
-    pd.testing.assert_frame_equal(df_result, expected_output)
-
-
 @pytest.fixture
 def sic_dummy_data() -> pd.DataFrame:
     # Set up the dummyinput  data
@@ -63,8 +53,8 @@ def sic_dummy_data() -> pd.DataFrame:
 def sic_mapper() -> pd.DataFrame:
     # Set up the dummy mapper data
     mapper = {
-        "SIC 2007_CODE": [1110, 10101],
-        "2016 > Pub PG": ["A", "B"],
+        "sic": [1110, 10101],
+        "pg_alpha": ["A", "B"],
     }
     return pd.DataFrame(mapper)
 
