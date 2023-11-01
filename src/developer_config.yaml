@@ -16,7 +16,7 @@ global:
   output_tau: False
   output_gb_sas: False
   output_intram_by_pg: False
-  output_intram_by_itl1: True
+  output_intram_by_itl1: False
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
