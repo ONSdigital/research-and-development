@@ -46,13 +46,15 @@ def run_staging(
     Returns:
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
+            secondary_full_responses (pd.Dataframe): The staged and validated updated snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
-            pg_mapper (pd.DataFrame): Product grouo mapper,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
-            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
+            pg_num_alpha (pd.DataFrame): Product group numeric to alpha mapper.
+            sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -61,6 +63,8 @@ def run_staging(
     paths = config[f"{network_or_hdfs}_paths"]
     snapshot_path = paths["snapshot_path"]
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
+    secondary_snapshot_path = paths["secondary_snapshot_path"]
+    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
 
     # Load historic data
     if config["global"]["load_historic_data"]:
@@ -101,7 +105,15 @@ def run_staging(
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
-    feather_files_exist = check_file_exists(feather_file)
+
+    # Check if the secondary snapshot exists
+    load_updated_snapshot = config["global"]["load_updated_snapshot"]
+    if load_updated_snapshot:
+        check_file_exists(secondary_snapshot_path)
+        secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+        feather_files_exist = check_file_exists(feather_file) and check_file_exists(secondary_feather_file) # ? Should only be true if both exist?
+    else: 
+        feather_files_exist = check_file_exists(feather_file)
 
     is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
@@ -110,6 +122,9 @@ def run_staging(
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = read_feather(feather_file)
         StagingMainLogger.info(f"{feather_file} loaded")
+        if load_updated_snapshot:
+            secondary_snapdata = read_feather(secondary_feather_file)
+            StagingMainLogger.info(f"{secondary_feather_file} loaded")
         READ_FROM_FEATHER = True
     else:
         StagingMainLogger.info("Loading SPP snapshot data from json file")
@@ -153,10 +168,23 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
+
+        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
+        if load_updated_snapshot:
+            secondary_snapdata = load_json(secondary_snapshot_path)
+            secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(secondary_snapdata)
+            secondary_responses_df["instance"] = 0
+            val.validate_data_with_schema(secondary_contributors_df, "./config/contributors_schema.toml")
+            val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
+            secondary_full_responses = processing.full_responses(secondary_contributors_df, secondary_responses_df)
+            val.combine_schemas_validate_full_df(secondary_full_responses, "./config/contributors_schema.toml", "./config/wide_responses.toml")
+
         # Write feather file to snapshot path
         if is_network:
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
             write_feather(feather_file, full_responses)
+            secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+            write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
@@ -167,6 +195,7 @@ def run_staging(
             os.path.join(feather_path, f"{snapshot_name}_responses.feather")
         )
         full_responses = snapdata
+        secondary_full_responses = secondary_snapdata
 
     # Get response rate
     processing.response_rate(contributors_df, responses_df)
@@ -178,18 +207,14 @@ def run_staging(
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist)
-    postcode_df = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_df["pcd2"]
-    invalid_df, unreal_df = val.validate_post_col(
-        full_responses, postcode_masterlist, config
-    )
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
+    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_pattern_postcodes_{tdate}_v{run_id}.csv"
-    unreal_filename = f"missing_postcodes_{tdate}_v{run_id}.csv"
+    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-    write_csv(f"{pcodes_folder}/{unreal_filename}", unreal_df)
     StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:
@@ -206,14 +231,6 @@ def run_staging(
     else:
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
-
-    # Load the PG mapper
-    pg_mapper = paths["pg_mapper_path"]
-    check_file_exists(pg_mapper)
-    pg_mapper = read_csv(pg_mapper)
-
-    # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -249,13 +266,63 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
-    # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    # Loading PG alpha to numeric mapper - possibly, deprecated
+    StagingMainLogger.info("Loading PG alpha to numeric File...")
     pg_alpha_num_path = paths["pg_alpha_num_path"]
     check_file_exists(pg_alpha_num_path)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    pg_alpha_num = val.validate_many_to_one(
+        pg_alpha_num,
+        col_many="pg_alpha",
+        col_one="pg_numeric")
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_num_alpha_path = paths["pg_num_alpha_path"]
+    check_file_exists(pg_num_alpha_path)
+    pg_num_alpha = read_csv(pg_num_alpha_path)
+    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    pg_num_alpha = val.validate_many_to_one(
+        pg_num_alpha,
+        col_many="pg_numeric",
+        col_one="pg_alpha")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading SIC to PG to alpha mapper
+    StagingMainLogger.info("Loading SIC to PG to alpha File...")
+    sic_pg_alpha_path = paths["sic_pg_alpha_path"]
+    check_file_exists(sic_pg_alpha_path)
+    sic_pg_alpha = read_csv(sic_pg_alpha_path)
+    val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
+    sic_pg_alpha = val.validate_many_to_one(
+        sic_pg_alpha,
+        col_many="sic",
+        col_one="pg_alpha")
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Map PG from SIC/PG numbers to column '201'.
+    full_responses = pg.run_pg_conversion(
+        full_responses,
+        pg_num_alpha,
+        sic_pg_alpha,
+        target_col="201")
+    # Loading PG detailed mapper
+    StagingMainLogger.info("Loading PG detailed mapper File...")
+    pg_detailed_path = paths["pg_detailed_path"]
+    check_file_exists(pg_detailed_path)
+    pg_detailed = read_csv(pg_detailed_path)
+    val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
+    StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
+
+    # Loading ITL1 detailed mapper
+    StagingMainLogger.info("Loading ITL1 detailed mapper File...")
+    itl1_detailed_path = paths["itl1_detailed_path"]
+    check_file_exists(itl1_detailed_path)
+    itl1_detailed = read_csv(itl1_detailed_path)
+    val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
+    StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
@@ -270,11 +337,16 @@ def run_staging(
 
     return (
         full_responses,
+        secondary_full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_df,
+        postcode_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
+        pg_detailed,
+        itl1_detailed,
     )

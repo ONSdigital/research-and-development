@@ -9,6 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
@@ -87,13 +88,18 @@ def run_pipeline(start, config_path):
 
     (
         full_responses,
+        secondary_full_responses,
         manual_outliers,
-        pg_mapper,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_itl_mapper,
+        postcode_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
+        pg_detailed,
+        itl1_detailed,
     ) = run_staging(
         config,
         check_file_exists,
@@ -106,9 +112,14 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Data Ingest...")
 
+    # TODO Construction module still in progress
+    MainLogger.info("Starting Construction...")
+    constructed_df = run_construction(full_responses, secondary_full_responses, config, write_csv, run_id)
+    MainLogger.info("Finished Construction...")
+
     # Imputation module
     MainLogger.info("Starting Imputation...")
-    imputed_df = run_imputation(full_responses, pg_mapper, config, write_csv, run_id)
+    imputed_df = run_imputation(full_responses, sic_pg_alpha, config, write_csv, run_id)
     MainLogger.info("Finished  Imputation...")
 
     # Outlier detection module
@@ -145,8 +156,13 @@ def run_pipeline(start, config_path):
         run_id,
         ultfoc_mapper,
         cora_mapper,
-        postcode_itl_mapper,
+        postcode_mapper,
+        itl_mapper,
         pg_alpha_num,
+        pg_num_alpha,
+        sic_pg_alpha,
+        pg_detailed,
+        itl1_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")

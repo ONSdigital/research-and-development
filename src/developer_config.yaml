@@ -3,6 +3,7 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
+  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
   load_manual_outliers: False
   output_full_responses: False
@@ -13,6 +14,9 @@ global:
   output_short_form: True
   output_long_form: True
   output_tau: False
+  output_gb_sas: False
+  output_intram_by_pg: False
+  output_intram_by_itl1: True
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
@@ -29,14 +33,14 @@ hdfs_paths:
   root: "/ons/rdbe_dev/"
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  secondary_snapshot_path: "TODO" # ? No secondary snapshot on the HDFS?
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
-  pg_mapper_path: "/ons/rdbe_dev/mappers/2023/SIC_to_PG_UTF-8.csv"
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
   cora_mapper_path: "/ons/rdbe_dev/mappers/2023/cora_mapper.csv"
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   output_path:  "/ons/rdbe_dev/outputs"
-  cellno_path: '/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv'
+  cellno_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
   itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   feather_path: "/ons/rdbe_dev/staging/feather"
@@ -45,7 +49,6 @@ hdfs_paths:
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  # TODO check below - copied from above but folder not found
   long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
@@ -53,9 +56,9 @@ network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
-  pg_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/SIC_to_PG.csv"
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
@@ -71,10 +74,16 @@ network_paths:
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
+  pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
+  gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
+
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
@@ -91,7 +100,7 @@ run_log_sql:
 estimation:
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 breakdowns:
-  2xx:
+  "211":
     - "202"
     - "203"
     - "204"
@@ -124,7 +133,7 @@ breakdowns:
     - "248"
     - "249"
     - "250"
-  3xx:
+  "305":
     - "302"
     - "303"
     - "304"

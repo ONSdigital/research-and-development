@@ -15,7 +15,6 @@ def run_short_to_long(df, selectiontype=["P", "C"]):
         pd.DataFrame: The dataframe with additional instances for civil and
             defence short form responses, in long form format.
     """
-
     short_to_long_df = df.copy().loc[df["selectiontype"].isin(selectiontype)]
     not_short_to_long_df = df.copy().loc[~df["selectiontype"].isin(selectiontype)]
 

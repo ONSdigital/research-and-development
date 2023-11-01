@@ -116,18 +116,16 @@ def flag_outliers(
             return f + 1
 
     # Add group count - how many RU refs there are in a cell, perod
-    filtered_df["group_count"] = (
-        filtered_df.groupby(groupby_cols)[value_col].transform("count") # noqa
-    )
+    filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform(
+        "count"
+    )  # noqa
 
     # Rank margins
     filtered_df["high"] = filtered_df["group_count"] * upper_clip
     filtered_df["high_rounded"] = filtered_df.apply(
         lambda row: _normal_round(row["high"]), axis=1
     )
-    filtered_df["upper_band"] = (
-        filtered_df["group_count"] - filtered_df["high_rounded"]
-    )
+    filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(
@@ -135,11 +133,8 @@ def flag_outliers(
     )
 
     # Ranks of RU refs in each group, depending on their value
-    filtered_df["group_rank"] = (
-        filtered_df.groupby(groupby_cols)[value_col].rank( 
-            method="first", 
-            ascending=True 
-        )
+    filtered_df["group_rank"] = filtered_df.groupby(groupby_cols)[value_col].rank(
+        method="first", ascending=True
     )
 
     # Outlier conditions
