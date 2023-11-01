@@ -1,11 +1,11 @@
 ["Detailed product groups (Alphabetical product groups A-AH)"]
 old_name = None
-Deduced_Data_Type = str
+Deduced_Data_Type = "str"
 
 ["2023 (Current period)"]
 old_name = None
-Deduced_Data_Type = float64
+Deduced_Data_Type = "float64"
 
 ["Notes"]
 old_name = None
-Deduced_Data_Type = str
+Deduced_Data_Type = "str"
