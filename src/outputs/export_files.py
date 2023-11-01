@@ -23,8 +23,10 @@ config_path = os.path.join("src", "developer_config.yaml")
 conf_obj = Config_settings(config_path)
 config = conf_obj.config_dict
 
-# Get logging level
-logging_level = config["logging_level"]
+# Get and set logging level
+logging_level = config["global"]["logging_level"]
+logging_levels = {"INFO": logging.INFO, "DEBUG": logging.DEBUG}
+logging.basicConfig(level=logging_levels[logging_level.upper()])
 
 # Check the environment switch
 network_or_hdfs = config["global"]["network_or_hdfs"]
