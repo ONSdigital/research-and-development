@@ -1,7 +1,6 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-import numpy as np
 from datetime import datetime
 from typing import Callable, Dict, Any
 
@@ -21,7 +20,7 @@ def output_long_form(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
 ):
-    """Prepare and run the outputs module on long forms.
+    """Run the outputs module on long forms.
 
     Args:
         df (pd.DataFrame): The main dataset for long form output

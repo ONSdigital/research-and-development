@@ -26,7 +26,8 @@ def run_outputs(
     """Run the outputs module.
 
     Args:
-        estimated_df (pd.DataFrame): The main dataset contains short and long form output
+        estimated_df (pd.DataFrame): The main dataset containing
+        short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.

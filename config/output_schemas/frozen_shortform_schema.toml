@@ -10,7 +10,7 @@ Deduced_Data_Type = "Int64"
 old_name = "formtype"
 Deduced_Data_Type = "category"
 
-[status]
+[form_status]
 old_name = "form_status"
 Deduced_Data_Type = "category"
 
