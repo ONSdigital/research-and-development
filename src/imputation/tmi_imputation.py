@@ -185,12 +185,12 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 def apply_trim_check(
     df: pd.DataFrame,
     variable: str,
-    trim_threshold=10,
+    trim_threshold,
 ) -> pd.DataFrame: 
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
-    # tag for those classes with more than trim_threshold (currently 10)
+    # tag for those classes with more than trim_threshold 
 
     df = df.copy()
 
@@ -230,6 +230,9 @@ def trim_bounds(
     df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
+
+    # Add trimming threshold marker
+    df = apply_trim_check(df, variable, trim_threshold)
 
     # trim only if the number of non-zeros is above trim_threshold
     full_length = len(df[variable])
@@ -338,11 +341,8 @@ def create_mean_dict(
             # Sort by target_variable, df['employees'], reference
             sorted_df = sort_df(var, subgrp)
 
-            # Add trimming threshold marker
-            trimcheck_df = apply_trim_check(sorted_df, var)
-
-            # Apply trimming marker
-            trimmed_df = trim_bounds(trimcheck_df, var, config)
+            # Apply trimming 
+            trimmed_df = trim_bounds(sorted_df, var, config)
 
             tr_df = trimmed_df.set_index("pre_index")
 
@@ -480,6 +480,7 @@ def run_longform_tmi(
     qa_df.set_index("qa_index", drop=True, inplace=True)
     qa_df = qa_df.drop("trim_check", axis=1)
 
+    # apply the imputed values to the statuses requiring imputation
     final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict, formtype_long)
 
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
@@ -519,6 +520,7 @@ def run_shortform_tmi(
     qa_df.set_index("qa_index", drop=True, inplace=True)
     qa_df = qa_df.drop("trim_check", axis=1)
 
+    # apply the imputed values to the statuses requiring imputation
     final_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
 
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
@@ -547,6 +549,11 @@ def run_tmi(
     # changing type of Civil or Defence column 200 helps with imputation classes
     full_df["200"] = full_df["200"].astype("category")
 
+    # exclude rows that have had MoR or CF applied
+    mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
+    excluded_df = full_df.copy().loc[mor_mask, :]
+    full_df = full_df.copy().loc[~mor_mask, :]
+
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
     shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
 
@@ -555,7 +562,7 @@ def run_tmi(
     shortform_tmi_df, qa_df_short = run_shortform_tmi(shortform_df, config)
 
     # concatinate the short and long form dataframes and qa
-    full_df = pd.concat([longform_tmi_df, shortform_tmi_df])
+    full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
     full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(

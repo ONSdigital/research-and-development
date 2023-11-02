@@ -46,10 +46,8 @@ def output_intram_by_pg(
 
     # Merge with labels and ranks
     df_merge = pg_detailed.merge(
-        df_agg,
-        how="left",
-        left_on="pg_alpha",
-        right_on=key_col)
+        df_agg, how="left", left_on="pg_alpha", right_on=key_col
+    )
     df_merge[value_col] = df_merge[value_col].fillna(0)
 
     # Sort by rank
@@ -60,7 +58,8 @@ def output_intram_by_pg(
     notes = "Notes"
     value_title = "2023 (Current period)"
     df_merge = df_merge[[detail, value_col, notes]].rename(
-        columns={value_col: value_title})
+        columns={value_col: value_title}
+    )
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
