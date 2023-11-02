@@ -367,7 +367,6 @@ def apply_tmi(df, target_variables, mean_dict):
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
     )
-
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.
@@ -451,6 +450,11 @@ def run_tmi(
     """
     TMILogger.info("Starting TMI imputation.")
 
+    # exclude rows that have had MoR or CF applied
+    mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
+    excluded_df = full_df.copy().loc[mor_mask, :]
+    full_df = full_df.copy().loc[~mor_mask, :]
+
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
     shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
 
@@ -485,7 +489,7 @@ def run_tmi(
     final_df = calculate_totals(expanded_df)
 
     # add short forms back to dataframe
-    full_df = pd.concat([final_df, shortform_df])
+    full_df = pd.concat([final_df, shortform_df, excluded_df])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
