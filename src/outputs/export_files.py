@@ -74,7 +74,20 @@ export_folder = paths["export_path"]
 
 
 def get_schema_headers(config: dict = config):
+    """
+    Extracts the schema headers from the provided configuration.
 
+    This function filters the configuration for entries containing "schema" in their output name,
+    and loads the corresponding TOML files. It then converts the headers (keys of the dict) into
+    a comma-separated string and returns a dictionary where the keys are output names and the values
+    are these comma-separated strings of schema headers.
+
+    Args:
+        config (dict, optional): A dictionary containing configuration details. Defaults to config.
+
+    Returns:
+        dict: A dictionary where the keys are output names and the values are comma-separated strings of schema headers.
+    """
     schema_paths_only = config["schema_paths"]
 
     schema_paths = {
