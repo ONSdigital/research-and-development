@@ -91,13 +91,15 @@ def run_pipeline(start, config_path):
         secondary_full_responses,
         manual_outliers,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_itl_mapper,
+        postcode_mapper,
         pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
         pg_detailed,
+        itl1_detailed,
     ) = run_staging(
         config,
         check_file_exists,
@@ -154,11 +156,13 @@ def run_pipeline(start, config_path):
         run_id,
         ultfoc_mapper,
         cora_mapper,
-        postcode_itl_mapper,
+        postcode_mapper,
+        itl_mapper,
         pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
         pg_detailed,
+        itl1_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")

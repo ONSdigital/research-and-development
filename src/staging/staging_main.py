@@ -46,12 +46,13 @@ def run_staging(
     Returns:
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
-            secondary_full_responses (pd.Dataframe): The staged and validated updated snapshot data
+            secondary_full_responses (pd.Dataframe): The staged and validated updated
+            snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
-            postcode_df (pd.DataFrame): Postcodes to Regional Code mapper,
+            postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
             pg_num_alpha (pd.DataFrame): Product group numeric to alpha mapper.
             sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
@@ -110,9 +111,14 @@ def run_staging(
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
     if load_updated_snapshot:
         check_file_exists(secondary_snapshot_path)
-        secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
-        feather_files_exist = check_file_exists(feather_file) and check_file_exists(secondary_feather_file) # ? Should only be true if both exist?
-    else: 
+        secondary_feather_file = os.path.join(
+            feather_path,
+            f"{secondary_snapshot_name}.feather")
+        feather_files_exist = (
+            check_file_exists(feather_file) and
+            check_file_exists(secondary_feather_file))
+        # Should only be true if both exist?
+    else:
         feather_files_exist = check_file_exists(feather_file)
 
     is_network = network_or_hdfs == "network"
@@ -168,22 +174,37 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-
-        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
+        # ! This only works for local data since we've not reproduced
+        # the fix for anonymoised HDFS data above
         if load_updated_snapshot:
-            secondary_snapdata = load_json(secondary_snapshot_path)
-            secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(secondary_snapdata)
+            secondary_snapdata = load_json(
+                secondary_snapshot_path)
+            (
+                secondary_contributors_df,
+                secondary_responses_df
+            ) = spp_parser.parse_snap_data(secondary_snapdata)
             secondary_responses_df["instance"] = 0
-            val.validate_data_with_schema(secondary_contributors_df, "./config/contributors_schema.toml")
-            val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
-            secondary_full_responses = processing.full_responses(secondary_contributors_df, secondary_responses_df)
-            val.combine_schemas_validate_full_df(secondary_full_responses, "./config/contributors_schema.toml", "./config/wide_responses.toml")
+            val.validate_data_with_schema(
+                secondary_contributors_df,
+                "./config/contributors_schema.toml")
+            val.validate_data_with_schema(
+                secondary_responses_df,
+                "./config/long_response.toml")
+            secondary_full_responses = processing.full_responses(
+                secondary_contributors_df,
+                secondary_responses_df)
+            val.combine_schemas_validate_full_df(
+                secondary_full_responses,
+                "./config/contributors_schema.toml",
+                "./config/wide_responses.toml")
 
         # Write feather file to snapshot path
         if is_network:
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
             write_feather(feather_file, full_responses)
-            secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+            secondary_feather_file = os.path.join(
+                feather_path,
+                f"{secondary_snapshot_name}.feather")
             write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
@@ -211,8 +232,8 @@ def run_staging(
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist)
-    postcode_df = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_df["pcd2"]
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
     invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
     StagingMainLogger.info("Saving Invalid Postcodes to File")
     pcodes_folder = paths["postcode_path"]
@@ -320,6 +341,14 @@ def run_staging(
     val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
 
+    # Loading ITL1 detailed mapper
+    StagingMainLogger.info("Loading ITL1 detailed mapper File...")
+    itl1_detailed_path = paths["itl1_detailed_path"]
+    check_file_exists(itl1_detailed_path)
+    itl1_detailed = read_csv(itl1_detailed_path)
+    val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
+    StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
+
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -336,11 +365,13 @@ def run_staging(
         secondary_full_responses,
         manual_outliers,
         ultfoc_mapper,
+        itl_mapper,
         cora_mapper,
         cellno_df,
-        postcode_df,
+        postcode_mapper,
         pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
         pg_detailed,
+        itl1_detailed,
     )

@@ -19,7 +19,7 @@ def output_gb_sas(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
-    postcode_itl_mapper: pd.DataFrame,
+    postcode_mapper: pd.DataFrame,
     pg_alpha_num: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -32,7 +32,7 @@ def output_gb_sas(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-        postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
+        postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
     """
@@ -59,7 +59,7 @@ def output_gb_sas(
     df = map_o.map_sizebands(df)
 
     # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_itl_mapper)
+    df = map_o.join_itl_regions(df, postcode_mapper)
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
