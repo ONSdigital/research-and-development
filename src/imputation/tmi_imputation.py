@@ -185,17 +185,17 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 def apply_trim_check(
     df: pd.DataFrame,
     variable: str,
-    check_value=10,
-) -> pd.DataFrame:  # TODO add check_value to a config
+    trim_threshold=10,
+) -> pd.DataFrame: 
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
-    # tag for those classes with more than check_value (currently 10)
+    # tag for those classes with more than trim_threshold (currently 10)
 
     df = df.copy()
 
     # Exclude zero values in trim calculations
-    if len(df.loc[df[variable] > 0, variable]) <= check_value:
+    if len(df.loc[df[variable] > 0, variable]) <= trim_threshold:
         df["trim_check"] = "below_trim_threshold"
     else:
         df["trim_check"] = "above_trim_threshold"
@@ -208,26 +208,32 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    check_value: int = 10,
-    lower_perc: int = 15,  # TODO add percentages to config -
-    upper_perc: int = 15,
+    config: Dict[str, Any],
 ) -> pd.DataFrame:
     """Applies a marker to specifiy whether a mean calculation is to be trimmed.
 
-    If the 'variable' column contains more than 'check_value' non-zero values,
+    If the 'variable' column contains more than 'trim_threshold' non-zero values,
     the largest and smallest values are flagged for trimming based on the
     percentages specified.
 
     Args:
         df (pd.DataFrame): Dataframe of the imputation class
+        config (Dict): the configuration settings
     """
+    # get the trimming parameters from the config
+    #TODO: add a function to check the config settings make sense
+    #TODO: as is done in outlier-detection/auto_outliers
+    trim_threshold = config["imputation"]["trim_threshold"]
+    lower_perc = config["imputation"]["lower_trim_perc"]
+    upper_perc = config["imputation"]["upper_trim_perc"]
+
     df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
 
-    # trim only if the number of non-zeros is above check_value
+    # trim only if the number of non-zeros is above trim_threshold
     full_length = len(df[variable])
-    if len(df.loc[df[variable] > 0, variable]) <= check_value:
+    if len(df.loc[df[variable] > 0, variable]) <= trim_threshold:
         df[f"{variable}_trim"] = False
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
@@ -293,7 +299,8 @@ def calculate_mean(
 
 
 def create_mean_dict(
-    df: pd.DataFrame, target_variable_list: List[str]
+    df: pd.DataFrame, target_variable_list: List[str],
+    config: Dict[str, Any],
 ) -> Tuple[Dict, pd.DataFrame]:
     """Calculate trimmed mean values for each target variable and imputation class.
 
@@ -304,6 +311,7 @@ def create_mean_dict(
         df (pd.DataFrame): The dataframe for imputation
         target_variable List(str): List of target variables for which the mean is
             to be evaluated.
+        config: Dict[str, Any]: the pipeline configuration settings
     Returns:
         Tuple[Dict[str, float], pd.DataFrame]
     """
@@ -334,7 +342,7 @@ def create_mean_dict(
             trimcheck_df = apply_trim_check(sorted_df, var)
 
             # Apply trimming marker
-            trimmed_df = trim_bounds(trimcheck_df, var)
+            trimmed_df = trim_bounds(trimcheck_df, var, config)
 
             tr_df = trimmed_df.set_index("pre_index")
 
@@ -467,7 +475,7 @@ def run_longform_tmi(
     lf_target_variables = config["imputation"]["lf_target_vars"]
     df = tmi_pre_processing(df, lf_target_variables)
 
-    mean_dict, qa_df = create_mean_dict(df, lf_target_variables)
+    mean_dict, qa_df = create_mean_dict(df, lf_target_variables, config)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
 
@@ -507,7 +515,7 @@ def run_shortform_tmi(
 
     df = tmi_pre_processing(shortform_df, sf_target_variables)
 
-    mean_dict, qa_df = create_mean_dict(df, sf_target_variables)
+    mean_dict, qa_df = create_mean_dict(df, sf_target_variables, config)
 
     # qa_df.set_index("qa_index", drop=True, inplace=True)
 

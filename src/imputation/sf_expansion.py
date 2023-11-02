@@ -177,14 +177,6 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
 
 # @df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-
-    # # TODO: Move this imp_class step to census TMI
-    # short_form_df = df.loc[(df["formtype"] == "0006") & (df["instance"] != 0)]
-    # short_form_df = create_imp_class_col(short_form_df, "200", "201", "imp_class")
-
-    # # Re-joining the output of create_imp_class_col to original df
-    # df = apply_to_original(short_form_df, df)
-
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class
     filtered_df, excluded_df = split_df_on_imp_class(df)
