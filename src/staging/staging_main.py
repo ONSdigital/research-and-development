@@ -105,19 +105,18 @@ def run_staging(
     # Check if feather file exists in snapshot path
     feather_path = paths["feather_path"]
     load_from_feather = config["global"]["load_from_feather"]
-    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
 
     # Check if the secondary snapshot exists
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
     if load_updated_snapshot:
         check_file_exists(secondary_snapshot_path)
         secondary_feather_file = os.path.join(
-            feather_path,
-            f"{secondary_snapshot_name}.feather")
-        feather_files_exist = (
-            check_file_exists(feather_file) and
-            check_file_exists(secondary_feather_file))
-        # Should only be true if both exist?
+            feather_path, f"{secondary_snapshot_name}.feather"
+        )
+        feather_files_exist = check_file_exists(feather_file) and check_file_exists(
+            secondary_feather_file
+        )  # ? Should only be true if both exist?
     else:
         feather_files_exist = check_file_exists(feather_file)
 
@@ -174,37 +173,38 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-        # ! This only works for local data since we've not reproduced
-        # the fix for anonymoised HDFS data above
+        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
-            secondary_snapdata = load_json(
-                secondary_snapshot_path)
+            secondary_snapdata = load_json(secondary_snapshot_path)
             (
                 secondary_contributors_df,
-                secondary_responses_df
+                secondary_responses_df,
             ) = spp_parser.parse_snap_data(secondary_snapdata)
             secondary_responses_df["instance"] = 0
             val.validate_data_with_schema(
-                secondary_contributors_df,
-                "./config/contributors_schema.toml")
+                secondary_contributors_df, "./config/contributors_schema.toml"
+            )
             val.validate_data_with_schema(
-                secondary_responses_df,
-                "./config/long_response.toml")
+                secondary_responses_df, "./config/long_response.toml"
+            )
             secondary_full_responses = processing.full_responses(
-                secondary_contributors_df,
-                secondary_responses_df)
+                secondary_contributors_df, secondary_responses_df
+            )
             val.combine_schemas_validate_full_df(
                 secondary_full_responses,
                 "./config/contributors_schema.toml",
-                "./config/wide_responses.toml")
+                "./config/wide_responses.toml",
+            )
 
         # Write feather file to snapshot path
         if is_network:
-            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+            feather_file = os.path.join(
+                feather_path, f"{snapshot_name}_corrected.feather"
+            )
             write_feather(feather_file, full_responses)
             secondary_feather_file = os.path.join(
-                feather_path,
-                f"{secondary_snapshot_name}.feather")
+                feather_path, f"{secondary_snapshot_name}.feather"
+            )
             write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
@@ -216,7 +216,11 @@ def run_staging(
             os.path.join(feather_path, f"{snapshot_name}_responses.feather")
         )
         full_responses = snapdata
-        secondary_full_responses = secondary_snapdata
+
+        if load_updated_snapshot:
+            secondary_full_responses = secondary_snapdata
+        else:
+            secondary_full_responses = None
 
     # Get response rate
     processing.response_rate(contributors_df, responses_df)
@@ -252,6 +256,40 @@ def run_staging(
     else:
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
+
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_num_alpha_path = paths["pg_num_alpha_path"]
+    check_file_exists(pg_num_alpha_path)
+    pg_num_alpha = read_csv(pg_num_alpha_path)
+    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    pg_num_alpha = val.validate_many_to_one(
+        pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
+    )
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    if config["global"]["load_backdata"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Backdata File")
+        backdata_path = paths["backdata_path"]
+        check_file_exists(backdata_path)
+        backdata = read_csv(backdata_path)
+        # To be added once schema is defined
+        # val.validate_data_with_schema(
+        #     backdata_path, "./config/backdata_schema.toml"
+        # )
+
+        # Map PG numeric to alpha in column q201
+        backdata = pg.pg_to_pg_mapper(
+        backdata,
+        pg_num_alpha,
+        target_col="q201",
+        pg_column="q201",
+        )
+        StagingMainLogger.info("Backdata File Loaded Successfully...")
+    else:
+        backdata = None
+        StagingMainLogger.info("Loading of Backdata File skipped")
 
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
@@ -294,21 +332,8 @@ def run_staging(
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
     pg_alpha_num = val.validate_many_to_one(
-        pg_alpha_num,
-        col_many="pg_alpha",
-        col_one="pg_numeric")
-    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
-
-    # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
-    pg_num_alpha_path = paths["pg_num_alpha_path"]
-    check_file_exists(pg_num_alpha_path)
-    pg_num_alpha = read_csv(pg_num_alpha_path)
-    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
-    pg_num_alpha = val.validate_many_to_one(
-        pg_num_alpha,
-        col_many="pg_numeric",
-        col_one="pg_alpha")
+        pg_alpha_num, col_many="pg_alpha", col_one="pg_numeric"
+    )
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Loading SIC to PG to alpha mapper
@@ -318,17 +343,15 @@ def run_staging(
     sic_pg_alpha = read_csv(sic_pg_alpha_path)
     val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
     sic_pg_alpha = val.validate_many_to_one(
-        sic_pg_alpha,
-        col_many="sic",
-        col_one="pg_alpha")
+        sic_pg_alpha, col_many="sic", col_one="pg_alpha"
+    )
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(
-        full_responses,
-        pg_num_alpha,
-        sic_pg_alpha,
-        target_col="201")
+        full_responses, pg_num_alpha, sic_pg_alpha, target_col="201"
+    )
+
     # Loading PG detailed mapper
     StagingMainLogger.info("Loading PG detailed mapper File...")
     pg_detailed_path = paths["pg_detailed_path"]
@@ -368,6 +391,7 @@ def run_staging(
         pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
+        backdata,
         pg_detailed,
         itl1_detailed,
     )
