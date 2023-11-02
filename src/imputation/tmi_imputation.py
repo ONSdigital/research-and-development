@@ -65,8 +65,6 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame
 
     df = df.copy()
 
-    df["200"] = df["200"].astype("category")
-
     # Filter for q604 = No or status = "Form sent out"
     filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
 
@@ -537,6 +535,8 @@ def run_tmi(
         final_df: dataframe with the imputed valued added and counts columns
         qa_df: qa dataframe
     """
+    # changing type of Civil or Defence column 200 helps with imputation classes
+    full_df["200"] = full_df["200"].astype("category")
 
     longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
     shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
