@@ -287,14 +287,6 @@ def run_staging(
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
-    # # Load the PG mapper
-    # pg_mapper = paths["pg_mapper_path"]
-    # check_file_exists(pg_mapper)
-    # pg_mapper = read_csv(pg_mapper)
-
-    # # Map PG from SIC/PG numbers to column '201'.
-    # full_responses = pg.run_pg_conversion(full_responses, pg_mapper, target_col="201")
-
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]

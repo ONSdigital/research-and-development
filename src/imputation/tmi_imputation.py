@@ -371,8 +371,6 @@ def apply_tmi(df, target_variables, mean_dict):
     # This ensures that means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.
     filtered_df = filtered_df[~(filtered_df["imp_class"].str.contains("nan"))]
-    # Only apply TMI to values that are yet to be imputed
-    filtered_df = filtered_df[filtered_df["imp_marker"] == "no_imputation"]
 
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
