@@ -478,7 +478,6 @@ def run_longform_tmi(
     mean_dict, qa_df = create_mean_dict(df, lf_target_variables, config)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
-
     qa_df = qa_df.drop("trim_check", axis=1)
 
     final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict, formtype_long)
@@ -517,14 +516,16 @@ def run_shortform_tmi(
 
     mean_dict, qa_df = create_mean_dict(df, sf_target_variables, config)
 
-    # qa_df.set_index("qa_index", drop=True, inplace=True)
-
+    qa_df.set_index("qa_index", drop=True, inplace=True)
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    shortform_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
+    final_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
+
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
     TMILogger.info("TMI imputation completed.")
-    return shortform_tmi_df, qa_df
+    return final_tmi_df, qa_df
 
 
 def run_tmi(
