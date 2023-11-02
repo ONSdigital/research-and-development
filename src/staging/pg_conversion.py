@@ -32,8 +32,9 @@ def pg_to_pg_mapper(
 
     filtered_df = df.copy()
 
-    formtype_cond = filtered_df["formtype"] == "0001"
-    filtered_df = filtered_df[formtype_cond]
+    if "formtype" in filtered_df.columns:
+        formtype_cond = filtered_df["formtype"] == "0001"
+        filtered_df = filtered_df[formtype_cond]
 
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(mapper[from_col], mapper[to_col]))
@@ -130,7 +131,7 @@ def run_pg_conversion(
     df: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
     sic_pg_alpha: pd.DataFrame,
-    target_col: str = "product_group"
+    target_col: str = "product_group",
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
