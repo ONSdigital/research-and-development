@@ -78,8 +78,9 @@ network_paths:
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
-# Schema paths
-  short_form_schema: "config/output_schemas/frozen_shortform_schema.toml"
+
+schema_paths:
+  frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
