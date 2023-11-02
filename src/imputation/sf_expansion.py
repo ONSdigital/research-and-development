@@ -42,9 +42,10 @@ def expansion_impute(
     clear_mask = group_copy["status"].isin(clear_statuses)
 
     # Combination masks to select correct records for summing
-    # NOTE: we only use clear responders in calculations
+    # NOTE: we only use long form clear responders in calculations
+    # but we calculate breakdown values for imputed short form rows
     long_responder_mask = clear_mask & long_mask
-    short_responder_mask = clear_mask & short_mask
+    to_expand_mask = short_mask
 
     master_col_imputed = f"{master_col}_imputed"
 
@@ -54,7 +55,7 @@ def expansion_impute(
     ].sum()
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group_copy[short_responder_mask][master_col_imputed]
+    returned_master_vals = group_copy[to_expand_mask][master_col_imputed]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
