@@ -68,7 +68,7 @@ OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
 
 # Define paths
-paths = config[f"{network_or_hdfs}_paths"]
+paths = config[f"{network_or_hdfs}_paths"] # Dynamically get paths based on config
 output_path = paths["output_path"]
 export_folder = paths["export_path"]
 
@@ -225,8 +225,8 @@ def run_export(paths=paths, config=config):
     )
 
     # Copy or Move files to outgoing folder
-    c_m_choice = config["export_choices"]["copy_or_move_files"]
-    copy_move_func = {"copy": copy_files, "move": move_files}[c_m_choice]
+    file_transfer_method = config["export_choices"]["copy_or_move_files"]
+    copy_move_func = {"copy": copy_files, "move": move_files}[file_transfer_method]
 
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
@@ -234,7 +234,7 @@ def run_export(paths=paths, config=config):
 
         # Log success message
         OutgoingLogger.info(
-            f"Files {file_path} transferred successfully using {c_m_choice}."
+            f"Files {file_path} transferred successfully using {file_transfer_method}."
         )
 
     OutgoingLogger.info("Exporting files finished.")
