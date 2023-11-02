@@ -68,13 +68,26 @@ OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
 
 # Define paths
-paths = config[f"{network_or_hdfs}_paths"]
+paths = config[f"{network_or_hdfs}_paths"] # Dynamically get paths based on config
 output_path = paths["output_path"]
 export_folder = paths["export_path"]
 
 
 def get_schema_headers(config: dict = config):
+    """
+    Extracts the schema headers from the provided configuration.
 
+    This function filters the configuration for entries containing "schema" in their output name,
+    and loads the corresponding TOML files. It then converts the headers (keys of the dict) into
+    a comma-separated string and returns a dictionary where the keys are output names and the values
+    are these comma-separated strings of schema headers.
+
+    Args:
+        config (dict, optional): A dictionary containing configuration details. Defaults to config.
+
+    Returns:
+        dict: A dictionary where the keys are output names and the values are comma-separated strings of schema headers.
+    """
     schema_paths_only = config["schema_paths"]
 
     schema_paths = {
@@ -105,11 +118,24 @@ pipeline_run_datetime = datetime.now()
 
 
 def get_file_choice(paths, config: dict = config):
-    """Get files to transfer from the 'export_choices' section of the config.
+    """
+    Constructs a dictionary of file paths based on user's choices from the configuration.
+
+    This function extracts the user's choices from the configuration, specifically entries where the key contains "output".
+    It then constructs a dictionary where the keys are directory names (with the "output" prefix removed) and the values are
+    complete file paths with a ".csv" extension. The file paths are constructed by joining the root output path, directory name,
+    and file name from the configuration.
+
+    Args:
+        paths (dict): A dictionary containing various paths. The function specifically uses the "output_path" key to get the root output path.
+        config (dict, optional): A dictionary containing configuration details, including the user's choices for files to export. Defaults to config.
 
     Returns:
-        selection_list (list): A list of the files to transfer."""
+        dict: A dictionary where the keys are directory names and the values are complete file paths to the files to be exported.
 
+    Logs:
+        The function logs the list of files being exported at the INFO level.
+    """
     # Get the user's choices from config
     output_paths = {
         output_name: path
@@ -150,6 +176,20 @@ def check_files_exist(file_list: List):
             raise FileNotFoundError
     OutgoingLogger.info("All output files exist")
 
+
+def transfer_files(source, destination, method, logger):
+    """
+    Transfer files from source to destination using the specified method and log the action.
+
+    Args:
+        source (str): The source file path.
+        destination (str): The destination file path.
+        method (str): The method to use for transferring files ("copy" or "move").
+        logger (logging.Logger): The logger to use for logging the action.
+    """
+    transfer_func = {"copy": copy_files, "move": move_files}[method]
+    transfer_func(source, destination)
+    logger.info(f"Files {source} successfully {method}d to {destination}.")
 
 def run_export(paths=paths, config=config):
     """Main function to run the data export pipeline."""
@@ -193,23 +233,16 @@ def run_export(paths=paths, config=config):
     manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
-    move_files(manifest_path, manifest.export_directory)
-    OutgoingLogger.info(
-        f"Files {manifest_path} successfully moved to {manifest.export_directory}."
-    )
+    
+    transfer_files(manifest_path, manifest.export_directory, "move", OutgoingLogger)
+    
 
     # Copy or Move files to outgoing folder
-    c_m_choice = config["export_choices"]["copy_or_move_files"]
-    copy_move_func = {"copy": copy_files, "move": move_files}[c_m_choice]
+    file_transfer_method = config["export_choices"]["copy_or_move_files"]
 
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
-        copy_move_func(file_path, manifest.export_directory)
-
-        # Log success message
-        OutgoingLogger.info(
-            f"Files {file_path} transferred successfully using {c_m_choice}."
-        )
+        transfer_files(file_path, manifest.export_directory, file_transfer_method, OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
 
