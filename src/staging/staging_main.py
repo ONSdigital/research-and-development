@@ -46,7 +46,8 @@ def run_staging(
     Returns:
         tuple
             full_responses (pd.DataFrame): The staged and vaildated snapshot data,
-            secondary_full_responses (pd.Dataframe): The staged and validated updated snapshot data
+            secondary_full_responses (pd.Dataframe): The staged and validated updated
+            snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
             cora_mapper (pd.DataFrame): CORA status mapper,
