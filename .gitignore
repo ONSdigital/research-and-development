@@ -5,6 +5,9 @@
 .direnv
 #.envrc
 
+### gz ###
+*.pstats
+
 ### Django ###
 *.log
 *.pot
