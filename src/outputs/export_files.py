@@ -118,11 +118,24 @@ pipeline_run_datetime = datetime.now()
 
 
 def get_file_choice(paths, config: dict = config):
-    """Get files to transfer from the 'export_choices' section of the config.
+    """
+    Constructs a dictionary of file paths based on user's choices from the configuration.
+
+    This function extracts the user's choices from the configuration, specifically entries where the key contains "output".
+    It then constructs a dictionary where the keys are directory names (with the "output" prefix removed) and the values are
+    complete file paths with a ".csv" extension. The file paths are constructed by joining the root output path, directory name,
+    and file name from the configuration.
+
+    Args:
+        paths (dict): A dictionary containing various paths. The function specifically uses the "output_path" key to get the root output path.
+        config (dict, optional): A dictionary containing configuration details, including the user's choices for files to export. Defaults to config.
 
     Returns:
-        selection_list (list): A list of the files to transfer."""
+        dict: A dictionary where the keys are directory names and the values are complete file paths to the files to be exported.
 
+    Logs:
+        The function logs the list of files being exported at the INFO level.
+    """
     # Get the user's choices from config
     output_paths = {
         output_name: path
