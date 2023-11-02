@@ -90,7 +90,7 @@ schema_paths:
 # Export config for users
 export_choices:
   copy_or_move_files: "copy"
-  output_short_form: "output_short_form_2023-11-01_v38" # Can be set to None
+  output_frozen_shortform: "output_short_form_2023-11-01_v38" # Can be set to None
   output_tau: "output_tau_2023-10-11_v15" # Can be set to None
   output_gb_sas: "output_gb_sas_2023-10-27_v1" # Can be set to None
   output_intram_by_pg: "output_intram_by_pg_2023-10-27_v46" # Can be set to None

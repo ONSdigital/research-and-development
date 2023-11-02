@@ -73,11 +73,13 @@ output_path = paths["output_path"]
 export_folder = paths["export_path"]
 
 
-def get_schema_headers(file_path_dict: dict, paths: dict = paths):
+def get_schema_headers(config: dict = config):
+
+    schema_paths_only = config["schema_paths"]
 
     schema_paths = {
         output_name: path
-        for output_name, path in paths.items()
+        for output_name, path in schema_paths_only.items()
         if "schema" in output_name
     }
 
@@ -173,7 +175,7 @@ def run_export(paths=paths, config=config):
         string_to_file_func=write_string_to_file,
     )
 
-    schemas_header_dict = get_schema_headers(file_select_dict, paths)
+    schemas_header_dict = get_schema_headers(config)
 
     # Add the short form output file to the manifest object
     for file_name, file_path in file_select_dict.items():
