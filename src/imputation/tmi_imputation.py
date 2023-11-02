@@ -65,8 +65,6 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame
 
     df = df.copy()
 
-    df["200"] = df["200"].astype("category")
-
     # Filter for q604 = No or status = "Form sent out"
     filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
 
@@ -187,17 +185,17 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 def apply_trim_check(
     df: pd.DataFrame,
     variable: str,
-    check_value=10,
-) -> pd.DataFrame:  # TODO add check_value to a config
+    trim_threshold,
+) -> pd.DataFrame: 
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
-    # tag for those classes with more than check_value (currently 10)
+    # tag for those classes with more than trim_threshold 
 
     df = df.copy()
 
     # Exclude zero values in trim calculations
-    if len(df.loc[df[variable] > 0, variable]) <= check_value:
+    if len(df.loc[df[variable] > 0, variable]) <= trim_threshold:
         df["trim_check"] = "below_trim_threshold"
     else:
         df["trim_check"] = "above_trim_threshold"
@@ -210,26 +208,35 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    check_value: int = 10,
-    lower_perc: int = 15,  # TODO add percentages to config -
-    upper_perc: int = 15,
+    config: Dict[str, Any],
 ) -> pd.DataFrame:
     """Applies a marker to specifiy whether a mean calculation is to be trimmed.
 
-    If the 'variable' column contains more than 'check_value' non-zero values,
+    If the 'variable' column contains more than 'trim_threshold' non-zero values,
     the largest and smallest values are flagged for trimming based on the
     percentages specified.
 
     Args:
         df (pd.DataFrame): Dataframe of the imputation class
+        config (Dict): the configuration settings
     """
+    # get the trimming parameters from the config
+    #TODO: add a function to check the config settings make sense
+    #TODO: as is done in outlier-detection/auto_outliers
+    trim_threshold = config["imputation"]["trim_threshold"]
+    lower_perc = config["imputation"]["lower_trim_perc"]
+    upper_perc = config["imputation"]["upper_trim_perc"]
+
     df = df.copy()
     # Save the index before the sorting
     df["pre_index"] = df.index
 
-    # trim only if the number of non-zeros is above check_value
+    # Add trimming threshold marker
+    df = apply_trim_check(df, variable, trim_threshold)
+
+    # trim only if the number of non-zeros is above trim_threshold
     full_length = len(df[variable])
-    if len(df.loc[df[variable] > 0, variable]) <= check_value:
+    if len(df.loc[df[variable] > 0, variable]) <= trim_threshold:
         df[f"{variable}_trim"] = False
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
@@ -295,7 +302,8 @@ def calculate_mean(
 
 
 def create_mean_dict(
-    df: pd.DataFrame, target_variable_list: List[str]
+    df: pd.DataFrame, target_variable_list: List[str],
+    config: Dict[str, Any],
 ) -> Tuple[Dict, pd.DataFrame]:
     """Calculate trimmed mean values for each target variable and imputation class.
 
@@ -306,6 +314,7 @@ def create_mean_dict(
         df (pd.DataFrame): The dataframe for imputation
         target_variable List(str): List of target variables for which the mean is
             to be evaluated.
+        config: Dict[str, Any]: the pipeline configuration settings
     Returns:
         Tuple[Dict[str, float], pd.DataFrame]
     """
@@ -332,11 +341,8 @@ def create_mean_dict(
             # Sort by target_variable, df['employees'], reference
             sorted_df = sort_df(var, subgrp)
 
-            # Add trimming threshold marker
-            trimcheck_df = apply_trim_check(sorted_df, var)
-
-            # Apply trimming marker
-            trimmed_df = trim_bounds(trimcheck_df, var)
+            # Apply trimming 
+            trimmed_df = trim_bounds(sorted_df, var, config)
 
             tr_df = trimmed_df.set_index("pre_index")
 
@@ -358,7 +364,7 @@ def create_mean_dict(
     return mean_dict, df
 
 
-def apply_tmi(df, target_variables, mean_dict):
+def apply_tmi(df, target_variables, mean_dict, form_type):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
 
@@ -367,6 +373,13 @@ def apply_tmi(df, target_variables, mean_dict):
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
     )
+
+    # For short forms, imputation is only applied to Census references
+    if form_type == formtype_short:
+        filtered_df = filter_by_column_content(
+            filtered_df, "selectiontype", ["C"]
+        )
+
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes
     # Since imp_class is string type, any entry containing "nan" is excluded.
@@ -429,17 +442,16 @@ def calculate_totals(df):
     return df
 
 
-def run_tmi(
-    full_df: pd.DataFrame,
-    target_variables: List[str],
+def run_longform_tmi(
+    longform_df: pd.DataFrame,
     sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Function to run imputation end to end and returns the final
     dataframe back to the pipeline
         dataframe back to the pipeline
     Args:
-        full_df (pd.DataFrame): main data
+        longform_df (pd.DataFrame): the dataset filtered for long form entries
         target_variables (list): key variables
         sic_mapper (pd.DataFrame): dataframe with sic mapper info
         config (Dict): the configuration settings
@@ -448,15 +460,7 @@ def run_tmi(
         and counts columns
         qa_df: qa dataframe
     """
-    TMILogger.info("Starting TMI imputation.")
-
-    # exclude rows that have had MoR or CF applied
-    mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
-    excluded_df = full_df.copy().loc[mor_mask, :]
-    full_df = full_df.copy().loc[~mor_mask, :]
-
-    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
-    shortform_df = full_df.copy().loc[full_df["formtype"] != formtype_long]
+    TMILogger.info("Starting TMI long form imputation.")
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     longform_df = instance_fix(longform_df)
@@ -468,16 +472,16 @@ def run_tmi(
     TMILogger.info("Imputing for R&D type (civil or defence).")
     df = impute_civil_defence(df)
 
-    TMILogger.info("Calculating the trimmed mean for target variables")
-    df = tmi_pre_processing(df, target_variables)
+    lf_target_variables = config["imputation"]["lf_target_vars"]
+    df = tmi_pre_processing(df, lf_target_variables)
 
-    mean_dict, qa_df = create_mean_dict(df, target_variables)
+    mean_dict, qa_df = create_mean_dict(df, lf_target_variables, config)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
-
     qa_df = qa_df.drop("trim_check", axis=1)
 
-    final_tmi_df = apply_tmi(df, target_variables, mean_dict)
+    # apply the imputed values to the statuses requiring imputation
+    final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict, formtype_long)
 
     final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
     final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
@@ -488,12 +492,86 @@ def run_tmi(
     # TMI Step 5: Calculate headcount and employment totals
     final_df = calculate_totals(expanded_df)
 
-    # add short forms back to dataframe
-    full_df = pd.concat([final_df, shortform_df, excluded_df])
+    TMILogger.info("TMI long form imputation completed.")
+    return final_df, qa_df
+
+
+def run_shortform_tmi(
+    shortform_df: pd.DataFrame,
+    config: Dict[str, Any],
+) -> pd.DataFrame:
+    """Function to run imputation end to end and returns the final
+    dataframe back to the pipeline
+        dataframe back to the pipeline
+    Args:
+        shortform_df (pd.DataFrame): the dataset filtered for long form entries
+        config (Dict): the configuration settings
+    Returns:
+        pd.DataFrame: dataframe with the imputed valued added
+    """
+    TMILogger.info("Starting TMI short form imputation.")
+
+    sf_target_variables = list(config["breakdowns"])
+
+    df = tmi_pre_processing(shortform_df, sf_target_variables)
+
+    mean_dict, qa_df = create_mean_dict(df, sf_target_variables, config)
+
+    qa_df.set_index("qa_index", drop=True, inplace=True)
+    qa_df = qa_df.drop("trim_check", axis=1)
+
+    # apply the imputed values to the statuses requiring imputation
+    final_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
+
+    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    TMILogger.info("TMI imputation completed.")
+    return final_tmi_df, qa_df
+
+
+def run_tmi(
+    full_df: pd.DataFrame,
+    sic_mapper: pd.DataFrame,
+    config: Dict[str, Any],
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Function to run imputation end to end and returns the final
+    dataframe back to the pipeline
+        dataframe back to the pipeline
+    Args:
+        full_df (pd.DataFrame): main data
+        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+        config (Dict): the configuration settings
+    Returns:
+        final_df: dataframe with the imputed valued added and counts columns
+        qa_df: qa dataframe
+    """
+    # changing type of Civil or Defence column 200 helps with imputation classes
+    full_df["200"] = full_df["200"].astype("category")
+
+    # exclude rows that have had MoR or CF applied
+    mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
+    excluded_df = full_df.copy().loc[mor_mask, :]
+    full_df = full_df.copy().loc[~mor_mask, :]
+
+    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
+    shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
+
+    longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, sic_mapper, config)
+
+    shortform_tmi_df, qa_df_short = run_shortform_tmi(shortform_df, config)
+
+    # concatinate the short and long form dataframes and qa
+    full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
+    full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    full_qa_df = full_qa_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
     TMILogger.info("TMI imputation completed.")
-    return full_df, qa_df
+    return full_df, full_qa_df

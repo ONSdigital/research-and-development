@@ -216,7 +216,11 @@ def run_staging(
             os.path.join(feather_path, f"{snapshot_name}_responses.feather")
         )
         full_responses = snapdata
-        secondary_full_responses = secondary_snapdata
+
+        if load_updated_snapshot:
+            secondary_full_responses = secondary_snapdata
+        else:
+            secondary_full_responses = None
 
     # Get response rate
     processing.response_rate(contributors_df, responses_df)

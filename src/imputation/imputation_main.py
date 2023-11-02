@@ -23,17 +23,17 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
 
+    # Get the target values and breakdown columns from the config
+    lf_target_vars = config["imputation"]["lf_target_vars"]
+    sum_cols = config["imputation"]["sum_cols"]
+    bd_qs_lists = list(config["breakdowns"].values())
+    bd_cols = list(chain(*bd_qs_lists))
+
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
-
-    # Get the column names needed for imputation from the config
-    lf_target_vars = config["imputation"]["lf_target_vars"]
-    sum_cols = config["imputation"]["sum_cols"]
-    bd_qs_lists = list(config["breakdowns"].values())
-    bd_cols = list(chain(*bd_qs_lists))
 
     # TODO: imp_marker should be 'R' for clear responders
     # Initialise imp_marker column, default value "no_imputation"
@@ -48,8 +48,8 @@ def run_imputation(
     if backdata is not None:
         df = run_mor(df, backdata, orig_cols)
 
-    # run TMI
-    imputed_df, qa_df = tmi.run_tmi(df, lf_target_vars, mapper, config)
+    # Run TMI for long forms and short forms
+    imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)

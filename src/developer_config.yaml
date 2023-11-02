@@ -12,8 +12,8 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: True
-  output_long_form: True
+  output_short_form: False
+  output_long_form: False
   output_tau: False
   output_gb_sas: False
   output_intram_by_pg: False
@@ -102,8 +102,26 @@ run_log_sql:
 estimation:
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 imputation:
-  lf_target_vars: ["211", "305", "emp_researcher", "emp_technician", "emp_other", "headcount_res_m", "headcount_res_f", "headcount_tec_m", "headcount_tec_f", "headcount_oth_m", "headcount_oth_f"]
-  sum_cols: ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
+  lower_trim_perc: 15
+  upper_trim_perc: 15
+  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
+  lf_target_vars:
+    - "211"
+    - "305"
+    - "emp_researcher"
+    - "emp_technician"
+    - "emp_other"
+    - "headcount_res_m"
+    - "headcount_res_f"
+    - "headcount_tec_m"
+    - "headcount_tec_f"
+    - "headcount_oth_m"
+    - "headcount_oth_f"
+  sum_cols: 
+    - "emp_total"
+    - "headcount_tot_m"
+    - "headcount_tot_f"
+    - "headcount_total"
 breakdowns:
   "211":
     - "202"
