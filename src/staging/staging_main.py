@@ -252,6 +252,17 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
+    # Loading PG numeric to alpha mapper
+    StagingMainLogger.info("Loading PG numeric to alpha File...")
+    pg_num_alpha_path = paths["pg_num_alpha_path"]
+    check_file_exists(pg_num_alpha_path)
+    pg_num_alpha = read_csv(pg_num_alpha_path)
+    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    pg_num_alpha = val.validate_many_to_one(
+        pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
+    )
+    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
@@ -262,6 +273,14 @@ def run_staging(
         # val.validate_data_with_schema(
         #     backdata_path, "./config/backdata_schema.toml"
         # )
+
+        # Map PG numeric to alpha in column q201
+        backdata = pg.pg_to_pg_mapper(
+        backdata,
+        pg_num_alpha,
+        target_col="q201",
+        pg_column="q201",
+        )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
         backdata = None
@@ -320,17 +339,6 @@ def run_staging(
     )
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
-    # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
-    pg_num_alpha_path = paths["pg_num_alpha_path"]
-    check_file_exists(pg_num_alpha_path)
-    pg_num_alpha = read_csv(pg_num_alpha_path)
-    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
-    pg_num_alpha = val.validate_many_to_one(
-        pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
-    )
-    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
-
     # Loading SIC to PG to alpha mapper
     StagingMainLogger.info("Loading SIC to PG to alpha File...")
     sic_pg_alpha_path = paths["sic_pg_alpha_path"]
@@ -345,14 +353,6 @@ def run_staging(
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(
         full_responses, pg_num_alpha, sic_pg_alpha, target_col="201"
-    )
-
-    # Map PG numeric to alpha in column q201 in backdata.
-    backdata = pg.pg_to_pg_mapper(
-        backdata,
-        pg_num_alpha,
-        target_col="q201",
-        pg_column="q201",
     )
 
     # Loading PG detailed mapper

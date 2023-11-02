@@ -45,7 +45,8 @@ def run_imputation(
         df[f"{col}_imputed"] = df[col]
 
     # Run MoR
-    df = run_mor(df, backdata, orig_cols)
+    if backdata is not None:
+        df = run_mor(df, backdata, orig_cols)
 
     # run TMI
     imputed_df, qa_df = tmi.run_tmi(df, lf_target_vars, mapper, config)
