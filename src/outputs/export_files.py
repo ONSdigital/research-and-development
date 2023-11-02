@@ -177,6 +177,20 @@ def check_files_exist(file_list: List):
     OutgoingLogger.info("All output files exist")
 
 
+def transfer_files(source, destination, method, logger):
+    """
+    Transfer files from source to destination using the specified method and log the action.
+
+    Args:
+        source (str): The source file path.
+        destination (str): The destination file path.
+        method (str): The method to use for transferring files ("copy" or "move").
+        logger (logging.Logger): The logger to use for logging the action.
+    """
+    transfer_func = {"copy": copy_files, "move": move_files}[method]
+    transfer_func(source, destination)
+    logger.info(f"Files {source} successfully {method}d to {destination}.")
+
 def run_export(paths=paths, config=config):
     """Main function to run the data export pipeline."""
 
@@ -219,23 +233,16 @@ def run_export(paths=paths, config=config):
     manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
-    move_files(manifest_path, manifest.export_directory)
-    OutgoingLogger.info(
-        f"Files {manifest_path} successfully moved to {manifest.export_directory}."
-    )
+    
+    transfer_files(manifest_path, manifest.export_directory, "move", OutgoingLogger)
+    
 
     # Copy or Move files to outgoing folder
     file_transfer_method = config["export_choices"]["copy_or_move_files"]
-    copy_move_func = {"copy": copy_files, "move": move_files}[file_transfer_method]
 
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
-        copy_move_func(file_path, manifest.export_directory)
-
-        # Log success message
-        OutgoingLogger.info(
-            f"Files {file_path} transferred successfully using {file_transfer_method}."
-        )
+        transfer_files(file_path, manifest.export_directory, file_transfer_method, OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
 
