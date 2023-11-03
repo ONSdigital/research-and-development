@@ -1,6 +1,7 @@
 """The main file for the Intram by Civil or Defence output."""
 import logging
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from typing import Callable, Dict, Any
 
@@ -15,7 +16,7 @@ def output_intram_by_civil_defence(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    civil_defence_detailed
+    civil_defence_detailed,
 ):
     """Run the outputs module.
 
@@ -32,38 +33,33 @@ def output_intram_by_civil_defence(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Group by PG and aggregate intram
+    period = config["years"]["current_year"]
+    period_str = str(period)
+
+    # Group by civil/defence (200) and aggregate intram (211)
     key_col = "200"
     value_col = "211"
     agg_method = "sum"
 
     df_agg = aggregate_output(df, [key_col], [value_col], agg_method)
 
-    print(df_agg)
-
-    # Merge with labels and ranks
+    # Merge with output table
     df_merge = civil_defence_detailed.merge(
-        df_agg,
-        how="left",
-        left_on="c_d",
-        right_on=key_col)
-    df_merge[value_col] = df_merge[value_col].fillna(0)
+        df_agg, how="left", left_on="CD", right_on=key_col
+    )
 
-    #! replace period and value
+    # Replace placeholder "period" with year from config
+    df_merge["B"] = df_merge["B"].replace("period", period_str)
 
-    print(df_merge.head())
+    # Copy summed values to correct column
+    df_merge["B"] = np.where(df_merge["211"].notnull(), df_merge["211"], df_merge["B"])
 
-    # # Select and rename the correct columns
-    # detail = "Total Intramural Expenditure"
-    # notes = "Notes"
-    # value_title = "2023 (Current period)"
-    # df_merge = df_agg[[detail, value_col, notes]].rename(
-    #     columns={value_col: value_title})
+    # Drop the columns/rows not required for output
+    df_merge = df_merge.drop(columns=["CD", "200", "211"])
+    df_merge.columns = df_merge.iloc[0]
+    df_for_output = df_merge.iloc[1:]
 
-    # print(df_merge)
-
-
-    # # Outputting the CSV file with timestamp and run_id
-    # tdate = datetime.now().strftime("%Y-%m-%d")
-    # filename = f"output_intram_by_civil_defence{tdate}_v{run_id}.csv"
-    # write_csv(f"{output_path}/output_intram_by_civil_defence/{filename}", df_merge)
+    # Outputting the CSV file with timestamp and run_id
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    filename = f"output_intram_by_civil_defence{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_intram_by_civil_defence/{filename}", df_for_output)
