@@ -7,6 +7,7 @@ from src.imputation.apportionment import run_apportionment
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
+
 def run_mor(df, backdata, impute_vars):
     """Function to implement Mean of Ratios method.
 
@@ -70,7 +71,7 @@ def carry_forwards(df, backdata, impute_vars):
     NOTE:
     As a result of the left join, where there is a match, each of the n instances
     in the backdata is joined to each of the m instances in the original df,
-    resulting in n*m rows. 
+    resulting in n*m rows.
     For rows where there is a match, we only want to keep one instance
     For "Form sent out" statuses, the only instance is null, so we keep that one
     For "Check needed" statuses, we keep instance 0
@@ -85,10 +86,6 @@ def carry_forwards(df, backdata, impute_vars):
         pd.DataFrame: df with values carried forwards
     """
     # log number of records before and after MoR
-    # Debug - start
-    # df.to_pickle(r"d:\data\df.pkl")
-    # backdata.to_pickle(r"d:\data\backdata.pkl")
-    # Debug - end
 
     df = pd.merge(df,
                   backdata,
