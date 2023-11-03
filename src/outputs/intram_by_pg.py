@@ -66,7 +66,7 @@ def output_intram_by_pg(
     df_merge = df_merge[[detail, value_col, notes]].rename(
         columns={value_col: value_title})
 
-    # # Outputting the CSV file with timestamp and run_id
-    # tdate = datetime.now().strftime("%Y-%m-%d")
-    # filename = f"output_intram_by_pg_{tdate}_v{run_id}.csv"
-    # write_csv(f"{output_path}/output_intram_by_pg/{filename}", df_merge)
+    # Outputting the CSV file with timestamp and run_id
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    filename = f"output_intram_by_pg_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_intram_by_pg/{filename}", df_merge)
