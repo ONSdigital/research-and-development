@@ -194,7 +194,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%Y-%m-%d")
     # ? Should this go in a subfolder of the outputs folder?
-    construction_output_filepath = os.path.join(paths["output_path"], f"construction_amendments_{tdate}_v{run_id}.csv")
+    construction_output_filepath = os.path.join(paths["output_path"], f"constructed_snapshot_{tdate}_v{run_id}.csv")
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
 
@@ -233,11 +233,12 @@ def apply_amendments(main_df, amendments_df):
 def apply_additions(main_df, additions_df):
     """Apply additions to the main snapshot."""
     # Drop records where accept_changes is False and if any remain, add them to main df
-    accepted_additions_df = additions_df.drop(additions_df[~additions_df.accept_changes])
+    accepted_additions_df = additions_df.drop(additions_df[~additions_df["accept_changes"]].index)
     if accepted_additions_df.shape[0] > 0:
         added_df = pd.concat([main_df, accepted_additions_df])
         construction_logger.info(f"{accepted_additions_df.shape[0]} records added during construction")
     else:
         construction_logger.info("No additional records found during construction")
+        return main_df
 
     return added_df
