@@ -326,12 +326,12 @@ def run_staging(
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Loading Civil or Defence detailed mapper
-    StagingMainLogger.info("Loading Civil or Defence detailed mapper File...")
+    StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")
     civil_defence_detailed_path = paths["civil_defence_detailed_path"]
     check_file_exists(civil_defence_detailed_path)
     civil_defence_detailed = read_csv(civil_defence_detailed_path)
     # val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
-    StagingMainLogger.info("Civil or Defence detailed mapper File Loaded Successfully...")
+    StagingMainLogger.info("Civil/Defence detailed mapper File Loaded Successfully...")
 
 
     # Output the staged BERD data for BaU testing when on local network.
