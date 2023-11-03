@@ -44,8 +44,6 @@ def output_intram_by_pg(
     df_tot = pd.DataFrame({key_col: ["total"], value_col: value_tot})
     df_agg = pd.concat([df_agg, df_tot])
 
-    print(df_agg.head(5))
-
     # Merge with labels and ranks
     df_merge = pg_detailed.merge(
         df_agg,
@@ -53,8 +51,6 @@ def output_intram_by_pg(
         left_on="pg_alpha",
         right_on=key_col)
     df_merge[value_col] = df_merge[value_col].fillna(0)
-
-    print(df_merge.head())
 
     # Sort by rank
     df_merge.sort_values("ranking", axis=0, ascending=True)
