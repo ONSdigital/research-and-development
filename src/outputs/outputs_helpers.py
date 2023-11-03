@@ -57,10 +57,11 @@ def regions() -> dict:
 
 
 def aggregate_output(
-        df: pd.DataFrame,
-        key_cols: list,
-        value_cols: list,
-        agg_method: str = "sum",) -> pd.DataFrame:
+    df: pd.DataFrame,
+    key_cols: list,
+    value_cols: list,
+    agg_method: str = "sum",
+) -> pd.DataFrame:
 
     """Groups the datadrame by key columns and aggregates the value columns
     using a specified aggregation method.
@@ -87,3 +88,21 @@ def aggregate_output(
     df_agg = df.groupby(my_keys).agg(agg_dict).reset_index()
 
     return df_agg
+
+
+def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
+    """Created year column for short form output
+
+    The 'period_year' column is added containing the year in form 'YYYY'.
+
+    Args:
+        df (pd.DataFrame): The main dataframe to be used for short form output.
+
+    Returns:
+        pd.DataFrame: returns short form output data frame with added new col
+    """
+
+    # Extracted the year from period and crated new columns 'period_year'
+    df["period_year"] = df["period"].astype("str").str[:4]
+
+    return df

@@ -7,6 +7,7 @@ from itertools import chain
 
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
+from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import tmi_imputation as tmi
 
@@ -16,28 +17,15 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
+    backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
 
-    target_vars = [
-        "211",
-        "305",
-        "emp_researcher",
-        "emp_technician",
-        "emp_other",
-        "headcount_res_m",
-        "headcount_res_f",
-        "headcount_tec_m",
-        "headcount_tec_f",
-        "headcount_oth_m",
-        "headcount_oth_f",
-    ]
-
-    sum_cols = ["emp_total", "headcount_tot_m", "headcount_tot_f", "headcount_total"]
-
-    # Get the breakdown columns from the config
+    # Get the target values and breakdown columns from the config
+    lf_target_vars = config["imputation"]["lf_target_vars"]
+    sum_cols = config["imputation"]["sum_cols"]
     bd_qs_lists = list(config["breakdowns"].values())
     bd_cols = list(chain(*bd_qs_lists))
 
@@ -47,16 +35,21 @@ def run_imputation(
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
+    # TODO: imp_marker should be 'R' for clear responders
     # Initialise imp_marker column, default value "no_imputation"
     df["imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
-    orig_cols = target_vars + bd_cols + sum_cols
+    orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
-    # Run TMI for long forms
-    imputed_df, qa_df = tmi.run_tmi(df, target_vars, mapper, config)
+    # Run MoR
+    if backdata is not None:
+        df = run_mor(df, backdata, orig_cols)
+
+    # Run TMI for long forms and short forms
+    imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)

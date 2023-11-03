@@ -480,7 +480,7 @@ old_ref = "nan"
 
 [302]
 Description = "Purchased/funded R&D in the UK (Yes or No)"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "Int64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = "None"
