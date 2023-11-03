@@ -85,6 +85,11 @@ def carry_forwards(df, backdata, impute_vars):
         pd.DataFrame: df with values carried forwards
     """
     # log number of records before and after MoR
+    # Debug - start
+    # df.to_pickle(r"d:\data\df.pkl")
+    # backdata.to_pickle(r"d:\data\backdata.pkl")
+    # Debug - end
+
     df = pd.merge(df,
                   backdata,
                   how="left",
