@@ -12,6 +12,46 @@ from src.staging import pg_conversion as pg
 
 StagingMainLogger = logging.getLogger(__name__)
 
+def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
+            """Load historic data into the pipeline.
+
+            Args:
+                config (dict): The pipeline configuration
+                paths (dict): The paths to the data files
+                read_csv (Callable): Function to read a csv file.
+                    This will be the hdfs or network version depending on settings.
+
+            Returns:
+                dict: A dictionary of history data loaded into the pipeline.
+            """
+            curent_year = config["years"]["current_year"]
+            years_to_load = config["years"]["previous_years_to_load"]
+            years_gen = history_loader.history_years(curent_year, years_to_load)
+
+            if years_gen is None:
+                StagingMainLogger.info("No historic data to load for this run.")
+                return {}
+            else:
+                StagingMainLogger.info("Loading historic data...")
+                history_path = paths["history_path"]
+                dict_of_hist_dfs = history_loader.load_history(
+                    years_gen, history_path, read_csv
+                )
+                # Check if it has loaded and is not empty
+                if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
+                    StagingMainLogger.info(
+                        "Dictionary of history data: %s loaded into pipeline",
+                        ", ".join(dict_of_hist_dfs),
+                    )
+                    StagingMainLogger.info("Historic data loaded.")
+                else:
+                    StagingMainLogger.warning(
+                        "Problem loading historic data. Dict may be empty or not present"
+                    )
+                    raise Exception("The historic data did not load")
+
+            return dict_of_hist_dfs if dict_of_hist_dfs else {}
+
 
 def run_staging(
     config: dict,
@@ -69,33 +109,7 @@ def run_staging(
 
     # Load historic data
     if config["global"]["load_historic_data"]:
-        curent_year = config["years"]["current_year"]
-        years_to_load = config["years"]["previous_years_to_load"]
-        years_gen = history_loader.history_years(curent_year, years_to_load)
-
-        if years_gen is None:
-            StagingMainLogger.info("No historic data to load for this run.")
-        else:
-            StagingMainLogger.info("Loading historic data...")
-            history_path = paths["history_path"]
-            dict_of_hist_dfs = history_loader.load_history(
-                years_gen, history_path, read_csv
-            )
-            # Check if it has loaded and is not empty
-            if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-                StagingMainLogger.info(
-                    "Dictionary of history data: %s loaded into pipeline",
-                    ", ".join(dict_of_hist_dfs),
-                )
-                StagingMainLogger.info("Historic data loaded.")
-            else:
-                StagingMainLogger.warning(
-                    "Problem loading historic data. Dict may be empty or not present"
-                )
-                raise Exception("The historic data did not load")
-
-    else:
-        StagingMainLogger.info("Skipping loading historic data...")
+            dict_of_hist_dfs = load_historic_data()
 
     # Check data file exists, raise an error if it does not.
 
