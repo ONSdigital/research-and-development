@@ -116,6 +116,130 @@ def fix_anon_data(responses_df, config):
     responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
     return responses_df
 
+def load_validate_snapshot(load_json, snapshot_path, config, network_or_hdfs):
+    
+    StagingMainLogger.info("Loading SPP snapshot data from json file")
+    
+    # Load data from JSON file
+    snapdata = load_json(snapshot_path)
+
+    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+
+    # the anonymised snapshot data we use in the DevTest environment
+    # does not include the instance column. This fix should be removed
+    # when new anonymised data is given.
+    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+        responses_df = fix_anon_data(responses_df, config)
+    StagingMainLogger.info("Finished Data Ingest...")
+
+    # Validate snapshot data
+    val.validate_data_with_schema(
+        contributors_df, "./config/contributors_schema.toml"
+    )
+    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+
+    # Data Transmutation
+    StagingMainLogger.info("Starting Data Transmutation...")
+    full_responses = processing.full_responses(contributors_df, responses_df)
+    
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
+
+    # Validate and force data types for the full responses df
+    # TODO Find a fix for the datatype casting before uncommenting
+    val.combine_schemas_validate_full_df(
+        full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
+
+
+def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
+    
+    # Load secondary snapshot data
+    StagingMainLogger.info("Loading secondary snapshot data from json file")
+    secondary_snapdata = load_json(secondary_snapshot_path)
+    
+    # Parse secondary snapshot data
+    secondary_contributors_df, secondary_responses_df = (
+        spp_parser.parse_snap_data(secondary_snapdata))
+    
+    # Assign instance column, with value 0
+    secondary_responses_df["instance"] = 0
+            
+    # Validate secondary snapshot data
+    
+    StagingMainLogger.info("Validating secondary snapshot data...")
+    val.validate_data_with_schema(
+        secondary_contributors_df, "./config/contributors_schema.toml"
+    )
+    val.validate_data_with_schema(
+        secondary_responses_df, "./config/long_response.toml"
+    )
+    
+    # Create secondary full responses dataframe
+    secondary_full_responses = processing.full_responses(
+        secondary_contributors_df, secondary_responses_df
+    )
+    # Validate and force data types for the secondary full responses df
+    val.combine_schemas_validate_full_df(
+        secondary_full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
+
+    # return secondary_full_responses
+    return secondary_full_responses
+
+
+def write_snapshot_to_feather(feather_path: str,
+                              snapshot_name: str,
+                              full_responses: pd.DataFrame,
+                              secondary_snapshot_name: str,
+                              secondary_full_responses: pd.DataFrame,
+                              write_feather) -> None:
+    """
+    Writes the provided DataFrames to feather files.
+
+    This function writes the `full_responses` DataFrame to a feather file named "{snapshot_name}_corrected.feather",
+    and the `secondary_full_responses` DataFrame to a feather file named "{secondary_snapshot_name}.feather".
+    Both files are written to the provided `feather_path`.
+
+    Args:
+        feather_path (str): The path where the feather files will be written.
+        snapshot_name (str): The name of the snapshot for the `full_responses` DataFrame.
+        full_responses (pd.DataFrame): The DataFrame to write to the "{snapshot_name}_corrected.feather" file.
+        secondary_snapshot_name (str): The name of the snapshot for the `secondary_full_responses` DataFrame.
+        secondary_full_responses (pd.DataFrame): The DataFrame to write to the "{secondary_snapshot_name}.feather" file.
+    """
+    logger = logging.getLogger(__name__)
+
+    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
+    write_feather(feather_file, full_responses)
+    logger.info(f"Written {snapshot_name}_corrected.feather to {feather_path}")
+
+    secondary_feather_file = os.path.join(feather_path, f"{secondary_snapshot_name}.feather")
+    write_feather(secondary_feather_file, secondary_full_responses)
+    logger.info(f"Written {secondary_snapshot_name}.feather to {feather_path}")
+
+def stage_validate_harmonise_postcodes(config, paths, full_responses, run_id, check_file_exists, read_csv, write_csv):
+        """
+        Stage, validate and harmonise the postcode column
+        """
+        StagingMainLogger.info("Starting PostCode Validation")
+        postcode_masterlist = paths["postcode_masterlist"]
+        check_file_exists(postcode_masterlist)
+        postcode_mapper = read_csv(postcode_masterlist)
+        postcode_masterlist = postcode_mapper["pcd2"]
+        invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
+        StagingMainLogger.info("Saving Invalid Postcodes to File")
+        pcodes_folder = paths["postcode_path"]
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+        write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+        StagingMainLogger.info("Finished PostCode Validation")
+
 def run_staging(
     config: dict,
     check_file_exists: Callable,
@@ -169,7 +293,8 @@ def run_staging(
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-
+    feather_path = paths["feather_path"]
+    
     # Config settings for staging
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
@@ -188,82 +313,34 @@ def run_staging(
     
 
     # Only read from feather if feather files exist and we are on network
-    if is_network & feather_files_exist & load_from_feather:
+    READ_FROM_FEATHER = is_network & feather_files_exist & load_from_feather
+    if READ_FROM_FEATHER:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         snapdata = load_snapshot_feather(feather_file)
         if load_updated_snapshot:
             secondary_snapdata = load_snapshot_feather(secondary_feather_file)
-        READ_FROM_FEATHER = True
+    
     else:
-        StagingMainLogger.info("Loading SPP snapshot data from json file")
-        # Load data from JSON file
-        snapdata = load_json(snapshot_path)
-
-        contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
-
-        # the anonymised snapshot data we use in the DevTest environment
-        # does not include the instance column. This fix should be removed
-        # when new anonymised data is given.
-        if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-            responses_df = fix_anon_data(responses_df, config)
-        StagingMainLogger.info("Finished Data Ingest...")
-
-        val.validate_data_with_schema(
-            contributors_df, "./config/contributors_schema.toml"
-        )
-        val.validate_data_with_schema(responses_df, "./config/long_response.toml")
-
-        # Data Transmutation
-        StagingMainLogger.info("Starting Data Transmutation...")
-        full_responses = processing.full_responses(contributors_df, responses_df)
-        StagingMainLogger.info(
-            "Finished Data Transmutation and validation of full responses dataframe"
-        )
-
-        # Validate and force data types for the full responses df
-        # TODO Find a fix for the datatype casting before uncommenting
-        val.combine_schemas_validate_full_df(
-            full_responses,
-            "./config/contributors_schema.toml",
-            "./config/wide_responses.toml",
-        )
+        full_responses = load_validate_snapshot(load_json, snapshot_path, 
+                                                config, network_or_hdfs)
 
         # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
-            secondary_snapdata = load_json(secondary_snapshot_path)
-            (
-                secondary_contributors_df,
-                secondary_responses_df,
-            ) = spp_parser.parse_snap_data(secondary_snapdata)
-            secondary_responses_df["instance"] = 0
-            val.validate_data_with_schema(
-                secondary_contributors_df, "./config/contributors_schema.toml"
-            )
-            val.validate_data_with_schema(
-                secondary_responses_df, "./config/long_response.toml"
-            )
-            secondary_full_responses = processing.full_responses(
-                secondary_contributors_df, secondary_responses_df
-            )
-            val.combine_schemas_validate_full_df(
-                secondary_full_responses,
-                "./config/contributors_schema.toml",
-                "./config/wide_responses.toml",
-            )
+            secondary_full_responses = load_validate_secondary_snapshot(
+                load_json, secondary_snapshot_path, 
+            )  
 
         # Write feather file to snapshot path
         if is_network:
-            feather_file = os.path.join(
-                feather_path, f"{snapshot_name}_corrected.feather"
-            )
-            write_feather(feather_file, full_responses)
-            secondary_feather_file = os.path.join(
-                feather_path, f"{secondary_snapshot_name}.feather"
-            )
-            write_feather(secondary_feather_file, secondary_full_responses)
-        READ_FROM_FEATHER = False
-
+            
+            write_snapshot_to_feather(feather_path,
+                                      snapshot_name,
+                                      full_responses,
+                                      secondary_snapshot_name,
+                                      secondary_full_responses
+                                      write_feather=write_feather)
+    
     if READ_FROM_FEATHER:
         contributors_df = read_feather(
             os.path.join(feather_path, f"{snapshot_name}_contributors.feather")
@@ -284,19 +361,14 @@ def run_staging(
     # Data validation
     val.check_data_shape(full_responses)
 
-    # Stage, validate and harmonise the postcode column
-    StagingMainLogger.info("Starting PostCode Validation")
-    postcode_masterlist = paths["postcode_masterlist"]
-    check_file_exists(postcode_masterlist)
-    postcode_mapper = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_mapper["pcd2"]
-    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
-    StagingMainLogger.info("Saving Invalid Postcodes to File")
-    pcodes_folder = paths["postcode_path"]
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
-    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-    StagingMainLogger.info("Finished PostCode Validation")
+    
+
+    stage_validate_harmonise_postcodes(config,
+                                       paths,
+                                       full_responses,
+                                       run_id,
+                                       check_file_exists,
+                                       read_csv)
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
