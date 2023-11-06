@@ -18,38 +18,43 @@ def evaluate_imputed_ixx(
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 or 305 values, multiplied by the imputed 211.
     """
+    imp_class = group["imp_class"].values[0]
+    ExpansionLogger.debug(f"Imputation class: {imp_class}.")
+    ExpansionLogger.debug(f"Master column: {master_col}.")
+
+    # Return the groupby object unaltered if there are no TMI values
+    # in the imputation class
+    TMI_mask = group["imp_marker"] == "TMI"
+    imputed_subgroup = group.loc[TMI_mask]
+
+    if imputed_subgroup.empty:
+        ExpansionLogger.debug(
+            f"Imputation class {imp_class} has no TMI rows to process."
+        )
+        return group        
+
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
     # Sum the master column, e.g. "211" or "305" for the clear responders
     clear_statuses = ["Clear", "Clear - overridden"]
     clear_mask = group["status"].isin(clear_statuses)
-    sum_master_q = group.loc[clear_mask][master_col].sum()  # scalar
+    sum_master_q = group.loc[clear_mask, master_col].sum()  # scalar
 
-    # Calculate the imputation columns for the breakdown questions
+    # Find the imputed value for the master col for the current imputation class
+    # As this value is the same for the whole imputation class, we return the first
+    master_imp_val = group.loc[TMI_mask, f"{master_col}_imputed"].values[0]  # scalar
+
+    # Calculate the value to enter as the imputed value for the breakdown cols
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
-        sum_breakdown_q = group.loc[clear_mask][bd_col].sum()
+        sum_breakdown_q = group.loc[clear_mask, bd_col].sum()
 
-        # Master col imputed, e.g. 211_imputed or 305_imputed
-        # Sum the breakdown master q imputed for TMI records
-        TMI_mask = group["imp_marker"] == "TMI"
-        master_imp_val = group.loc[TMI_mask][f"{master_col}_imputed"]
-        if master_imp_val.values.any():
-            master_imp_val = master_imp_val.values[0]  # get a single value
-        else:
-            master_imp_val = float("nan")  # assign nan where there are no vals
+        # calculate the imputed values
+        imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val  # scalar
 
-        # Make imputation col equal to original column
-        group[f"{bd_col}_imputed"] = group[bd_col]
-
-        # Update the imputation column for status encoded 100 and 201
-        # i.e. for non-responders
-        unclear_statuses = ["Form sent out", "Check needed"]
-        unclear_mask = group["status"].isin(unclear_statuses)
-        imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val
-        # Write imputed value to the non-responder records
-        group.loc[unclear_mask, f"{bd_col}_imputed"] = imputed_value
+        # Update the imputed break-down columns where TMI imputation has been applied
+        group.loc[TMI_mask, f"{bd_col}_imputed"] = imputed_value
 
     # Returning updated group and updated QA dict
     return group
@@ -99,15 +104,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)
 
     # Calculate the imputation values for 3xx questions
-
-    # TODO: Fix datatypes and remove this temp-fix
-    result_211_df.loc[:, breakdown_qs_3xx] = result_211_df.loc[
-        :, breakdown_qs_3xx
-    ].fillna(0)
-    result_211_df.loc[:, breakdown_qs_3xx] = result_211_df.loc[
-        :, breakdown_qs_3xx
-    ].astype(int)
-
+    
     # Filter to exclude the same rows trimmed for 305_trim == False
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
     ExpansionLogger.debug(

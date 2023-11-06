@@ -1,6 +1,6 @@
 global:
   log_to_file: True # Write logs to .log file
-  logging_level: "INFO" # "DEBUG"
+  logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
   load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
@@ -11,7 +11,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_short_form: False
   output_long_form: False
   output_tau: False
