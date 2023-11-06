@@ -42,10 +42,7 @@ def mor_preprocessing(df, backdata):
     # TODO move this to imputation main
     # Select only values to be imputed
 
-    imputation_cond = (
-        (df["formtype"] == "0001")
-        & (df["status"].isin(bad_statuses))
-    )
+    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
@@ -86,17 +83,13 @@ def carry_forwards(df, backdata, impute_vars):
         pd.DataFrame: df with values carried forwards
     """
     # log number of records before and after MoR
-
-    df = pd.merge(df,
-                  backdata,
-                  how="left",
-                  on="reference",
-                  suffixes=("", "_prev"),
-                  indicator=True)
+    df = pd.merge(
+        df, backdata, how="left", on="reference", suffixes=("", "_prev"), indicator=True
+    )
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"
-    instance_cond = ((df["instance"] == 0) | pd.isnull(df["instance"]))
+    instance_cond = (df["instance"] == 0) | pd.isnull(df["instance"])
     keep_cond = no_match_cond | instance_cond
 
     df = df.copy().loc[keep_cond, :]
@@ -116,7 +109,7 @@ def carry_forwards(df, backdata, impute_vars):
     df.loc[match_cond, "imp_marker"] = "CF"
 
     # Drop merge related columns
-    to_drop = [column for column in df.columns if column.endswith('_prev')]
-    to_drop += ['_merge']
+    to_drop = [column for column in df.columns if column.endswith("_prev")]
+    to_drop += ["_merge"]
     df = df.drop(to_drop, axis=1)
     return df

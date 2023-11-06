@@ -94,7 +94,7 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished TAU output.")
 
-# Running GB SAS output
+    # Running GB SAS output
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
         output_gb_sas(

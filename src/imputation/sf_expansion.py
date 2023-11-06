@@ -50,9 +50,7 @@ def expansion_impute(
     master_col_imputed = f"{master_col}_imputed"
 
     # Get long forms only for summing the imputed master_col (scalar value)
-    sum_master_q_lng = group_copy.loc[
-        long_responder_mask, master_col_imputed
-    ].sum()
+    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col_imputed].sum()
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
     returned_master_vals = group_copy[to_expand_mask][master_col_imputed]

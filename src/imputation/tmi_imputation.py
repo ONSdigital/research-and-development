@@ -186,11 +186,11 @@ def apply_trim_check(
     df: pd.DataFrame,
     variable: str,
     trim_threshold,
-) -> pd.DataFrame: 
+) -> pd.DataFrame:
     """Checks if the number of records is above or below
     the threshold required for trimming.
     """
-    # tag for those classes with more than trim_threshold 
+    # tag for those classes with more than trim_threshold
 
     df = df.copy()
 
@@ -221,8 +221,8 @@ def trim_bounds(
         config (Dict): the configuration settings
     """
     # get the trimming parameters from the config
-    #TODO: add a function to check the config settings make sense
-    #TODO: as is done in outlier-detection/auto_outliers
+    # TODO: add a function to check the config settings make sense
+    # TODO: as is done in outlier-detection/auto_outliers
     trim_threshold = config["imputation"]["trim_threshold"]
     lower_perc = config["imputation"]["lower_trim_perc"]
     upper_perc = config["imputation"]["upper_trim_perc"]
@@ -302,7 +302,8 @@ def calculate_mean(
 
 
 def create_mean_dict(
-    df: pd.DataFrame, target_variable_list: List[str],
+    df: pd.DataFrame,
+    target_variable_list: List[str],
     config: Dict[str, Any],
 ) -> Tuple[Dict, pd.DataFrame]:
     """Calculate trimmed mean values for each target variable and imputation class.
@@ -341,7 +342,7 @@ def create_mean_dict(
             # Sort by target_variable, df['employees'], reference
             sorted_df = sort_df(var, subgrp)
 
-            # Apply trimming 
+            # Apply trimming
             trimmed_df = trim_bounds(sorted_df, var, config)
 
             tr_df = trimmed_df.set_index("pre_index")
@@ -376,9 +377,7 @@ def apply_tmi(df, target_variables, mean_dict, form_type):
 
     # For short forms, imputation is only applied to Census references
     if form_type == formtype_short:
-        filtered_df = filter_by_column_content(
-            filtered_df, "selectiontype", ["C"]
-        )
+        filtered_df = filter_by_column_content(filtered_df, "selectiontype", ["C"])
 
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes

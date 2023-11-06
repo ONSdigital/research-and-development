@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
-from src.outputs.outputs_helpers import (create_output_df, regions)
+from src.outputs.outputs_helpers import create_output_df, regions
 
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -69,12 +69,8 @@ def output_gb_sas(
 
     # Create ovss_oth
     df["ovss_oth"] = (
-        df["243"] +
-        df["244"] +
-        df["245"] +
-        df["246"] +
-        df["247"] +
-        df["249"])
+        df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+    )
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]

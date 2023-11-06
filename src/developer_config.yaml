@@ -130,7 +130,7 @@ imputation:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
-  sum_cols: 
+  sum_cols:
     - "emp_total"
     - "headcount_tot_m"
     - "headcount_tot_f"

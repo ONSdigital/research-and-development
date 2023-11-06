@@ -524,9 +524,7 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 @time_logger_wrap
 @exception_wrap
 def validate_many_to_one(
-    mapper: pd.DataFrame,
-    col_many: str,
-    col_one: str
+    mapper: pd.DataFrame, col_many: str, col_one: str
 ) -> pd.DataFrame:
     """
 
@@ -552,20 +550,23 @@ def validate_many_to_one(
 
         # Check the count of col_one
         df_count = (
-            df
-            .groupby(col_many)
-            .agg({col_one: 'count'})
+            df.groupby(col_many)
+            .agg({col_one: "count"})
             .reset_index()
-            .rename(columns={col_one: 'code_count'}))
-        df_bad = df_count[df_count['code_count'] > 1]
+            .rename(columns={col_one: "code_count"})
+        )
+        df_bad = df_count[df_count["code_count"] > 1]
         if not df_bad.empty:
             validation_logger.info(
-                "The following codes have multile mapping: \n {df_bad}")
+                "The following codes have multile mapping: \n {df_bad}"
+            )
             raise ValueError(f"Mapper is many to many")
         return df
 
     except ValueError as ve:
         raise ValueError("Many-to-one mapper validation failed: " + str(ve))
+
+
 @exception_wrap
 def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
     """
