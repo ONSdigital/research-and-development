@@ -9,6 +9,7 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
+from src.utils.wrappers import time_logger_wrap
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -52,6 +53,67 @@ def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
 
             return dict_of_hist_dfs if dict_of_hist_dfs else {}
 
+
+def check_secondary_snapshot_feather(config: dict, paths, check_file_exists: Callable) -> bool:
+            """Check if the secondary snapshot feather file exists.
+
+            Args:
+                config (dict): The pipeline configuration
+                check_file_exists (Callable): Function to check if file exists
+                    This will be the hdfs or network version depending on settings.
+
+            Returns:
+                bool: True if the feather file exists, False otherwise.
+            """
+            network_or_hdfs = config["global"]["network_or_hdfs"]
+            paths = config[f"{network_or_hdfs}_paths"]
+            feather_path = paths["feather_path"]
+            snapshot_name = os.path.basename(paths["snapshot_path"]).split(".", 1)[0]
+            secondary_snapshot_path = paths["secondary_snapshot_path"]
+            secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
+            
+            
+            feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
+            secondary_feather_file = os.path.join(
+                feather_path, f"{secondary_snapshot_name}.feather"
+            )
+            if config["global"]["load_updated_snapshot"]:
+                check_file_exists(secondary_snapshot_path)
+                return check_file_exists(feather_file) and check_file_exists(secondary_feather_file)
+            else:
+                return check_file_exists(feather_file)
+
+@time_logger_wrap
+def load_snapshot_feather(feather_file, read_feather):
+    snapdata = read_feather(feather_file)
+    StagingMainLogger.info(f"{feather_file} loaded")
+    return snapdata
+
+def fix_anon_data(responses_df, config):
+    """
+    Fixes anonymised snapshot data for use in the DevTest environment.
+
+    This function adds an "instance" column to the provided DataFrame, and populates it with zeros.
+    It also adds a "selectiontype" column with random values of "P", "C", or "L", and a "cellnumber" column
+    with random values from the "seltype_list" in the configuration.
+
+    This fix is necessary because the anonymised snapshot data currently used in the DevTest environment
+    does not include the "instance" column. This fix should be removed when new anonymised data is provided.
+
+    Args:
+        responses_df (pandas.DataFrame): The DataFrame containing the anonymised snapshot data.
+        config (dict): A dictionary containing configuration details.
+
+    Returns:
+        pandas.DataFrame: The fixed DataFrame with the added "instance", "selectiontype", and "cellnumber" columns.
+    """
+    responses_df["instance"] = 0
+    col_size = responses_df.shape[0]
+    random.seed(seed=42)
+    responses_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
+    cellno_list = config["devtest"]["seltype_list"]
+    responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
+    return responses_df
 
 def run_staging(
     config: dict,
@@ -107,43 +169,29 @@ def run_staging(
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
 
+    # Config settings for staging
+    is_network = network_or_hdfs == "network"
+    load_from_feather = config["global"]["load_from_feather"]
+    load_updated_snapshot = config["global"]["load_updated_snapshot"]
+
     # Load historic data
     if config["global"]["load_historic_data"]:
             dict_of_hist_dfs = load_historic_data()
 
     # Check data file exists, raise an error if it does not.
-
     check_file_exists(snapshot_path)
+    
+    # Check if the secondary snapshot feather file exists
+    feather_files_exist = check_secondary_snapshot_feather(config, paths, check_file_exists)
+    
 
-    # load and parse the snapshot data json file
-    # Check if feather file exists in snapshot path
-    feather_path = paths["feather_path"]
-    load_from_feather = config["global"]["load_from_feather"]
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-
-    # Check if the secondary snapshot exists
-    load_updated_snapshot = config["global"]["load_updated_snapshot"]
-    if load_updated_snapshot:
-        check_file_exists(secondary_snapshot_path)
-        secondary_feather_file = os.path.join(
-            feather_path, f"{secondary_snapshot_name}.feather"
-        )
-        feather_files_exist = check_file_exists(feather_file) and check_file_exists(
-            secondary_feather_file
-        )  # ? Should only be true if both exist?
-    else:
-        feather_files_exist = check_file_exists(feather_file)
-
-    is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
     if is_network & feather_files_exist & load_from_feather:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
-        snapdata = read_feather(feather_file)
-        StagingMainLogger.info(f"{feather_file} loaded")
+        snapdata = load_snapshot_feather(feather_file)
         if load_updated_snapshot:
-            secondary_snapdata = read_feather(secondary_feather_file)
-            StagingMainLogger.info(f"{secondary_feather_file} loaded")
+            secondary_snapdata = load_snapshot_feather(secondary_feather_file)
         READ_FROM_FEATHER = True
     else:
         StagingMainLogger.info("Loading SPP snapshot data from json file")
@@ -156,15 +204,7 @@ def run_staging(
         # does not include the instance column. This fix should be removed
         # when new anonymised data is given.
         if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-            responses_df["instance"] = 0
-            # In the anonymised data the selectiontype is always 'L'
-            col_size = contributors_df.shape[0]
-            random.seed(seed=42)
-            contributors_df["selectiontype"] = random.choice(
-                ["P", "C", "L"], size=col_size
-            )
-            cellno_list = config["devtest"]["seltype_list"]
-            contributors_df["cellnumber"] = random.choice(cellno_list, size=col_size)
+            responses_df = fix_anon_data(responses_df, config)
         StagingMainLogger.info("Finished Data Ingest...")
 
         val.validate_data_with_schema(
@@ -419,3 +459,5 @@ def run_staging(
         itl1_detailed,
         civil_defence_detailed,
     )
+
+
