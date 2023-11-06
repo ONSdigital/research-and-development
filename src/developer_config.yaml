@@ -4,7 +4,7 @@ global:
   table_config: "SingleLine"
   postcode_csv_check: False
   load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
-  load_historic_data: False
+  load_historic_data: True
   load_manual_outliers: False
   load_backdata: True
   output_full_responses: False
@@ -130,7 +130,7 @@ imputation:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
-  sum_cols: 
+  sum_cols:
     - "emp_total"
     - "headcount_tot_m"
     - "headcount_tot_f"
