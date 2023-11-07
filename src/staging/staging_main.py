@@ -3,6 +3,7 @@ import logging
 from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
+import pandas as pd
 import os
 
 from src.staging import spp_parser, history_loader
@@ -55,14 +56,15 @@ def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
     return dict_of_hist_dfs if dict_of_hist_dfs else {}
 
 
-def check_secondary_snapshot_feather(
+def check_snapshot_feather_exists(
     config: dict,
-    paths,
     check_file_exists: Callable,
-    feather_file,
+    feather_file_to_check,
     secondary_feather_file,
 ) -> bool:
-    """Check if the secondary snapshot feather file exists.
+    """Check if one or both of snapshot feather files exists.
+
+    Conifg arguments decide whether to check for one or both.
 
     Args:
         config (dict): The pipeline configuration
@@ -72,24 +74,13 @@ def check_secondary_snapshot_feather(
     Returns:
         bool: True if the feather file exists, False otherwise.
     """
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    paths = config[f"{network_or_hdfs}_paths"]
-    feather_path = paths["feather_path"]
-    snapshot_name = os.path.basename(paths["snapshot_path"]).split(".", 1)[0]
-    secondary_snapshot_path = paths["secondary_snapshot_path"]
-    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
 
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-    secondary_feather_file = os.path.join(
-        feather_path, f"{secondary_snapshot_name}.feather"
-    )
     if config["global"]["load_updated_snapshot"]:
-        check_file_exists(secondary_snapshot_path)
-        return check_file_exists(feather_file) and check_file_exists(
+        return check_file_exists(feather_file_to_check) and check_file_exists(
             secondary_feather_file
         )
     else:
-        return check_file_exists(feather_file)
+        return check_file_exists(feather_file_to_check)
 
 
 @time_logger_wrap
@@ -329,9 +320,9 @@ def run_staging(
     # Check data file exists, raise an error if it does not.
     check_file_exists(snapshot_path)
 
-    # Check if the secondary snapshot feather file exists
-    feather_files_exist = check_secondary_snapshot_feather(
-        config, paths, check_file_exists
+    # Check if the if the snapshot feather and optionally the secondary snapshot feather exist
+    feather_files_exist = check_snapshot_feather_exists(
+        config, check_file_exists, feather_file, secondary_feather_file
     )
 
     # Only read from feather if feather files exist and we are on network
