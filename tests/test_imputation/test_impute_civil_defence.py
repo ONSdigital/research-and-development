@@ -8,7 +8,7 @@ from src.imputation.impute_civ_def import (
     impute_civil_defence,
     prep_cd_imp_classes,
     create_civdef_dict,
-    calc_cd_proportions
+    calc_cd_proportions,
 )
 
 
@@ -17,12 +17,7 @@ class TestCalcCDPorportions:
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
-        input_cols = [
-            "reference",
-            "instance",
-            "200",
-            "202",
-            "pg_sic_class"]
+        input_cols = ["reference", "instance", "200", "202", "pg_sic_class"]
 
         data1 = [
             [1001, 1, "C", 100, "AC_1234"], # noqa
@@ -67,7 +62,7 @@ class TestCreateCivdefDict:
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
-           "reference",
+            "reference",
             "instance",
             "200",
             "201",
@@ -78,7 +73,8 @@ class TestCreateCivdefDict:
             "pg_sic_class",
             "empty_pgsic_group",
             "pg_class",
-            "empty_pg_group"]
+            "empty_pg_group",
+        ]
 
         data = [
             [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
@@ -102,7 +98,6 @@ class TestCreateCivdefDict:
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
 
-
     def test_create_civdef_dict(self):
         "Test the pg_sic dict calcuclation in create_civdef_dict function."
         input_df = self.create_input_df()
@@ -113,14 +108,13 @@ class TestCreateCivdefDict:
 
         assert pgsic_dict == exp_pgsic_dict
 
-
     def test_create_civdef_dict2(self):
         "Test the pg only dict calcuclation in create_civdef_dict function."
         input_df = self.create_input_df()
 
         pgsic_dict, pg_dict = create_civdef_dict(input_df)
 
-        exp_pg_dict = {"AC":(0.6, 0.4)}
+        exp_pg_dict = {"AC": (0.6, 0.4)}
 
         assert pg_dict == exp_pg_dict
 
@@ -138,7 +132,8 @@ class TestPrepCDImpClasses:
             "202",
             "status",
             "cellnumber",
-            "rusic"]
+            "rusic",
+        ]
 
         data = [
             [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234"], # noqa
@@ -176,7 +171,8 @@ class TestPrepCDImpClasses:
             "pg_sic_class",
             "empty_pgsic_group",
             "pg_class",
-            "empty_pg_group"]
+            "empty_pg_group",
+        ]
 
         data = [
             [1001, 0, np.nan, np.nan, 0, "Clear", "800", "1234", "nan_1234", False, "nan", False], # noqa
@@ -200,7 +196,6 @@ class TestPrepCDImpClasses:
         output_df = pandasDF(data=data, columns=output_cols)
         return output_df
 
-
     def test_prep_cd_imp_classes(self):
         """Test for prep_imp_classes function"""
         input_df = self.create_input_df()
@@ -209,6 +204,7 @@ class TestPrepCDImpClasses:
         result_df = prep_cd_imp_classes(input_df)
 
         assert_frame_equal(result_df, expected_df)
+
 
 class TestPrepCDImpClasses2:
     """Unit tests for calc_cd_proportions function."""
@@ -221,7 +217,8 @@ class TestPrepCDImpClasses2:
             "rusic",
             "cellnumber",
             "status",
-            "200",]
+            "200",
+        ]
 
         data = [
             [1, "A", "12", "800", "Clear", "C"], # noqa # test valid (statusencoded=211) row with no nans in class name
@@ -251,7 +248,8 @@ class TestPrepCDImpClasses2:
             "pg_sic_class",
             "empty_pgsic_group",
             "pg_class",
-            "empty_pg_group"]
+            "empty_pg_group",
+        ]
 
         data = [
             [1, "A", "12", "800", "Clear", "C", "A_12", False, "A", False], # noqa # test valid (statusencoded=211) row with no nans in class name

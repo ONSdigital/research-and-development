@@ -42,15 +42,20 @@ def expansion_impute(
     clear_mask = group_copy["status"].isin(clear_statuses)
 
     # Combination masks to select correct records for summing
-    # NOTE: we only use clear responders in calculations
+    # NOTE: we only use long form clear responders in calculations
+    # but we calculate breakdown values for imputed short form rows
     long_responder_mask = clear_mask & long_mask
-    short_responder_mask = clear_mask & short_mask
+    to_expand_mask = short_mask
 
-    # Get long forms only for summing master_col (scalar value)
-    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
+    master_col_imputed = f"{master_col}_imputed"
+
+    # Get long forms only for summing the imputed master_col (scalar value)
+    sum_master_q_lng = group_copy.loc[
+        long_responder_mask, master_col_imputed
+    ].sum()
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group_copy[short_responder_mask][master_col]
+    returned_master_vals = group_copy[to_expand_mask][master_col_imputed]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
@@ -170,25 +175,16 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     return filtered_df, excluded_df
 
 
-@df_change_func_wrap
+# @df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-
-    # Get the breakdowns dict
-    breakdown_dict = config["breakdowns"]
-
-    # TODO: Move this imp_class step to census TMI
-    short_form_df = df.loc[(df["formtype"] == "0006") & (df["instance"] != 0)]
-    short_form_df = create_imp_class_col(short_form_df, "200", "201", "imp_class")
-
-    # Re-joining the output of create_imp_class_col to original df
-    df = apply_to_original(short_form_df, df)
-
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class
     filtered_df, excluded_df = split_df_on_imp_class(df)
 
-    # Get master keys
-    master_values = breakdown_dict.keys()
+    # Get dictionary of short form master keys (or target variables)
+    # and breakdown variables
+    breakdown_dict = config["breakdowns"]
+    master_values = list(breakdown_dict)
 
     # Run the `expansion_impute` function in a for-loop via `apply_expansion`
     expanded_df = apply_expansion(filtered_df, master_values, breakdown_dict)

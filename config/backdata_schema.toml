@@ -1,0 +1,70 @@
+[reference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
+
+[period]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = 6
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [202012]
+
+[survey]
+Description = "All values are 002"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["002"]
+
+[formid]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "Int64"
+Length = 2
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [20, 21]
+
+[status]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
+
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[211]
+Description = "Total Inhouse Expenditure"
+Deduced_Data_Type = "float64"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q211"
+old_ref = "intram"
