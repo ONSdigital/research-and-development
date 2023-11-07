@@ -55,7 +55,10 @@ def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
     return dict_of_hist_dfs if dict_of_hist_dfs else {}
 
 
-def check_secondary_snapshot_feather(config: dict, paths, check_file_exists: Callable) -> bool:
+def check_secondary_snapshot_feather(config: dict, paths,
+                                     check_file_exists: Callable,
+                                     feather_file,
+                                     secondary_feather_file) -> bool:
             """Check if the secondary snapshot feather file exists.
 
             Args:
@@ -72,8 +75,8 @@ def check_secondary_snapshot_feather(config: dict, paths, check_file_exists: Cal
             snapshot_name = os.path.basename(paths["snapshot_path"]).split(".", 1)[0]
             secondary_snapshot_path = paths["secondary_snapshot_path"]
             secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-            
-            
+
+
             feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
             secondary_feather_file = os.path.join(
                 feather_path, f"{secondary_snapshot_name}.feather"
@@ -118,9 +121,9 @@ def fix_anon_data(responses_df, config):
 
 
 def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
-    
+
     StagingMainLogger.info("Loading SPP snapshot data from json file")
-    
+
     # Load data from JSON file
     snapdata = load_json(snapshot_path)
 
@@ -145,7 +148,7 @@ def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
     # Data Transmutation
     StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
-    
+
     StagingMainLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
@@ -156,24 +159,24 @@ def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
         "./config/contributors_schema.toml",
         "./config/wide_responses.toml",
     )
-    
+
 
 
 def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
-    
+
     # Load secondary snapshot data
     StagingMainLogger.info("Loading secondary snapshot data from json file")
     secondary_snapdata = load_json(secondary_snapshot_path)
-    
+
     # Parse secondary snapshot data
     secondary_contributors_df, secondary_responses_df = (
         spp_parser.parse_snap_data(secondary_snapdata))
-    
+
     # Assign instance column, with value 0
     secondary_responses_df["instance"] = 0
-            
+
     # Validate secondary snapshot data
-    
+
     StagingMainLogger.info("Validating secondary snapshot data...")
     val.validate_data_with_schema(
         secondary_contributors_df, "./config/contributors_schema.toml"
@@ -181,7 +184,7 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
     val.validate_data_with_schema(
         secondary_responses_df, "./config/long_response.toml"
     )
-    
+
     # Create secondary full responses dataframe
     secondary_full_responses = processing.full_responses(
         secondary_contributors_df, secondary_responses_df
@@ -298,7 +301,11 @@ def run_staging(
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
     feather_path = paths["feather_path"]
-    
+    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
+    secondary_feather_file = os.path.join(
+            feather_path, f"{secondary_snapshot_name}.feather"
+        )
+
     # Config settings for staging
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
@@ -311,10 +318,10 @@ def run_staging(
 
     # Check data file exists, raise an error if it does not.
     check_file_exists(snapshot_path)
-    
+
     # Check if the secondary snapshot feather file exists
     feather_files_exist = check_secondary_snapshot_feather(config, paths, check_file_exists)
-    
+
 
     # Only read from feather if feather files exist and we are on network
     READ_FROM_FEATHER = is_network & feather_files_exist & load_from_feather
@@ -324,10 +331,10 @@ def run_staging(
         full_responses = load_snapshot_feather(feather_file)
         if load_updated_snapshot:
             secondary_snapdata = load_snapshot_feather(secondary_feather_file)
-    
+
     else:
         # Read from JSON
-        full_responses = load_val_snapshot_json(load_json, snapshot_path, 
+        full_responses = load_val_snapshot_json(load_json, snapshot_path,
                                                 config, network_or_hdfs)
 
         # Validate the postcodes in data loaded from JSON
@@ -337,13 +344,13 @@ def run_staging(
                                        run_id,
                                        check_file_exists,
                                        read_csv)
-        
-        
+
+
         # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(
-                load_json, secondary_snapshot_path, 
-            )  
+                load_json, secondary_snapshot_path,
+            )
 
         # Write feather file to snapshot path
         if is_network:
@@ -351,7 +358,7 @@ def run_staging(
                                       snapshot_name,
                                       full_responses,
                                       secondary_snapshot_name,
-                                      secondary_full_responses
+                                      secondary_full_responses,
                                       write_feather=write_feather)
 
 
@@ -364,9 +371,9 @@ def run_staging(
     if not val.check_data_shape(full_responses):
         raise Exception("The data shape is not correct")
 
-    
 
-    
+
+
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -530,5 +537,3 @@ def run_staging(
         itl1_detailed,
         civil_defence_detailed,
     )
-
-
