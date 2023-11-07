@@ -76,11 +76,11 @@ def check_snapshot_feather_exists(
     """
 
     if config["global"]["load_updated_snapshot"]:
-        return check_file_exists(feather_file_to_check) and check_file_exists(
-            secondary_feather_file
-        )
+        return check_file_exists(
+            feather_file_to_check, raise_error=True
+        ) and check_file_exists(secondary_feather_file, raise_error=True)
     else:
-        return check_file_exists(feather_file_to_check)
+        return check_file_exists(feather_file_to_check, raise_error=True)
 
 
 @time_logger_wrap
@@ -236,7 +236,7 @@ def stage_validate_harmonise_postcodes(
     """
     StagingMainLogger.info("Starting PostCode Validation")
     postcode_masterlist = paths["postcode_masterlist"]
-    check_file_exists(postcode_masterlist)
+    check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_mapper["pcd2"]
     invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
@@ -317,9 +317,6 @@ def run_staging(
         dict_of_hist_dfs = load_historic_data(config, paths, read_csv)
         print(dict_of_hist_dfs)
 
-    # Check data file exists, raise an error if it does not.
-    check_file_exists(snapshot_path)
-
     # Check if the if the snapshot feather and optionally the secondary snapshot feather exist
     feather_files_exist = check_snapshot_feather_exists(
         config, check_file_exists, feather_file, secondary_feather_file
@@ -334,15 +331,23 @@ def run_staging(
         if load_updated_snapshot:
             secondary_snapdata = load_snapshot_feather(secondary_feather_file)
 
-    else:
-        # Read from JSON
+    else:  # Read from JSON
+
+        # Check data file exists, raise an error if it does not.
+        check_file_exists(snapshot_path, raise_error=True)
         full_responses = load_val_snapshot_json(
             load_json, snapshot_path, config, network_or_hdfs
         )
 
         # Validate the postcodes in data loaded from JSON
         stage_validate_harmonise_postcodes(
-            config, paths, full_responses, run_id, check_file_exists, read_csv
+            config,
+            paths,
+            full_responses,
+            run_id,
+            check_file_exists,
+            read_csv,
+            write_csv,
         )
 
         # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
@@ -376,7 +381,7 @@ def run_staging(
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = paths["manual_outliers_path"]
-        check_file_exists(manual_path)
+        check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
         val.validate_data_with_schema(
@@ -390,7 +395,7 @@ def run_staging(
     # Loading PG numeric to alpha mapper
     StagingMainLogger.info("Loading PG numeric to alpha File...")
     pg_num_alpha_path = paths["pg_num_alpha_path"]
-    check_file_exists(pg_num_alpha_path)
+    check_file_exists(pg_num_alpha_path, raise_error=True)
     pg_num_alpha = read_csv(pg_num_alpha_path)
     val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
     pg_num_alpha = val.validate_many_to_one(
@@ -402,7 +407,7 @@ def run_staging(
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
         backdata_path = paths["backdata_path"]
-        check_file_exists(backdata_path)
+        check_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
         # To be added once schema is defined
         # val.validate_data_with_schema(
@@ -424,7 +429,7 @@ def run_staging(
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
-    check_file_exists(cora_mapper_path)
+    check_file_exists(cora_mapper_path, raise_error=True)
     cora_mapper = read_csv(cora_mapper_path)
     # validates and updates from int64 to string type
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
@@ -434,7 +439,7 @@ def run_staging(
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
-    check_file_exists(ultfoc_mapper_path)
+    check_file_exists(ultfoc_mapper_path, raise_error=True)
     ultfoc_mapper = read_csv(ultfoc_mapper_path)
     val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
@@ -443,7 +448,7 @@ def run_staging(
     # Load itl mapper
     StagingMainLogger.info("Loading ITL File")
     itl_mapper_path = paths["itl_path"]
-    check_file_exists(itl_mapper_path)
+    check_file_exists(itl_mapper_path, raise_error=True)
     itl_mapper = read_csv(itl_mapper_path)
     val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
     StagingMainLogger.info("ITL File Loaded Successfully...")
@@ -451,14 +456,14 @@ def run_staging(
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
     cellno_path = paths["cellno_path"]
-    check_file_exists(cellno_path)
+    check_file_exists(cellno_path, raise_error=True)
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Loading PG alpha to numeric mapper - possibly, deprecated
     StagingMainLogger.info("Loading PG alpha to numeric File...")
     pg_alpha_num_path = paths["pg_alpha_num_path"]
-    check_file_exists(pg_alpha_num_path)
+    check_file_exists(pg_alpha_num_path, raise_error=True)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
     pg_alpha_num = val.validate_many_to_one(
@@ -469,7 +474,7 @@ def run_staging(
     # Loading SIC to PG to alpha mapper
     StagingMainLogger.info("Loading SIC to PG to alpha File...")
     sic_pg_alpha_path = paths["sic_pg_alpha_path"]
-    check_file_exists(sic_pg_alpha_path)
+    check_file_exists(sic_pg_alpha_path, raise_error=True)
     sic_pg_alpha = read_csv(sic_pg_alpha_path)
     val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
     sic_pg_alpha = val.validate_many_to_one(
@@ -485,7 +490,7 @@ def run_staging(
     # Loading PG detailed mapper
     StagingMainLogger.info("Loading PG detailed mapper File...")
     pg_detailed_path = paths["pg_detailed_path"]
-    check_file_exists(pg_detailed_path)
+    check_file_exists(pg_detailed_path, raise_error=True)
     pg_detailed = read_csv(pg_detailed_path)
     val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
@@ -493,7 +498,7 @@ def run_staging(
     # Loading ITL1 detailed mapper
     StagingMainLogger.info("Loading ITL1 detailed mapper File...")
     itl1_detailed_path = paths["itl1_detailed_path"]
-    check_file_exists(itl1_detailed_path)
+    check_file_exists(itl1_detailed_path, raise_error=True)
     itl1_detailed = read_csv(itl1_detailed_path)
     val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
@@ -501,7 +506,7 @@ def run_staging(
     # Loading Civil or Defence detailed mapper
     StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")
     civil_defence_detailed_path = paths["civil_defence_detailed_path"]
-    check_file_exists(civil_defence_detailed_path)
+    check_file_exists(civil_defence_detailed_path, raise_error=True)
     civil_defence_detailed = read_csv(civil_defence_detailed_path)
     # val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("Civil/Defence detailed mapper File Loaded Successfully...")
