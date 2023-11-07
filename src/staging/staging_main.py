@@ -116,7 +116,8 @@ def fix_anon_data(responses_df, config):
     responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
     return responses_df
 
-def load_validate_snapshot(load_json, snapshot_path, config, network_or_hdfs):
+
+def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
     
     StagingMainLogger.info("Loading SPP snapshot data from json file")
     
@@ -124,6 +125,9 @@ def load_validate_snapshot(load_json, snapshot_path, config, network_or_hdfs):
     snapdata = load_json(snapshot_path)
 
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+
+    # Get response rate
+    processing.response_rate(contributors_df, responses_df)
 
     # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
@@ -145,14 +149,14 @@ def load_validate_snapshot(load_json, snapshot_path, config, network_or_hdfs):
     StagingMainLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
-
-    # Validate and force data types for the full responses df
+# Validate and force data types for the full responses df
     # TODO Find a fix for the datatype casting before uncommenting
     val.combine_schemas_validate_full_df(
         full_responses,
         "./config/contributors_schema.toml",
         "./config/wide_responses.toml",
     )
+    
 
 
 def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
@@ -317,14 +321,24 @@ def run_staging(
     if READ_FROM_FEATHER:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
-        snapdata = load_snapshot_feather(feather_file)
+        full_responses = load_snapshot_feather(feather_file)
         if load_updated_snapshot:
             secondary_snapdata = load_snapshot_feather(secondary_feather_file)
     
     else:
-        full_responses = load_validate_snapshot(load_json, snapshot_path, 
+        # Read from JSON
+        full_responses = load_val_snapshot_json(load_json, snapshot_path, 
                                                 config, network_or_hdfs)
 
+        # Validate the postcodes in data loaded from JSON
+        stage_validate_harmonise_postcodes(config,
+                                       paths,
+                                       full_responses,
+                                       run_id,
+                                       check_file_exists,
+                                       read_csv)
+        
+        
         # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(
@@ -333,42 +347,26 @@ def run_staging(
 
         # Write feather file to snapshot path
         if is_network:
-            
             write_snapshot_to_feather(feather_path,
                                       snapshot_name,
                                       full_responses,
                                       secondary_snapshot_name,
                                       secondary_full_responses
                                       write_feather=write_feather)
-    
-    if READ_FROM_FEATHER:
-        contributors_df = read_feather(
-            os.path.join(feather_path, f"{snapshot_name}_contributors.feather")
-        )
-        responses_df = read_feather(
-            os.path.join(feather_path, f"{snapshot_name}_responses.feather")
-        )
-        full_responses = snapdata
+
 
         if load_updated_snapshot:
             secondary_full_responses = secondary_snapdata
         else:
             secondary_full_responses = None
 
-    # Get response rate
-    processing.response_rate(contributors_df, responses_df)
-
-    # Data validation
-    val.check_data_shape(full_responses)
+    # Data validation of json or feather data
+    if not val.check_data_shape(full_responses):
+        raise Exception("The data shape is not correct")
 
     
 
-    stage_validate_harmonise_postcodes(config,
-                                       paths,
-                                       full_responses,
-                                       run_id,
-                                       check_file_exists,
-                                       read_csv)
+    
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
