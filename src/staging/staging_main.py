@@ -364,9 +364,6 @@ def run_staging(
     if not val.check_data_shape(full_responses):
         raise Exception("The data shape is not correct")
 
-    
-
-    
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
