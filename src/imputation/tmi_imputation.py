@@ -570,15 +570,6 @@ def run_tmi(
     # create dataframe for all the rows excluded from TMI
     excluded_df = full_df.copy().loc[mor_mask]
 
-    TMILogger.debug(
-        f"There are {full_df.shape[0]} rows in the original df \n"
-        f"There are {longform_df.shape[0]} rows in df for longform TMI \n"
-        f"There are {shortform_df.shape[0]} rows in df for longform TMI \n"
-        f"There are {excluded_df.shape[0]} rows in the excluded df \n"
-        f"The total rows in the 3 dataframes is "
-        f"{longform_df.shape[0] + shortform_df.shape[0] + excluded_df.shape[0]}"
-    )
-
     # apply TMI imputation to long forms and then short forms
     longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, sic_mapper, config)
 

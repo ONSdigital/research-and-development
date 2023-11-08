@@ -114,10 +114,16 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Data Ingest...")
 
-    # TODO Construction module still in progress
+    # Construction module
     MainLogger.info("Starting Construction...")
-    constructed_df = run_construction(
-        full_responses, secondary_full_responses, config, write_csv, run_id
+    full_responses = run_construction(
+        full_responses,
+        secondary_full_responses,
+        config,
+        check_file_exists,
+        write_csv,
+        read_csv,
+        run_id
     )
     MainLogger.info("Finished Construction...")
 
