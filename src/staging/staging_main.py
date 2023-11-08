@@ -76,11 +76,11 @@ def check_snapshot_feather_exists(
     """
 
     if config["global"]["load_updated_snapshot"]:
-        return check_file_exists(
-            feather_file_to_check, raise_error=True
-        ) and check_file_exists(secondary_feather_file, raise_error=True)
+        return check_file_exists(feather_file_to_check) and check_file_exists(
+            secondary_feather_file
+        )
     else:
-        return check_file_exists(feather_file_to_check, raise_error=True)
+        return check_file_exists(feather_file_to_check)
 
 
 @time_logger_wrap
@@ -117,7 +117,7 @@ def fix_anon_data(responses_df, config):
     return responses_df
 
 
-def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
+def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
     StagingMainLogger.info("Loading SPP snapshot data from json file")
 
@@ -127,7 +127,7 @@ def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
     # Get response rate
-    processing.response_rate(contributors_df, responses_df)
+    res_rate = "{:.2f}".format(processing.response_rate(contributors_df, responses_df))
 
     # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
@@ -141,7 +141,6 @@ def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
     val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
     # Data Transmutation
-    StagingMainLogger.info("Starting Data Transmutation...")
     full_responses = processing.full_responses(contributors_df, responses_df)
 
     StagingMainLogger.info(
@@ -154,6 +153,8 @@ def load_val_snapshot_json(load_json, snapshot_path, config, network_or_hdfs):
         "./config/contributors_schema.toml",
         "./config/wide_responses.toml",
     )
+
+    return full_responses, res_rate
 
 
 def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
@@ -194,12 +195,12 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
 
 
 def write_snapshot_to_feather(
-    feather_path: str,
+    feather_dir_path: str,
     snapshot_name: str,
     full_responses: pd.DataFrame,
-    secondary_snapshot_name: str,
-    secondary_full_responses: pd.DataFrame,
     write_feather,
+    secondary_snapshot_name: str,
+    secondary_full_responses: pd.DataFrame = None,
 ) -> None:
     """
     Writes the provided DataFrames to feather files.
@@ -215,17 +216,20 @@ def write_snapshot_to_feather(
         secondary_snapshot_name (str): The name of the snapshot for the `secondary_full_responses` DataFrame.
         secondary_full_responses (pd.DataFrame): The DataFrame to write to the "{secondary_snapshot_name}.feather" file.
     """
-    logger = logging.getLogger(__name__)
 
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-    write_feather(feather_file, full_responses)
-    logger.info(f"Written {snapshot_name}_corrected.feather to {feather_path}")
+    feather_file = f"{snapshot_name}_corrected.feather"
+    feather_file_path = os.path.join(feather_dir_path, feather_file)
+    write_feather(feather_file_path, full_responses)
+    StagingMainLogger.info(f"Written {feather_file} to {feather_dir_path}")
 
-    secondary_feather_file = os.path.join(
-        feather_path, f"{secondary_snapshot_name}.feather"
-    )
-    write_feather(secondary_feather_file, secondary_full_responses)
-    logger.info(f"Written {secondary_snapshot_name}.feather to {feather_path}")
+    if secondary_full_responses:
+        secondary_feather_file = os.path.join(
+            feather_dir_path, f"{secondary_snapshot_name}.feather"
+        )
+        write_feather(secondary_feather_file, secondary_full_responses)
+        StagingMainLogger.info(
+            f"Written {secondary_snapshot_name}.feather to {feather_dir_path}"
+        )
 
 
 def stage_validate_harmonise_postcodes(
@@ -327,17 +331,21 @@ def run_staging(
     if READ_FROM_FEATHER:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
-        full_responses = load_snapshot_feather(feather_file)
+        full_responses = load_snapshot_feather(feather_file, read_feather)
         if load_updated_snapshot:
-            secondary_snapdata = load_snapshot_feather(secondary_feather_file)
+            secondary_snapdata = load_snapshot_feather(
+                secondary_feather_file, read_feather
+            )
 
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
         check_file_exists(snapshot_path, raise_error=True)
-        full_responses = load_val_snapshot_json(
-            load_json, snapshot_path, config, network_or_hdfs
+        full_responses, response_rate = load_val_snapshot_json(
+            snapshot_path, load_json, config, network_or_hdfs
         )
+
+        print(response_rate)  # TODO: We might want to use this in a QA output
 
         # Validate the postcodes in data loaded from JSON
         stage_validate_harmonise_postcodes(
@@ -363,9 +371,9 @@ def run_staging(
                 feather_path,
                 snapshot_name,
                 full_responses,
+                write_feather,
                 secondary_snapshot_name,
                 secondary_full_responses,
-                write_feather=write_feather,
             )
 
         if load_updated_snapshot:
