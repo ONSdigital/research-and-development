@@ -39,18 +39,20 @@ def run_construction(
     """
     # Skip this module if the secondary snapshot isn't loaded
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
-    if load_updated_snapshot is False:
+    load_manual_construction = config["global"]["load_manual_construction"]
+    if load_manual_construction is False:
         construction_logger.info("Skipping Construction...")
         return main_snapshot
 
     # ! For now, we add the year column since neither file has it
     main_snapshot["year"] = 2022
-    secondary_snapshot["year"] = 2022
+    if load_updated_snapshot is True:
+        secondary_snapshot["year"] = 2022
 
-    # Use the secondary snapshot to generate construction files for the next run
-    additions_df = get_additions(main_snapshot, secondary_snapshot)
-    amendments_df = get_amendments(main_snapshot, secondary_snapshot)
-    output_construction_files(amendments_df, additions_df, config, write_csv, run_id)
+        # Use the secondary snapshot to generate construction files for the next run
+        additions_df = get_additions(main_snapshot, secondary_snapshot)
+        amendments_df = get_amendments(main_snapshot, secondary_snapshot)
+        output_construction_files(amendments_df, additions_df, config, write_csv, run_id)
 
     # Read the construction files from the last run and apply them
     constructed_df = apply_construction(main_snapshot,
@@ -99,7 +101,7 @@ def get_amendments(main_snapshot, secondary_snapshot):
         # Select only the keys, updated value, difference, and postcode
         # TODO Would be easier for users if the numberic cols alternated
         select_cols = ["reference", "year", "instance", *numeric_cols_new,
-                       *numeric_cols_diff, "harmonised_postcode"]
+                       *numeric_cols_diff, "postcodes_harmonised"]
         amendments_df = amendments_df[select_cols]
 
         # Add markers
@@ -148,8 +150,8 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     paths = config[f"{network_or_hdfs}_paths"]
     tdate = datetime.now().strftime("%Y-%m-%d")
     construction_folder = paths["construction_path"]
-    amendments_filename = os.path.join(construction_folder, f"construction_amendments_{tdate}_v{run_id}.csv")
-    additions_filename = os.path.join(construction_folder, f"construction_additions_{tdate}_v{run_id}.csv")
+    amendments_filename = os.path.join(construction_folder, "auto_construction", f"construction_amendments_{tdate}_v{run_id}.csv")
+    additions_filename = os.path.join(construction_folder, "auto_construction", f"construction_additions_{tdate}_v{run_id}.csv")
 
     # Check if the dataframes are empty before writing
     if amendments_df is not None:
@@ -165,7 +167,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
     # Prepare filepaths to read from
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
-    amendments_filepath = paths["construction_edit_path"]
+    amendments_filepath = paths["construction_amend_path"]
     additions_filepath = paths["construction_add_path"]
 
     # Check if the construction files exist
@@ -187,6 +189,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
     if additions_exist:
         try:
             additions_df = read_csv(additions_filepath)
+            additions_df["instance"] = additions_df["instance"].astype("Int64")
             constructed_df = apply_additions(main_df, additions_df)
         except pd.errors.EmptyDataError:
             construction_logger.warning(f"Additions file {additions_filepath} is empty, skipping...")
