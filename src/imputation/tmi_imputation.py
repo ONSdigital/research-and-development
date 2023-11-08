@@ -102,7 +102,6 @@ def create_imp_class_col(
         pd.DataFrame: Dataframe which contains a new column with the
         imputation classes.
     """
-
     df = df.copy()
 
     # Create class col with concatenation
@@ -319,6 +318,7 @@ def create_mean_dict(
     Returns:
         Tuple[Dict[str, float], pd.DataFrame]
     """
+    TMILogger.debug("Creating mean dictionaries")
     df_list = []
 
     # Create an empty dict to store means
@@ -365,7 +365,7 @@ def create_mean_dict(
     return mean_dict, df
 
 
-def apply_tmi(df, target_variables, mean_dict, form_type):
+def apply_tmi(df, target_variables, mean_dict):
     """Function to replace the not clear statuses with the mean value
     for each imputation class"""
 
@@ -374,10 +374,6 @@ def apply_tmi(df, target_variables, mean_dict, form_type):
     filtered_df = filter_by_column_content(
         df, "status", ["Form sent out", "Check needed"]
     )
-
-    # For short forms, imputation is only applied to Census references
-    if form_type == formtype_short:
-        filtered_df = filter_by_column_content(filtered_df, "selectiontype", ["C"])
 
     # Filter out any cases where 200 or 201 are missing from the imputation class
     # This ensures that means are calculated using only valid imputation classes
@@ -468,25 +464,26 @@ def run_longform_tmi(
     # TMI Step 1: impute the Product Group
     df = impute_pg_by_sic(longform_df, sic_mapper)
 
-    TMILogger.info("Imputing for R&D type (civil or defence).")
+    # TMI Step 2: impute for R&D type (civil or defence)
     df = impute_civil_defence(df)
 
     lf_target_variables = config["imputation"]["lf_target_vars"]
     df = tmi_pre_processing(df, lf_target_variables)
 
+    TMILogger.info("Starting TMI mean calculations.")
     mean_dict, qa_df = create_mean_dict(df, lf_target_variables, config)
 
     qa_df.set_index("qa_index", drop=True, inplace=True)
     qa_df = qa_df.drop("trim_check", axis=1)
 
     # apply the imputed values to the statuses requiring imputation
-    final_tmi_df = apply_tmi(df, lf_target_variables, mean_dict, formtype_long)
+    tmi_df = apply_tmi(df, lf_target_variables, mean_dict)
 
-    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
     # TMI Step 4: expansion imputation
-    expanded_df = ximp.run_expansion(final_tmi_df, config)
+    expanded_df = ximp.run_expansion(tmi_df, config)
 
     # TMI Step 5: Calculate headcount and employment totals
     final_df = calculate_totals(expanded_df)
@@ -512,7 +509,12 @@ def run_shortform_tmi(
 
     sf_target_variables = list(config["breakdowns"])
 
-    df = tmi_pre_processing(shortform_df, sf_target_variables)
+    # logic to identify Census rows, only these will be used for shortform TMI
+    census_mask = shortform_df["selectiontype"] == "C"
+    to_impute_df = shortform_df.copy().loc[census_mask]
+    not_imputed_df = shortform_df.copy().loc[~census_mask]
+
+    df = tmi_pre_processing(to_impute_df, sf_target_variables)
 
     mean_dict, qa_df = create_mean_dict(df, sf_target_variables, config)
 
@@ -520,13 +522,18 @@ def run_shortform_tmi(
     qa_df = qa_df.drop("trim_check", axis=1)
 
     # apply the imputed values to the statuses requiring imputation
-    final_tmi_df = apply_tmi(df, sf_target_variables, mean_dict, formtype_short)
+    tmi_df = apply_tmi(df, sf_target_variables, mean_dict)
 
-    final_tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
-    final_tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+    tmi_df.loc[qa_df.index, "211_trim"] = qa_df["211_trim"]
+    tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
+
+    # create imputation classes for shortform entries not imputed (selectiontype 'P')
+    not_imputed_df = create_imp_class_col(not_imputed_df, "200", "201", "imp_class")
+    # concatinate qa dataframes from short forms and long forms
+    shortforms_updated_df = pd.concat([tmi_df, not_imputed_df])
 
     TMILogger.info("TMI imputation completed.")
-    return final_tmi_df, qa_df
+    return shortforms_updated_df, qa_df
 
 
 def run_tmi(
@@ -548,20 +555,38 @@ def run_tmi(
     # changing type of Civil or Defence column 200 helps with imputation classes
     full_df["200"] = full_df["200"].astype("category")
 
-    # exclude rows that have had MoR or CF applied
+    # logic to identify rows that have had MoR or CF applied, 
+    # these should be excluded from TMI
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
-    excluded_df = full_df.copy().loc[mor_mask, :]
-    full_df = full_df.copy().loc[~mor_mask, :]
 
-    longform_df = full_df.copy().loc[full_df["formtype"] == formtype_long]
-    shortform_df = full_df.copy().loc[full_df["formtype"] == formtype_short]
+    # create logic to select rows for longform and shortform TMI
+    long_tmi_mask = (full_df["formtype"] == formtype_long) & ~mor_mask
+    short_tmi_mask = (full_df["formtype"] == formtype_short) & ~mor_mask
 
+    # create dataframes to be used for longform TMI and short form census TMI
+    longform_df = full_df.copy().loc[long_tmi_mask]
+    shortform_df = full_df.copy().loc[short_tmi_mask]
+
+    # create dataframe for all the rows excluded from TMI
+    excluded_df = full_df.copy().loc[mor_mask]
+
+    TMILogger.debug(
+        f"There are {full_df.shape[0]} rows in the original df \n"
+        f"There are {longform_df.shape[0]} rows in df for longform TMI \n"
+        f"There are {shortform_df.shape[0]} rows in df for longform TMI \n"
+        f"There are {excluded_df.shape[0]} rows in the excluded df \n"
+        f"The total rows in the 3 dataframes is "
+        f"{longform_df.shape[0] + shortform_df.shape[0] + excluded_df.shape[0]}"
+    )
+
+    # apply TMI imputation to long forms and then short forms
     longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, sic_mapper, config)
 
     shortform_tmi_df, qa_df_short = run_shortform_tmi(shortform_df, config)
 
-    # concatinate the short and long form dataframes and qa
+    # concatinate the short and long form with the excluded dataframes
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
+    # concatinate qa dataframes from short forms and long forms
     full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(

@@ -1,6 +1,4 @@
-"""Module containing all functions relating to short form expansion.
-"""
-
+"""Module containing all functions relating to short form expansion."""
 from typing import List, Union
 import pandas as pd
 import logging
@@ -8,7 +6,6 @@ import logging
 from src.imputation.expansion_imputation import split_df_on_trim
 from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
 from src.utils.wrappers import df_change_func_wrap
-
 
 SFExpansionLogger = logging.getLogger(__name__)
 
@@ -53,17 +50,21 @@ def expansion_impute(
     sum_master_q_lng = group_copy.loc[long_responder_mask, master_col_imputed].sum()
 
     # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group_copy[to_expand_mask][master_col_imputed]
+    returned_master_vals = group_copy.loc[to_expand_mask, master_col_imputed]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
         sum_breakdown_q = group_copy.loc[long_responder_mask, bd_col].sum()
 
-        # Update the imputation column for status encoded 100 and 201
-        # i.e. for non-responders
-        imputed_sf_vals = (sum_breakdown_q / sum_master_q_lng) * returned_master_vals
+        # Calculate the values of the imputation column
+        if sum_master_q_lng > 0:
+            scale_factor = sum_breakdown_q / sum_master_q_lng
+        else:
+            scale_factor = 0
 
+        imputed_sf_vals = scale_factor * returned_master_vals
+        
         # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
@@ -71,7 +72,7 @@ def expansion_impute(
     return group_copy
 
 
-# @df_change_func_wrap
+@df_change_func_wrap
 def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
 
     df = df.copy()
@@ -153,7 +154,6 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     return combined_df
 
 
-# @df_change_func_wrap
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
 
     # Exclude the records from the reference list
@@ -173,7 +173,7 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     return filtered_df, excluded_df
 
 
-# @df_change_func_wrap
+@df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class

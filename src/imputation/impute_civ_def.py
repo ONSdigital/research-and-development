@@ -1,11 +1,13 @@
 """This code could eventually be added to tmi_imputation.py this
 doesn't impact on the readability of the existing code. """
-
+import logging
 import pandas as pd
 import numpy as np
 from typing import Dict, Tuple
 
 from src.imputation import tmi_imputation as tmi
+
+CivdefLogger = logging.getLogger(__name__)
 
 clear_statuses = ["Clear", "Clear - overridden"]
 
@@ -233,6 +235,8 @@ def impute_civil_defence(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The original dataframe with imputed values for
             R&D type (civil or defence)
     """
+    CivdefLogger.info("Imputing for R&D type (civil or defence).")
+
     # create temp QA columns
     df["200_original"] = df["200"]
     df["pg_sic_class"] = "nan_nan"

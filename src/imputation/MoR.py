@@ -53,8 +53,12 @@ def mor_preprocessing(df, backdata):
     backdata = backdata.rename(columns=to_rename)
 
     backdata = run_apportionment(backdata)
+
+    clear_status_cond = backdata["status"].isin(good_statuses)
+    # identify backdata rows that only consist of postcodes to eliminate this
+    postcode_only_cond = backdata["211"].isnull() & backdata["405"].isnull()
     # Only pick up useful backdata
-    backdata = backdata.loc[(backdata["status"].isin(good_statuses)), :]
+    backdata = backdata.loc[clear_status_cond & ~postcode_only_cond, :]
 
     return to_impute_df, remainder_df, backdata
 

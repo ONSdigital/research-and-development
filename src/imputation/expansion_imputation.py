@@ -51,7 +51,10 @@ def evaluate_imputed_ixx(
         sum_breakdown_q = group.loc[clear_mask, bd_col].sum()
 
         # calculate the imputed values
-        imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val  # scalar
+        if master_imp_val > 0:
+            imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val
+        else:
+            imputed_value = 0
 
         # Update the imputed break-down columns where TMI imputation has been applied
         group.loc[TMI_mask, f"{bd_col}_imputed"] = imputed_value
@@ -69,15 +72,31 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     df_not_trimmed = df.loc[~df[trim_bool_col]]
     df_trimmed = df.loc[df[trim_bool_col]]
 
+    ExpansionLogger.debug(
+        f"There are {df.shape[0]} rows in the original df \n"
+        f"There are {df_not_trimmed.shape[0]} rows in the nontrimmed_df \n"
+        f"There are {df_trimmed.shape[0]} rows in the trimmed_211_df"
+    )
+
     return df_trimmed, df_not_trimmed
 
 
-@time_logger_wrap
 def run_expansion(df: pd.DataFrame, config: dict):
-    """The main 'entry point' function to run the expansion imputation."""
+    """The main 'entry point' function to run the expansion imputation.
+    
+    Expansion imputation is Step 4 in TMI imputation for longforms, and
+    calculates imputed values for breakdown questions 2xx and 3xx
+    for the rows where TMI has been applied.
 
-    # Step 4: Expansion imputation for breakdown questions
+    To calculate the values to use in imputation, clear longform responders
+    are used, and the imputed values are applied to rows where imp_marker = TMI.
 
+    Args:
+        df (pd.DataFrame): the full dataframe after TMI imputation
+        config (Dict): the configuration settings     
+    Returns:
+        pd.DataFrame: the full dataframe with imputed 2xx and 3xx columns.
+    """
     # Get the breakdowns dict
     breakdown_dict = config["breakdowns"]
     breakdown_qs_2xx = breakdown_dict["211"]
@@ -85,11 +104,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Filter to exclude the same rows trimmed for 211_trim == False
     trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
-    ExpansionLogger.debug(
-        f"There are {df.shape[0]} rows in the original df \n"
-        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
-        f"There are {trimmed_211_df.shape[0]} rows in the trimmed_211_df"
-    )
 
     # Trimmed groups
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
@@ -120,8 +134,10 @@ def run_expansion(df: pd.DataFrame, config: dict):
     )
 
     # Join the expanded df (processed from untrimmed records) back on to
-    # trimmed records
-    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df], axis=0)
+    # trimmed records for 305 trimming, and the dataframe of excluded rows
+    expanded_result_df = pd.concat(
+        [result_211_305_df, trimmed_305_df], axis=0
+    )
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
