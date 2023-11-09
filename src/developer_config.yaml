@@ -1,15 +1,15 @@
 global:
   # Logging settings
   log_to_file: True # Write logs to .log file
-  logging_level: "INFO" # "DEBUG"
+  logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
-  postcode_csv_check: True
-  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
-  load_historic_data: True
+  postcode_csv_check: False
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
+  load_historic_data: False
   load_manual_outliers: True
   load_backdata: True
   load_from_feather: True
@@ -25,7 +25,7 @@ global:
   output_gb_sas: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
-  output_intram_by_civil_defence: True
+  output_intram_by_civil_defence: False
 
 years:
   current_year: 2022 # TODO: put this in the userconfig
