@@ -222,7 +222,7 @@ def write_snapshot_to_feather(
     write_feather(feather_file_path, full_responses)
     StagingMainLogger.info(f"Written {feather_file} to {feather_dir_path}")
 
-    if secondary_full_responses:
+    if secondary_full_responses is not None:
         secondary_feather_file = os.path.join(
             feather_dir_path, f"{secondary_snapshot_name}.feather"
         )
@@ -250,6 +250,8 @@ def stage_validate_harmonise_postcodes(
     invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
     StagingMainLogger.info("Finished PostCode Validation")
+
+    return postcode_mapper
 
 
 def run_staging(
@@ -333,10 +335,14 @@ def run_staging(
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         full_responses = load_snapshot_feather(feather_file, read_feather)
         if load_updated_snapshot:
-            secondary_snapdata = load_snapshot_feather(
+            secondary_full_responses = load_snapshot_feather(
                 secondary_feather_file, read_feather
             )
-
+        else:
+            secondary_full_responses = None
+        postcode_mapper = (
+            None  # TODO: check if the actual mapper is needed later in the pipeline
+        )
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
@@ -347,8 +353,11 @@ def run_staging(
 
         print(response_rate)  # TODO: We might want to use this in a QA output
 
+        # Data validation of json or feather data
+        val.check_data_shape(full_responses, raise_error=True)
+
         # Validate the postcodes in data loaded from JSON
-        stage_validate_harmonise_postcodes(
+        postcode_mapper = stage_validate_harmonise_postcodes(
             config,
             paths,
             full_responses,
@@ -364,8 +373,10 @@ def run_staging(
                 load_json,
                 secondary_snapshot_path,
             )
+        else:
+            secondary_full_responses = None
 
-        # Write feather file to snapshot path
+        # Write both snapshots to feather file at given path
         if is_network:
             write_snapshot_to_feather(
                 feather_path,
@@ -375,15 +386,6 @@ def run_staging(
                 secondary_snapshot_name,
                 secondary_full_responses,
             )
-
-        if load_updated_snapshot:
-            secondary_full_responses = secondary_snapdata
-        else:
-            secondary_full_responses = None
-
-    # Data validation of json or feather data
-    if not val.check_data_shape(full_responses):
-        raise Exception("The data shape is not correct")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
