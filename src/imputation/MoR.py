@@ -29,7 +29,7 @@ def run_mor(df, backdata, impute_vars):
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
 
     # TODO Remove the `XXX_prev` columns (left in for QA)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index()
+    return pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True)
 
 
 def mor_preprocessing(df, backdata):

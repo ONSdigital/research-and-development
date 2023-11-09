@@ -65,7 +65,7 @@ def expansion_impute(
             scale_factor = 0
 
         imputed_sf_vals = scale_factor * returned_master_vals
-        
+
         # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
@@ -94,7 +94,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
         # Create group_by obj of the trimmed df
-        groupby_obj = expanded_df.groupby("imp_class")  
+        groupby_obj = expanded_df.groupby("imp_class")
 
         # Calculate the imputation values for master question
         expanded_df = groupby_obj.apply(
@@ -103,7 +103,6 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
             trim_col,
             break_down_cols=breakdown_dict[master_value],
         )  # returns a dataframe
-
 
     # Calculate the headcount_m and headcount_f imputed values by summing
     short_mask = expanded_df["formtype"] == formtype_short

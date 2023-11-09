@@ -123,7 +123,7 @@ def run_pipeline(start, config_path):
         check_file_exists,
         write_csv,
         read_csv,
-        run_id
+        run_id,
     )
     MainLogger.info("Finished Construction...")
 
@@ -175,7 +175,7 @@ def run_pipeline(start, config_path):
         sic_pg_alpha,
         pg_detailed,
         itl1_detailed,
-        civil_defence_detailed
+        civil_defence_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")
