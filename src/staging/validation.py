@@ -371,7 +371,7 @@ def check_data_shape(
     resp_schema_cols = set(toml_string_response.keys())
 
     schema_full_col_set = cont_schema_cols.union(resp_schema_cols)
-    # Drop the columns which are dropped in SPP processing 
+    # Drop the columns which are dropped in SPP processing
     drop_cols_set = {"createdby", "createddate", "lastupdatedby"}
     schema_full_col_set = schema_full_col_set - drop_cols_set
 
@@ -382,7 +382,9 @@ def check_data_shape(
     else:
         cols_match = False
         ValidationLogger.warning(f"Data columns do not match schema.")
-        missing_file_cols = f"Missing from dataframe: {schema_full_col_set - df_cols_set}"
+        missing_file_cols = (
+            f"Missing from dataframe: {schema_full_col_set - df_cols_set}"
+        )
         missing_df_cols = f"Missing from schema: {df_cols_set - schema_full_col_set}"
         ValidationLogger.warning(missing_file_cols)
         ValidationLogger.warning(missing_df_cols)
