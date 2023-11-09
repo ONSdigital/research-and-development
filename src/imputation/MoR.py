@@ -3,12 +3,13 @@ import pandas as pd
 import re
 
 from src.imputation.apportionment import run_apportionment
+from src.imputation.tmi_imputation import create_imp_class_col
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
 
-def run_mor(df, backdata, impute_vars):
+def run_mor(df, backdata, impute_vars, lf_target_vars):
     """Function to implement Mean of Ratios method.
 
     This is implemented by first carrying forward data from last year
@@ -19,6 +20,7 @@ def run_mor(df, backdata, impute_vars):
         df (pd.DataFrame): Processed full responses DataFrame
         backdata (pd.DataFrame): One period of backdata.
         impute_vars ([string]): List of variables to impute.
+        lf_target_vars ([string]): List of long form target vars.
 
     Returns:
         pd.DataFrame: df with MoR applied
@@ -27,7 +29,8 @@ def run_mor(df, backdata, impute_vars):
 
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
-
+    
+    links_df = calculate_links(remainder_df, backdata, lf_target_vars)
     # TODO Remove the `XXX_prev` columns (left in for QA)
     return pd.concat([remainder_df, carried_forwards_df]).reset_index()
 
@@ -38,19 +41,21 @@ def mor_preprocessing(df, backdata):
     Args:
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
-    """
-    # TODO move this to imputation main
-    # Select only values to be imputed
-
-    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
-    to_impute_df = df.copy().loc[imputation_cond, :]
-    remainder_df = df.copy().loc[~imputation_cond, :]
-
+    """    
     # Convert backdata column names from qXXX to XXX
     p = re.compile(r"q\d{3}")
     cols = [col for col in list(backdata.columns) if p.match(col)]
     to_rename = {col: col[1:] for col in cols}
     backdata = backdata.rename(columns=to_rename)
+
+    # TODO move this to imputation main
+    # Select only values to be imputed
+    df = create_imp_class_col(df, "200", "201", use_cellno=False)
+    backdata = create_imp_class_col(backdata, "200", "201", use_cellno=False)
+
+    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
+    to_impute_df = df.copy().loc[imputation_cond, :]
+    remainder_df = df.copy().loc[~imputation_cond, :]
 
     backdata = run_apportionment(backdata)
 
@@ -117,3 +122,28 @@ def carry_forwards(df, backdata, impute_vars):
     to_drop += ["_merge"]
     df = df.drop(to_drop, axis=1)
     return df
+
+
+def calculate_links(current_df, prev_df, target_vars):
+    """Calculate the links between previous and current data.
+
+    Args:
+        current_df (_type_): _description_
+        prev_df (_type_): _description_
+        target_vars (_type_): _description_
+    """
+    link_df = pd.merge(current_df, 
+                       prev_df,
+                       on=["reference", "imp_class"],
+                       how="inner",
+                       suffixes=("", "_prev"))
+    target_vars_prev = [f"{var}_prev" for var in target_vars]
+    link_df = (link_df[["reference", "imp_class"] + target_vars + target_vars_prev]
+               .groupby(["reference", "imp_class"])
+               .sum()
+               )
+    for target in target_vars:
+        link_df[f"{target}_link"] = link_df[target]/link_df[f"{target}_prev"]
+    
+    #TODO How to deal with infs or 0/0
+    return link_df
