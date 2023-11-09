@@ -46,12 +46,14 @@ def expansion_impute(
     # but we calculate breakdown values for imputed short form rows
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
+    
+    master_col_imputed = f"{master_col}_imputed"
 
-    # Get long forms only for summing the master_col (scalar value)
-    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
+    # Get long forms only for summing the imputed master_col (scalar value)
+    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col_imputed].sum()
 
-    # Get the master (e.g. 211) value for all short forms (will be a vector)
-    returned_master_vals = group_copy.loc[to_expand_mask, master_col]
+    # Get the master (e.g. 211) returned value for each responder (will be a vector)
+    returned_master_vals = group_copy.loc[to_expand_mask, master_col_imputed]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
