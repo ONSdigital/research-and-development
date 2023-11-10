@@ -238,7 +238,7 @@ def apply_additions(main_df, additions_df):
     # Drop records where accept_changes is False and if any remain, add them to main df
     accepted_additions_df = additions_df.drop(additions_df[~additions_df["accept_changes"]].index)
     if accepted_additions_df.shape[0] > 0:
-        added_df = pd.concat([main_df, accepted_additions_df])
+        added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
         construction_logger.info(f"{accepted_additions_df.shape[0]} records added during construction")
     else:
         construction_logger.info("No additional records found during construction")
