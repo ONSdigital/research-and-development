@@ -1,12 +1,12 @@
 global:
   log_to_file: True # Write logs to .log file
-  logging_level: "INFO" # "DEBUG"
+  logging_level: "DEBUG"
   table_config: "SingleLine"
   postcode_csv_check: False
-  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
   load_manual_outliers: False
-  load_backdata: True
+  load_backdata: True  # whether to load previous year data for MoR
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -18,7 +18,7 @@ global:
   output_gb_sas: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
-  output_intram_by_civil_defence: True
+  output_intram_by_civil_defence: False
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   load_from_feather: True
@@ -133,7 +133,7 @@ imputation:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
-  sum_cols: 
+  sum_cols:
     - "emp_total"
     - "headcount_tot_m"
     - "headcount_tot_f"

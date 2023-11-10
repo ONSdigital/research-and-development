@@ -49,7 +49,8 @@ def regions() -> dict:
         "England": ["AA", "BA", "BB", "DC", "ED", "FE", "GF", "GG", "HH", "JG", "KJ"],
         "Wales": ["WW"],
         "Scotland": ["XX"],
-        "NI": ["YY"], }
+        "NI": ["YY"],
+    }
 
     regions["GB"] = regions["England"] + regions["Wales"] + regions["Scotland"]
     regions["UK"] = regions["GB"] + regions["NI"]

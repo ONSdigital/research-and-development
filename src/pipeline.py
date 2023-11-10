@@ -116,13 +116,15 @@ def run_pipeline(start, config_path):
 
     # Construction module
     MainLogger.info("Starting Construction...")
-    full_responses = run_construction(full_responses,
-                                      secondary_full_responses,
-                                      config,
-                                      check_file_exists,
-                                      write_csv,
-                                      read_csv,
-                                      run_id)
+    full_responses = run_construction(
+        full_responses,
+        secondary_full_responses,
+        config,
+        check_file_exists,
+        write_csv,
+        read_csv,
+        run_id,
+    )
     MainLogger.info("Finished Construction...")
 
     # Imputation module
@@ -173,7 +175,7 @@ def run_pipeline(start, config_path):
         sic_pg_alpha,
         pg_detailed,
         itl1_detailed,
-        civil_defence_detailed
+        civil_defence_detailed,
     )
 
     MainLogger.info("Finished All Output modules.")

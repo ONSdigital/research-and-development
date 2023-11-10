@@ -351,27 +351,37 @@ class TestManyToOne(unittest.TestCase):
 
     def mapper_good(self):
         # Good mapper
-        return pd.DataFrame({
-            "child": ["AA", "AB", "AC"],
-            "parent": ["A", "A", "A"], })
+        return pd.DataFrame(
+            {
+                "child": ["AA", "AB", "AC"],
+                "parent": ["A", "A", "A"],
+            }
+        )
 
     def mapper_duplicates(self):
         # Mapper with dulicates, but it should pass validation
-        return pd.DataFrame({
-            "child": ["AA", "AB", "AC", "AA"],
-            "parent": ["A", "A", "A", "A"], })
+        return pd.DataFrame(
+            {
+                "child": ["AA", "AB", "AC", "AA"],
+                "parent": ["A", "A", "A", "A"],
+            }
+        )
 
     def mapper_many(self):
         # Many-to-many mapper. should fail
-        return pd.DataFrame({
-            "child": ["AA", "AB", "AC", "AA"],
-            "parent": ["A", "A", "A", "B"], })
+        return pd.DataFrame(
+            {
+                "child": ["AA", "AB", "AC", "AA"],
+                "parent": ["A", "A", "A", "B"],
+            }
+        )
 
     def test_good_mapper(self):
         # Call the create_output_df funtion
         df_input = self.mapper_good()
         actual_result = validate_many_to_one(
-            df_input, col_many="child", col_one="parent")
+            df_input, col_many="child", col_one="parent"
+        )
         expected_result = df_input
         assert_frame_equal(actual_result, expected_result)
 
@@ -379,7 +389,8 @@ class TestManyToOne(unittest.TestCase):
         # Call the create_output_df funtion
         df_input = self.mapper_duplicates()
         actual_result = validate_many_to_one(
-            df_input, col_many="child", col_one="parent")
+            df_input, col_many="child", col_one="parent"
+        )
         expected_result = self.mapper_good()
         assert_frame_equal(actual_result, expected_result)
 
@@ -387,12 +398,10 @@ class TestManyToOne(unittest.TestCase):
         # Validation should fail if the mapper is many to many
         df_input = self.mapper_many()
         with self.assertRaises(ValueError):
-            validate_many_to_one(
-                df_input, col_many="child", col_one="parent")
+            validate_many_to_one(df_input, col_many="child", col_one="parent")
 
     def test_names(self):
         # Validation should fail if column names are wrong
         df_input = self.mapper_good()
         with self.assertRaises(ValueError):
-            validate_many_to_one(
-                df_input, col_many="dad", col_one="parent")
+            validate_many_to_one(df_input, col_many="dad", col_one="parent")

@@ -35,9 +35,11 @@ def run_imputation(
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
-    # TODO: imp_marker should be 'R' for clear responders
-    # Initialise imp_marker column, default value "no_imputation"
-    df["imp_marker"] = "no_imputation"
+    # Initialise imp_marker column with a value of 'R' for clear responders
+    # and a default value "no_imputation" for all other rows for now.
+    clear_responders_mask = df.status.isin(["Clear", "Clear - overridden"])
+    df.loc[clear_responders_mask, "imp_marker"] = "R"
+    df.loc[~clear_responders_mask, "imp_marker"] = "no_imputation"
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols

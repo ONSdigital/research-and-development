@@ -281,10 +281,10 @@ def run_staging(
 
         # Map PG numeric to alpha in column q201
         backdata = pg.pg_to_pg_mapper(
-        backdata,
-        pg_num_alpha,
-        target_col="q201",
-        pg_column="q201",
+            backdata,
+            pg_num_alpha,
+            target_col="q201",
+            pg_column="q201",
         )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
@@ -375,7 +375,6 @@ def run_staging(
     civil_defence_detailed = read_csv(civil_defence_detailed_path)
     # val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("Civil/Defence detailed mapper File Loaded Successfully...")
-
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
