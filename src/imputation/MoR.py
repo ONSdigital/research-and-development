@@ -1,15 +1,16 @@
 """Functions for the Mean of Ratios (MoR) methods."""
+import itertools
 import pandas as pd
 import re
 
 from src.imputation.apportionment import run_apportionment
-from src.imputation.tmi_imputation import create_imp_class_col
+from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
 
-def run_mor(df, backdata, impute_vars, lf_target_vars):
+def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     """Function to implement Mean of Ratios method.
 
     This is implemented by first carrying forward data from last year
@@ -31,6 +32,7 @@ def run_mor(df, backdata, impute_vars, lf_target_vars):
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
     
     links_df = calculate_links(remainder_df, backdata, lf_target_vars)
+    mor_df = calculate_MoR(links_df, lf_target_vars, config)
     # TODO Remove the `XXX_prev` columns (left in for QA)
     return pd.concat([remainder_df, carried_forwards_df]).reset_index()
 
@@ -146,4 +148,37 @@ def calculate_links(current_df, prev_df, target_vars):
         link_df[f"{target}_link"] = link_df[target]/link_df[f"{target}_prev"]
     
     #TODO How to deal with infs or 0/0
-    return link_df
+    return link_df.reset_index()
+
+def calculate_MoR(link_df, target_vars, config):
+    """Calculate the Means of Ratios (links) for each imp_class
+
+    Args:
+        link_df (pd.DataFrame): DataFrame of links for each target variable
+        target_vars ([string]): List of target variables to use.
+    """
+    link_vars = [f"{var}_link" for var in target_vars]
+    # Apply trimming
+    link_df = link_df[["imp_class", "reference"] + link_vars].groupby("imp_class")
+    link_df = link_df.apply(apply_MoR, target_vars, config)
+    
+    column_order = (["imp_class", "reference"] 
+                    + list(itertools.chain(
+                        *[(f"{var}_link", f"{var}_link_trim", f"{var}_mor") 
+                          for var in target_vars])
+                    ))                        
+    return link_df[column_order].reset_index(drop=True)
+
+
+def apply_MoR(group, target_vars, config):
+    """Apply the MoR method to each group
+
+    Args:
+        group (pd.core.groupby.DataFrameGroupBy): Imputation class group
+        link_vars ([string]): List of the linked variables.
+        config (Dict): Confuration settings
+    """
+    for var in target_vars:
+        group = trim_bounds(group, f"{var}_link", config)
+        group[f"{var}_mor"] = group.loc[~group[f"{var}_link_trim"], f"{var}_link"].mean()
+    return group.drop(["pre_index", "trim_check"])
