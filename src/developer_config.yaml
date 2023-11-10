@@ -1,12 +1,19 @@
 global:
+  # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
+  # Environment settings
+  dev_test : False
+  network_or_hdfs: network #whether to load from hdfs or network (local Python)
+  # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
-  load_manual_outliers: False
+  load_manual_outliers: True
   load_backdata: True  # whether to load previous year data for MoR
+  load_from_feather: True
+  # Output settings
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -19,9 +26,6 @@ global:
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
-  dev_test : False
-  network_or_hdfs: network #whether to load from hdfs or network (local Python)
-  load_from_feather: True
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig

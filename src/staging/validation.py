@@ -8,7 +8,13 @@ import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
 
 # Set up logging
-validation_logger = logging.getLogger(__name__)
+ValidationLogger = logging.getLogger(__name__)
+
+
+class ColumnMismatch(Exception):
+    def __init__(self, message=None):
+        self.message = message
+        super().__init__(message)
 
 
 def validate_postcode_pattern(pcode: str) -> bool:
@@ -100,10 +106,10 @@ def validate_post_col(
     )
 
     # Log the invalid postcodes
-    validation_logger.warning(
+    ValidationLogger.warning(
         f"Invalid pattern postcodes found: {invalid_pattern_postcodes.to_list()}"
     )
-    validation_logger.warning(
+    ValidationLogger.warning(
         f"""Number of invalid pattern postcodes found:
         {len(invalid_pattern_postcodes.to_list())}"""
     )
@@ -139,11 +145,11 @@ def validate_post_col(
     )
 
     # Log the unreal postcodes
-    validation_logger.warning(
+    ValidationLogger.warning(
         f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
     )
 
-    validation_logger.warning(
+    ValidationLogger.warning(
         f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
     )
 
@@ -154,11 +160,11 @@ def validate_post_col(
     combined_invalid_postcodes.drop_duplicates(inplace=True)
 
     if not combined_invalid_postcodes.empty:
-        validation_logger.warning(
+        ValidationLogger.warning(
             f"Total list of unique invalid postcodes found: {combined_invalid_postcodes.to_list()}"  # noqa
         )
 
-        validation_logger.warning(
+        ValidationLogger.warning(
             f"Total count of unique invalid postcodes found: {len(combined_invalid_postcodes.to_list())}"  # noqa
         )
 
@@ -177,7 +183,7 @@ def validate_post_col(
         other=None,
     )
 
-    validation_logger.info("All postcodes validated....")
+    ValidationLogger.info("All postcodes validated....")
 
     return combined_invalid_postcodes_df
 
@@ -334,6 +340,7 @@ def check_data_shape(
     data_df: pd.DataFrame,
     contributor_schema: str = "./config/contributors_schema.toml",
     wide_respon_schema: str = "./config/wide_responses.toml",
+    raise_error=False,
 ) -> bool:
     """Compares the shape of the data and compares it to the shape of the toml
     file based off the data schema. Returns true if there is a match and false
@@ -353,32 +360,43 @@ def check_data_shape(
 
     cols_match = False
 
-    data_dict = data_df.to_dict()
+    df_cols_set = set(data_df.columns)
 
     # Load toml data schemas into dictionary
     toml_string_cont = load_schema(contributor_schema)
     toml_string_response = load_schema(wide_respon_schema)
 
-    # Combained two dicts
-    full_columns_list = {**toml_string_cont, **toml_string_response}
+    # Combine two dicts - with no duplicates
+    cont_schema_cols = set(toml_string_cont.keys())
+    resp_schema_cols = set(toml_string_response.keys())
 
-    # Filtered schema colum if is in data columns
-    toml_string = [key for key in full_columns_list.keys() if key in data_df.columns]
+    schema_full_col_set = cont_schema_cols.union(resp_schema_cols)
+    # Drop the columns which are dropped in SPP processing
+    drop_cols_set = {"createdby", "createddate", "lastupdatedby"}
+    schema_full_col_set = schema_full_col_set - drop_cols_set
 
     # Compare length of data dictionary to the data schema
-    if len(data_dict) == len(toml_string):
+    if len(df_cols_set) == len(schema_full_col_set):
         cols_match = True
+        ValidationLogger.info(f"Data columns match schema.")
     else:
         cols_match = False
+        ValidationLogger.warning(f"Data columns do not match schema.")
+        missing_file_cols = (
+            f"Missing from dataframe: {schema_full_col_set - df_cols_set}"
+        )
+        missing_df_cols = f"Missing from schema: {df_cols_set - schema_full_col_set}"
+        ValidationLogger.warning(missing_file_cols)
+        ValidationLogger.warning(missing_df_cols)
+        if raise_error:
+            raise ColumnMismatch(
+                "Error: The the number of columns do not match. Halted"
+            )
 
-    if cols_match is False:
-        validation_logger.warning(f"Data columns match schema: {cols_match}.")
-    else:
-        validation_logger.info(f"Data columns match schema: {cols_match}.")
-
-    validation_logger.info(
-        f"Length of data: {len(data_dict)}. Length of schema: {len(toml_string)}"
+    ValidationLogger.info(
+        f"Length of data: {len(df_cols_set)}. Length of schema: {len(schema_full_col_set)}"
     )
+
     return cols_match
 
 
@@ -390,7 +408,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
         survey_df (pd.DataFrame): Survey data in a pd.df format
         schema_path (str): path to the schema toml (should be in config folder)
     """
-
+    ValidationLogger.info(f"Starting validation with {schema_path}")
     # Load schema from toml
     dtypes_schema = load_schema(schema_path)
 
@@ -410,7 +428,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
             dtypes_dict[column] = "float64"
 
         try:
-            validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
+            ValidationLogger.debug(f"{column} before: {survey_df[column].dtype}")
             if dtypes_dict[column] == "Int64":
                 # Convert non-integer string to NaN
                 survey_df[column] = survey_df[column].apply(
@@ -422,9 +440,10 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype("string")
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
-            validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
+            ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
-            validation_logger.error(e)
+            ValidationLogger.error(e)
+    ValidationLogger.info("Validation successful")
 
 
 @time_logger_wrap
@@ -439,7 +458,9 @@ def combine_schemas_validate_full_df(
         contributor_schema (str): path to the schema toml (should be in config folder)
         wide_response_schema (str): path to the schema toml (should be in config folder)
     """
+
     # Load schemas from toml
+    ValidationLogger.info("Loading contributer and wide schemas from toml")
     dtypes_con_schema = load_schema(contributor_schema)
     dtypes_res_schema = load_schema(wide_response_schema)
 
@@ -455,6 +476,7 @@ def combine_schemas_validate_full_df(
     }
 
     # Cast each column individually and catch any errors
+    ValidationLogger.info("Starting data type casting process")
     for column in survey_df.columns:
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes[column] == "pd.NA":
@@ -463,7 +485,8 @@ def combine_schemas_validate_full_df(
             dtypes[column] = "float64"
 
             # Try to cast each column to the required data type
-        validation_logger.debug(f"{column} before: {survey_df[column].dtype}")
+
+        ValidationLogger.debug(f"{column} before: {survey_df[column].dtype}")
         if dtypes[column] == "Int64":
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
@@ -478,7 +501,8 @@ def combine_schemas_validate_full_df(
             survey_df[column] = survey_df[column].astype("string")
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
-        validation_logger.debug(f"{column} after: {survey_df[column].dtype}")
+        ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
+    ValidationLogger.info("Finished data type casting process")
 
 
 @time_logger_wrap
@@ -557,7 +581,7 @@ def validate_many_to_one(
         )
         df_bad = df_count[df_count["code_count"] > 1]
         if not df_bad.empty:
-            validation_logger.info(
+            ValidationLogger.info(
                 "The following codes have multile mapping: \n {df_bad}"
             )
             raise ValueError(f"Mapper is many to many")
