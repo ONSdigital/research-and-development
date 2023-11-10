@@ -68,7 +68,7 @@ OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
 
 # Define paths
-paths = config[f"{network_or_hdfs}_paths"] # Dynamically get paths based on config
+paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
 output_path = paths["output_path"]
 export_folder = paths["export_path"]
 
@@ -191,6 +191,7 @@ def transfer_files(source, destination, method, logger):
     transfer_func(source, destination)
     logger.info(f"Files {source} successfully {method}d to {destination}.")
 
+
 def run_export(paths=paths, config=config):
     """Main function to run the data export pipeline."""
 
@@ -233,16 +234,17 @@ def run_export(paths=paths, config=config):
     manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
-    
+
     transfer_files(manifest_path, manifest.export_directory, "move", OutgoingLogger)
-    
 
     # Copy or Move files to outgoing folder
     file_transfer_method = config["export_choices"]["copy_or_move_files"]
 
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
-        transfer_files(file_path, manifest.export_directory, file_transfer_method, OutgoingLogger)
+        transfer_files(
+            file_path, manifest.export_directory, file_transfer_method, OutgoingLogger
+        )
 
     OutgoingLogger.info("Exporting files finished.")
 

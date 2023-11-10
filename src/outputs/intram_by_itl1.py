@@ -67,10 +67,8 @@ def output_intram_by_itl1(
 
     # Merge with labels and ranks
     df_merge = itl1_detailed.merge(
-        df_agg,
-        how="left",
-        left_on=itl_code,
-        right_on=itl_code)
+        df_agg, how="left", left_on=itl_code, right_on=itl_code
+    )
     df_merge[value_col] = df_merge[value_col].fillna(0)
 
     # Sort by rank
@@ -82,7 +80,8 @@ def output_intram_by_itl1(
     notes = "Notes"
     value_title = "2023"
     df_merge = df_merge[[code, detail, value_col, notes]].rename(
-        columns={value_col: value_title})
+        columns={value_col: value_title}
+    )
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")

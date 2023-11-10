@@ -11,7 +11,7 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
   load_manual_outliers: True
-  load_backdata: True
+  load_backdata: True  # whether to load previous year data for MoR
   load_from_feather: True
   # Output settings
   output_full_responses: False
@@ -26,7 +26,6 @@ global:
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
-
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
