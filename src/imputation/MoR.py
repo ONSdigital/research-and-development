@@ -36,7 +36,7 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
 
     carried_forwards_df = apply_MoR(carried_forwards_df, mor_df, lf_target_vars)
     # TODO Remove the `XXX_prev` columns (left in for QA)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index()
+    return pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True)
 
 
 def mor_preprocessing(df, backdata):

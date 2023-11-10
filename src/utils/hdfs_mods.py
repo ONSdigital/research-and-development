@@ -74,7 +74,7 @@ def hdfs_load_json(filepath: str) -> dict:
     return datadict
 
 
-def hdfs_file_exists(filepath: str) -> bool:
+def hdfs_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check file exists in hdfs.
 
         Args:
@@ -86,6 +86,9 @@ def hdfs_file_exists(filepath: str) -> bool:
     """
 
     file_exists = hdfs.path.exists(filepath)
+
+    if not file_exists and raise_error:
+        raise FileExistsError(f"File: {filepath} does not exist")
 
     return file_exists
 

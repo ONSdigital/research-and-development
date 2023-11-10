@@ -31,7 +31,7 @@ def evaluate_imputed_ixx(
         ExpansionLogger.debug(
             f"Imputation class {imp_class} has no TMI rows to process."
         )
-        return group        
+        return group
 
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
@@ -83,7 +83,7 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
 
 def run_expansion(df: pd.DataFrame, config: dict):
     """The main 'entry point' function to run the expansion imputation.
-    
+
     Expansion imputation is Step 4 in TMI imputation for longforms, and
     calculates imputed values for breakdown questions 2xx and 3xx
     for the rows where TMI has been applied.
@@ -93,7 +93,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     Args:
         df (pd.DataFrame): the full dataframe after TMI imputation
-        config (Dict): the configuration settings     
+        config (Dict): the configuration settings
     Returns:
         pd.DataFrame: the full dataframe with imputed 2xx and 3xx columns.
     """
@@ -118,7 +118,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     result_211_df = pd.concat([result_211_df, trimmed_211_df], axis=0)
 
     # Calculate the imputation values for 3xx questions
-    
+
     # Filter to exclude the same rows trimmed for 305_trim == False
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
     ExpansionLogger.debug(
@@ -135,9 +135,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records for 305 trimming, and the dataframe of excluded rows
-    expanded_result_df = pd.concat(
-        [result_211_305_df, trimmed_305_df], axis=0
-    )
+    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df], axis=0)
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)

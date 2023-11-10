@@ -67,7 +67,7 @@ def load_local_json(filepath: str) -> dict:
     return data
 
 
-def local_file_exists(filepath: str) -> bool:
+def local_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check if a file exists on a local network drive
 
     Args:
@@ -77,6 +77,9 @@ def local_file_exists(filepath: str) -> bool:
         bool: A boolean value indicating whether the file exists or not
     """
     file_exists = os.path.exists(filepath)
+
+    if raise_error and not file_exists:
+        raise FileExistsError(f"File: {filepath} does not exist")
 
     return file_exists
 
