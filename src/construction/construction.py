@@ -209,14 +209,14 @@ def apply_amendments(main_df, amendments_df):
                     "246", "247", "248", "249", "250"]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
-    accepted_amendments_df = amendments_df.drop(amendments_df[~amendments_df.accept_changes])
+    accepted_amendments_df = amendments_df.drop(amendments_df[~amendments_df.accept_changes].index)
 
     if accepted_amendments_df.shape[0] == 0:
         construction_logger.info("No amended records found during construction")
         return main_df
 
     # Drop the diff columns
-    accepted_amendments_df = accepted_amendments_df.drop([col for col in accepted_amendments_df.columns if col.endswith("_diff")])
+    accepted_amendments_df = accepted_amendments_df.drop(columns=[col for col in accepted_amendments_df.columns if col.endswith("_diff")])
 
     # Join the amendments onto the main snapshot
     amended_df = pd.merge(main_df, accepted_amendments_df,
@@ -224,7 +224,7 @@ def apply_amendments(main_df, amendments_df):
                           on=key_cols)
 
     # Drop the old numeric cols and rename the amended cols
-    amended_df = amended_df.drop(numeric_cols)
+    amended_df = amended_df.drop(columns=numeric_cols)
     cols_to_rename = dict(zip(numeric_cols_new, numeric_cols))
     amended_df = amended_df.rename(columns=cols_to_rename, errors="raise")
 
