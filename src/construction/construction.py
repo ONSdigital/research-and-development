@@ -17,7 +17,7 @@ def run_construction(
     check_file_exists: Callable,
     write_csv: Callable,
     read_csv: Callable,
-    run_id: int
+    run_id: int,
 ) -> pd.DataFrame:
     """Run the construction module.
 
@@ -53,11 +53,9 @@ def run_construction(
     output_construction_files(amendments_df, additions_df, config, write_csv, run_id)
 
     # Read the construction files from the last run and apply them
-    constructed_df = apply_construction(main_snapshot,
-                                        config,
-                                        check_file_exists,
-                                        read_csv,
-                                        write_csv, run_id)
+    constructed_df = apply_construction(
+        main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
+    )
 
     return constructed_df
 
@@ -75,17 +73,24 @@ def get_amendments(main_snapshot, secondary_snapshot):
     numeric_cols_diff = [f"{i}_diff" for i in numeric_cols]
 
     # Inner join on keys to select only records present in both snapshots
-    amendments_df = pd.merge(main_snapshot, secondary_snapshot,
-                             on=key_cols,
-                             how="inner",
-                             suffixes=("_original", "_updated"))
+    amendments_df = pd.merge(
+        main_snapshot,
+        secondary_snapshot,
+        on=key_cols,
+        how="inner",
+        suffixes=("_original", "_updated"),
+    )
 
     # If there are any records to amend, calculate differences
     if amendments_df.shape[0] > 0:
 
         for each in numeric_cols:
-            amendments_df[f"{each}_diff"] = amendments_df[f"{each}_updated"] - amendments_df[f"{each}_original"]
-            amendments_df.loc[amendments_df[f"{each}_diff"] > 0.00001, f"is_{each}_diff_nonzero"] = True
+            amendments_df[f"{each}_diff"] = (
+                amendments_df[f"{each}_updated"] - amendments_df[f"{each}_original"]
+            )
+            amendments_df.loc[
+                amendments_df[f"{each}_diff"] > 0.00001, f"is_{each}_diff_nonzero"
+            ] = True
 
         # ? I think this is the way to do it:
         # ?     Take a slice of the df which is just the cols ending with _diff_nonzero
@@ -93,13 +98,21 @@ def get_amendments(main_snapshot, secondary_snapshot):
         # ?     Add that series as a column to the original df
         # ?     Remove any rows from the df where is_any_diff_nonzero is False
         # ! Can't test this without a real secondary snapshot file
-        amendments_df["is_any_diff_nonzero"] = amendments_df[amendments_df.columns[amendments_df.columns.str.endswith('_diff_nonzero')]].any(axis="columns")
+        amendments_df["is_any_diff_nonzero"] = amendments_df[
+            amendments_df.columns[amendments_df.columns.str.endswith("_diff_nonzero")]
+        ].any(axis="columns")
         amendments_df = amendments_df.loc[amendments_df["is_any_diff_nonzero"]]
 
         # Select only the keys, updated value, difference, and postcode
         # TODO Would be easier for users if the numberic cols alternated
-        select_cols = ["reference", "year", "instance", *numeric_cols_new,
-                       *numeric_cols_diff, "harmonised_postcode"]
+        select_cols = [
+            "reference",
+            "year",
+            "instance",
+            *numeric_cols_new,
+            *numeric_cols_diff,
+            "harmonised_postcode",
+        ]
         amendments_df = amendments_df[select_cols]
 
         # Add markers
@@ -124,13 +137,20 @@ def get_additions(main_snapshot, secondary_snapshot):
     # that, there will be copies of every column in both, but for the
     # right-only rows the columns from the left df will be null, so they're
     # all dropped afterwards.
-    outer_join = pd.merge(main_snapshot, secondary_snapshot,
-                          on=key_cols,
-                          how="outer",
-                          suffixes=("_old", ""),
-                          indicator=True)
-    additions_df = outer_join[(outer_join._merge == "right_only")].drop("_merge", axis=1)
-    additions_df = additions_df[additions_df.columns[~additions_df.columns.str.endswith('_old')]]
+    outer_join = pd.merge(
+        main_snapshot,
+        secondary_snapshot,
+        on=key_cols,
+        how="outer",
+        suffixes=("_old", ""),
+        indicator=True,
+    )
+    additions_df = outer_join[(outer_join._merge == "right_only")].drop(
+        "_merge", axis=1
+    )
+    additions_df = additions_df[
+        additions_df.columns[~additions_df.columns.str.endswith("_old")]
+    ]
 
     if additions_df.shape[0] > 0:
         additions_df["is_constructed"] = True
@@ -148,8 +168,12 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     paths = config[f"{network_or_hdfs}_paths"]
     tdate = datetime.now().strftime("%Y-%m-%d")
     construction_folder = paths["construction_path"]
-    amendments_filename = os.path.join(construction_folder, f"construction_amendments_{tdate}_v{run_id}.csv")
-    additions_filename = os.path.join(construction_folder, f"construction_additions_{tdate}_v{run_id}.csv")
+    amendments_filename = os.path.join(
+        construction_folder, f"construction_amendments_{tdate}_v{run_id}.csv"
+    )
+    additions_filename = os.path.join(
+        construction_folder, f"construction_additions_{tdate}_v{run_id}.csv"
+    )
 
     # Check if the dataframes are empty before writing
     if amendments_df is not None:
@@ -182,19 +206,25 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
             amendments_df = read_csv(amendments_filepath)
             constructed_df = apply_amendments(main_df, amendments_df)
         except pd.errors.EmptyDataError:
-            construction_logger.warning(f"Amendments file {amendments_filepath} is empty, skipping...")
+            construction_logger.warning(
+                f"Amendments file {amendments_filepath} is empty, skipping..."
+            )
 
     if additions_exist:
         try:
             additions_df = read_csv(additions_filepath)
             constructed_df = apply_additions(main_df, additions_df)
         except pd.errors.EmptyDataError:
-            construction_logger.warning(f"Additions file {additions_filepath} is empty, skipping...")
+            construction_logger.warning(
+                f"Additions file {additions_filepath} is empty, skipping..."
+            )
 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%Y-%m-%d")
     # ? Should this go in a subfolder of the outputs folder?
-    construction_output_filepath = os.path.join(paths["output_path"], f"constructed_snapshot_{tdate}_v{run_id}.csv")
+    construction_output_filepath = os.path.join(
+        paths["output_path"], f"constructed_snapshot_{tdate}_v{run_id}.csv"
+    )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
 
@@ -206,26 +236,30 @@ def apply_amendments(main_df, amendments_df):
                     "246", "247", "248", "249", "250"]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
-    accepted_amendments_df = amendments_df.drop(amendments_df[~amendments_df.accept_changes])
+    accepted_amendments_df = amendments_df.drop(
+        amendments_df[~amendments_df.accept_changes]
+    )
 
     if accepted_amendments_df.shape[0] == 0:
         construction_logger.info("No amended records found during construction")
         return main_df
 
     # Drop the diff columns
-    accepted_amendments_df = accepted_amendments_df.drop([col for col in accepted_amendments_df.columns if col.endswith("_diff")])
+    accepted_amendments_df = accepted_amendments_df.drop(
+        [col for col in accepted_amendments_df.columns if col.endswith("_diff")]
+    )
 
     # Join the amendments onto the main snapshot
-    amended_df = pd.merge(main_df, accepted_amendments_df,
-                          how="left",
-                          on=key_cols)
+    amended_df = pd.merge(main_df, accepted_amendments_df, how="left", on=key_cols)
 
     # Drop the old numeric cols and rename the amended cols
     amended_df = amended_df.drop(numeric_cols)
     cols_to_rename = dict(zip(numeric_cols_new, numeric_cols))
     amended_df = amended_df.rename(columns=cols_to_rename, errors="raise")
 
-    construction_logger.info(f"{accepted_amendments_df.shape[0]} records amended during construction")
+    construction_logger.info(
+        f"{accepted_amendments_df.shape[0]} records amended during construction"
+    )
 
     return amended_df
 
@@ -233,10 +267,14 @@ def apply_amendments(main_df, amendments_df):
 def apply_additions(main_df, additions_df):
     """Apply additions to the main snapshot."""
     # Drop records where accept_changes is False and if any remain, add them to main df
-    accepted_additions_df = additions_df.drop(additions_df[~additions_df["accept_changes"]].index)
+    accepted_additions_df = additions_df.drop(
+        additions_df[~additions_df["accept_changes"]].index
+    )
     if accepted_additions_df.shape[0] > 0:
         added_df = pd.concat([main_df, accepted_additions_df])
-        construction_logger.info(f"{accepted_additions_df.shape[0]} records added during construction")
+        construction_logger.info(
+            f"{accepted_additions_df.shape[0]} records added during construction"
+        )
     else:
         construction_logger.info("No additional records found during construction")
         return main_df

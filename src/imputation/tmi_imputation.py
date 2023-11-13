@@ -557,7 +557,7 @@ def run_tmi(
     # changing type of Civil or Defence column 200 helps with imputation classes
     full_df["200"] = full_df["200"].astype("category")
 
-    # logic to identify rows that have had MoR or CF applied, 
+    # logic to identify rows that have had MoR or CF applied,
     # these should be excluded from TMI
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
 

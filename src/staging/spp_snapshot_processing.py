@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 import logging
 
-spp_processing_logger = logging.getLogger(__name__)
+SppProcessingLogger = logging.getLogger(__name__)
 
 
 def create_response_dataframe(
@@ -58,7 +58,8 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
     Returns:
         full_responses -- DataFrame containing both response and contributor data
     """
-
+    SppProcessingLogger.info("Starting Data Transmutation...")
+    
     drop_cols = ["createdby", "createddate", "lastupdatedby"]
 
     unique_id_cols = ["reference", "instance"]
@@ -107,6 +108,6 @@ def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
 
     rounded_resp_rate = round(response_rate, 2)
 
-    spp_processing_logger.info(f"The response rate is {int(rounded_resp_rate*100)}%")
+    SppProcessingLogger.info(f"The response rate is {int(rounded_resp_rate*100)}%")
 
     return response_rate
