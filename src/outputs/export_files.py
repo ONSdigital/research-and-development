@@ -158,7 +158,7 @@ def get_file_choice(paths, config: dict = config):
     return selection_dict
 
 
-def check_files_exist(file_list: List):
+def check_files_exist(file_list: List, network_or_hdfs):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
@@ -169,7 +169,7 @@ def check_files_exist(file_list: List):
     # Check the existence of every file using is_file
     for file in file_list:
         file_path = Path(file)  # Changes to path if str
-        if not file_path.is_file():
+        if not isfile(file_path):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
             )
