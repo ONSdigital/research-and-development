@@ -149,7 +149,7 @@ def get_file_choice(paths, config: dict = config):
     selection_dict = {
         dir[7:]: Path(f"{root_output}/{dir}/{file}").with_suffix(".csv")
         for dir, file in output_paths.items()
-        if file is not None
+        if file != "None"
     }
 
     # Log the files being exported
