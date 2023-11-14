@@ -5,7 +5,7 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
-  network_or_hdfs: network #whether to load from hdfs or network (local Python)
+  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
@@ -100,11 +100,13 @@ schema_paths:
 # Export config for users
 export_choices:
   copy_or_move_files: "copy"
-  output_frozen_shortform: "output_short_form_2023-11-01_v38" # Can be set to None
-  output_tau: "output_tau_2023-10-11_v15" # Can be set to None
-  output_gb_sas: "output_gb_sas_2023-10-27_v1" # Can be set to None
-  output_intram_by_pg: "output_intram_by_pg_2023-10-27_v46" # Can be set to None
-  output_intram_by_itl1: "output_intram_by_itl1_2023-11-01_v302" # Can be set to None
+  output_frozen_shortform: "output_short_form2023-09-12_v1" # Can be set to None
+  output_tau: None # Can be set to None
+  output_gb_sas: None # Can be set to None
+  output_intram_by_pg: None # Can be set to None
+  output_intram_by_itl1: None # Can be set to None
+
+# / ons/ rdbe_dev/ outputs/ output_short_form/ output_short_form2023-09-12_v1.csv
 
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
