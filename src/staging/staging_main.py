@@ -173,14 +173,12 @@ def run_staging(
             "./config/wide_responses.toml",
         )
 
-        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
             secondary_snapdata = load_json(secondary_snapshot_path)
             (
                 secondary_contributors_df,
                 secondary_responses_df,
             ) = spp_parser.parse_snap_data(secondary_snapdata)
-            secondary_responses_df["instance"] = 0
             val.validate_data_with_schema(
                 secondary_contributors_df, "./config/contributors_schema.toml"
             )
