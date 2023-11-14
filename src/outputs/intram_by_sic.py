@@ -52,10 +52,12 @@ def output_intram_by_sic(
     df_agg = pd.concat([df_agg, df_tot])
 
     # Combine relevant sic divisions and total
+    # Spaces required in front of 01-03, 05-09 & 11-12 to
+    # stop automatic conversion to dates in output
     sic_div_combos = {
-        "01-03'": ["01", "02", "03"],
-        "05-09'": ["05", "06", "07", "08", "09"],
-        "11-12'": ["11", "12"],
+        " 01-03": ["01", "02", "03"],
+        " 05-09": ["05", "06", "07", "08", "09"],
+        " 11-12": ["11", "12"],
         "37-39": ["37", "38", "39"],
         "41-43": ["41", "42", "43"],
         "45-47": ["45", "46", "47"],
