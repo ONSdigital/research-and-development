@@ -139,6 +139,7 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     # Concat the expanded df (processed from untrimmed records) back on to
     # trimmed records. Reassigning to `df` to feed back into for-loop
     combined_df = pd.concat([expanded_305_df, trimmed_305_df], axis=0)
+    combined_df.reset_index(drop=True, inplace=True)
 
     # Calculate the headcount_m and headcount_f imputed values by summing
     short_mask = combined_df["formtype"] == formtype_short

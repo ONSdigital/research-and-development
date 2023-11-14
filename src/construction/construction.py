@@ -60,6 +60,7 @@ def run_construction(
                                         check_file_exists,
                                         read_csv,
                                         write_csv, run_id)
+    constructed_df.reset_index(drop=True, inplace=True)
 
     return constructed_df
 
