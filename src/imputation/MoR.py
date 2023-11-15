@@ -32,12 +32,14 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
 
-    links_df = calculate_links(remainder_df, backdata, lf_target_vars)
-    mor_df = calculate_MoR(links_df, lf_target_vars, config)
+    gr_df = calculate_growth_rates(remainder_df, backdata, lf_target_vars)
+    links_df = calculate_links(gr_df, lf_target_vars, config)
 
-    carried_forwards_df = apply_MoR(carried_forwards_df, mor_df, lf_target_vars, config)
+    carried_forwards_df = apply_links(
+        carried_forwards_df, links_df, lf_target_vars, config
+    )
     # TODO Remove the `XXX_prev` columns (left in for QA)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index(), mor_df
+    return pd.concat([remainder_df, carried_forwards_df]).reset_index(), links_df
 
 
 def mor_preprocessing(df, backdata):
@@ -90,8 +92,8 @@ def carry_forwards(df, backdata, impute_vars):
 
     Args:
         df (pd.DataFrame): Processed full responses DataFrame.
-        backdata (_type_): One period of backdata.
-        impute_vars (_type_): Variables to be imputed.
+        backdata (pd.DataFrame): One period of backdata.
+        impute_vars ([string]): Variables to be imputed.
 
     Returns:
         pd.DataFrame: df with values carried forwards
@@ -122,67 +124,79 @@ def carry_forwards(df, backdata, impute_vars):
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    df.loc[match_cond] = create_imp_class_col(df,
-                                              "200_prev",
-                                              "201_prev",
-                                              use_cellno=False)
+    df.loc[match_cond] = create_imp_class_col(
+        df, "200_prev", "201_prev", use_cellno=False
+    )
 
     # Drop merge related columns
-    to_drop = [column for column in df.columns
-               if (column.endswith("_prev"))
-               & (re.search("(.*)_prev|.*", column).group(1) not in impute_vars)]
+    to_drop = [
+        column
+        for column in df.columns
+        if (column.endswith("_prev"))
+        & (re.search("(.*)_prev|.*", column).group(1) not in impute_vars)
+    ]
     to_drop += ["_merge"]
     df = df.drop(to_drop, axis=1)
     return df
 
 
-def calculate_links(current_df, prev_df, target_vars):
-    """Calculate the links between previous and current data.
+def calculate_growth_rates(current_df, prev_df, target_vars):
+    """Calculate the growth rates between previous and current data.
 
     Args:
-        current_df (_type_): _description_
-        prev_df (_type_): _description_
-        target_vars (_type_): _description_
+        current_df (pd.DataFrame): pre-processed current data.
+        prev_df (pd.DataFrame): pre-processed backdata.
+        target_vars ([string]): target vars to impute.
     """
-    link_df = pd.merge(current_df,
-                       prev_df,
-                       on=["reference", "imp_class"],
-                       how="inner",
-                       suffixes=("", "_prev"))
+    # Only calculate links for long form responders
+    current_df = current_df.copy().loc[current_df["formtype"] == "0001", :]
+    # prev_df = prev_df.copy().loc[prev_df["formtype"] == "0001", :]
+
+    gr_df = pd.merge(
+        current_df,
+        prev_df,
+        on=["reference", "imp_class"],
+        how="inner",
+        suffixes=("", "_prev"),
+    )
     target_vars_prev = [f"{var}_prev" for var in target_vars]
-    link_df = (link_df[["reference", "imp_class"] + target_vars + target_vars_prev]
-               .groupby(["reference", "imp_class"])
-               .sum()
-               ).reset_index()
+    gr_df = (
+        gr_df[["reference", "imp_class"] + target_vars + target_vars_prev]
+        .groupby(["reference", "imp_class"])
+        .sum()
+    ).reset_index()
     # Calculate the ratios for the relevant variables
     for target in target_vars:
-        link_df[f"{target}_link"] = link_df[target] / link_df[f"{target}_prev"]
+        gr_df[f"{target}_gr"] = gr_df[target] / gr_df[f"{target}_prev"]
 
-    # TODO How to deal with infs or 0/0
-    return link_df
+    return gr_df
 
 
-def calculate_MoR(link_df, target_vars, config):
+def calculate_links(gr_df, target_vars, config):
     """Calculate the Means of Ratios (links) for each imp_class
 
     Args:
-        link_df (pd.DataFrame): DataFrame of links for each target variable
+        gr_df (pd.DataFrame): DataFrame of growth rates for each target variable
         target_vars ([string]): List of target variables to use.
+        config (Dict): Confuration settings.
     """
     # Apply trimming and calculate means for each imp class
-    link_df = link_df.groupby("imp_class")
-    link_df = link_df.apply(group_calc_mor, target_vars, config)
+    gr_df = gr_df.groupby("imp_class")
+    gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier
-    column_order = (["imp_class", "reference"]
-                    + list(itertools.chain(
-                        *[(var, f"{var}_prev", f"{var}_link", f"{var}_link_trim", f"{var}_mor")
-                          for var in target_vars]))
-                    )
-    return link_df[column_order].reset_index(drop=True)
+    column_order = ["imp_class", "reference"] + list(
+        itertools.chain(
+            *[
+                (var, f"{var}_prev", f"{var}_gr", f"{var}_gr_trim", f"{var}_link")
+                for var in target_vars
+            ]
+        )
+    )
+    return gr_df[column_order].reset_index(drop=True)
 
 
-def group_calc_mor(group, target_vars, config):
+def group_calc_link(group, target_vars, config):
     """Apply the MoR method to each group
 
     Args:
@@ -191,28 +205,34 @@ def group_calc_mor(group, target_vars, config):
         config (Dict): Confuration settings
     """
     for var in target_vars:
-        group = trim_bounds(group, f"{var}_link", config)
-        group[f"{var}_mor"] = (
-            group.loc[~group[f"{var}_link_trim"], f"{var}_link"].mean()
-        )
+        group = trim_bounds(group, f"{var}_gr", config)
+        # Create mask to not use 0s in mean calculation
+        no_zero_mask = pd.notnull(group[f"{var}_gr"]) & (group[f"{var}_gr"] != 0)
+        group[f"{var}_link"] = 1
+        group.loc[~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_link"] = group.loc[
+            ~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_gr"
+        ].mean()
     return group
 
 
-def apply_MoR(cf_df, mor_df, target_vars, config):
+def apply_links(cf_df, links_df, target_vars, config):
     """Apply the links to the carried forwards values.
 
     Args:
         cf_df (pd.DataFrame): DataFrame of carried forwards values.
-        mor_df (pd.DataFrame): DataFrame containing calculated links.
+        links_df (pd.DataFrame): DataFrame containing calculated links.
         target_vars ([string]): List of target variables.
         config (Dict): Dictorary of configuration.
     """
     # Reduce the mor_df so we only have the variables we need and one row
     # per imputation class
-    mor_df = (mor_df[["imp_class"] + [f"{var}_mor" for var in target_vars]]
-              .groupby("imp_class").first())
+    links_df = (
+        links_df[["imp_class"] + [f"{var}_link" for var in target_vars]]
+        .groupby("imp_class")
+        .first()
+    )
 
-    cf_df = pd.merge(cf_df, mor_df, on="imp_class", how="left", indicator=True)
+    cf_df = pd.merge(cf_df, links_df, on="imp_class", how="left", indicator=True)
 
     # Mask for values that are CF and also have a MoR link
     matched_mask = (cf_df["_merge"] == "both") & (cf_df["imp_marker"] == "CF")
@@ -220,11 +240,11 @@ def apply_MoR(cf_df, mor_df, target_vars, config):
     # Apply MoR for the target variables
     for var in target_vars:
         # Only apply MoR where the link is non null/0
-        no_zero_mask = pd.notnull(cf_df[f"{var}_mor"]) & (cf_df[f"{var}_mor"] != 0)
+        no_zero_mask = pd.notnull(cf_df[f"{var}_link"]) & (cf_df[f"{var}_link"] != 0)
         full_mask = matched_mask & no_zero_mask
         # Apply the links to the previous values
         cf_df.loc[full_mask, f"{var}_imputed"] = (
-            cf_df.loc[full_mask, f"{var}_imputed"] * cf_df.loc[full_mask, f"{var}_mor"]
+            cf_df.loc[full_mask, f"{var}_imputed"] * cf_df.loc[full_mask, f"{var}_link"]
         )
         cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
@@ -233,11 +253,14 @@ def apply_MoR(cf_df, mor_df, target_vars, config):
     for var in q_targets:
         for breakdown in config["breakdowns"][var]:
             # As above but using different elements to multiply
-            no_zero_mask = pd.notnull(cf_df[f"{var}_mor"]) & (cf_df[f"{var}_mor"] != 0)
+            no_zero_mask = pd.notnull(cf_df[f"{var}_link"]) & (
+                cf_df[f"{var}_link"] != 0
+            )
             full_mask = matched_mask & no_zero_mask
             # Apply the links to the previous values
             cf_df.loc[full_mask, f"{breakdown}_imputed"] = (
-                cf_df.loc[full_mask, f"{breakdown}_imputed"] * cf_df.loc[full_mask, f"{var}_mor"]
+                cf_df.loc[full_mask, f"{breakdown}_imputed"]
+                * cf_df.loc[full_mask, f"{var}_link"]
             )
             cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
