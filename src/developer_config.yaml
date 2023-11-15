@@ -89,6 +89,7 @@ network_paths:
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
