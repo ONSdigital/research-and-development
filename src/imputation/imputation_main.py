@@ -66,7 +66,7 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         links_filename = f"links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
-        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)    
+        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
         write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
