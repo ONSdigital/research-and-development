@@ -203,7 +203,8 @@ def run_staging(
             secondary_feather_file = os.path.join(
                 feather_path, f"{secondary_snapshot_name}.feather"
             )
-            write_feather(secondary_feather_file, secondary_full_responses)
+            if load_updated_snapshot:
+                write_feather(secondary_feather_file, secondary_full_responses)
         READ_FROM_FEATHER = False
 
     if READ_FROM_FEATHER:
@@ -385,6 +386,10 @@ def run_staging(
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
+
+    # If we didn't load a snapshot, leave the df as null
+    if not load_updated_snapshot:
+        secondary_full_responses = None
 
     return (
         full_responses,
