@@ -50,6 +50,7 @@ def mor_preprocessing(df, backdata):
         backdata (pd.Dataframe): backdata file read in during staging.
     """
     # Convert backdata column names from qXXX to XXX
+    # Note that this is only applicable when using the backdata on the network
     p = re.compile(r"q\d{3}")
     cols = [col for col in list(backdata.columns) if p.match(col)]
     to_rename = {col: col[1:] for col in cols}
@@ -208,10 +209,12 @@ def group_calc_link(group, target_vars, config):
         group = trim_bounds(group, f"{var}_gr", config)
         # Create mask to not use 0s in mean calculation
         no_zero_mask = pd.notnull(group[f"{var}_gr"]) & (group[f"{var}_gr"] != 0)
-        group[f"{var}_link"] = 1
-        group.loc[~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_link"] = group.loc[
-            ~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_gr"
-        ].mean()
+        if sum(~group[f"{var}_gr_trim"] & no_zero_mask) != 0:
+            group[f"{var}_link"] = group.loc[
+                ~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_gr"
+            ].mean()
+        else:
+            group[f"{var}_link"] = 1.0
     return group
 
 
