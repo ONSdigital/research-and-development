@@ -213,7 +213,7 @@ def apply_amendments(main_df, amendments_df):
     accepted_amendments_df = amendments_df.drop(amendments_df[~amendments_df.accept_changes].index)
 
     if accepted_amendments_df.shape[0] == 0:
-        construction_logger.info("No amended records found during construction")
+        construction_logger.info("Amendments file contained no records marked for inclusion")
         return main_df
 
     # Drop the diff columns
@@ -242,7 +242,7 @@ def apply_additions(main_df, additions_df):
         added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
         construction_logger.info(f"{accepted_additions_df.shape[0]} records added during construction")
     else:
-        construction_logger.info("No additional records found during construction")
+        construction_logger.info("Additions file contained no records marked for inclusion")
         return main_df
 
     return added_df
