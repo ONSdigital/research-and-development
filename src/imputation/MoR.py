@@ -166,7 +166,7 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         gr_df[["reference", "imp_class"] + target_vars + target_vars_prev]
         .groupby(["reference", "imp_class"])
         .sum()
-    ).reset_index(drop=True)
+    ).reset_index()
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         gr_df[f"{target}_gr"] = gr_df[target] / gr_df[f"{target}_prev"]
