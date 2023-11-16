@@ -6,42 +6,38 @@ Create schema
 """
 import pandas as pd
 import os
-#%% Estimation
-#mydir = r"R:\BERD Results System Development 2023\DAP_emulation\estimation\estimation_qa"
-#pref = "full_estimation_qa"
-#suff = "_2023-11-02_v57.csv"
 
-#%% Imputation
+# Imputation file location and name
+common_dir = "R:\\BERD Results System Development 2023\\DAP_emulation\\"
+output_dir = "imputation\\imputation_qa"
 
-
-mydir = r"R:\BERD Results System Development 2023\DAP_emulation\imputation\imputation_qa"
 pref = "full_responses_imputed"
 suff = "_2023-11-16_v340.csv"
 
-out_fol = r"config\output_schemas"
-#%% Read the ent
+# Output folder for all schemas
+out_dir = r"config\output_schemas"
+
+# Read the top 10 rows, inferrring the schema from csv
+mydir = common_dir + output_dir
 mypath = os.path.join(mydir, pref + suff)
 df = pd.read_csv(mypath, nrows=10)
 
-#%% 
+# Get column names  as data types as dict of strings
 types = dict(df.dtypes)
 schema = {col: str(types[col]) for col in types}
 
-#%%
+# Calculate the schema
 
+# Initially, the schema is empty
 S = ""
 
+# Iterate through columns
 for col in schema:
-    s = (
-            f'[{col}]' + '\n' + 
-            f'old_name = "{col}"' + '\n' +
-            f'Deduced_Data_Type = "{schema[col]}"\n\n'
-            )
+    s = f'[{col}]\nold_name = "{col}"\nDeduced_Data_Type = "{schema[col]}"\n\n'
     S = S + s
- 
-#%%
-mypath = os.path.join(out_fol, pref + '_schema.toml')
+
+# Output the schema toml file
+mypath = os.path.join(out_dir, pref + '_schema.toml')
 text_file = open(mypath, "w")
 text_file.write(S)
 text_file.close()
-
