@@ -220,53 +220,53 @@ Deduced_Data_Type = "str"
 
 
 ["emp_researcher"]
-old_name = ""
+old_name = "emp_researcher"
 Deduced_Data_Type = "Int64"
 
 ["emp_technician"]
-old_name = ""
+old_name = "emp_technician"
 Deduced_Data_Type = "Int64"
 
 ["emp_other"]
-old_name = ""
+old_name = "emp_other"
 Deduced_Data_Type = "Int64"
 
 ["headcount_res_m"]
-old_name = ""
+old_name = "headcount_res_m"
 Deduced_Data_Type = "Int64"
 
 ["headcount_res_f"]
-old_name = ""
+old_name = "headcount_res_f"
 Deduced_Data_Type = "Int64"
 
 ["headcount_tec_m"]
-old_name = ""
+old_name = "headcount_tec_m"
 Deduced_Data_Type = "Int64"
 
 ["headcount_tec_f"]
-old_name = ""
+old_name = "headcount_tec_f"
 Deduced_Data_Type = "Int64"
 
 ["headcount_oth_m"]
-old_name = ""
+old_name = "headcount_oth_m"
 Deduced_Data_Type = "Int64"
 
 ["headcount_oth_f"]
-old_name = ""
+old_name = "headcount_oth_f"
 Deduced_Data_Type = "Int64"
 
 ["emp_total"]
-old_name = ""
+old_name = "emp_total"
 Deduced_Data_Type = "Int64"
 
 ["headcount_tot_m"]
-old_name = ""
+old_name = "headcount_tot_m"
 Deduced_Data_Type = "Int64"
 
 ["headcount_tot_f"]
-old_name = ""
+old_name = "headcount_tot_f"
 Deduced_Data_Type = "Int64"
 
 ["headcount_total"]
-old_name = ""
+old_name = "headcount_total"
 Deduced_Data_Type = "Int64"
