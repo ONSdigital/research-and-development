@@ -35,7 +35,7 @@ def run_construction(
         run_id (int): The run id for this run.
     Returns:
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
-            and added from the construction files. amended
+            and added from the construction files.
     """
     # Skip this module if the secondary snapshot isn't loaded
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
