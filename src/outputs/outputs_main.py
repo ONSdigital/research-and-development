@@ -54,11 +54,14 @@ def run_outputs(
 
 
     """
+
+    outputs_df = estimated_df.copy().loc[estimated_df["imp_marker"].isin(["R", "TMI", "CF", "MoR"])]
+
     # Running short form output
     if config["global"]["output_short_form"]:
         OutputMainLogger.info("Starting short form output...")
         output_short_form(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -72,7 +75,7 @@ def run_outputs(
     if config["global"]["output_long_form"]:
         OutputMainLogger.info("Starting long form output...")
         output_long_form(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -100,7 +103,7 @@ def run_outputs(
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
         output_gb_sas(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -115,7 +118,7 @@ def run_outputs(
     if config["global"]["output_intram_by_pg"]:
         OutputMainLogger.info("Starting  Intram by PG output...")
         output_intram_by_pg(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -127,7 +130,7 @@ def run_outputs(
     if config["global"]["output_intram_by_itl1"]:
         OutputMainLogger.info("Starting  Intram by ITL1 output...")
         output_intram_by_itl1(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -141,7 +144,7 @@ def run_outputs(
     if config["global"]["output_intram_by_civil_defence"]:
         OutputMainLogger.info("Starting Intram by civil or defence output...")
         output_intram_by_civil_defence(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -153,7 +156,7 @@ def run_outputs(
     if config["global"]["output_intram_by_sic"]:
         OutputMainLogger.info("Starting Intram by SIC output...")
         output_intram_by_sic(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
