@@ -1,7 +1,3 @@
-[index]
-old_name = "index"
-Deduced_Data_Type = "float64"
-
 [reference]
 old_name = "reference"
 Deduced_Data_Type = "int64"

@@ -21,6 +21,7 @@ out_dir = r"config\output_schemas"
 mydir = common_dir + output_dir
 mypath = os.path.join(mydir, pref + suff)
 df = pd.read_csv(mypath, nrows=10)
+df = df.drop("index", axis=1)
 
 # Get column names  as data types as dict of strings
 types = dict(df.dtypes)
