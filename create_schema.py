@@ -18,6 +18,7 @@ mydir = r"R:\BERD Results System Development 2023\DAP_emulation\imputation\imput
 pref = "full_responses_imputed"
 suff = "_2023-11-16_v340.csv"
 
+out_fol = r"config\output_schemas"
 #%% Read the ent
 mypath = os.path.join(mydir, pref + suff)
 df = pd.read_csv(mypath, nrows=10)
@@ -39,7 +40,7 @@ for col in schema:
     S = S + s
  
 #%%
-mypath = os.path.join(mydir, pref + '_schema.toml')
+mypath = os.path.join(out_fol, pref + '_schema.toml')
 text_file = open(mypath, "w")
 text_file.write(S)
 text_file.close()
