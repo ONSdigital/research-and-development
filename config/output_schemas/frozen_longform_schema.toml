@@ -217,3 +217,56 @@ Deduced_Data_Type = "str"
 [q309]
 old_name = "309"
 Deduced_Data_Type = "str"
+
+
+["emp_researcher"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["emp_technician"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["emp_other"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_res_m"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_res_f"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_tec_m"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_tec_f"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_oth_m"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_oth_f"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["emp_total"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_tot_m"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_tot_f"]
+old_name = ""
+Deduced_Data_Type = "Int64"
+
+["headcount_total"]
+old_name = ""
+Deduced_Data_Type = "Int64"
