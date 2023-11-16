@@ -514,16 +514,20 @@ def run_staging(
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Loading ru_817_list mapper
-    StagingMainLogger.info("Loading ru_817_list mapper File...")
-    ref_list_817_path = paths["ref_list_817_path"]
-    check_file_exists(ref_list_817_path, raise_error=True)
-    ref_list_817 = read_csv(ref_list_817_path)
-    schema_path = "./config/reference_list_schema.toml"
-    # check_file_exists(schema_path, raise_error=True)
-    val.validate_data_with_schema(ref_list_817, schema_path)
-    StagingMainLogger.info("reference list mapper File Loaded Successfully...")
-    # update longform references that should be on the reference list
-    full_responses = val.update_ref_list(full_responses, ref_list_817)
+    load_ref_list_mapper = config["global"]["load_reference_list"]
+    if load_ref_list_mapper:
+        StagingMainLogger.info("Loading the reference list mapper file...")
+        ref_list_817_path = paths["ref_list_817_path"]
+        check_file_exists(ref_list_817_path, raise_error=True)
+        ref_list_817 = read_csv(ref_list_817_path)
+        schema_path = "./config/reference_list_schema.toml"
+        # check_file_exists(schema_path, raise_error=True)
+        val.validate_data_with_schema(ref_list_817, schema_path)
+        StagingMainLogger.info("reference list mapper File Loaded Successfully...")
+        # update longform references that should be on the reference list
+        full_responses = val.update_ref_list(full_responses, ref_list_817)
+    else:
+        StagingMainLogger.info("Skipping loding the reference list mapper File.")
 
     # Loading Civil or Defence detailed mapper
     StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")

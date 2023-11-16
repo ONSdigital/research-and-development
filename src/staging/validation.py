@@ -654,7 +654,7 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
     df = pd.merge(
         full_df, 
         ref_list_filtered[["reference", "cellnumber"]], 
-        how="left", 
+        how="outer", 
         on="reference", 
         suffixes=("", "_new"), 
         indicator=True
