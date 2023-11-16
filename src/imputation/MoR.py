@@ -38,8 +38,8 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     carried_forwards_df = apply_links(
         carried_forwards_df, links_df, lf_target_vars, config
     )
-    # TODO Remove the `XXX_prev` columns (left in for QA)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index(), links_df
+
+    return pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True), links_df
 
 
 def mor_preprocessing(df, backdata):
@@ -165,7 +165,7 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         gr_df[["reference", "imp_class"] + target_vars + target_vars_prev]
         .groupby(["reference", "imp_class"])
         .sum()
-    ).reset_index()
+    ).reset_index(drop=True)
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         gr_df[f"{target}_gr"] = gr_df[target] / gr_df[f"{target}_prev"]
@@ -209,10 +209,12 @@ def group_calc_link(group, target_vars, config):
         group = trim_bounds(group, f"{var}_gr", config)
         # Create mask to not use 0s in mean calculation
         no_zero_mask = pd.notnull(group[f"{var}_gr"]) & (group[f"{var}_gr"] != 0)
+        # If there are non-null, non-zero values in the group calculate the mean
         if sum(~group[f"{var}_gr_trim"] & no_zero_mask) != 0:
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_gr"
             ].mean()
+        # Otherwise the link is set to 1
         else:
             group[f"{var}_link"] = 1.0
     return group
