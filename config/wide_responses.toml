@@ -82,7 +82,7 @@ old_ref = "selgrpno"
 
 [202]
 Description = "Salaries & Wages"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -93,7 +93,7 @@ old_ref = "slries"
 
 [203]
 Description = "Other current expenditure"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -104,7 +104,7 @@ old_ref = "curr_oth"
 
 [204]
 Description = "Total Current Expenditure"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -115,7 +115,7 @@ old_ref = "curr_tot"
 
 [205]
 Description = "Basic Research"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -126,7 +126,7 @@ old_ref = "res_bas"
 
 [206]
 Description = "Applied Research"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -137,7 +137,7 @@ old_ref = "res_app"
 
 [207]
 Description = "Experimental Development"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -148,7 +148,7 @@ old_ref = "experm"
 
 [209]
 Description = "Equipment & Machinery CapEx"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -159,7 +159,7 @@ old_ref = "cxplm"
 
 [210]
 Description = "Total Capex."
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -181,7 +181,7 @@ old_ref = "intram"
 
 [212]
 Description = "Own Funds"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -192,7 +192,7 @@ old_ref = "own_f"
 
 [214]
 Description = "Funding - UK government"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -203,7 +203,7 @@ old_ref = "ex_uk_gv"
 
 [216]
 Description = "Funding - Other UK Private Bus/Public Orgs"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -214,7 +214,7 @@ old_ref = "ex_uk"
 
 [218]
 Description = "Total Funding"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -225,7 +225,7 @@ old_ref = "f_tot"
 
 [219]
 Description = "Land Acquired for R&D (Split of Land & Build CapEx)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -236,7 +236,7 @@ old_ref = "None"
 
 [220]
 Description = "Buildings acquired/constructed for R&D (Split of Land & Build CapEx)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -247,7 +247,7 @@ old_ref = "None"
 
 [221]
 Description = "Expenditure on computer software only (of which from Equipment & Machinery CapEx)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -258,7 +258,7 @@ old_ref = "None"
 
 [222]
 Description = "Purchase of Materials (Split of Other current)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -269,7 +269,7 @@ old_ref = "None"
 
 [223]
 Description = "Purchase of Services (Split of Other current)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -280,7 +280,7 @@ old_ref = "None"
 
 [225]
 Description = "Ownership - Own Business"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -291,7 +291,7 @@ old_ref = "None"
 
 [226]
 Description = "Ownership - UK Government"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -302,7 +302,7 @@ old_ref = "None"
 
 [227]
 Description = "Ownership - Other UK Priv Bus"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -313,7 +313,7 @@ old_ref = "None"
 
 [228]
 Description = "Ownership - Other UK Orgs"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -324,7 +324,7 @@ old_ref = "None"
 
 [229]
 Description = "Ownership - Bus Enterprises in Group Outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -335,7 +335,7 @@ old_ref = "None"
 
 [237]
 Description = "Ownership - not owned freely available"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -346,7 +346,7 @@ old_ref = "None"
 
 [242]
 Description = "Funding - Any other UK organisations"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -357,7 +357,7 @@ old_ref = "None"
 
 [243]
 Description = "Funding - Business Enterprises in group outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -368,7 +368,7 @@ old_ref = "None"
 
 [244]
 Description = "Funding - Other Business Enterprises outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -379,7 +379,7 @@ old_ref = "None"
 
 [245]
 Description = "Funding - Other Governments outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -390,7 +390,7 @@ old_ref = "None"
 
 [246]
 Description = "Funding - Higher Education Est Outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -401,7 +401,7 @@ old_ref = "None"
 
 [247]
 Description = "Funding - Non-profit Orgs outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -412,7 +412,7 @@ old_ref = "None"
 
 [248]
 Description = "Funding - International Orgs"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -423,7 +423,7 @@ old_ref = "None"
 
 [249]
 Description = "Funding - Any other orgs outside UK"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -434,7 +434,7 @@ old_ref = "None"
 
 [250]
 Description = "Funding - UK Higher Education Establishments"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -480,7 +480,7 @@ old_ref = "nan"
 
 [302]
 Description = "Purchased/funded R&D in the UK (Yes or No)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "No"
 Length = "# an integer of the length, or N/A"
 Min_values = "None"
@@ -491,7 +491,7 @@ old_ref = "None"
 
 [303]
 Description = "Purchased Outside UK (Govt Funded)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0
@@ -502,7 +502,7 @@ old_ref = "None"
 
 [304]
 Description = "Purchased Outside UK (Other)"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "Yes"
 Length = "# an integer of the length, or N/A"
 Min_values = 0

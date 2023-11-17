@@ -82,6 +82,7 @@ def create_imp_class_col(
     col_first_half: str,
     col_second_half: str,
     class_name: str = "imp_class",
+    use_cellno: bool = True
 ) -> pd.DataFrame:
     """Creates a column for the imputation class.
 
@@ -111,12 +112,13 @@ def create_imp_class_col(
         )
     else:
         df[class_name] = df[col_first_half].astype(str)
+    
+    if use_cellno:
+        fil_df = filter_by_column_content(df, "cellnumber", [817])
+        # Create class col with concatenation + 817
+        fil_df[class_name] = fil_df[class_name] + "_817"
 
-    fil_df = filter_by_column_content(df, "cellnumber", [817])
-    # Create class col with concatenation + 817
-    fil_df[class_name] = fil_df[class_name] + "_817"
-
-    df = apply_to_original(fil_df, df)
+        df = apply_to_original(fil_df, df)
 
     return df
 
