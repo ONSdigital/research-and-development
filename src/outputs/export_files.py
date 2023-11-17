@@ -17,76 +17,26 @@ from src.outputs.manifest_output import Manifest
 OutgoingLogger = logging.getLogger(__name__)
 
 
-config_path = os.path.join("src", "developer_config.yaml")
-
-# Load config
-conf_obj = Config_settings(config_path)
-config = conf_obj.config_dict
-
-# Get and set logging level
-logging_level = config["global"]["logging_level"]
-logging_levels = {"INFO": logging.INFO, "DEBUG": logging.DEBUG}
-logging.basicConfig(level=logging_levels[logging_level.upper()])
-
-# Check the environment switch
-network_or_hdfs = config["global"]["network_or_hdfs"]
-
-if network_or_hdfs == "network":
-
-    from src.utils.local_file_mods import local_move_file as move_files
-    from src.utils.local_file_mods import local_copy_file as copy_files
-    from src.utils.local_file_mods import local_search_file as search_files
-    from src.utils.local_file_mods import local_isfile as isfile
-    from src.utils.local_file_mods import local_delete_file as delete_file
-    from src.utils.local_file_mods import local_md5sum as hdfs_md5sum
-    from src.utils.local_file_mods import local_stat_size as hdfs_stat_size
-    from src.utils.local_file_mods import local_isdir as isdir
-    from src.utils.local_file_mods import local_read_header as read_header
-    from src.utils.local_file_mods import (
-        local_write_string_to_file as write_string_to_file,
-    )
-
-elif network_or_hdfs == "hdfs":
-
-    from src.utils.hdfs_mods import hdfs_move_file as move_files
-    from src.utils.hdfs_mods import hdfs_copy_file as copy_files
-    from src.utils.hdfs_mods import hdfs_search_file as search_files
-    from src.utils.hdfs_mods import hdfs_isfile as isfile
-    from src.utils.hdfs_mods import hdfs_delete_file as delete_file
-    from src.utils.hdfs_mods import hdfs_md5sum as hdfs_md5sum
-    from src.utils.hdfs_mods import hdfs_stat_size as hdfs_stat_size
-    from src.utils.hdfs_mods import hdfs_isdir as isdir
-    from src.utils.hdfs_mods import hdfs_read_header as read_header
-    from src.utils.hdfs_mods import hdfs_write_string_to_file as write_string_to_file
+# config_path = os.path.join("src", "developer_config.yaml")
 
 
-else:
-    OutgoingLogger.error("The network_or_hdfs configuration is wrong")
-    raise ImportError
-
-OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
-
-
-# Define paths
-paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
-output_path = paths["output_path"]
-export_folder = paths["export_path"]
-
-
-def get_schema_headers(config: dict = config):
+def get_schema_headers(config: dict):
     """
     Extracts the schema headers from the provided configuration.
 
-    This function filters the configuration for entries containing "schema" in their output name,
-    and loads the corresponding TOML files. It then converts the headers (keys of the dict) into
-    a comma-separated string and returns a dictionary where the keys are output names and the values
-    are these comma-separated strings of schema headers.
+    This function filters the configuration for entries containing "schema" in
+    their output name, and loads the corresponding TOML files. It then converts
+    the headers (keys of the dict) into a comma-separated string and returns a
+    dictionary where the keys are output names and the values are these
+    comma-separated strings of schema headers.
 
     Args:
-        config (dict, optional): A dictionary containing configuration details. Defaults to config.
+        config (dict, optional): A dictionary containing configuration details.
+        Defaults to config.
 
     Returns:
-        dict: A dictionary where the keys are output names and the values are comma-separated strings of schema headers.
+        dict: A dictionary where the keys are output names and the values are
+        comma-separated strings of schema headers.
     """
     schema_paths_only = config["schema_paths"]
 
@@ -117,21 +67,28 @@ def get_schema_headers(config: dict = config):
 pipeline_run_datetime = datetime.now()
 
 
-def get_file_choice(paths, config: dict = config):
+def get_file_choice(paths, config: dict):
     """
-    Constructs a dictionary of file paths based on user's choices from the configuration.
+    Constructs a dictionary of file paths based on user's choices from the
+    configuration.
 
-    This function extracts the user's choices from the configuration, specifically entries where the key contains "output".
-    It then constructs a dictionary where the keys are directory names (with the "output" prefix removed) and the values are
-    complete file paths with a ".csv" extension. The file paths are constructed by joining the root output path, directory name,
+    This function extracts the user's choices from the configuration,
+    specifically entries where the key contains "output".
+    It then constructs a dictionary where the keys are directory names
+    (with the "output" prefix removed) and the values are
+    complete file paths with a ".csv" extension. The file paths are constructed
+    by joining the root output path, directory name,
     and file name from the configuration.
 
     Args:
-        paths (dict): A dictionary containing various paths. The function specifically uses the "output_path" key to get the root output path.
-        config (dict, optional): A dictionary containing configuration details, including the user's choices for files to export. Defaults to config.
+        paths (dict): A dictionary containing various paths. The function
+        specifically uses the "output_path" key to get the root output path.
+        config (dict, optional): A dictionary containing configuration details,
+        including the user's choices for files to export. Defaults to config.
 
     Returns:
-        dict: A dictionary where the keys are directory names and the values are complete file paths to the files to be exported.
+        dict: A dictionary where the keys are directory names and the values are
+        complete file paths to the files to be exported.
 
     Logs:
         The function logs the list of files being exported at the INFO level.
@@ -153,7 +110,8 @@ def get_file_choice(paths, config: dict = config):
     }
 
     # Log the files being exported
-    logging.info(f"These are the files being exported: {selection_dict.values()}")
+    logging.info(
+        f"These are the files being exported: {selection_dict.values()}")
 
     return selection_dict
 
@@ -178,9 +136,18 @@ def check_files_exist(file_list: List, network_or_hdfs):
     OutgoingLogger.info("All output files exist")
 
 
-def transfer_files(source, destination, method, logger):
+def transfer_files(
+    source,
+    destination,
+    method,
+    logger,
+    copy_files,
+    move_files
+):
+
     """
-    Transfer files from source to destination using the specified method and log the action.
+    Transfer files from source to destination using the specified method and log
+    the action.
 
     Args:
         source (str): The source file path.
@@ -195,8 +162,62 @@ def transfer_files(source, destination, method, logger):
     logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
 
-def run_export(paths=paths, config=config):
+def run_export(config_path: str):
     """Main function to run the data export pipeline."""
+
+###
+    # Load config
+    conf_obj = Config_settings(config_path)
+    config = conf_obj.config_dict
+
+    # Get and set logging level
+    logging_level = config["global"]["logging_level"]
+    logging_levels = {"INFO": logging.INFO, "DEBUG": logging.DEBUG}
+    logging.basicConfig(level=logging_levels[logging_level.upper()])
+
+    # Check the environment switch
+    network_or_hdfs = config["global"]["network_or_hdfs"]
+
+    if network_or_hdfs == "network":
+
+        from src.utils.local_file_mods import local_move_file as move_files
+        from src.utils.local_file_mods import local_copy_file as copy_files
+        from src.utils.local_file_mods import local_search_file as search_files
+        from src.utils.local_file_mods import local_isfile as isfile
+        from src.utils.local_file_mods import local_delete_file as delete_file
+        from src.utils.local_file_mods import local_md5sum as hdfs_md5sum
+        from src.utils.local_file_mods import local_stat_size as hdfs_stat_size
+        from src.utils.local_file_mods import local_isdir as isdir
+        from src.utils.local_file_mods import local_read_header as read_header
+        from src.utils.local_file_mods import (
+            local_write_string_to_file as write_string_to_file,
+        )
+
+    elif network_or_hdfs == "hdfs":
+
+        from src.utils.hdfs_mods import hdfs_move_file as move_files
+        from src.utils.hdfs_mods import hdfs_copy_file as copy_files
+        from src.utils.hdfs_mods import hdfs_search_file as search_files
+        from src.utils.hdfs_mods import hdfs_isfile as isfile
+        from src.utils.hdfs_mods import hdfs_delete_file as delete_file
+        from src.utils.hdfs_mods import hdfs_md5sum as hdfs_md5sum
+        from src.utils.hdfs_mods import hdfs_stat_size as hdfs_stat_size
+        from src.utils.hdfs_mods import hdfs_isdir as isdir
+        from src.utils.hdfs_mods import hdfs_read_header as read_header
+        from src.utils.hdfs_mods import (
+            hdfs_write_string_to_file as write_string_to_file)
+
+    else:
+        OutgoingLogger.error("The network_or_hdfs configuration is wrong")
+        raise ImportError
+
+    OutgoingLogger.info(
+        f"Using the {network_or_hdfs} file system as data source.")
+
+    # Define paths
+    paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
+    output_path = paths["output_path"]
+    export_folder = paths["export_path"]
 
     # Get list of files to transfer from user
     file_select_dict = get_file_choice(paths, config)
@@ -238,7 +259,14 @@ def run_export(paths=paths, config=config):
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
 
-    transfer_files(manifest_path, manifest.export_directory, "move", OutgoingLogger)
+    transfer_files(
+        manifest_path,
+        manifest.export_directory,
+        "move",
+        OutgoingLogger,
+        copy_files,
+        move_files,
+    )
 
     # Copy or Move files to outgoing folder
     file_transfer_method = config["export_choices"]["copy_or_move_files"]
@@ -246,8 +274,12 @@ def run_export(paths=paths, config=config):
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
         transfer_files(
-            file_path, manifest.export_directory, file_transfer_method, OutgoingLogger
-        )
+            file_path,
+            manifest.export_directory,
+            file_transfer_method,
+            OutgoingLogger,
+            copy_files,
+            move_files)
 
     OutgoingLogger.info("Exporting files finished.")
 

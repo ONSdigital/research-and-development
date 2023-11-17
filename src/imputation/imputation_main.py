@@ -48,7 +48,7 @@ def run_imputation(
 
     # Run MoR
     if backdata is not None:
-        df = run_mor(df, backdata, orig_cols)
+        df, links_df = run_mor(df, backdata, orig_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
@@ -64,8 +64,10 @@ def run_imputation(
         ImputationMainLogger.info("Outputting Imputation files.")
         tdate = datetime.now().strftime("%Y-%m-%d")
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
+        links_filename = f"links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
+        write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 

@@ -168,11 +168,7 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
         secondary_snapdata
     )
 
-    # Assign instance column, with value 0
-    secondary_responses_df["instance"] = 0
-
     # Validate secondary snapshot data
-
     StagingMainLogger.info("Validating secondary snapshot data...")
     val.validate_data_with_schema(
         secondary_contributors_df, "./config/contributors_schema.toml"
@@ -367,7 +363,6 @@ def run_staging(
             write_csv,
         )
 
-        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(
                 load_json,
@@ -423,13 +418,19 @@ def run_staging(
         # val.validate_data_with_schema(
         #     backdata_path, "./config/backdata_schema.toml"
         # )
+        
+        # Fix for different column names on network vs hdfs
+        if network_or_hdfs == "network":
+            to_map_col = "q201"
+        elif network_or_hdfs == "hdfs":
+            to_map_col = "201"
 
         # Map PG numeric to alpha in column q201
         backdata = pg.pg_to_pg_mapper(
             backdata,
             pg_num_alpha,
-            target_col="q201",
-            pg_column="q201",
+            target_col=to_map_col,
+            pg_column=to_map_col,
         )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
@@ -513,6 +514,22 @@ def run_staging(
     val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
+    # Loading ru_817_list mapper
+    load_ref_list_mapper = config["global"]["load_reference_list"]
+    if load_ref_list_mapper:
+        StagingMainLogger.info("Loading the reference list mapper file...")
+        ref_list_817_path = paths["ref_list_817_path"]
+        check_file_exists(ref_list_817_path, raise_error=True)
+        ref_list_817 = read_csv(ref_list_817_path)
+        schema_path = "./config/reference_list_schema.toml"
+        # check_file_exists(schema_path, raise_error=True)
+        val.validate_data_with_schema(ref_list_817, schema_path)
+        StagingMainLogger.info("reference list mapper File Loaded Successfully...")
+        # update longform references that should be on the reference list
+        full_responses = val.update_ref_list(full_responses, ref_list_817)
+    else:
+        StagingMainLogger.info("Skipping loding the reference list mapper File.")
+
     # Loading Civil or Defence detailed mapper
     StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")
     civil_defence_detailed_path = paths["civil_defence_detailed_path"]
@@ -537,6 +554,10 @@ def run_staging(
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
+
+    # If we didn't load a snapshot, leave the df as null
+    if not load_updated_snapshot:
+        secondary_full_responses = None
 
     return (
         full_responses,
