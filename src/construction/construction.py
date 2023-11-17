@@ -197,8 +197,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%Y-%m-%d")
-    # ? Should this go in a subfolder of the outputs folder?
-    construction_output_filepath = os.path.join(paths["output_path"], f"constructed_snapshot_{tdate}_v{run_id}.csv")
+    construction_output_filepath = os.path.join(paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv")
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
 
