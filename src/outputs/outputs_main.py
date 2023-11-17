@@ -58,13 +58,13 @@ def run_outputs(
 
     imputed_statuses = ["TMI", "CF", "MoR"]
 
+    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")
     # filter estimated_df to only include good or imputed statuses
-    outputs_df = estimated_df.copy().loc[estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")]
+    outputs_df = estimated_df.copy().loc[to_keep]
 
-    #! not working
     # change the value of the status column to 'imputed' for imputed statuses
     condition = outputs_df["status"].isin(imputed_statuses)
-    outputs_df["status"] = np.where(condition, "imputed", outputs_df["status"])
+    outputs_df.loc[condition, "status"] = "imputed"
 
     # Running short form output
     if config["global"]["output_short_form"]:
