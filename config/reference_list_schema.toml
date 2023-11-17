@@ -1,0 +1,39 @@
+[reference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
+
+[cellnumber]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "Int64"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [0]
+
+[selectiontype]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["C"]
+
+[formtype]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [1, 6]

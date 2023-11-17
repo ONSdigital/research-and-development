@@ -5,13 +5,15 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
-  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
+  network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
-  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
+  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
+  load_manual_construction: False
   load_manual_outliers: True
   load_backdata: True  # whether to load previous year data for MoR
+  load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Output settings
   output_full_responses: False
@@ -74,11 +76,11 @@ network_paths:
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-  construction_add_path: "D:/dump/amendments_and_additions_test/construction_additions_2023-10-31_v2.csv" # TODO Need to test
-  construction_edit_path: "D:/dump/amendments_and_additions_test/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
+  construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
+  construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  construction_path: "D:/dump" # TODO
+  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
@@ -89,6 +91,7 @@ network_paths:
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
