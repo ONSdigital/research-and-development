@@ -338,7 +338,7 @@ def run_staging(
             secondary_full_responses = None
         #postcode_mapper = (
         #    To do: read the postcode mapper from feather; it's needed
-        )
+        #)
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
