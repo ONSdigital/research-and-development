@@ -5,7 +5,7 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
-  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
+  network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
