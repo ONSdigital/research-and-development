@@ -20,15 +20,15 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_short_form: False
   output_long_form: False
   output_tau: False
   output_gb_sas: False
   output_intram_by_pg: False
-  output_intram_by_itl1: False
+  output_intram_by_itl1: True
   output_intram_by_civil_defence: False
-  output_intram_by_sic: True
+  output_intram_by_sic: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -59,7 +59,7 @@ hdfs_paths:
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
   long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
-  export_path: /ons/rdbe_dev/outgoing_export
+  export_path: "/ons/rdbe_dev/outgoing_export"
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
