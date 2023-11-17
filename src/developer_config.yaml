@@ -8,27 +8,27 @@ global:
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
-  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
-  load_manual_construction: False
   load_manual_outliers: True
   load_backdata: True  # whether to load previous year data for MoR
-  load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
+  load_reference_list: True
+
   # Output settings
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_short_form: False
   output_long_form: False
   output_tau: False
   output_gb_sas: False
   output_intram_by_pg: False
-  output_intram_by_itl1: False
+  output_intram_by_itl1: True
   output_intram_by_civil_defence: False
-  output_intram_by_sic: True
+  output_intram_by_sic: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -76,11 +76,11 @@ network_paths:
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-  construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
-  construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
+  construction_add_path: "D:/dump/amendments_and_additions_test/construction_additions_2023-10-31_v2.csv" # TODO Need to test
+  construction_edit_path: "D:/dump/amendments_and_additions_test/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
+  construction_path: "D:/dump" # TODO
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
@@ -91,9 +91,10 @@ network_paths:
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
-  ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+  ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
+
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
@@ -105,13 +106,11 @@ schema_paths:
 # Export config for users
 export_choices:
   copy_or_move_files: "copy"
-  output_frozen_shortform: "output_short_form2023-09-12_v1" # Can be set to None
-  output_tau: None # Can be set to None
-  output_gb_sas: None # Can be set to None
-  output_intram_by_pg: None # Can be set to None
-  output_intram_by_itl1: None # Can be set to None
-
-# / ons/ rdbe_dev/ outputs/ output_short_form/ output_short_form2023-09-12_v1.csv
+  output_frozen_shortform: "output_short_form_2023-11-01_v38" # Can be set to None
+  output_tau: "output_tau_2023-10-11_v15" # Can be set to None
+  output_gb_sas: "output_gb_sas_2023-10-27_v1" # Can be set to None
+  output_intram_by_pg: "output_intram_by_pg_2023-10-27_v46" # Can be set to None
+  output_intram_by_itl1: "output_intram_by_itl1_2023-11-01_v302" # Can be set to None
 
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
