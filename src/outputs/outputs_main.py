@@ -1,6 +1,7 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
+import numpy as np
 from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
@@ -54,11 +55,22 @@ def run_outputs(
 
 
     """
+
+    imputed_statuses = ["TMI", "CF", "MoR"]
+
+    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")
+    # filter estimated_df to only include good or imputed statuses
+    outputs_df = estimated_df.copy().loc[to_keep]
+
+    # change the value of the status column to 'imputed' for imputed statuses
+    condition = outputs_df["status"].isin(imputed_statuses)
+    outputs_df.loc[condition, "status"] = "imputed"
+
     # Running short form output
     if config["global"]["output_short_form"]:
         OutputMainLogger.info("Starting short form output...")
         output_short_form(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -72,7 +84,7 @@ def run_outputs(
     if config["global"]["output_long_form"]:
         OutputMainLogger.info("Starting long form output...")
         output_long_form(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -100,7 +112,7 @@ def run_outputs(
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
         output_gb_sas(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -115,7 +127,7 @@ def run_outputs(
     if config["global"]["output_intram_by_pg"]:
         OutputMainLogger.info("Starting  Intram by PG output...")
         output_intram_by_pg(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -127,7 +139,7 @@ def run_outputs(
     if config["global"]["output_intram_by_itl1"]:
         OutputMainLogger.info("Starting  Intram by ITL1 output...")
         output_intram_by_itl1(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -141,7 +153,7 @@ def run_outputs(
     if config["global"]["output_intram_by_civil_defence"]:
         OutputMainLogger.info("Starting Intram by civil or defence output...")
         output_intram_by_civil_defence(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
@@ -153,7 +165,7 @@ def run_outputs(
     if config["global"]["output_intram_by_sic"]:
         OutputMainLogger.info("Starting Intram by SIC output...")
         output_intram_by_sic(
-            estimated_df,
+            outputs_df,
             config,
             write_csv,
             run_id,
