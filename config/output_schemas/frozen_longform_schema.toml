@@ -198,70 +198,6 @@ Deduced_Data_Type = "Int64"
 old_name = "305"
 Deduced_Data_Type = "float64"
 
-[q405]
-old_name = "405"
-Deduced_Data_Type = "float64"
-
-[q406]
-old_name = "406"
-Deduced_Data_Type = "float64"
-
-[q407]
-old_name = "407"
-Deduced_Data_Type = "float64"
-
-[q408]
-old_name = "408"
-Deduced_Data_Type = "float64"
-
-[q409]
-old_name = "409"
-Deduced_Data_Type = "float64"
-
-[q410]
-old_name = "410"
-Deduced_Data_Type = "float64"
-
-[q411]
-old_name = "411"
-Deduced_Data_Type = "float64"
-
-[q412]
-old_name = "412"
-Deduced_Data_Type = "float64"
-
-[q501]
-old_name = "501"
-Deduced_Data_Type = "float64"
-
-[q502]
-old_name = "502"
-Deduced_Data_Type = "float64"
-
-[q503]
-old_name = "503"
-Deduced_Data_Type = "float64"
-
-[q504]
-old_name = "504"
-Deduced_Data_Type = "float64"
-
-[q505]
-old_name = "505"
-Deduced_Data_Type = "float64"
-
-[q506]
-old_name = "506"
-Deduced_Data_Type = "float64"
-
-[q507]
-old_name = "507"
-Deduced_Data_Type = "float64"
-
-[q508]
-old_name = "508"
-Deduced_Data_Type = "float64"
-
 [q250]
 old_name = "250"
 Deduced_Data_Type = "Int64"
@@ -281,3 +217,56 @@ Deduced_Data_Type = "str"
 [q309]
 old_name = "309"
 Deduced_Data_Type = "str"
+
+
+["emp_researcher"]
+old_name = "emp_researcher"
+Deduced_Data_Type = "Int64"
+
+["emp_technician"]
+old_name = "emp_technician"
+Deduced_Data_Type = "Int64"
+
+["emp_other"]
+old_name = "emp_other"
+Deduced_Data_Type = "Int64"
+
+["headcount_res_m"]
+old_name = "headcount_res_m"
+Deduced_Data_Type = "Int64"
+
+["headcount_res_f"]
+old_name = "headcount_res_f"
+Deduced_Data_Type = "Int64"
+
+["headcount_tec_m"]
+old_name = "headcount_tec_m"
+Deduced_Data_Type = "Int64"
+
+["headcount_tec_f"]
+old_name = "headcount_tec_f"
+Deduced_Data_Type = "Int64"
+
+["headcount_oth_m"]
+old_name = "headcount_oth_m"
+Deduced_Data_Type = "Int64"
+
+["headcount_oth_f"]
+old_name = "headcount_oth_f"
+Deduced_Data_Type = "Int64"
+
+["emp_total"]
+old_name = "emp_total"
+Deduced_Data_Type = "Int64"
+
+["headcount_tot_m"]
+old_name = "headcount_tot_m"
+Deduced_Data_Type = "Int64"
+
+["headcount_tot_f"]
+old_name = "headcount_tot_f"
+Deduced_Data_Type = "Int64"
+
+["headcount_total"]
+old_name = "headcount_total"
+Deduced_Data_Type = "Int64"
