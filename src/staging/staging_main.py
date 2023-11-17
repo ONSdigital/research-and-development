@@ -336,8 +336,8 @@ def run_staging(
             )
         else:
             secondary_full_responses = None
-        postcode_mapper = (
-            None  # TODO: check if the actual mapper is needed later in the pipeline
+        #postcode_mapper = (
+        #    To do: read the postcode mapper from feather; it's needed
         )
     else:  # Read from JSON
 
@@ -352,16 +352,16 @@ def run_staging(
         # Data validation of json or feather data
         val.check_data_shape(full_responses, raise_error=True)
 
-        # Validate the postcodes in data loaded from JSON
-        postcode_mapper = stage_validate_harmonise_postcodes(
-            config,
-            paths,
-            full_responses,
-            run_id,
-            check_file_exists,
-            read_csv,
-            write_csv,
-        )
+    # Validate the postcodes in data loaded from JSON
+    postcode_mapper = stage_validate_harmonise_postcodes(
+        config,
+        paths,
+        full_responses,
+        run_id,
+        check_file_exists,
+        read_csv,
+        write_csv,
+    )
 
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(

@@ -37,6 +37,14 @@ def output_intram_by_itl1(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
+    # Debug - begin
+    myfol = "D:\\data\\res_dev\\outputs\\itl\\"
+    df.to_csv(myfol+"df_no_region.csv", index=None)
+    postcode_mapper.to_csv(myfol+"postcode_mapper.csv", index=None)
+    # Debug - end
+
+
+
     # Join region code
     df = map_o.join_itl_regions(df, postcode_mapper)
 
@@ -46,7 +54,6 @@ def output_intram_by_itl1(
     itl1_mapper = itl_mapper[[reg_code, itl_code]]
 
     # Debug - begin
-    myfol = "D:\\data\\res_dev\\outputs\\itl\\"
     df.to_csv(myfol+"df_before.csv", index=None)
     itl1_mapper.to_csv(myfol+"itl1_mapper.csv", index=None)
     # Debug - end
