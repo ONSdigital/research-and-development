@@ -149,7 +149,7 @@ def get_file_choice(paths, config: dict = config):
     selection_dict = {
         dir[7:]: Path(f"{root_output}/{dir}/{file}").with_suffix(".csv")
         for dir, file in output_paths.items()
-        if file is not None
+        if file != "None"
     }
 
     # Log the files being exported
@@ -158,7 +158,7 @@ def get_file_choice(paths, config: dict = config):
     return selection_dict
 
 
-def check_files_exist(file_list: List):
+def check_files_exist(file_list: List, network_or_hdfs):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
@@ -169,7 +169,8 @@ def check_files_exist(file_list: List):
     # Check the existence of every file using is_file
     for file in file_list:
         file_path = Path(file)  # Changes to path if str
-        if not file_path.is_file():
+        OutgoingLogger.debug(f"Using {network_or_hdfs} isfile function")
+        if not isfile(file_path):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
             )
@@ -188,8 +189,10 @@ def transfer_files(source, destination, method, logger):
         logger (logging.Logger): The logger to use for logging the action.
     """
     transfer_func = {"copy": copy_files, "move": move_files}[method]
+    past_tense = {"copy": "copied", "move": "moved"}[method]
     transfer_func(source, destination)
-    logger.info(f"Files {source} successfully {method}d to {destination}.")
+
+    logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
 
 def run_export(paths=paths, config=config):
@@ -199,7 +202,7 @@ def run_export(paths=paths, config=config):
     file_select_dict = get_file_choice(paths, config)
 
     # Check that files exist
-    check_files_exist(list(file_select_dict.values()))
+    check_files_exist(list(file_select_dict.values()), network_or_hdfs)
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
