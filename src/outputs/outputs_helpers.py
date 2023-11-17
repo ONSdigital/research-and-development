@@ -23,7 +23,6 @@ def create_output_df(df: pd.DataFrame, output_schema: dict) -> pd.DataFrame:
     }
 
     # Create subset dataframe with only the required outputs
-    schema_keys = set()
     output_df = df[colname_schema_dict.keys()].copy()
 
     # Rename columns to match the output specification
