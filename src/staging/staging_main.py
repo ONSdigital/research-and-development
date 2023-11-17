@@ -352,17 +352,6 @@ def run_staging(
         # Data validation of json or feather data
         val.check_data_shape(full_responses, raise_error=True)
 
-    # Validate the postcodes in data loaded from JSON
-    postcode_mapper = stage_validate_harmonise_postcodes(
-        config,
-        paths,
-        full_responses,
-        run_id,
-        check_file_exists,
-        read_csv,
-        write_csv,
-    )
-
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(
                 load_json,
@@ -381,6 +370,19 @@ def run_staging(
                 secondary_snapshot_name,
                 secondary_full_responses,
             )
+    # Stage, validate and harmonise the postcode column
+    StagingMainLogger.info("Starting PostCode Validation")
+    postcode_masterlist = paths["postcode_masterlist"]
+    check_file_exists(postcode_masterlist)
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
+    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
+    StagingMainLogger.info("Saving Invalid Postcodes to File")
+    pcodes_folder = paths["postcode_path"]
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+    StagingMainLogger.info("Finished PostCode Validation")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
