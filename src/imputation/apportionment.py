@@ -103,7 +103,7 @@ def calc_headcount_column(
         df.loc[df["tot_202_all"] > 0, new_col] = round(
             update_column(df, old_col) * df["202"] / df["tot_202_all"], round_val
         )
-        df.loc[(df["tot_202_all"] == 0), new_col] = 0
+        df.loc[(df["instance"] != 0) & (df["tot_202_all"] == 0), new_col] = 0
 
     return df
 
