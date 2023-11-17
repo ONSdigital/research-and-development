@@ -1,6 +1,4 @@
-"""Module containing all functions relating to short form expansion.
-"""
-
+"""Module containing all functions relating to short form expansion."""
 from typing import List, Union
 import pandas as pd
 import logging
@@ -8,7 +6,6 @@ import logging
 from src.imputation.expansion_imputation import split_df_on_trim
 from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
 from src.utils.wrappers import df_change_func_wrap
-
 
 SFExpansionLogger = logging.getLogger(__name__)
 
@@ -19,6 +16,7 @@ formtype_short = "0006"
 def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
+    trim_col: str,
     break_down_cols: List[Union[str, int]],
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
@@ -28,7 +26,6 @@ def expansion_impute(
 
     imp_class = group_copy["imp_class"].values[0]
     SFExpansionLogger.debug(f"Imputation class: {imp_class}.")
-    SFExpansionLogger.debug(f"Master column: {master_col}.")
 
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
@@ -41,30 +38,34 @@ def expansion_impute(
     clear_statuses = ["Clear", "Clear - overridden"]
     clear_mask = group_copy["status"].isin(clear_statuses)
 
+    # Create a mask to exclude trimmed values
+    exclude_trim_mask = group_copy[trim_col].isin([False])
+
     # Combination masks to select correct records for summing
-    # NOTE: we only use long form clear responders in calculations
-    # but we calculate breakdown values for imputed short form rows
-    long_responder_mask = clear_mask & long_mask
+    long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
 
+    # Get long forms only for summing the master_col (scalar value)
+    sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
+
+    # We calculate breakdown values for both responder and imputed short form rows
+    # Get the master (e.g. 211) value for all short form rows (will be a vector)
+    # Note: the _imputed columns contain both original and imputed values.
     master_col_imputed = f"{master_col}_imputed"
-
-    # Get long forms only for summing the imputed master_col (scalar value)
-    sum_master_q_lng = group_copy.loc[
-        long_responder_mask, master_col_imputed
-    ].sum()
-
-    # Get the master (e.g. 211) returned value for each responder (will be a vector)
-    returned_master_vals = group_copy[to_expand_mask][master_col_imputed]
+    returned_master_vals = group_copy.loc[to_expand_mask, master_col_imputed]
 
     # Calculate the imputation columns for the breakdown questions
     for bd_col in bd_cols:
         # Sum the breakdown q for the (clear) responders
         sum_breakdown_q = group_copy.loc[long_responder_mask, bd_col].sum()
 
-        # Update the imputation column for status encoded 100 and 201
-        # i.e. for non-responders
-        imputed_sf_vals = (sum_breakdown_q / sum_master_q_lng) * returned_master_vals
+        # Calculate the values of the imputation column
+        if sum_master_q_lng > 0:
+            scale_factor = sum_breakdown_q / sum_master_q_lng
+        else:
+            scale_factor = 0
+
+        imputed_sf_vals = scale_factor * returned_master_vals
 
         # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
@@ -73,26 +74,23 @@ def expansion_impute(
     return group_copy
 
 
-# @df_change_func_wrap
+@df_change_func_wrap
 def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict):
 
-    df = df.copy()
-
-    # Filter to exclude the 211 trimming, the excluded rows are in trimmed_211_df
-    # and the dataframe after trimming in nontrimmed_df
-    trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
-    SFExpansionLogger.debug(
-        f"There are {df.shape[0]} rows in the original df \n"
-        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
-        f"There are {trimmed_211_df.shape[0]} rows in the trimmed_211_df"
-    )
     # Renaming this df to use in the for loop
-    expanded_df = nontrimmed_df
+    expanded_df = df.copy()
+
+    # Cast nulls in the boolean trim columns to False
+    expanded_df[["211_trim", "305_trim"]] = expanded_df[
+        ["211_trim", "305_trim"]
+    ].fillna(False)
 
     for master_value in master_values:
         # exclude the "305" case which will be based on different trimming
         if master_value == "305":
-            continue
+            trim_col = "305_trim"
+        else:
+            trim_col = "211_trim"
 
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
@@ -100,66 +98,34 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
         expanded_df.reset_index(drop=True, inplace=True)
 
         # Create group_by obj of the trimmed df
-        non_trim_grouped = expanded_df.groupby("imp_class")  # groupby object
+        groupby_obj = expanded_df.groupby("imp_class")
 
         # Calculate the imputation values for master question
-        expanded_df = non_trim_grouped.apply(
+        expanded_df = groupby_obj.apply(
             expansion_impute,
             master_value,
+            trim_col,
             break_down_cols=breakdown_dict[master_value],
         )  # returns a dataframe
 
-    # Concat the expanded df (processed from untrimmed records) back on to
-    # trimmed records. Reassigning to `df` to feed back into for-loop
-    combined_df = pd.concat([expanded_df, trimmed_211_df], axis=0)
-
-    # Set master value to be "305"
-    master_value = "305"
-
-    # now filter on the 305 trimming- the excluded rows are in trimmed_305_df
-    # and the dataframe after trimming in nontrimmed_df
-    trimmed_305_df, nontrimmed_df = split_df_on_trim(combined_df, "305_trim")
-    SFExpansionLogger.debug(
-        f"There are {df.shape[0]} rows in the original df \n"
-        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df \n"
-        f"There are {trimmed_305_df.shape[0]} rows in the trimmed_305_df"
-    )
-
-    SFExpansionLogger.debug(f"Processing expansion imputation for {master_value}")
-
-    # Create group_by obj of the trimmed df
-    non_trim_grouped = nontrimmed_df.groupby("imp_class")
-
-    # Calculate the imputation values for master question
-    expanded_305_df = non_trim_grouped.apply(
-        expansion_impute,
-        master_value,
-        break_down_cols=breakdown_dict[master_value],
-    )
-    # Concat the expanded df (processed from untrimmed records) back on to
-    # trimmed records. Reassigning to `df` to feed back into for-loop
-    combined_df = pd.concat([expanded_305_df, trimmed_305_df], axis=0)
-    combined_df.reset_index(drop=True, inplace=True)
-
     # Calculate the headcount_m and headcount_f imputed values by summing
-    short_mask = combined_df["formtype"] == formtype_short
+    short_mask = expanded_df["formtype"] == formtype_short
 
-    combined_df.loc[short_mask, "headcount_tot_m_imputed"] = (
-        combined_df["headcount_res_m_imputed"]
-        + combined_df["headcount_tec_m_imputed"]
-        + combined_df["headcount_oth_m_imputed"]
+    expanded_df.loc[short_mask, "headcount_tot_m_imputed"] = (
+        expanded_df["headcount_res_m_imputed"]
+        + expanded_df["headcount_tec_m_imputed"]
+        + expanded_df["headcount_oth_m_imputed"]
     )
 
-    combined_df.loc[short_mask, "headcount_tot_f_imputed"] = (
-        combined_df["headcount_res_f_imputed"]
-        + combined_df["headcount_tec_f_imputed"]
-        + combined_df["headcount_oth_f_imputed"]
+    expanded_df.loc[short_mask, "headcount_tot_f_imputed"] = (
+        expanded_df["headcount_res_f_imputed"]
+        + expanded_df["headcount_tec_f_imputed"]
+        + expanded_df["headcount_oth_f_imputed"]
     )
 
-    return combined_df
+    return expanded_df
 
 
-# @df_change_func_wrap
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
 
     # Exclude the records from the reference list
@@ -179,7 +145,7 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     return filtered_df, excluded_df
 
 
-# @df_change_func_wrap
+@df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class

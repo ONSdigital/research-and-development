@@ -3,14 +3,251 @@ import logging
 from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
+import pandas as pd
 import os
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
+from src.utils.wrappers import time_logger_wrap
 
 StagingMainLogger = logging.getLogger(__name__)
+
+
+def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
+    """Load historic data into the pipeline.
+
+    Args:
+        config (dict): The pipeline configuration
+        paths (dict): The paths to the data files
+        read_csv (Callable): Function to read a csv file.
+            This will be the hdfs or network version depending on settings.
+
+    Returns:
+        dict: A dictionary of history data loaded into the pipeline.
+    """
+    curent_year = config["years"]["current_year"]
+    years_to_load = config["years"]["previous_years_to_load"]
+    years_gen = history_loader.history_years(curent_year, years_to_load)
+
+    if years_gen is None:
+        StagingMainLogger.info("No historic data to load for this run.")
+        return {}
+    else:
+        StagingMainLogger.info("Loading historic data...")
+        history_path = paths["history_path"]
+        dict_of_hist_dfs = history_loader.load_history(
+            years_gen, history_path, read_csv
+        )
+        # Check if it has loaded and is not empty
+        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
+            StagingMainLogger.info(
+                "Dictionary of history data: %s loaded into pipeline",
+                ", ".join(dict_of_hist_dfs),
+            )
+            StagingMainLogger.info("Historic data loaded.")
+        else:
+            StagingMainLogger.warning(
+                "Problem loading historic data. Dict may be empty or not present"
+            )
+            raise Exception("The historic data did not load")
+
+    return dict_of_hist_dfs if dict_of_hist_dfs else {}
+
+
+def check_snapshot_feather_exists(
+    config: dict,
+    check_file_exists: Callable,
+    feather_file_to_check,
+    secondary_feather_file,
+) -> bool:
+    """Check if one or both of snapshot feather files exists.
+
+    Conifg arguments decide whether to check for one or both.
+
+    Args:
+        config (dict): The pipeline configuration
+        check_file_exists (Callable): Function to check if file exists
+            This will be the hdfs or network version depending on settings.
+
+    Returns:
+        bool: True if the feather file exists, False otherwise.
+    """
+
+    if config["global"]["load_updated_snapshot"]:
+        return check_file_exists(feather_file_to_check) and check_file_exists(
+            secondary_feather_file
+        )
+    else:
+        return check_file_exists(feather_file_to_check)
+
+
+@time_logger_wrap
+def load_snapshot_feather(feather_file, read_feather):
+    snapdata = read_feather(feather_file)
+    StagingMainLogger.info(f"{feather_file} loaded")
+    return snapdata
+
+
+def fix_anon_data(responses_df, config):
+    """
+    Fixes anonymised snapshot data for use in the DevTest environment.
+
+    This function adds an "instance" column to the provided DataFrame, and populates it with zeros.
+    It also adds a "selectiontype" column with random values of "P", "C", or "L", and a "cellnumber" column
+    with random values from the "seltype_list" in the configuration.
+
+    This fix is necessary because the anonymised snapshot data currently used in the DevTest environment
+    does not include the "instance" column. This fix should be removed when new anonymised data is provided.
+
+    Args:
+        responses_df (pandas.DataFrame): The DataFrame containing the anonymised snapshot data.
+        config (dict): A dictionary containing configuration details.
+
+    Returns:
+        pandas.DataFrame: The fixed DataFrame with the added "instance", "selectiontype", and "cellnumber" columns.
+    """
+    responses_df["instance"] = 0
+    col_size = responses_df.shape[0]
+    random.seed(seed=42)
+    responses_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
+    cellno_list = config["devtest"]["seltype_list"]
+    responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
+    return responses_df
+
+
+def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
+
+    StagingMainLogger.info("Loading SPP snapshot data from json file")
+
+    # Load data from JSON file
+    snapdata = load_json(snapshot_path)
+
+    contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
+
+    # Get response rate
+    res_rate = "{:.2f}".format(processing.response_rate(contributors_df, responses_df))
+
+    # the anonymised snapshot data we use in the DevTest environment
+    # does not include the instance column. This fix should be removed
+    # when new anonymised data is given.
+    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+        responses_df = fix_anon_data(responses_df, config)
+    StagingMainLogger.info("Finished Data Ingest...")
+
+    # Validate snapshot data
+    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+
+    # Data Transmutation
+    full_responses = processing.full_responses(contributors_df, responses_df)
+
+    StagingMainLogger.info(
+        "Finished Data Transmutation and validation of full responses dataframe"
+    )
+    # Validate and force data types for the full responses df
+    # TODO Find a fix for the datatype casting before uncommenting
+    val.combine_schemas_validate_full_df(
+        full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
+
+    return full_responses, res_rate
+
+
+def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
+
+    # Load secondary snapshot data
+    StagingMainLogger.info("Loading secondary snapshot data from json file")
+    secondary_snapdata = load_json(secondary_snapshot_path)
+
+    # Parse secondary snapshot data
+    secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(
+        secondary_snapdata
+    )
+
+    # Validate secondary snapshot data
+    StagingMainLogger.info("Validating secondary snapshot data...")
+    val.validate_data_with_schema(
+        secondary_contributors_df, "./config/contributors_schema.toml"
+    )
+    val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
+
+    # Create secondary full responses dataframe
+    secondary_full_responses = processing.full_responses(
+        secondary_contributors_df, secondary_responses_df
+    )
+    # Validate and force data types for the secondary full responses df
+    val.combine_schemas_validate_full_df(
+        secondary_full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
+
+    # return secondary_full_responses
+    return secondary_full_responses
+
+
+def write_snapshot_to_feather(
+    feather_dir_path: str,
+    snapshot_name: str,
+    full_responses: pd.DataFrame,
+    write_feather,
+    secondary_snapshot_name: str,
+    secondary_full_responses: pd.DataFrame = None,
+) -> None:
+    """
+    Writes the provided DataFrames to feather files.
+
+    This function writes the `full_responses` DataFrame to a feather file named "{snapshot_name}_corrected.feather",
+    and the `secondary_full_responses` DataFrame to a feather file named "{secondary_snapshot_name}.feather".
+    Both files are written to the provided `feather_path`.
+
+    Args:
+        feather_path (str): The path where the feather files will be written.
+        snapshot_name (str): The name of the snapshot for the `full_responses` DataFrame.
+        full_responses (pd.DataFrame): The DataFrame to write to the "{snapshot_name}_corrected.feather" file.
+        secondary_snapshot_name (str): The name of the snapshot for the `secondary_full_responses` DataFrame.
+        secondary_full_responses (pd.DataFrame): The DataFrame to write to the "{secondary_snapshot_name}.feather" file.
+    """
+
+    feather_file = f"{snapshot_name}_corrected.feather"
+    feather_file_path = os.path.join(feather_dir_path, feather_file)
+    write_feather(feather_file_path, full_responses)
+    StagingMainLogger.info(f"Written {feather_file} to {feather_dir_path}")
+
+    if secondary_full_responses is not None:
+        secondary_feather_file = os.path.join(
+            feather_dir_path, f"{secondary_snapshot_name}.feather"
+        )
+        write_feather(secondary_feather_file, secondary_full_responses)
+        StagingMainLogger.info(
+            f"Written {secondary_snapshot_name}.feather to {feather_dir_path}"
+        )
+
+
+def stage_validate_harmonise_postcodes(
+    config, paths, full_responses, run_id, check_file_exists, read_csv, write_csv
+):
+    """
+    Stage, validate and harmonise the postcode column
+    """
+    StagingMainLogger.info("Starting PostCode Validation")
+    postcode_masterlist = paths["postcode_masterlist"]
+    check_file_exists(postcode_masterlist, raise_error=True)
+    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_masterlist = postcode_mapper["pcd2"]
+    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
+    StagingMainLogger.info("Saving Invalid Postcodes to File")
+    pcodes_folder = paths["postcode_path"]
+    tdate = datetime.now().strftime("%Y-%m-%d")
+    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+    StagingMainLogger.info("Finished PostCode Validation")
+
+    return postcode_mapper
 
 
 def run_staging(
@@ -66,186 +303,90 @@ def run_staging(
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
+    feather_path = paths["feather_path"]
+    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
+    secondary_feather_file = os.path.join(
+        feather_path, f"{secondary_snapshot_name}.feather"
+    )
+
+    # Config settings for staging
+    is_network = network_or_hdfs == "network"
+    load_from_feather = config["global"]["load_from_feather"]
+    load_updated_snapshot = config["global"]["load_updated_snapshot"]
 
     # Load historic data
     if config["global"]["load_historic_data"]:
-        curent_year = config["years"]["current_year"]
-        years_to_load = config["years"]["previous_years_to_load"]
-        years_gen = history_loader.history_years(curent_year, years_to_load)
+        dict_of_hist_dfs = load_historic_data(config, paths, read_csv)
+        print(dict_of_hist_dfs)
 
-        if years_gen is None:
-            StagingMainLogger.info("No historic data to load for this run.")
-        else:
-            StagingMainLogger.info("Loading historic data...")
-            history_path = paths["history_path"]
-            dict_of_hist_dfs = history_loader.load_history(
-                years_gen, history_path, read_csv
-            )
-            # Check if it has loaded and is not empty
-            if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-                StagingMainLogger.info(
-                    "Dictionary of history data: %s loaded into pipeline",
-                    ", ".join(dict_of_hist_dfs),
-                )
-                StagingMainLogger.info("Historic data loaded.")
-            else:
-                StagingMainLogger.warning(
-                    "Problem loading historic data. Dict may be empty or not present"
-                )
-                raise Exception("The historic data did not load")
+    # Check if the if the snapshot feather and optionally the secondary snapshot feather exist
+    feather_files_exist = check_snapshot_feather_exists(
+        config, check_file_exists, feather_file, secondary_feather_file
+    )
 
-    else:
-        StagingMainLogger.info("Skipping loading historic data...")
-
-    # Check data file exists, raise an error if it does not.
-
-    check_file_exists(snapshot_path)
-
-    # load and parse the snapshot data json file
-    # Check if feather file exists in snapshot path
-    feather_path = paths["feather_path"]
-    load_from_feather = config["global"]["load_from_feather"]
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-
-    # Check if the secondary snapshot exists
-    load_updated_snapshot = config["global"]["load_updated_snapshot"]
-    if load_updated_snapshot:
-        check_file_exists(secondary_snapshot_path)
-        secondary_feather_file = os.path.join(
-            feather_path, f"{secondary_snapshot_name}.feather"
-        )
-        feather_files_exist = check_file_exists(feather_file) and check_file_exists(
-            secondary_feather_file
-        )  # ? Should only be true if both exist?
-    else:
-        feather_files_exist = check_file_exists(feather_file)
-
-    is_network = network_or_hdfs == "network"
     # Only read from feather if feather files exist and we are on network
-    if is_network & feather_files_exist & load_from_feather:
+    READ_FROM_FEATHER = is_network & feather_files_exist & load_from_feather
+    if READ_FROM_FEATHER:
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
-        snapdata = read_feather(feather_file)
-        StagingMainLogger.info(f"{feather_file} loaded")
+        full_responses = load_snapshot_feather(feather_file, read_feather)
         if load_updated_snapshot:
-            secondary_snapdata = read_feather(secondary_feather_file)
-            StagingMainLogger.info(f"{secondary_feather_file} loaded")
-        READ_FROM_FEATHER = True
-    else:
-        StagingMainLogger.info("Loading SPP snapshot data from json file")
-        # Load data from JSON file
-        snapdata = load_json(snapshot_path)
-
-        contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
-
-        # the anonymised snapshot data we use in the DevTest environment
-        # does not include the instance column. This fix should be removed
-        # when new anonymised data is given.
-        if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-            responses_df["instance"] = 0
-            # In the anonymised data the selectiontype is always 'L'
-            col_size = contributors_df.shape[0]
-            random.seed(seed=42)
-            contributors_df["selectiontype"] = random.choice(
-                ["P", "C", "L"], size=col_size
+            secondary_full_responses = load_snapshot_feather(
+                secondary_feather_file, read_feather
             )
-            cellno_list = config["devtest"]["seltype_list"]
-            contributors_df["cellnumber"] = random.choice(cellno_list, size=col_size)
-        StagingMainLogger.info("Finished Data Ingest...")
-
-        val.validate_data_with_schema(
-            contributors_df, "./config/contributors_schema.toml"
+        else:
+            secondary_full_responses = None
+        postcode_mapper = (
+            None  # TODO: check if the actual mapper is needed later in the pipeline
         )
-        val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+    else:  # Read from JSON
 
-        # Data Transmutation
-        StagingMainLogger.info("Starting Data Transmutation...")
-        full_responses = processing.full_responses(contributors_df, responses_df)
-        StagingMainLogger.info(
-            "Finished Data Transmutation and validation of full responses dataframe"
+        # Check data file exists, raise an error if it does not.
+        check_file_exists(snapshot_path, raise_error=True)
+        full_responses, response_rate = load_val_snapshot_json(
+            snapshot_path, load_json, config, network_or_hdfs
         )
 
-        # Validate and force data types for the full responses df
-        # TODO Find a fix for the datatype casting before uncommenting
-        val.combine_schemas_validate_full_df(
+        print(response_rate)  # TODO: We might want to use this in a QA output
+
+        # Data validation of json or feather data
+        val.check_data_shape(full_responses, raise_error=True)
+
+        # Validate the postcodes in data loaded from JSON
+        postcode_mapper = stage_validate_harmonise_postcodes(
+            config,
+            paths,
             full_responses,
-            "./config/contributors_schema.toml",
-            "./config/wide_responses.toml",
+            run_id,
+            check_file_exists,
+            read_csv,
+            write_csv,
         )
 
         if load_updated_snapshot:
-            secondary_snapdata = load_json(secondary_snapshot_path)
-            (
-                secondary_contributors_df,
-                secondary_responses_df,
-            ) = spp_parser.parse_snap_data(secondary_snapdata)
-            val.validate_data_with_schema(
-                secondary_contributors_df, "./config/contributors_schema.toml"
+            secondary_full_responses = load_validate_secondary_snapshot(
+                load_json,
+                secondary_snapshot_path,
             )
-            val.validate_data_with_schema(
-                secondary_responses_df, "./config/long_response.toml"
-            )
-            secondary_full_responses = processing.full_responses(
-                secondary_contributors_df, secondary_responses_df
-            )
-            val.combine_schemas_validate_full_df(
-                secondary_full_responses,
-                "./config/contributors_schema.toml",
-                "./config/wide_responses.toml",
-            )
-
-        # Write feather file to snapshot path
-        if is_network:
-            feather_file = os.path.join(
-                feather_path, f"{snapshot_name}_corrected.feather"
-            )
-            write_feather(feather_file, full_responses)
-            secondary_feather_file = os.path.join(
-                feather_path, f"{secondary_snapshot_name}.feather"
-            )
-            if load_updated_snapshot:
-                write_feather(secondary_feather_file, secondary_full_responses)
-        READ_FROM_FEATHER = False
-
-    if READ_FROM_FEATHER:
-        contributors_df = read_feather(
-            os.path.join(feather_path, f"{snapshot_name}_contributors.feather")
-        )
-        responses_df = read_feather(
-            os.path.join(feather_path, f"{snapshot_name}_responses.feather")
-        )
-        full_responses = snapdata
-
-        if load_updated_snapshot:
-            secondary_full_responses = secondary_snapdata
         else:
             secondary_full_responses = None
 
-    # Get response rate
-    processing.response_rate(contributors_df, responses_df)
-
-    # Data validation
-    val.check_data_shape(full_responses)
-
-    # Stage, validate and harmonise the postcode column
-    StagingMainLogger.info("Starting PostCode Validation")
-    postcode_masterlist = paths["postcode_masterlist"]
-    check_file_exists(postcode_masterlist)
-    postcode_mapper = read_csv(postcode_masterlist)
-    postcode_masterlist = postcode_mapper["pcd2"]
-    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
-    StagingMainLogger.info("Saving Invalid Postcodes to File")
-    pcodes_folder = paths["postcode_path"]
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
-    write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
-    StagingMainLogger.info("Finished PostCode Validation")
+        # Write both snapshots to feather file at given path
+        if is_network:
+            write_snapshot_to_feather(
+                feather_path,
+                snapshot_name,
+                full_responses,
+                write_feather,
+                secondary_snapshot_name,
+                secondary_full_responses,
+            )
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = paths["manual_outliers_path"]
-        check_file_exists(manual_path)
+        check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
         val.validate_data_with_schema(
@@ -259,7 +400,7 @@ def run_staging(
     # Loading PG numeric to alpha mapper
     StagingMainLogger.info("Loading PG numeric to alpha File...")
     pg_num_alpha_path = paths["pg_num_alpha_path"]
-    check_file_exists(pg_num_alpha_path)
+    check_file_exists(pg_num_alpha_path, raise_error=True)
     pg_num_alpha = read_csv(pg_num_alpha_path)
     val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
     pg_num_alpha = val.validate_many_to_one(
@@ -271,7 +412,7 @@ def run_staging(
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
         backdata_path = paths["backdata_path"]
-        check_file_exists(backdata_path)
+        check_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
         # To be added once schema is defined
         # val.validate_data_with_schema(
@@ -280,10 +421,10 @@ def run_staging(
 
         # Map PG numeric to alpha in column q201
         backdata = pg.pg_to_pg_mapper(
-        backdata,
-        pg_num_alpha,
-        target_col="q201",
-        pg_column="q201",
+            backdata,
+            pg_num_alpha,
+            target_col="q201",
+            pg_column="q201",
         )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
@@ -293,7 +434,7 @@ def run_staging(
     # Load cora mapper
     StagingMainLogger.info("Loading Cora status mapper file")
     cora_mapper_path = paths["cora_mapper_path"]
-    check_file_exists(cora_mapper_path)
+    check_file_exists(cora_mapper_path, raise_error=True)
     cora_mapper = read_csv(cora_mapper_path)
     # validates and updates from int64 to string type
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
@@ -303,7 +444,7 @@ def run_staging(
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
     ultfoc_mapper_path = paths["ultfoc_mapper_path"]
-    check_file_exists(ultfoc_mapper_path)
+    check_file_exists(ultfoc_mapper_path, raise_error=True)
     ultfoc_mapper = read_csv(ultfoc_mapper_path)
     val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
     val.validate_ultfoc_df(ultfoc_mapper)
@@ -312,7 +453,7 @@ def run_staging(
     # Load itl mapper
     StagingMainLogger.info("Loading ITL File")
     itl_mapper_path = paths["itl_path"]
-    check_file_exists(itl_mapper_path)
+    check_file_exists(itl_mapper_path, raise_error=True)
     itl_mapper = read_csv(itl_mapper_path)
     val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
     StagingMainLogger.info("ITL File Loaded Successfully...")
@@ -320,14 +461,14 @@ def run_staging(
     # Loading cell number covarege
     StagingMainLogger.info("Loading Cell Covarage File...")
     cellno_path = paths["cellno_path"]
-    check_file_exists(cellno_path)
+    check_file_exists(cellno_path, raise_error=True)
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
     # Loading PG alpha to numeric mapper - possibly, deprecated
     StagingMainLogger.info("Loading PG alpha to numeric File...")
     pg_alpha_num_path = paths["pg_alpha_num_path"]
-    check_file_exists(pg_alpha_num_path)
+    check_file_exists(pg_alpha_num_path, raise_error=True)
     pg_alpha_num = read_csv(pg_alpha_num_path)
     val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
     pg_alpha_num = val.validate_many_to_one(
@@ -338,7 +479,7 @@ def run_staging(
     # Loading SIC to PG to alpha mapper
     StagingMainLogger.info("Loading SIC to PG to alpha File...")
     sic_pg_alpha_path = paths["sic_pg_alpha_path"]
-    check_file_exists(sic_pg_alpha_path)
+    check_file_exists(sic_pg_alpha_path, raise_error=True)
     sic_pg_alpha = read_csv(sic_pg_alpha_path)
     val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
     sic_pg_alpha = val.validate_many_to_one(
@@ -354,7 +495,7 @@ def run_staging(
     # Loading PG detailed mapper
     StagingMainLogger.info("Loading PG detailed mapper File...")
     pg_detailed_path = paths["pg_detailed_path"]
-    check_file_exists(pg_detailed_path)
+    check_file_exists(pg_detailed_path, raise_error=True)
     pg_detailed = read_csv(pg_detailed_path)
     val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
     StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
@@ -362,7 +503,7 @@ def run_staging(
     # Loading ITL1 detailed mapper
     StagingMainLogger.info("Loading ITL1 detailed mapper File...")
     itl1_detailed_path = paths["itl1_detailed_path"]
-    check_file_exists(itl1_detailed_path)
+    check_file_exists(itl1_detailed_path, raise_error=True)
     itl1_detailed = read_csv(itl1_detailed_path)
     val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
@@ -370,11 +511,16 @@ def run_staging(
     # Loading Civil or Defence detailed mapper
     StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")
     civil_defence_detailed_path = paths["civil_defence_detailed_path"]
-    check_file_exists(civil_defence_detailed_path)
+    check_file_exists(civil_defence_detailed_path, raise_error=True)
     civil_defence_detailed = read_csv(civil_defence_detailed_path)
-    # val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
     StagingMainLogger.info("Civil/Defence detailed mapper File Loaded Successfully...")
 
+    # Loading SIC division detailed mapper
+    StagingMainLogger.info("Loading SIC division detailed mapper File...")
+    sic_division_detailed_path = paths["sic_division_detailed_path"]
+    check_file_exists(sic_division_detailed_path, raise_error=True)
+    sic_division_detailed = read_csv(sic_division_detailed_path)
+    StagingMainLogger.info("SIC division detailed mapper File Loaded Successfully...")
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
@@ -407,4 +553,5 @@ def run_staging(
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,
+        sic_division_detailed,
     )

@@ -10,6 +10,7 @@ from src.outputs.gb_sas import output_gb_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
+from src.outputs.intram_by_sic import output_intram_by_sic
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -29,7 +30,8 @@ def run_outputs(
     sic_pg_alpha: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
-    civil_defence_detailed,
+    civil_defence_detailed: pd.DataFrame,
+    sic_division_detailed: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -94,7 +96,7 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished TAU output.")
 
-# Running GB SAS output
+    # Running GB SAS output
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
         output_gb_sas(
@@ -146,3 +148,15 @@ def run_outputs(
             civil_defence_detailed,
         )
         OutputMainLogger.info("Finished Intram by civil or defence output.")
+
+    # Running Intram by SIC
+    if config["global"]["output_intram_by_sic"]:
+        OutputMainLogger.info("Starting Intram by SIC output...")
+        output_intram_by_sic(
+            estimated_df,
+            config,
+            write_csv,
+            run_id,
+            sic_division_detailed,
+        )
+        OutputMainLogger.info("Finished Intram by SIC output.")
