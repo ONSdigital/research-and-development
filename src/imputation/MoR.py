@@ -59,8 +59,8 @@ def mor_preprocessing(df, backdata):
 
     # TODO move this to imputation main
     # Select only values to be imputed
-    df = create_imp_class_col(df, "200", "201", use_cellno=False)
-    backdata = create_imp_class_col(backdata, "200", "201", use_cellno=False)
+    df = create_imp_class_col(df, "200", "201")
+    backdata = create_imp_class_col(backdata, "200", "201")
 
     imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
