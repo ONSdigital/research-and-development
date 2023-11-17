@@ -94,6 +94,9 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
 
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
+        # ! This fixes issues with imputation, not sure why
+        expanded_df.reset_index(drop=True, inplace=True)
+
         # Create group_by obj of the trimmed df
         groupby_obj = expanded_df.groupby("imp_class")
 

@@ -168,11 +168,7 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
         secondary_snapdata
     )
 
-    # Assign instance column, with value 0
-    secondary_responses_df["instance"] = 0
-
     # Validate secondary snapshot data
-
     StagingMainLogger.info("Validating secondary snapshot data...")
     val.validate_data_with_schema(
         secondary_contributors_df, "./config/contributors_schema.toml"
@@ -367,7 +363,6 @@ def run_staging(
             write_csv,
         )
 
-        # ! This only works for local data since we've not reproduced the fix for anonymoised HDFS data above
         if load_updated_snapshot:
             secondary_full_responses = load_validate_secondary_snapshot(
                 load_json,
@@ -553,6 +548,10 @@ def run_staging(
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
+
+    # If we didn't load a snapshot, leave the df as null
+    if not load_updated_snapshot:
+        secondary_full_responses = None
 
     return (
         full_responses,
