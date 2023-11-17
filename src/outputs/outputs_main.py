@@ -1,6 +1,7 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
+import numpy as np
 from typing import Callable, Dict, Any
 
 from src.outputs.short_form import output_short_form
@@ -55,7 +56,15 @@ def run_outputs(
 
     """
 
-    outputs_df = estimated_df.copy().loc[estimated_df["imp_marker"].isin(["R", "TMI", "CF", "MoR"])]
+    imputed_statuses = ["TMI", "CF", "MoR"]
+
+    # filter estimated_df to only include good or imputed statuses
+    outputs_df = estimated_df.copy().loc[estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")]
+
+    #! not working
+    # change the value of the status column to 'imputed' for imputed statuses
+    condition = outputs_df["status"].isin(imputed_statuses)
+    outputs_df["status"] = np.where(condition, "imputed", outputs_df["status"])
 
     # Running short form output
     if config["global"]["output_short_form"]:
