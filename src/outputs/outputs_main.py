@@ -1,7 +1,6 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-import numpy as np
 from typing import Callable, Dict, Any
 
 from src.outputs.status_filtered import output_status_filtered
@@ -62,14 +61,11 @@ def run_outputs(
     to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
         estimated_df["imp_marker"] == "R"
     )
-    filtered_out = ~(
-        estimated_df["imp_marker"].isin(imputed_statuses)
-        | (estimated_df["imp_marker"] == "R")
-    )
+
     # filter estimated_df to only include good or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
     # filter estimated_df for records not included in outputs
-    filtered_output_df = estimated_df.copy().loc[filtered_out]
+    filtered_output_df = estimated_df.copy().loc[~to_keep]
 
     # change the value of the status column to 'imputed' for imputed statuses
     condition = outputs_df["status"].isin(imputed_statuses)
