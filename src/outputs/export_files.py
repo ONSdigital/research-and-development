@@ -162,6 +162,16 @@ def transfer_files(
     logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
 
+def log_exports(list_file_exported: List):
+    
+    # Get the current date and time
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M")
+    
+    # Get the user's username
+    
+    # Log the Date, time,username, and list of files
+
 def run_export(config_path: str):
     """Main function to run the data export pipeline."""
 
