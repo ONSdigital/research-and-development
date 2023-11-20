@@ -162,20 +162,36 @@ def transfer_files(
     logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
 
-def log_exports(list_file_exported: List):
-    
-    # Get the current date and time
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M")
+def get_username(hdfs_or_network: str):
     
     # Get the user's username
+    username_get_dict = {"hdfs": os.getenv("HADOOP_USER_NAME"),
+                         "network": os.environ.get("USER")}
+    username = username_get_dict[hdfs_or_network]
+    
+    if context is None:
+        context = "unknown"
+    
+    return username
+
+def log_exports(list_file_exported: List, 
+                hdfs_or_network: str, 
+                pipeline_run_datetime: datetime,
+                logger: logging.Logger):
+      
+    # Get the user's username
+    username = get_username(hdfs_or_network)    
     
     # Log the Date, time,username, and list of files
+    pipeline_run_datetime = pipeline_run_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Log the files being exported
+    logger.info(f"{pipeline_run_datetime}: User {username} exported the following files:{list_file_exported}")
+    
 
 def run_export(config_path: str):
     """Main function to run the data export pipeline."""
 
-###
     # Load config
     conf_obj = Config_settings(config_path)
     config = conf_obj.config_dict
@@ -290,6 +306,11 @@ def run_export(config_path: str):
             OutgoingLogger,
             copy_files,
             move_files)
+
+    log_exports(list(file_select_dict.values()), 
+                network_or_hdfs, 
+                pipeline_run_datetime,
+                OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
 
