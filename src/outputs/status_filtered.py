@@ -7,6 +7,7 @@ from typing import Callable, Dict, Any
 
 OutputMainLogger = logging.getLogger(__name__)
 
+
 def output_status_filtered(
     df: pd.DataFrame,
     config: Dict[str, Any],
