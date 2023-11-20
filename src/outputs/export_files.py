@@ -175,9 +175,8 @@ def get_username():
 
 
 def log_exports(
-    list_file_exported: List,
-    pipeline_run_datetime: datetime,
-    logger: logging.Logger):
+    list_file_exported: List, pipeline_run_datetime: datetime, logger: logging.Logger
+):
     """
     Logs the details of the exported files.
 
@@ -199,8 +198,11 @@ def log_exports(
     pipeline_run_datetime = pipeline_run_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
     # Log the files being exported
+    strs_exported_files = list(map(str, list_file_exported))
     logger.info(
-    "{}: User {} exported the following files:\n{}".format(pipeline_run_datetime, username, '\n'.join(list_file_exported))
+        "{}: User {} exported the following files:\n{}".format(
+            pipeline_run_datetime, username, "\n".join(strs_exported_files)
+        )
     )
 
 
@@ -323,11 +325,10 @@ def run_export(config_path: str):
             move_files,
         )
 
-    log_exports(list(file_select_dict.values()),
-                pipeline_run_datetime,
-                OutgoingLogger)
+    log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
+
 
 if __name__ == "__main__":
     run_export()
