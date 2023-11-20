@@ -8,6 +8,7 @@ from datetime import datetime
 import toml
 from typing import List
 from pathlib import Path
+import getpass
 
 from src.utils.helpers import Config_settings
 from src.outputs.manifest_output import Manifest
@@ -110,13 +111,12 @@ def get_file_choice(paths, config: dict):
     }
 
     # Log the files being exported
-    logging.info(
-        f"These are the files being exported: {selection_dict.values()}")
+    logging.info(f"These are the files being exported: {selection_dict.values()}")
 
     return selection_dict
 
 
-def check_files_exist(file_list: List, network_or_hdfs):
+def check_files_exist(file_list: List, network_or_hdfs: str, isfile: callable):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
@@ -132,18 +132,11 @@ def check_files_exist(file_list: List, network_or_hdfs):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
             )
-            raise FileNotFoundError
+            raise FileNotFoundError(f"{file} not found in {file_path}")
     OutgoingLogger.info("All output files exist")
 
 
-def transfer_files(
-    source,
-    destination,
-    method,
-    logger,
-    copy_files,
-    move_files
-):
+def transfer_files(source, destination, method, logger, copy_files, move_files):
 
     """
     Transfer files from source to destination using the specified method and log
@@ -162,32 +155,32 @@ def transfer_files(
     logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
 
-def get_username(hdfs_or_network: str):
-    
+def get_username():
+
     # Get the user's username
-    username_get_dict = {"hdfs": os.getenv("HADOOP_USER_NAME"),
-                         "network": os.environ.get("USER")}
-    username = username_get_dict[hdfs_or_network]
-    
-    if context is None:
-        context = "unknown"
-    
+    username = getpass.getuser()
+
+    if username is None:
+        username = "unknown"
+
     return username
 
-def log_exports(list_file_exported: List, 
-                hdfs_or_network: str, 
-                pipeline_run_datetime: datetime,
-                logger: logging.Logger):
-      
+
+def log_exports(
+    list_file_exported: List, pipeline_run_datetime: datetime, logger: logging.Logger
+):
+
     # Get the user's username
-    username = get_username(hdfs_or_network)    
-    
+    username = get_username()
+
     # Log the Date, time,username, and list of files
     pipeline_run_datetime = pipeline_run_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    
+
     # Log the files being exported
-    logger.info(f"{pipeline_run_datetime}: User {username} exported the following files:{list_file_exported}")
-    
+    logger.info(
+        f"{pipeline_run_datetime}: User {username} exported the following files:{list_file_exported}"
+    )
+
 
 def run_export(config_path: str):
     """Main function to run the data export pipeline."""
@@ -231,14 +224,14 @@ def run_export(config_path: str):
         from src.utils.hdfs_mods import hdfs_isdir as isdir
         from src.utils.hdfs_mods import hdfs_read_header as read_header
         from src.utils.hdfs_mods import (
-            hdfs_write_string_to_file as write_string_to_file)
+            hdfs_write_string_to_file as write_string_to_file,
+        )
 
     else:
         OutgoingLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
 
-    OutgoingLogger.info(
-        f"Using the {network_or_hdfs} file system as data source.")
+    OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
 
     # Define paths
     paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
@@ -249,7 +242,7 @@ def run_export(config_path: str):
     file_select_dict = get_file_choice(paths, config)
 
     # Check that files exist
-    check_files_exist(list(file_select_dict.values()), network_or_hdfs)
+    check_files_exist(list(file_select_dict.values()), network_or_hdfs, isfile)
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
@@ -305,12 +298,10 @@ def run_export(config_path: str):
             file_transfer_method,
             OutgoingLogger,
             copy_files,
-            move_files)
+            move_files,
+        )
 
-    log_exports(list(file_select_dict.values()), 
-                network_or_hdfs, 
-                pipeline_run_datetime,
-                OutgoingLogger)
+    log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
 
