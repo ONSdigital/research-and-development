@@ -21,7 +21,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_status_filtered: True
+  output_status_filtered: False
   output_short_form: False
   output_long_form: False
   output_tau: False
@@ -29,7 +29,7 @@ global:
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
-  output_intram_by_sic: False
+  output_intram_by_sic: True
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
