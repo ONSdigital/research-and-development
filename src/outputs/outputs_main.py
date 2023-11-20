@@ -1,9 +1,9 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-import numpy as np
 from typing import Callable, Dict, Any
 
+from src.outputs.status_filtered import output_status_filtered
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
@@ -58,13 +58,29 @@ def run_outputs(
 
     imputed_statuses = ["TMI", "CF", "MoR"]
 
-    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")
+    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
+        estimated_df["imp_marker"] == "R"
+    )
+
     # filter estimated_df to only include good or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
+    # filter estimated_df for records not included in outputs
+    filtered_output_df = estimated_df.copy().loc[~to_keep]
 
     # change the value of the status column to 'imputed' for imputed statuses
     condition = outputs_df["status"].isin(imputed_statuses)
     outputs_df.loc[condition, "status"] = "imputed"
+
+    # Running status filtered dataframe output for QA
+    if config["global"]["output_status_filtered"]:
+        OutputMainLogger.info("Starting status filtered output...")
+        output_status_filtered(
+            filtered_output_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished status filtered output.")
 
     # Running short form output
     if config["global"]["output_short_form"]:
