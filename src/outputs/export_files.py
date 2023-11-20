@@ -156,7 +156,15 @@ def transfer_files(source, destination, method, logger, copy_files, move_files):
 
 
 def get_username():
+    """
+    Retrieves the username of the currently logged-in user.
 
+    This function uses the `getpass` module to get the username of the currently logged-in user.
+    If the username cannot be determined, it defaults to "unknown".
+
+    Returns:
+        str: The username of the currently logged-in user, or "unknown" if the username cannot be determined.
+    """
     # Get the user's username
     username = getpass.getuser()
 
@@ -167,9 +175,23 @@ def get_username():
 
 
 def log_exports(
-    list_file_exported: List, pipeline_run_datetime: datetime, logger: logging.Logger
-):
+    list_file_exported: List,
+    pipeline_run_datetime: datetime,
+    logger: logging.Logger):
+    """
+    Logs the details of the exported files.
 
+    This function logs the date and time of the pipeline run, the username of the user who ran the pipeline,
+    and the list of files that were exported. The date and time are formatted as "YYYY-MM-DD HH:MM:SS".
+
+    Args:
+        list_file_exported (List[str]): A list of the names of the files that were exported.
+        pipeline_run_datetime (datetime): The date and time when the pipeline was run.
+        logger (logging.Logger): The logger to use for logging the export details.
+
+    Returns:
+        None
+    """
     # Get the user's username
     username = get_username()
 
@@ -178,7 +200,7 @@ def log_exports(
 
     # Log the files being exported
     logger.info(
-        f"{pipeline_run_datetime}: User {username} exported the following files:{list_file_exported}"
+    "{}: User {} exported the following files:\n{}".format(pipeline_run_datetime, username, '\n'.join(list_file_exported))
     )
 
 
@@ -301,10 +323,11 @@ def run_export(config_path: str):
             move_files,
         )
 
-    log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)
+    log_exports(list(file_select_dict.values()),
+                pipeline_run_datetime,
+                OutgoingLogger)
 
     OutgoingLogger.info("Exporting files finished.")
-
 
 if __name__ == "__main__":
     run_export()
