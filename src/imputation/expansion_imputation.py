@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 from typing import List, Union
 
-from src.utils.wrappers import time_logger_wrap
+from src.imputation.imputation_helpers import split_df_on_imp_class, split_df_on_trim
 
 ExpansionLogger = logging.getLogger(__name__)
 
@@ -19,8 +19,6 @@ def evaluate_imputed_ixx(
     over the sum of all 211 or 305 values, multiplied by the imputed 211.
     """
     imp_class = group["imp_class"].values[0]
-    ExpansionLogger.debug(f"Imputation class: {imp_class}.")
-    ExpansionLogger.debug(f"Master column: {master_col}.")
 
     # Return the groupby object unaltered if there are no TMI values
     # in the imputation class
@@ -63,22 +61,7 @@ def evaluate_imputed_ixx(
     return group
 
 
-def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
-    """Splits the dataframe in based on if it was trimmed or not"""
 
-    # TODO: remove this temporary fix to cast Nans to False
-    df[trim_bool_col].fillna(False, inplace=True)
-
-    df_not_trimmed = df.loc[~df[trim_bool_col]]
-    df_trimmed = df.loc[df[trim_bool_col]]
-
-    ExpansionLogger.debug(
-        f"There are {df.shape[0]} rows in the original df \n"
-        f"There are {df_not_trimmed.shape[0]} rows in the nontrimmed_df \n"
-        f"There are {df_trimmed.shape[0]} rows in the trimmed_211_df"
-    )
-
-    return df_trimmed, df_not_trimmed
 
 
 def run_expansion(df: pd.DataFrame, config: dict):
@@ -102,8 +85,12 @@ def run_expansion(df: pd.DataFrame, config: dict):
     breakdown_qs_2xx = breakdown_dict["211"]
     breakdown_qs_3xx = breakdown_dict["305"]
 
+    # Remove records that have the reference list variables
+    # and those that have "nan" in the imp class
+    filtered_df, excluded_df = split_df_on_imp_class(df, ["nan"])
+
     # Filter to exclude the same rows trimmed for 211_trim == False
-    trimmed_211_df, nontrimmed_df = split_df_on_trim(df, "211_trim")
+    trimmed_211_df, nontrimmed_df = split_df_on_trim(filtered_df, "211_trim")
 
     # Trimmed groups
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
@@ -121,10 +108,6 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Filter to exclude the same rows trimmed for 305_trim == False
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
-    ExpansionLogger.debug(
-        f"There are {result_211_df.shape[0]} rows in the result_211_df \n"
-        f"There are {nontrimmed_df.shape[0]} rows in the nontrimmed_df"
-    )
 
     # Groupby imp_class again
     non_trim_grouped = nontrimmed_df.groupby("imp_class")
@@ -135,7 +118,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records for 305 trimming, and the dataframe of excluded rows
-    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df], axis=0)
+    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df, excluded_df], axis=0)
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
