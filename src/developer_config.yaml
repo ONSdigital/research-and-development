@@ -29,7 +29,7 @@ global:
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
-  output_intram_by_sic: True
+  output_intram_by_sic: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
