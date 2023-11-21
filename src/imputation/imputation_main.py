@@ -14,11 +14,9 @@ from src.imputation import tmi_imputation as tmi
 ImputationMainLogger = logging.getLogger(__name__)
 
 
-def add_column(df: pd.DataFrame,
-               column_name: str = 'manual_trim',
-               value: bool = False) -> pd.DataFrame:
+def add_trim_column(df: pd.DataFrame, column_name: str = 'manual_trim', value: bool = False) -> pd.DataFrame:
     """
-    Adds a new column to a DataFrame with a default False value.
+    Adds a new column to a DataFrame with a default value.
 
     Args:
         df (pd.DataFrame): The DataFrame to add the new column to.
@@ -27,9 +25,21 @@ def add_column(df: pd.DataFrame,
 
     Returns:
         pd.DataFrame: The DataFrame with the new column added.
+
+    Raises:
+        ValueError: If the DataFrame is empty or the column already exists in the DataFrame.
     """
+    if df.empty:
+        raise ValueError("The DataFrame is empty.")
+    
+    if column_name in df.columns:
+        raise ValueError(f"A column with name {column_name} already exists in the DataFrame.")
+
     df[column_name] = value
     return df
+
+
+
 
 def run_imputation(
     df: pd.DataFrame,
