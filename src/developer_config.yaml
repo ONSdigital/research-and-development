@@ -12,6 +12,7 @@ global:
   load_historic_data: False
   load_manual_construction: False
   load_manual_outliers: False
+  load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
