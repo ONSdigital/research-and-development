@@ -39,6 +39,53 @@ def add_trim_column(df: pd.DataFrame, column_name: str = 'manual_trim', value: b
     return df
 
 
+def get_latest_csv(directory: str) -> str:
+    """
+    Gets the latest CSV file in a directory.
+
+    Args:
+        directory (str): The directory to search for CSV files.
+
+    Returns:
+        str: The path of the latest CSV file, or an empty string if no CSV files are found.
+    """
+    list_of_files = glob.glob(os.path.join(directory, "*.csv"))  # get list of all csv files
+    if not list_of_files:  # if list is empty, return empty string
+        return None
+    latest_file = max(list_of_files, key=os.path.getctime) # get the latest file
+    
+    return latest_file
+
+# check if any files are in imputation/manual_trimming and check if load_manual_imputation is True
+# if so load the file and any records which are marked True in the manual_trim column will be 
+# excluded from the imputation process and will be output as is. They will be marked as 'manual_trim' in the imp_marker column
+def load_manual_imputation(config: Dict[str, Any], 
+                           df: pd.DataFrame,
+                           isfile_func: callable) -> pd.DataFrame:
+    """
+    Loads a manual trimming file if it exists and adds a manual_trim column to the DataFrame.
+
+    Args:
+        config (Dict[str, Any]): The configuration dictionary.
+        df (pd.DataFrame): The dataframe to be imputed.
+        isfile_func (callable): The function to use to check if the file exists.
+    Returns:
+        pd.DataFrame: The DataFrame with the manual_trim column added.
+    """
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+
+    new_man_trim_file = get_latest_csv(f"{imp_path}/manual_trimming/")
+    
+    if config["global"]["load_manual_imputation"] and isfile_func(new_man_trim_file):
+        manual_trim_df = pd.read_csv(new_man_trim_file)
+        df = df.merge(manual_trim_df, on=["reference", "instance"], how="left")
+        df = df.drop(columns=["manual_trim_x"])
+        df = df.rename(columns={"manual_trim_y": "manual_trim"})
+        df["manual_trim"] = df["manual_trim"].fillna(False)
+    else:
+        df = add_trim_column(df)
+    return df
 
 
 def run_imputation(
