@@ -14,6 +14,23 @@ from src.imputation import tmi_imputation as tmi
 ImputationMainLogger = logging.getLogger(__name__)
 
 
+def add_column(df: pd.DataFrame,
+               column_name: str = 'manual_trim',
+               value: bool = False) -> pd.DataFrame:
+    """
+    Adds a new column to a DataFrame with a default False value.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to add the new column to.
+        column_name (str, optional): The name of the new column. Defaults to 'manual_trim'.
+        value (bool, optional): The default value for the new column. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the new column added.
+    """
+    df[column_name] = value
+    return df
+
 def run_imputation(
     df: pd.DataFrame,
     mapper: pd.DataFrame,
@@ -73,6 +90,9 @@ def run_imputation(
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+
+    # Add a manual_trim column to the QA df
+    qa_df = add_column(qa_df, column_name="manual_trim", value=False)
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
