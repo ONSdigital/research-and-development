@@ -8,10 +8,10 @@ global:
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
-  load_updated_snapshot: True # Whether to load the updated snapshots for amendments and additions
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
   load_manual_construction: False
-  load_manual_outliers: True
+  load_manual_outliers: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
@@ -20,7 +20,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_status_filtered: False
   output_short_form: False
   output_long_form: False
