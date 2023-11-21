@@ -3,7 +3,6 @@ from typing import List, Union
 import pandas as pd
 import logging
 
-from src.imputation.expansion_imputation import split_df_on_trim
 from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
 from src.utils.wrappers import df_change_func_wrap
 
@@ -94,9 +93,6 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
 
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
-        # ! This fixes issues with imputation, not sure why
-        expanded_df.reset_index(drop=True, inplace=True)
-
         # Create group_by obj of the trimmed df
         groupby_obj = expanded_df.groupby("imp_class")
 
@@ -107,6 +103,8 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
             trim_col,
             break_down_cols=breakdown_dict[master_value],
         )  # returns a dataframe
+
+        expanded_df.reset_index(drop=True, inplace=True)
 
     # Calculate the headcount_m and headcount_f imputed values by summing
     short_mask = expanded_df["formtype"] == formtype_short
