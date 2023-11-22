@@ -1,0 +1,1575 @@
+[reference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
+
+[period]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = 6
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [202012]
+
+[survey]
+Description = "All values are 002"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["002"]
+
+[formid]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "Int64"
+Length = 2
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [20, 21]
+
+[status]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Clear - overridden SE", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
+
+[statusencoded]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "Int64"
+Length = 3
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305, 308, 309]
+
+[receiptdate]
+Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "datetime64"
+Nullable = false
+Current_Data_Type = ["None","str"]
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[lockedby]
+Description = "All empty strings"
+Deduced_Data_Type = "pd.NA"
+Nullable = true
+Current_Data_Type = ["None","str"]
+Length = 0
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[lockeddate]
+Description = "All None type"
+Deduced_Data_Type = "pd.NA"
+Nullable = true
+Current_Data_Type = ["None","str"]
+Length = 0
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+
+[formtype]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["0001", "0006"]
+
+[checkletter]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = 1
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L", "S"]
+
+[frozensicoutdated]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1120
+Max_values = 93059
+Possible_Categorical_Values = ["nan"]
+
+[rusicoutdated]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1120
+Max_values = 93059
+Possible_Categorical_Values = ["nan"]
+
+[frozensic]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1300
+Max_values = 96090
+Possible_Categorical_Values = ["nan"]
+
+[rusic]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1300
+Max_values = 96090
+Possible_Categorical_Values = ["nan"]
+
+[frozenemployees]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 272527
+Possible_Categorical_Values = ["nan"]
+
+[employees]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 272528
+Possible_Categorical_Values = ["nan"]
+
+[frozenemployment]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1
+Max_values = 272527
+Possible_Categorical_Values = ["nan"]
+
+[employment]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1
+Max_values = 272528
+Possible_Categorical_Values = ["nan"]
+
+[frozenfteemployment]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0.0
+Max_values = 177699.0
+Possible_Categorical_Values = ["nan"]
+
+[fteemployment]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0.0
+Max_values = 177699.5
+Possible_Categorical_Values = ["nan"]
+
+[frozenturnover]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 55277352
+Possible_Categorical_Values = ["nan"]
+
+[turnover]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 55277352
+Possible_Categorical_Values = ["nan"]
+
+[enterprisereference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 1001603625
+Max_values = 9891309165
+Possible_categorical_Values = ["nan"]
+
+[wowenterprisereference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 1001603625
+Max_values = 9891309165
+Possible_categorical_Values = ["nan"]
+
+[cellnumber]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "Int64"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [0]
+
+[currency]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["S", "E"]
+
+[vatreference]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["VATREF"]
+
+[payereference]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["PAYEREF"]
+
+[companyregistrationnumber]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["CRN"]
+
+[numberlivelocalunits]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 6063
+Possible_categorical_Values = ["nan"]
+
+[numberlivevat]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 255
+Possible_categorical_Values = ["nan"]
+
+[numberlivepaye]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 0
+Max_values = 24
+Possible_categorical_Values = ["nan"]
+
+[legalstatus]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = 1
+Max_values = 4
+Possible_Categorical_Values = [1, 2, 3, 4]
+
+[reportingunitmarker]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["L", "E"]
+
+[region]
+Description = "nan"
+Deduced_Data_Type = "category"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "XX", "AA", "DC", "GF", "BA"]
+
+[birthdate]
+Description = "Datetime format = format=%d/%m/%Y"
+Deduced_Data_Type = "datetime64"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[referencename]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[referencepostcode]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[tradingstyle]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[selectiontype]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["L"]
+
+[inclusionexclusion]
+Description = 'All values are " "'
+Deduced_Data_Type = "pd.NA"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[lastupdateddate]
+Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
+Deduced_Data_Type = "datetime64"
+Nullable = false
+Current_Data_Type = ["None","str"]
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+q_code = ""
+old_ref = "nan"
+
+[101]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[102]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[103]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[104]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[200]
+Description = "Business type: Civil or Defence"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = ""
+old_ref = "c_or_d"
+
+[201]
+Description = "Published Product Group"
+Deduced_Data_Type = "Int64"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = ""
+old_ref = "selgrpno"
+
+[202]
+Description = "Salaries & Wages"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q202"
+old_ref = "slries"
+
+[203]
+Description = "Other current expenditure"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q203"
+old_ref = "curr_oth"
+
+[204]
+Description = "Total Current Expenditure"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q204"
+old_ref = "curr_tot"
+
+[205]
+Description = "Basic Research"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q205"
+old_ref = "res_bas"
+
+[206]
+Description = "Applied Research"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q206"
+old_ref = "res_app"
+
+[207]
+Description = "Experimental Development"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q207"
+old_ref = "experm"
+
+[209]
+Description = "Equipment & Machinery CapEx"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q209"
+old_ref = "cxplm"
+
+[210]
+Description = "Total Capex."
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q210"
+old_ref = "None"
+
+[211]
+Description = "Total Inhouse Expenditure"
+Deduced_Data_Type = "float64"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q211"
+old_ref = "intram"
+
+[212]
+Description = "Own Funds"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q212"
+old_ref = "own_f"
+
+[214]
+Description = "Funding - UK government"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q214"
+old_ref = "ex_uk_gv"
+
+[216]
+Description = "Funding - Other UK Private Bus/Public Orgs"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q216"
+old_ref = "ex_uk"
+
+[218]
+Description = "Total Funding"
+Deduced_Data_Type = "float64"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q218"
+old_ref = "f_tot"
+
+[219]
+Description = "Land Acquired for R&D (Split of Land & Build CapEx)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q219"
+old_ref = "None"
+
+[220]
+Description = "Buildings acquired/constructed for R&D (Split of Land & Build CapEx)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q220"
+old_ref = "None"
+
+[221]
+Description = "Expenditure on computer software only (of which from Equipment & Machinery CapEx)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q221"
+old_ref = "None"
+
+[222]
+Description = "Purchase of Materials (Split of Other current)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q222"
+old_ref = "None"
+
+[223]
+Description = "Purchase of Services (Split of Other current)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q223"
+old_ref = "None"
+
+[225]
+Description = "Ownership - Own Business"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q225"
+old_ref = "None"
+
+[226]
+Description = "Ownership - UK Government"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q226"
+old_ref = "None"
+
+[227]
+Description = "Ownership - Other UK Priv Bus"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q227"
+old_ref = "None"
+
+[228]
+Description = "Ownership - Other UK Orgs"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q228"
+old_ref = "None"
+
+[229]
+Description = "Ownership - Bus Enterprises in Group Outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q229"
+old_ref = "None"
+
+[237]
+Description = "Ownership - not owned freely available"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q237"
+old_ref = "None"
+
+[242]
+Description = "Funding - Any other UK organisations"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q242"
+old_ref = "None"
+
+[243]
+Description = "Funding - Business Enterprises in group outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q243"
+old_ref = "None"
+
+[244]
+Description = "Funding - Other Business Enterprises outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q244"
+old_ref = "None"
+
+[245]
+Description = "Funding - Other Governments outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q245"
+old_ref = "None"
+
+[246]
+Description = "Funding - Higher Education Est Outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q246"
+old_ref = "None"
+
+[247]
+Description = "Funding - Non-profit Orgs outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q247"
+old_ref = "None"
+
+[248]
+Description = "Funding - International Orgs"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q248"
+old_ref = "None"
+
+[249]
+Description = "Funding - Any other orgs outside UK"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q249"
+old_ref = "None"
+
+[250]
+Description = "Funding - UK Higher Education Establishments"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q250"
+old_ref = "None"
+
+[251]
+Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) LONG FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q251"
+old_ref = "None"
+
+[300]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[301]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[302]
+Description = "Purchased/funded R&D in the UK (Yes or No)"
+Deduced_Data_Type = "float64"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q302"
+old_ref = "None"
+
+[303]
+Description = "Purchased Outside UK (Govt Funded)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q303"
+old_ref = "None"
+
+[304]
+Description = "Purchased Outside UK (Other)"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q304"
+old_ref = "None"
+
+[305]
+Description = "Total Purchased"
+Deduced_Data_Type = "float64"
+Nullable = "Yes"
+Length = "# an integer of the length, or N/A"
+Min_values = 0
+Max_values = 1000000
+Possible_categorical_Values = []
+q_code = "q305"
+old_ref = "None"
+
+[307]
+Description = "Tax credit claim submitted or intended for purchased work commissioned in UK (Y/N) LONG FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q307"
+old_ref = "None"
+
+[308]
+Description = "Tax credit claim submitted/intended for purchased work outside Ukorig. Funded by UK gov (Y/N) LONG FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q308"
+old_ref = "None"
+
+[309]
+Description = "Tax credit claim submitted or intended for all other purchased work outside the UK (Y/N) LONG FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q309"
+old_ref = "None"
+
+[405]
+Description ="emp_researcher (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[406]
+Description ="emp_researcher (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[407]
+Description ="emp_technician (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[408]
+Description ="emp_technician (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[409]
+Description ="emp_other (Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[410]
+Description ="emp_other (Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[411]
+Description ="total fte(Civil)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[412]
+Description ="total fte(Defence)"
+Deduced_Data_Type ="float64"
+Nullable ="Yes"
+Length ="# an integer of the length, or N/A"
+Min_values = 0
+Max_values =1000000
+Possible_categorical_Values =[ ]
+q_code =""
+
+[501]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[502]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[503]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[504]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[505]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[506]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[507]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[508]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[601]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[602]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[603]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[604]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[605]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+
+[701]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[702]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "Int64"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[703]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[704]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[705]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[706]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[707]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[708]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[709]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[710]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[711]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[712]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[713]
+Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q713"
+old_ref = "None"
+
+[714]
+Description = "Tax credit claim submitted or intended for purchased R&D (Y/N) SHORT FORM"
+Deduced_Data_Type = "str"
+Nullable = "No"
+Length = "# an integer of the length, or N/A"
+Min_values = "None"
+Max_values = "None"
+Possible_categorical_Values = []
+q_code = "q714"
+old_ref = "None"
+
+[9000]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9001]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9002]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9003]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9004]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9005]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9006]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9007]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9008]
+Description = "nan"
+Deduced_Data_Type = "float64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9009]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9010]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9011]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9012]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[9013]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[postcodes_harmonised]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[force_imputation]
+Description = "nan"
+Deduced_Data_Type = "bool"
+Nullable = true
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
