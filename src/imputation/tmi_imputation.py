@@ -560,10 +560,17 @@ def run_tmi(
     # logic to identify rows that have had MoR or CF applied,
     # these should be excluded from TMI
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
+    
+    # create mask to exlude records that have been manually trimmed
+    manual_trim_mask = full_df["manual_trim"] # True if record has been manually trimmed
 
     # create logic to select rows for longform and shortform TMI
-    long_tmi_mask = (full_df["formtype"] == formtype_long) & ~mor_mask
-    short_tmi_mask = (full_df["formtype"] == formtype_short) & ~mor_mask
+    long_tmi_mask = ((full_df["formtype"] == formtype_long) 
+                     & ~mor_mask 
+                     & ~manual_trim_mask)
+    short_tmi_mask = ((full_df["formtype"] == formtype_short) 
+                      & ~mor_mask 
+                      & ~manual_trim_mask)
 
     # create dataframes to be used for longform TMI and short form census TMI
     longform_df = full_df.copy().loc[long_tmi_mask]
