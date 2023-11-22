@@ -27,9 +27,6 @@ def add_trim_column(
     Raises:
         ValueError: If the DataFrame is empty or the column already exists in the DataFrame.
     """
-    if df.empty:
-        raise ValueError("The DataFrame is empty.")
-
     if column_name in df.columns:
         raise ValueError(
             f"A column with name {column_name} already exists in the DataFrame."
@@ -64,8 +61,8 @@ def get_latest_csv(directory: str) -> str:
 # if so load the file and any records which are marked True in the manual_trim column will be
 # excluded from the imputation process and will be output as is. They will be marked as 'manual_trim' in the imp_marker column
 def load_manual_imputation(
-    config: Dict[str, Any],
     df: pd.DataFrame,
+    config: Dict[str, Any],
     isfile_func: callable,
     imp_path: str
 ) -> pd.DataFrame:
