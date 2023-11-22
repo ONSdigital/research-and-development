@@ -50,6 +50,16 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
+    
+    # Catch dataframes which are missing cols 200, 201, formtype, status or manual_trim
+    needed_cols = set("200", "201", "formtype", "status", "manual_trim")
+    if not df.columns.isin(needed_cols).all():
+        missing = needed_cols - set(df.columns)
+        raise ValueError(
+            f"The DataFrame must contain columns 200, 201, formtype, status and manual_trim.
+            Missing: {missing}"
+        )
+                         
     # Convert backdata column names from qXXX to XXX
     # Note that this is only applicable when using the backdata on the network
     p = re.compile(r"q\d{3}")
@@ -62,7 +72,9 @@ def mor_preprocessing(df, backdata):
     df = create_imp_class_col(df, "200", "201")
     backdata = create_imp_class_col(backdata, "200", "201")
 
-    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
+    imputation_cond = ((df["formtype"] == "0001") 
+                        & (df["status"].isin(bad_statuses))
+                        & (df("manual_trim" == False)))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
