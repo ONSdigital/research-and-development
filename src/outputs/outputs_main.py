@@ -82,6 +82,37 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished status filtered output.")
 
+    # Topping up the postcodes
+    def _topup(mystr: str, target_len: int = 8):
+        ''' Regulates the number of spaces in a postcode, so that the total
+        length is 8 characters.
+        Brings all letters to upper case, in line with the mapper.
+        Splits it into parts, separated by any number of spaces.
+        If there are two or more parts, the first two are used.
+            If their total lenght is too big, cuts the tail
+        If it's only one part, keeps 8 characters, tops up with spaces if needed
+        '''
+        mystr = mystr.upper()
+        parts = mystr.split()
+        if len(parts) >= 2:
+            part1 = parts[0]
+            part2 = parts[1]
+            num_spaces = target_len - len(part1) - len(part2)
+            if num_spaces >= 0:
+                return part1 + " " * num_spaces + part2
+            else:
+                return (part1 + part2)[:target_len]
+        else:
+            return mystr[:target_len].ljust(target_len, " ")
+
+    outputs_df = outputs_df.astype({'postcodes_harmonised': 'str'})
+    outputs_df['postcodes_harmonised'] = (
+        outputs_df['postcodes_harmonised'].apply(_topup))
+
+    weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
+    weighted_df['postcodes_harmonised'] = (
+        weighted_df['postcodes_harmonised'].apply(_topup))
+
     # Running short form output
     if config["global"]["output_short_form"]:
         OutputMainLogger.info("Starting short form output...")
