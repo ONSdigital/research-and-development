@@ -1,4 +1,4 @@
-"""TODO."""
+"""DEPRECATED MODULE DO NOT USE."""
 
 import os
 import logging
