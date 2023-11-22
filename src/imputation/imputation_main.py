@@ -21,6 +21,7 @@ def run_imputation(
     backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
+    is_file: Callable,
     run_id: int,
 ) -> pd.DataFrame:
 
@@ -53,9 +54,13 @@ def run_imputation(
     orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
+    
+    # Create imp_path variable for QA output and manual imputation file
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Load manual imputation file
-    df = mimp.load_manual_imputation()
+    df = mimp.load_manual_imputation(df, config, is_file, imp_path)
 
     # Run MoR
     if backdata is not None:
@@ -75,8 +80,7 @@ def run_imputation(
         ).reset_index(drop=True)
 
     # Output QA files
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+    
 
     # Add a manual_trim column to the QA df
     qa_df = mimp.add_trim_column(qa_df, column_name="manual_trim", trim_bool=False)
