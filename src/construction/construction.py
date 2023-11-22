@@ -1,5 +1,4 @@
-"""TODO."""
-
+"""The main file for the construction module."""
 import logging
 import pandas as pd
 from typing import Callable
