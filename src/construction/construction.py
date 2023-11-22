@@ -1,10 +1,8 @@
 """TODO."""
 
-import os
 import logging
 import pandas as pd
 from typing import Callable
-from datetime import datetime
 
 from src.staging.validation import validate_data_with_schema
 
@@ -55,14 +53,17 @@ def run_construction(
             )
             return snapshot_df
     else:
-        construction_logger.info("Construction file not found, skipping construction...")
+        construction_logger.info(
+            "Construction file not found, skipping construction..."
+        )
         return snapshot_df
 
     # Make a copy of the snapshot
     updated_snapshot_df = snapshot_df.copy()
 
     # Validate construction file and drop columns without constructed values
-    validate_data_with_schema(construction_df, schema_path="./config/construction_schema.toml")
+    validate_data_with_schema(construction_df,
+                              "./config/construction_schema.toml")
     construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Add flags to indicate whether a row was constructed
