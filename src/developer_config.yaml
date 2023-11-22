@@ -10,7 +10,7 @@ global:
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
-  load_manual_construction: False
+  load_manual_construction: True
   load_manual_outliers: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
@@ -77,6 +77,7 @@ network_paths:
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
   construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
