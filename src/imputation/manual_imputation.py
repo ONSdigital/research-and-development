@@ -85,6 +85,7 @@ def load_manual_imputation(
         df = df.drop(columns=["manual_trim_x"])
         df = df.rename(columns={"manual_trim_y": "manual_trim"})
         df["manual_trim"] = df["manual_trim"].fillna(False)
+        df["manual_trim"].astype(bool, inplace=True)
     else:
         df = add_trim_column(df)
     return df
