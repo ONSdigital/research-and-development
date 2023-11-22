@@ -54,6 +54,9 @@ def run_imputation(
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
+    # Load manual imputation file
+    df = mimp.load_manual_imputation()
+
     # Run MoR
     if backdata is not None:
         df, links_df = run_mor(df, backdata, orig_cols, lf_target_vars, config)
@@ -76,7 +79,7 @@ def run_imputation(
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Add a manual_trim column to the QA df
-    qa_df = mimp.add_trim_column(qa_df, column_name="manual_trim", value=False)
+    qa_df = mimp.add_trim_column(qa_df, column_name="manual_trim", trim_bool=False)
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
