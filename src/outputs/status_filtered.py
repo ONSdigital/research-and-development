@@ -32,4 +32,4 @@ def output_status_filtered(
 
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"status_filtered_qa_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/status_filtered_qa/{filename}", df)
+    write_csv(f"{output_path}/output_status_filtered_qa/{filename}", df)
