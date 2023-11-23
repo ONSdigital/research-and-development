@@ -14,7 +14,7 @@ global:
   load_manual_outliers: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: True
+  load_from_feather: False
   # Output settings
   output_full_responses: False
   output_auto_outliers: False
@@ -26,10 +26,12 @@ global:
   output_long_form: False
   output_tau: False
   output_gb_sas: False
-  output_intram_by_pg: False
-  output_intram_by_itl1: False
+  output_intram_by_pg: True
+  output_intram_by_itl1: True
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
+  output_status_filtered: False
+  output_fte_total_qa: True
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
