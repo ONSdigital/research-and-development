@@ -8,6 +8,7 @@ from typing import List
 import hashlib
 import shutil
 
+
 from src.utils.wrappers import time_logger_wrap
 
 
@@ -240,6 +241,9 @@ def local_isfile(path: str) -> bool:
     -------
     True if the file exists. Else False.
     """
+    if path is None:
+        return False
+
     return os.path.isfile(path)
 
 
@@ -321,17 +325,3 @@ def local_search_file(dir_path, ending):
                 target_file = str(file)
 
     return target_file
-
-
-@time_logger_wrap
-def local_read_feather(filepath):
-    """Reads a feather file from a local network drive into a Pandas DataFrame
-
-    Args:
-        filepath (str): Filepath
-
-    Returns:
-        pd.DataFrame: Dataframe created from feather file
-    """
-    df = pd.read_feather(filepath)
-    return df
