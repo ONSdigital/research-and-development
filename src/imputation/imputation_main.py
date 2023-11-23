@@ -31,7 +31,7 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-
+        
     # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
@@ -40,6 +40,13 @@ def run_imputation(
     clear_responders_mask = df.status.isin(["Clear", "Clear - overridden"])
     df.loc[clear_responders_mask, "imp_marker"] = "R"
     df.loc[~clear_responders_mask, "imp_marker"] = "no_imputation"
+
+    # remove records that have had construction applied before imputation
+    if "is_constructed" in df.columns:
+        constructed_df = df.copy().loc[df["is_constructed"].isin([True])]
+        constructed_df["imp_marker"] = "constructed"
+
+        df = df.copy().loc[~df["is_constructed"].isin([True])]
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
@@ -55,6 +62,13 @@ def run_imputation(
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
+
+    # join constructed rows back to the imputed df
+    if "is_constructed" in df.columns:
+        imputed_df = pd.concat(imputed_df, constructed_df)
+        imputed_df = imputed_df.sort_values(
+            ["reference", "instance"], ascending=[True, True]
+        ).reset_index(drop=True)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]

@@ -127,7 +127,7 @@ def carry_forwards(df, backdata, impute_vars):
     df.loc[match_cond, "imp_marker"] = "CF"
 
     df.loc[match_cond] = create_imp_class_col(
-        df, "200_prev", "201_prev", use_cellno=False
+        df, "200_prev", "201_prev"
     )
 
     # Drop merge related columns
@@ -169,7 +169,8 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     ).reset_index()
     # Calculate the ratios for the relevant variables
     for target in target_vars:
-        gr_df[f"{target}_gr"] = gr_df[target] / gr_df[f"{target}_prev"]
+        mask = gr_df[f"{target}_prev"] != 0
+        gr_df.loc[mask, f"{target}_gr"] = gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
 
     return gr_df
 
