@@ -278,6 +278,9 @@ def hdfs_isfile(path: str) -> bool:
     If checking that directory with partitioned files (i.e. csv, parquet)
     exists this will return false use isdir instead.
     """
+    if path is None:
+        return False
+
     command = ["hadoop", "fs", "-test", "-f", path]
     return _perform(command)
 
