@@ -25,12 +25,12 @@ def qa_output_total_fte(
 
     """
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["estimation_path"]
+    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
-    totals_names = ["Total",
-                    "Scientists and engineers",
-                    "Technicians, laboratory assistants and draughtsmen",
-                    "Administrative, clerical, industrial and other staff"]
+    totals_names = ["emp_total",
+                    "emp_researcher",
+                    "emp_technician",
+                    "emp_other"]
     totals_values = [df["emp_total"].sum(),
                      df["emp_researcher"].sum(),
                      df["emp_technician"].sum(),
