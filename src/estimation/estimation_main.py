@@ -7,7 +7,6 @@ from typing import Callable, Dict, Any
 from src.estimation import calculate_weights as weights
 from src.estimation import apply_weights as appweights
 from src.estimation import cellno_mapper as cmap
-from src.outputs.total_fte import qa_output_total_fte
 
 EstMainLogger = logging.getLogger(__name__)
 
@@ -57,7 +56,6 @@ def run_estimation(
         full_qa_filename = f"full_estimation_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{est_path}/estimation_qa/{cell_qa_filename}", qa_df)
         write_csv(f"{est_path}/estimation_qa/{full_qa_filename}", estimated_df)
-        qa_output_total_fte(estimated_df, config, write_csv, run_id)
     EstMainLogger.info("Finished estimation weights calculation.")
 
     # update the numeric columns to the estimated values, and drop the qa cols

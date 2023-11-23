@@ -665,7 +665,7 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
         msg = (
         "The following references in the reference list mapper are not in the data:"
         )
-        raise ValueError(msg + str(missing_ref.reference.unique()))
+        raise ValueError(msg + str(missing_refs.reference.unique()))
 
     # update cellnumber and selectiontype where there is a match
     match_cond = df["_merge"] == "both"
