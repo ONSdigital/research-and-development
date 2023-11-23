@@ -19,7 +19,7 @@ old_name = "201_numeric"
 Deduced_Data_Type = "str"
 
 [sic07]
-old_name = "frozensic"
+old_name = "rusic"
 Deduced_Data_Type = "Int64"
 
 [form]
@@ -27,7 +27,7 @@ old_name = "formtype"
 Deduced_Data_Type = "category"
 
 [emp]
-old_name = "frozenemployment"
+old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [turn]
