@@ -35,8 +35,8 @@ def run_construction(
             amended and flags added to mark whether a record was constructed.
     """
     # Skip this module if not needed
-    load_manual_construction = config["global"]["load_manual_construction"]
-    if load_manual_construction is False:
+    run_construction = config["global"]["run_construction"]
+    if run_construction is False:
         construction_logger.info("Skipping Construction...")
         return snapshot_df
 

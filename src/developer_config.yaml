@@ -10,7 +10,7 @@ global:
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_historic_data: False
-  load_manual_construction: True
+  run_construction: True
   load_manual_outliers: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
