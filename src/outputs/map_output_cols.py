@@ -86,8 +86,8 @@ def map_sizebands(
 
     # Create conditions for sizebands
     conditions = [
-        (sizeband_dict[key]["min"] <= df["frozenemployment"])
-        & (df["frozenemployment"] <= sizeband_dict[key]["max"])
+        (sizeband_dict[key]["min"] <= df["employment"])
+        & (df["employment"] <= sizeband_dict[key]["max"])
         for key in sizeband_dict.keys()
     ]
     decisions = [key for key in sizeband_dict.keys()]
