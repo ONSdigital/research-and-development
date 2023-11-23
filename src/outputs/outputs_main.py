@@ -12,6 +12,7 @@ from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
+from src.outputs.outputs_helpers import postcode_topup
 from src.outputs.total_fte import qa_output_total_fte
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -71,6 +72,25 @@ def run_outputs(
     # change the value of the status column to 'imputed' for imputed statuses
     condition = outputs_df["status"].isin(imputed_statuses)
     outputs_df.loc[condition, "status"] = "imputed"
+
+    # Running status filtered dataframe output for QA
+    if config["global"]["output_status_filtered"]:
+        OutputMainLogger.info("Starting status filtered output...")
+        output_status_filtered(
+            filtered_output_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished status filtered output.")
+
+    outputs_df = outputs_df.astype({'postcodes_harmonised': 'str'})
+    outputs_df['postcodes_harmonised'] = (
+        outputs_df['postcodes_harmonised'].apply(postcode_topup))
+
+    weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
+    weighted_df['postcodes_harmonised'] = (
+        weighted_df['postcodes_harmonised'].apply(postcode_topup))
 
     # Running short form output
     if config["global"]["output_short_form"]:
