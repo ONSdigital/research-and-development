@@ -323,7 +323,7 @@ def hdfs_move_file(src_path: str, dst_path: str):
     return _perform(command)
 
 
-def hdfs_list_files(path: str, ext: str = None):
+def hdfs_list_files(path: str, ext: str = None, order=None):
     """
     List files in a directory. Uses 'hadoop fs -ls'.
     """
@@ -343,6 +343,20 @@ def hdfs_list_files(path: str, ext: str = None):
         file_names_in_dir = [
             file for file in file_names_in_dir if os.path.splitext(file)[1] == ext
         ]
+
+    if order:
+        ord_dict = {
+            "newest": False,
+            "oldest": True,
+        }  # TODO: Check sorting logic. Ensure newest yields newest file
+        # Lambda func: line is each line returned by hdfs command. split() to
+        # create list of words. [-2:] gets the last two elements of list (which
+        # should be date & time) which is used as the sorting key
+        file_names_in_dir = sorted(
+            file_names_in_dir,
+            key=lambda line: line.split()[-2:],
+            reverse=ord_dict[order],
+        )
 
     return file_names_in_dir
 

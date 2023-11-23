@@ -288,7 +288,7 @@ def local_move_file(src_path: str, dst_path: str):
     shutil.move(src_path, dst_path)
 
 
-def local_list_files(path: str, ext: str = None):
+def local_list_files(path: str, ext: str = None, order: str = None):
     """
     Lists all files in a directory on the local file system.
 
@@ -302,6 +302,12 @@ def local_list_files(path: str, ext: str = None):
         files_in_dir = [
             file for file in files_in_dir if os.path.splitext(file)[1] == ext
         ]
+
+    if order:
+        ord_dict = {"newest": True, "oldest": False}
+        files_in_dir = sorted(
+            files_in_dir, key=os.path.getmtime, reverse=ord_dict[order]
+        )
 
     return files_in_dir
 
