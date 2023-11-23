@@ -12,6 +12,7 @@ from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
+from src.outputs.total_fte import qa_output_total_fte
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -172,3 +173,13 @@ def run_outputs(
             sic_division_detailed,
         )
         OutputMainLogger.info("Finished Intram by SIC output.")
+
+    # Running FTE total QA
+    if config["global"]["output_fte_total_qa"]:
+        qa_output_total_fte(
+            outputs_df, 
+            config, 
+            write_csv, 
+            run_id
+        )
+    OutputMainLogger.info("Finished FTE total QA output")
