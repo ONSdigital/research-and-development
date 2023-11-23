@@ -41,7 +41,7 @@ def run_construction(
         return snapshot_df
 
     # Check the construction file exists and has records, then read it
-    construction_file_path = config["global"]["construction_file_path"]
+    construction_file_path = config["network_paths"]["construction_file_path"]
     construction_file_exists = check_file_exists(construction_file_path)
     if construction_file_exists:
         try:
@@ -73,6 +73,9 @@ def run_construction(
     updated_snapshot_df["year"] = 2022
 
     # Update the values with the constructed ones
+    construction_df.set_index(["reference", "year", "instance"], inplace=True)
+    updated_snapshot_df.set_index(["reference", "year", "instance"], inplace=True)
     updated_snapshot_df.update(construction_df)
+    updated_snapshot_df.reset_index(inplace=True)
 
     return updated_snapshot_df
