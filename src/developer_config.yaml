@@ -20,15 +20,15 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_short_form: False
   output_long_form: False
   output_tau: False
-  output_gb_sas: False
+  output_gb_sas: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
-  output_intram_by_sic: True
+  output_intram_by_sic: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -86,6 +86,8 @@ network_paths:
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
+  mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
+  sic_pg_utf_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
   pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
   pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'

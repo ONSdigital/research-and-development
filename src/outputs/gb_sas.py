@@ -7,7 +7,7 @@ from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df, regions
-
+from src.staging.pg_conversion import sic_to_pg_mapper
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def output_gb_sas(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
-    pg_alpha_num: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -49,8 +49,14 @@ def output_gb_sas(
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
-    # Create a columns for numeric product grouo
-    df = map_o.join_pg_numeric(df, pg_alpha_num, cols_pg=["201"])
+    # # Create a columns for numeric product group
+    # df = map_o.join_pg_numeric(df, pg_alpha_num, cols_pg=["201"])
+
+    df = sic_to_pg_mapper(df,
+                          sic_pg_num,
+                          target_col="pg_numeric",
+                          from_col="SIC 2007_CODE",
+                          to_col="2016 > Form PG")
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
@@ -58,8 +64,10 @@ def output_gb_sas(
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
 
-    # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_mapper)
+    #! revert this back
+    # # Map the itl regions using the postcodes
+    # df = map_o.join_itl_regions(df, postcode_mapper)
+    df["itl"] = "TEMP"
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
@@ -74,6 +82,7 @@ def output_gb_sas(
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
+
 
     # Create GB SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["gb_sas_schema"]

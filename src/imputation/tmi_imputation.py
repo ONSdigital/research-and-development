@@ -112,7 +112,7 @@ def create_imp_class_col(
         )
     else:
         df[class_name] = df[col_first_half].astype(str)
-    
+
     if use_cellno:
         fil_df = filter_by_column_content(df, "cellnumber", [817])
         # Create class col with concatenation + 817

@@ -55,8 +55,10 @@ def output_tau(
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
 
-    # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_itl_mapper)
+    #! revert this back
+    # # Map the itl regions using the postcodes
+    # df = map_o.join_itl_regions(df, postcode_itl_mapper)
+    df["itl"] = "TEMP"
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
@@ -71,6 +73,13 @@ def output_tau(
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
+
+    # temporary - for debugging
+    import os
+    out_fol=r"D:\data\res_dev\bug"
+    mypath=os.path.join(out_fol, "df.csv")
+    df.to_csv(mypath, index=None)
+    # end of debugging
 
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]

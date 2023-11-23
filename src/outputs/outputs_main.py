@@ -26,9 +26,9 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
-    pg_alpha_num: pd.DataFrame,
+    #pg_alpha_num: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
@@ -90,6 +90,7 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
+            pg_num_alpha,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -104,7 +105,7 @@ def run_outputs(
             ultfoc_mapper,
             cora_mapper,
             postcode_mapper,
-            pg_alpha_num,
+            #pg_alpha_num,
         )
         OutputMainLogger.info("Finished TAU output.")
 
@@ -119,7 +120,7 @@ def run_outputs(
             ultfoc_mapper,
             cora_mapper,
             postcode_mapper,
-            pg_alpha_num,
+            sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 

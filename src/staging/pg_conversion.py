@@ -131,7 +131,7 @@ def run_pg_conversion(
     df: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
     sic_pg_alpha: pd.DataFrame,
-    target_col: str = "product_group",
+    target_col: str = "201",
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
@@ -145,6 +145,8 @@ def run_pg_conversion(
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
+
+    df["pg_numeric"] = df["201"].copy()
 
     if target_col == "201":
         target_col = "201_mapping"

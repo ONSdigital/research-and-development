@@ -7,10 +7,9 @@ from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df, create_period_year
-
+from src.staging.pg_conversion import pg_to_pg_mapper
 
 OutputMainLogger = logging.getLogger(__name__)
-
 
 def output_long_form(
     df: pd.DataFrame,
@@ -19,6 +18,7 @@ def output_long_form(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
 ):
     """Run the outputs module on long forms.
 
@@ -30,7 +30,7 @@ def output_long_form(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-
+        pg_num_alpha (pd.DataFrame): product g
 
     """
 

@@ -418,7 +418,7 @@ def run_staging(
         # val.validate_data_with_schema(
         #     backdata_path, "./config/backdata_schema.toml"
         # )
-        
+
         # Fix for different column names on network vs hdfs
         if network_or_hdfs == "network":
             to_map_col = "q201"
@@ -471,16 +471,16 @@ def run_staging(
     cellno_df = read_csv(cellno_path)
     StagingMainLogger.info("Covarage File Loaded Successfully...")
 
-    # Loading PG alpha to numeric mapper - possibly, deprecated
-    StagingMainLogger.info("Loading PG alpha to numeric File...")
-    pg_alpha_num_path = paths["pg_alpha_num_path"]
-    check_file_exists(pg_alpha_num_path, raise_error=True)
-    pg_alpha_num = read_csv(pg_alpha_num_path)
-    val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
-    pg_alpha_num = val.validate_many_to_one(
-        pg_alpha_num, col_many="pg_alpha", col_one="pg_numeric"
-    )
-    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+    # # Loading PG alpha to numeric mapper - possibly, deprecated
+    # StagingMainLogger.info("Loading PG alpha to numeric File...")
+    # pg_alpha_num_path = paths["pg_alpha_num_path"]
+    # check_file_exists(pg_alpha_num_path, raise_error=True)
+    # pg_alpha_num = read_csv(pg_alpha_num_path)
+    # val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
+    # pg_alpha_num = val.validate_many_to_one(
+    #     pg_alpha_num, col_many="pg_alpha", col_one="pg_numeric"
+    # )
+    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Loading SIC to PG to alpha mapper
     StagingMainLogger.info("Loading SIC to PG to alpha File...")
@@ -492,6 +492,21 @@ def run_staging(
         sic_pg_alpha, col_many="sic", col_one="pg_alpha"
     )
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    # Loading SIC to PG UTF mapper
+    StagingMainLogger.info("Loading SIC to PG UTF File...")
+    sic_pg_utf_path = paths["sic_pg_utf_path"]
+    check_file_exists(sic_pg_utf_path, raise_error=True)
+    sic_pg_utf = read_csv(sic_pg_utf_path)
+    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
+    sic_pg_num = sic_pg_utf[cols_needed]
+    mapper_path = paths["mapper_path"]
+    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_num)
+    #val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
+    sic_pg_num = val.validate_many_to_one(
+        sic_pg_num, col_many="SIC 2007_CODE", col_one="2016 > Form PG"
+    )
+    StagingMainLogger.info("SIC to PG UTF File Loaded Successfully...")
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(
@@ -568,9 +583,10 @@ def run_staging(
         cora_mapper,
         cellno_df,
         postcode_mapper,
-        pg_alpha_num,
+        #pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
+        sic_pg_num,
         backdata,
         pg_detailed,
         itl1_detailed,
