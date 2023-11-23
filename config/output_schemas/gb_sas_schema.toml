@@ -63,15 +63,15 @@ old_name = "200"
 Deduced_Data_Type = "str"
 
 [emp_sci]
-old_name = "405"
+old_name = "emp_researcher"
 Deduced_Data_Type = "float64"
 
 [emp_tech]
-old_name = "407"
+old_name = "emp_technician"
 Deduced_Data_Type = "float64"
 
 [emp_oth]
-old_name = "409"
+old_name = "emp_other"
 Deduced_Data_Type = "float64"
 
 [slries]
