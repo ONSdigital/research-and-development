@@ -105,6 +105,7 @@ def run_pipeline(start, config_path):
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        manual_trimming_df,
     ) = run_staging(
         config,
         check_file_exists,
@@ -133,7 +134,14 @@ def run_pipeline(start, config_path):
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(
-        full_responses, sic_pg_alpha, backdata, config, write_csv, isfile, run_id
+        full_responses,
+        manual_trimming_df,
+        sic_pg_alpha,
+        backdata,
+        config,
+        write_csv,
+        isfile,
+        run_id,
     )
     MainLogger.info("Finished  Imputation...")
 
