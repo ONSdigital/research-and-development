@@ -61,12 +61,9 @@ def merge_manual_imputation(
     """
 
     if not manual_trim_df.empty():
+        # An empty df will be initialised if there's no man trim file
         df = df.drop(columns=["manual_trim"])
         df = df.merge(manual_trim_df, on=["reference", "instance"], how="left")
 
-    else:
-        ManualImputationLogger.debug("Adding a manual_trim column")
-        df = add_trim_column(df)
-        trimmed_df = pd.DataFrame() #
-    
-    return df, trimmed_df
+
+    return df
