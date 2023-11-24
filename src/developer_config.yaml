@@ -24,14 +24,14 @@ global:
   output_status_filtered: False
   output_short_form: False
   output_long_form: False
-  output_tau: False
-  output_gb_sas: False
+  output_tau: True
+  output_gb_sas: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_status_filtered: False
-  output_fte_total_qa: True
+  output_fte_total_qa: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
