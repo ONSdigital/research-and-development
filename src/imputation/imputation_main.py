@@ -63,9 +63,7 @@ def run_imputation(
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Load manual imputation file
-    df, manually_trimmed_df = mimp.merge_manual_imputation(
-        df, config, is_file, read_csv, imp_path
-    )
+    df = mimp.merge_manual_imputation(df, config, manual_trimming_df)
 
     trimmed_df, df = split_df_on_trim(df, "manual_trim")
 
