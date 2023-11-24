@@ -42,7 +42,7 @@ def output_gb_sas(
     output_path = paths["output_path"]
 
     # Filter out records that answer "no R&D"
-    df = df.copy().loc[~df["604"] == "No"]
+    df = df.copy().loc[~(df["604"] == "No")]
 
     # Filter regions for GB only
     df = df.copy().loc[df["region"].isin(regions()["GB"])]
