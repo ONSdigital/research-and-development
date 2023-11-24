@@ -296,7 +296,7 @@ def local_list_files(path: str, ext: str = None, order: str = None):
     -------
     A list of files in the directory.
     """
-    files_in_dir = os.listdir(path)
+    files_in_dir = [os.path.join(path, file) for file in os.listdir(path)]
 
     if ext:
         if not ext[0] == ".":
