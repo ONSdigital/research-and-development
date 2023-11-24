@@ -406,11 +406,17 @@ def run_staging(
     if config["global"]["load_manual_imputation"] and isfile(latest_man_file):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
-        manual_trim_df = read_csv(latest_man_file, wanted_cols)
-        val.validate_data_with_schema(
+        try:
+            manual_trim_df = read_csv(latest_man_file, wanted_cols)
+            val.validate_data_with_schema(
             manual_trim_df, "./config/manual_trimming_schema.toml"
         )
-        manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+            manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+        except:
+            # In case there's an error with loading or validation, e.g. no file in the 
+            # manual_trimming folder
+            StagingMainLogger.warning("There has been a problem loading imputation manual trimming file.")
+            manual_trim_df = pd.DataFrame()
     else:
         manual_outliers = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
