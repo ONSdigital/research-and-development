@@ -144,7 +144,6 @@ def run_pipeline(start, config_path):
         backdata,
         config,
         write_csv,
-        isfile,
         run_id,
     )
     MainLogger.info("Finished  Imputation...")

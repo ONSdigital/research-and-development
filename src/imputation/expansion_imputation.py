@@ -66,19 +66,24 @@ def evaluate_imputed_ixx(
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Splits the dataframe in based on if it was trimmed or not"""
 
-    # TODO: remove this temporary fix to cast Nans to False
-    df[trim_bool_col].fillna(False, inplace=True)
+    if not df.empty:
+        # TODO: remove this temporary fix to cast Nans to False
+        df[trim_bool_col].fillna(False, inplace=True)
 
-    df_not_trimmed = df.loc[~df[trim_bool_col]]
-    df_trimmed = df.loc[df[trim_bool_col]]
+        df_not_trimmed = df.loc[~df[trim_bool_col]]
+        df_trimmed = df.loc[df[trim_bool_col]]
 
-    ExpansionLogger.debug(
-        f"There are {df.shape[0]} rows in the original df \n"
-        f"There are {df_not_trimmed.shape[0]} rows in the nontrimmed_df \n"
-        f"There are {df_trimmed.shape[0]} rows in the trimmed_211_df"
-    )
+        ExpansionLogger.debug(
+            f"There are {df.shape[0]} rows in the original df \n"
+            f"There are {df_not_trimmed.shape[0]} rows in the nontrimmed_df \n"
+            f"There are {df_trimmed.shape[0]} rows in the trimmed_211_df"
+        )
 
-    return df_trimmed, df_not_trimmed
+        return df_trimmed, df_not_trimmed
+    
+    else:
+        # return two empty dfs
+        return df, df
 
 
 def run_expansion(df: pd.DataFrame, config: dict):

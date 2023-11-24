@@ -59,11 +59,13 @@ def merge_manual_imputation(
     Returns:
         pd.DataFrame: The DataFrame with the manual_trim column added.
     """
+    if "manual_trim" not in df.columns:
+        # Add a manual_trim column to the QA df
+        df = add_trim_column(df, column_name="manual_trim", trim_bool=False)
 
-    if not manual_trim_df.empty():
+    if not manual_trim_df.empty:
         # An empty df will be initialised if there's no man trim file
         df = df.drop(columns=["manual_trim"])
         df = df.merge(manual_trim_df, on=["reference", "instance"], how="left")
-
-
+    
     return df

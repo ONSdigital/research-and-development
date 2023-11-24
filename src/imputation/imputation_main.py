@@ -23,8 +23,6 @@ def run_imputation(
     backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
-    is_file: Callable,
-    read_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
 
@@ -63,7 +61,7 @@ def run_imputation(
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Load manual imputation file
-    df = mimp.merge_manual_imputation(df, config, manual_trimming_df)
+    df = mimp.merge_manual_imputation(df, manual_trimming_df)
 
     trimmed_df, df = split_df_on_trim(df, "manual_trim")
 
@@ -89,9 +87,6 @@ def run_imputation(
         ).reset_index(drop=True)
 
     # Output QA files
-
-    # Add a manual_trim column to the QA df
-    qa_df = mimp.add_trim_column(qa_df, column_name="manual_trim", trim_bool=False)
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
