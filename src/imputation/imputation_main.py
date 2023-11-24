@@ -8,20 +8,23 @@ from itertools import chain
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
-from src.imputation.sf_expansion import run_sf_expansion
+from src.imputation.sf_expansion import run_sf_expansion, split_df_on_trim
 from src.imputation import tmi_imputation as tmi
 from src.imputation import manual_imputation as mimp
+
 
 ImputationMainLogger = logging.getLogger(__name__)
 
 
 def run_imputation(
     df: pd.DataFrame,
+    manual_trimming_df: pd.DataFrame,
     mapper: pd.DataFrame,
     backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     is_file: Callable,
+    read_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
 
@@ -54,13 +57,17 @@ def run_imputation(
     orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
-    
+
     # Create imp_path variable for QA output and manual imputation file
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Load manual imputation file
-    df = mimp.load_manual_imputation(df, config, is_file, imp_path)
+    df, manually_trimmed_df = mimp.merge_manual_imputation(
+        df, config, is_file, read_csv, imp_path
+    )
+
+    trimmed_df, df = split_df_on_trim(df, "manual_trim")
 
     # Run MoR
     if backdata is not None:
@@ -68,6 +75,10 @@ def run_imputation(
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
+
+    # Join TMI and MoR imputed_df (processed from untrimmed records) back on to
+    # manually trimmed records
+    imputed_df = pd.concat([imputed_df, trimmed_df], axis=0)
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
@@ -80,7 +91,6 @@ def run_imputation(
         ).reset_index(drop=True)
 
     # Output QA files
-    
 
     # Add a manual_trim column to the QA df
     qa_df = mimp.add_trim_column(qa_df, column_name="manual_trim", trim_bool=False)
