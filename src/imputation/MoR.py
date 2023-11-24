@@ -4,7 +4,11 @@ import pandas as pd
 import re
 
 from src.imputation.apportionment import run_apportionment
-from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds, calculate_totals
+from src.imputation.tmi_imputation import (
+    create_imp_class_col,
+    trim_bounds,
+    calculate_totals,
+)
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
@@ -27,6 +31,7 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
         pd.DataFrame: df with MoR applied.
         pd.DataFrame: QA DataFrame showing how imputation links are calculated.
     """
+
     to_impute_df, remainder_df, backdata = mor_preprocessing(df, backdata)
 
     # Carry forwards method
@@ -40,7 +45,10 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     )
     # Calculate totals as with TMI
     carried_forwards_df = calculate_totals(carried_forwards_df)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True), links_df
+    return (
+        pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True),
+        links_df,
+    )
 
 
 def mor_preprocessing(df, backdata):
@@ -50,16 +58,16 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-    
+
     # Catch dataframes which are missing cols 200, 201, formtype, status or manual_trim
-    needed_cols = set("200", "201", "formtype", "status", "manual_trim")
-    if not df.columns.isin(needed_cols).all():
+    needed_cols = {"200", "201", "formtype", "status", "manual_trim"}
+    if not needed_cols.issubset(df.columns):
         missing = needed_cols - set(df.columns)
         raise ValueError(
-            f"The DataFrame must contain columns 200, 201, formtype, status and manual_trim.
-            Missing: {missing}"
+            "The DataFrame must contain columns 200, 201, formtype, status and manual_trim."  # noqa
+            "Missing: {}".format("\n - ".join(missing))
         )
-                         
+
     # Convert backdata column names from qXXX to XXX
     # Note that this is only applicable when using the backdata on the network
     p = re.compile(r"q\d{3}")
@@ -72,9 +80,7 @@ def mor_preprocessing(df, backdata):
     df = create_imp_class_col(df, "200", "201")
     backdata = create_imp_class_col(backdata, "200", "201")
 
-    imputation_cond = ((df["formtype"] == "0001") 
-                        & (df["status"].isin(bad_statuses))
-                        & (df("manual_trim" == False)))
+    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
@@ -138,9 +144,7 @@ def carry_forwards(df, backdata, impute_vars):
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    df.loc[match_cond] = create_imp_class_col(
-        df, "200_prev", "201_prev"
-    )
+    df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
 
     # Drop merge related columns
     to_drop = [
@@ -182,7 +186,9 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         mask = gr_df[f"{target}_prev"] != 0
-        gr_df.loc[mask, f"{target}_gr"] = gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
+        gr_df.loc[mask, f"{target}_gr"] = (
+            gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
+        )
 
     return gr_df
 
