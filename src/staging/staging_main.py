@@ -336,9 +336,12 @@ def run_staging(
             )
         else:
             secondary_full_responses = None
-        postcode_mapper = (
-            None  # TODO: check if the actual mapper is needed later in the pipeline
-        )
+
+        # Read in postcode mapper (needed later in the pipeline)
+        postcode_masterlist = paths["postcode_masterlist"]
+        check_file_exists(postcode_masterlist, raise_error=True)
+        postcode_mapper = read_csv(postcode_masterlist)
+
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
