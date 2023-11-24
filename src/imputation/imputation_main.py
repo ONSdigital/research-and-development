@@ -22,6 +22,27 @@ def run_imputation(
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
+    """Run all the processes for the imputation module.
+    
+    These processes are, in order:
+    1) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
+    2) Short to long form conversion: create new instances with short form questions
+        mapped and apportioned to longform question equivalents
+    3) Mean of Ratios imputation: (forwards imputation) where back data is available, 
+        with "carry forward" as fall back data exists for prev but not current period.
+    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to 
+        allow mean of ratios or carried forward method
+    5) Short form expansion imputation: imputing for questions not asked in short forms
+
+    Args:
+        df (pd.DataFrame): the full responses spp data
+        mapper (pd.DataFrame): dataframe with sic to product group mapper info
+        backdata (pd.DataFrame): responses data for the previous period
+        config (Dict): the configuration settings
+
+    Returns:
+        pd.DataFrame: dataframe with the imputed columns updated
+    """
 
     # Get the target values and breakdown columns from the config
     lf_target_vars = config["imputation"]["lf_target_vars"]
@@ -31,8 +52,8 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-        
-    # Convert shortform responses to longform format
+
+    # Convert shortform rows to longform format
     df = run_short_to_long(df)
 
     # Initialise imp_marker column with a value of 'R' for clear responders

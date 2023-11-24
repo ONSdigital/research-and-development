@@ -547,11 +547,11 @@ def run_tmi(
     dataframe back to the pipeline
         dataframe back to the pipeline
     Args:
-        full_df (pd.DataFrame): main data
-        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+        full_df (pd.DataFrame): the full responses spp dataframe
+        sic_mapper (pd.DataFrame): dataframe with sic to product group mapper info
         config (Dict): the configuration settings
     Returns:
-        final_df: dataframe with the imputed valued added and counts columns
+        final_df(pd.DataFrame): dataframe with the imputed valued added and counts columns
         qa_df: qa dataframe
     """
     # changing type of Civil or Defence column 200 helps with imputation classes

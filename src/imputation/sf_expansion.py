@@ -3,8 +3,7 @@ from typing import List, Union
 import pandas as pd
 import logging
 
-from src.imputation.expansion_imputation import split_df_on_trim
-from src.imputation.tmi_imputation import create_imp_class_col, apply_to_original
+from src.imputation.imputation_helpers import split_df_on_imp_class
 from src.utils.wrappers import df_change_func_wrap
 
 SFExpansionLogger = logging.getLogger(__name__)
@@ -17,15 +16,14 @@ def expansion_impute(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
     trim_col: str,
+    group_type: str,
     break_down_cols: List[Union[str, int]],
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
-
     # Create a copy of the group dataframe
     group_copy = group.copy()
 
     imp_class = group_copy["imp_class"].values[0]
-    SFExpansionLogger.debug(f"Imputation class: {imp_class}.")
 
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
@@ -41,9 +39,16 @@ def expansion_impute(
     # Create a mask to exclude trimmed values
     exclude_trim_mask = group_copy[trim_col].isin([False])
 
-    # Combination masks to select correct records for summing
+    # Masks to select correct records for summing
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
+
+    # If there are no clear responders in the imputation class then pass.
+    # In this case the values previously calculated in the "civil defence fallback" 
+    # group will be used instead.
+    if (group_type == "imp_class_group") & group_copy.loc[long_responder_mask].empty:
+        SFExpansionLogger.debug(f"Empty group for imputation class: {imp_class}.")
+        return group
 
     # Get long forms only for summing the master_col (scalar value)
     sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
@@ -70,7 +75,9 @@ def expansion_impute(
         # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
-    # Returning updated group and updated QA dict
+    # Indicate how the short_form expansion has been computed
+    group_copy["sf_expansion_grouping"] = group_type
+
     return group_copy
 
 
@@ -94,19 +101,33 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
 
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
-        # ! This fixes issues with imputation, not sure why
-        expanded_df.reset_index(drop=True, inplace=True)
-
-        # Create group_by obj of the trimmed df
-        groupby_obj = expanded_df.groupby("imp_class")
+        # for a first pass, group by civil or defence only
+        groupby_obj_cd = expanded_df.groupby("200")
 
         # Calculate the imputation values for master question
-        expanded_df = groupby_obj.apply(
+        expanded_df = groupby_obj_cd.apply(
             expansion_impute,
             master_value,
             trim_col,
+            "civil_defence_fallback",
             break_down_cols=breakdown_dict[master_value],
         )  # returns a dataframe
+
+        expanded_df.reset_index(drop=True, inplace=True)
+
+        # For the second pass, group by imputation class
+        groupby_obj_impcl = expanded_df.groupby("imp_class")
+
+        # Calculate the imputation values for master question
+        expanded_df = groupby_obj_impcl.apply(
+            expansion_impute,
+            master_value,
+            trim_col,
+            "imp_class_group",
+            break_down_cols=breakdown_dict[master_value],
+        )  # returns a dataframe
+
+        expanded_df.reset_index(drop=True, inplace=True)
 
     # Calculate the headcount_m and headcount_f imputed values by summing
     short_mask = expanded_df["formtype"] == formtype_short
@@ -124,25 +145,6 @@ def apply_expansion(df: pd.DataFrame, master_values: List, breakdown_dict: dict)
     )
 
     return expanded_df
-
-
-def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
-
-    # Exclude the records from the reference list
-    exclusion_str = "|".join(exclusion_list)
-
-    # Create the filter
-    exclusion_filter = df["imp_class"].str.contains(exclusion_str)
-    # Where imputation class is null, `NaN` is returned by the
-    # .str.contains(exclusion_str) so we need to swap out the
-    # returned `NaN`s with True, so it gets filtered out
-    exclusion_filter = exclusion_filter.fillna(True)
-
-    # Filter out imputation classes that include "817" or "nan"
-    filtered_df = df[~exclusion_filter]  # df has 817 and nan filtered out
-    excluded_df = df[exclusion_filter]  # df only has 817 and nan records
-
-    return filtered_df, excluded_df
 
 
 @df_change_func_wrap
