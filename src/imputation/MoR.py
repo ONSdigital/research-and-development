@@ -154,9 +154,15 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     current_df = current_df.copy().loc[current_df["formtype"] == "0001", :]
     # prev_df = prev_df.copy().loc[prev_df["formtype"] == "0001", :]
 
-    # Ensure we only have one row per reference/imp_class
+    # Ensure we only have one row per reference/imp_class for previous and current data
     prev_df = (
         prev_df[["reference", "imp_class"] + target_vars]
+        .groupby(["reference", "imp_class"])
+        .sum()
+    ).reset_index()
+
+    current_df = (
+        current_df[["reference", "imp_class"] + target_vars]
         .groupby(["reference", "imp_class"])
         .sum()
     ).reset_index()
@@ -168,25 +174,9 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         on=["reference", "imp_class"],
         how="inner",
         suffixes=("", "_prev"),
+        validate="one_to_one"
     )
-    # List of the previous versions of target vars
-    target_vars_prev = [f"{var}_prev" for var in target_vars]
 
-    # Specify how to aggregate current and previous vars so as to remove
-    # duplicate entries for the same reference and class
-    agg_dict = {
-        **dict.fromkeys(target_vars, 'sum'),
-        # This lambda function will raise an error if there isn't one item in
-        # the column
-        **dict.fromkeys(target_vars_prev, lambda x: x.unique().item())
-    }
-
-    # Ensure there is only one entry per reference per class
-    gr_df = (
-        gr_df[["reference", "imp_class"] + target_vars + target_vars_prev]
-        .groupby(["reference", "imp_class"])
-        .aggregate(agg_dict)
-    ).reset_index()
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
