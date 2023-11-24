@@ -400,8 +400,8 @@ def run_staging(
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Get the latest manual trim file
-    manual_trim_path = paths["manual_trim_path"]
-    latest_man_file = list_files(manual_trim_path, "newest")[0]
+    manual_trim_path = paths["manual_imp_trim_path"]
+    latest_man_file = list_files(manual_trim_path, ext="csv", order="newest")[0]
 
     if config["global"]["load_manual_imputation"] and isfile(latest_man_file):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")

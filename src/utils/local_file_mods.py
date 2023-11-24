@@ -299,6 +299,9 @@ def local_list_files(path: str, ext: str = None, order: str = None):
     files_in_dir = os.listdir(path)
 
     if ext:
+        if not ext[0] == ".":
+            # insert a dot if it's been forgotten
+            ext = "." + ext
         files_in_dir = [
             file for file in files_in_dir if os.path.splitext(file)[1] == ext
         ]
