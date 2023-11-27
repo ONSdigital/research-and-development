@@ -65,7 +65,7 @@ def run_imputation(
 
     # join constructed rows back to the imputed df
     if "is_constructed" in df.columns:
-        imputed_df = pd.concat(imputed_df, constructed_df)
+        imputed_df = pd.concat([imputed_df, constructed_df])
         imputed_df = imputed_df.sort_values(
             ["reference", "instance"], ascending=[True, True]
         ).reset_index(drop=True)
