@@ -15,7 +15,7 @@ old_name = "wowenterprisereference"
 Deduced_Data_Type = "Int64"
 
 [selgrpno]
-old_name = "201_numeric"
+old_name = "pg_numeric"
 Deduced_Data_Type = "str"
 
 [sic07]
