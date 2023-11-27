@@ -498,7 +498,7 @@ def run_staging(
     sic_pg_utf_path = paths["sic_pg_utf_path"]
     check_file_exists(sic_pg_utf_path, raise_error=True)
     sic_pg_utf = read_csv(sic_pg_utf_path)
-    cols_needed = ["SIC 2007_CODE", "2016 > Form PG", "2016 > Pub PG"]
+    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
     sic_pg_num = sic_pg_utf[cols_needed]
     mapper_path = paths["mapper_path"]
     write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_num)
