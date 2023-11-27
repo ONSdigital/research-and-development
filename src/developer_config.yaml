@@ -21,7 +21,6 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_status_filtered: False
   output_short_form: False
   output_long_form: False
   output_tau: False
