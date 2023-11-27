@@ -534,3 +534,7 @@ Deduced_Data_Type = "float64"
 [headcount_total_trim]
 old_name = "headcount_total_trim"
 Deduced_Data_Type = "float64"
+
+[manual_outlier]
+old_name = "manual_outlier"
+Deduced_Data_Type = "boolean"

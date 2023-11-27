@@ -14,13 +14,13 @@ global:
   load_manual_outliers: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: False
+  load_from_feather: True
   # Output settings
   output_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_short_form: False
   output_long_form: False
   output_tau: False
@@ -103,6 +103,7 @@ schema_paths:
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
+  manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
 
 # Export config for users
 export_choices:

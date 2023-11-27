@@ -586,16 +586,30 @@ def run_tmi(
 
     # concatinate the short and long form with the excluded dataframes
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
-    # concatinate qa dataframes from short forms and long forms
-    full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    # concatinate qa dataframes from short forms and long forms
+    full_qa_df = pd.concat([qa_df_long, qa_df_short])
+
     full_qa_df = full_qa_df.sort_values(
-        ["reference", "instance"], ascending=[True, True]
+        ["formtype", "200", "201"], ascending=True
     ).reset_index(drop=True)
+
+    # add the imputed rows for reference in the trimming qa dataframe 
+    # Note, the buiness area weren't sure theyd need this, 
+    # so we might be able to take it out later
+    imputed_only_df = full_df.loc[full_df.imp_marker.isin(["MoR", "CF", "TMI"])]
+    imputed_only_df = imputed_only_df.sort_values(
+            ["formtype", "200", "201"], ascending=True
+    ).reset_index(drop=True)
+    full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
+
+    # create boolean flag column in the trimming_qa data frame 
+    # to allow users to indicate manual trimming
+    full_qa_df["manual_trim"] = np.nan
 
     TMILogger.info("TMI imputation completed.")
     return full_df, full_qa_df

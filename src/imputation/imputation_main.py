@@ -5,11 +5,13 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
+from src.staging.validation import load_schema
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import tmi_imputation as tmi
+from src.outputs.outputs_helpers import create_output_df
 
 ImputationMainLogger = logging.getLogger(__name__)
 
@@ -101,9 +103,16 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         links_filename = f"links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
-        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
+
+        # create trimming qa dataframe with required columns from schema
+        schema_path = config["schema_paths"]["manual_trimming_schema"]
+        schema_dict = load_schema(schema_path)
+        trimming_qa_output = create_output_df(qa_df, schema_dict)
+
         write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
+        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
+
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # Create names for imputed cols
