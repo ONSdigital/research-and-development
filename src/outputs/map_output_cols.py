@@ -86,8 +86,8 @@ def map_sizebands(
 
     # Create conditions for sizebands
     conditions = [
-        (sizeband_dict[key]["min"] <= df["frozenemployment"])
-        & (df["frozenemployment"] <= sizeband_dict[key]["max"])
+        (sizeband_dict[key]["min"] <= df["employment"])
+        & (df["employment"] <= sizeband_dict[key]["max"])
         for key in sizeband_dict.keys()
     ]
     decisions = [key for key in sizeband_dict.keys()]
@@ -134,12 +134,12 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
     return df
 
 
-def join_itl_regions(df: pd.DataFrame, itl_mapper: pd.DataFrame):
+def join_itl_regions(df: pd.DataFrame, postcode_mapper: pd.DataFrame):
     """Joins the itl regions onto the full dataframe using the mapper provided
 
     Args:
         df (pd.DataFrame): Full dataframe
-        itl_mapper (pd.DataFrame): Mapper containing postcodes and regions
+        postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
 
     Returns:
         df: Dataframe with column "ua_county" for regions
@@ -147,7 +147,7 @@ def join_itl_regions(df: pd.DataFrame, itl_mapper: pd.DataFrame):
     try:
         # Perform left join
         df = df.merge(
-            itl_mapper, how="left", left_on="postcodes_harmonised", right_on="pcd2"
+            postcode_mapper, how="left", left_on="postcodes_harmonised", right_on="pcd2"
         )
         df.drop(columns=["pcd2"], inplace=True)
 
@@ -155,7 +155,7 @@ def join_itl_regions(df: pd.DataFrame, itl_mapper: pd.DataFrame):
 
     except Exception as e:
         raise ValueError(
-            "An error occurred while combining df and itl_mapper: " + str(e)
+            "An error occurred while combining df and postcode_mapper: " + str(e)
         )
 
 

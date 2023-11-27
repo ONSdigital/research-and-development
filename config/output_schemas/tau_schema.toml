@@ -19,7 +19,7 @@ old_name = "201_numeric"
 Deduced_Data_Type = "str"
 
 [sic07]
-old_name = "frozensic"
+old_name = "rusic"
 Deduced_Data_Type = "Int64"
 
 [form]
@@ -27,7 +27,7 @@ old_name = "formtype"
 Deduced_Data_Type = "category"
 
 [emp]
-old_name = "frozenemployment"
+old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [turn]
@@ -62,16 +62,16 @@ Deduced_Data_Type = "str"
 old_name = "200"
 Deduced_Data_Type = "str"
 
-[emp_sci]
-old_name = "405"
+[emp_res]
+old_name = "emp_researcher"
 Deduced_Data_Type = "float64"
 
 [emp_tech]
-old_name = "407"
+old_name = "emp_technician"
 Deduced_Data_Type = "float64"
 
 [emp_oth]
-old_name = "409"
+old_name = "emp_other"
 Deduced_Data_Type = "float64"
 
 [slries]

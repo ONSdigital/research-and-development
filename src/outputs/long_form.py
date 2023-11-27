@@ -41,10 +41,9 @@ def output_long_form(
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
 
-    # Filter for long-forms/NI and CORA statuses
+    # Filter for long-forms/NI (status mapping has already been done)
     df = df.loc[
         ((df["formtype"] == "0001") | (df["formtype"] == "0003"))
-        & (df["form_status"].isin(["600", "800"]))
     ]
 
     # Create a 'year' column

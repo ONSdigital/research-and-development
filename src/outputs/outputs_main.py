@@ -64,8 +64,9 @@ def run_outputs(
         estimated_df["imp_marker"] == "R"
     )
 
-    # filter estimated_df to only include good or imputed statuses
+    # filter estimated_df and weighted_df to only include clear or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
+    tau_outputs_df = weighted_df.copy().loc[to_keep]
     # filter estimated_df for records not included in outputs
     filtered_output_df = estimated_df.copy().loc[~to_keep]
 
@@ -73,7 +74,7 @@ def run_outputs(
     condition = outputs_df["status"].isin(imputed_statuses)
     outputs_df.loc[condition, "status"] = "imputed"
 
-    # Running status filtered dataframe output for QA
+    # Running status filtered full dataframe output for QA
     if config["global"]["output_status_filtered"]:
         OutputMainLogger.info("Starting status filtered output...")
         output_status_filtered(
@@ -123,7 +124,7 @@ def run_outputs(
     if config["global"]["output_tau"]:
         OutputMainLogger.info("Starting TAU output...")
         output_tau(
-            weighted_df,
+            tau_outputs_df,
             config,
             write_csv,
             run_id,
