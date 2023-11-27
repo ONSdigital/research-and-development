@@ -52,7 +52,6 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-
     # Convert shortform rows to longform format
     df = run_short_to_long(df)
 
@@ -64,10 +63,10 @@ def run_imputation(
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
-        constructed_df = df.copy().loc[df["is_constructed"].isin([True])]
+        constructed_df = df.copy().loc[df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])]
         constructed_df["imp_marker"] = "constructed"
 
-        df = df.copy().loc[~df["is_constructed"].isin([True])]
+        df = df.copy().loc[~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))]
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
@@ -86,7 +85,7 @@ def run_imputation(
 
     # join constructed rows back to the imputed df
     if "is_constructed" in df.columns:
-        imputed_df = pd.concat(imputed_df, constructed_df)
+        imputed_df = pd.concat([imputed_df, constructed_df])
         imputed_df = imputed_df.sort_values(
             ["reference", "instance"], ascending=[True, True]
         ).reset_index(drop=True)
