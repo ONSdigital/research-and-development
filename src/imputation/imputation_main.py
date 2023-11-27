@@ -63,10 +63,10 @@ def run_imputation(
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
-        constructed_df = df.copy().loc[df["is_constructed"].isin([True])]
+        constructed_df = df.copy().loc[df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])]
         constructed_df["imp_marker"] = "constructed"
 
-        df = df.copy().loc[~df["is_constructed"].isin([True])]
+        df = df.copy().loc[~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))]
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols

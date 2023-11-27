@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable
 
 from src.staging.validation import validate_data_with_schema
+from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
 
@@ -65,16 +66,18 @@ def run_construction(
                               "./config/construction_schema.toml")
     construction_df = construction_df.dropna(axis="columns", how="all")
 
-    # Add flags to indicate whether a row was constructed
+    # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
+    updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
 
-    # ! TEMPORARY Fix the year since the snapshot doesn't seem to have one?
-    updated_snapshot_df["year"] = 2022
+    # Add the years
+    updated_snapshot_df = create_period_year(updated_snapshot_df)
+    construction_df = create_period_year(construction_df)
 
     # Update the values with the constructed ones
-    construction_df.set_index(["reference", "year", "instance"], inplace=True)
-    updated_snapshot_df.set_index(["reference", "year", "instance"], inplace=True)
+    construction_df.set_index(["reference", "period_year", "instance"], inplace=True)
+    updated_snapshot_df.set_index(["reference", "period_year", "instance"], inplace=True)
     updated_snapshot_df.update(construction_df)
     updated_snapshot_df.reset_index(inplace=True)
 

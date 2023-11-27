@@ -1566,9 +1566,9 @@ Possible_categorical_Values = ["nan"]
 
 [force_imputation]
 Description = "nan"
-Deduced_Data_Type = "bool"
+Deduced_Data_Type = "boolean"
 Nullable = true
-Current_Data_Type = "object"
+Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
