@@ -69,7 +69,7 @@ def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame
     filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
 
     filtered_data = sic_to_pg_mapper(
-        filtered_data, sic_mapper, target_col="201", formtype=formtype_long
+        filtered_data, sic_mapper, target_col="201", formtype=[formtype_long]
     )
 
     updated_df = apply_to_original(filtered_data, df)

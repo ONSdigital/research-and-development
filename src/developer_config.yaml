@@ -88,7 +88,7 @@ network_paths:
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
   sic_pg_utf_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
-  pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
+  # pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv' - deprecated
   pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"

@@ -7,6 +7,7 @@ from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
+from src.staging.pg_conversion import sic_to_pg_mapper
 
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ def output_tau(
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
-    pg_alpha_num: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -43,11 +44,18 @@ def output_tau(
 
     # Prepare the columns needed for outputs:
 
+
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
-    # Create a columns for numeric product grouo
-    df = map_o.join_pg_numeric(df, pg_alpha_num, cols_pg=["201"])
+    # Fill in numeric PG for short forms and imputed long forms
+    df = sic_to_pg_mapper(df,
+                          sic_pg_num,
+                          target_col="pg_numeric",
+                          from_col="SIC 2007_CODE",
+                          to_col="2016 > Form PG",
+                          formtype=["0006", "0001"],
+                          )
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
@@ -73,13 +81,6 @@ def output_tau(
 
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
-
-    # temporary - for debugging
-    import os
-    out_fol=r"D:\data\res_dev\bug"
-    mypath=os.path.join(out_fol, "df.csv")
-    df.to_csv(mypath, index=None)
-    # end of debugging
 
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]
