@@ -128,22 +128,29 @@ def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
     return df[column].fillna(0).astype("float")
 
 
-def apply_fill_zeros(filtered_df, df, target_variables: list):
-    """Applies the fill zeros function to filtered dataframes."""
-    # only fill zeros where intance is not zero
-    filtered_df = filtered_df.loc[filtered_df["instance"] != 0]
-    # Replace 305 nulls with zeros
-    filtered_df["305"] = fill_zeros(filtered_df, "305")
-    filtered_df["305_imputed"] = fill_zeros(filtered_df, "305_imputed")
-    df = apply_to_original(filtered_df, df)
+def apply_fill_zeros(clear_df, df, target_variables: list):
+    """Applies the fill zeros function to filtered dataframes.
 
-    # Replace Nan with zero for companies with NO R&D Q604 = "No"
+    This will be applied to all target variables for clear responders 
+    and all target variables for "No R&D".
+
+    Args:
+        clear_df (pd.DataFrame): The clear responders, excluding instance 0.
+        df (pd.DataFrame): The unfiltered dataframe
+    """
+    # only fill zeros where intance is not zero
+    clear_df = clear_df.loc[clear_df["instance"] != 0]
 
     no_rd = filter_by_column_content(df, "604", ["No"])
     no_rd = no_rd.loc[no_rd["instance"] != 0]
+
     for i in target_variables:
-        no_rd[i] = fill_zeros(no_rd, i)
+        clear_df[i] = fill_zeros(clear_df, i)
+        clear_df[f"{i}_imputed"] = fill_zeros(clear_df, f"{i}_imputed")
+        no_rd[i] = fill_zeros(clear_df, i)
         no_rd[f"{i}_imputed"] = fill_zeros(no_rd, f"{i}_imputed")
+
+    df = apply_to_original(clear_df, df)
     df = apply_to_original(no_rd, df)
 
     # Return cleaned original dataset
@@ -547,11 +554,11 @@ def run_tmi(
     dataframe back to the pipeline
         dataframe back to the pipeline
     Args:
-        full_df (pd.DataFrame): main data
-        sic_mapper (pd.DataFrame): dataframe with sic mapper info
+        full_df (pd.DataFrame): the full responses spp dataframe
+        sic_mapper (pd.DataFrame): dataframe with sic to product group mapper info
         config (Dict): the configuration settings
     Returns:
-        final_df: dataframe with the imputed valued added and counts columns
+        final_df(pd.DataFrame): dataframe with the imputed valued added and counts columns
         qa_df: qa dataframe
     """
     # changing type of Civil or Defence column 200 helps with imputation classes

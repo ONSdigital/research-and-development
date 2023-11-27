@@ -127,7 +127,7 @@ def carry_forwards(df, backdata, impute_vars):
     df.loc[match_cond, "imp_marker"] = "CF"
 
     df.loc[match_cond] = create_imp_class_col(
-        df, "200_prev", "201_prev", use_cellno=False
+        df, "200_prev", "201_prev"
     )
 
     # Drop merge related columns
@@ -154,22 +154,33 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     current_df = current_df.copy().loc[current_df["formtype"] == "0001", :]
     # prev_df = prev_df.copy().loc[prev_df["formtype"] == "0001", :]
 
+    # Ensure we only have one row per reference/imp_class for previous and current data
+    prev_df = (
+        prev_df[["reference", "imp_class"] + target_vars]
+        .groupby(["reference", "imp_class"])
+        .sum()
+    ).reset_index()
+
+    current_df = (
+        current_df[["reference", "imp_class"] + target_vars]
+        .groupby(["reference", "imp_class"])
+        .sum()
+    ).reset_index()
+
+    # Merge the clear current and previous data
     gr_df = pd.merge(
         current_df,
         prev_df,
         on=["reference", "imp_class"],
         how="inner",
         suffixes=("", "_prev"),
+        validate="one_to_one"
     )
-    target_vars_prev = [f"{var}_prev" for var in target_vars]
-    gr_df = (
-        gr_df[["reference", "imp_class"] + target_vars + target_vars_prev]
-        .groupby(["reference", "imp_class"])
-        .sum()
-    ).reset_index()
+
     # Calculate the ratios for the relevant variables
     for target in target_vars:
-        gr_df[f"{target}_gr"] = gr_df[target] / gr_df[f"{target}_prev"]
+        mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
+        gr_df.loc[mask, f"{target}_gr"] = gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
 
     return gr_df
 
@@ -207,13 +218,14 @@ def group_calc_link(group, target_vars, config):
         config (Dict): Confuration settings
     """
     for var in target_vars:
+        group = group.sort_values(f"{var}_gr")
         group = trim_bounds(group, f"{var}_gr", config)
         # Create mask to not use 0s in mean calculation
-        no_zero_mask = pd.notnull(group[f"{var}_gr"]) & (group[f"{var}_gr"] != 0)
+        non_null_mask = pd.notnull(group[f"{var}_gr"])
         # If there are non-null, non-zero values in the group calculate the mean
-        if sum(~group[f"{var}_gr_trim"] & no_zero_mask) != 0:
+        if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
             group[f"{var}_link"] = group.loc[
-                ~group[f"{var}_gr_trim"] & no_zero_mask, f"{var}_gr"
+                ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
             ].mean()
         # Otherwise the link is set to 1
         else:

@@ -42,6 +42,9 @@ def output_tau(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
+    # Filter out records that answer "no R&D"
+    df = df.copy().loc[~(df["604"] == "No")]
+
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper

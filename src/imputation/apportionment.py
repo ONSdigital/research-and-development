@@ -34,6 +34,9 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
     For long form entries, questions 405 - 412 and 501 - 508 are recorded
     in instance 0. A series is returned representing the updated column with
     values from instance 0 copied to all other instances of a reference.
+    
+    Note: this is achieved using .transform(max), which takes the value at
+    instance 0 and inserts it to all memebers of the group.
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
@@ -43,7 +46,7 @@ def update_column(df: pd.DataFrame, col: str) -> pd.Series:
         pd.Series: A single column dataframe with the values in instance 0
         copied to other instances for the same reference.
     """
-    updated_col = df.groupby("reference")[col].transform(sum)
+    updated_col = df.groupby("reference")[col].transform(max)
     return updated_col
 
 
@@ -62,18 +65,21 @@ def calc_fte_column(
 
     Returns:
         pd.Dataframe: The dataset with new columns for FTE.
-    """
-
-    # create new apportionment column for each item in the dictionary
+      """
     for new_col, old_cols in fte_dict.items():
-        # take the civil and defence cases in turn
-        cases_list = [["C", 0], ["D", 1]]
-        for item in cases_list:
-            condition = (df["200"] == item[0]) & (df["tot_202_CD"] > 0)
-            df.loc[condition, new_col] = round(
-                update_column(df, old_cols[item[1]]) * df["202"] / df["tot_202_CD"],
-                round_val,
-            )
+        # create new apportionment column for the civil cases
+        df.loc[(df["200"] == "C") & (df["tot_202_CD"] > 0), new_col] = round(
+            update_column(df, old_cols[0]) * df["202"] / df["tot_202_CD"],
+            round_val
+        )
+        df.loc[(df["200"] == "C") & (df["tot_202_CD"] == 0), new_col] = 0
+
+        # create new apportionment column for the defence cases
+        df.loc[(df["200"] == "D") & (df["tot_202_CD"] > 0), new_col] = round(
+            update_column(df, old_cols[1]) * df["202"] / df["tot_202_CD"],
+            round_val
+        )
+        df.loc[(df["200"] == "D") & (df["tot_202_CD"] == 0), new_col] = 0
 
     return df
 
@@ -97,6 +103,7 @@ def calc_headcount_column(
         df.loc[df["tot_202_all"] > 0, new_col] = round(
             update_column(df, old_col) * df["202"] / df["tot_202_all"], round_val
         )
+        df.loc[(df["instance"] != 0) & (df["tot_202_all"] == 0), new_col] = 0
 
     return df
 

@@ -336,9 +336,12 @@ def run_staging(
             )
         else:
             secondary_full_responses = None
-        postcode_mapper = (
-            None  # TODO: check if the actual mapper is needed later in the pipeline
-        )
+
+        # Read in postcode mapper (needed later in the pipeline)
+        postcode_masterlist = paths["postcode_masterlist"]
+        check_file_exists(postcode_masterlist, raise_error=True)
+        postcode_mapper = read_csv(postcode_masterlist)
+
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
@@ -421,17 +424,14 @@ def run_staging(
 
         # Fix for different column names on network vs hdfs
         if network_or_hdfs == "network":
-            to_map_col = "q201"
-        elif network_or_hdfs == "hdfs":
-            to_map_col = "201"
-
-        # Map PG numeric to alpha in column q201
-        backdata = pg.pg_to_pg_mapper(
-            backdata,
-            pg_num_alpha,
-            target_col=to_map_col,
-            pg_column=to_map_col,
-        )
+            # Map PG numeric to alpha in column q201
+            # This isn't done on HDFS as the column is already mapped
+            backdata = pg.pg_to_pg_mapper(
+                backdata,
+                pg_num_alpha,
+                target_col="q201",
+                pg_column="q201",
+            )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
         backdata = None
