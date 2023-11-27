@@ -6,6 +6,7 @@ from datetime import datetime
 from itertools import chain
 
 from src.staging.validation import load_schema
+from src.imputation.imputation_helpers import split_df_on_trim
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
@@ -65,10 +66,17 @@ def run_imputation(
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
-        constructed_df = df.copy().loc[df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])]
+        constructed_df = df.copy().loc[
+            df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])
+        ]
         constructed_df["imp_marker"] = "constructed"
 
-        df = df.copy().loc[~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))]
+        df = df.copy().loc[
+            ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
+        ]
+
+    if "manual_trim" in df.columns:
+        trimmed_df, df = split_df_on_trim(df, "manual_trim")
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
@@ -88,9 +96,14 @@ def run_imputation(
     # join constructed rows back to the imputed df
     if "is_constructed" in df.columns:
         imputed_df = pd.concat([imputed_df, constructed_df])
-        imputed_df = imputed_df.sort_values(
-            ["reference", "instance"], ascending=[True, True]
-        ).reset_index(drop=True)
+
+    # join manually trimmed columns back to the imputed df
+    if "manual_trim" in df.columns:
+         imputed_df = pd.concat([imputed_df, trimmed_df])       
+
+    imputed_df = imputed_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
 
     # Output QA files
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
@@ -109,8 +122,8 @@ def run_imputation(
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
         write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
-        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
+        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 
