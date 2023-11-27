@@ -71,7 +71,7 @@ def sic_to_pg_mapper(
     sic_column: str = "rusic",
     from_col: str = "sic",
     to_col: str = "pg_alpha",
-    formtype: str = "0006",
+    formtype: str = ["0006"],
 ):
     """This function maps all values in one column to another column
     using a mapper file. This is only applied for short forms and unsampled
@@ -94,8 +94,10 @@ def sic_to_pg_mapper(
 
     filtered_df = df.copy()
 
-    formtype_cond = filtered_df["formtype"] == formtype
-    filtered_df = filtered_df[formtype_cond]
+    filtered_df = filtered_df[filtered_df["formtype"].isin(formtype)]
+
+    if "pg_numeric" in filtered_df.columns:
+        filtered_df = filtered_df[filtered_df["pg_numeric"].isnull()]
 
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
@@ -131,7 +133,7 @@ def run_pg_conversion(
     df: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
     sic_pg_alpha: pd.DataFrame,
-    target_col: str = "product_group",
+    target_col: str = "201",
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
@@ -145,6 +147,8 @@ def run_pg_conversion(
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
+
+    df["pg_numeric"] = df["201"].copy()
 
     if target_col == "201":
         target_col = "201_mapping"

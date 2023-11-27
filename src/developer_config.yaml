@@ -24,9 +24,9 @@ global:
   output_short_form: False
   output_long_form: False
   output_tau: False
-  output_gb_sas: False
-  output_intram_by_pg: True
-  output_intram_by_itl1: True
+  output_gb_sas: True
+  output_intram_by_pg: False
+  output_intram_by_itl1: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_status_filtered: False
@@ -89,7 +89,9 @@ network_paths:
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
-  pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv'
+  mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
+  sic_pg_utf_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
+  # pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv' - deprecated
   pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
   sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"

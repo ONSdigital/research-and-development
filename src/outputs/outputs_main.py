@@ -28,9 +28,8 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
-    pg_alpha_num: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
@@ -52,6 +51,7 @@ def run_outputs(
         postcode_mapper (pd.DataFrame): Links postcode to region code
         itl_mapper (pd.DataFrame): Links region to ITL codes
         pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
+        sic_pg_num (pd.DataFrame): Maps SIC to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
 
@@ -117,6 +117,7 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
+            pg_num_alpha,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -131,7 +132,7 @@ def run_outputs(
             ultfoc_mapper,
             cora_mapper,
             postcode_mapper,
-            pg_alpha_num,
+            sic_pg_num,
         )
         OutputMainLogger.info("Finished TAU output.")
 
@@ -146,7 +147,7 @@ def run_outputs(
             ultfoc_mapper,
             cora_mapper,
             postcode_mapper,
-            pg_alpha_num,
+            sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 
@@ -214,9 +215,9 @@ def run_outputs(
     # Running FTE total QA
     if config["global"]["output_fte_total_qa"]:
         qa_output_total_fte(
-            outputs_df, 
-            config, 
-            write_csv, 
+            outputs_df,
+            config,
+            write_csv,
             run_id
         )
     OutputMainLogger.info("Finished FTE total QA output.")

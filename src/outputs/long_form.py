@@ -8,7 +8,6 @@ import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df, create_period_year
 
-
 OutputMainLogger = logging.getLogger(__name__)
 
 
@@ -30,7 +29,6 @@ def output_long_form(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-
 
     """
 
