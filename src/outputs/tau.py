@@ -44,18 +44,18 @@ def output_tau(
 
     # Prepare the columns needed for outputs:
 
-
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Fill in numeric PG for short forms and imputed long forms
-    df = sic_to_pg_mapper(df,
-                          sic_pg_num,
-                          target_col="pg_numeric",
-                          from_col="SIC 2007_CODE",
-                          to_col="2016 > Form PG",
-                          formtype=["0006", "0001"],
-                          )
+    df = sic_to_pg_mapper(
+        df,
+        sic_pg_num,
+        target_col="pg_numeric",
+        from_col="SIC 2007_CODE",
+        to_col="2016 > Form PG",
+        formtype=["0006", "0001"],
+    )
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
@@ -63,10 +63,8 @@ def output_tau(
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
 
-    #! revert this back
-    # # Map the itl regions using the postcodes
-    # df = map_o.join_itl_regions(df, postcode_itl_mapper)
-    df["itl"] = "TEMP"
+    # Map the itl regions using the postcodes
+    df = map_o.join_itl_regions(df, postcode_itl_mapper)
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)

@@ -58,7 +58,9 @@ def run_outputs(
 
     imputed_statuses = ["TMI", "CF", "MoR"]
 
-    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (estimated_df["imp_marker"] == "R")
+    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
+        estimated_df["imp_marker"] == "R"
+    )
     # filter estimated_df to only include good or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
 

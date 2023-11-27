@@ -502,7 +502,7 @@ def run_staging(
     sic_pg_num = sic_pg_utf[cols_needed]
     mapper_path = paths["mapper_path"]
     write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_num)
-    #val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
+    # val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
     sic_pg_num = val.validate_many_to_one(
         sic_pg_num, col_many="SIC 2007_CODE", col_one="2016 > Form PG"
     )
@@ -583,7 +583,6 @@ def run_staging(
         cora_mapper,
         cellno_df,
         postcode_mapper,
-        #pg_alpha_num,
         pg_num_alpha,
         sic_pg_alpha,
         sic_pg_num,
