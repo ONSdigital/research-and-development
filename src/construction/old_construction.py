@@ -52,15 +52,14 @@ def run_construction(
         # Use the secondary snapshot to generate construction files for the next run
         additions_df = get_additions(main_snapshot, secondary_snapshot)
         amendments_df = get_amendments(main_snapshot, secondary_snapshot)
-        output_construction_files(amendments_df, additions_df, config, write_csv, run_id)
+        output_construction_files(
+            amendments_df, additions_df, config, write_csv, run_id
+        )
 
     # Read the construction files from the last run and apply them
-    constructed_df = apply_construction(main_snapshot,
-                                        config,
-                                        check_file_exists,
-                                        read_csv,
-                                        write_csv,
-                                        run_id)
+    constructed_df = apply_construction(
+        main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
+    )
     constructed_df.reset_index(drop=True, inplace=True)
 
     return constructed_df
@@ -73,8 +72,19 @@ def get_amendments(main_snapshot, secondary_snapshot):
     snapshot, and have matching keys.
     """
     key_cols = ["reference", "year", "instance"]
-    numeric_cols = ["219", "220", "242", "243", "244", "245",
-                    "246", "247", "248", "249", "250"]
+    numeric_cols = [
+        "219",
+        "220",
+        "242",
+        "243",
+        "244",
+        "245",
+        "246",
+        "247",
+        "248",
+        "249",
+        "250",
+    ]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
     numeric_cols_diff = [f"{i}_diff" for i in numeric_cols]
 
@@ -175,10 +185,14 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     tdate = datetime.now().strftime("%Y-%m-%d")
     construction_folder = paths["construction_path"]
     amendments_filename = os.path.join(
-        construction_folder, "auto_construction", f"construction_amendments_{tdate}_v{run_id}.csv"
+        construction_folder,
+        "auto_construction",
+        f"construction_amendments_{tdate}_v{run_id}.csv",
     )
     additions_filename = os.path.join(
-        construction_folder, "auto_construction", f"construction_additions_{tdate}_v{run_id}.csv"
+        construction_folder,
+        "auto_construction",
+        f"construction_additions_{tdate}_v{run_id}.csv",
     )
 
     # Check if the dataframes are empty before writing
@@ -228,7 +242,9 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%Y-%m-%d")
-    construction_output_filepath = os.path.join(paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv")
+    construction_output_filepath = os.path.join(
+        paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv"
+    )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
 
@@ -240,14 +256,20 @@ def apply_amendments(main_df, amendments_df):
                     "246", "247", "248", "249", "250"]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
-    accepted_amendments_df = amendments_df.drop(amendments_df[~amendments_df.accept_changes].index)
+    accepted_amendments_df = amendments_df.drop(
+        amendments_df[~amendments_df.accept_changes].index
+    )
 
     if accepted_amendments_df.shape[0] == 0:
-        construction_logger.info("Amendments file contained no records marked for inclusion")
+        construction_logger.info(
+            "Amendments file contained no records marked for inclusion"
+        )
         return main_df
 
     # Drop the diff columns
-    accepted_amendments_df = accepted_amendments_df.drop(columns=[col for col in accepted_amendments_df.columns if col.endswith("_diff")])
+    accepted_amendments_df = accepted_amendments_df.drop(
+        columns=[col for col in accepted_amendments_df.columns if col.endswith("_diff")]
+    )
 
     # Join the amendments onto the main snapshot
     amended_df = pd.merge(main_df, accepted_amendments_df, how="left", on=key_cols)
@@ -276,7 +298,9 @@ def apply_additions(main_df, additions_df):
             f"{accepted_additions_df.shape[0]} records added during construction"
         )
     else:
-        construction_logger.info("Additions file contained no records marked for inclusion")
+        construction_logger.info(
+            "Additions file contained no records marked for inclusion"
+        )
         return main_df
 
     return added_df

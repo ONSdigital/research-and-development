@@ -26,14 +26,14 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
-    
+
     These processes are, in order:
     1) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
     2) Short to long form conversion: create new instances with short form questions
         mapped and apportioned to longform question equivalents
-    3) Mean of Ratios imputation: (forwards imputation) where back data is available, 
+    3) Mean of Ratios imputation: (forwards imputation) where back data is available,
         with "carry forward" as fall back data exists for prev but not current period.
-    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to 
+    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
         allow mean of ratios or carried forward method
     5) Short form expansion imputation: imputing for questions not asked in short forms
 
@@ -99,7 +99,7 @@ def run_imputation(
 
     # join manually trimmed columns back to the imputed df
     if "manual_trim" in df.columns:
-         imputed_df = pd.concat([imputed_df, trimmed_df])       
+        imputed_df = pd.concat([imputed_df, trimmed_df])
 
     imputed_df = imputed_df.sort_values(
         ["reference", "instance"], ascending=[True, True]

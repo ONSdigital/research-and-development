@@ -82,7 +82,7 @@ def create_imp_class_col(
     col_first_half: str,
     col_second_half: str,
     class_name: str = "imp_class",
-    use_cellno: bool = True
+    use_cellno: bool = True,
 ) -> pd.DataFrame:
     """Creates a column for the imputation class.
 
@@ -131,7 +131,7 @@ def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
 def apply_fill_zeros(clear_df, df, target_variables: list):
     """Applies the fill zeros function to filtered dataframes.
 
-    This will be applied to all target variables for clear responders 
+    This will be applied to all target variables for clear responders
     and all target variables for "No R&D".
 
     Args:
@@ -598,23 +598,25 @@ def run_tmi(
         ["formtype", "imp_class"], ascending=True
     ).reset_index(drop=True)
 
-    # add the imputed rows for reference in the trimming qa dataframe 
-    # Note, the buiness area weren't sure theyd need this, 
+    # add the imputed rows for reference in the trimming qa dataframe
+    # Note, the buiness area weren't sure theyd need this,
     # so we might be able to take it out later
     imputed_only_df = full_df.loc[full_df.imp_marker.isin(["MoR", "CF", "TMI"])]
     imputed_only_df = imputed_only_df.sort_values(
-            ["formtype", "imp_class"], ascending=True
+        ["formtype", "imp_class"], ascending=True
     ).reset_index(drop=True)
     full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
 
     # rearange the rows to put the manual_trim column at the end
     if "manual_trim" in full_df.columns:
-        cols = [col for col in full_df.columns if col != "manual_trim"] + ["manual_trim"]
+        cols = [col for col in full_df.columns if col != "manual_trim"] + [
+            "manual_trim"
+        ]
         full_df = full_df[cols]
         full_qa_df = full_qa_df[cols]
     else:
-    # create a new column in the trimming qa if one doesn't exist
-    # to allow users to indicate manual trimming
+        # create a new column in the trimming qa if one doesn't exist
+        # to allow users to indicate manual trimming
         full_qa_df["manual_trim"] = np.nan
 
     TMILogger.info("TMI imputation completed.")

@@ -9,10 +9,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def qa_output_total_fte(
-    df: pd.DataFrame,
-    config: Dict[str, Any],
-    write_csv: Callable,
-    run_id: int
+    df: pd.DataFrame, config: Dict[str, Any], write_csv: Callable, run_id: int
 ):
     """Run the outputs module.
 
@@ -27,17 +24,16 @@ def qa_output_total_fte(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
-    totals_names = ["emp_total",
-                    "emp_researcher",
-                    "emp_technician",
-                    "emp_other"]
-    totals_values = [df["emp_total"].sum(),
-                     df["emp_researcher"].sum(),
-                     df["emp_technician"].sum(),
-                     df["emp_other"].sum()]
-    qa_total_fte_df = pd.DataFrame(list(zip(totals_names, totals_values)),
-                                   columns=["Column", "Total"]
-                                   )
+    totals_names = ["emp_total", "emp_researcher", "emp_technician", "emp_other"]
+    totals_values = [
+        df["emp_total"].sum(),
+        df["emp_researcher"].sum(),
+        df["emp_technician"].sum(),
+        df["emp_other"].sum(),
+    ]
+    qa_total_fte_df = pd.DataFrame(
+        list(zip(totals_names, totals_values)), columns=["Column", "Total"]
+    )
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")

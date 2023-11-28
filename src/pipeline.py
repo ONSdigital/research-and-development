@@ -119,7 +119,7 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Construction...")
     full_responses = run_construction(
         full_responses, config, check_file_exists, read_csv, run_id
-        )
+    )
     MainLogger.info("Finished Construction...")
 
     # Imputation module

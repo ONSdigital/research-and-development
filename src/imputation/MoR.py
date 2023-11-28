@@ -4,7 +4,11 @@ import pandas as pd
 import re
 
 from src.imputation.apportionment import run_apportionment
-from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds, calculate_totals
+from src.imputation.tmi_imputation import (
+    create_imp_class_col,
+    trim_bounds,
+    calculate_totals,
+)
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
@@ -40,7 +44,10 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     )
     # Calculate totals as with TMI
     carried_forwards_df = calculate_totals(carried_forwards_df)
-    return pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True), links_df
+    return (
+        pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True),
+        links_df,
+    )
 
 
 def mor_preprocessing(df, backdata):
@@ -126,9 +133,7 @@ def carry_forwards(df, backdata, impute_vars):
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    df.loc[match_cond] = create_imp_class_col(
-        df, "200_prev", "201_prev"
-    )
+    df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
 
     # Drop merge related columns
     to_drop = [
@@ -174,13 +179,15 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         on=["reference", "imp_class"],
         how="inner",
         suffixes=("", "_prev"),
-        validate="one_to_one"
+        validate="one_to_one",
     )
 
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
-        gr_df.loc[mask, f"{target}_gr"] = gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
+        gr_df.loc[mask, f"{target}_gr"] = (
+            gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
+        )
 
     return gr_df
 

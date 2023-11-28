@@ -62,8 +62,7 @@ def run_construction(
     updated_snapshot_df = snapshot_df.copy()
 
     # Validate construction file and drop columns without constructed values
-    validate_data_with_schema(construction_df,
-                              "./config/construction_schema.toml")
+    validate_data_with_schema(construction_df, "./config/construction_schema.toml")
     construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Add flags to indicate whether a row was constructed or should be imputed
@@ -77,7 +76,9 @@ def run_construction(
 
     # Update the values with the constructed ones
     construction_df.set_index(["reference", "period_year", "instance"], inplace=True)
-    updated_snapshot_df.set_index(["reference", "period_year", "instance"], inplace=True)
+    updated_snapshot_df.set_index(
+        ["reference", "period_year", "instance"], inplace=True
+    )
     updated_snapshot_df.update(construction_df)
     updated_snapshot_df.reset_index(inplace=True)
 
