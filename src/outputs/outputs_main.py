@@ -89,6 +89,15 @@ def run_outputs(
     outputs_df['postcodes_harmonised'] = (
         outputs_df['postcodes_harmonised'].apply(postcode_topup))
 
+    # Debug - begin
+    OutputMainLogger.info("Started saving outputs_df for debugging...")
+    mydir = "D:\\data\res_dev\\outputs\\reg_apport\\"
+    outputs_df_file = "outputs_df.csv"
+    outputs_df.to_csv(mydir + outputs_df_file, index=None)
+    OutputMainLogger.info("Saved outputs_df for debugging.")
+
+    # Debug - end 
+
     weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
     weighted_df['postcodes_harmonised'] = (
         weighted_df['postcodes_harmonised'].apply(postcode_topup))
