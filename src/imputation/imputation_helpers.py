@@ -3,6 +3,36 @@ from typing import List
 import pandas as pd
 
 
+
+def instance_fix(df: pd.DataFrame):
+    """Set instance to 1 for longforms with status 'Form sent out.'
+
+    References with status 'Form sent out' initially have a null in the instance
+    column.
+    """
+    mask = (df.formtype == "0001") & (df.status == "Form sent out")
+    df.loc[mask, "instance"] = 1
+ 
+    return df
+
+
+def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a duplicate long form records with no R&D and set instance to 1.
+    
+    These references initailly have one entry with instance 0. 
+    A copy will be created with instance set to 1.
+    """
+    mask = (df.formtype == "0001") & (df["604"] == "No")
+    filtered_df = df.copy().loc[mask]
+    filtered_df["instance"] == 1
+
+    updated_df = pd.concat([df, filtered_df], ignore_index=True)
+    updated_df = updated_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+    return updated_df
+
+
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Splits the dataframe in based on if it was trimmed or not"""
 

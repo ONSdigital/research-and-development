@@ -26,29 +26,6 @@ def filter_by_column_content(
     return df[df[column].isin(column_content)].copy()
 
 
-def instance_fix(df: pd.DataFrame):
-    """Set instance to 1 for status 'Form sent out.'
-
-    References with status 'Form sent out' initially have a null in the instance
-    column.
-    """
-    filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
-    filtered_df["instance"] = 1
-    updated_df = apply_to_original(filtered_df, df)
-    return updated_df
-
-
-def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
-    """Create a duplicate of references with no R&D and set instance to 1."""
-    filtered_df = filter_by_column_content(df, "604", ["No"])
-    filtered_df["instance"] = 1
-    updated_df = pd.concat([df, filtered_df], ignore_index=True)
-    updated_df = updated_df.sort_values(
-        ["reference", "instance"], ascending=[True, True]
-    ).reset_index(drop=True)
-    return updated_df
-
-
 def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"

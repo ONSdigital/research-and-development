@@ -5,8 +5,8 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
+import src.imputation.imputation_helpers as hlp
 from src.staging.validation import load_schema
-from src.imputation.imputation_helpers import split_df_on_trim
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
@@ -64,6 +64,10 @@ def run_imputation(
     df.loc[clear_responders_mask, "imp_marker"] = "R"
     df.loc[~clear_responders_mask, "imp_marker"] = "no_imputation"
 
+    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
+    df = hlp.instance_fix(df)
+    df = hlp.duplicate_rows(df)
+
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
         constructed_df = df.copy().loc[
@@ -76,7 +80,7 @@ def run_imputation(
         ]
 
     if "manual_trim" in df.columns:
-        trimmed_df, df = split_df_on_trim(df, "manual_trim")
+        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
