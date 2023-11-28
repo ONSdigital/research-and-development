@@ -108,10 +108,6 @@ def run_imputation(
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
-    # Join TMI and MoR imputed_df (processed from untrimmed records) back on to
-    # manually trimmed records
-    imputed_df = pd.concat([imputed_df, trimmed_df], axis=0)
-
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
 
