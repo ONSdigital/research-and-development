@@ -96,8 +96,9 @@ def carry_forwards(df, backdata, impute_vars):
     in the backdata is joined to each of the m instances in the original df,
     resulting in n*m rows.
     For rows where there is a match, we only want to keep one instance
-    For "Form sent out" statuses, the only instance is null, so we keep that one
-    For "Check needed" statuses, we keep instance 0
+    For "Form sent out" statuses, the only instance has been set to 1, 
+        so we keep that one.
+    For "Check needed" statuses, we keep instance 0 only.
     Where there is no match, we keep all rows.
 
     Args:
@@ -115,8 +116,9 @@ def carry_forwards(df, backdata, impute_vars):
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"
-    instance_cond = (df["instance"] == 0) | pd.isnull(df["instance"])
-    keep_cond = no_match_cond | instance_cond
+    form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1) 
+    check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0) 
+    keep_cond = no_match_cond | form_sent_out_cond | check_needed_cond
 
     df = df.copy().loc[keep_cond, :]
 
