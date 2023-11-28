@@ -103,6 +103,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
     # Extracted the year from period and crated new columns 'period_year'
     df["period_year"] = df["period"].astype("str").str[:4]
+    df["period_year"] = df["period_year"].apply(pd.to_numeric, errors="coerce")
 
     return df
 

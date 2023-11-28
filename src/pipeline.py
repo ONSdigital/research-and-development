@@ -46,6 +46,8 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import local_open as open_file
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
+        from src.utils.local_file_mods import local_isfile as isfile
+        from src.utils.local_file_mods import local_list_files as list_files
 
         # from src.utils.local_file_mods import local_file_exists as file_exists
         from src.utils.local_file_mods import local_write_feather as write_feather
@@ -58,6 +60,8 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import hdfs_open as open_file
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
+        from src.utils.hdfs_mods import hdfs_isfile as isfile
+        from src.utils.hdfs_mods import hdfs_list_files as list_files
 
         # from src.utils.hdfs_mods import hdfs_file_exists as file_exists
         from src.utils.hdfs_mods import hdfs_write_feather as write_feather
@@ -103,6 +107,7 @@ def run_pipeline(start, config_path):
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        manual_trimming_df,
     ) = run_staging(
         config,
         check_file_exists,
@@ -111,6 +116,8 @@ def run_pipeline(start, config_path):
         write_csv,
         read_feather,
         write_feather,
+        isfile,
+        list_files,
         run_id,
     )
     MainLogger.info("Finished Data Ingest...")
@@ -125,7 +132,13 @@ def run_pipeline(start, config_path):
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(
-        full_responses, sic_pg_alpha, backdata, config, write_csv, run_id
+        full_responses,
+        manual_trimming_df,
+        sic_pg_alpha,
+        backdata,
+        config,
+        write_csv,
+        run_id,
     )
     MainLogger.info("Finished  Imputation...")
 

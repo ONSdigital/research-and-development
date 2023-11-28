@@ -443,10 +443,6 @@ def run_longform_tmi(
     """
     TMILogger.info("Starting TMI long form imputation.")
 
-    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
-    longform_df = instance_fix(longform_df)
-    longform_df = duplicate_rows(longform_df)
-
     # TMI Step 1: impute the Product Group
     df = impute_pg_by_sic(longform_df, sic_mapper)
 
@@ -546,8 +542,8 @@ def run_tmi(
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
 
     # create logic to select rows for longform and shortform TMI
-    long_tmi_mask = (full_df["formtype"] == formtype_long) & ~mor_mask
-    short_tmi_mask = (full_df["formtype"] == formtype_short) & ~mor_mask
+    long_tmi_mask = ((full_df["formtype"] == formtype_long) & ~mor_mask)
+    short_tmi_mask = ((full_df["formtype"] == formtype_short) & ~mor_mask)
 
     # create dataframes to be used for longform TMI and short form census TMI
     longform_df = full_df.copy().loc[long_tmi_mask]

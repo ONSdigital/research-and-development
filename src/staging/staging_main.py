@@ -258,6 +258,8 @@ def run_staging(
     write_csv: Callable,
     read_feather: Callable,
     write_feather: Callable,
+    isfile: Callable,
+    list_files: Callable,
     run_id: int,
 ) -> Tuple:
     """Run the staging and validation module.
@@ -399,6 +401,22 @@ def run_staging(
     else:
         manual_outliers = None
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
+
+    # Get the latest manual trim file
+    manual_trim_path = paths["manual_imp_trim_path"]
+
+    if config["global"]["load_manual_imputation"] and isfile(manual_trim_path):
+        StagingMainLogger.info("Loading Imputation Manual Trimming File")
+        wanted_cols = ["reference", "instance", "manual_trim"]
+        manual_trim_df = read_csv(manual_trim_path, wanted_cols)
+        manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+        val.validate_data_with_schema(
+            manual_trim_df, "./config/manual_trimming_schema.toml"
+        )
+        # Fill empty values with False
+    else:
+        manual_outliers = None
+        StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
     # Loading PG numeric to alpha mapper
     StagingMainLogger.info("Loading PG numeric to alpha File...")
@@ -591,4 +609,5 @@ def run_staging(
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        manual_trim_df,
     )

@@ -5,20 +5,24 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
-import src.imputation.imputation_helpers as hlp
+from src.imputation import imputation_helpers as hlp
+from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
-from src.imputation import tmi_imputation as tmi
+from src.imputation import manual_imputation as mimp
 from src.outputs.outputs_helpers import create_output_df
+
+
 
 ImputationMainLogger = logging.getLogger(__name__)
 
 
 def run_imputation(
     df: pd.DataFrame,
+    manual_trimming_df: pd.DataFrame,
     mapper: pd.DataFrame,
     backdata: pd.DataFrame,
     config: Dict[str, Any],
@@ -55,7 +59,8 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-    # Convert shortform rows to longform format
+
+    # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
     # Initialise imp_marker column with a value of 'R' for clear responders
@@ -87,12 +92,25 @@ def run_imputation(
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
 
+    # Create imp_path variable for QA output and manual imputation file
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+
+    # Load manual imputation file
+    df = mimp.merge_manual_imputation(df, manual_trimming_df)
+
+    trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
+
     # Run MoR
     if backdata is not None:
         df, links_df = run_mor(df, backdata, orig_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
+
+    # Join TMI and MoR imputed_df (processed from untrimmed records) back on to
+    # manually trimmed records
+    imputed_df = pd.concat([imputed_df, trimmed_df], axis=0)
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
@@ -104,14 +122,13 @@ def run_imputation(
     # join manually trimmed columns back to the imputed df
     if "manual_trim" in df.columns:
         imputed_df = pd.concat([imputed_df, trimmed_df])
+        qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
 
     imputed_df = imputed_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
     # Output QA files
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
