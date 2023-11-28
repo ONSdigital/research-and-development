@@ -8,32 +8,23 @@ Min_values = 11001603625
 Max_values = 19891309165
 Possible_Categorical_Values = ["nan"]
 
-[cellnumber]
+[instance]
 Description = "nan"
 Deduced_Data_Type = "Int64"
 Nullable = false
-Current_Data_Type = "Int64"
+Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_Categorical_Values = [0]
+Possible_Categorical_Values = ["nan"]
 
-[selectiontype]
+
+[manual_trimming]
 Description = "nan"
-Deduced_Data_Type = "str"
+Deduced_Data_Type = "boolean"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_Categorical_Values = ["C"]
-
-[formtype]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = false
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [1, 6]
+Possible_Categorical_Values = [true, false]

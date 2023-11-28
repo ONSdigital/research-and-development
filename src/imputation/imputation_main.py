@@ -5,17 +5,24 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 from itertools import chain
 
+from src.imputation import imputation_helpers as hlp
+from src.imputation import tmi_imputation as tmi
+from src.staging.validation import load_schema
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
-from src.imputation import tmi_imputation as tmi
+from src.imputation import manual_imputation as mimp
+from src.outputs.outputs_helpers import create_output_df
+
+
 
 ImputationMainLogger = logging.getLogger(__name__)
 
 
 def run_imputation(
     df: pd.DataFrame,
+    manual_trimming_df: pd.DataFrame,
     mapper: pd.DataFrame,
     backdata: pd.DataFrame,
     config: Dict[str, Any],
@@ -23,14 +30,14 @@ def run_imputation(
     run_id: int,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
-    
+
     These processes are, in order:
     1) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
     2) Short to long form conversion: create new instances with short form questions
         mapped and apportioned to longform question equivalents
-    3) Mean of Ratios imputation: (forwards imputation) where back data is available, 
+    3) Mean of Ratios imputation: (forwards imputation) where back data is available,
         with "carry forward" as fall back data exists for prev but not current period.
-    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to 
+    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
         allow mean of ratios or carried forward method
     5) Short form expansion imputation: imputing for questions not asked in short forms
 
@@ -52,7 +59,8 @@ def run_imputation(
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
-    # Convert shortform rows to longform format
+
+    # Convert shortform responses to longform format
     df = run_short_to_long(df)
 
     # Initialise imp_marker column with a value of 'R' for clear responders
@@ -61,17 +69,37 @@ def run_imputation(
     df.loc[clear_responders_mask, "imp_marker"] = "R"
     df.loc[~clear_responders_mask, "imp_marker"] = "no_imputation"
 
+    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
+    df = hlp.instance_fix(df)
+    df = hlp.duplicate_rows(df)
+
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
-        constructed_df = df.copy().loc[df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])]
+        constructed_df = df.copy().loc[
+            df["is_constructed"].isin([True]) & df["force_imputation"].isin([False])
+        ]
         constructed_df["imp_marker"] = "constructed"
 
-        df = df.copy().loc[~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))]
+        df = df.copy().loc[
+            ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
+        ]
+
+    if "manual_trim" in df.columns:
+        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
         df[f"{col}_imputed"] = df[col]
+
+    # Create imp_path variable for QA output and manual imputation file
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+
+    # Load manual imputation file
+    df = mimp.merge_manual_imputation(df, manual_trimming_df)
+
+    trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
     if backdata is not None:
@@ -86,13 +114,17 @@ def run_imputation(
     # join constructed rows back to the imputed df
     if "is_constructed" in df.columns:
         imputed_df = pd.concat([imputed_df, constructed_df])
-        imputed_df = imputed_df.sort_values(
-            ["reference", "instance"], ascending=[True, True]
-        ).reset_index(drop=True)
+
+    # join manually trimmed columns back to the imputed df
+    if "manual_trim" in df.columns:
+        imputed_df = pd.concat([imputed_df, trimmed_df])
+        qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
+
+    imputed_df = imputed_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
 
     # Output QA files
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
@@ -100,9 +132,16 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         links_filename = f"links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
-        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", qa_df)
+
+        # create trimming qa dataframe with required columns from schema
+        schema_path = config["schema_paths"]["manual_trimming_schema"]
+        schema_dict = load_schema(schema_path)
+        trimming_qa_output = create_output_df(qa_df, schema_dict)
+
         write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
+        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
+
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # Create names for imputed cols

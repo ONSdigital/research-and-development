@@ -59,7 +59,7 @@ def full_responses(contributors: pd.DataFrame, responses: pd.DataFrame) -> pd.Da
         full_responses -- DataFrame containing both response and contributor data
     """
     SppProcessingLogger.info("Starting Data Transmutation...")
-    
+
     drop_cols = ["createdby", "createddate", "lastupdatedby"]
 
     unique_id_cols = ["reference", "instance"]

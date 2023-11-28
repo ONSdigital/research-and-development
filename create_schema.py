@@ -38,7 +38,7 @@ for col in schema:
     S = S + s
 
 # Output the schema toml file
-mypath = os.path.join(out_dir, pref + '_schema.toml')
+mypath = os.path.join(out_dir, pref + "_schema.toml")
 text_file = open(mypath, "w")
 text_file.write(S)
 text_file.close()

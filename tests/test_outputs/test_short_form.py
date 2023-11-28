@@ -24,7 +24,7 @@ class TestCreateNewCols(unittest.TestCase):
         expected_result = pd.DataFrame(
             {
                 "period": ["202201", "202206", "202109", "202112"],
-                "period_year": ["2022", "2022", "2021", "2021"],
+                "period_year": [2022, 2022, 2021, 2021],
             }
         )
 
