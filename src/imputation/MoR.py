@@ -58,16 +58,6 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-
-    # Catch dataframes which are missing cols 200, 201, formtype, status or manual_trim
-    needed_cols = {"200", "201", "formtype", "status", "manual_trim"}
-    if not needed_cols.issubset(df.columns):
-        missing = needed_cols - set(df.columns)
-        raise ValueError(
-            "The DataFrame must contain columns 200, 201, formtype, status and manual_trim."  # noqa
-            "Missing: {}".format("\n - ".join(missing))
-        )
-
     # Convert backdata column names from qXXX to XXX
     # Note that this is only applicable when using the backdata on the network
     p = re.compile(r"q\d{3}")

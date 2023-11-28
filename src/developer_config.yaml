@@ -83,7 +83,7 @@ network_paths:
   construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/dummy.csv"
+  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
