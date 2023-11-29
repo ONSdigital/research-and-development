@@ -5,6 +5,7 @@ from typing import Callable, Tuple
 from datetime import datetime
 import pandas as pd
 import os
+import re
 
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
@@ -428,6 +429,50 @@ def run_staging(
         pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
     )
     StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+
+def getmappername(mapper_path_key, split):
+
+    patt = re.compile(r"([_a-z]+)_path")
+    mapper_name = re.search(patt, mapper_path_key)
+
+    if split:
+        mapper_name = mapper_name.replace("_", " ")
+
+    return mapper_name
+
+
+def load_valdiate_mapper(
+    mapper_path_key,
+    paths,
+    file_exists_func,
+    validation_func: Callable,
+    *args,
+    read_csv_func,
+    val_with_schema_func: Callable,
+    logger,
+):
+    """Loads mapper of choice, validates it using schema and validation func if supplied
+
+
+    Returns:
+        _type_: _description_
+    """
+    logger.info(f"Loading {getmappername(mapper_path, split=True)} to File...")
+
+    mapper_path = paths[mapper_path_key]
+
+    file_exists_func(mapper_path, raise_error=True)
+
+    mapper_df = read_csv_func(mapper_path)
+
+    schema_path = f"./config/{getmappername(mapper_path, split=False)}_schema.toml"
+    val_with_schema_func(mapper_df, schema_path)
+
+    if validation_func:
+        mapper_df = validation_func(*args)
+
+    return mapper_df
 
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
