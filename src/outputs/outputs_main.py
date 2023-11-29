@@ -85,10 +85,12 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished status filtered output.")
 
-    outputs_df = outputs_df.astype({'postcodes_harmonised': 'str'})
-    outputs_df['postcodes_harmonised'] = (
-        outputs_df['postcodes_harmonised'].apply(postcode_topup))
+    outputs_df = outputs_df.astype({"postcodes_harmonised": "str"})
+    outputs_df["postcodes_harmonised"] = outputs_df["postcodes_harmonised"].apply(
+        postcode_topup
+    )
 
+<<<<<<< HEAD
     # Debug - begin
     OutputMainLogger.info("Started saving outputs_df for debugging...")
     mydir = "D:\\data\res_dev\\outputs\\reg_apport\\"
@@ -101,6 +103,12 @@ def run_outputs(
     weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
     weighted_df['postcodes_harmonised'] = (
         weighted_df['postcodes_harmonised'].apply(postcode_topup))
+=======
+    weighted_df = weighted_df.astype({"postcodes_harmonised": "str"})
+    weighted_df["postcodes_harmonised"] = weighted_df["postcodes_harmonised"].apply(
+        postcode_topup
+    )
+>>>>>>> origin/develop
 
     # Running short form output
     if config["global"]["output_short_form"]:
@@ -223,10 +231,5 @@ def run_outputs(
 
     # Running FTE total QA
     if config["global"]["output_fte_total_qa"]:
-        qa_output_total_fte(
-            outputs_df,
-            config,
-            write_csv,
-            run_id
-        )
+        qa_output_total_fte(outputs_df, config, write_csv, run_id)
     OutputMainLogger.info("Finished FTE total QA output.")

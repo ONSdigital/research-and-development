@@ -8,6 +8,7 @@ from typing import List
 import hashlib
 import shutil
 
+
 from src.utils.wrappers import time_logger_wrap
 
 
@@ -240,6 +241,9 @@ def local_isfile(path: str) -> bool:
     -------
     True if the file exists. Else False.
     """
+    if path is None:
+        return False
+
     return os.path.isfile(path)
 
 
@@ -284,7 +288,7 @@ def local_move_file(src_path: str, dst_path: str):
     shutil.move(src_path, dst_path)
 
 
-def local_list_files(path: str, ext: str = None):
+def local_list_files(path: str, ext: str = None, order: str = None):
     """
     Lists all files in a directory on the local file system.
 
@@ -292,12 +296,21 @@ def local_list_files(path: str, ext: str = None):
     -------
     A list of files in the directory.
     """
-    files_in_dir = os.listdir(path)
+    files_in_dir = [os.path.join(path, file) for file in os.listdir(path)]
 
     if ext:
+        if not ext[0] == ".":
+            # insert a dot if it's been forgotten
+            ext = "." + ext
         files_in_dir = [
             file for file in files_in_dir if os.path.splitext(file)[1] == ext
         ]
+
+    if order:
+        ord_dict = {"newest": True, "oldest": False}
+        files_in_dir = sorted(
+            files_in_dir, key=os.path.getmtime, reverse=ord_dict[order]
+        )
 
     return files_in_dir
 
@@ -321,17 +334,3 @@ def local_search_file(dir_path, ending):
                 target_file = str(file)
 
     return target_file
-
-
-@time_logger_wrap
-def local_read_feather(filepath):
-    """Reads a feather file from a local network drive into a Pandas DataFrame
-
-    Args:
-        filepath (str): Filepath
-
-    Returns:
-        pd.DataFrame: Dataframe created from feather file
-    """
-    df = pd.read_feather(filepath)
-    return df

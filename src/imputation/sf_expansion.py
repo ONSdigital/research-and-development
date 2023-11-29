@@ -44,7 +44,7 @@ def expansion_impute(
     to_expand_mask = short_mask
 
     # If there are no clear responders in the imputation class then pass.
-    # In this case the values previously calculated in the "civil defence fallback" 
+    # In this case the values previously calculated in the "civil defence fallback"
     # group will be used instead.
     if (group_type == "imp_class_group") & group_copy.loc[long_responder_mask].empty:
         SFExpansionLogger.debug(f"Empty group for imputation class: {imp_class}.")

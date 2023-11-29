@@ -26,29 +26,6 @@ def filter_by_column_content(
     return df[df[column].isin(column_content)].copy()
 
 
-def instance_fix(df: pd.DataFrame):
-    """Set instance to 1 for status 'Form sent out.'
-
-    References with status 'Form sent out' initially have a null in the instance
-    column.
-    """
-    filtered_df = filter_by_column_content(df, "status", ["Form sent out"])
-    filtered_df["instance"] = 1
-    updated_df = apply_to_original(filtered_df, df)
-    return updated_df
-
-
-def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
-    """Create a duplicate of references with no R&D and set instance to 1."""
-    filtered_df = filter_by_column_content(df, "604", ["No"])
-    filtered_df["instance"] = 1
-    updated_df = pd.concat([df, filtered_df], ignore_index=True)
-    updated_df = updated_df.sort_values(
-        ["reference", "instance"], ascending=[True, True]
-    ).reset_index(drop=True)
-    return updated_df
-
-
 def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
     """Impute missing product groups for companies that do no r&d,
     where instance = 1 and status = "Form sent out"
@@ -82,7 +59,7 @@ def create_imp_class_col(
     col_first_half: str,
     col_second_half: str,
     class_name: str = "imp_class",
-    use_cellno: bool = True
+    use_cellno: bool = True,
 ) -> pd.DataFrame:
     """Creates a column for the imputation class.
 
@@ -131,7 +108,7 @@ def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
 def apply_fill_zeros(clear_df, df, target_variables: list):
     """Applies the fill zeros function to filtered dataframes.
 
-    This will be applied to all target variables for clear responders 
+    This will be applied to all target variables for clear responders
     and all target variables for "No R&D".
 
     Args:
@@ -466,10 +443,6 @@ def run_longform_tmi(
     """
     TMILogger.info("Starting TMI long form imputation.")
 
-    # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
-    longform_df = instance_fix(longform_df)
-    longform_df = duplicate_rows(longform_df)
-
     # TMI Step 1: impute the Product Group
     df = impute_pg_by_sic(longform_df, sic_mapper)
 
@@ -569,8 +542,8 @@ def run_tmi(
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
 
     # create logic to select rows for longform and shortform TMI
-    long_tmi_mask = (full_df["formtype"] == formtype_long) & ~mor_mask
-    short_tmi_mask = (full_df["formtype"] == formtype_short) & ~mor_mask
+    long_tmi_mask = ((full_df["formtype"] == formtype_long) & ~mor_mask)
+    short_tmi_mask = ((full_df["formtype"] == formtype_short) & ~mor_mask)
 
     # create dataframes to be used for longform TMI and short form census TMI
     longform_df = full_df.copy().loc[long_tmi_mask]
@@ -586,16 +559,42 @@ def run_tmi(
 
     # concatinate the short and long form with the excluded dataframes
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
-    # concatinate qa dataframes from short forms and long forms
-    full_qa_df = pd.concat([qa_df_long, qa_df_short])
 
     full_df = full_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    # concatinate qa dataframes from short forms and long forms
+    full_qa_df = pd.concat([qa_df_long, qa_df_short])
+
     full_qa_df = full_qa_df.sort_values(
-        ["reference", "instance"], ascending=[True, True]
+        ["formtype", "imp_class"], ascending=True
     ).reset_index(drop=True)
+
+    # add the imputed rows for reference in the trimming qa dataframe
+    # Note, the buiness area weren't sure theyd need this,
+    # so we might be able to take it out later
+    imputed_only_df = full_df.loc[full_df.imp_marker.isin(["MoR", "CF", "TMI"])]
+    imputed_only_df = imputed_only_df.sort_values(
+        ["formtype", "imp_class"], ascending=True
+    ).reset_index(drop=True)
+    full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
+
+    # rearange the rows to put the manual_trim column at the end
+    if "manual_trim" in full_df.columns:
+        cols = [col for col in full_df.columns if col != "manual_trim"] + [
+            "manual_trim"
+        ]
+        full_df = full_df[cols]
+
+        qa_cols = [col for col in full_qa_df.columns if col != "manual_trim"] + [
+            "manual_trim"
+        ]
+        full_qa_df = full_qa_df[qa_cols]
+    else:
+        # create a new column in the trimming qa if one doesn't exist
+        # to allow users to indicate manual trimming
+        full_qa_df["manual_trim"] = np.nan
 
     TMILogger.info("TMI imputation completed.")
     return full_df, full_qa_df

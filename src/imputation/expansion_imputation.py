@@ -61,9 +61,6 @@ def evaluate_imputed_ixx(
     return group
 
 
-
-
-
 def run_expansion(df: pd.DataFrame, config: dict):
     """The main 'entry point' function to run the expansion imputation.
 
@@ -118,7 +115,9 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     # Join the expanded df (processed from untrimmed records) back on to
     # trimmed records for 305 trimming, and the dataframe of excluded rows
-    expanded_result_df = pd.concat([result_211_305_df, trimmed_305_df, excluded_df], axis=0)
+    expanded_result_df = pd.concat(
+        [result_211_305_df, trimmed_305_df, excluded_df], axis=0
+    )
     expanded_result_df = expanded_result_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)

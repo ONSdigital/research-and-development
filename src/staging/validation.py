@@ -652,18 +652,18 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
         (ref_list_df.formtype == 1) & (ref_list_df.cellnumber != 817)
     ]
     df = pd.merge(
-        full_df, 
-        ref_list_filtered[["reference", "cellnumber"]], 
-        how="outer", 
-        on="reference", 
-        suffixes=("", "_new"), 
-        indicator=True
+        full_df,
+        ref_list_filtered[["reference", "cellnumber"]],
+        how="outer",
+        on="reference",
+        suffixes=("", "_new"),
+        indicator=True,
     )
     # check no items in the reference list mapper are missing from the full responses
     missing_refs = df.loc[df["_merge"] == "right_only"]
     if not missing_refs.empty:
         msg = (
-        "The following references in the reference list mapper are not in the data:"
+            "The following references in the reference list mapper are not in the data:"
         )
         raise ValueError(msg + str(missing_refs.reference.unique()))
 

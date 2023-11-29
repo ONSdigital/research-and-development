@@ -278,6 +278,9 @@ def hdfs_isfile(path: str) -> bool:
     If checking that directory with partitioned files (i.e. csv, parquet)
     exists this will return false use isdir instead.
     """
+    if path is None:
+        return False
+
     command = ["hadoop", "fs", "-test", "-f", path]
     return _perform(command)
 
@@ -320,28 +323,28 @@ def hdfs_move_file(src_path: str, dst_path: str):
     return _perform(command)
 
 
-def hdfs_list_files(path: str, ext: str = None):
+def hdfs_list_files(path: str, ext: str = None, order=None):
     """
     List files in a directory. Uses 'hadoop fs -ls'.
     """
     # Forming the command line command and executing
     command = ["hadoop", "fs", "-ls", path]
+    if order:
+        ord_dict = {"newest": "-t", "oldest": "-t -r"}
+        command = ["hadoop", "fs", "-ls", ord_dict[order], path]
     files_as_str = _perform(command, str_output=True)
 
     # Breaking up the returned string, and stripping down to just paths of files
     file_paths = [line.split()[-1] for line in files_as_str.strip().split("\n")[1:]]
 
-    # Getting just the filename (including ext) alone
-    file_names_in_dir = [os.path.basename(path) for path in file_paths]
-
     # Filtering the files to just those with the required extension
     if ext:
         ext = f".{ext}"
-        file_names_in_dir = [
-            file for file in file_names_in_dir if os.path.splitext(file)[1] == ext
+        file_paths = [
+            file for file in file_paths if os.path.splitext(file)[1] == ext
         ]
 
-    return file_names_in_dir
+    return file_paths
 
 
 def hdfs_search_file(dir_path, ending):

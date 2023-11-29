@@ -103,12 +103,13 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
 
     # Extracted the year from period and crated new columns 'period_year'
     df["period_year"] = df["period"].astype("str").str[:4]
+    df["period_year"] = df["period_year"].apply(pd.to_numeric, errors="coerce")
 
     return df
 
 
 def postcode_topup(mystr: str, target_len: int = 8) -> str:
-    """ Regulates the number of spaces between the first and the second part of
+    """Regulates the number of spaces between the first and the second part of
     a postcode, so that the total length is 8 characters.
     Brings all letters to upper case, in line with the mapper.
     Splits the postcode string into parts, separated by any number of spaces.

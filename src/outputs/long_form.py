@@ -40,9 +40,7 @@ def output_long_form(
     df = map_o.create_cora_status_col(df, cora_mapper)
 
     # Filter for long-forms/NI (status mapping has already been done)
-    df = df.loc[
-        ((df["formtype"] == "0001") | (df["formtype"] == "0003"))
-    ]
+    df = df.loc[((df["formtype"] == "0001") | (df["formtype"] == "0003"))]
 
     # Create a 'year' column
     df = create_period_year(df)

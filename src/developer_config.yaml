@@ -12,6 +12,7 @@ global:
   load_historic_data: False
   run_construction: False
   load_manual_outliers: False
+  load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
@@ -24,7 +25,7 @@ global:
   output_short_form: False
   output_long_form: False
   output_tau: False
-  output_gb_sas: True
+  output_gb_sas: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
@@ -57,6 +58,7 @@ hdfs_paths:
   backdata_path: ""
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
   imputation_path: "/ons/rdbe_dev/imputation"
+  manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
@@ -83,6 +85,7 @@ network_paths:
   construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
+  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
@@ -106,6 +109,7 @@ schema_paths:
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
+  manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
 
 # Export config for users
 export_choices:
