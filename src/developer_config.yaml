@@ -9,6 +9,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
+  load_ni_data: True
   load_historic_data: False
   run_construction: True
   load_manual_outliers: False

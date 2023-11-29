@@ -85,7 +85,12 @@ def run_pipeline(start, config_path):
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
-    # Load SPP data from DAP
+    # NI staging and validation
+    if global_config["load_ni_data"]:
+        MainLogger.info("Starting NI Data Staging and Validation...")
+        MainLogger.info("Finished NI Data Ingest.")
+    else:
+        MainLogger.info("Skipping NI data staging.")
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
@@ -120,7 +125,7 @@ def run_pipeline(start, config_path):
         list_files,
         run_id,
     )
-    MainLogger.info("Finished Data Ingest...")
+    MainLogger.info("Finished Data Ingest.")
 
     # Construction module
     MainLogger.info("Starting Construction...")
