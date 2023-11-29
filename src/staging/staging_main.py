@@ -420,16 +420,25 @@ def run_staging(
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
     # Loading PG numeric to alpha mapper
-    StagingMainLogger.info("Loading PG numeric to alpha File...")
-    pg_num_alpha_path = paths["pg_num_alpha_path"]
-    check_file_exists(pg_num_alpha_path, raise_error=True)
-    pg_num_alpha = read_csv(pg_num_alpha_path)
-    val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
-    pg_num_alpha = val.validate_many_to_one(
-        pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
-    )
-    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+    # StagingMainLogger.info("Loading PG numeric to alpha File...")
+    # pg_num_alpha_path = paths["pg_num_alpha_path"]
+    # check_file_exists(pg_num_alpha_path, raise_error=True)
+    # pg_num_alpha = read_csv(pg_num_alpha_path)
+    # val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
+    # pg_num_alpha = val.validate_many_to_one(
+    #     pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
+    # )
+    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
+    load_valdiate_mapper("pg_num_alpha_path",
+                          paths = paths,
+                          file_exists_func = check_file_exists,
+                          read_csv_func = read_csv,
+                          val_with_schema_func = val.validate_data_with_schema,
+                          logger = StagingMainLogger,
+                          validation_func = val.validate_many_to_one,
+                          args = (col_many="pg_numeric", col_one="pg_alpha"),
+                         )
 
 def getmappername(mapper_path_key, split):
 
@@ -446,11 +455,11 @@ def load_valdiate_mapper(
     mapper_path_key,
     paths,
     file_exists_func,
-    validation_func: Callable,
-    *args,
     read_csv_func,
     val_with_schema_func: Callable,
     logger,
+    validation_func: Callable,
+    *args,
 ):
     """Loads mapper of choice, validates it using schema and validation func if supplied
 
