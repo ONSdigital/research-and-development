@@ -109,7 +109,7 @@ def fix_anon_data(responses_df, config):
         config (dict): A dictionary containing configuration details.
 
     Returns:
-        pandas.DataFrame: The fixed DataFrame with the added "instance", 
+        pandas.DataFrame: The fixed DataFrame with the added "instance",
         "selectiontype", and "cellnumber" columns.
     """
     responses_df["instance"] = 0
@@ -330,7 +330,7 @@ def run_staging(
         dict_of_hist_dfs = load_historic_data(config, paths, read_csv)
         print(dict_of_hist_dfs)
 
-    # Check if the if the snapshot feather and optionally the secondary 
+    # Check if the if the snapshot feather and optionally the secondary
     # snapshot feather exist
     feather_files_exist = check_snapshot_feather_exists(
         config, check_file_exists, feather_file, secondary_feather_file
