@@ -90,7 +90,6 @@ def run_outputs(
         postcode_topup
     )
 
-<<<<<<< HEAD
     # Debug - begin
     OutputMainLogger.info("Started saving outputs_df for debugging...")
     mydir = "D:\\data\res_dev\\outputs\\reg_apport\\"
@@ -103,12 +102,6 @@ def run_outputs(
     weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
     weighted_df['postcodes_harmonised'] = (
         weighted_df['postcodes_harmonised'].apply(postcode_topup))
-=======
-    weighted_df = weighted_df.astype({"postcodes_harmonised": "str"})
-    weighted_df["postcodes_harmonised"] = weighted_df["postcodes_harmonised"].apply(
-        postcode_topup
-    )
->>>>>>> origin/develop
 
     # Running short form output
     if config["global"]["output_short_form"]:
