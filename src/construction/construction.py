@@ -78,16 +78,28 @@ def run_construction(
     construction_df = create_period_year(construction_df)
 
     # Update the values with the constructed ones
-    construction_df.set_index(["reference",  "instance", "period_year",], inplace=True)
+    construction_df.set_index(
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
+    )
     updated_snapshot_df.set_index(
-        ["reference",  "instance", "period_year",], inplace=True
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
     )
     updated_snapshot_df.update(construction_df)
     updated_snapshot_df.reset_index(inplace=True)
 
     updated_snapshot_df = updated_snapshot_df.astype(
-        {"reference":"Int64", "instance":"Int64", "period_year":"Int64"}
-        )
+        {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
+    )
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
