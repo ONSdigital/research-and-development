@@ -45,6 +45,7 @@ def run_construction(
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     construction_file_path = paths["construction_file_path"]
+    construction_logger.info(f"Reading construction file {construction_file_path}")
     construction_file_exists = check_file_exists(construction_file_path)
     if construction_file_exists:
         try:
@@ -99,5 +100,7 @@ def run_construction(
     updated_snapshot_df = updated_snapshot_df.astype(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
+
+    construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
