@@ -54,7 +54,8 @@ def load_valdiate_mapper(
 
     mapper_df = read_csv_func(mapper_path)
 
-    schema_path = f"./config/{mapper_name.split(' ')[0]}_schema.toml"
+    schema_prefix = "_".join(word for word in mapper_name.split("_") if word != "mapper")
+    schema_path = f"./config/{schema_prefix}_schema.toml"
     val_with_schema_func(mapper_df, schema_path)
 
     if validation_func:
