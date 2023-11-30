@@ -46,13 +46,15 @@ def load_valdiate_mapper(
 
     mapper_path = paths[mapper_path_key]
 
+    mapper_name = getmappername(mapper_path_key, split=True)
+
     logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
 
     file_exists_func(mapper_path, raise_error=True)
 
     mapper_df = read_csv_func(mapper_path)
 
-    schema_path = f"./config/{getmappername(mapper_path_key, split=False)}_schema.toml"
+    schema_path = f"./config/{mapper_name.split(' ')[0]}_schema.toml"
     val_with_schema_func(mapper_df, schema_path)
 
     if validation_func:
@@ -60,6 +62,7 @@ def load_valdiate_mapper(
         mapper_df = validation_func(*args)
 
     return mapper_df
+
 
 def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
     """Load historic data into the pipeline.
@@ -474,7 +477,7 @@ def run_staging(
     # )
     # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
-    load_valdiate_mapper(
+    pg_num_alpha = load_valdiate_mapper(
         "pg_num_alpha_path",
         paths,
         check_file_exists,
@@ -485,7 +488,6 @@ def run_staging(
         "pg_numeric",
         "pg_alpha",
     )
-
 
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
@@ -514,14 +516,24 @@ def run_staging(
         StagingMainLogger.info("Loading of Backdata File skipped")
 
     # Load cora mapper
-    StagingMainLogger.info("Loading Cora status mapper file")
-    cora_mapper_path = paths["cora_mapper_path"]
-    check_file_exists(cora_mapper_path, raise_error=True)
-    cora_mapper = read_csv(cora_mapper_path)
-    # validates and updates from int64 to string type
-    val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
-    cora_mapper = val.validate_cora_df(cora_mapper)
-    StagingMainLogger.info("Cora status mapper file loaded successfully...")
+    # StagingMainLogger.info("Loading Cora status mapper file")
+    # cora_mapper_path = paths["cora_mapper_path"]
+    # check_file_exists(cora_mapper_path, raise_error=True)
+    # cora_mapper = read_csv(cora_mapper_path)
+    # # validates and updates from int64 to string type
+    # val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
+    # cora_mapper = val.validate_cora_df(cora_mapper)
+    # StagingMainLogger.info("Cora status mapper file loaded successfully...")
+
+    cora_mapper = load_valdiate_mapper(
+        "cora_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        val.validate_cora_df,
+    )
 
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")

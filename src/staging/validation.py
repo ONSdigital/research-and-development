@@ -330,6 +330,9 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
         toml_dict = toml.load(file_path)
     else:
         # Return False if file does not exist
+        ValidationLogger.warning(
+            "Validation schema does not exist! Path may be incorrect"
+        )
         return file_exists
 
     return toml_dict

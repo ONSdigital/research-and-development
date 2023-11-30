@@ -95,9 +95,9 @@ network_paths:
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
   sic_pg_utf_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
   # pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv' - deprecated
-  pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
-  sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
-  pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  sic_pg_alpha__mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
   ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
@@ -110,6 +110,7 @@ schema_paths:
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
   manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
+  cora_mapper_schema: "/config/cora_schema.toml"
 
 # Export config for users
 export_choices:
