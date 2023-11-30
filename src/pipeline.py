@@ -117,7 +117,6 @@ def run_pipeline(start, config_path):
         read_feather,
         write_feather,
         isfile,
-        list_files,
         run_id,
     )
     MainLogger.info("Finished Data Ingest...")

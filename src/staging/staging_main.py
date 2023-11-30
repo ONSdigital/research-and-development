@@ -260,7 +260,6 @@ def run_staging(
     read_feather: Callable,
     write_feather: Callable,
     isfile: Callable,
-    list_files: Callable,
     run_id: int,
 ) -> Tuple:
     """Run the staging and validation module.
@@ -430,20 +429,23 @@ def run_staging(
     # )
     # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
-    load_valdiate_mapper("pg_num_alpha_path",
-                          paths = paths,
-                          file_exists_func = check_file_exists,
-                          read_csv_func = read_csv,
-                          val_with_schema_func = val.validate_data_with_schema,
-                          logger = StagingMainLogger,
-                          validation_func = val.validate_many_to_one,
-                          args = (col_many="pg_numeric", col_one="pg_alpha"),
-                         )
+    load_valdiate_mapper(
+        "pg_num_alpha_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
+        "pg_numeric",
+        "pg_alpha",
+    )
+
 
 def getmappername(mapper_path_key, split):
 
     patt = re.compile(r"([_a-z]+)_path")
-    mapper_name = re.search(patt, mapper_path_key)
+    mapper_name = re.search(patt, mapper_path_key).group(1)
 
     if split:
         mapper_name = mapper_name.replace("_", " ")
@@ -456,8 +458,8 @@ def load_valdiate_mapper(
     paths,
     file_exists_func,
     read_csv_func,
-    val_with_schema_func: Callable,
     logger,
+    val_with_schema_func: Callable,
     validation_func: Callable,
     *args,
 ):
@@ -467,18 +469,20 @@ def load_valdiate_mapper(
     Returns:
         _type_: _description_
     """
-    logger.info(f"Loading {getmappername(mapper_path, split=True)} to File...")
 
     mapper_path = paths[mapper_path_key]
+
+    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
 
     file_exists_func(mapper_path, raise_error=True)
 
     mapper_df = read_csv_func(mapper_path)
 
-    schema_path = f"./config/{getmappername(mapper_path, split=False)}_schema.toml"
+    schema_path = f"./config/{getmappername(mapper_path_key, split=False)}_schema.toml"
     val_with_schema_func(mapper_df, schema_path)
 
     if validation_func:
+        args = (mapper_df,) + args
         mapper_df = validation_func(*args)
 
     return mapper_df

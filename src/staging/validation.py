@@ -547,9 +547,7 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
 @time_logger_wrap
 @exception_wrap
-def validate_many_to_one(
-    mapper: pd.DataFrame, col_many: str, col_one: str
-) -> pd.DataFrame:
+def validate_many_to_one(*args) -> pd.DataFrame:
     """
 
     Validates a many to one mapper:
@@ -563,6 +561,10 @@ def validate_many_to_one(
         col_many (str): name of the column with many entries
         col_one (str): name of the column with one entry
     """
+
+    mapper = args[0]
+    col_many = args[1]
+    col_one = args[2]
     try:
         # Check that expected column are present
         cols = mapper.columns
