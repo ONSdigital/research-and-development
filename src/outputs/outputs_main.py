@@ -14,6 +14,7 @@ from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.outputs_helpers import postcode_topup
 from src.outputs.total_fte import qa_output_total_fte
+from src.sites.sites_main import run_sites
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -91,13 +92,17 @@ def run_outputs(
     )
 
     # Debug - begin
-    OutputMainLogger.info("Started saving outputs_df for debugging...")
-    mydir = "D:\\data\res_dev\\outputs\\reg_apport\\"
-    outputs_df_file = "outputs_df.csv"
-    outputs_df.to_csv(mydir + outputs_df_file, index=None)
-    OutputMainLogger.info("Saved outputs_df for debugging.")
+    OutputMainLogger.info("Started SITES outputs_df for debugging...")
+    mydir = "D:/data/res_dev/outputs/reg_apport/"
+    myfile = "outputs_df_before.pkl"
+    outputs_df.to_pickle(mydir + myfile)
 
-    # Debug - end 
+    outputs_df = run_sites(config, outputs_df)
+
+    myfile = "outputs_df_corrected.csv"
+    outputs_df.to_csv(mydir + myfile, index=None)
+    OutputMainLogger.info("Saved SITES outputs_df for debugging.")
+    # Debug - end
 
     weighted_df = weighted_df.astype({'postcodes_harmonised': 'str'})
     weighted_df['postcodes_harmonised'] = (
