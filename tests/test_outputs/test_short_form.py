@@ -38,9 +38,9 @@ class TestCreateHeadcountCols:
         """Create input dataframe."""
         data = {
             "reference": [1, 2, 3, 4, 5, 6],
-            "705": [100, 0, 200, 300, np.nan, 400],
-            "706": [20, 0, 80, 0, 10, 20],
-            "707": [10, 0, 0, 0, np.nan, np.nan],
+            "705": [100.0, 0.0, 200.0, 300.0, np.nan, 400],
+            "706": [20.0, 0.0, 80.0, 0.0, 10.0, 20],
+            "707": [10.0, 0.0, 0.0, 0.0, np.nan, np.nan],
         }
 
         input_data_df = pd.DataFrame(data)
@@ -50,11 +50,11 @@ class TestCreateHeadcountCols:
         """Create expected output dataframe."""
         data = {
             "reference": [1, 2, 3, 4, 5, 6],
-            "705": [100, 0, 200, 300, np.nan, 400],
-            "706": [20, 0, 80, 0, 10, 20],
-            "707": [10, 0, 0, 0, np.nan, np.nan],
-            "headcount_civil": [66.6667, 0, 200, 0, np.nan, np.nan],
-            "headcount_defence": [33.3333, 0, 0, 0, np.nan, np.nan],
+            "705": [100.0, 0.0, 200.0, 300.0, 0.0, 400],
+            "706": [20.0, 0.0, 80.0, 0.0, 10.0, 20],
+            "707": [10.0, 0.0, 0.0, 0.0, 0.0, 0],
+            "headcount_civil": [66.6667, 0.0, 200.0, 0.0, 0.0, 400],
+            "headcount_defence": [33.3333, 0.0, 0.0, 0.0, 0.0, 0],
         }
 
         expected_data_df = pd.DataFrame(data)

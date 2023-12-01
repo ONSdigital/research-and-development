@@ -28,25 +28,41 @@ def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def update_column(df: pd.DataFrame, col: str) -> pd.Series:
+def update_column(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     """Copy item in insance 0 to all other instances in a given reference.
+
+    Example: 
 
     For long form entries, questions 405 - 412 and 501 - 508 are recorded
     in instance 0. A series is returned representing the updated column with
     values from instance 0 copied to all other instances of a reference.
 
-    Note: this is achieved using .transform(max), which takes the value at
+    Note: this is achieved using .transform("first"), which takes the value at
     instance 0 and inserts it to all memebers of the group.
+
+    initial dataframe:
+        reference | instance    | col    
+    ---------------------------------
+        1         | 0           | 333
+        1         | 1           | nan
+        1         | 2           | nan
+
+    returns the series
+        col
+        ---
+        333
+        333
+        333
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
-        col (str): The name of the 4xx or 5xx column being treated.
+        col_to_update (str): The name of the column being updated
 
     Returns:
         pd.Series: A single column dataframe with the values in instance 0
         copied to other instances for the same reference.
     """
-    updated_col = df.groupby("reference")[col].transform(max)
+    updated_col = df.groupby("reference")[col_to_update].transform("first")
     return updated_col
 
 

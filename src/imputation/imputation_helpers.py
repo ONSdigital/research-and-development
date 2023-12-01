@@ -16,6 +16,39 @@ def instance_fix(df: pd.DataFrame):
     return df
 
 
+def copy_val_to_group(
+    df: pd.DataFrame, 
+    groupby_col: str, 
+    transform_col: str
+) -> pd.DataFrame:
+    """Group a dataframe by a given column and copy the first value in another column
+    to all values in the group for that column.
+
+    example:
+
+    initial dataframe:
+        groupby_col | transform_col
+        ---------------------------
+        a           | "No"
+        a           | nan
+        b           | "Yes"
+
+    is transformed to:
+        groupby_col | transform_col
+        ---------------------------
+        a           | "No"
+        a           | "No"
+        b           | "Yes"
+
+    args:
+        df (pd.DataFame): The dataframe to be transformed
+        groupby_col (str): The name of the column to group by
+        transform_col (str): The name of the column t be transformed
+    """
+
+
+
+
 def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Create a duplicate long form records with no R&D and set instance to 1.
     
