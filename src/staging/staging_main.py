@@ -259,7 +259,6 @@ def run_staging(
     read_feather: Callable,
     write_feather: Callable,
     isfile: Callable,
-    list_files: Callable,
     run_id: int,
 ) -> Tuple:
     """Run the staging and validation module.
