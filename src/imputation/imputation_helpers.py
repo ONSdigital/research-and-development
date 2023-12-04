@@ -162,3 +162,16 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     excluded_df = df[exclusion_filter]  # df only has 817 and nan records
 
     return filtered_df, excluded_df
+
+
+def fill_sf_zeros(df:pd.DataFrame) -> pd.DataFrame:
+    """Fill nulls with zeros in short from numeric questions."""
+    sf_questions = [str(q) for q in range(701, 712) if q != 708]
+
+    sf_mask = (df["formtype"] == "0006") 
+    clear_mask = (df["status"].isin(["Clear", "Clear - overridden"]))
+
+    for q in sf_questions:
+        df.loc[(sf_mask & clear_mask), q] = df.copy()[q].fillna(0)
+
+    return df

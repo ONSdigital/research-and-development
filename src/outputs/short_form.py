@@ -7,6 +7,7 @@ from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
+from src.imputation.imputation_helpers import fill_sf_zeros
 from src.outputs.outputs_helpers import create_output_df, create_period_year
 
 
@@ -34,7 +35,8 @@ def create_headcount_cols(
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
-    df[["705", "706", "707"]] = df[["705", "706", "707"]].fillna(0)
+    # fill nulls with zeros for numerical rows
+    df = fill_sf_zeros(df)
 
     headcount_tot_mask = (df["706"] + df["707"]) > 0
 
