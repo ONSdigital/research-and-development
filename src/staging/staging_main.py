@@ -54,13 +54,15 @@ def load_valdiate_mapper(
 
     mapper_df = read_csv_func(mapper_path)
 
-    schema_prefix = "_".join(word for word in mapper_name.split("_") if word != "mapper")
+    schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
     schema_path = f"./config/{schema_prefix}_schema.toml"
     val_with_schema_func(mapper_df, schema_path)
 
     if validation_func:
         args = (mapper_df,) + args
-        mapper_df = validation_func(*args)
+        validation_func(*args)
+
+    logger.info(f"{mapper_name} loaded successfully")
 
     return mapper_df
 
@@ -467,19 +469,8 @@ def run_staging(
         manual_outliers = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
-    # Loading PG numeric to alpha mapper
-    # StagingMainLogger.info("Loading PG numeric to alpha File...")
-    # pg_num_alpha_path = paths["pg_num_alpha_path"]
-    # check_file_exists(pg_num_alpha_path, raise_error=True)
-    # pg_num_alpha = read_csv(pg_num_alpha_path)
-    # val.validate_data_with_schema(pg_num_alpha, "./config/pg_num_alpha_schema.toml")
-    # pg_num_alpha = val.validate_many_to_one(
-    #     pg_num_alpha, col_many="pg_numeric", col_one="pg_alpha"
-    # )
-    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
-
     pg_num_alpha = load_valdiate_mapper(
-        "pg_num_alpha_path",
+        "pg_num_alpha_mapper_path",
         paths,
         check_file_exists,
         read_csv,
@@ -516,16 +507,6 @@ def run_staging(
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
-    # Load cora mapper
-    # StagingMainLogger.info("Loading Cora status mapper file")
-    # cora_mapper_path = paths["cora_mapper_path"]
-    # check_file_exists(cora_mapper_path, raise_error=True)
-    # cora_mapper = read_csv(cora_mapper_path)
-    # # validates and updates from int64 to string type
-    # val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
-    # cora_mapper = val.validate_cora_df(cora_mapper)
-    # StagingMainLogger.info("Cora status mapper file loaded successfully...")
-
     cora_mapper = load_valdiate_mapper(
         "cora_mapper_path",
         paths,
@@ -536,24 +517,27 @@ def run_staging(
         val.validate_cora_df,
     )
 
-    # Load ultfoc (Foreign Ownership) mapper
-    StagingMainLogger.info("Loading Foreign Ownership File")
-    ultfoc_mapper_path = paths["ultfoc_mapper_path"]
-    check_file_exists(ultfoc_mapper_path, raise_error=True)
-    ultfoc_mapper = read_csv(ultfoc_mapper_path)
-    val.validate_data_with_schema(ultfoc_mapper, "./config/ultfoc_schema.toml")
-    val.validate_ultfoc_df(ultfoc_mapper)
-    StagingMainLogger.info("Foreign Ownership mapper file loaded successfully...")
+    ultfoc_mapper = load_valdiate_mapper(
+        "ultfoc_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        val.validate_ultfoc_df,
+    )
 
-    # Load itl mapper
-    StagingMainLogger.info("Loading ITL File")
-    itl_mapper_path = paths["itl_path"]
-    check_file_exists(itl_mapper_path, raise_error=True)
-    itl_mapper = read_csv(itl_mapper_path)
-    val.validate_data_with_schema(itl_mapper, "./config/itl_schema.toml")
-    StagingMainLogger.info("ITL File Loaded Successfully...")
+    itl_mapper = load_valdiate_mapper(
+        "ultfoc_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
 
-    # Loading cell number covarege
+    # Loading cell number coverage
     StagingMainLogger.info("Loading Cell Covarage File...")
     cellno_path = paths["cellno_path"]
     check_file_exists(cellno_path, raise_error=True)
@@ -572,34 +556,46 @@ def run_staging(
     # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
     # Loading SIC to PG to alpha mapper
-    StagingMainLogger.info("Loading SIC to PG to alpha File...")
-    sic_pg_alpha_path = paths["sic_pg_alpha_path"]
-    check_file_exists(sic_pg_alpha_path, raise_error=True)
-    sic_pg_alpha = read_csv(sic_pg_alpha_path)
-    val.validate_data_with_schema(sic_pg_alpha, "./config/sic_pg_alpha_schema.toml")
-    sic_pg_alpha = val.validate_many_to_one(
-        sic_pg_alpha, col_many="sic", col_one="pg_alpha"
-    )
-    StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
 
-    # Loading SIC to PG UTF mapper
-    StagingMainLogger.info("Loading SIC to PG UTF File...")
-    sic_pg_utf_path = paths["sic_pg_utf_path"]
-    check_file_exists(sic_pg_utf_path, raise_error=True)
-    sic_pg_utf = read_csv(sic_pg_utf_path)
-    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
-    sic_pg_num = sic_pg_utf[cols_needed]
-    mapper_path = paths["mapper_path"]
-    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_num)
-    val.validate_data_with_schema(sic_pg_num, "./config/sic_pg_num_schema.toml")
-    sic_pg_num = val.validate_many_to_one(
-        sic_pg_num, col_many="SIC 2007_CODE", col_one="2016 > Form PG"
+    sic_pg_alpha_mapper = load_valdiate_mapper(
+        "sic_pg_alpha_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
+        "sic",
+        "pg_alpha",
     )
-    StagingMainLogger.info("SIC to PG UTF File Loaded Successfully...")
+
+    # StagingMainLogger.info("Loading SIC to PG to alpha File...")
+    # sic_pg_alpha_path = paths["sic_pg_alpha_path"]
+    # check_file_exists(sic_pg_alpha_path, raise_error=True)
+    # sic_pg_alpha_mapper = read_csv(sic_pg_alpha_path)
+    # val.validate_data_with_schema(
+    #     sic_pg_alpha_mapper, "./config/sic_pg_alpha_schema.toml"
+    # )
+    # sic_pg_alpha_mapper = val.validate_many_to_one(
+    #     sic_pg_alpha_mapper, col_many="sic", col_one="pg_alpha"
+    # )
+    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+
+    sic_pg_utf_mapper = load_valdiate_mapper(
+        "sic_pg_utf_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
+        "SIC 2007_CODE",
+        "2016 > Form PG",
+    )
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(
-        full_responses, pg_num_alpha, sic_pg_alpha, target_col="201"
+        full_responses, pg_num_alpha, sic_pg_alpha_mapper, target_col="201"
     )
 
     # Loading PG detailed mapper
@@ -673,7 +669,7 @@ def run_staging(
         cellno_df,
         postcode_mapper,
         pg_num_alpha,
-        sic_pg_alpha,
+        sic_pg_alpha_mapper,
         sic_pg_num,
         backdata,
         pg_detailed,

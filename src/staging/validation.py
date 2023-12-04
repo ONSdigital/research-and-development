@@ -415,6 +415,9 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     # Load schema from toml
     dtypes_schema = load_schema(schema_path)
 
+    if not dtypes_schema:
+        raise FileNotFoundError(f"File at {schema_path} does not exist. Check path")
+
     # Create a dict for dtypes only
     dtypes_dict = {
         column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
