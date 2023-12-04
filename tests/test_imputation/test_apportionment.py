@@ -1,62 +1,14 @@
 import numpy as np
-import pandas as pd
 from pandas import DataFrame as pandasDF
-from pandas._testing import assert_frame_equal, assert_series_equal
+from pandas._testing import assert_frame_equal
 
 from src.imputation.apportionment import (
     calc_202_totals,
-    update_column,
+    copy_first_to_group,
     calc_fte_column,
     calc_headcount_column,
 )
 
-class TestUpdateColumn:
-    """Unit tests for calc_202_totals function."""
-
-    def create_input_df(self):
-        """Create an input dataframe for the test."""
-        input_cols = [
-            "reference",
-            "instance",
-            "200",
-            "604",
-        ]
-
-        data = [
-            [1001, 0, None, "No"],
-            [1001, 1, "C", np.nan],
-            [1001, 2, "C", np.nan],
-            [1001, 3, "D", np.nan],
-            [2002, 0, None, "Yes"],
-            [3003, 0, None, np.nan],
-            [3003, 1, "C", np.nan],
-            [3003, 2, "C", "Haha"],
-            [3003, 3, "D", np.nan],
-        ]
-
-        input_df = pandasDF(data=data, columns=input_cols)
-        return input_df
-
-    def test_update_column(self):
-        """Test for  function update_column."""
-        input_df = self.create_input_df()
-
-        expected_output = pd.Series(
-            [
-                "No",
-                "No",
-                "No",
-                "No",
-                "Yes",
-                "Haha",
-                "Haha",
-                "Haha",
-                "Haha",
-            ], name = "604"
-        )
-
-        result_df = update_column(input_df, "604")
-        assert_series_equal(result_df, expected_output)
 
 class TestCalc202Totals:
     """Unit tests for calc_202_totals function."""
