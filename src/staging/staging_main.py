@@ -18,7 +18,7 @@ StagingMainLogger = logging.getLogger(__name__)
 
 def getmappername(mapper_path_key, split):
 
-    patt = re.compile(r"([_a-z]+)_path")
+    patt = re.compile(r"^(.*?)_path")
     mapper_name = re.search(patt, mapper_path_key).group(1)
 
     if split:
@@ -598,44 +598,68 @@ def run_staging(
         full_responses, pg_num_alpha, sic_pg_alpha_mapper, target_col="201"
     )
 
-    # Loading PG detailed mapper
-    StagingMainLogger.info("Loading PG detailed mapper File...")
-    pg_detailed_path = paths["pg_detailed_path"]
-    check_file_exists(pg_detailed_path, raise_error=True)
-    pg_detailed = read_csv(pg_detailed_path)
-    val.validate_data_with_schema(pg_detailed, "./config/pg_detailed_schema.toml")
-    StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
+    pg_detailed_mapper = load_valdiate_mapper(
+        "pg_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
+
+    # # Loading PG detailed mapper
+    # StagingMainLogger.info("Loading PG detailed mapper File...")
+    # pg_detailed_path = paths["pg_detailed_path"]
+    # check_file_exists(pg_detailed_path, raise_error=True)
+    # pg_detailed_mapper = read_csv(pg_detailed_path)
+    # val.validate_data_with_schema(pg_detailed_mapper, "./config/pg_detailed_schema.toml")
+    # StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
 
     # Loading ITL1 detailed mapper
-    StagingMainLogger.info("Loading ITL1 detailed mapper File...")
-    itl1_detailed_path = paths["itl1_detailed_path"]
-    check_file_exists(itl1_detailed_path, raise_error=True)
-    itl1_detailed = read_csv(itl1_detailed_path)
-    val.validate_data_with_schema(itl1_detailed, "./config/itl1_detailed_schema.toml")
-    StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
+    itl1_detailed_mapper = load_valdiate_mapper(
+        "itl1_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
+
+    # StagingMainLogger.info("Loading ITL1 detailed mapper File...")
+    # itl1_detailed_path = paths["itl1_detailed_mapper_path"]
+    # check_file_exists(itl1_detailed_path, raise_error=True)
+    # itl1_detailed_mapper = read_csv(itl1_detailed_path)
+    # val.validate_data_with_schema(itl1_detailed_mapper, "./config/itl1_detailed_schema.toml")
+    # StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Loading ru_817_list mapper
     load_ref_list_mapper = config["global"]["load_reference_list"]
     if load_ref_list_mapper:
-        StagingMainLogger.info("Loading the reference list mapper file...")
-        ref_list_817_path = paths["ref_list_817_path"]
-        check_file_exists(ref_list_817_path, raise_error=True)
-        ref_list_817 = read_csv(ref_list_817_path)
-        schema_path = "./config/reference_list_schema.toml"
-        # check_file_exists(schema_path, raise_error=True)
-        val.validate_data_with_schema(ref_list_817, schema_path)
-        StagingMainLogger.info("reference list mapper File Loaded Successfully...")
-        # update longform references that should be on the reference list
-        full_responses = val.update_ref_list(full_responses, ref_list_817)
+        ref_list_817_mapper = load_valdiate_mapper(
+            "ref_list_817_mapper_path",
+            paths,
+            check_file_exists,
+            read_csv,
+            StagingMainLogger,
+            val.validate_data_with_schema,
+            None,
+        )
     else:
         StagingMainLogger.info("Skipping loding the reference list mapper File.")
+        ref_list_817_mapper = pd.DataFrame()
 
     # Loading Civil or Defence detailed mapper
-    StagingMainLogger.info("Loading Civil/Defence detailed mapper File...")
-    civil_defence_detailed_path = paths["civil_defence_detailed_path"]
-    check_file_exists(civil_defence_detailed_path, raise_error=True)
-    civil_defence_detailed = read_csv(civil_defence_detailed_path)
-    StagingMainLogger.info("Civil/Defence detailed mapper File Loaded Successfully...")
+    civil_defence_detailed_mapper = load_valdiate_mapper(
+        "civil_defence_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
 
     # Loading SIC division detailed mapper
     StagingMainLogger.info("Loading SIC division detailed mapper File...")
@@ -672,9 +696,10 @@ def run_staging(
         sic_pg_alpha_mapper,
         sic_pg_num,
         backdata,
-        pg_detailed,
-        itl1_detailed,
-        civil_defence_detailed,
+        pg_detailed_mapper,
+        itl1_detailed_mapper,
+        ref_list_817_mapper,
+        civil_defence_detailed_mapper,
         sic_division_detailed,
         manual_trim_df,
     )
