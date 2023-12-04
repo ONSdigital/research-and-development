@@ -3,7 +3,19 @@ import pandas as pd
 from src.outputs.short_form import create_headcount_cols
 
 
-def run_short_to_long(df:pd.DataFrame):
+def fill_sf_zeros(df:pd.DataFrame) -> pd.DataFrame:
+    """Fill nulls with zeros in short from numeric questions."""
+    sf_questions = [str(q) for q in range(701, 712) if q != 708]
+
+    sf_mask = (df["formtype"] == "0006") 
+    clear_mask = (df["status"].isin(["Clear", "Clear - overriden"]))
+
+    for q in sf_questions:
+        df.loc[(sf_mask & clear_mask), q] = df.copy()[q].fillna(0)
+
+    return df
+
+def run_short_to_long(df:pd.DataFrame) -> pd.DataFrame:
     """Implement short form to long form conversion.
 
     Args:
@@ -15,6 +27,10 @@ def run_short_to_long(df:pd.DataFrame):
         pd.DataFrame: The dataframe with additional instances for civil and
             defence short form responses, in long form format.
     """
+    # Fill shortform questions nulls with zeros for clear records
+    df = fill_sf_zeros(df)
+    
+    # create columns temporary "headcount_civil" and "headcount_defence"
     df = create_headcount_cols(df)
 
     convert_short_to_long = [
