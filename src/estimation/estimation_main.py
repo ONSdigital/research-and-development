@@ -47,7 +47,8 @@ def run_estimation(
     weighted_df = weights.outlier_weights(df)
 
     # apply the weights to the dataframe and apply the specified rounding
-    estimated_df, num_cols = appweights.apply_weights(weighted_df, config, 4)
+    for_est = weighted_df.copy()
+    estimated_df, num_cols = appweights.apply_weights(for_est, config, 4)
 
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")

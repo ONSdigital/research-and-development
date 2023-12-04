@@ -203,4 +203,4 @@ def run_outputs(
     # Running FTE total QA
     if config["global"]["output_fte_total_qa"]:
         qa_output_total_fte(outputs_df, config, write_csv, run_id)
-    OutputMainLogger.info("Finished FTE total QA output.")
+        OutputMainLogger.info("Finished FTE total QA output.")
