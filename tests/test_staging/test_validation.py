@@ -379,9 +379,7 @@ class TestManyToOne(unittest.TestCase):
     def test_good_mapper(self):
         # Call the create_output_df funtion
         df_input = self.mapper_good()
-        actual_result = validate_many_to_one(
-            df_input, col_many="child", col_one="parent"
-        )
+        actual_result = validate_many_to_one(df_input, "child", "parent")
         expected_result = df_input
         assert_frame_equal(actual_result, expected_result)
 
