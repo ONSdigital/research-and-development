@@ -45,6 +45,9 @@ def output_tau(
     # Filter out records that answer "no R&D"
     df = df.copy().loc[~(df["604"] == "No")]
 
+    # Filter out instance 0
+    df = df.copy().loc[df.instance != 0]
+
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper

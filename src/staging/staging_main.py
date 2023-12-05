@@ -146,19 +146,23 @@ def fix_anon_data(responses_df, config):
     """
     Fixes anonymised snapshot data for use in the DevTest environment.
 
-    This function adds an "instance" column to the provided DataFrame, and populates it with zeros.
-    It also adds a "selectiontype" column with random values of "P", "C", or "L", and a "cellnumber" column
-    with random values from the "seltype_list" in the configuration.
+    This function adds an "instance" column to the provided DataFrame, and populates
+    it with zeros. It also adds a "selectiontype" column with random values of "P",
+    "C", or "L", and a "cellnumber" column with random values from the "seltype_list"
+    in the configuration.
 
-    This fix is necessary because the anonymised snapshot data currently used in the DevTest environment
-    does not include the "instance" column. This fix should be removed when new anonymised data is provided.
+    This fix is necessary because the anonymised snapshot data currently used in the
+    DevTest environment does not include the "instance" column. This fix should be
+    removed when new anonymised data is provided.
 
     Args:
-        responses_df (pandas.DataFrame): The DataFrame containing the anonymised snapshot data.
+        responses_df (pandas.DataFrame): The DataFrame containing the anonymised
+        snapshot data.
         config (dict): A dictionary containing configuration details.
 
     Returns:
-        pandas.DataFrame: The fixed DataFrame with the added "instance", "selectiontype", and "cellnumber" columns.
+        pandas.DataFrame: The fixed DataFrame with the added "instance",
+        "selectiontype", and "cellnumber" columns.
     """
     responses_df["instance"] = 0
     col_size = responses_df.shape[0]
@@ -253,16 +257,21 @@ def write_snapshot_to_feather(
     """
     Writes the provided DataFrames to feather files.
 
-    This function writes the `full_responses` DataFrame to a feather file named "{snapshot_name}_corrected.feather",
-    and the `secondary_full_responses` DataFrame to a feather file named "{secondary_snapshot_name}.feather".
+    This function writes the `full_responses` DataFrame to a feather file named
+    "{snapshot_name}_corrected.feather", and the `secondary_full_responses`
+    DataFrame to a feather file named "{secondary_snapshot_name}.feather".
     Both files are written to the provided `feather_path`.
 
     Args:
         feather_path (str): The path where the feather files will be written.
-        snapshot_name (str): The name of the snapshot for the `full_responses` DataFrame.
-        full_responses (pd.DataFrame): The DataFrame to write to the "{snapshot_name}_corrected.feather" file.
-        secondary_snapshot_name (str): The name of the snapshot for the `secondary_full_responses` DataFrame.
-        secondary_full_responses (pd.DataFrame): The DataFrame to write to the "{secondary_snapshot_name}.feather" file.
+        snapshot_name (str): The name of the snapshot for the `full_responses`
+        DataFrame.
+        full_responses (pd.DataFrame): The DataFrame to write to the
+        "{snapshot_name}_corrected.feather" file.
+        secondary_snapshot_name (str): The name of the snapshot for the
+        `secondary_full_responses` DataFrame.
+        secondary_full_responses (pd.DataFrame): The DataFrame to write to the
+        "{secondary_snapshot_name}.feather" file.
     """
 
     feather_file = f"{snapshot_name}_corrected.feather"
@@ -372,7 +381,8 @@ def run_staging(
         dict_of_hist_dfs = load_historic_data(config, paths, read_csv)
         print(dict_of_hist_dfs)
 
-    # Check if the if the snapshot feather and optionally the secondary snapshot feather exist
+    # Check if the if the snapshot feather and optionally the secondary
+    # snapshot feather exist
     feather_files_exist = check_snapshot_feather_exists(
         config, check_file_exists, feather_file, secondary_feather_file
     )
@@ -466,6 +476,7 @@ def run_staging(
         )
         # Fill empty values with False
     else:
+        manual_trim_df = pd.DataFrame()  # Create and empty df
         manual_outliers = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 

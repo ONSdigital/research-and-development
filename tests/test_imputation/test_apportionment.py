@@ -4,6 +4,7 @@ from pandas._testing import assert_frame_equal
 
 from src.imputation.apportionment import (
     calc_202_totals,
+    copy_first_to_group,
     calc_fte_column,
     calc_headcount_column,
 )
@@ -69,7 +70,7 @@ class TestCalc202Totals:
         return expected_df
 
     def test_calc_202_totals(self):
-        """Test for flag_outliers function."""
+        """Test for calc_202_totals function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 

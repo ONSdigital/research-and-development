@@ -71,7 +71,7 @@ def run_imputation(
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     df = hlp.instance_fix(df)
-    df = hlp.duplicate_rows(df)
+    df = hlp.create_r_and_d_instance(df)
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
