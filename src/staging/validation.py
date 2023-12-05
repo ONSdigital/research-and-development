@@ -555,17 +555,24 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 @exception_wrap
 def validate_many_to_one(*args) -> pd.DataFrame:
     """
+    Validates a many-to-one mapper DataFrame.
 
-    Validates a many to one mapper:
-    1. Checks if the mapper has two columns col_many and col_one.
-    2. Salects and deduplicates col_many and col_one.
-    3. Checks that for each entry in col_many there is exactly one entry in
-    col_one.
+    This function performs the following checks:
+    1. Checks if the mapper has two specified columns, referred to as 'col_many' and 'col_one'.
+    2. Selects and deduplicates 'col_many' and 'col_one'.
+    3. Checks that for each entry in 'col_many' there is exactly one corresponding entry in 'col_one'.
 
     Args:
-        df (pd.DataFrame): The input mapper
-        col_many (str): name of the column with many entries
-        col_one (str): name of the column with one entry
+        *args: Variable length argument list. It should contain the following items in order:
+            - df (pd.DataFrame): The input mapper DataFrame.
+            - col_many (str): The name of the column with many entries.
+            - col_one (str): The name of the column with one entry.
+
+    Returns:
+        pd.DataFrame: The validated mapper DataFrame with deduplicated 'col_many' and 'col_one' columns.
+
+    Raises:
+        ValueError: If the mapper does not have the 'col_many' and 'col_one' columns, or if there are multiple entries in 'col_one' for any entry in 'col_many'.
     """
 
     mapper = args[0]

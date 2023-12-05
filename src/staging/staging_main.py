@@ -34,16 +34,34 @@ def load_valdiate_mapper(
     read_csv_func,
     logger,
     val_with_schema_func: Callable,
-    validation_func: Callable,
+    one_to_many_val_func: Callable,
     *args,
 ):
-    """Loads mapper of choice, validates it using schema and validation func if supplied
+    """
+    Loads a specified mapper, validates it using a schema and an optional validation function.
 
+    This function first retrieves the path of the mapper from the provided paths dictionary using the mapper_path_key.
+    It then checks if the file exists at the mapper path. If the file exists, it is read into a DataFrame.
+    The DataFrame is then validated against a schema, which is located at a path constructed from the mapper name.
+    If a validation function is provided, it is called with the DataFrame and any additional arguments.
+
+    Args:
+        mapper_path_key (str): The key to retrieve the mapper path from the paths dictionary.
+        paths (dict): A dictionary containing paths.
+        file_exists_func (Callable): A function to check if a file exists at a given path.
+        read_csv_func (Callable): A function to read a CSV file into a DataFrame.
+        logger (logging.Logger): A logger to log information and errors.
+        val_with_schema_func (Callable): A function to validate a DataFrame against a schema.
+        validation_func (Callable, optional): An optional function to perform additional validation on the DataFrame.
+        *args: Additional arguments to pass to the validation function.
 
     Returns:
-        _type_: _description_
-    """
+        pd.DataFrame: The loaded and validated mapper DataFrame.
 
+    Raises:
+        FileNotFoundError: If no file exists at the mapper path.
+        ValidationError: If the DataFrame fails schema validation or the validation function.
+    """
     mapper_path = paths[mapper_path_key]
 
     mapper_name = getmappername(mapper_path_key, split=True)
@@ -58,9 +76,9 @@ def load_valdiate_mapper(
     schema_path = f"./config/{schema_prefix}_schema.toml"
     val_with_schema_func(mapper_df, schema_path)
 
-    if validation_func:
-        args = (mapper_df,) + args
-        validation_func(*args)
+    if one_to_many_val_func:
+        args = (mapper_df,) + args # prepending the df to the args
+        one_to_many_val_func(*args) # args include "col_many" and "col_one"
 
     logger.info(f"{mapper_name} loaded successfully")
 
