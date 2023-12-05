@@ -101,7 +101,7 @@ network_paths:
   itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
   ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
-  sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+  sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
