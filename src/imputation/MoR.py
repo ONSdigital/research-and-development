@@ -234,7 +234,9 @@ def group_calc_link(group, target_vars, config):
         group = group.sort_values(f"{var}_gr")
         
         group[f"{var}_gr_trim"] = False
-        group.loc[non_null_mask] = trim_bounds(group[non_null_mask], f"{var}_gr", config)
+        group.loc[non_null_mask] = trim_bounds(
+            group.loc[non_null_mask], f"{var}_gr", config
+        )
 
         # If there are non-null, non-zero values in the group calculate the mean
         if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
