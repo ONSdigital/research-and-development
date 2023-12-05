@@ -569,18 +569,6 @@ def run_staging(
         "pg_alpha",
     )
 
-    # StagingMainLogger.info("Loading SIC to PG to alpha File...")
-    # sic_pg_alpha_path = paths["sic_pg_alpha_path"]
-    # check_file_exists(sic_pg_alpha_path, raise_error=True)
-    # sic_pg_alpha_mapper = read_csv(sic_pg_alpha_path)
-    # val.validate_data_with_schema(
-    #     sic_pg_alpha_mapper, "./config/sic_pg_alpha_schema.toml"
-    # )
-    # sic_pg_alpha_mapper = val.validate_many_to_one(
-    #     sic_pg_alpha_mapper, col_many="sic", col_one="pg_alpha"
-    # )
-    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
-
     sic_pg_utf_mapper = load_valdiate_mapper(
         "sic_pg_utf_mapper_path",
         paths,
@@ -592,6 +580,10 @@ def run_staging(
         "SIC 2007_CODE",
         "2016 > Form PG",
     )
+    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
+    sic_pg_utf_mapper = sic_pg_utf_mapper[cols_needed]
+    mapper_path = paths["mapper_path"]
+    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
 
     # Map PG from SIC/PG numbers to column '201'.
     full_responses = pg.run_pg_conversion(
@@ -608,14 +600,6 @@ def run_staging(
         None,
     )
 
-    # # Loading PG detailed mapper
-    # StagingMainLogger.info("Loading PG detailed mapper File...")
-    # pg_detailed_path = paths["pg_detailed_path"]
-    # check_file_exists(pg_detailed_path, raise_error=True)
-    # pg_detailed_mapper = read_csv(pg_detailed_path)
-    # val.validate_data_with_schema(pg_detailed_mapper, "./config/pg_detailed_schema.toml")
-    # StagingMainLogger.info("PG detailed mapper File Loaded Successfully...")
-
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = load_valdiate_mapper(
         "itl1_detailed_mapper_path",
@@ -626,13 +610,6 @@ def run_staging(
         val.validate_data_with_schema,
         None,
     )
-
-    # StagingMainLogger.info("Loading ITL1 detailed mapper File...")
-    # itl1_detailed_path = paths["itl1_detailed_mapper_path"]
-    # check_file_exists(itl1_detailed_path, raise_error=True)
-    # itl1_detailed_mapper = read_csv(itl1_detailed_path)
-    # val.validate_data_with_schema(itl1_detailed_mapper, "./config/itl1_detailed_schema.toml")
-    # StagingMainLogger.info("ITL1 detailed mapper File Loaded Successfully...")
 
     # Loading ru_817_list mapper
     load_ref_list_mapper = config["global"]["load_reference_list"]
@@ -662,11 +639,15 @@ def run_staging(
     )
 
     # Loading SIC division detailed mapper
-    StagingMainLogger.info("Loading SIC division detailed mapper File...")
-    sic_division_detailed_path = paths["sic_division_detailed_path"]
-    check_file_exists(sic_division_detailed_path, raise_error=True)
-    sic_division_detailed = read_csv(sic_division_detailed_path)
-    StagingMainLogger.info("SIC division detailed mapper File Loaded Successfully...")
+    sic_division_detailed_mapper = load_valdiate_mapper(
+        "sic_division_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
 
     # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
@@ -694,12 +675,12 @@ def run_staging(
         postcode_mapper,
         pg_num_alpha,
         sic_pg_alpha_mapper,
-        sic_pg_num,
+        sic_pg_utf_mapper,
         backdata,
         pg_detailed_mapper,
         itl1_detailed_mapper,
         ref_list_817_mapper,
         civil_defence_detailed_mapper,
-        sic_division_detailed,
+        sic_division_detailed_mapper,
         manual_trim_df,
     )
