@@ -107,6 +107,9 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished short form output.")
 
+    # Instance 0 should now be removed from all subsequent outputs
+    outputs_df = outputs_df.copy().loc[outputs_df.instance != 0]
+
     # Running long form output
     if config["global"]["output_long_form"]:
         OutputMainLogger.info("Starting long form output...")
