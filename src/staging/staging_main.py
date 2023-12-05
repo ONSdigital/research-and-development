@@ -62,26 +62,39 @@ def load_valdiate_mapper(
         FileNotFoundError: If no file exists at the mapper path.
         ValidationError: If the DataFrame fails schema validation or the validation function.
     """
+    # Get the path of the mapper from the paths dictionary
     mapper_path = paths[mapper_path_key]
 
+    # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
 
+    # Log the loading of the mapper
     logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
 
+    # Check if the file exists at the mapper path, raise an error if it doesn't
     file_exists_func(mapper_path, raise_error=True)
 
+    # Read the file at the mapper path into a DataFrame
     mapper_df = read_csv_func(mapper_path)
 
+    # Construct the path of the schema from the mapper name
     schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
     schema_path = f"./config/{schema_prefix}_schema.toml"
+
+    # Validate the DataFrame against the schema
     val_with_schema_func(mapper_df, schema_path)
 
+    # If a one-to-many validation function is provided, validate the DataFrame
     if one_to_many_val_func:
-        args = (mapper_df,) + args # prepending the df to the args
-        one_to_many_val_func(*args) # args include "col_many" and "col_one"
+        # Prepend the DataFrame to the arguments
+        args = (mapper_df,) + args
+        # Call the validation function with the DataFrame and the other arguments
+        one_to_many_val_func(*args)  # args include "col_many" and "col_one"
 
+    # Log the successful loading of the mapper
     logger.info(f"{mapper_name} loaded successfully")
 
+    # Return the loaded and validated DataFrame
     return mapper_df
 
 
