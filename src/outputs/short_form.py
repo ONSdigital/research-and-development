@@ -41,13 +41,13 @@ def create_headcount_cols(
     headcount_tot_mask = (df["706"] + df["707"]) > 0
 
     df.loc[(headcount_tot_mask), "headcount_civil"] = (
-        df["705"] * df["706"] / (df["706"] + df["707"])
+        df.copy()["705"] * df.copy()["706"] / (df.copy()["706"] + df.copy()["707"])
     )
     df.loc[~(headcount_tot_mask), "headcount_civil"] = 0
 
 
     df.loc[(headcount_tot_mask), "headcount_defence"] = (
-        df["705"] * df["707"] / (df["706"] + df["707"])
+        df.copy()["705"] * df.copy()["707"] / (df.copy()["706"] + df.copy()["707"])
     )
     df.loc[~(headcount_tot_mask), "headcount_defence"] = 0
 
