@@ -614,8 +614,8 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
             raise ValueError("Column headers must be 'statusencoded' and 'form_status'")
 
         # Check the contents of the "status" and "form_status" columns
-        status_check = df["statusencoded"].str.len() == 3
-        from_status_check = df["form_status"].str.len().isin([3, 4])
+        status_check = df["statusencoded"].astype('str').str.len() == 3
+        from_status_check = df["form_status"].astype('str').str.len().isin([3, 4])
 
         # Create the "contents_check" column based on the checks
         df["contents_check"] = status_check & from_status_check

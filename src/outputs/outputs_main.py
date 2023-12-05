@@ -56,7 +56,7 @@ def run_outputs(
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    imputed_statuses = ["TMI", "CF", "MoR"]
+    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
 
     to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
         estimated_df["imp_marker"] == "R"
@@ -88,10 +88,9 @@ def run_outputs(
         postcode_topup
     )
 
-    weighted_df = weighted_df.astype({"postcodes_harmonised": "str"})
-    weighted_df["postcodes_harmonised"] = weighted_df["postcodes_harmonised"].apply(
-        postcode_topup
-    )
+    tau_outputs_df = tau_outputs_df.astype({"postcodes_harmonised": "str"})
+    tau_outputs_df["postcodes_harmonised"] = (
+        tau_outputs_df["postcodes_harmonised"].apply(postcode_topup))
 
     # Running short form output
     if config["global"]["output_short_form"]:
