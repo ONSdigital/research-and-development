@@ -99,6 +99,8 @@ def run_pipeline(start, config_path):
             run_id,
         )
         MainLogger.info("Finished NI Data Ingest.")
+        # for now print to the screen
+        print(ni_full_responses.head())
     else:
         MainLogger.info("Skipping NI data staging.")
 
