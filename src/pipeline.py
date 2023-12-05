@@ -192,7 +192,6 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_mapper,
         itl_mapper,
-        pg_num_alpha,
         sic_pg_num,
         pg_detailed,
         itl1_detailed,

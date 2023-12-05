@@ -7,6 +7,7 @@ from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
+from src.imputation.imputation_helpers import fill_sf_zeros
 from src.outputs.outputs_helpers import create_output_df, create_period_year
 
 
@@ -34,19 +35,21 @@ def create_headcount_cols(
         pd.DataFrame: The dataframe with extra columns for civil and
             defence headcount values.
     """
-    df = df.copy()
-    # Use np.where to avoid division by zero.
-    df["headcount_civil"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["706"] / (df["706"] + df["707"]),
-        0,
-    )
+    # fill nulls with zeros for numerical rows
+    df = fill_sf_zeros(df)
 
-    df["headcount_defence"] = np.where(
-        df["706"] + df["707"] != 0,  # noqa
-        df["705"] * df["707"] / (df["706"] + df["707"]),
-        0,
+    headcount_tot_mask = (df["706"] + df["707"]) > 0
+
+    df.loc[(headcount_tot_mask), "headcount_civil"] = (
+        df.copy()["705"] * df.copy()["706"] / (df.copy()["706"] + df.copy()["707"])
     )
+    df.loc[~(headcount_tot_mask), "headcount_civil"] = 0
+
+
+    df.loc[(headcount_tot_mask), "headcount_defence"] = (
+        df.copy()["705"] * df.copy()["707"] / (df.copy()["706"] + df.copy()["707"])
+    )
+    df.loc[~(headcount_tot_mask), "headcount_defence"] = 0
 
     df["headcount_civil"] = round(df["headcount_civil"], round_val)
     df["headcount_defence"] = round(df["headcount_defence"], round_val)

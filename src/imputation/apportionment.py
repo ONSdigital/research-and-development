@@ -4,6 +4,8 @@ import pandas as pd
 
 from typing import Dict, List
 
+from src.imputation.imputation_helpers import copy_first_to_group
+
 ApportionmentLogger = logging.getLogger(__name__)
 
 
@@ -28,28 +30,6 @@ def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def update_column(df: pd.DataFrame, col: str) -> pd.Series:
-    """Copy item in insance 0 to all other instances in a given reference.
-
-    For long form entries, questions 405 - 412 and 501 - 508 are recorded
-    in instance 0. A series is returned representing the updated column with
-    values from instance 0 copied to all other instances of a reference.
-
-    Note: this is achieved using .transform(max), which takes the value at
-    instance 0 and inserts it to all memebers of the group.
-
-    Args:
-        df (pd.DataFrame): The main dataset for apportionment.
-        col (str): The name of the 4xx or 5xx column being treated.
-
-    Returns:
-        pd.Series: A single column dataframe with the values in instance 0
-        copied to other instances for the same reference.
-    """
-    updated_col = df.groupby("reference")[col].transform(max)
-    return updated_col
-
-
 def calc_fte_column(
     df: pd.DataFrame, fte_dict: Dict[str, List[str]], round_val: int = 4
 ) -> pd.DataFrame:
@@ -69,13 +49,13 @@ def calc_fte_column(
     for new_col, old_cols in fte_dict.items():
         # create new apportionment column for the civil cases
         df.loc[(df["200"] == "C") & (df["tot_202_CD"] > 0), new_col] = round(
-            update_column(df, old_cols[0]) * df["202"] / df["tot_202_CD"], round_val
+            copy_first_to_group(df, old_cols[0]) * df["202"] / df["tot_202_CD"], round_val
         )
         df.loc[(df["200"] == "C") & (df["tot_202_CD"] == 0), new_col] = 0
 
         # create new apportionment column for the defence cases
         df.loc[(df["200"] == "D") & (df["tot_202_CD"] > 0), new_col] = round(
-            update_column(df, old_cols[1]) * df["202"] / df["tot_202_CD"], round_val
+            copy_first_to_group(df, old_cols[1]) * df["202"] / df["tot_202_CD"], round_val
         )
         df.loc[(df["200"] == "D") & (df["tot_202_CD"] == 0), new_col] = 0
 
@@ -99,7 +79,7 @@ def calc_headcount_column(
     # create new apportionment column (avoid division by 0)
     for new_col, old_col in hc_dict.items():
         df.loc[df["tot_202_all"] > 0, new_col] = round(
-            update_column(df, old_col) * df["202"] / df["tot_202_all"], round_val
+            copy_first_to_group(df, old_col) * df["202"] / df["tot_202_all"], round_val
         )
         df.loc[(df["instance"] != 0) & (df["tot_202_all"] == 0), new_col] = 0
 

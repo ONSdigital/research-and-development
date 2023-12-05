@@ -23,10 +23,10 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
-  output_short_form: False
   output_long_form: False
-  output_tau: False
+  output_short_form: True
   output_gb_sas: False
+  output_tau: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False

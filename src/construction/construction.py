@@ -42,7 +42,10 @@ def run_construction(
         return snapshot_df
 
     # Check the construction file exists and has records, then read it
-    construction_file_path = config["network_paths"]["construction_file_path"]
+    network_or_hdfs = config["global"]["network_or_hdfs"]
+    paths = config[f"{network_or_hdfs}_paths"]
+    construction_file_path = paths["construction_file_path"]
+    construction_logger.info(f"Reading construction file {construction_file_path}")
     construction_file_exists = check_file_exists(construction_file_path)
     if construction_file_exists:
         try:
@@ -75,15 +78,29 @@ def run_construction(
     construction_df = create_period_year(construction_df)
 
     # Update the values with the constructed ones
-    construction_df.set_index(["reference",  "instance", "period_year",], inplace=True)
+    construction_df.set_index(
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
+    )
     updated_snapshot_df.set_index(
-        ["reference",  "instance", "period_year",], inplace=True
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
     )
     updated_snapshot_df.update(construction_df)
     updated_snapshot_df.reset_index(inplace=True)
 
     updated_snapshot_df = updated_snapshot_df.astype(
-        {"reference":"Int64", "instance":"Int64", "period_year":"Int64"}
-        )
+        {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
+    )
+
+    construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df

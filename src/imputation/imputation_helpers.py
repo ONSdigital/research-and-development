@@ -1,8 +1,107 @@
 """Utility functions  to be used in the imputation module."""
+import logging
+
 from typing import List
 import pandas as pd
 
+ImputationHelpersLogger = logging.getLogger(__name__)
 
+def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
+    """Copy item in insance 0 to all other instances in a given reference.
+
+    Example: 
+
+    For long form entries, questions 405 - 412 and 501 - 508 are recorded
+    in instance 0. A series is returned representing the updated column with
+    values from instance 0 copied to all other instances of a reference.
+
+    Note: this is achieved using .transform("first"), which takes the value at
+    instance 0 and inserts it to all memebers of the group.
+
+    initial dataframe:
+        reference | instance    | col    
+    ---------------------------------
+        1         | 0           | 333
+        1         | 1           | nan
+        1         | 2           | nan
+
+    returns the series
+        col
+        ---
+        333
+        333
+        333
+
+    Args:
+        df (pd.DataFrame): The main dataset for apportionment.
+        col_to_update (str): The name of the column being updated
+
+    Returns:
+        pd.Series: A single column dataframe with the values in instance 0
+        copied to other instances for the same reference.
+    """
+    updated_col = df.groupby("reference")[col_to_update].transform("first")
+    return updated_col
+
+
+def fix_604_error(df: pd.DataFrame) -> pd.Series:
+    """Copy 'Yes' or 'No' in insance 0 for q604 to all other instances for each ref.
+
+    Note: 
+        Occasionally we have noticed that an instance 1 containing a small amount of 
+        data has been created for a "no R&D" reference, in error. 
+        These entries were not identified and removed from the pipeline as
+        they don't have a "No" in column 604. To fix this, we copy the "No" from 
+        instance 0 to all instances, then ensure only instance 0 remains before
+        creating a fresh instance 1.
+
+    Note: this is achieved using .transform("first"), which takes the value at
+    instance 0 and inserts it to all memebers of the group.
+
+    initial dataframe:
+        reference | instance    | "604"    
+    ---------------------------------
+        1         | 0           | "No"
+        1         | 1           | nan
+        2         | 0           | "Yes"
+        2         | 1           | nan
+
+    returned dataframe:
+        reference | instance    | "604"    
+    ---------------------------------
+        1         | 0           | "No"
+        2         | 0           | "Yes"
+        2         | 1           | "Yes"
+
+    args:
+        df (pd.DataFrame): The dataframe being prepared for imputation.
+    
+    returns:
+        (pd.DataFrame): The dataframe with only instance 0 for "no r&d" refs.
+    """
+    # Copy the "Yes" or "No" in col 604 to all other instances
+    df["604"] = copy_first_to_group(df, "604")
+
+    # For long form references with "No" in col 604, keep only instance 0
+    to_remove_mask = (
+        (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
+    )
+
+    # Note: where any of the columns in the mask has a null value, the mask will be null
+    to_remove_mask = to_remove_mask.fillna(False)
+
+    # output the references that contained data in error
+    removed_df = df.copy().loc[to_remove_mask][["reference", "instance", "604"]]
+    if not removed_df.empty:
+        ImputationHelpersLogger.info(
+            "The following 'No R&D' references have had invalid records removed: \n"
+            f"{removed_df}"
+        )
+
+    # finally we remove unwanted rows
+    filtered_df = df.copy().loc[~(to_remove_mask)]
+
+    return filtered_df
 
 def instance_fix(df: pd.DataFrame):
     """Set instance to 1 for longforms with status 'Form sent out.'
@@ -16,14 +115,25 @@ def instance_fix(df: pd.DataFrame):
     return df
 
 
-def duplicate_rows(df: pd.DataFrame) -> pd.DataFrame:
-    """Create a duplicate long form records with no R&D and set instance to 1.
-    
+def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a duplicate of long form records with no R&D and set instance to 1.
+
     These references initailly have one entry with instance 0. 
-    A copy will be created with instance set to 1.
+    A copy will be created with instance set to 1. During imputation, all target values
+    in this row will be set to zero, so that the reference "counts" towards the means
+    calculated in TMI.
+
+    args:
+        df (pd.DataFrame): The dataframe being prepared for imputation.
+    
+    returns:
+        (pd.DataFrame): The same dataframe with an instance 1 for "no R&D" refs.
     """
-    mask = (df.formtype == "0001") & (df["604"] == "No")
-    filtered_df = df.copy().loc[mask]
+    # Ensure that in the case longforms with "no R&D" we only have one row
+    df = fix_604_error(df)
+
+    no_rd_mask = (df.formtype == "0001") & (df["604"] == "No")
+    filtered_df = df.copy().loc[no_rd_mask]
     filtered_df["instance"] = 1
 
     updated_df = pd.concat([df, filtered_df], ignore_index=True)
@@ -67,3 +177,16 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     excluded_df = df[exclusion_filter]  # df only has 817 and nan records
 
     return filtered_df, excluded_df
+
+
+def fill_sf_zeros(df:pd.DataFrame) -> pd.DataFrame:
+    """Fill nulls with zeros in short from numeric questions."""
+    sf_questions = [str(q) for q in range(701, 712) if q != 708]
+
+    sf_mask = (df["formtype"] == "0006") 
+    clear_mask = (df["status"].isin(["Clear", "Clear - overridden"]))
+
+    for q in sf_questions:
+        df.loc[(sf_mask & clear_mask), q] = df.copy()[q].fillna(0)
+
+    return df

@@ -28,7 +28,6 @@ def run_outputs(
     cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
-    pg_num_alpha: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
@@ -50,12 +49,11 @@ def run_outputs(
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): Links postcode to region code
         itl_mapper (pd.DataFrame): Links region to ITL codes
-        pg_alpha_num (pd.DataFrame): Maps alpha PG to numeric PG
         sic_pg_num (pd.DataFrame): Maps SIC to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
-
-
+        civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
+        sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
     imputed_statuses = ["TMI", "CF", "MoR"]
@@ -109,6 +107,9 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished short form output.")
 
+    # Instance 0 should now be removed from all subsequent outputs
+    outputs_df = outputs_df.copy().loc[outputs_df.instance != 0]
+
     # Running long form output
     if config["global"]["output_long_form"]:
         OutputMainLogger.info("Starting long form output...")
@@ -119,7 +120,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             cora_mapper,
-            pg_num_alpha,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -203,18 +203,7 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished Intram by SIC output.")
 
-    # Running status filtered dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        OutputMainLogger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished status filtered output.")
-
     # Running FTE total QA
     if config["global"]["output_fte_total_qa"]:
         qa_output_total_fte(outputs_df, config, write_csv, run_id)
-    OutputMainLogger.info("Finished FTE total QA output.")
+        OutputMainLogger.info("Finished FTE total QA output.")

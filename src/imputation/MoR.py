@@ -228,10 +228,16 @@ def group_calc_link(group, target_vars, config):
         config (Dict): Confuration settings
     """
     for var in target_vars:
-        group = group.sort_values(f"{var}_gr")
-        group = trim_bounds(group, f"{var}_gr", config)
         # Create mask to not use 0s in mean calculation
         non_null_mask = pd.notnull(group[f"{var}_gr"])
+
+        group = group.sort_values(f"{var}_gr")
+        
+        group[f"{var}_gr_trim"] = False
+        group.loc[non_null_mask] = trim_bounds(
+            group.loc[non_null_mask], f"{var}_gr", config
+        )
+
         # If there are non-null, non-zero values in the group calculate the mean
         if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
             group[f"{var}_link"] = group.loc[

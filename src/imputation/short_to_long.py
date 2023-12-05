@@ -1,9 +1,10 @@
 import pandas as pd
 
+from src.imputation.imputation_helpers import fill_sf_zeros
 from src.outputs.short_form import create_headcount_cols
 
 
-def run_short_to_long(df, selectiontype=["P", "C"]):
+def run_short_to_long(df:pd.DataFrame) -> pd.DataFrame:
     """Implement short form to long form conversion.
 
     Args:
@@ -15,10 +16,11 @@ def run_short_to_long(df, selectiontype=["P", "C"]):
         pd.DataFrame: The dataframe with additional instances for civil and
             defence short form responses, in long form format.
     """
-    short_to_long_df = df.copy().loc[df["selectiontype"].isin(selectiontype)]
-    not_short_to_long_df = df.copy().loc[~df["selectiontype"].isin(selectiontype)]
-
-    df = create_headcount_cols(short_to_long_df)
+    # Fill shortform questions nulls with zeros for clear records
+    df = fill_sf_zeros(df)
+    
+    # create columns temporary "headcount_civil" and "headcount_defence"
+    df = create_headcount_cols(df)
 
     convert_short_to_long = [
         ("701", "702", "211"),
@@ -42,7 +44,7 @@ def run_short_to_long(df, selectiontype=["P", "C"]):
         civil_df[each[2]] = civil_df[each[0]]
         defence_df[each[2]] = defence_df[each[1]]
 
-    df = pd.concat([df, civil_df, defence_df, not_short_to_long_df])
+    df = pd.concat([df, civil_df, defence_df])
 
     df = df.sort_values(["reference", "instance"], ascending=[True, True]).reset_index(
         drop=True
