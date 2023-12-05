@@ -23,14 +23,15 @@ class TestCopyFirstToGroup:
 
         data = [
             [1001, 0, None, "No"],
-            [1001, 1, "C", np.nan],
-            [1001, 2, "C", np.nan],
-            [1001, 3, "D", np.nan],
+            [1001, 1, "C", None],
+            [1001, 2, "C", None],
+            [1001, 3, "D", None],
             [2002, 0, None, "Yes"],
-            [3003, 0, None, np.nan],
-            [3003, 1, "C", np.nan],
+            [3003, 0, None, None],
+            [3003, 1, "C", None],
             [3003, 2, "C", "Haha"],
-            [3003, 3, "D", np.nan],
+            [3003, 3, "D", None],
+            [4004, 0, None, None],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -51,6 +52,7 @@ class TestCopyFirstToGroup:
                 "Haha",
                 "Haha",
                 "Haha",
+                None,
             ], name = "604"
         )
 
@@ -81,6 +83,7 @@ class TestFix604Error:
             [3003, 1, "C", np.nan, "0001"],
             [3003, 2, "C", "Haha", "0001"],
             [3003, 3, "D", np.nan, "0001"],
+            [4004, 0, None, None, "0001"],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -103,6 +106,7 @@ class TestFix604Error:
             [3003, 1, "C", "Haha", "0001"],
             [3003, 2, "C", "Haha", "0001"],
             [3003, 3, "D", "Haha", "0001"],
+            [4004, 0, None, None, "0001"],
         ]
 
         expected_df = pandasDF(data=data, columns=input_cols)
@@ -117,7 +121,7 @@ class TestFix604Error:
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)
 
 
-class TestFix604Error:
+class TestCreateRAndDInstance:
     """Unit tests for create_r_and_d_instance function."""
 
     def create_input_df(self):
@@ -138,6 +142,7 @@ class TestFix604Error:
             [2002, 0, None, "Yes", "0001"],
             [2002, 1, "C", "Yes", "0001"],
             [3003, 0, None, "No", "0001"],
+            [4004, 0, None, None, "0001"],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -160,6 +165,7 @@ class TestFix604Error:
             [2002, 1, "C", "Yes", "0001"],
             [3003, 0, None, "No", "0001"],
             [3003, 1, None, "No", "0001"],
+            [4004, 0, None, None, "0001"],
         ]
 
         expected_df = pandasDF(data=data, columns=input_cols)

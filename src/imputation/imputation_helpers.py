@@ -1,8 +1,10 @@
 """Utility functions  to be used in the imputation module."""
+import logging
+
 from typing import List
 import pandas as pd
 
-
+ImputationHelpersLogger = logging.getLogger(__name__)
 
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     """Copy item in insance 0 to all other instances in a given reference.
@@ -84,6 +86,19 @@ def fix_604_error(df: pd.DataFrame) -> pd.Series:
     to_remove_mask = (
         (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
     )
+
+    # Note: where any of the columns in the mask has a null value, the mask will be null
+    to_remove_mask = to_remove_mask.fillna(False)
+
+    # output the references that contained data in error
+    removed_df = df.copy().loc[to_remove_mask][["reference", "instance", "604"]]
+    if not removed_df.empty:
+        ImputationHelpersLogger.info(
+            "The following 'No R&D' references have had invalid records removed: \n"
+            f"{removed_df}"
+        )
+
+    # finally we remove unwanted rows
     filtered_df = df.copy().loc[~(to_remove_mask)]
 
     return filtered_df
