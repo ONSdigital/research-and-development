@@ -5,7 +5,8 @@ from datetime import datetime
 import pandas as pd
 import os
 
-from src.staging import validation as val
+from src.staging.validation import load_schema
+from src.northern_ireland import ni_validation as ni_val
 
 NIStagingLogger = logging.getLogger(__name__)
 
@@ -53,7 +54,27 @@ def run_ni_staging(
     check_file_exists(responses_file, raise_error=True)
     check_file_exists(indicative_file, raise_error=True)
 
-    ni_responses = read_csv(responses_file)
-    ni_indcative = read_csv(indicative_file)
+    # read in schemas
+    indicative_schema = load_schema("./config/ni_indicative_schema.toml")
+    responses_schema = load_schema("./config/ni_responses_schema.toml")
+
+    NIStagingLogger.info("Loading NI data from csv...")
+    # read only required columns from indicative file
+    wanted_indicative_cols = [
+        indicative_schema[i]['old_name'] for i in indicative_schema.keys()
+    ]
+    indicative_df = read_csv(indicative_file, wanted_indicative_cols)
+    # read all columns from ni responses file
+    ni_responses_df = read_csv(responses_file)
+
+    NIStagingLogger.info("Finished reading NI data.")
+
+    # Validate the dataframes
+    # TODO: This bit is work in progress
+    # TODO: rename columns, validate datatypes 
+    ni_val.validate_data_with_schema(indicative_df, indicative_schema)
+    ni_val.validate_data_with_schema(ni_responses_df, responses_schema)
+
+    # TODO: join the two dataframes on "reference", and return full_responses NI equiv
 
     return "hello"

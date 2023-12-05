@@ -6,47 +6,35 @@ Deduced_Data_Type = "Int64"
 old_name = "ruref"
 Deduced_Data_Type = "Int64"
 
-[company name]
+[referencename]
 old_name = "company name"
 Deduced_Data_Type = "object"
 
-[ru emp]
+[employment]
 old_name = "ru emp"
 Deduced_Data_Type = "Int64"
 
-[ru turnover]
+[turnover]
 old_name = "ru turnover"
 Deduced_Data_Type = "Int64"
 
-[legal status]
+[legalstatus]
 old_name = "legal status"
 Deduced_Data_Type = "Int64"
 
-[ru region]
+[region]
 old_name = "ru region"
 Deduced_Data_Type = "object"
 
-[entref]
+[enterprisereference]
 old_name = "entref"
 Deduced_Data_Type = "Int64"
 
-[ent emp]
-old_name = "ent emp"
-Deduced_Data_Type = "Int64"
-
-[ent turnover]
-old_name = "ent turnover"
-Deduced_Data_Type = "Int64"
-
-[ent region]
-old_name = "ent region"
-Deduced_Data_Type = "object"
-
-[wowref]
+[wowenterprisereference]
 old_name = "wowref"
 Deduced_Data_Type = "object"
 
-[ult FOC]
+[foc]
 old_name = "ult FOC"
 Deduced_Data_Type = "object"
 
