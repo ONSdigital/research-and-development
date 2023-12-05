@@ -80,7 +80,7 @@ Possible_Categorical_Values = ["ingestion"]
 
 [createddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "datetime64[ns]"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -100,7 +100,7 @@ Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
 
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "datetime64[ns]"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
