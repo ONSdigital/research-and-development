@@ -19,6 +19,7 @@ global:
   load_from_feather: True
   # Output settings
   output_full_responses: False
+  output_ni_full_responses: True
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
@@ -79,6 +80,7 @@ network_paths:
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
+  ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"

@@ -167,7 +167,17 @@ def run_ni_staging(
 
     ni_full_responses = ni_full_responses.drop("_merge", axis=1)
 
-    #TODO: need to output the ni_full_responses, conditional on settings in the config,
-    #TODO: in the same way as we do for full_responses
+    # Optionally output the staged NI data
+    if config["global"]["output_ni_full_responses"]:
+        network_or_hdfs = config["global"]["network_or_hdfs"]
+        paths = config[f"{network_or_hdfs}_paths"]
+        NIStagingLogger.info("Starting output of staged NI data...")
+        staging_folder = paths["ni_staging_output_path"]
+        tdate = datetime.now().strftime("%Y-%m-%d")
+        staged_filename = f"staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        write_csv(f"{staging_folder}/{staged_filename}", ni_full_responses)
+        NIStagingLogger.info("Finished output of staged NI data.")
+    else:
+        NIStagingLogger.info("Skipping output of staged NI data...")
 
     return ni_full_responses

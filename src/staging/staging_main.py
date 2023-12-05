@@ -587,7 +587,7 @@ def run_staging(
     sic_division_detailed = read_csv(sic_division_detailed_path)
     StagingMainLogger.info("SIC division detailed mapper File Loaded Successfully...")
 
-    # Output the staged BERD data for BaU testing when on local network.
+    # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = paths["staging_output_path"]
