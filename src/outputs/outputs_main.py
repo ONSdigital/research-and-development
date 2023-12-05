@@ -56,7 +56,7 @@ def run_outputs(
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    imputed_statuses = ["TMI", "CF", "MoR"]
+    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
 
     to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
         estimated_df["imp_marker"] == "R"
