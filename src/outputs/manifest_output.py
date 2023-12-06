@@ -57,7 +57,10 @@ class Manifest:
             )
 
         if not isinstance(pipeline_run_datetime, datetime):
-            raise ManifestError("Pipeline run datetime must be a datetime object.")
+            raise ManifestError(
+                "The datetime of the Pipeline run must be a datetime object."
+                "The data type is wrong."
+            )
 
         self.manifest_datetime = pipeline_run_datetime.strftime("%Y%m%d_%H%M")
         self.manifest_filename = self.manifest_datetime
@@ -136,13 +139,22 @@ class Manifest:
                 f"Missing from file: {set(column_header_list) - set(file_header_list)}\n"  # noqa
                 f"Missing from schema: {set(file_header_list) - set(column_header_list)}\n"  # noqa
             )
-        elif column_header == "" or file_header_string == "":
-            # Raise error if headers are an empty string
-            raise ManifestError("Column headers cannot be an empty string.")
-            
+
         else:
             # Column headers in file match expected column headers
-            ManifestLogger.info(f"Column headers match for {relative_file_path} and its schema.")
+            ManifestLogger.info(
+                f"Column headers match for {relative_file_path} and its schema."
+            )
+
+        # check for empty column headers
+        any_empty_strings = bool([n.strip() for n in file_header_list if n == ""])
+        if (
+            column_header.strip() == ""
+            or file_header_string.strip() == ""
+            or any_empty_strings
+        ):
+            # Raise error if headers are an empty string
+            raise ManifestError("Column headers cannot be an empty string.")
 
         # Checks that column names are not more than 32 chars
         if validate_col_name_length:
