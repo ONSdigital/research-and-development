@@ -81,13 +81,12 @@ df_out = run_short(df)
 
 #%% Apportionment of long forms 
 # Extract the long forms
-cond = df[cols["form"]] == long_code
-df = df[cond]
+df = df[df[cols["form"]] == long_code]
 
 # Count distinct non-empty codes
-df = count_codes(df, "postcode")
-df = count_codes(df, "product")
-df = count_codes(df, "civdef")
+for code in ["postcode", "product", "civdef"]:
+    df = count_codes(df, code)
+
 
 # Selecting cases with one product, many sites
 dfc = df.copy()
