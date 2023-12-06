@@ -25,16 +25,8 @@ cols = {
     "product": "201",
     "civdef": "200",
 }
-ref_col = "reference"
-ins_col = "instance"
-period_col = "period"
-form_col = "formtype"
-pc_col = "postcodes_harmonised"
-percent_col = "602"
 
 want_cals = [str(x) for x in range(202, 251)] + [str(x) for x in range(300, 509)] 
-
-#value_cols = ["211", "407", "408", "409"]
 
 short_code = "0006"
 long_code = "0001"
@@ -125,7 +117,7 @@ def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
     dfc[vcs].replace(0, np.nan, inplace=True)
     return dfc
 
-#%% Calculate whoch columns are numeric
+#%% Calculate which columns are numeric
 exist_cols = [x for x in want_cals if x in dfc.columns]
 value_cols = [x for x in exist_cols if is_numeric_dtype(dfc[x])]
 
@@ -135,32 +127,36 @@ for vc in value_cols:
     dfc = value_to_sites(dfc, vc)
 
 #%% Repeat the product group
-dfc[cols["product"]].fillna("", inplace=True)
-dfc[cols["product"]].astype("str")
-dfc[cols["product"] + "_s"] = (
-    dfc
-    .groupby([cols["ref"], cols["period"]])[cols["product"]]
-    .transform("max"))
+key_cols = ["product", "civdef"]
+for col in key_cols:
+    dfc[cols[col]].fillna("", inplace=True)
+    dfc[cols[col]].astype("str")
+    dfc[cols[col] + "_s"] = (
+        dfc
+        .groupby([cols["ref"], cols["period"]])[cols[col]]
+        .transform("max"))
+
 
 #%% Replace initial values with apportioned values
 indexcols = [cols["ref"], cols["period"], cols["ins"]]
 svaluecols = [x + "_s" for x in value_cols]
-usecols = indexcols + svaluecols + [cols["product"] + "_s"]
+usecols = indexcols + svaluecols + [cols[col] + "_s" for col in key_cols] 
 dfc = dfc[usecols]
 # %%
-df = df.merge(dfc, on=indexcols, how="left")
+df_out = df_out.merge(dfc, on=indexcols, how="left")
 
 
 #%% Replace the values and remove the columns _s
-for vc in value_cols:
-    _ = df.loc[~df[vc + "_s"].isnull(), vc] = df[vc + "_s"]
-df.drop(columns=svaluecols, inplace=True)
+key_names = [cols[x] for x in cols if x in key_cols]
+for vc in value_cols + key_names:
+    _ = df_out.loc[~df_out[vc + "_s"].isnull(), vc] = df_out[vc + "_s"]
+df_out.drop(columns=svaluecols, inplace=True)
 #%%
-df.loc[~df[cols["product"] + "_s"].isnull(), cols["product"]] = df[cols["product"] + "_s"]
+# for col in key_cols:
+#     df_out.loc[~df_out[cols[col] + "_s"].isnull(), cols[col]] = df_out[cols[col] + "_s"]
 #%% Save
-#collist = [cols[x] for x in cols]  + value_cols + [cols["postcode"] + "_count"]
 mypath = os.path.join(mydir, out_file)
-df.to_csv(mypath, index=None)
+df_out.to_csv(mypath, index=None)
 print(f"Output is saved")
 
 
