@@ -110,6 +110,11 @@ schema_paths:
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
   manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
+  status_filtered_schema: "config/output_schemas/status_filtered_schema.toml"
+  fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
+  intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"
+  intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
+  
 
 # Export config for users
 export_choices:
