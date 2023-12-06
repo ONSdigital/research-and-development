@@ -1,6 +1,11 @@
 import json
 import os
 from datetime import datetime
+import logging
+
+
+# set up logging
+ManifestLogger = logging.getLogger(__name__)
 
 
 class ManifestError(Exception):
@@ -131,6 +136,13 @@ class Manifest:
                 f"Missing from file: {set(column_header_list) - set(file_header_list)}\n"  # noqa
                 f"Missing from schema: {set(file_header_list) - set(column_header_list)}\n"  # noqa
             )
+        elif column_header == "" or file_header_string == "":
+            # Raise error if headers are an empty string
+            raise ManifestError("Column headers cannot be an empty string.")
+            
+        else:
+            # Column headers in file match expected column headers
+            ManifestLogger.info(f"Column headers match for {relative_file_path} and its schema.")
 
         # Checks that column names are not more than 32 chars
         if validate_col_name_length:
