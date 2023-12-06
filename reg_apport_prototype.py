@@ -70,12 +70,32 @@ def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
     dfc[vcs].replace(0, np.nan, inplace=True)
     return dfc
 
+# Calculate weights
+def weights(dfc):
+    dfc["s_percent"] = dfc[cols["percent"]]
+    dfc["s_percent"].fillna(0, inplace=True)
+
+    # Set the weight for instance 0 to be 0
+    dfc["s_percent"] = dfc["s_percent"] * dfc[cols["ins"]].astype("bool")
+
+    #%% Calculate the total percent for each reference and period
+    dfc["s_percent_total"] = (
+        dfc.groupby([cols["ref"], cols["period"]])["s_percent"].transform("sum"))
+
+    # Filter out the rows where total percent is zero
+    dfc= dfc[dfc["s_percent_total"] != 0]
+
+    # Compute weights
+    dfc["s_weight"] = dfc["s_percent"] / dfc["s_percent_total"]
+
+    return dfc
+
 #%% Load input data
 mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
 print(f"Input df is read. Columns are:\n{df.dtypes}")
 
-#%% Main functio
+#%% Main function
 # Assign 100 to the "percent" column of short forms 
 df_out = run_short(df)
 
@@ -87,7 +107,6 @@ df = df[df[cols["form"]] == long_code]
 for code in ["postcode", "product", "civdef"]:
     df = count_codes(df, code)
 
-
 # Selecting cases with one product, many sites
 dfc = df.copy()
 dfc = dfc[
@@ -95,22 +114,8 @@ dfc = dfc[
     (dfc[cols["product"] + "_count"] == 1)
 ]
 
-# Create a separate column for site percents
-dfc["s_percent"] = dfc[cols["percent"]]
-dfc["s_percent"].fillna(0, inplace=True)
-
-# Set the weight for instance 0 to be 0
-dfc["s_percent"] = dfc["s_percent"] * dfc[cols["ins"]].astype("bool")
-
-#%% Calculate the total percent for each reference and period
-dfc["s_percent_total"] = (
-    dfc.groupby([cols["ref"], cols["period"]])["s_percent"].transform("sum"))
-
-# Filter out the rows where total percent is zero
-dfc= dfc[dfc["s_percent_total"] != 0]
-
-# Compute weights
-dfc["s_weight"] = dfc["s_percent"] / dfc["s_percent_total"]
+# Calculate weights
+dfc = weights(dfc)
 
 # Applying weights
 # Calculate which value columns are in the data and are numeric
@@ -124,11 +129,12 @@ for vc in value_cols:
 # Repeat the product group and C or D marker across multiple sites
 key_cols = ["product", "civdef"]
 for col in key_cols:
-    dfc[cols[col]].fillna("", inplace=True)
-    dfc[cols[col]].astype("str")
-    dfc[cols[col] + "_s"] = (
+    c = cols[col]
+    dfc[c].fillna("", inplace=True)
+    dfc[c].astype("str")
+    dfc[c + "_s"] = (
         dfc
-        .groupby([cols["ref"], cols["period"]])[cols[col]]
+        .groupby([cols["ref"], cols["period"]])[c]
         .transform("max"))
 
 # Chooses the columns to merge back to the original data
