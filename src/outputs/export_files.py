@@ -98,7 +98,7 @@ def get_file_choice(paths, config: dict):
     output_paths = {
         output_name: path
         for output_name, path in config["export_choices"].items()
-        if "output" in output_name
+        if "export" in output_name
     }
 
     root_output = paths["output_path"]
