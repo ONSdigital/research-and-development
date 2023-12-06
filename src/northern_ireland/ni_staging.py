@@ -17,7 +17,7 @@ def read_ni_files(
     check_file_exists: Callable,
     read_csv: Callable,        
 ) -> Tuple:
-    """Read in the csv files and schemas for NI data."""
+    """Read in CSV files and schemas for NI data."""
     # read in csv files as pandas dataframes
     paths = config[f"{config['global']['network_or_hdfs']}_paths"]
     responses_file = paths["ni_responses_path"]
@@ -67,26 +67,26 @@ def rename_columns(
 
 
 def qa_dataframe_merge(ni_full_responses): 
-    """Output a warning if there are miss-matches in the join."""
+    """Output a warning if there are mismatches in the join."""
     missing_resp = ni_full_responses.loc[ni_full_responses["_merge"] == "right_only"]
     missing_indic = ni_full_responses.loc[ni_full_responses["_merge"] == "left_only"]
 
-    #TODO: ask the business area about these miss-matches, do they just want a warning,
-    #TODO: or do they want an error?
+    # TODO: Need to ask business area about the mismatches, and if they want
+    # TODO  them to produce warnings or an error
 
     if not missing_resp.empty:
         msg = (
             "The following references appear in the indicative data "
             "but not in the responses:"
         )
-        NIStagingLogger.info(msg + str(missing_resp.reference.unique()))
+        NIStagingLogger.warning(msg + str(missing_resp.reference.unique()))
     
     if not missing_indic.empty:
         msg = (
             "The following references appear in the responses data "
             "but not in the indicative data:"
         )
-        NIStagingLogger.info(msg + str(missing_indic.reference.unique()))
+        NIStagingLogger.warning(msg + str(missing_indic.reference.unique()))
     
     return None
     
@@ -100,18 +100,14 @@ def run_ni_staging(
 ) -> pd.DataFrame:
     """Run the Northern Ireland staging and validation module.
 
-    Two csv files are read in as dataframes, one containing the survey question 
-    responses, and the other indicative data.
-    
-    Validation is performed to check column names and cast to the required datatypes, 
-    based on toml schemas. The columns are renamed, again based on the toml schemas.
-
-    The two dataframes are then merged on reference (there are no "instance" entries in
-    the NI data, only one entry per reference.) The resulting dataframe can optionally
-    be output for qa purposes.
-
-    The staged NI data is passed back to the pipeline, but is not used except to be 
-    joined to the GB data for the outputs module.
+    Two CSV files are read in as dataframes, one containing the survey question 
+    responses, and the other indicative data. Validation is performed to check
+    column names and cast to the required datatypes, based on toml schemas. The
+    columns are renamed, again based on the toml schemas. The two dataframes are
+    then merged on reference (there are no "instance" entries in the NI data,
+    only one entry per reference.) The resulting dataframe can optionally be
+    output for qa purposes. The staged NI data is passed back to the pipeline,
+    but is not used except to be joined to the GB data for the outputs module.
 
     Args:
         config (dict): The pipeline configuration
