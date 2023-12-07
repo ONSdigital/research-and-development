@@ -90,6 +90,16 @@ def weights(dfc):
 
     return dfc
 
+# Repeat keys
+def repeat_key(dfc, col):
+    c = cols[col]
+    dfc[c].fillna("", inplace=True)
+    dfc[c].astype("str")
+    dfc[c + "_s"] = (
+        dfc
+        .groupby([cols["ref"], cols["period"]])[c]
+        .transform("max"))
+    return dfc
 #%% Load input data
 mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
@@ -108,12 +118,10 @@ for code in ["postcode", "product", "civdef"]:
     df = count_codes(df, code)
 
 # Selecting cases with one product, many sites
-dfc = df.copy()
-dfc = dfc[
-    (dfc[cols["postcode"] + "_count"] > 1) &
-    (dfc[cols["product"] + "_count"] == 1)
-]
-
+dfm = df.copy()
+dfm = dfm[dfm[cols["postcode"] + "_count"] > 1]
+dfc = dfm[dfm[cols["product"] + "_count"] == 1]
+dfd = dfm[dfm[cols["product"] + "_count"] >= 2]
 # Calculate weights
 dfc = weights(dfc)
 
@@ -129,13 +137,7 @@ for vc in value_cols:
 # Repeat the product group and C or D marker across multiple sites
 key_cols = ["product", "civdef"]
 for col in key_cols:
-    c = cols[col]
-    dfc[c].fillna("", inplace=True)
-    dfc[c].astype("str")
-    dfc[c + "_s"] = (
-        dfc
-        .groupby([cols["ref"], cols["period"]])[c]
-        .transform("max"))
+    dfc = repeat_key(dfc, col)
 
 # Chooses the columns to merge back to the original data
 indexcols = [cols["ref"], cols["period"], cols["ins"]]
@@ -147,12 +149,12 @@ dfc = dfc[usecols]
 # Merges the apportioned values and repeated code back to the main dataframe
 df_out = df_out.merge(dfc, on=indexcols, how="left")
 
-# Replace the values and remove the columns _s
+# Replace the values when the apportioned value is not null
 key_names = [cols[x] for x in cols if x in key_cols]
 for vc in value_cols + key_names:
     _ = df_out.loc[~df_out[vc + "_s"].isnull(), vc] = df_out[vc + "_s"]
 
-# Removes the columns with underscore _s
+# Removes the columns ending with "_s"
 df_out.drop(columns=(svaluecols + scodecols), inplace=True)
 
 # Save the output
