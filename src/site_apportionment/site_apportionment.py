@@ -15,7 +15,7 @@ in_file = "outputs_df_before.pkl"
 out_file = "outputs_df_corrected.csv"
 
 #%% Parameters
-cols = {
+col_name_reference = {
     "ref": "reference",
     "ins": "instance",
     "period": "period",
@@ -26,7 +26,7 @@ cols = {
     "civdef": "200",
 }
 
-want_cals = [str(x) for x in range(202, 509)] 
+cols_to_apportion = [str(x) for x in range(202, 509)] 
 
 short_code = "0006"
 long_code = "0001"
@@ -50,8 +50,8 @@ def apply_short_percent(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame: The modified DataFrame.
     """
     df_out = df.copy()
-    cond = (df_out[cols["form"]] == short_code)
-    df_out[cols["percent"]].mask(cond, other=short_percent, inplace=True)
+    cond = (df_out[col_name_reference["form"]] == short_code)
+    df_out[col_name_reference["percent"]].mask(cond, other=short_percent, inplace=True)
     return df_out
 
 # Counting unique non-blank codes
@@ -60,15 +60,15 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str = "postcode") -> pd.Da
 
     dfa = df.copy()
     # Select columns that we need
-    cols_need = [cols["ref"], cols["period"], cols[code]]
+    cols_need = [col_name_reference["ref"], col_name_reference["period"], col_name_reference[code]]
     dfa = dfa[cols_need]
-    dfa = dfa[dfa[cols[code]].str.len() > 0]
+    dfa = dfa[dfa[col_name_reference[code]].str.len() > 0]
     dfa.drop_duplicates(inplace=True)
-    dfb = dfa.groupby([cols["ref"], cols["period"]]).agg("count").reset_index()
-    dfb.rename({cols[code]: cols[code] + "_count"}, axis='columns', inplace=True)
+    dfb = dfa.groupby([col_name_reference["ref"], col_name_reference["period"]]).agg("count").reset_index()
+    dfb.rename({col_name_reference[code]: col_name_reference[code] + "_count"}, axis='columns', inplace=True)
     df = df.merge(
         dfb,
-        on = [cols["ref"], cols["period"]],
+        on = [col_name_reference["ref"], col_name_reference["period"]],
         how="left")
     return dfcount_codes
 
@@ -84,16 +84,16 @@ def count_unique_codes_in_col(df: pd.DataFrame, col_to_count: str = "postcode") 
     pd.DataFrame: The DataFrame with an additional column showing the count of unique codes.
     """
     # Select the necessary columns and rows
-    dfa = df.loc[df[col_to_count].str.strip().str.len() > 0, [cols["ref"], cols["period"], cols[col_to_count]]]
+    dfa = df.loc[df[col_to_count].str.strip().str.len() > 0, [col_name_reference["ref"], col_name_reference["period"], col_name_reference[col_to_count]]]
 
     # Count the number of unique non-empty codes
-    dfb = dfa.groupby([cols["ref"], cols["period"]])[cols[col_to_count]].nunique().reset_index()
+    dfb = dfa.groupby([col_name_reference["ref"], col_name_reference["period"]])[col_name_reference[col_to_count]].nunique().reset_index()
 
     # Rename the count column
-    dfb.rename(columns={cols[col_to_count]: cols[col_to_count] + "_count"}, inplace=True)
+    dfb.rename(columns={col_name_reference[col_to_count]: col_name_reference[col_to_count] + "_count"}, inplace=True)
 
     # Merge the count column back into the original DataFrame
-    df = df.merge(dfb, on=[cols["ref"], cols["period"]], how="left")
+    df = df.merge(dfb, on=[col_name_reference["ref"], col_name_reference["period"]], how="left")
 
     return df
 
@@ -115,24 +115,24 @@ def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with an additional column showing the distributed values.
     """
-    vcs = vc + "_s"
+    vcs = vc + "_sum"
     dfc[vcs] = dfc[vc].fillna(0)
-    dfc[vcs] = dfc.groupby([cols["ref"], cols["period"]])[vcs].transform("sum")
+    dfc[vcs] = dfc.groupby([col_name_reference["ref"], col_name_reference["period"]])[vcs].transform("sum")
     dfc[vcs] = dfc[vcs] * dfc["s_weight"]
     dfc[vcs].replace(0, np.nan, inplace=True)
     return dfc
 
 # Calculate weights
 def weights(dfc):
-    dfc["s_percent"] = dfc[cols["percent"]]
+    dfc["s_percent"] = dfc[col_name_reference["percent"]]
     dfc["s_percent"].fillna(0, inplace=True)
 
     # Set the weight for instance 0 to be 0
-    dfc["s_percent"] = dfc["s_percent"] * dfc[cols["ins"]].astype("bool")
+    dfc["s_percent"] = dfc["s_percent"] * dfc[col_name_reference["ins"]].astype("bool")
 
     #%% Calculate the total percent for each reference and period
     dfc["s_percent_total"] = (
-        dfc.groupby([cols["ref"], cols["period"]])["s_percent"].transform("sum"))
+        dfc.groupby([col_name_reference["ref"], col_name_reference["period"]])["s_percent"].transform("sum"))
 
     # Filter out the rows where total percent is zero
     dfc= dfc[dfc["s_percent_total"] != 0]
@@ -144,12 +144,12 @@ def weights(dfc):
 
 # Repeat keys
 def repeat_key(dfc, col):
-    c = cols[col]
+    c = col_name_reference[col]
     dfc[c].fillna("", inplace=True)
     dfc[c].astype("str")
     dfc[c + "_s"] = (
         dfc
-        .groupby([cols["ref"], cols["period"]])[c]
+        .groupby([col_name_reference["ref"], col_name_reference["period"]])[c]
         .transform("max"))
     return dfc
 #%% Load input data
@@ -163,7 +163,7 @@ df_out = apply_short_percent(df)
 
 #%% Apportionment of long forms 
 # Extract the long forms
-df = df[df[cols["form"]] == long_code]
+df = df[df[col_name_reference["form"]] == long_code]
 
 # Count distinct non-empty codes
 for code in ["postcode", "product", "civdef"]:
@@ -171,15 +171,15 @@ for code in ["postcode", "product", "civdef"]:
 
 # Selecting cases with one product, many sites
 dfm = df.copy()
-dfm = dfm[dfm[cols["postcode"] + "_count"] > 1]
-dfc = dfm[dfm[cols["product"] + "_count"] == 1]
-dfd = dfm[dfm[cols["product"] + "_count"] >= 2]
+dfm = dfm[dfm[col_name_reference["postcode"] + "_count"] > 1]
+dfc = dfm[dfm[col_name_reference["product"] + "_count"] == 1]
+dfd = dfm[dfm[col_name_reference["product"] + "_count"] >= 2]
 # Calculate weights
 dfc = weights(dfc)
 
 # Applying weights
 # Calculate which value columns are in the data and are numeric
-exist_cols = [x for x in want_cals if x in dfc.columns]
+exist_cols = [x for x in cols_to_apportion if x in dfc.columns]
 value_cols = [x for x in exist_cols if is_numeric_dtype(dfc[x])]
 
 # Calculates the apportioned value for all value columns
@@ -192,9 +192,9 @@ for col in key_cols:
     dfc = repeat_key(dfc, col)
 
 # Chooses the columns to merge back to the original data
-indexcols = [cols["ref"], cols["period"], cols["ins"]]
+indexcols = [col_name_reference["ref"], col_name_reference["period"], col_name_reference["ins"]]
 svaluecols = [x + "_s" for x in value_cols]
-scodecols = [cols[col] + "_s" for col in key_cols]
+scodecols = [col_name_reference[col] + "_s" for col in key_cols]
 usecols = indexcols + svaluecols + scodecols
 dfc = dfc[usecols]
 
@@ -202,7 +202,7 @@ dfc = dfc[usecols]
 df_out = df_out.merge(dfc, on=indexcols, how="left")
 
 # Replace the values when the apportioned value is not null
-key_names = [cols[x] for x in cols if x in key_cols]
+key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
 for vc in value_cols + key_names:
     _ = df_out.loc[~df_out[vc + "_s"].isnull(), vc] = df_out[vc + "_s"]
 
