@@ -10,6 +10,7 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
+from src.staging.staging_helpers import postcode_topup
 from src.utils.wrappers import time_logger_wrap
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -244,6 +245,8 @@ def stage_validate_harmonise_postcodes(
     Stage, validate and harmonise the postcode column
     """
     StagingMainLogger.info("Starting PostCode Validation")
+    full_responses = full_responses.astype({"601": "str"})
+    full_responses["601"] = full_responses["601"].apply(postcode_topup)
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
@@ -256,7 +259,7 @@ def stage_validate_harmonise_postcodes(
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
     StagingMainLogger.info("Finished PostCode Validation")
 
-    return postcode_mapper
+    return full_responses, postcode_mapper
 
 
 def run_staging(
@@ -368,7 +371,7 @@ def run_staging(
         val.check_data_shape(full_responses, raise_error=True)
 
         # Validate the postcodes in data loaded from JSON
-        postcode_mapper = stage_validate_harmonise_postcodes(
+        full_responses, postcode_mapper = stage_validate_harmonise_postcodes(
             config,
             paths,
             full_responses,

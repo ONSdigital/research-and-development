@@ -71,6 +71,8 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
+    df["601"] = df["601"].replace("<NA>    ", np.nan)
+
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
 
@@ -614,8 +616,8 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
             raise ValueError("Column headers must be 'statusencoded' and 'form_status'")
 
         # Check the contents of the "status" and "form_status" columns
-        status_check = df["statusencoded"].astype('str').str.len() == 3
-        from_status_check = df["form_status"].astype('str').str.len().isin([3, 4])
+        status_check = df["statusencoded"].astype("str").str.len() == 3
+        from_status_check = df["form_status"].astype("str").str.len().isin([3, 4])
 
         # Create the "contents_check" column based on the checks
         df["contents_check"] = status_check & from_status_check
