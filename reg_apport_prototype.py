@@ -33,17 +33,29 @@ long_code = "0001"
 short_percent = 100.0
 
 
-# %%  Functions
 
 # Cleaning the short forms
-def run_short(df: pd.DataFrame) -> pd.DataFrame:
+def apply_short_percent(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Apply a specific percentage value to rows in a DataFrame where a certain condition is met.
+
+    This function takes a DataFrame as input, makes a copy of it, and then modifies the copy. 
+    The modification involves replacing values in the 'percent' column with a predefined value 
+    (`short_percent`) for rows where the 'form' column equals a predefined code (`short_code`).
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    pd.DataFrame: The modified DataFrame.
+    """
     df_out = df.copy()
     cond = (df_out[cols["form"]] == short_code)
     df_out[cols["percent"]].mask(cond, other=short_percent, inplace=True)
     return df_out
 
 # Counting unique non-blank codes
-def count_codes(df: pd.DataFrame, code: str = "postcode") -> pd.DataFrame:
+def count_unique_codes_in_col(df: pd.DataFrame, code: str = "postcode") -> pd.DataFrame:
     # Calculates the number of unique non-empty codes
 
     dfa = df.copy()
@@ -58,11 +70,51 @@ def count_codes(df: pd.DataFrame, code: str = "postcode") -> pd.DataFrame:
         dfb,
         on = [cols["ref"], cols["period"]],
         how="left")
+    return dfcount_codes
+
+def count_unique_codes_in_col(df: pd.DataFrame, col_to_count: str = "postcode") -> pd.DataFrame:
+    """
+    Calculates the number of unique non-empty codes.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+    code (str): The column name to count unique codes from.
+
+    Returns:
+    pd.DataFrame: The DataFrame with an additional column showing the count of unique codes.
+    """
+    # Select the necessary columns and rows
+    dfa = df.loc[df[col_to_count].str.strip().str.len() > 0, [cols["ref"], cols["period"], cols[col_to_count]]]
+
+    # Count the number of unique non-empty codes
+    dfb = dfa.groupby([cols["ref"], cols["period"]])[cols[col_to_count]].nunique().reset_index()
+
+    # Rename the count column
+    dfb.rename(columns={cols[col_to_count]: cols[col_to_count] + "_count"}, inplace=True)
+
+    # Merge the count column back into the original DataFrame
+    df = df.merge(dfb, on=[cols["ref"], cols["period"]], how="left")
+
     return df
 
-# Computes the total numerical value across multiple sites and spreads it using 
-# the weights
+# 
 def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
+    """
+    Distributes a column's total value across multiple sites proportionally based on site weights.
+
+    This function takes a DataFrame and a column name as input. It first replaces any NaN values in the 
+    specified column with 0. Then, it computes the total value of this column for each group of 'ref' and 
+    'period'. This total is then distributed across the sites according to their 's_weight'. Finally, it 
+    replaces any 0 values with NaN.
+
+    Args:
+        dfc (pd.DataFrame): The input DataFrame, which must contain columns for 'ref', 'period', the 
+                            specified value column, and 's_weight'.
+        vc (str): The name of the column whose values are to be distributed.
+
+    Returns:
+        pd.DataFrame: The DataFrame with an additional column showing the distributed values.
+    """
     vcs = vc + "_s"
     dfc[vcs] = dfc[vc].fillna(0)
     dfc[vcs] = dfc.groupby([cols["ref"], cols["period"]])[vcs].transform("sum")
@@ -107,7 +159,7 @@ print(f"Input df is read. Columns are:\n{df.dtypes}")
 
 #%% Main function
 # Assign 100 to the "percent" column of short forms 
-df_out = run_short(df)
+df_out = apply_short_percent(df)
 
 #%% Apportionment of long forms 
 # Extract the long forms
@@ -115,7 +167,7 @@ df = df[df[cols["form"]] == long_code]
 
 # Count distinct non-empty codes
 for code in ["postcode", "product", "civdef"]:
-    df = count_codes(df, code)
+    df = count_unique_codes_in_col(df, code)
 
 # Selecting cases with one product, many sites
 dfm = df.copy()
