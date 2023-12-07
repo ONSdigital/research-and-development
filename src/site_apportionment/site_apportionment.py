@@ -26,16 +26,15 @@ col_name_reference = {
     "civdef": "200",
 }
 
-cols_to_apportion = [str(x) for x in range(202, 509)] 
-
+# Constants
 short_code = "0006"
 long_code = "0001"
-short_percent = 100.0
+
 
 
 
 # Cleaning the short forms
-def apply_short_percent(df: pd.DataFrame) -> pd.DataFrame:
+def apply_short_percent(df: pd.DataFrame, short_percent = 100.0is_n) -> pd.DataFrame:
     """
     Apply a specific percentage value to rows in a DataFrame where a certain condition is met.
 
@@ -44,7 +43,7 @@ def apply_short_percent(df: pd.DataFrame) -> pd.DataFrame:
     (`short_percent`) for rows where the 'form' column equals a predefined code (`short_code`).
 
     Parameters:
-    df (pd.DataFrame): The input DataFrame.
+    df (pd.DataFrame): Thef input DataFrame.
 
     Returns:
     pd.DataFrame: The modified DataFrame.
@@ -179,12 +178,13 @@ dfc = weights(dfc)
 
 # Applying weights
 # Calculate which value columns are in the data and are numeric
-exist_cols = [x for x in cols_to_apportion if x in dfc.columns]
-value_cols = [x for x in exist_cols if is_numeric_dtype(dfc[x])]
+cols_to_apportion = [str(x) for x in range(202, 509)] 
+cols_to_apportion = [col for col in cols_to_apportion if col in dfc.columns]
+cols_to_apportion = [col for col in cols_to_apportion if is_numeric_dtype(dfc[col])]
 
 # Calculates the apportioned value for all value columns
-for vc in value_cols:
-    dfc = value_to_sites(dfc, vc)
+for val_col in cols_to_apportion:
+    dfc = value_to_sites(dfc, val_col)
 
 # Repeat the product group and C or D marker across multiple sites
 key_cols = ["product", "civdef"]
@@ -203,8 +203,8 @@ df_out = df_out.merge(dfc, on=indexcols, how="left")
 
 # Replace the values when the apportioned value is not null
 key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
-for vc in value_cols + key_names:
-    _ = df_out.loc[~df_out[vc + "_s"].isnull(), vc] = df_out[vc + "_s"]
+for val_col in value_cols + key_names:
+    _ = df_out.loc[~df_out[val_col + "_s"].isnull(), val_col] = df_out[val_col + "_s"]
 
 # Removes the columns ending with "_s"
 df_out.drop(columns=(svaluecols + scodecols), inplace=True)
