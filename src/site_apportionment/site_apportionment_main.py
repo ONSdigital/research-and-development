@@ -16,6 +16,18 @@ from src.site_apportionment.site_apportionment_helpers import (apply_short_perce
 
 SitesMainLogger = logging.getLogger(__name__)
 
+# Make a dictionary of column names that are more human-readable
+col_name_reference = {
+    "ref": "reference",
+    "ins": "instance",
+    "period": "period",
+    "form": "formtype",
+    "postcode": "postcodes_harmonised",
+    "percent": "602",
+    "product": "201",
+    "civdef": "200",
+}
+
 
 def run_site_apportionment(
     config: dict,
@@ -68,6 +80,14 @@ def run_site_apportionment(
         short_forms_df = df_out.loc[cond]
         short_forms_df = apply_short_percent(short_forms_df, short_percent = short_percent)
         SitesMainLogger.info(f"Short forms assigned {short_percent}%.")
+        
+        # Apportionment of long forms 
+        # Extract the long forms
+        df = df[df[col_name_reference["form"]] == long_code]
+
+# Count distinct non-empty codes
+for code in ["postcode", "product", "civdef"]:
+    df = count_unique_codes_in_col(df, code)
 
         # Return the result
         SitesMainLogger.info("Pro-rating to sites finished.")
