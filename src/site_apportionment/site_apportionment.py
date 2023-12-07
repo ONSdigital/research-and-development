@@ -141,7 +141,6 @@ def weights(dfc):
 
     return dfc
 
-# Repeat keys
 def copy_vals_across_instances(df, cols):
     """
     Copies the max value of specified columns across instances grouped by 'ref' and 'period'.
@@ -184,13 +183,7 @@ df = pd.read_pickle(mypath)
 print(f"Input df is read. Columns are:\n{df.dtypes}")
 
 
-#%% Apportionment of long forms 
-# Extract the long forms
-df = df[df[col_name_reference["form"]] == long_code]
-
-# Count distinct non-empty codes
-for code in ["postcode", "product", "civdef"]:
-    df = count_unique_codes_in_col(df, code)
+#%% 
 
 # Selecting cases with one product, many sites
 dfm = df.copy()
