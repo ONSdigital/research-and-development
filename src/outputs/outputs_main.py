@@ -14,7 +14,6 @@ from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.outputs_helpers import postcode_topup
 from src.outputs.total_fte import qa_output_total_fte
-from src.site_apportionment.site_apportionment_main import run_site_apportionment
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -96,8 +95,6 @@ def run_outputs(
     mydir = "D:/data/res_dev/outputs/reg_apport/"
     myfile = "outputs_df_before.pkl"
     outputs_df.to_pickle(mydir + myfile)
-
-    outputs_df = run_site_apportionment(config, outputs_df)
 
     myfile = "outputs_df_corrected.csv"
     outputs_df.to_csv(mydir + myfile, index=None)
