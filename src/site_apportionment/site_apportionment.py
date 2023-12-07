@@ -97,7 +97,7 @@ def count_unique_codes_in_col(df: pd.DataFrame, col_to_count: str = "postcode") 
     return df
 
 # 
-def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
+def value_to_sites(df : pd.DataFrame, vc: str) -> pd.DataFrame:
     """
     Distributes a column's total value across multiple sites proportionally based on site weights.
 
@@ -114,12 +114,24 @@ def value_to_sites(dfc : pd.DataFrame, vc: str) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with an additional column showing the distributed values.
     """
-    vcs = vc + "_sum"
-    dfc[vcs] = dfc[vc].fillna(0)
-    dfc[vcs] = dfc.groupby([col_name_reference["ref"], col_name_reference["period"]])[vcs].transform("sum")
-    dfc[vcs] = dfc[vcs] * dfc["s_weight"]
-    dfc[vcs].replace(0, np.nan, inplace=True)
-    return dfc
+    # Create a new column name by appending "_site" to the input column name
+    vcs = vc + "_site"
+    
+    # Replace any NaN values in the input column with 0
+    df[vcs] = df[vc].fillna(0)
+    
+    # Group the DataFrame by 'ref' and 'period', compute the sum of the new column in each group,
+    # and store these sums in the new column
+    df[vcs] = df.groupby([col_name_reference["ref"], col_name_reference["period"]])[vcs].transform("sum")
+    
+    # Multiply the new column by the 'site_weight' column to distribute the values across the sites
+    df[vcs] = df[vcs] * df["site_weight"]
+    
+    # Replace any 0 values in the new column with NaN
+    df[vcs].replace(0, np.nan, inplace=True)
+    
+    # Return the modified DataFrame
+    return df
 
 # Calculate weights
 def weights(dfc):
