@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 def postcode_topup(mystr: str, target_len: int = 8) -> str:
     """Regulates the number of spaces between the first and the second part of
     a postcode, so that the total length is 8 characters.
@@ -22,16 +25,16 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
     Returns:
         str: The postcode topped up to the desired number of characters.
     """
-
-    mystr = mystr.upper()
-    parts = mystr.split()
-    if len(parts) >= 2:
-        part1 = parts[0]
-        part2 = parts[1]
-        num_spaces = target_len - len(part1) - len(part2)
-        if num_spaces >= 0:
-            return part1 + " " * num_spaces + part2
+    if pd.notna(mystr):
+        mystr = mystr.upper()
+        parts = mystr.split()
+        if len(parts) >= 2:
+            part1 = parts[0]
+            part2 = parts[1]
+            num_spaces = target_len - len(part1) - len(part2)
+            if num_spaces >= 0:
+                return part1 + " " * num_spaces + part2
+            else:
+                return (part1 + part2)[:target_len]
         else:
-            return (part1 + part2)[:target_len]
-    else:
-        return mystr[:target_len].ljust(target_len, " ")
+            return mystr[:target_len].ljust(target_len, " ")

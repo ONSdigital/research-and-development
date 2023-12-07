@@ -245,7 +245,6 @@ def stage_validate_harmonise_postcodes(
     Stage, validate and harmonise the postcode column
     """
     StagingMainLogger.info("Starting PostCode Validation")
-    full_responses = full_responses.astype({"601": "str"})
     full_responses["601"] = full_responses["601"].apply(postcode_topup)
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist, raise_error=True)

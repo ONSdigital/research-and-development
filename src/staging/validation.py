@@ -71,8 +71,6 @@ def validate_post_col(
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
 
-    df["601"] = df["601"].replace("<NA>    ", np.nan)
-
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
 
