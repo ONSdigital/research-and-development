@@ -160,12 +160,22 @@ def copy_vals_across_instances(df, cols):
     Returns:
         pd.DataFrame: The DataFrame with additional columns showing the maximum values.
     """
+    # Loop over each column in the input list
     for col in cols:
-        c = col_name_reference[col]
-        df[c].fillna("", inplace=True)
-        df[c] = df[c].astype("str")
-        df[c + "_s"] = df.groupby([col_name_reference["ref"], 
-                                     col_name_reference["period"]])[c].transform("max")
+        # Get the actual column name from the reference dictionary
+        col_number = col_name_reference[col]
+        
+        # Fill any missing values in the column with an empty string
+        df[col_number].fillna("", inplace=True)
+        
+        # Convert the column to string type
+        df[col_number] = df[col_number].astype("str")
+        
+        # Group the DataFrame by 'ref' and 'period', compute the max value in each group for the current column,
+        # and store these max values in a new column with "_s" appended to the original column name
+        df[col_number + "_s"] = df.groupby([col_name_reference["ref"],
+                                            col_name_reference["period"]])[col_number].transform("max")
+                                
     return df
 
 
