@@ -114,7 +114,7 @@ schema_paths:
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
-  
+
 
 # Export config for users
 export_choices:
@@ -124,7 +124,7 @@ export_choices:
   export_gb_sas: None # Can be set to None
   export_intram_by_pg: None # Can be set to None
   export_intram_by_itl1: None # Can be set to None
-  export_intram_by_civil_defence: "output_intram_by_civil_defence2023-12-06_v68.csv" # Can be set to None
+  export_intram_by_civil_defence: None # Can be set to None
   export_intram_by_sic: "output_intram_by_sic_2023-12-06_v68.csv" # Can be set to None
   export_status_filtered: None # Can be set to None
   export_fte_total_qa: "total_fte_qa_2023-12-06_v68.csv" # Can be set to None
