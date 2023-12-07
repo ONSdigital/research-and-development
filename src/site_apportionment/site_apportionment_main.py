@@ -12,6 +12,8 @@ import pandas as pd
 # from src.staging import pg_conversion as pg
 # from src.utils.wrappers import time_logger_wrap
 
+from src.site_apportionment.site_apportionment_helpers import (apply_short_percent)
+
 SitesMainLogger = logging.getLogger(__name__)
 
 
@@ -63,8 +65,9 @@ def run_site_apportionment(
 
         # Apply 100 percent to short forms
         cond = df_out[form_col] == short_code
-        df_out[pecent_col].mask(cond, other=short_percent, inplace=True)
-        SitesMainLogger.info("Short forms assigned 100 pecent.")
+        short_forms_df = df_out.loc[cond]
+        short_forms_df = apply_short_percent(short_forms_df, short_percent = short_percent)
+        SitesMainLogger.info(f"Short forms assigned {short_percent}%.")
 
         # Return the result
         SitesMainLogger.info("Pro-rating to sites finished.")

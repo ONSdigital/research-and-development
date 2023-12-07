@@ -167,14 +167,12 @@ def copy_vals_across_instances(df, cols):
         df[c + "_s"] = df.groupby([col_name_reference["ref"], 
                                      col_name_reference["period"]])[c].transform("max")
     return df
-#%% Load input data
+
+
 mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
 print(f"Input df is read. Columns are:\n{df.dtypes}")
 
-#%% Main function
-# Assign 100 to the "percent" column of short forms 
-df_out = apply_short_percent(df)
 
 #%% Apportionment of long forms 
 # Extract the long forms
