@@ -142,14 +142,14 @@ def weights(dfc):
     return dfc
 
 # Repeat keys
-def repeat_key(dfc, cols):
+def copy_vals_across_instances(df, cols):
     for col in cols:
         c = col_name_reference[col]
-        dfc[c].fillna("", inplace=True)
-        dfc[c] = dfc[c].astype("str")
-        dfc[c + "_s"] = dfc.groupby([col_name_reference["ref"], 
+        df[c].fillna("", inplace=True)
+        df[c] = df[c].astype("str")
+        df[c + "_s"] = df.groupby([col_name_reference["ref"], 
                                      col_name_reference["period"]])[c].transform("max")
-    return dfc
+    return df
 #%% Load input data
 mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
@@ -187,7 +187,7 @@ for val_col in cols_to_apportion:
 
 # Repeat the product group and C or D marker across multiple sites
 key_cols = ["product", "civdef"]
-dfc = repeat_key(dfc, key_cols)
+dfc = copy_vals_across_instances(dfc, key_cols)
 
 # Chooses the columns to merge back to the original data
 indexcols = [col_name_reference["ref"], col_name_reference["period"], col_name_reference["ins"]]
