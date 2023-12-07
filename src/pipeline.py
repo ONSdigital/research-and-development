@@ -145,20 +145,27 @@ def run_pipeline(start, config_path):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(
+    outliered_responses_df = run_outliers(
         imputed_df, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses, weighted_responses = run_estimation(
-        outliered_responses, cellno_df, config, write_csv, run_id
+    estimated_responses_df, weighted_responses_df = run_estimation(
+        outliered_responses_df,
+        cellno_df,
+        config,
+        write_csv,
+        run_id
     )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Apportionment to sites
-    
+    estimated_responses_df = run_site_apportionment(
+                                                    config,
+                                                    estimated_responses_df
+                                                    )
 
     # Data processing: Regional Apportionment
 
@@ -173,8 +180,8 @@ def run_pipeline(start, config_path):
 
     # Run short frozen form output
     run_outputs(
-        estimated_responses,
-        weighted_responses,
+        estimated_responses_df,
+        weighted_responses_df,
         config,
         write_csv,
         run_id,
