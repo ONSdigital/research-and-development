@@ -143,6 +143,23 @@ def weights(dfc):
 
 # Repeat keys
 def copy_vals_across_instances(df, cols):
+    """
+    Copies the max value of specified columns across instances grouped by 'ref' and 'period'.
+
+    This function takes a DataFrame and a list of column names as input. For each column, it fills any 
+    missing values with an empty string and converts the column to str type. 
+    Then, it computes the maximum value of the column for each group of 'ref' and 'period'. 
+    
+    The maximum values are stored in a new column with the suffix "_s" added to the original column name.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame, which must contain columns for 'ref', 'period', and the 
+                           specified columns.
+        cols (list): A list of column names to process.
+
+    Returns:
+        pd.DataFrame: The DataFrame with additional columns showing the maximum values.
+    """
     for col in cols:
         c = col_name_reference[col]
         df[c].fillna("", inplace=True)
