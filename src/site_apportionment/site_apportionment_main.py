@@ -15,7 +15,7 @@ import pandas as pd
 SitesMainLogger = logging.getLogger(__name__)
 
 
-def run_sites(
+def run_site_apportionment(
     config: dict,
     df: pd.DataFrame,
     # check_file_exists: Callable,

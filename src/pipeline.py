@@ -13,6 +13,7 @@ from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
+from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
@@ -155,6 +156,9 @@ def run_pipeline(start, config_path):
         outliered_responses, cellno_df, config, write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
+
+    # Data processing: Apportionment to sites
+    
 
     # Data processing: Regional Apportionment
 
