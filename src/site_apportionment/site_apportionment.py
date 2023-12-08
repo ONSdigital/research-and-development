@@ -25,16 +25,30 @@ col_name_reference = {
     "product": "201",
     "civdef": "200",
 }
+# To do: a dictionary seems an overkill. Better idea: juts have variables:
+# ref = "reference"
+# ins = "instance"
+# period = "period"
+# form = "formtype"
+# postcode = "postcodes_harmonised"
+# percent = "602"
+# product = "201"
+# civdef = "200"
+
+# instead of col_name_reference["form"] just write form and so on
+# can do a batch find and replace later
+
 
 # Constants
 short_code = "0006"
 long_code = "0001"
 
+# Value columns that we want to apportion
+want_cals = [str(x) for x in range(202, 509)]
 
 
-
-# Cleaning the short forms
-def apply_short_percent(df: pd.DataFrame, short_percent = 100.0is_n) -> pd.DataFrame:
+#%%Cleaning the short forms
+def apply_short_percent(df: pd.DataFrame, short_percent = 100.0) -> pd.DataFrame:
     """
     Apply a specific percentage value to rows in a DataFrame where a certain condition is met.
 
@@ -53,7 +67,7 @@ def apply_short_percent(df: pd.DataFrame, short_percent = 100.0is_n) -> pd.DataF
     df_out[col_name_reference["percent"]].mask(cond, other=short_percent, inplace=True)
     return df_out
 
-# Counting unique non-blank codes
+#%% Counting unique non-blank codes
 def count_unique_codes_in_col(df: pd.DataFrame, code: str = "postcode") -> pd.DataFrame:
     # Calculates the number of unique non-empty codes
 
@@ -69,32 +83,32 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str = "postcode") -> pd.Da
         dfb,
         on = [col_name_reference["ref"], col_name_reference["period"]],
         how="left")
-    return dfcount_codes
-
-def count_unique_codes_in_col(df: pd.DataFrame, col_to_count: str = "postcode") -> pd.DataFrame:
-    """
-    Calculates the number of unique non-empty codes.
-
-    Parameters:
-    df (pd.DataFrame): The input DataFrame.
-    code (str): The column name to count unique codes from.
-
-    Returns:
-    pd.DataFrame: The DataFrame with an additional column showing the count of unique codes.
-    """
-    # Select the necessary columns and rows
-    dfa = df.loc[df[col_to_count].str.strip().str.len() > 0, [col_name_reference["ref"], col_name_reference["period"], col_name_reference[col_to_count]]]
-
-    # Count the number of unique non-empty codes
-    dfb = dfa.groupby([col_name_reference["ref"], col_name_reference["period"]])[col_name_reference[col_to_count]].nunique().reset_index()
-
-    # Rename the count column
-    dfb.rename(columns={col_name_reference[col_to_count]: col_name_reference[col_to_count] + "_count"}, inplace=True)
-
-    # Merge the count column back into the original DataFrame
-    df = df.merge(dfb, on=[col_name_reference["ref"], col_name_reference["period"]], how="left")
-
     return df
+
+# def count_unique_codes_in_col(df: pd.DataFrame, col_to_count: str = "postcode") -> pd.DataFrame:
+#     """
+#     Calculates the number of unique non-empty codes.
+
+#     Parameters:
+#     df (pd.DataFrame): The input DataFrame.
+#     code (str): The column name to count unique codes from.
+
+#     Returns:
+#     pd.DataFrame: The DataFrame with an additional column showing the count of unique codes.
+#     """
+#     # Select the necessary columns and rows
+#     dfa = df.loc[df[col_to_count].str.strip().str.len() > 0, [col_name_reference["ref"], col_name_reference["period"], col_name_reference[col_to_count]]]
+
+#     # Count the number of unique non-empty codes
+#     dfb = dfa.groupby([col_name_reference["ref"], col_name_reference["period"]])[col_name_reference[col_to_count]].nunique().reset_index()
+
+#     # Rename the count column
+#     dfb.rename(columns={col_name_reference[col_to_count]: col_name_reference[col_to_count] + "_count"}, inplace=True)
+
+#     # Merge the count column back into the original DataFrame
+#     df = df.merge(dfb, on=[col_name_reference["ref"], col_name_reference["period"]], how="left")
+
+#     return df
 
 # 
 def value_to_sites(df : pd.DataFrame, vc: str) -> pd.DataFrame:
@@ -103,12 +117,12 @@ def value_to_sites(df : pd.DataFrame, vc: str) -> pd.DataFrame:
 
     This function takes a DataFrame and a column name as input. It first replaces any NaN values in the 
     specified column with 0. Then, it computes the total value of this column for each group of 'ref' and 
-    'period'. This total is then distributed across the sites according to their 's_weight'. Finally, it 
+    'period'. This total is then distributed across the sites according to their 'site_weight'. Finally, it 
     replaces any 0 values with NaN.
 
     Args:
         dfc (pd.DataFrame): The input DataFrame, which must contain columns for 'ref', 'period', the 
-                            specified value column, and 's_weight'.
+                            specified value column, and 'site_weight'.
         vc (str): The name of the column whose values are to be distributed.
 
     Returns:
@@ -149,7 +163,7 @@ def weights(dfc):
     dfc= dfc[dfc["s_percent_total"] != 0]
 
     # Compute weights
-    dfc["s_weight"] = dfc["s_percent"] / dfc["s_percent_total"]
+    dfc["site_weight"] = dfc["s_percent"] / dfc["s_percent_total"]
 
     return dfc
 
@@ -161,7 +175,7 @@ def copy_vals_across_instances(df, cols):
     missing values with an empty string and converts the column to str type. 
     Then, it computes the maximum value of the column for each group of 'ref' and 'period'. 
     
-    The maximum values are stored in a new column with the suffix "_s" added to the original column name.
+    The maximum values are stored in a new column with the suffix "_site" added to the original column name.
 
     Args:
         df (pd.DataFrame): The input DataFrame, which must contain columns for 'ref', 'period', and the 
@@ -183,8 +197,8 @@ def copy_vals_across_instances(df, cols):
         df[col_number] = df[col_number].astype("str")
         
         # Group the DataFrame by 'ref' and 'period', compute the max value in each group for the current column,
-        # and store these max values in a new column with "_s" appended to the original column name
-        df[col_number + "_s"] = df.groupby([col_name_reference["ref"],
+        # and store these max values in a new column with "_site" appended to the original column name
+        df[col_number + "_site"] = df.groupby([col_name_reference["ref"],
                                             col_name_reference["period"]])[col_number].transform("max")
                                 
     return df
@@ -192,20 +206,27 @@ def copy_vals_across_instances(df, cols):
 
 mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
-print(f"Input df is read. Columns are:\n{df.dtypes}")
+print(f"Input df is read. Dataframe shape:\n{df.shape}")
+
+#%% Calculate which columns are present and  numeric
+exist_cols = [x for x in want_cals if x in dfc.columns]
+value_cols = [x for x in exist_cols if is_numeric_dtype(dfc[x])]
 
 
-#%% 
+#%% Calculate the number of uniqie non-blank codes
+for code in ["postcode", "product", "civdef"]:
+    df = count_unique_codes_in_col(df, code)
 
-# Selecting cases with one product, many sites
+#%% Selecting cases with one product, many sites
 dfm = df.copy()
 dfm = dfm[dfm[col_name_reference["postcode"] + "_count"] > 1]
 dfc = dfm[dfm[col_name_reference["product"] + "_count"] == 1]
 dfd = dfm[dfm[col_name_reference["product"] + "_count"] >= 2]
-# Calculate weights
+
+#%% Calculate weights
 dfc = weights(dfc)
 
-# Applying weights
+#%% Applying weights
 # Calculate which value columns are in the data and are numeric
 cols_to_apportion = [str(x) for x in range(202, 509)] 
 cols_to_apportion = [col for col in cols_to_apportion if col in dfc.columns]
@@ -221,8 +242,8 @@ dfc = copy_vals_across_instances(dfc, key_cols)
 
 # Chooses the columns to merge back to the original data
 indexcols = [col_name_reference["ref"], col_name_reference["period"], col_name_reference["ins"]]
-svaluecols = [x + "_s" for x in value_cols]
-scodecols = [col_name_reference[col] + "_s" for col in key_cols]
+svaluecols = [x + "_site" for x in value_cols]
+scodecols = [col_name_reference[col] + "_site" for col in key_cols]
 usecols = indexcols + svaluecols + scodecols
 dfc = dfc[usecols]
 
@@ -232,9 +253,9 @@ df_out = df_out.merge(dfc, on=indexcols, how="left")
 # Replace the values when the apportioned value is not null
 key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
 for val_col in value_cols + key_names:
-    _ = df_out.loc[~df_out[val_col + "_s"].isnull(), val_col] = df_out[val_col + "_s"]
+    _ = df_out.loc[~df_out[val_col + "_site"].isnull(), val_col] = df_out[val_col + "_site"]
 
-# Removes the columns ending with "_s"
+# Removes the columns ending with "_site"
 df_out.drop(columns=(svaluecols + scodecols), inplace=True)
 
 # Save the output
