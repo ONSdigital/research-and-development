@@ -97,9 +97,9 @@ def run_imputation(
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
     # Load manual imputation file
-    df = mimp.merge_manual_imputation(df, manual_trimming_df)
-
-    trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
+    if "manual_trim" in df.columns:
+        df = mimp.merge_manual_imputation(df, manual_trimming_df)
+        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
     if backdata is not None:
