@@ -9,6 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+from src.northern_ireland.ni_staging import run_ni_staging
 from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
@@ -86,14 +87,30 @@ def run_pipeline(start, config_path):
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
-    # Load SPP data from DAP
+    # NI staging and validation
+    #TODO: move this to after the main snapshot staging 
+    # (it's temp. here for speed of development)
+    if global_config["load_ni_data"]:
+        MainLogger.info("Starting NI Data Staging and Validation...")
+        ni_full_responses = run_ni_staging(
+            config, 
+            check_file_exists,
+            read_csv,
+            write_csv,
+            run_id,
+        )
+        MainLogger.info("Finished NI Data Ingest.")
+        # for now print to the screen
+        print(ni_full_responses.head())
+    else:
+        MainLogger.info("Skipping NI data staging.")
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
 
     (
         full_responses,
-        secondary_full_responses,
+        secondary_full_responses, #  may be needed later for freezing
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
@@ -118,10 +135,9 @@ def run_pipeline(start, config_path):
         read_feather,
         write_feather,
         isfile,
-        list_files,
         run_id,
     )
-    MainLogger.info("Finished Data Ingest...")
+    MainLogger.info("Finished Data Ingest.")
 
     # Construction module
     MainLogger.info("Starting Construction...")
@@ -193,7 +209,6 @@ def run_pipeline(start, config_path):
         cora_mapper,
         postcode_mapper,
         itl_mapper,
-        pg_num_alpha,
         sic_pg_num,
         pg_detailed,
         itl1_detailed,
