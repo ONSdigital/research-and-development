@@ -209,8 +209,8 @@ df = pd.read_pickle(mypath)
 print(f"Input df is read. Dataframe shape:\n{df.shape}")
 
 #%% Calculate which columns are present and  numeric
-exist_cols = [x for x in want_cals if x in dfc.columns]
-value_cols = [x for x in exist_cols if is_numeric_dtype(dfc[x])]
+exist_cols = [x for x in want_cals if x in df.columns]
+value_cols = [x for x in exist_cols if is_numeric_dtype(df[x])]
 
 
 #%% Calculate the number of uniqie non-blank codes
@@ -248,7 +248,7 @@ usecols = indexcols + svaluecols + scodecols
 dfc = dfc[usecols]
 
 # Merges the apportioned values and repeated code back to the main dataframe
-df_out = df_out.merge(dfc, on=indexcols, how="left")
+df_out = df.merge(dfc, on=indexcols, how="left")
 
 # Replace the values when the apportioned value is not null
 key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
