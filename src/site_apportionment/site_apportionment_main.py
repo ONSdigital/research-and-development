@@ -27,7 +27,9 @@ def run_site_apportionment(config: dict, df: pd.DataFrame) -> pd.DataFrame:
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
         SitesMainLogger.info("Starting apportionment to sites...")
-        return sap.apportion_sites(df)
+        df_out = sap.apportion_sites(df)
+        SitesMainLogger.info("Finished apportionment to sites.")
+        return df_out
     else:
-        SitesMainLogger.info("PApportionment to sites disabled, skipp")
+        SitesMainLogger.info("Apportionment to sites disabled, skipped")
         return df

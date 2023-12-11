@@ -1,7 +1,9 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import os
+import logging
 
+SitesApportionmentLogger = logging.getLogger(__name__)
 
 # Colunm names redefined for convenience
 ref = "reference"
@@ -92,17 +94,18 @@ def weights(df):
 
 def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     """Apportions the numerical values for each product group across multiple
-    sites, using percents as weights.
-    Selects the records that are long forms, and have multiple non-empty
-    postcodes. Splits the dataframe in two, codes and sites.
-    Codes have reference, period, pg_alpha, civil or defence, and pg_numeric,
-    and all numeric columns. Sites has reference, period, instance and all other
-    fields, except for product group, civil or defence and numeric product
-    groups.
-    For sites, weights are calculated using the percents.
-    Then, a Cartesian product of product groups and sites is created, and the
-    weights of each site are applied to values of each product.
-    Also, for short forms, sets percent to 100.
+    sites, using percents from question 602 to compute weights.
+    Selects the records long from references that have multiple non-empty
+    postcodes. Splits the dataframe in two, codes and sites. Codes have
+    reference, period, product group (unique combinations of product, civil or
+    defence and pg_numeric) and (all numeric columns. Sites have reference,
+    period and all other fields except for product group keys and numerical
+    values. Sites dataframe contains multiple instances, with instance 1 and
+    higher having different postcodes and with percents for each site.
+    For sites, weights are calculated using the percents. Then, a Cartesian
+    product of product groups and sites is created, and the weights of each site
+    are applied to values of each product. Also, for short forms, sets percent
+    to 100.
 
     Args:
         df (pd.DataFrame): Dataframe containing all input data
@@ -132,28 +135,28 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     value_cols = [x for x in exist_cols if is_numeric_dtype(df[x])]
 
     # Calculate the number of uniqie non-blank postcodes
-    dfm = count_unique_codes_in_col(df, postcode)
+    df = count_unique_codes_in_col(df, postcode)
 
-    # Condition of long forms, many sites, instance 1 and above, non-null postcodes
-    cond_mm = (
-        (dfm[form] == long_code) &
-        (dfm[postcode + "_count"] > 1) &
-        (dfm[ins] >= 1) &
-        (dfm[postcode].str.len() > 0)
+    # Condition of long forms, many sites, instance >=1, non-null postcodes
+    cond = (
+        (df[form] == long_code) &
+        (df[postcode + "_count"] > 1) &
+        (df[ins] >= 1) &
+        (df[postcode].str.len() > 0)
     )
 
-    # Dataframe witm many products - for apportionment and Cartesian product
-    dfmm = dfm[cond_mm]
-    dfmm.drop(columns=[postcode + "_count"], inplace=True)
+    # Dataframe dfm with many products - for apportionment and Cartesian product
+    dfm = df[cond]
+    dfm.drop(columns=[postcode + "_count"], inplace=True)
 
     # Dataframe with everything else - save unchanged
-    df_out = dfm[~cond_mm]
+    df_out = df[~cond]
     df_out.drop(columns=[postcode + "_count"], inplace=True)
 
     # df_codes: dataframe with codes and numerical values
     group_cols = [ref, period]
     code_cols = [product, civdef, pg_num]
-    df_codes = dfmm.copy()[group_cols + code_cols + value_cols]
+    df_codes = dfm.copy()[group_cols + code_cols + value_cols]
 
     # Remove blank products
     df_codes = df_codes[df_codes[product].str.len() > 0]
@@ -166,16 +169,18 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
 
     # df_stes: dataframe with postcodes, percents, and everyting else
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
-    df_sites = dfmm.copy()[site_cols]
+    df_sites = dfm.copy()[site_cols]
 
-    # check for postcode duplicates
+    # Check for postcode duplicates for QA
     df_sites["site_count"] = (
         df_sites.groupby(group_cols + [postcode])[postcode].transform("count")
     )
     df_duplicate_sites = df_sites[df_sites["site_count"] > 1]
     num_duplicate_sites = df_duplicate_sites.shape[0]
     if num_duplicate_sites:
-        print(f"There are {num_duplicate_sites} duplicate sites")
+        SitesApportionmentLogger.info(
+            f"There are {num_duplicate_sites} duplicate sites."
+        )
 
     # Calculate weights
     df_sites = weights(df_sites)
@@ -190,10 +195,10 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     # Restore the original column order
     df_cart = df_cart[df_cols]
 
-    # Append the columns back to the original df
+    # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)
 
-    # Order by period, ref, instance, ASC
+    # Sort by period, ref, instance in ascending order.
     df_out.sort_values(by=[period, ref, ins], ascending=True, inplace=True)
 
     return df_out
