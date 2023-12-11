@@ -106,7 +106,6 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     df_out = dfm[~cond_mm]
     df_out.drop(columns=[postcode + "_count"], inplace=True)
 
-
     # df_codes: dataframe with codes and numerical values
     group_cols = [ref, period]
     code_cols = [product, civdef, pg_num]

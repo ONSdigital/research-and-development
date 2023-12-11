@@ -16,8 +16,8 @@ global:
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
-  # Pro-rating settings
-  prorate_sites: True
+  # Apportionment to sites settings
+  apportion_sites: True
   # Output settings
   output_full_responses: False
   output_auto_outliers: False
