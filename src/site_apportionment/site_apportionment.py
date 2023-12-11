@@ -320,14 +320,14 @@ df_cart = df_cart[df_cols]
 
 #%%Append the columns back to the original df
 df_out = df1m.append(df_cart, ignore_index=True)
-#%% Output
-out_file = "dfmm.csv"
-mypath = os.path.join(mydir, out_file)
-dfmm.to_csv(mypath, index=None)
 
-out_file = "df_codes.csv"
+#%% Order by period, ref, instance, ASC
+df_out.sort_values(by=[period, ref, ins], ascending=True, inplace=True)
+#%% Output
+out_file = "df_out.csv"
 mypath = os.path.join(mydir, out_file)
-df_codes.to_csv(mypath, index=None)
+df_out.to_csv(mypath, index=None)
+
 print(f"Output is saved")
 
 #%% old code below
