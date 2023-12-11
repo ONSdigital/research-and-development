@@ -307,6 +307,19 @@ if num_duplicate_sites:
 
 #%% Apply weights
 df_sites = weights(df_sites)
+
+#%%  Merge codes to sites to create a Cartesian product
+df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
+
+#%% Apply weights
+for value_col in value_cols:
+    df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
+
+#%% Restore the original column order
+df_cart = df_cart[df_cols]
+
+#%%Append the columns back to the original df
+df_out = df1m.append(df_cart, ignore_index=True)
 #%% Output
 out_file = "dfmm.csv"
 mypath = os.path.join(mydir, out_file)
