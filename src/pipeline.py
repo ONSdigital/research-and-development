@@ -163,13 +163,13 @@ def run_pipeline(start, config_path):
 
     # Data processing: Apportionment to sites
     estimated_responses_df = run_site_apportionment(
-                                                    config,
-                                                    estimated_responses_df
-                                                    )
+        config,
+        estimated_responses_df
+    )
     weighted_responses_df = run_site_apportionment(
-                                                    config,
-                                                    weighted_responses_df
-                                                    )
+        config,
+        weighted_responses_df
+    )
 
     # Data processing: Regional Apportionment
 

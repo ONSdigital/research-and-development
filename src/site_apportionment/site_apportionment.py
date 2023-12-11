@@ -19,8 +19,18 @@ short_code = "0006"
 long_code = "0001"
 
 
-def count_unique_codes_in_col(df: pd.DataFrame, code) -> pd.DataFrame:
-    """Calculates the number of unique non-empty codes"""
+def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
+    """Calculates the number of unique non-empty codes in a column.
+
+    Args:
+        df (pd.DataFrame): A dataframe containing all data
+        code (str): Name of the column containing codes
+
+    Returns:
+        (pd.DataFrame): A copy of originl dataframe with an additional column
+        called the same as code with suffix "_count" countaining the number of
+        unique non-empty codes
+    """
 
     dfa = df.copy()
 
@@ -39,7 +49,24 @@ def count_unique_codes_in_col(df: pd.DataFrame, code) -> pd.DataFrame:
 
 
 def weights(df):
-    """Calculates site weights based on the percents"""
+    """Calculates site weights based on the percents. Copies the precent value
+    from its original location (question 602) to a new column "site_percent".
+    If the percent value is Null, fills it with zero.
+
+    Adds all percents per RU reference and period and calculates
+    site_percent_total. If the total for a reference is zero, apportionment
+    cannot be done, and this reference is removed.
+    Re-noramalises the percent values by total, to compute site_weight. This
+    deals with the case when the users entered percents incorrectly, so they
+    don't sum up to 100.
+
+    Args:
+        df (pd.DataFrame): A dataframe containing all data
+
+    Returns:
+        (pd.DataFrame): A copy of original dataframe with an additional column
+        called site_weight countaining the weights of each site, between 0 and 1
+    """
     dfc = df.copy()
     dfc["site_percent"] = dfc[percent]
     dfc["site_percent"].fillna(0, inplace=True)
@@ -66,6 +93,23 @@ def weights(df):
 def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     """Apportions the numerical values for each product group across multiple
     sites, using percents as weights.
+    Selects the records that are long forms, and have multiple non-empty
+    postcodes. Splits the dataframe in two, codes and sites.
+    Codes have reference, period, pg_alpha, civil or defence, and pg_numeric,
+    and all numeric columns. Sites has reference, period, instance and all other
+    fields, except for product group, civil or defence and numeric product
+    groups.
+    For sites, weights are calculated using the percents.
+    Then, a Cartesian product of product groups and sites is created, and the
+    weights of each site are applied to values of each product.
+    Also, for short forms, sets percent to 100.
+
+    Args:
+        df (pd.DataFrame): Dataframe containing all input data
+
+    Returns:
+        (pd.DataFrame): A dataframe with the same columns, with applied site
+        apportionment
     """
 
     # Value columns that we want to apportion
