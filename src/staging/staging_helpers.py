@@ -29,14 +29,28 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
     if pd.notna(mystr):
         mystr = mystr.upper()
         parts = mystr.split()
-        if len(parts) >= 2:
-            part1 = parts[0]
-            part2 = parts[1]
+
+        if len(parts) == 1:
+            mystr = mystr.strip()
+            part1 = mystr[:-3]
+            part2 = mystr[-3:]
+
             num_spaces = target_len - len(part1) - len(part2)
             if num_spaces >= 0:
                 return part1 + " " * num_spaces + part2
             else:
                 return (part1 + part2)[:target_len]
+
+        elif len(parts) >= 2:
+            part1 = parts[0]
+            part2 = parts[1]
+
+            num_spaces = target_len - len(part1) - len(part2)
+            if num_spaces >= 0:
+                return part1 + " " * num_spaces + part2
+            else:
+                return (part1 + part2)[:target_len]
+
         else:
             return mystr[:target_len].ljust(target_len, " ")
 
@@ -71,7 +85,7 @@ def fix_anon_data(responses_df, config):
     cellno_list = config["devtest"]["seltype_list"]
     responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
     return responses_df
-    
+
 
 def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.DataFrame:
     """
