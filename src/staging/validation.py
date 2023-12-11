@@ -6,6 +6,7 @@ import numpy as np
 
 import logging
 from src.utils.wrappers import time_logger_wrap, exception_wrap
+from src.staging.staging_helpers import postcode_topup
 
 # Set up logging
 ValidationLogger = logging.getLogger(__name__)
@@ -73,6 +74,7 @@ def validate_post_col(
 
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
+    df["601"] = df["601"].apply(postcode_topup)
 
     # Create a copy to work from and add temp "postcode_source" column
     validation_df = df.copy()
@@ -182,6 +184,8 @@ def validate_post_col(
         ),
         other=None,
     )
+
+    df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(postcode_topup)
 
     ValidationLogger.info("All postcodes validated....")
 
