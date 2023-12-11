@@ -16,7 +16,7 @@ global:
   load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: False
+  load_from_feather: True
   # Output settings
   output_full_responses: False
   output_ni_full_responses: True

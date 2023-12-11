@@ -9,7 +9,7 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
-from src.staging.staging_helpers import postcode_topup, update_ref_list, fix_anon_data
+from src.staging.staging_helpers import update_ref_list, fix_anon_data
 from src.utils.wrappers import time_logger_wrap
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -556,7 +556,7 @@ def run_staging(
     sic_division_detailed = read_csv(sic_division_detailed_path)
     StagingMainLogger.info("SIC division detailed mapper File Loaded Successfully...")
 
-    # Output the staged BERD data.
+    # Output the staged BERD data for BaU testing when on local network.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = paths["staging_output_path"]
