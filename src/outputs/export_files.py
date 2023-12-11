@@ -96,9 +96,9 @@ def get_file_choice(paths, config: dict):
     """
     # Get the user's choices from config
     output_paths = {
-        output_name: path
+        output_name.replace("export", "output"): path
         for output_name, path in config["export_choices"].items()
-        if "output" in output_name
+        if "export" in output_name
     }
 
     root_output = paths["output_path"]
@@ -132,7 +132,7 @@ def check_files_exist(file_list: List, network_or_hdfs: str, isfile: callable):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
             )
-            raise FileNotFoundError(f"{file} not found in {file_path}")
+            raise FileNotFoundError(f"{file.name} not found in {file_path.parent}")
     OutgoingLogger.info("All output files exist")
 
 
