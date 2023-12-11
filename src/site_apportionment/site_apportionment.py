@@ -24,16 +24,18 @@ col_name_reference = {
     "percent": "602",
     "product": "201",
     "civdef": "200",
+    "pg_num": "pg_numeric",
 }
 # To do: a dictionary seems an overkill. Better idea: juts have variables:
-# ref = "reference"
-# ins = "instance"
-# period = "period"
+ref = "reference"
+ins = "instance"
+period = "period"
 # form = "formtype"
-# postcode = "postcodes_harmonised"
+postcode = "postcodes_harmonised"
 # percent = "602"
-# product = "201"
-# civdef = "200"
+product = "201"
+pg_num = "pg_numeric"
+civdef = "200"
 
 # instead of col_name_reference["form"] just write form and so on
 # can do a batch find and replace later
@@ -148,7 +150,8 @@ def value_to_sites(df : pd.DataFrame, vc: str) -> pd.DataFrame:
     return df
 
 # Calculate weights
-def weights(dfc):
+def weights(df):
+    dfc = df.copy()
     dfc["s_percent"] = dfc[col_name_reference["percent"]]
     dfc["s_percent"].fillna(0, inplace=True)
 
@@ -164,6 +167,9 @@ def weights(dfc):
 
     # Compute weights
     dfc["site_weight"] = dfc["s_percent"] / dfc["s_percent_total"]
+
+    # Remove unnecessary
+    # dfc.drop(columns=['s_percent', 's_percent_total'], inplace=True)    
 
     return dfc
 
@@ -208,8 +214,12 @@ mypath = os.path.join(mydir, in_file)
 df = pd.read_pickle(mypath)
 print(f"Input df is read. Dataframe shape:\n{df.shape}")
 
+#%% Cleane "NONE" postcodes
+df[postcode][df[postcode] == "NONE    "] = ""
+
 #%% Calculate which columns are present and  numeric
-exist_cols = [x for x in want_cals if x in df.columns]
+df_cols = list(df.columns)
+exist_cols = [x for x in want_cals if x in df_cols]
 value_cols = [x for x in exist_cols if is_numeric_dtype(df[x])]
 
 
@@ -219,49 +229,134 @@ for code in ["postcode", "product", "civdef"]:
 
 #%% Selecting cases with one product, many sites
 dfm = df.copy()
+
+# Dataframe with many sites
 dfm = dfm[dfm[col_name_reference["postcode"] + "_count"] > 1]
-dfc = dfm[dfm[col_name_reference["product"] + "_count"] == 1]
-dfd = dfm[dfm[col_name_reference["product"] + "_count"] >= 2]
+#dfc = dfm[dfm[col_name_reference["product"] + "_count"] == 1]
+#dfd = dfm[dfm[col_name_reference["product"] + "_count"] >= 2]
 
-#%% Calculate weights
-dfc = weights(dfc)
+#%% Calculate the number of unique postcode, civdef combinations
+def count_unique_keys_in_group(
+    df: pd.DataFrame,
+    group_cols: list = [ref, period],
+    key_cols: list = [product, civdef]) ->pd.DataFrame:
+    """ Calculates the number of unique key combinations per group"""
+    dfa = df.copy()
 
-#%% Applying weights
-# Calculate which value columns are in the data and are numeric
-cols_to_apportion = [str(x) for x in range(202, 509)] 
-cols_to_apportion = [col for col in cols_to_apportion if col in dfc.columns]
-cols_to_apportion = [col for col in cols_to_apportion if is_numeric_dtype(dfc[col])]
+    # Select columns that we need
+    dfa = dfa[group_cols + key_cols]
 
-# Calculates the apportioned value for all value columns
-for val_col in cols_to_apportion:
-    dfc = value_to_sites(dfc, val_col)
+    # Remove empty keys
+    for key in key_cols:
+        dfa = dfa[dfa[key].str.len() > 0]
+    
+    # Remove duplicate keys
+    dfa.drop_duplicates(inplace=True)
 
-# Repeat the product group and C or D marker across multiple sites
-key_cols = ["product", "civdef"]
-dfc = copy_vals_across_instances(dfc, key_cols)
+    # Calculate the number of rows in each group and repeat it in every row
+    dfa["group_size"] = dfa.groupby(group_cols)[ref].transform("count").fillna(0)
 
-# Chooses the columns to merge back to the original data
-indexcols = [col_name_reference["ref"], col_name_reference["period"], col_name_reference["ins"]]
-svaluecols = [x + "_site" for x in value_cols]
-scodecols = [col_name_reference[col] + "_site" for col in key_cols]
-usecols = indexcols + svaluecols + scodecols
-dfc = dfc[usecols]
+    # Select the group colums and group size
+    dfa = dfa[group_cols + key_cols + ["group_size"]]
 
-# Merges the apportioned values and repeated code back to the main dataframe
-df_out = df.merge(dfc, on=indexcols, how="left")
+    # Merge the group size back to the original df
+    df = df.merge(dfa, on=(group_cols + key_cols), how="left")
 
-# Replace the values when the apportioned value is not null
-key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
-for val_col in value_cols + key_names:
-    _ = df_out.loc[~df_out[val_col + "_site"].isnull(), val_col] = df_out[val_col + "_site"]
+    return df
+#%% calculate number of product, civdef combinations in multiple sites
+dfm = count_unique_keys_in_group(dfm)
+#%% Save many-to-many cases
+cond_mm = (
+    (dfm["group_size"] >= 2) &
+    (dfm[ins] >= 1) &
+    (dfm[postcode].str.len() > 0)
+)
 
-# Removes the columns ending with "_site"
-df_out.drop(columns=(svaluecols + scodecols), inplace=True)
+# Dataframe witm many products - many sites
+dfmm = dfm[cond_mm]
 
-# Save the output
+# Dataframe with one postcode - many sites
+df1m = dfm[~cond_mm]
+
+#%% Dataframe with codes and numerical values
+group_cols = [ref, period]
+code_cols = [product, civdef, pg_num]
+value_cols
+df_codes = dfmm.copy()[group_cols + code_cols + value_cols]
+
+#%% Df with references, sites and everyting else
+site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
+df_sites = dfmm.copy()[site_cols]
+
+#%% Clean codes
+# Remove blank produts
+df_codes = df_codes[df_codes[product].str.len() > 0]
+
+#%% De-duplicate by summation
+value_dict = {value_col: 'sum' for value_col in value_cols}
+df_codes = df_codes.groupby(group_cols + code_cols).agg(value_dict).reset_index()
+
+#%% Site cleaning
+
+# check for postcode duplicates
+df_sites["site_count"] = df_sites.groupby(group_cols + [postcode])[postcode].transform("count")
+df_duplicate_sites = df_sites[df_sites["site_count"] > 1]
+num_duplicate_sites = df_duplicate_sites.shape[0]
+if num_duplicate_sites:
+    print(f"There are {num_duplicate_sites} duplicate sites")
+
+#%% Apply weights
+df_sites = weights(df_sites)
+#%% Output
+out_file = "dfmm.csv"
 mypath = os.path.join(mydir, out_file)
-df_out.to_csv(mypath, index=None)
+dfmm.to_csv(mypath, index=None)
+
+out_file = "df_codes.csv"
+mypath = os.path.join(mydir, out_file)
+df_codes.to_csv(mypath, index=None)
 print(f"Output is saved")
+
+#%% old code below
+# #%% Calculate weights
+# dfc = weights(dfc)
+
+# #%% Applying weights
+# # Calculate which value columns are in the data and are numeric
+# cols_to_apportion = [str(x) for x in range(202, 509)] 
+# cols_to_apportion = [col for col in cols_to_apportion if col in dfc.columns]
+# cols_to_apportion = [col for col in cols_to_apportion if is_numeric_dtype(dfc[col])]
+
+# # Calculates the apportioned value for all value columns
+# for val_col in cols_to_apportion:
+#     dfc = value_to_sites(dfc, val_col)
+
+# # Repeat the product group and C or D marker across multiple sites
+# key_cols = ["product", "civdef"]
+# dfc = copy_vals_across_instances(dfc, key_cols)
+
+# # Chooses the columns to merge back to the original data
+# indexcols = [col_name_reference["ref"], col_name_reference["period"], col_name_reference["ins"]]
+# svaluecols = [x + "_site" for x in value_cols]
+# scodecols = [col_name_reference[col] + "_site" for col in key_cols]
+# usecols = indexcols + svaluecols + scodecols
+# dfc = dfc[usecols]
+
+# # Merges the apportioned values and repeated code back to the main dataframe
+# df_out = df.merge(dfc, on=indexcols, how="left")
+
+# # Replace the values when the apportioned value is not null
+# key_names = [col_name_reference[x] for x in col_name_reference if x in key_cols]
+# for val_col in value_cols + key_names:
+#     _ = df_out.loc[~df_out[val_col + "_site"].isnull(), val_col] = df_out[val_col + "_site"]
+
+# # Removes the columns ending with "_site"
+# df_out.drop(columns=(svaluecols + scodecols), inplace=True)
+
+# # Save the output
+# mypath = os.path.join(mydir, out_file)
+# df_out.to_csv(mypath, index=None)
+# print(f"Output is saved")
 
 
 # %%
