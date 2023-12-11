@@ -424,8 +424,7 @@ def run_staging(
         )
         # Fill empty values with False
     else:
-        manual_trim_df = pd.DataFrame()  # Create and empty df
-        manual_outliers = None
+        manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
     # Loading PG numeric to alpha mapper
