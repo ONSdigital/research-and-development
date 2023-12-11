@@ -1,18 +1,7 @@
-#%% -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 22 11:46:52 2023
-@author: zoring
-
-"""
-import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-
 import os
-# #%% Loading ddata
-# mydir = r"D:\data\res_dev\outputs\reg_apport"
-# in_file = "outputs_df_before.pkl"
-# out_file = "outputs_df_corrected.csv"
+
 
 # Colunm names redefined for convenience
 ref = "reference"
@@ -29,9 +18,10 @@ civdef = "200"
 short_code = "0006"
 long_code = "0001"
 
+
 def count_unique_codes_in_col(df: pd.DataFrame, code) -> pd.DataFrame:
     """Calculates the number of unique non-empty codes"""
-    
+
     dfa = df.copy()
 
     # Select columns that we need
@@ -43,9 +33,10 @@ def count_unique_codes_in_col(df: pd.DataFrame, code) -> pd.DataFrame:
     dfb.rename({code: code + "_count"}, axis='columns', inplace=True)
     df = df.merge(
         dfb,
-        on = [ref, period],
+        on=[ref, period],
         how="left")
     return df
+
 
 def weights(df):
     """Calculates site weights based on the percents"""
@@ -56,23 +47,24 @@ def weights(df):
     # Set the percent for instance 0 to be 0
     dfc["site_percent"] = dfc["site_percent"] * dfc[ins].astype("bool")
 
-    #%% Calculate the total percent for each reference and period
+    # Calculate the total percent for each reference and period
     dfc["site_percent_total"] = (
-        dfc.groupby(ref, period)["site_percent"].transform("sum"))
+        dfc.groupby([ref, period])["site_percent"].transform("sum"))
 
     # Filter out the rows where total percent is zero
-    dfc= dfc[dfc["site_percent_total"] != 0]
+    dfc = dfc[dfc["site_percent_total"] != 0]
 
     # Compute weights
     dfc["site_weight"] = dfc["site_percent"] / dfc["site_percent_total"]
 
     # Remove unnecessary
-    dfc.drop(columns=['site_percent', 'site_percent_total'], inplace=True)    
+    dfc.drop(columns=['site_percent', 'site_percent_total'], inplace=True)
 
     return dfc
 
+
 def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
-    """Apportions the numerical values for each product group across multiple 
+    """Apportions the numerical values for each product group across multiple
     sites, using percents as weights.
     """
 
@@ -80,13 +72,13 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     want_cals = [str(x) for x in range(202, 509)]
 
     # Clean "NONE" postcodes
-    df[postcode][df[postcode] == "NONE    "] = ""
+    df.loc[df[postcode] == "NONE    ", postcode] = ""
 
     # Set short form percentages to 100
-    df[percent][df[form] == short_code] = 100
+    df.loc[df[form] == short_code, percent] = 100
 
-    # Calculate values column names 
-    # df_cols: original columns  
+    # Calculate values column names
+    # df_cols: original columns
     df_cols = list(df.columns)
 
     # exist_cols: the ones we want, which are present in the data
@@ -108,9 +100,12 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
 
     # Dataframe witm many products - for apportionment and Cartesian product
     dfmm = dfm[cond_mm]
+    dfmm.drop(columns=[postcode + "_count"], inplace=True)
 
     # Dataframe with everything else - save unchanged
     df_out = dfm[~cond_mm]
+    df_out.drop(columns=[postcode + "_count"], inplace=True)
+
 
     # df_codes: dataframe with codes and numerical values
     group_cols = [ref, period]
@@ -120,7 +115,7 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     # Remove blank products
     df_codes = df_codes[df_codes[product].str.len() > 0]
 
-    #%% De-duplicate by summation - possibly, not needed
+    # De-duplicate by summation - possibly, not needed
     value_dict = {value_col: 'sum' for value_col in value_cols}
     df_codes = (
         df_codes.groupby(group_cols + code_cols).agg(value_dict).reset_index()
@@ -142,27 +137,35 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     # Calculate weights
     df_sites = weights(df_sites)
 
-    #%%  Merge codes to sites to create a Cartesian product
+    #  Merge codes to sites to create a Cartesian product
     df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
 
-    #%% Apply weights
+    # Apply weights
     for value_col in value_cols:
         df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
 
-    #%% Restore the original column order
+    # Restore the original column order
     df_cart = df_cart[df_cols]
 
-    #%%Append the columns back to the original df
+    # Append the columns back to the original df
     df_out = df_out.append(df_cart, ignore_index=True)
 
-    #%% Order by period, ref, instance, ASC
+    # Order by period, ref, instance, ASC
     df_out.sort_values(by=[period, ref, ins], ascending=True, inplace=True)
 
     return df_out
-#%% Output
-out_file = "df_out.csv"
-mypath = os.path.join(mydir, out_file)
-df_out.to_csv(mypath, index=None)
 
-print(f"Output is saved")
-#%%
+
+if __name__ == "__main__":
+    mydir = r"D:\data\res_dev\outputs\reg_apport"
+    in_file = "outputs_df_before.pkl"
+    out_file = "df_out.csv"
+    mypath = os.path.join(mydir, in_file)
+    df = pd.read_pickle(mypath)
+    print(f"Input df is read. Dataframe shape:\n{df.shape}")
+
+    df_out = apportion_sites(df)
+
+    mypath = os.path.join(mydir, out_file)
+    df_out.to_csv(mypath, index=None)
+    print(f"Output is saved")
