@@ -1,4 +1,5 @@
 import pandas as pd
+from numpy import random
 
 
 def postcode_topup(mystr: str, target_len: int = 8) -> str:
@@ -38,3 +39,79 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
                 return (part1 + part2)[:target_len]
         else:
             return mystr[:target_len].ljust(target_len, " ")
+
+
+
+def fix_anon_data(responses_df, config):
+    """
+    Fixes anonymised snapshot data for use in the DevTest environment.
+
+    This function adds an "instance" column to the provided DataFrame, and populates
+    it with zeros. It also adds a "selectiontype" column with random values of "P",
+    "C", or "L", and a "cellnumber" column with random values from the "seltype_list"
+    in the configuration.
+
+    This fix is necessary because the anonymised snapshot data currently used in the
+    DevTest environment does not include the "instance" column. This fix should be
+    removed when new anonymised data is provided.
+
+    Args:
+        responses_df (pandas.DataFrame): The DataFrame containing the anonymised
+        snapshot data.
+        config (dict): A dictionary containing configuration details.
+
+    Returns:
+        pandas.DataFrame: The fixed DataFrame with the added "instance",
+        "selectiontype", and "cellnumber" columns.
+    """
+    responses_df["instance"] = 0
+    col_size = responses_df.shape[0]
+    random.seed(seed=42)
+    responses_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
+    cellno_list = config["devtest"]["seltype_list"]
+    responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
+    return responses_df
+    
+
+def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Update long form references that should be on the reference list.
+
+    For the first year (processing 2022 data) only, several references
+    should have been designated on the "reference list", ie, should have been
+    assigned cellnumber = 817, but were wrongly assigned a different cellnumber.
+
+    Args:
+        full_df (pd.DataFrame): The full_responses dataframe
+        ref_list_df (pd.DataFrame): The mapper containing updates for the cellnumber
+    Returns:
+        df (pd.DataFrame): with cellnumber and selectiontype cols updated.
+    """
+    ref_list_filtered = ref_list_df.loc[
+        (ref_list_df.formtype == 1) & (ref_list_df.cellnumber != 817)
+    ]
+    df = pd.merge(
+        full_df,
+        ref_list_filtered[["reference", "cellnumber"]],
+        how="outer",
+        on="reference",
+        suffixes=("", "_new"),
+        indicator=True,
+    )
+    # check no items in the reference list mapper are missing from the full responses
+    missing_refs = df.loc[df["_merge"] == "right_only"]
+    if not missing_refs.empty:
+        msg = (
+            "The following references in the reference list mapper are not in the data:"
+        )
+        raise ValueError(msg + str(missing_refs.reference.unique()))
+
+    # update cellnumber and selectiontype where there is a match
+    match_cond = df["_merge"] == "both"
+    df = df.copy()
+    df.loc[match_cond, "cellnumber"] = 817
+    df.loc[match_cond, "selectiontype"] = "L"
+
+    df = df.drop(["_merge", "cellnumber_new"], axis=1)
+
+    return df
