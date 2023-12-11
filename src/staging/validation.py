@@ -74,7 +74,6 @@ def validate_post_col(
 
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])
-    df["601"] = df["601"].apply(postcode_topup)
 
     # Create a copy to work from and add temp "postcode_source" column
     validation_df = df.copy()
