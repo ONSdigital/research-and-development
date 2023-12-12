@@ -1,7 +1,6 @@
 """The main file for the Outputs module."""
 import logging
 import pandas as pd
-import numpy as np
 from datetime import datetime
 from typing import Callable, Dict, Any
 
@@ -44,7 +43,6 @@ def create_headcount_cols(
         df.copy()["705"] * df.copy()["706"] / (df.copy()["706"] + df.copy()["707"])
     )
     df.loc[~(headcount_tot_mask), "headcount_civil"] = 0
-
 
     df.loc[(headcount_tot_mask), "headcount_defence"] = (
         df.copy()["705"] * df.copy()["707"] / (df.copy()["706"] + df.copy()["707"])

@@ -1,6 +1,5 @@
 """The main file for the staging and validation module."""
 import logging
-from numpy import random
 from typing import Callable, Tuple
 from datetime import datetime
 import pandas as pd
@@ -11,6 +10,7 @@ from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
+from src.staging.staging_helpers import update_ref_list, fix_anon_data
 from src.utils.wrappers import time_logger_wrap
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -173,37 +173,6 @@ def load_snapshot_feather(feather_file, read_feather):
     return snapdata
 
 
-def fix_anon_data(responses_df, config):
-    """
-    Fixes anonymised snapshot data for use in the DevTest environment.
-
-    This function adds an "instance" column to the provided DataFrame, and populates
-    it with zeros. It also adds a "selectiontype" column with random values of "P",
-    "C", or "L", and a "cellnumber" column with random values from the "seltype_list"
-    in the configuration.
-
-    This fix is necessary because the anonymised snapshot data currently used in the
-    DevTest environment does not include the "instance" column. This fix should be
-    removed when new anonymised data is provided.
-
-    Args:
-        responses_df (pandas.DataFrame): The DataFrame containing the anonymised
-        snapshot data.
-        config (dict): A dictionary containing configuration details.
-
-    Returns:
-        pandas.DataFrame: The fixed DataFrame with the added "instance",
-        "selectiontype", and "cellnumber" columns.
-    """
-    responses_df["instance"] = 0
-    col_size = responses_df.shape[0]
-    random.seed(seed=42)
-    responses_df["selectiontype"] = random.choice(["P", "C", "L"], size=col_size)
-    cellno_list = config["devtest"]["seltype_list"]
-    responses_df["cellnumber"] = random.choice(cellno_list, size=col_size)
-    return responses_df
-
-
 def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
     StagingMainLogger.info("Loading SPP snapshot data from json file")
@@ -339,7 +308,7 @@ def stage_validate_harmonise_postcodes(
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
     StagingMainLogger.info("Finished PostCode Validation")
 
-    return postcode_mapper
+    return full_responses, postcode_mapper
 
 
 def run_staging(
@@ -450,7 +419,7 @@ def run_staging(
         val.check_data_shape(full_responses, raise_error=True)
 
         # Validate the postcodes in data loaded from JSON
-        postcode_mapper = stage_validate_harmonise_postcodes(
+        full_responses, postcode_mapper = stage_validate_harmonise_postcodes(
             config,
             paths,
             full_responses,
@@ -665,6 +634,8 @@ def run_staging(
             val.validate_data_with_schema,
             None,
         )
+        # update longform references that should be on the reference list
+        full_responses = update_ref_list(full_responses, ref_list_817_mapper)
     else:
         StagingMainLogger.info("Skipping loding the reference list mapper File.")
         ref_list_817_mapper = pd.DataFrame()
@@ -691,7 +662,7 @@ def run_staging(
         None,
     )
 
-    # Output the staged BERD data for BaU testing when on local network.
+    # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = paths["staging_output_path"]

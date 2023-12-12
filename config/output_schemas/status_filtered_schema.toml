@@ -1,0 +1,5 @@
+# Dummy schema
+
+[reference]
+old_name = "reference"
+Deduced_Data_Type = "Int64"
