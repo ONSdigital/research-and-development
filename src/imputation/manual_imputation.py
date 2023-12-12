@@ -63,4 +63,6 @@ def merge_manual_imputation(
 
         df = df.merge(manual_trim_df, on=["reference", "instance"], how="left")
         df["manual_trim"] = df["manual_trim"].fillna(False).astype(bool)
+    else:
+        df = add_trim_column(df)
     return df

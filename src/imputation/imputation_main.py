@@ -84,9 +84,6 @@ def run_imputation(
             ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
         ]
 
-    if "manual_trim" in df.columns:
-        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
-
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
@@ -96,7 +93,7 @@ def run_imputation(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
-    # Load manual imputation file
+        # Load manual imputation file
     if "manual_trim" in df.columns:
         df = mimp.merge_manual_imputation(df, manual_trimming_df)
         trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
