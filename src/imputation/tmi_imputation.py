@@ -581,20 +581,16 @@ def run_tmi(
     full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
 
     # rearange the rows to put the manual_trim column at the end
-    if "manual_trim" in full_df.columns:
-        cols = [col for col in full_df.columns if col != "manual_trim"] + [
-            "manual_trim"
-        ]
-        full_df = full_df[cols]
+    cols = [col for col in full_df.columns if col != "manual_trim"] + [
+        "manual_trim"
+    ]
+    full_df = full_df[cols]
 
-        qa_cols = [col for col in full_qa_df.columns if col != "manual_trim"] + [
-            "manual_trim"
-        ]
-        full_qa_df = full_qa_df[qa_cols]
-    else:
-        # create a new column in the trimming qa if one doesn't exist
-        # to allow users to indicate manual trimming
-        full_qa_df["manual_trim"] = np.nan
+    qa_cols = [col for col in full_qa_df.columns if col != "manual_trim"] + [
+        "manual_trim"
+    ]
+    full_qa_df = full_qa_df[qa_cols]
+
 
     TMILogger.info("TMI imputation completed.")
     return full_df, full_qa_df
