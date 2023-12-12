@@ -93,10 +93,9 @@ def run_imputation(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
 
-        # Load manual imputation file
-    if "manual_trim" in df.columns:
-        df = mimp.merge_manual_imputation(df, manual_trimming_df)
-        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
+    # Load manual imputation file
+    df = mimp.merge_manual_imputation(df, manual_trimming_df)
+    trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
     if backdata is not None:
@@ -113,7 +112,7 @@ def run_imputation(
         imputed_df = pd.concat([imputed_df, constructed_df])
 
     # join manually trimmed columns back to the imputed df
-    if "manual_trim" in df.columns:
+    if not trimmed_df.empty:
         imputed_df = pd.concat([imputed_df, trimmed_df])
         qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
 
