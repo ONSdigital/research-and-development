@@ -570,7 +570,7 @@ def run_staging(
     )
 
     itl_mapper = load_valdiate_mapper(
-        "ultfoc_mapper_path",
+        "itl_mapper_path",
         paths,
         check_file_exists,
         read_csv,
