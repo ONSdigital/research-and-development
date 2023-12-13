@@ -10,7 +10,7 @@ from src.staging.pg_conversion import sic_to_pg_mapper
 
 OutputMainLogger = logging.getLogger(__name__)
 
-def output_tau(
+def output_uk_tau(
     df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
@@ -34,16 +34,12 @@ def output_tau(
         pg_alpha_num (pd.DataFrame): mapper of alpha PG to numeric PG
 
     """
-
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
     # Filter out records that answer "no R&D"
     df = df.copy().loc[~(df["604"] == "No")]
-
-    # Filter regions for GB only
-    df = df.copy().loc[df["region"].isin(regions()["GB"])]
 
     # Filter out instance 0
     df = df.copy().loc[df.instance != 0]
@@ -87,11 +83,11 @@ def output_tau(
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
 
     # Create tau output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["tau_schema"]
+    schema_path = config["schema_paths"]["uk_tau_schema"]
     schema_dict = load_schema(schema_path)
     tau_output = create_output_df(df, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_tau_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_tau/{filename}", tau_output)
+    filename = f"output_uk_tau_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_uk_tau/{filename}", tau_output)

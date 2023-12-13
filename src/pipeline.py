@@ -83,6 +83,7 @@ def run_pipeline(start, config_path):
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
@@ -174,6 +175,7 @@ def run_pipeline(start, config_path):
     run_outputs(
         estimated_responses,
         weighted_responses,
+        ni_df,
         config,
         write_csv,
         run_id,

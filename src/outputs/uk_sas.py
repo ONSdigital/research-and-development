@@ -1,37 +1,38 @@
-"""The main file for the Tau output module."""
+"""The GB SAS for the Outputs module."""
 import logging
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
-from src.outputs.outputs_helpers import create_output_df, regions
+from src.outputs.outputs_helpers import create_output_df
 from src.staging.pg_conversion import sic_to_pg_mapper
-
 OutputMainLogger = logging.getLogger(__name__)
 
-def output_tau(
+def output_uk_sas(
     df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     cora_mapper: pd.DataFrame,
-    postcode_itl_mapper: pd.DataFrame,
+    postcode_mapper: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
 ):
+
     """Run the outputs module.
 
     Args:
-        df (pd.DataFrame): The dataset main with weights not applied
+        df (pd.DataFrame): The dataset main with estimation weights
+        ni_full_responses (pd.DataFrame): NI dataset
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-        postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
-        pg_alpha_num (pd.DataFrame): mapper of alpha PG to numeric PG
+        postcode_mapper (pd.DataFrame): maps the postcode to region code
+        pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
     """
 
@@ -41,12 +42,6 @@ def output_tau(
 
     # Filter out records that answer "no R&D"
     df = df.copy().loc[~(df["604"] == "No")]
-
-    # Filter regions for GB only
-    df = df.copy().loc[df["region"].isin(regions()["GB"])]
-
-    # Filter out instance 0
-    df = df.copy().loc[df.instance != 0]
 
     # Prepare the columns needed for outputs:
 
@@ -70,12 +65,10 @@ def output_tau(
     df = map_o.map_sizebands(df)
 
     # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_itl_mapper)
+    df = map_o.join_itl_regions(df, postcode_mapper)
 
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
-
-    # Create C_lnd_bl
     df["C_lnd_bl"] = df["219"] + df["220"]
 
     # Create ovss_oth
@@ -86,12 +79,12 @@ def output_tau(
     # Create oth_sc
     df["oth_sc"] = df["242"] + df["248"] + df["250"]
 
-    # Create tau output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["tau_schema"]
+    # Create UK SAS output dataframe with required columns from schema
+    schema_path = config["schema_paths"]["uk_sas_schema"]
     schema_dict = load_schema(schema_path)
-    tau_output = create_output_df(df, schema_dict)
+    output = create_output_df(df, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_tau_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_tau/{filename}", tau_output)
+    filename = f"output_uk_sas_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_uk_sas/{filename}", output)

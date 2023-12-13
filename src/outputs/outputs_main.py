@@ -7,7 +7,9 @@ from src.outputs.status_filtered import output_status_filtered
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
+from src.outputs.uk_tau import output_uk_tau
 from src.outputs.gb_sas import output_gb_sas
+from src.outputs.uk_sas import output_uk_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
@@ -21,6 +23,7 @@ OutputMainLogger = logging.getLogger(__name__)
 def run_outputs(
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
+    ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -41,6 +44,7 @@ def run_outputs(
         estimated_df (pd.DataFrame): The main dataset containing
         short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
+        ni_full_responses(pd.DataFrame): Dataset with constructed NI data
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -65,8 +69,16 @@ def run_outputs(
     # filter estimated_df and weighted_df to only include clear or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
     tau_outputs_df = weighted_df.copy().loc[to_keep]
+
     # filter estimated_df for records not included in outputs
     filtered_output_df = estimated_df.copy().loc[~to_keep]
+
+    # Add required columns to NI data
+    ni_full_responses["a_weight"] = 1
+    ni_full_responses["formtype"] = 3
+
+    outputs_df = pd.concat([outputs_df, ni_full_responses])
+    tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])
 
     # change the value of the status column to 'imputed' for imputed statuses
     condition = outputs_df["status"].isin(imputed_statuses)
@@ -137,6 +149,21 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished TAU output.")
 
+    # Running TAU output
+    if config["global"]["output_uk_tau"]:
+        OutputMainLogger.info("Starting UK TAU output...")
+        output_uk_tau(
+            tau_outputs_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_mapper,
+            sic_pg_num,
+        )
+        OutputMainLogger.info("Finished UK TAU output.")
+
     # Running GB SAS output
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
@@ -151,6 +178,21 @@ def run_outputs(
             sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
+
+    # Running UK SAS output
+    if config["global"]["output_uk_sas"]:
+        OutputMainLogger.info("Starting UK SAS output...")
+        output_uk_sas(
+            outputs_df,
+            config,
+            write_csv,
+            run_id,
+            ultfoc_mapper,
+            cora_mapper,
+            postcode_mapper,
+            sic_pg_num,
+        )
+        OutputMainLogger.info("Finished UK SAS output.")
 
     # Running Intram by PG output
     if config["global"]["output_intram_by_pg"]:
