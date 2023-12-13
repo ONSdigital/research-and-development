@@ -3,44 +3,28 @@ old_name = "period_year"
 Deduced_Data_Type = "Int64"
 
 [reference]
-old_name = "ruref"
+old_name = "ru_ref"
+Deduced_Data_Type = "Int64"
+
+[rusic]
+old_name = "current_sic"
 Deduced_Data_Type = "Int64"
 
 [referencename]
 old_name = "company name"
 Deduced_Data_Type = "object"
 
+[referencepostcode]
+old_name = "company postcode"
+Deduced_Data_Type = "object"
+
 [employment]
-old_name = "ru emp"
+old_name = "ru_emp"
 Deduced_Data_Type = "Int64"
 
 [turnover]
-old_name = "ru turnover"
+old_name = "ru_turnover"
 Deduced_Data_Type = "Int64"
-
-[legalstatus]
-old_name = "legal status"
-Deduced_Data_Type = "Int64"
-
-[region]
-old_name = "ru region"
-Deduced_Data_Type = "object"
-
-[enterprisereference]
-old_name = "entref"
-Deduced_Data_Type = "Int64"
-
-[ent_emp_find_out]
-old_name = "ent emp"
-Deduced_Data_Type = "Int64"
-
-[ent_turnover_find_out]
-old_name = "ent turnover"
-Deduced_Data_Type = "Int64"
-
-[ent_region_find_out]
-old_name = "ent region"
-Deduced_Data_Type = "object"
 
 [wowenterprisereference]
 old_name = "wowref"
@@ -49,14 +33,6 @@ Deduced_Data_Type = "object"
 [foc]
 old_name = "ult FOC"
 Deduced_Data_Type = "object"
-
-[rusic_check_this]
-old_name = "sic07"
-Deduced_Data_Type = "Int64"
-
-[rusic]
-old_name = "current_sic"
-Deduced_Data_Type = "Int64"
 
 [200]
 old_name = "q200"
@@ -110,10 +86,6 @@ Deduced_Data_Type = "Int64"
 old_name = "q212"
 Deduced_Data_Type = "float64"
 
-[213]
-old_name = "q213"
-Deduced_Data_Type = "float64"
-
 [214]
 old_name = "q214"
 Deduced_Data_Type = "float64"
@@ -125,34 +97,6 @@ Deduced_Data_Type = "float64"
 [218]
 old_name = "q218"
 Deduced_Data_Type = "float64"
-
-[252]
-old_name = "q252"
-Deduced_Data_Type = "Int64"
-
-[253]
-old_name = "q253"
-Deduced_Data_Type = "Int64"
-
-[254]
-old_name = "q254"
-Deduced_Data_Type = "Int64"
-
-[255]
-old_name = "q255"
-Deduced_Data_Type = "Int64"
-
-[256]
-old_name = "q256"
-Deduced_Data_Type = "Int64"
-
-[257]
-old_name = "q257"
-Deduced_Data_Type = "Int64"
-
-[258]
-old_name = "q258"
-Deduced_Data_Type = "Int64"
 
 [219]
 old_name = "q219"
@@ -333,4 +277,3 @@ Deduced_Data_Type = "float64"
 [250]
 old_name = "q250"
 Deduced_Data_Type = "float64"
-
