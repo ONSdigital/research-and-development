@@ -63,8 +63,8 @@ hdfs_paths:
   manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
-  short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
+  short_form_schema: "src/outputs/output_schemas/shortform_schema.toml"
+  long_form_schema: "src/outputs/output_schemas/longform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
@@ -108,8 +108,8 @@ network_paths:
   civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
-  frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
-  frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
+  shortform_schema: "config/output_schemas/shortform_schema.toml"
+  longform_schema: "config/output_schemas/longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
@@ -124,7 +124,7 @@ schema_paths:
 # Export config for users
 export_choices:
   copy_or_move_files: "copy"
-  export_frozen_shortform: None # Can be set to None
+  export_shortform: None # Can be set to None
   export_tau: None # Can be set to None
   export_gb_sas: None # Can be set to None
   export_intram_by_pg: None # Can be set to None
@@ -133,7 +133,7 @@ export_choices:
   export_intram_by_sic: "output_intram_by_sic_2023-12-06_v68.csv" # Can be set to None
   export_status_filtered: None # Can be set to None
   export_fte_total_qa: "total_fte_qa_2023-12-06_v68.csv" # Can be set to None
-  export_frozen_long_form: None # Can be set to None
+  export_long_form: None # Can be set to None
 
 
 # / ons/ rdbe_dev/ outputs/ output_short_form/ output_short_form2023-09-12_v1.csv

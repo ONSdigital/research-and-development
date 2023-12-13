@@ -49,10 +49,10 @@ def output_long_form(
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Create long form output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["frozen_longform_schema"]
+    schema_path = config["schema_paths"]["longform_schema"]
     schema_dict = load_schema(schema_path)
     longform_output = create_output_df(df, schema_dict)
 
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"Frozen_Base_Data_{tdate}_v{run_id}.csv"
+    filename = f"Base_Data_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_long_form/{filename}", longform_output)

@@ -87,12 +87,12 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Data Ingest...")
 
     # NI staging and validation
-    #TODO: move this to after the main snapshot staging 
+    # TODO: move this to after the main snapshot staging
     # (it's temp. here for speed of development)
     if global_config["load_ni_data"]:
         MainLogger.info("Starting NI Data Staging and Validation...")
         ni_full_responses = run_ni_staging(
-            config, 
+            config,
             check_file_exists,
             read_csv,
             write_csv,
@@ -109,7 +109,7 @@ def run_pipeline(start, config_path):
 
     (
         full_responses,
-        secondary_full_responses, #  may be needed later for freezing
+        secondary_full_responses,  #  may be needed later for freezing
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
@@ -183,7 +183,7 @@ def run_pipeline(start, config_path):
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
-    # Run short frozen form output
+    # Run short  form output
     run_outputs(
         estimated_responses,
         weighted_responses,
