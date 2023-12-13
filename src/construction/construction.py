@@ -87,10 +87,9 @@ def run_construction(
         updated_snapshot_df = create_period_year(updated_snapshot_df)
         construction_df = create_period_year(construction_df)
 
-    # Assign NI data a temporary dummy instance so the multi-index works
+    # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
-        updated_snapshot_df["instance"] = 0
-        construction_df["instance"] = 0
+        construction_df["instance"] = 1
 
     # Update the values with the constructed ones
     construction_df.set_index(
@@ -115,10 +114,6 @@ def run_construction(
     updated_snapshot_df = updated_snapshot_df.astype(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
-
-    # Remove the dummy instance from NI data
-    if is_northern_ireland:
-        updated_snapshot_df.drop(columns="instance", inplace=True)
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 

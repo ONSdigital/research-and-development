@@ -162,6 +162,7 @@ def run_ni_staging(
     qa_dataframe_merge(ni_full_responses)
 
     ni_full_responses = ni_full_responses.drop("_merge", axis=1)
+    ni_full_responses["instance"] = 1
 
     # Optionally output the staged NI data
     if config["global"]["output_ni_full_responses"]:
