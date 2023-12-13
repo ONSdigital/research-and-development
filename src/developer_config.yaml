@@ -76,7 +76,7 @@ network_paths:
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/2021_NI_BERD_data_to_load.csv"
-  ni_indicative_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/ias6627out.csv"
+  ni_indicative_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/ias6627out_fixed_cols.csv"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
