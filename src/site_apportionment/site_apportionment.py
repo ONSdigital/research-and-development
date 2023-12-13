@@ -142,7 +142,7 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
         (df[form] == long_code) &
         (df[postcode + "_count"] > 1) &
         (df[ins] >= 1) &
-        (df[postcode].str.len() > 0)
+        (df[postcode].str.len() > 0) # Possibly, remove this line - TBC
     )
 
     # Dataframe dfm with many products - for apportionment and Cartesian product
