@@ -3,6 +3,8 @@ from pandas.api.types import is_numeric_dtype
 import os
 import logging
 
+from src.imputation.imputation_helpers import get_imputation_cols
+
 SitesApportionmentLogger = logging.getLogger(__name__)
 
 # Colunm names redefined for convenience
@@ -92,7 +94,10 @@ def weights(df):
     return dfc
 
 
-def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
+
+
+
+def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     """Apportions the numerical values for each product group across multiple
     sites, using percents from question 602 to compute weights.
     Selects the records long from references that have multiple non-empty
@@ -114,25 +119,18 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
         (pd.DataFrame): A dataframe with the same columns, with applied site
         apportionment
     """
-
-    # Value columns that we want to apportion
-    want_cals = [str(x) for x in range(202, 509)]
-
     # Clean "NONE" postcodes
     df.loc[df[postcode] == "NONE    ", postcode] = ""
 
     # Set short form percentages to 100
     df.loc[df[form] == short_code, percent] = 100
 
-    # Calculate values column names
     # df_cols: original columns
     df_cols = list(df.columns)
 
-    # exist_cols: the ones we want, which are present in the data
-    exist_cols = [x for x in want_cals if x in df_cols]
-
-    # value_cols: the ones we want and present and numeric
-    value_cols = [x for x in exist_cols if is_numeric_dtype(df[x])]
+    # Create a list of the value columns that we want to apportion
+    # These are the same as the columns we impute.
+    value_cols = get_imputation_cols(config)
 
     # Calculate the number of uniqie non-blank postcodes
     df = count_unique_codes_in_col(df, postcode)
@@ -161,10 +159,10 @@ def apportion_sites(df: pd.DataFrame)-> pd.DataFrame:
     # Remove blank products
     df_codes = df_codes[df_codes[product].str.len() > 0]
 
-    # De-duplicate by summation - possibly, not needed
-    value_dict = {value_col: 'sum' for value_col in value_cols}
+    # # De-duplicate by summation - possibly, not needed
+    # value_dict = {value_col: 'sum' for value_col in value_cols}
     df_codes = (
-        df_codes.groupby(group_cols + code_cols).agg(value_dict).reset_index()
+        df_codes.groupby(group_cols + code_cols).agg(sum).reset_index()
     )
 
     # df_stes: dataframe with postcodes, percents, and everyting else
