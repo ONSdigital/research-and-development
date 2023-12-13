@@ -21,6 +21,8 @@ def create_ni_headcount_cols(df:pd.DataFrame) -> pd.DataFrame:
         old_col = appt.hc_dict[hc_col]
         df[hc_col] = df[old_col]
 
+    df["headcount_total"] = df["headcount_tot_m"] + df["headcount_tot_f"]
+
     return df
 
 
