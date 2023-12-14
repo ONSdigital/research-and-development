@@ -77,9 +77,6 @@ def run_imputation(
             ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
         ]
 
-    if "manual_trim" in df.columns:
-        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
-
     # Get a list of all the target values and breakdown columns from the config
     to_impute_cols = hlp.get_imputation_cols(config)
 
@@ -93,7 +90,6 @@ def run_imputation(
 
     # Load manual imputation file
     df = mimp.merge_manual_imputation(df, manual_trimming_df)
-
     trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
