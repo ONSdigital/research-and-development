@@ -6,6 +6,7 @@ import pandas as pd
 import os
 
 from src.staging import validation as val
+from src.northern_ireland.ni_headcount_fte import run_ni_headcount_fte
 
 NIStagingLogger = logging.getLogger(__name__)
 
@@ -161,7 +162,9 @@ def run_ni_staging(
     # check if there are unmatched records
     qa_dataframe_merge(ni_full_responses)
 
-    ni_full_responses = ni_full_responses.drop("_merge", axis=1)
+    # Fix columns and instance
+    ni_full_responses = ni_full_responses.drop(columns=["_merge"])
+    ni_full_responses["instance"] = 1
 
     # Optionally output the staged NI data
     if config["global"]["output_ni_full_responses"]:

@@ -58,7 +58,7 @@ def merge_manual_imputation(
     Returns:
         pd.DataFrame: The DataFrame with the manual_trim column added.
     """
-    if not manual_trim_df.empty:
+    if manual_trim_df is not None:
         # An empty df will be initialised if there's no man trim file
         if "manual_trim" in df.columns:
             df = df.drop(columns=["manual_trim"])
