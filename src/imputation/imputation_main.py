@@ -84,9 +84,6 @@ def run_imputation(
             ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
         ]
 
-    if "manual_trim" in df.columns:
-        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
-
     # Create new columns to hold the imputed values
     orig_cols = lf_target_vars + bd_cols + sum_cols
     for col in orig_cols:
@@ -98,7 +95,6 @@ def run_imputation(
 
     # Load manual imputation file
     df = mimp.merge_manual_imputation(df, manual_trimming_df)
-
     trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
@@ -116,7 +112,7 @@ def run_imputation(
         imputed_df = pd.concat([imputed_df, constructed_df])
 
     # join manually trimmed columns back to the imputed df
-    if "manual_trim" in df.columns:
+    if not trimmed_df.empty:
         imputed_df = pd.concat([imputed_df, trimmed_df])
         qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
 
