@@ -8,6 +8,25 @@ from src.imputation.imputation_helpers import copy_first_to_group
 
 ApportionmentLogger = logging.getLogger(__name__)
 
+# create dictionaries which set up the equivalence between 4xx or 5xx columns and the
+# new columns to hold apportioned data: {new_col: old_cols}
+fte_dict = {
+    "emp_researcher": ["405", "406"],
+    "emp_technician": ["407", "408"],
+    "emp_other": ["409", "410"],
+    "emp_total": ["411", "412"],
+}
+
+hc_dict = {
+    "headcount_res_m": "501",
+    "headcount_res_f": "502",
+    "headcount_tec_m": "503",
+    "headcount_tec_f": "504",
+    "headcount_oth_m": "505",
+    "headcount_oth_f": "506",
+    "headcount_tot_m": "507",
+    "headcount_tot_f": "508",
+}
 
 def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate subtotals of q202 by reference.
@@ -99,13 +118,6 @@ def apportion_fte(df: pd.DataFrame, round_val=4) -> pd.DataFrame:
     Returns:
         pd.Dataframe: The dataset with all the new columns for FTE.
     """
-    fte_dict = {
-        "emp_researcher": ["405", "406"],
-        "emp_technician": ["407", "408"],
-        "emp_other": ["409", "410"],
-        "emp_total": ["411", "412"],
-    }
-
     df = calc_fte_column(df, fte_dict, round_val=4)
 
     return df
@@ -123,17 +135,6 @@ def apportion_headcounts(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.Dataframe: The dataset with new columns headcounts
     """
-    hc_dict = {
-        "headcount_res_m": "501",
-        "headcount_res_f": "502",
-        "headcount_tec_m": "503",
-        "headcount_tec_f": "504",
-        "headcount_oth_m": "505",
-        "headcount_oth_f": "506",
-        "headcount_tot_m": "507",
-        "headcount_tot_f": "508",
-    }
-
     df = calc_headcount_column(df, hc_dict, round_val=4)
 
     df["headcount_total"] = df["headcount_tot_m"] + df["headcount_tot_f"]

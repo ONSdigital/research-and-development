@@ -6,10 +6,6 @@ Deduced_Data_Type = "Int64"
 old_name = "ru_ref"
 Deduced_Data_Type = "Int64"
 
-[rusic]
-old_name = "current_sic"
-Deduced_Data_Type = "Int64"
-
 [referencename]
 old_name = "company name"
 Deduced_Data_Type = "object"
