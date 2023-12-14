@@ -108,7 +108,7 @@ def run_imputation(
         imputed_df = pd.concat([imputed_df, constructed_df])
 
     # join manually trimmed columns back to the imputed df
-    if "manual_trim" in df.columns:
+    if not trimmed_df.empty:
         imputed_df = pd.concat([imputed_df, trimmed_df])
         qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
 
