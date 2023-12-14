@@ -3,12 +3,12 @@ old_name = "reference"
 Deduced_Data_Type = "Int64"
 
 [period]
-old_name = "period"
+old_name = "period_year"
 Deduced_Data_Type = "Int64"
 
-[entref]
-old_name = "enterprisereference"
-Deduced_Data_Type = "Int64"
+# [entref]
+# old_name = "enterprisereference"
+# Deduced_Data_Type = "Int64"
 
 [wow]
 old_name = "wowenterprisereference"
@@ -31,7 +31,7 @@ old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [turn]
-old_name = "frozenturnover"
+old_name = "turnover"
 Deduced_Data_Type = "Int64"
 
 [f_owner]
@@ -46,9 +46,9 @@ Deduced_Data_Type = "Int64"
 old_name = "form_status"
 Deduced_Data_Type = "Int64"
 
-[reg_code]
-old_name = "itl"
-Deduced_Data_Type = "str"
+# [reg_code]
+# old_name = "region"
+# Deduced_Data_Type = "str"
 
 [percent]
 old_name = "602"

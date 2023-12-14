@@ -15,7 +15,7 @@ def read_ni_files(
     responses_schema: dict,
     config: dict,
     check_file_exists: Callable,
-    read_csv: Callable,        
+    read_csv: Callable,
 ) -> Tuple:
     """Read in CSV files and schemas for NI data."""
     # read in csv files as pandas dataframes
@@ -35,7 +35,7 @@ def read_ni_files(
         indicative_schema[i]['old_name'] for i in indicative_schema.keys()
     ]
     wanted_responses_cols = [
-        responses_schema[i]['old_name'] for i in responses_schema.keys()     
+        responses_schema[i]['old_name'] for i in responses_schema.keys()
     ]
 
     indicative_df = read_csv(indicative_file, wanted_indicative_cols)
@@ -66,7 +66,7 @@ def rename_columns(
     return indicative_df, ni_responses_df
 
 
-def qa_dataframe_merge(ni_full_responses): 
+def qa_dataframe_merge(ni_full_responses):
     """Output a warning if there are mismatches in the join."""
     missing_resp = ni_full_responses.loc[ni_full_responses["_merge"] == "right_only"]
     missing_indic = ni_full_responses.loc[ni_full_responses["_merge"] == "left_only"]
@@ -80,16 +80,16 @@ def qa_dataframe_merge(ni_full_responses):
             "but not in the responses:"
         )
         NIStagingLogger.warning(msg + str(missing_resp.reference.unique()))
-    
+
     if not missing_indic.empty:
         msg = (
             "The following references appear in the responses data "
             "but not in the indicative data:"
         )
         NIStagingLogger.warning(msg + str(missing_indic.reference.unique()))
-    
+
     return None
-    
+
 
 def run_ni_staging(
     config: dict,
@@ -100,7 +100,7 @@ def run_ni_staging(
 ) -> pd.DataFrame:
     """Run the Northern Ireland staging and validation module.
 
-    Two CSV files are read in as dataframes, one containing the survey question 
+    Two CSV files are read in as dataframes, one containing the survey question
     responses, and the other indicative data. Validation is performed to check
     column names and cast to the required datatypes, based on toml schemas. The
     columns are renamed, again based on the toml schemas. The two dataframes are
@@ -120,7 +120,7 @@ def run_ni_staging(
         run_id (int): The run id for this run.
     Returns:
         ni_full_responses (pd.DataFrame): The staged and vaildated NI data.
-    """  
+    """
     # read in the schemas for the NI data
     indicative_schema_path = "./config/ni_indicative_schema.toml"
     responses_schema_path = "./config/ni_responses_schema.toml"
@@ -139,7 +139,7 @@ def run_ni_staging(
 
     # Rename the columns of the two dataframes
     indicative_df, ni_responses_df = rename_columns(
-        indicative_df, 
+        indicative_df,
         ni_responses_df,
         indicative_schema,
         responses_schema
@@ -151,10 +151,10 @@ def run_ni_staging(
 
     # join the two dataframes on "reference"
     ni_full_responses = pd.merge(
-        ni_responses_df, 
-        indicative_df, 
-        how="outer", 
-        on=["period_year", "reference"], 
+        ni_responses_df,
+        indicative_df,
+        how="outer",
+        on=["period_year", "reference"],
         indicator=True
     )
 

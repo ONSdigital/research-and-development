@@ -34,13 +34,14 @@ def run_ni(
     if not load_ni_data:
         NIModuleLogger.info("Skipping Northern Ireland data...")
         return None
-    
+
     NIModuleLogger.info("Starting Northern Ireland data staging and validation...")
     ni_full_responses_df = run_ni_staging(config,
                                           check_file_exists,
                                           read_csv,
                                           write_csv,
-                                          run_id)
+                                          run_id,
+                                          )
 
     NIModuleLogger.info("Running NI construction")
     ni_df = run_construction(ni_full_responses_df,

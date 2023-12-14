@@ -71,9 +71,6 @@ def output_gb_sas(
     # Map the itl regions using the postcodes
     df = map_o.join_itl_regions(df, postcode_mapper)
 
-    # Map q713 and q714 to numeric format
-    df = map_o.map_to_numeric(df)
-
     # Create C_lnd_bl
     df["C_lnd_bl"] = df["219"] + df["220"]
 
