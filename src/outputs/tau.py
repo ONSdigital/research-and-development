@@ -57,7 +57,7 @@ def output_tau(
         target_col="pg_numeric",
         from_col="SIC 2007_CODE",
         to_col="2016 > Form PG",
-        formtype=["0006", "0001"],
+        formtype=["0006", "0001", "0003"],
     )
 
     # Map to the CORA statuses from the statusencoded column
