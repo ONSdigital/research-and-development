@@ -62,7 +62,18 @@ def run_outputs(
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    ni_full_responses, outputs_df, tau_outputs_df, filtered_output_df = form_output_prep(estimated_df, weighted_df, ni_full_responses, pg_num_alpha, sic_pg_alpha,)
+    (
+        ni_full_responses,
+        outputs_df,
+        tau_outputs_df,
+        filtered_output_df,
+    ) = form_output_prep(
+        estimated_df,
+        weighted_df,
+        ni_full_responses,
+        pg_num_alpha,
+        sic_pg_alpha,
+    )
 
     # Running status filtered full dataframe output for QA
     if config["global"]["output_status_filtered"]:
@@ -81,9 +92,9 @@ def run_outputs(
     )
 
     tau_outputs_df = tau_outputs_df.astype({"postcodes_harmonised": "str"})
-    tau_outputs_df["postcodes_harmonised"] = (
-        tau_outputs_df["postcodes_harmonised"].apply(postcode_topup))
-
+    tau_outputs_df["postcodes_harmonised"] = tau_outputs_df[
+        "postcodes_harmonised"
+    ].apply(postcode_topup)
 
     # Running short form output
     if config["global"]["output_short_form"]:

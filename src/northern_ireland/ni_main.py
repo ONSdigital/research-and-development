@@ -8,6 +8,7 @@ from src.construction.construction import run_construction
 
 NIModuleLogger = logging.getLogger(__name__)
 
+
 def run_ni(
     config: dict,
     check_file_exists: Callable,
@@ -36,18 +37,21 @@ def run_ni(
         return None
 
     NIModuleLogger.info("Starting Northern Ireland data staging and validation...")
-    ni_full_responses_df = run_ni_staging(config,
-                                          check_file_exists,
-                                          read_csv,
-                                          write_csv,
-                                          run_id,
-                                          )
+    ni_full_responses_df = run_ni_staging(
+        config,
+        check_file_exists,
+        read_csv,
+        write_csv,
+        run_id,
+    )
 
     NIModuleLogger.info("Running NI construction")
-    ni_df = run_construction(ni_full_responses_df,
-                             config,
-                             check_file_exists,
-                             read_csv,
-                             is_northern_ireland=True)
+    ni_df = run_construction(
+        ni_full_responses_df,
+        config,
+        check_file_exists,
+        read_csv,
+        is_northern_ireland=True,
+    )
 
     return ni_df

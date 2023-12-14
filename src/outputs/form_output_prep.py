@@ -2,12 +2,13 @@ import pandas as pd
 from src.staging.pg_conversion import run_pg_conversion
 
 
-def form_output_prep(estimated_df: pd.DataFrame,
-                weighted_df: pd.DataFrame,
-                ni_full_responses: pd.DataFrame,
-                pg_num_alpha,
-                sic_pg_alpha,
-                ):
+def form_output_prep(
+    estimated_df: pd.DataFrame,
+    weighted_df: pd.DataFrame,
+    ni_full_responses: pd.DataFrame,
+    pg_num_alpha,
+    sic_pg_alpha,
+):
 
     # TODO docstring
 
@@ -31,7 +32,9 @@ def form_output_prep(estimated_df: pd.DataFrame,
         ni_full_responses["form_status"] = 600
         ni_full_responses["602"] = 100
         ni_full_responses["formtype"] = "0003"
-        ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_alpha, target_col="201")
+        ni_full_responses = run_pg_conversion(
+            ni_full_responses, pg_num_alpha, sic_pg_alpha, target_col="201"
+        )
 
         # outputs_df = pd.concat([outputs_df, ni_full_responses])
         tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])

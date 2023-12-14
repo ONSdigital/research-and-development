@@ -32,10 +32,10 @@ def read_ni_files(
     # It may be they don't want to use all the cols in the files
     # but they haven't decdided yet, so this way of selecting cols maybe useful.
     wanted_indicative_cols = [
-        indicative_schema[i]['old_name'] for i in indicative_schema.keys()
+        indicative_schema[i]["old_name"] for i in indicative_schema.keys()
     ]
     wanted_responses_cols = [
-        responses_schema[i]['old_name'] for i in responses_schema.keys()
+        responses_schema[i]["old_name"] for i in responses_schema.keys()
     ]
 
     indicative_df = read_csv(indicative_file, wanted_indicative_cols)
@@ -47,21 +47,21 @@ def read_ni_files(
 
 
 def rename_columns(
-        indicative_df: pd.DataFrame,
-        ni_responses_df: pd.DataFrame,
-        indicative_schema: dict,
-        responses_schema: dict,
-        ) -> pd.DataFrame:
+    indicative_df: pd.DataFrame,
+    ni_responses_df: pd.DataFrame,
+    indicative_schema: dict,
+    responses_schema: dict,
+) -> pd.DataFrame:
     # rename columns
     indicative_rename_dict = {
-        indicative_schema[i]['old_name'] : i for i in indicative_schema.keys()
+        indicative_schema[i]["old_name"]: i for i in indicative_schema.keys()
     }
     responses_rename_dict = {
-        responses_schema[i]['old_name'] : i for i in responses_schema.keys()
+        responses_schema[i]["old_name"]: i for i in responses_schema.keys()
     }
 
-    indicative_df = indicative_df.rename(columns = indicative_rename_dict)
-    ni_responses_df = ni_responses_df.rename(columns = responses_rename_dict)
+    indicative_df = indicative_df.rename(columns=indicative_rename_dict)
+    ni_responses_df = ni_responses_df.rename(columns=responses_rename_dict)
 
     return indicative_df, ni_responses_df
 
@@ -130,19 +130,12 @@ def run_ni_staging(
 
     # read in the NI csv files as two dataframes
     indicative_df, ni_responses_df = read_ni_files(
-        indicative_schema,
-        responses_schema,
-        config,
-        check_file_exists,
-        read_csv
+        indicative_schema, responses_schema, config, check_file_exists, read_csv
     )
 
     # Rename the columns of the two dataframes
     indicative_df, ni_responses_df = rename_columns(
-        indicative_df,
-        ni_responses_df,
-        indicative_schema,
-        responses_schema
+        indicative_df, ni_responses_df, indicative_schema, responses_schema
     )
 
     # Validate the dataframes using the schema
@@ -155,7 +148,7 @@ def run_ni_staging(
         indicative_df,
         how="outer",
         on=["period_year", "reference"],
-        indicator=True
+        indicator=True,
     )
 
     # check if there are unmatched records
