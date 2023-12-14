@@ -161,7 +161,10 @@ def run_ni_staging(
     # check if there are unmatched records
     qa_dataframe_merge(ni_full_responses)
 
-    ni_full_responses = ni_full_responses.drop("_merge", axis=1)
+    # Fix columns and instance
+    ni_full_responses = ni_full_responses.drop(columns=["rusic_y", "_merge"])
+    ni_full_responses = ni_full_responses.rename(columns={"rusic_x": "rusic"})
+    ni_full_responses["instance"] = 1
 
     # Optionally output the staged NI data
     if config["global"]["output_ni_full_responses"]:
