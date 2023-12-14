@@ -5,6 +5,7 @@ import pandas as pd
 from typing import Callable
 from src.northern_ireland.ni_staging import run_ni_staging
 from src.construction.construction import run_construction
+from src.northern_ireland.ni_headcount_fte import run_ni_headcount_fte
 
 NIModuleLogger = logging.getLogger(__name__)
 
@@ -54,4 +55,7 @@ def run_ni(
         is_northern_ireland=True,
     )
 
-    return ni_df
+    NIModuleLogger.info("Running NI headcount and fte")
+    full_ni_df = run_ni_headcount_fte(ni_df)
+
+    return full_ni_df
