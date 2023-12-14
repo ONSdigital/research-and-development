@@ -9,7 +9,7 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
-from src.northern_ireland.ni_staging import run_ni_staging
+from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
@@ -138,10 +138,15 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Data Ingest.")
 
+    # Northern Ireland staging and construction
+    MainLogger.info("Starting NI module...")
+    ni_df = run_ni(config, check_file_exists, read_csv, write_csv, run_id)
+    MainLogger.info("Finished NI Data Ingest.")
+
     # Construction module
     MainLogger.info("Starting Construction...")
     full_responses = run_construction(
-        full_responses, config, check_file_exists, read_csv, run_id
+        full_responses, config, check_file_exists, read_csv
     )
     MainLogger.info("Finished Construction...")
 
