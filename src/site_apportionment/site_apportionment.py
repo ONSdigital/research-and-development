@@ -139,8 +139,7 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     cond = (
         (df[form] == long_code) &
         (df[postcode + "_count"] > 1) &
-        (df[ins] >= 1) &
-        (df[postcode].str.len() > 0) # Possibly, remove this line - TBC
+        (df[ins] >= 1)
     )
 
     # Dataframe dfm with many products - for apportionment and Cartesian product
@@ -168,6 +167,9 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     # df_stes: dataframe with postcodes, percents, and everyting else
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
     df_sites = dfm.copy()[site_cols]
+
+    # Remove instances that have no postcodes
+    df_sites = df_sites[df_sites[postcode].str.len() > 0]
 
     # Check for postcode duplicates for QA
     df_sites["site_count"] = (
