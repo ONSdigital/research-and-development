@@ -155,7 +155,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             sic_pg_num,
         )
         OutputMainLogger.info("Finished NI SAS output.")

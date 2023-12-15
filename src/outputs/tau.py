@@ -48,7 +48,7 @@ def output_tau(
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
+    df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"])
 
     # Fill in numeric PG for short forms and imputed long forms
     df = sic_to_pg_mapper(

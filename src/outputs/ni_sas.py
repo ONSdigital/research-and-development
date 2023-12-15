@@ -16,7 +16,6 @@ def output_ni_sas(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
 ):
 
@@ -29,7 +28,6 @@ def output_ni_sas(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
@@ -41,9 +39,6 @@ def output_ni_sas(
     output_path = paths["output_path"]
 
     # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Fill in numeric PG where missing
     df = sic_to_pg_mapper(
