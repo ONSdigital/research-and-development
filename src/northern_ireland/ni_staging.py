@@ -1,12 +1,11 @@
 """Stage and Validate Northern Ireland BERD data."""
+
 import logging
 from typing import Callable, Tuple
 from datetime import datetime
 import pandas as pd
-import os
 
 from src.staging import validation as val
-from src.northern_ireland.ni_headcount_fte import run_ni_headcount_fte
 
 NIStagingLogger = logging.getLogger(__name__)
 

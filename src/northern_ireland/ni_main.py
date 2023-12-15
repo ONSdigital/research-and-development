@@ -17,7 +17,7 @@ def run_ni(
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
-    """Run the Northern Ireland module to stage and apply construction.
+    """Stage NI data and apply construction to it.
 
     Args:
         config (dict): The pipeline configuration
