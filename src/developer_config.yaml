@@ -20,21 +20,22 @@ global:
   load_from_feather: True
   # Output settings
   output_full_responses: False
-  output_ni_full_responses: True
+  output_ni_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
   output_imputation_qa: False
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
-  output_tau: False
+  output_gb_sas: True
+  output_ni_sas: True
+  output_tau: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_status_filtered: False
-  output_fte_total_qa: True
+  output_fte_total_qa: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -114,6 +115,7 @@ schema_paths:
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
+  ni_sas_schema: "config/output_schemas/ni_sas_schema.toml"
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
   manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"

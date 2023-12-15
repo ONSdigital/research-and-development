@@ -83,6 +83,7 @@ def run_pipeline(start, config_path):
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
@@ -174,6 +175,7 @@ def run_pipeline(start, config_path):
     run_outputs(
         estimated_responses,
         weighted_responses,
+        ni_df,
         config,
         write_csv,
         run_id,
@@ -186,6 +188,8 @@ def run_pipeline(start, config_path):
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        pg_num_alpha,
+        sic_pg_alpha,
     )
 
     MainLogger.info("Finished All Output modules.")
