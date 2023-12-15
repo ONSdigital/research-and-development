@@ -34,7 +34,11 @@ def join_pg_numeric(
     return combined_df
 
 
-def join_fgn_ownership(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:
+def join_fgn_ownership(
+        main_df: pd.DataFrame, 
+        mapper_df: pd.DataFrame, 
+        formtype: list = ["0001", "0006"]
+    ) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 
@@ -46,13 +50,23 @@ def join_fgn_ownership(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.Dat
         pd.DataFrame: The combined DataFrame resulting from the left join.
     """
     try:
-        # Perform left join
-        combined_df = main_df.merge(
+        to_keep = main_df["formtype"].isin(formtype)
+
+        # filter for long and short forms only
+        filtered_df = main_df.copy().loc[to_keep]
+
+        # the remainder of the dataframe is the NI data
+        ni_df = main_df.copy().loc[~to_keep]
+
+        # Perform left join on filtered dataframe
+        combined_df = filtered_df.merge(
             mapper_df, how="left", left_on="reference", right_on="ruref"
         )
         combined_df.drop(columns=["ruref"], inplace=True)
 
-        return combined_df
+        main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
+
+        return main_df
 
     except Exception as e:
         raise ValueError(
