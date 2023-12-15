@@ -5,8 +5,10 @@ import pandas as pd
 from typing import Callable
 from src.northern_ireland.ni_staging import run_ni_staging
 from src.construction.construction import run_construction
+from src.northern_ireland.ni_headcount_fte import run_ni_headcount_fte
 
 NIModuleLogger = logging.getLogger(__name__)
+
 
 def run_ni(
     config: dict,
@@ -15,7 +17,7 @@ def run_ni(
     write_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
-    """Run the Northern Ireland module to stage and apply construction.
+    """Stage NI data and apply construction to it.
 
     Args:
         config (dict): The pipeline configuration
@@ -34,19 +36,26 @@ def run_ni(
     if not load_ni_data:
         NIModuleLogger.info("Skipping Northern Ireland data...")
         return None
-    
+
     NIModuleLogger.info("Starting Northern Ireland data staging and validation...")
-    ni_full_responses_df = run_ni_staging(config,
-                                          check_file_exists,
-                                          read_csv,
-                                          write_csv,
-                                          run_id)
+    ni_full_responses_df = run_ni_staging(
+        config,
+        check_file_exists,
+        read_csv,
+        write_csv,
+        run_id,
+    )
 
     NIModuleLogger.info("Running NI construction")
-    ni_df = run_construction(ni_full_responses_df,
-                             config,
-                             check_file_exists,
-                             read_csv,
-                             is_northern_ireland=True)
+    ni_df = run_construction(
+        ni_full_responses_df,
+        config,
+        check_file_exists,
+        read_csv,
+        is_northern_ireland=True,
+    )
 
-    return ni_df
+    NIModuleLogger.info("Running NI headcount and fte")
+    full_ni_df = run_ni_headcount_fte(ni_df)
+
+    return full_ni_df

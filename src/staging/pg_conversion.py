@@ -159,6 +159,9 @@ def run_pg_conversion(
     # SIC mapping for short forms
     df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col)
 
+    # SIC mapping for NI
+    df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col, formtype=["0003"])
+
     # PG mapping for long forms
     df = pg_to_pg_mapper(df, pg_num_alpha, target_col=target_col)
 

@@ -49,6 +49,7 @@ def join_fgn_ownership(
     Returns:
         pd.DataFrame: The combined DataFrame resulting from the left join.
     """
+
     try:
         to_keep = main_df["formtype"].isin(formtype)
 
