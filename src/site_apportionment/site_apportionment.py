@@ -202,21 +202,8 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     df_out = df_out.append(df_cart, ignore_index=True)
 
     # Sort by period, ref, instance in ascending order.
-    df_out.sort_values(by=[period, ref, ins], ascending=True, inplace=True)
+    df_out = df_out.sort_values(
+        by=[period, ref, ins], ascending=True
+    ).reset_index(drop=True)
 
     return df_out
-
-
-if __name__ == "__main__":
-    mydir = r"D:\data\res_dev\outputs\reg_apport"
-    in_file = "outputs_df_before.pkl"
-    out_file = "df_out.csv"
-    mypath = os.path.join(mydir, in_file)
-    df = pd.read_pickle(mypath)
-    print(f"Input df is read. Dataframe shape:\n{df.shape}")
-
-    df_out = apportion_sites(df)
-
-    mypath = os.path.join(mydir, out_file)
-    df_out.to_csv(mypath, index=None)
-    print(f"Output is saved")
