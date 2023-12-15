@@ -43,7 +43,9 @@ def form_output_prep(
 
     if ni_full_responses is not None:
         # Add required columns to NI data
-        ni_full_responses = ni_full_responses.rename(columns={"period_year":"period", "foc": "ultfoc"})
+        ni_full_responses = ni_full_responses.rename(
+            columns={"period_year":"period", "foc": "ultfoc"}
+        )
         ni_full_responses["a_weight"] = 1
         ni_full_responses["604"] = "Yes"
         ni_full_responses["form_status"] = 600
@@ -68,4 +70,7 @@ def form_output_prep(
         condition = outputs_df["status"].isin(imputed_statuses)
         outputs_df.loc[condition, "status"] = "imputed"
 
-        return outputs_df, tau_outputs_df, filtered_output_df
+        # create an empty ni_responses dataframe
+        ni_full_responses = pd.DataFrame()
+
+        return ni_full_responses, outputs_df, tau_outputs_df, filtered_output_df

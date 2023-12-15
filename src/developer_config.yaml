@@ -9,10 +9,10 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   load_historic_data: False
   run_construction: True
-  run_ni_construction: True
+  run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
@@ -25,16 +25,16 @@ global:
   output_ni_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
+  output_estimation_qa: True
   output_imputation_qa: False
-  output_long_form: False
+  output_long_form: True
   output_short_form: False
   output_gb_sas: True
-  output_ni_sas: True
+  output_ni_sas: False
   output_tau: True
-  output_intram_by_pg: False
-  output_intram_by_itl1: False
-  output_intram_by_civil_defence: False
+  output_intram_by_pg: True
+  output_intram_by_itl1: True
+  output_intram_by_civil_defence: True
   output_intram_by_sic: False
   output_status_filtered: False
   output_fte_total_qa: False
