@@ -42,7 +42,7 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
     cols_need = [ref, period, code]
     dfa = dfa[cols_need]
     dfa = dfa[dfa[code].str.len() > 0]
-    dfa = dfa.drop_duplicates
+    dfa = dfa.drop_duplicates()
     dfb = dfa.groupby([ref, period]).agg("count").reset_index()
     dfb.rename({code: code + "_count"}, axis='columns', inplace=True)
     df = df.merge(
