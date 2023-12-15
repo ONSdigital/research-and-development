@@ -35,8 +35,8 @@ def run_outputs(
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
-    pg_num_alpha,
-    sic_pg_alpha,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -59,6 +59,8 @@ def run_outputs(
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
+        pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
+        sic_pg_alpha (pd.DataFrame): Mapper for product group conversions (SIC to alpha)
     """
 
     (
