@@ -31,7 +31,7 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
         code (str): Name of the column containing codes
 
     Returns:
-        (pd.DataFrame): A copy of originl dataframe with an additional column
+        (pd.DataFrame): A copy of original dataframe with an additional column
         called the same as code with suffix "_count" countaining the number of
         unique non-empty codes
     """
@@ -42,7 +42,7 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
     cols_need = [ref, period, code]
     dfa = dfa[cols_need]
     dfa = dfa[dfa[code].str.len() > 0]
-    dfa.drop_duplicates(inplace=True)
+    dfa = dfa.drop_duplicates
     dfb = dfa.groupby([ref, period]).agg("count").reset_index()
     dfb.rename({code: code + "_count"}, axis='columns', inplace=True)
     df = df.merge(
@@ -83,13 +83,13 @@ def weights(df):
         dfc.groupby([ref, period])["site_percent"].transform("sum"))
 
     # Filter out the rows where total percent is zero
-    dfc = dfc[dfc["site_percent_total"] != 0]
+    dfc = dfc.copy()[dfc["site_percent_total"] != 0]
 
     # Compute weights
     dfc["site_weight"] = dfc["site_percent"] / dfc["site_percent_total"]
 
-    # Remove unnecessary
-    dfc.drop(columns=['site_percent', 'site_percent_total'], inplace=True)
+    # Remove unnecessary columns as they are no longer needed
+    dfc = dfc.drop(columns=['site_percent', 'site_percent_total'], axis=1)
 
     return dfc
 
@@ -98,26 +98,30 @@ def weights(df):
 
 
 def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
-    """Apportions the numerical values for each product group across multiple
-    sites, using percents from question 602 to compute weights.
-    Selects the records long from references that have multiple non-empty
-    postcodes. Splits the dataframe in two, codes and sites. Codes have
-    reference, period, product group (unique combinations of product, civil or
-    defence and pg_numeric) and (all numeric columns. Sites have reference,
-    period and all other fields except for product group keys and numerical
-    values. Sites dataframe contains multiple instances, with instance 1 and
-    higher having different postcodes and with percents for each site.
-    For sites, weights are calculated using the percents. Then, a Cartesian
-    product of product groups and sites is created, and the weights of each site
-    are applied to values of each product. Also, for short forms, sets percent
+    """Apportion the numerical values for each product group across multiple sites.
+
+    This is done using percents from question 602 to compute weights.
+    The code selects the records long from references that have multiple non-empty
+    postcodes, then splits the dataframe in two; one for codes and one for sites. 
+    
+    Codes have reference, period, product group (unique combinations of product group, 
+    civil or defence and pg_numeric) and all relevant numeric columns. 
+    
+    Sites have reference, period and all other fields except for product group keys and 
+    the relevant numerical values. Sites dataframe contains multiple instances, with 
+    instance 1 and higher having different postcodes and with percents for each site.
+    For sites, weights are calculated using the percents. 
+    
+    A Cartesian product of product groups and sites is created, and the weights of each 
+    site are applied to values of each product. Also, for short forms, percent is set
     to 100.
 
     Args:
-        df (pd.DataFrame): Dataframe containing all input data
+        df (pd.DataFrame): Dataframe containing all input data.
 
     Returns:
         (pd.DataFrame): A dataframe with the same columns, with applied site
-        apportionment
+        apportionment.
     """
     # Clean "NONE" postcodes
     df.loc[df[postcode] == "NONE    ", postcode] = ""
@@ -129,10 +133,10 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     df_cols = list(df.columns)
 
     # Create a list of the value columns that we want to apportion
-    # These are the same as the columns we impute.
+    # These are the same as the columns we impute so we use a function from imputation.
     value_cols = get_imputation_cols(config)
 
-    # Calculate the number of uniqie non-blank postcodes
+    # Calculate the number of unique non-blank postcodes
     df = count_unique_codes_in_col(df, postcode)
 
     # Condition of long forms, many sites, instance >=1, non-null postcodes
@@ -143,12 +147,12 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     )
 
     # Dataframe dfm with many products - for apportionment and Cartesian product
-    dfm = df[cond]
-    dfm.drop(columns=[postcode + "_count"], inplace=True)
+    dfm = df.copy()[cond]
+    dfm = dfm.drop(columns=[postcode + "_count"], axis=1)
 
     # Dataframe with everything else - save unchanged
     df_out = df[~cond]
-    df_out.drop(columns=[postcode + "_count"], inplace=True)
+    df_out = df_out.drop(columns=[postcode + "_count"], axis=1)
 
     # df_codes: dataframe with codes and numerical values
     group_cols = [ref, period]
@@ -159,12 +163,11 @@ def apportion_sites(df: pd.DataFrame, config: dict)-> pd.DataFrame:
     df_codes = df_codes[df_codes[product].str.len() > 0]
 
     # # De-duplicate by summation - possibly, not needed
-    # value_dict = {value_col: 'sum' for value_col in value_cols}
     df_codes = (
         df_codes.groupby(group_cols + code_cols).agg(sum).reset_index()
     )
 
-    # df_stes: dataframe with postcodes, percents, and everyting else
+    # df_sites: dataframe with postcodes, percents, and everyting else
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
     df_sites = dfm.copy()[site_cols]
 
