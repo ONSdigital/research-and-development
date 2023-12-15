@@ -3,7 +3,7 @@ old_name = "reference"
 Deduced_Data_Type = "Int64"
 
 [period]
-old_name = "period_year"
+old_name = "period"
 Deduced_Data_Type = "Int64"
 
 # [entref]
