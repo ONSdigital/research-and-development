@@ -441,6 +441,11 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
             elif dtypes_dict[column] == "str":
                 survey_df[column] = survey_df[column].astype("string")
+            elif "datetime" in dtypes_dict[column]:
+                try:
+                    survey_df[column] = pd.to_datetime(survey_df[column], errors='coerce')
+                except TypeError:
+                    raise TypeError(f"Failed to convert column '{column}' to datetime. Please check the data.")
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
