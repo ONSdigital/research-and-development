@@ -9,31 +9,35 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   load_historic_data: False
   run_construction: True
+  run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
+  # Apportionment to sites settings
+  apportion_sites: True
   # Output settings
   output_full_responses: False
   output_ni_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
+  output_estimation_qa: True
   output_imputation_qa: False
-  output_long_form: False
+  output_long_form: True
   output_short_form: False
-  output_gb_sas: False
-  output_tau: False
-  output_intram_by_pg: False
-  output_intram_by_itl1: False
-  output_intram_by_civil_defence: False
+  output_gb_sas: True
+  output_ni_sas: False
+  output_tau: True
+  output_intram_by_pg: True
+  output_intram_by_itl1: True
+  output_intram_by_civil_defence: True
   output_intram_by_sic: False
   output_status_filtered: False
-  output_fte_total_qa: True
+  output_fte_total_qa: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -73,7 +77,7 @@ network_paths:
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/2021_NI_BERD_data_to_load.csv"
-  ni_indicative_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/ias6627out.csv"
+  ni_indicative_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/ias6627out_fixed_cols.csv"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
@@ -84,8 +88,9 @@ network_paths:
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
-  construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
-  construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
+  construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
+  # construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
+  # construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
   manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
@@ -112,6 +117,7 @@ schema_paths:
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
+  ni_sas_schema: "config/output_schemas/ni_sas_schema.toml"
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
   manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
@@ -124,18 +130,7 @@ schema_paths:
 
 
 # Export config for users
-export_choices:
-  copy_or_move_files: "copy"
-  export_frozen_shortform: None # Can be set to None
-  export_tau: None # Can be set to None
-  export_gb_sas: None # Can be set to None
-  export_intram_by_pg: None # Can be set to None
-  export_intram_by_itl1: None # Can be set to None
-  export_intram_by_civil_defence: None # TODO structure of output (no col heads) means this currently doesn't work
-  export_intram_by_sic: "output_intram_by_sic_2023-12-06_v68.csv" # Can be set to None
-  export_status_filtered: None # Can be set to None
-  export_fte_total_qa: "total_fte_qa_2023-12-06_v68.csv" # Can be set to None
-  export_frozen_long_form: None # Can be set to None
+
 
 
 # / ons/ rdbe_dev/ outputs/ output_short_form/ output_short_form2023-09-12_v1.csv

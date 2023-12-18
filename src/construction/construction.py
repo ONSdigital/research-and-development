@@ -14,7 +14,7 @@ def run_construction(
     config: dict,
     check_file_exists: Callable,
     read_csv: Callable,
-    run_id: int,
+    is_northern_ireland: bool = False,
 ) -> pd.DataFrame:
     """Run the construction module.
 
@@ -26,17 +26,26 @@ def run_construction(
     Args:
         snapshot_df (pd.DataFrame): The staged and vaildated snapshot data.
         config (dict): The pipeline configuration
-        check_file_exists (callable): Function to check if file exists. This will
-            be the hdfs or network version depending on settings.
-        read_csv (callable): Function to read a csv file. This will be the hdfs or
-            network version depending on settings.
-        run_id (int): The run id for this run.
+        check_file_exists (callable): Function to check if file exists. This
+            will be the hdfs or network version depending on settings.
+        read_csv (callable): Function to read a csv file. This will be the hdfs
+            or network version depending on settings.
+        is_northern_ireland (bool): If true, do construction on Northern Ireland
+            data instead of England, Wales and Scotland data.
     Returns:
         updated_snapshot_df (pd.DataFrame): As main_snapshot but with records
             amended and flags added to mark whether a record was constructed.
     """
+    if is_northern_ireland:
+        run_construction = config["global"]["run_ni_construction"]
+        path_type = "construction_file_path_ni"
+        schema_path = "./config/construction_ni_schema.toml"
+    else:
+        run_construction = config["global"]["run_construction"]
+        path_type = "construction_file_path"
+        schema_path = "./config/construction_schema.toml"
+
     # Skip this module if not needed
-    run_construction = config["global"]["run_construction"]
     if run_construction is False:
         construction_logger.info("Skipping Construction...")
         return snapshot_df
@@ -44,7 +53,7 @@ def run_construction(
     # Check the construction file exists and has records, then read it
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
-    construction_file_path = paths["construction_file_path"]
+    construction_file_path = paths[path_type]
     construction_logger.info(f"Reading construction file {construction_file_path}")
     construction_file_exists = check_file_exists(construction_file_path)
     if construction_file_exists:
@@ -65,7 +74,7 @@ def run_construction(
     updated_snapshot_df = snapshot_df.copy()
 
     # Validate construction file and drop columns without constructed values
-    validate_data_with_schema(construction_df, "./config/construction_schema.toml")
+    validate_data_with_schema(construction_df, schema_path)
     construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Add flags to indicate whether a row was constructed or should be imputed
@@ -73,9 +82,14 @@ def run_construction(
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
 
-    # Add the years
-    updated_snapshot_df = create_period_year(updated_snapshot_df)
-    construction_df = create_period_year(construction_df)
+    # Create period_year column, except for NI which already has it
+    if not is_northern_ireland:
+        updated_snapshot_df = create_period_year(updated_snapshot_df)
+        construction_df = create_period_year(construction_df)
+
+    # NI data has no instance but needs an instance of 1
+    if is_northern_ireland:
+        construction_df["instance"] = 1
 
     # Update the values with the constructed ones
     construction_df.set_index(

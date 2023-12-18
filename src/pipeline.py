@@ -9,11 +9,12 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
-from src.northern_ireland.ni_staging import run_ni_staging
+from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
+from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
@@ -81,6 +82,7 @@ def run_pipeline(start, config_path):
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
@@ -137,10 +139,15 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Data Ingest.")
 
+    # Northern Ireland staging and construction
+    MainLogger.info("Starting NI module...")
+    ni_df = run_ni(config, check_file_exists, read_csv, write_csv, run_id)
+    MainLogger.info("Finished NI Data Ingest.")
+
     # Construction module
     MainLogger.info("Starting Construction...")
     full_responses = run_construction(
-        full_responses, config, check_file_exists, read_csv, run_id
+        full_responses, config, check_file_exists, read_csv
     )
     MainLogger.info("Finished Construction...")
 
@@ -159,17 +166,31 @@ def run_pipeline(start, config_path):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(
+    outliered_responses_df = run_outliers(
         imputed_df, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses, weighted_responses = run_estimation(
-        outliered_responses, cellno_df, config, write_csv, run_id
+    estimated_responses_df, weighted_responses_df = run_estimation(
+        outliered_responses_df,
+        cellno_df,
+        config,
+        write_csv,
+        run_id
     )
     MainLogger.info("Finished Estimation module.")
+
+    # Data processing: Apportionment to sites
+    estimated_responses_df = run_site_apportionment(
+        config,
+        estimated_responses_df
+    )
+    weighted_responses_df = run_site_apportionment(
+        config,
+        weighted_responses_df
+    )
 
     # Data processing: Regional Apportionment
 
@@ -184,8 +205,9 @@ def run_pipeline(start, config_path):
 
     # Run short frozen form output
     run_outputs(
-        estimated_responses,
-        weighted_responses,
+        estimated_responses_df,
+        weighted_responses_df,
+        ni_df,
         config,
         write_csv,
         run_id,
@@ -198,6 +220,8 @@ def run_pipeline(start, config_path):
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        pg_num_alpha,
+        sic_pg_alpha,
     )
 
     MainLogger.info("Finished All Output modules.")

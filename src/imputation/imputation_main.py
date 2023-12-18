@@ -50,13 +50,6 @@ def run_imputation(
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
     """
-
-    # Get the target values and breakdown columns from the config
-    lf_target_vars = config["imputation"]["lf_target_vars"]
-    sum_cols = config["imputation"]["sum_cols"]
-    bd_qs_lists = list(config["breakdowns"].values())
-    bd_cols = list(chain(*bd_qs_lists))
-
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
@@ -84,12 +77,11 @@ def run_imputation(
             ~(df["is_constructed"].isin([True]) & df["force_imputation"].isin([False]))
         ]
 
-    if "manual_trim" in df.columns:
-        trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
+    # Get a list of all the target values and breakdown columns from the config
+    to_impute_cols = hlp.get_imputation_cols(config)
 
     # Create new columns to hold the imputed values
-    orig_cols = lf_target_vars + bd_cols + sum_cols
-    for col in orig_cols:
+    for col in to_impute_cols:
         df[f"{col}_imputed"] = df[col]
 
     # Create imp_path variable for QA output and manual imputation file
@@ -98,12 +90,12 @@ def run_imputation(
 
     # Load manual imputation file
     df = mimp.merge_manual_imputation(df, manual_trimming_df)
-
     trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
     if backdata is not None:
-        df, links_df = run_mor(df, backdata, orig_cols, lf_target_vars, config)
+        lf_target_vars = config["imputation"]["lf_target_vars"]
+        df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
@@ -116,7 +108,7 @@ def run_imputation(
         imputed_df = pd.concat([imputed_df, constructed_df])
 
     # join manually trimmed columns back to the imputed df
-    if "manual_trim" in df.columns:
+    if not trimmed_df.empty:
         imputed_df = pd.concat([imputed_df, trimmed_df])
         qa_df = pd.concat([qa_df, trimmed_df]).reset_index(drop=True)
 
@@ -145,10 +137,10 @@ def run_imputation(
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # Create names for imputed cols
-    imp_cols = [f"{col}_imputed" for col in orig_cols]
+    imp_cols = [f"{col}_imputed" for col in to_impute_cols]
 
     # Update the original breakdown questions and target variables with the imputed
-    imputed_df[orig_cols] = imputed_df[imp_cols]
+    imputed_df[to_impute_cols] = imputed_df[imp_cols]
 
     # Drop imputed values from df
     imputed_df = imputed_df.drop(columns=imp_cols)

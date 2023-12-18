@@ -3,11 +3,13 @@ import logging
 import pandas as pd
 from typing import Callable, Dict, Any
 
+from src.outputs.form_output_prep import form_output_prep
 from src.outputs.status_filtered import output_status_filtered
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
 from src.outputs.gb_sas import output_gb_sas
+from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
@@ -20,6 +22,7 @@ OutputMainLogger = logging.getLogger(__name__)
 def run_outputs(
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
+    ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -32,6 +35,8 @@ def run_outputs(
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_alpha: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -40,6 +45,7 @@ def run_outputs(
         estimated_df (pd.DataFrame): The main dataset containing
         short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
+        ni_full_responses(pd.DataFrame): Dataset with all NI data
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -53,23 +59,22 @@ def run_outputs(
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
+        pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
+        sic_pg_alpha (pd.DataFrame): Mapper for product group conversions (SIC to alpha)
     """
 
-    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
-
-    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
-        estimated_df["imp_marker"] == "R"
+    (
+        ni_full_responses,
+        outputs_df,
+        tau_outputs_df,
+        filtered_output_df,
+    ) = form_output_prep(
+        estimated_df,
+        weighted_df,
+        ni_full_responses,
+        pg_num_alpha,
+        sic_pg_alpha,
     )
-
-    # filter estimated_df and weighted_df to only include clear or imputed statuses
-    outputs_df = estimated_df.copy().loc[to_keep]
-    tau_outputs_df = weighted_df.copy().loc[to_keep]
-    # filter estimated_df for records not included in outputs
-    filtered_output_df = estimated_df.copy().loc[~to_keep]
-
-    # change the value of the status column to 'imputed' for imputed statuses
-    condition = outputs_df["status"].isin(imputed_statuses)
-    outputs_df.loc[condition, "status"] = "imputed"
 
     # Running status filtered full dataframe output for QA
     if config["global"]["output_status_filtered"]:
@@ -141,6 +146,18 @@ def run_outputs(
             sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
+
+    # Running NI SAS output
+    if config["global"]["output_ni_sas"]:
+        OutputMainLogger.info("Starting NI SAS output...")
+        output_ni_sas(
+            ni_full_responses,
+            config,
+            write_csv,
+            run_id,
+            sic_pg_num,
+        )
+        OutputMainLogger.info("Finished NI SAS output.")
 
     # Running Intram by PG output
     if config["global"]["output_intram_by_pg"]:
