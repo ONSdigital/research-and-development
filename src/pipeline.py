@@ -174,23 +174,13 @@ def run_pipeline(start, config_path):
     # Estimation module
     MainLogger.info("Starting Estimation...")
     estimated_responses_df, weighted_responses_df = run_estimation(
-        outliered_responses_df,
-        cellno_df,
-        config,
-        write_csv,
-        run_id
+        outliered_responses_df, cellno_df, config, write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Apportionment to sites
-    estimated_responses_df = run_site_apportionment(
-        config,
-        estimated_responses_df
-    )
-    weighted_responses_df = run_site_apportionment(
-        config,
-        weighted_responses_df
-    )
+    estimated_responses_df = run_site_apportionment(config, estimated_responses_df)
+    weighted_responses_df = run_site_apportionment(config, weighted_responses_df)
 
     # Data processing: Regional Apportionment
 
