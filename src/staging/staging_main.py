@@ -389,7 +389,7 @@ def run_staging(
         manual_trim_df = read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         val.validate_data_with_schema(
-            manual_trim_df, "./config/manual_trimming_schema.toml"
+            manual_trim_df, "./config/manual_trim_schema.toml"
         )
         # Fill empty values with False
     else:
@@ -442,10 +442,10 @@ def run_staging(
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
 
     # Debug begin
-    cora_mapper = cora_mapper.astype('str')
+    cora_mapper = cora_mapper.astype("str")
     StagingMainLogger.info(f"Cora mapper coulms:\n{cora_mapper.dtypes}")
     # Debug end
-    
+
     cora_mapper = val.validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
 
