@@ -440,6 +440,12 @@ def run_staging(
     cora_mapper = read_csv(cora_mapper_path)
     # validates and updates from int64 to string type
     val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
+
+    # Debug begin
+    cora_mapper = cora_mapper.astype('str')
+    StagingMainLogger.info(f"Cora mapper coulms:\n{cora_mapper.dtypes}")
+    # Debug end
+    
     cora_mapper = val.validate_cora_df(cora_mapper)
     StagingMainLogger.info("Cora status mapper file loaded successfully...")
 

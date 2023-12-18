@@ -14,6 +14,7 @@ from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
+from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
@@ -148,17 +149,31 @@ def run_pipeline(start, config_path):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(
+    outliered_responses_df = run_outliers(
         imputed_df, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses, weighted_responses = run_estimation(
-        outliered_responses, cellno_df, config, write_csv, run_id
+    estimated_responses_df, weighted_responses_df = run_estimation(
+        outliered_responses_df,
+        cellno_df,
+        config,
+        write_csv,
+        run_id
     )
     MainLogger.info("Finished Estimation module.")
+
+    # Data processing: Apportionment to sites
+    estimated_responses_df = run_site_apportionment(
+        config,
+        estimated_responses_df
+    )
+    weighted_responses_df = run_site_apportionment(
+        config,
+        weighted_responses_df
+    )
 
     # Data processing: Regional Apportionment
 
@@ -173,8 +188,8 @@ def run_pipeline(start, config_path):
 
     # Run short frozen form output
     run_outputs(
-        estimated_responses,
-        weighted_responses,
+        estimated_responses_df,
+        weighted_responses_df,
         ni_df,
         config,
         write_csv,

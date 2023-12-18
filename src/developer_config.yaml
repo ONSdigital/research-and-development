@@ -9,30 +9,32 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   load_historic_data: False
   run_construction: True
-  run_ni_construction: True
+  run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
+  # Apportionment to sites settings
+  apportion_sites: True
   # Output settings
   output_full_responses: False
   output_ni_full_responses: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
+  output_estimation_qa: True
   output_imputation_qa: False
-  output_long_form: False
+  output_long_form: True
   output_short_form: False
   output_gb_sas: True
-  output_ni_sas: True
+  output_ni_sas: False
   output_tau: True
-  output_intram_by_pg: False
-  output_intram_by_itl1: False
-  output_intram_by_civil_defence: False
+  output_intram_by_pg: True
+  output_intram_by_itl1: True
+  output_intram_by_civil_defence: True
   output_intram_by_sic: False
   output_status_filtered: False
   output_fte_total_qa: False
@@ -126,18 +128,7 @@ schema_paths:
 
 
 # Export config for users
-export_choices:
-  copy_or_move_files: "copy"
-  export_frozen_shortform: None # Can be set to None
-  export_tau: None # Can be set to None
-  export_gb_sas: None # Can be set to None
-  export_intram_by_pg: None # Can be set to None
-  export_intram_by_itl1: None # Can be set to None
-  export_intram_by_civil_defence: None # TODO structure of output (no col heads) means this currently doesn't work
-  export_intram_by_sic: "output_intram_by_sic_2023-12-06_v68.csv" # Can be set to None
-  export_status_filtered: None # Can be set to None
-  export_fte_total_qa: "total_fte_qa_2023-12-06_v68.csv" # Can be set to None
-  export_frozen_long_form: None # Can be set to None
+
 
 
 # / ons/ rdbe_dev/ outputs/ output_short_form/ output_short_form2023-09-12_v1.csv

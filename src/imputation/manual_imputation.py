@@ -39,15 +39,17 @@ def add_trim_column(
     return df
 
 
-# check if any files are in imputation/manual_trimming folder and check if load_manual_imputation is True
-# if so load the file and any records which are marked True in the manual_trim column will be
-# excluded from the imputation process and will be output as is. They will be marked as 'manual_trim' in the imp_marker column
+# check if any files are in imputation/manual_trimming folder and check if 
+# load_manual_imputation is True- if so load the file and any records which are marked 
+# True in the manual_trim column will be excluded from the imputation process and will 
+# be output as is. They will be marked as 'manual_trim' in the imp_marker column
 def merge_manual_imputation(
     df: pd.DataFrame,
     manual_trim_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Loads a manual trimming file if it exists and adds a manual_trim column to the DataFrame.
+    Loads a manual trimming file if it exists and adds a manual_trim column 
+    to the DataFrame.
 
     Args:
         config (Dict[str, Any]): The configuration dictionary.
