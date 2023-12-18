@@ -8,10 +8,10 @@ from src.utils.wrappers import validate_dataframe_not_empty
 
 ManualImputationLogger = logging.getLogger(__name__)
 
+
 @validate_dataframe_not_empty
 def add_trim_column(
-    df: pd.DataFrame, column_name: str = "manual_trim",
-    trim_bool: bool = False
+    df: pd.DataFrame, column_name: str = "manual_trim", trim_bool: bool = False
 ) -> pd.DataFrame:
     """
     Adds a new column to a DataFrame with a default value.
@@ -39,16 +39,16 @@ def add_trim_column(
     return df
 
 
-# check if any files are in imputation/manual_trimming folder and check if 
-# load_manual_imputation is True- if so load the file and any records which are marked 
-# True in the manual_trim column will be excluded from the imputation process and will 
+# check if any files are in imputation/manual_trim folder and check if
+# load_manual_imputation is True- if so load the file and any records which are marked
+# True in the manual_trim column will be excluded from the imputation process and will
 # be output as is. They will be marked as 'manual_trim' in the imp_marker column
 def merge_manual_imputation(
     df: pd.DataFrame,
     manual_trim_df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Loads a manual trimming file if it exists and adds a manual_trim column 
+    Loads a manual trimming file if it exists and adds a manual_trim column
     to the DataFrame.
 
     Args:

@@ -64,7 +64,7 @@ hdfs_paths:
   backdata_path: ""
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
   imputation_path: "/ons/rdbe_dev/imputation"
-  manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
+  manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trim"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
   short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
@@ -95,7 +95,7 @@ network_paths:
   # construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
   estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trim/trimming_qa_2023-11-27_v359.csv"
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
