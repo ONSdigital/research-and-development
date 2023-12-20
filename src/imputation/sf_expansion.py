@@ -17,21 +17,11 @@ def expansion_impute(
     master_col: str,
     trim_col: str,
     group_type: str,
+    threshold_num: int,
     break_down_cols: List[Union[str, int]],
-    threshold_num
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
-    # Create a copy of the group dataframe
-    if "imp_class" in group.columns:
-        print(group["imp_class"].values[0])
-    else:
-        print("imp_class not in columns")
-    if group.empty:
-        print("empty group")
-        return group
-    
     group_copy = group.copy()
-
 
     imp_class = group_copy["imp_class"].values[0]
 
@@ -57,13 +47,14 @@ def expansion_impute(
     # then we do not attempt to calculate the breakdowns at the imputation class level.
     # In this case the values previously calculated in the "civil defence fallback"
     # group will be used instead.
-    threshold_check = 3 # long_responder_mask.sum()
+    threshold_check = long_responder_mask.sum()
+
     if (group_type == "imp_class_group") & (threshold_check <= threshold_num):
         SFExpansionLogger.debug(
-            (f"Imputation class: {imp_class} has fewer than ")
-            (f"{threshold_num} clear responders.")
+            f"Imputation class: {imp_class} has fewer than {threshold_num} "
+            "clear responders."
         )
-        return group
+        return group_copy
 
     # Get long forms only for summing the master_col (scalar value)
     sum_master_q_lng = group_copy.loc[long_responder_mask, master_col].sum()
@@ -100,7 +91,7 @@ def expansion_impute(
 def apply_expansion(df: pd.DataFrame, 
                     master_values: List, 
                     breakdown_dict: dict,
-                    threshold_num: int
+                    threshold_num: int=3,
     ):
 
     # Renaming this df to use in the for loop
@@ -129,8 +120,8 @@ def apply_expansion(df: pd.DataFrame,
             master_value,
             trim_col,
             "civil_defence_fallback",
+            threshold_num,
             break_down_cols=breakdown_dict[master_value],
-            threshold_num=3
         )  # returns a dataframe
 
         expanded_df.reset_index(drop=True, inplace=True)
@@ -144,8 +135,8 @@ def apply_expansion(df: pd.DataFrame,
             master_value,
             trim_col,
             "imp_class_group",
+            threshold_num,
             break_down_cols=breakdown_dict[master_value],
-            threshold_num=3
         )  # returns a dataframe
 
         expanded_df.reset_index(drop=True, inplace=True)
@@ -170,6 +161,8 @@ def apply_expansion(df: pd.DataFrame,
 
 @df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+    """Calculate the expansion imputated values for short forms using long form data."""
+
     # Remove records that have the reference list variables
     # and those that have "nan" in the imp class
     filtered_df, excluded_df = split_df_on_imp_class(df)
@@ -188,7 +181,7 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         filtered_df, 
         master_values, 
         breakdown_dict, 
-        threshold_num
+        threshold_num,
     )
 
     # Re-include those records from the reference list before returning df
