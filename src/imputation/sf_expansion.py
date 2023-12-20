@@ -18,11 +18,20 @@ def expansion_impute(
     trim_col: str,
     group_type: str,
     break_down_cols: List[Union[str, int]],
-    threshold_num=3
+    threshold_num
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
     # Create a copy of the group dataframe
+    if "imp_class" in group.columns:
+        print(group["imp_class"].values[0])
+    else:
+        print("imp_class not in columns")
+    if group.empty:
+        print("empty group")
+        return group
+    
     group_copy = group.copy()
+
 
     imp_class = group_copy["imp_class"].values[0]
 
@@ -48,8 +57,8 @@ def expansion_impute(
     # then we do not attempt to calculate the breakdowns at the imputation class level.
     # In this case the values previously calculated in the "civil defence fallback"
     # group will be used instead.
-    threshold_check = group_copy[long_responder_mask].sum()
-    if (group_type == "imp_class_group") & threshold_check <= threshold_num:
+    threshold_check = 3 # long_responder_mask.sum()
+    if (group_type == "imp_class_group") & (threshold_check <= threshold_num):
         SFExpansionLogger.debug(
             (f"Imputation class: {imp_class} has fewer than ")
             (f"{threshold_num} clear responders.")
@@ -87,11 +96,11 @@ def expansion_impute(
     return group_copy
 
 
-@df_change_func_wrap
+# @df_change_func_wrap
 def apply_expansion(df: pd.DataFrame, 
                     master_values: List, 
                     breakdown_dict: dict,
-                    threshold_num
+                    threshold_num: int
     ):
 
     # Renaming this df to use in the for loop
@@ -121,6 +130,7 @@ def apply_expansion(df: pd.DataFrame,
             trim_col,
             "civil_defence_fallback",
             break_down_cols=breakdown_dict[master_value],
+            threshold_num=3
         )  # returns a dataframe
 
         expanded_df.reset_index(drop=True, inplace=True)
