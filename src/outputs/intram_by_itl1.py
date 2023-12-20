@@ -40,26 +40,21 @@ def output_intram_by_itl1(
     # Join region code
     df = map_o.join_itl_regions(df, postcode_mapper)
 
-    # Join itl level 1
-    reg_code = "LAU121CD"
-    itl_code = "ITL121CD"
-    itl1_mapper = itl_mapper[[reg_code, itl_code]]
-    df = df.merge(itl1_mapper, how="left", left_on="itl", right_on=reg_code)
-
-    # Group by ITL level 1 and aggregate intram
+    # Group by region and aggregate intram
+    itl_code = "rgn"
     value_col = "211"
     agg_method = "sum"
     df_agg = aggregate_output(df, [itl_code], [value_col], agg_method)
 
     # Create UK total
     value_uk = df_agg[value_col].sum()
-    df_uk = pd.DataFrame({itl_code: ["TLA"], value_col: value_uk})
+    df_uk = pd.DataFrame({itl_code: ["K02000001"], value_col: value_uk})
 
     # Create England total
-    itls_eng = ["TLC", "TLD", "TLE", "TLF", "TLG", "TLH", "TLI", "TLJ", "TLK"]
+    itls_eng = df_agg[df_agg["rgn"].str.startswith("E")]["rgn"].tolist()
     df_eng = df_agg[df_agg[itl_code].isin(itls_eng)]
     value_eng = df_eng[value_col].sum()
-    df_eng = pd.DataFrame({itl_code: ["TLB"], value_col: value_eng})
+    df_eng = pd.DataFrame({itl_code: ["E92000001"], value_col: value_eng})
 
     # Concatinate totals
     df_agg = pd.concat([df_agg, df_uk])
