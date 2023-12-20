@@ -43,11 +43,13 @@ def expansion_impute(
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
 
-    # If there are fewer than "threshold_num" clear responders in the imputation class
-    # then we do not attempt to calculate the breakdowns at the imputation class level.
-    # In this case the values previously calculated in the "civil defence fallback"
-    # group will be used instead.
-    threshold_check = long_responder_mask.sum()
+    # Calculate the number of non-zero long-form clear responders in the master column
+    threshold_check = len(group_copy.loc[(group_copy[master_col] > 0), master_col])
+
+    # If there are fewer than "threshold_num" non-zero clear responders in the 
+    # imputation class then do not attempt to calculate the breakdowns at the imputation 
+    # class level. In this case the values previously calculated in the 
+    # "civil defence fallback" group will be used instead.
 
     if (group_type == "imp_class_group") & (threshold_check <= threshold_num):
         SFExpansionLogger.debug(
