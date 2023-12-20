@@ -16,7 +16,6 @@ from src.imputation import manual_imputation as mimp
 from src.outputs.outputs_helpers import create_output_df
 
 
-
 ImputationMainLogger = logging.getLogger(__name__)
 
 

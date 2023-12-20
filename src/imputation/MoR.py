@@ -96,7 +96,7 @@ def carry_forwards(df, backdata, impute_vars):
     in the backdata is joined to each of the m instances in the original df,
     resulting in n*m rows.
     For rows where there is a match, we only want to keep one instance
-    For "Form sent out" statuses, the only instance has been set to 1, 
+    For "Form sent out" statuses, the only instance has been set to 1,
         so we keep that one.
     For "Check needed" statuses, we keep instance 0 only.
     Where there is no match, we keep all rows.
@@ -116,8 +116,8 @@ def carry_forwards(df, backdata, impute_vars):
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"
-    form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1) 
-    check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0) 
+    form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1)
+    check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0)
     keep_cond = no_match_cond | form_sent_out_cond | check_needed_cond
 
     df = df.copy().loc[keep_cond, :]
@@ -234,9 +234,11 @@ def group_calc_link(group, target_vars, config):
         group = group.sort_values(f"{var}_gr")
 
         group[f"{var}_gr_trim"] = False
-        group.loc[non_null_mask, f"{var}_gr_trim"] = trim_bounds(
-            group.loc[non_null_mask, :], f"{var}_gr", config
-        ).loc[:, f"{var}_gr_trim"].values
+        group.loc[non_null_mask, f"{var}_gr_trim"] = (
+            trim_bounds(group.loc[non_null_mask, :], f"{var}_gr", config)
+            .loc[:, f"{var}_gr_trim"]
+            .values
+        )
 
         # If there are non-null, non-zero values in the group calculate the mean
         if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:

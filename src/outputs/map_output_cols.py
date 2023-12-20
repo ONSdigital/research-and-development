@@ -35,10 +35,8 @@ def join_pg_numeric(
 
 
 def join_fgn_ownership(
-        main_df: pd.DataFrame, 
-        mapper_df: pd.DataFrame, 
-        formtype: list = ["0001", "0006"]
-    ) -> pd.DataFrame:
+    main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
+) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 

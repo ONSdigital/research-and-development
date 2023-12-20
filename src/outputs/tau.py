@@ -10,6 +10,7 @@ from src.staging.pg_conversion import sic_to_pg_mapper
 
 OutputMainLogger = logging.getLogger(__name__)
 
+
 def output_tau(
     df: pd.DataFrame,
     config: Dict[str, Any],

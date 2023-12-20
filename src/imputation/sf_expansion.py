@@ -43,7 +43,7 @@ def expansion_impute(
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
 
-    # If there are fewer than "threshold_num" clear responders in the imputation class 
+    # If there are fewer than "threshold_num" clear responders in the imputation class
     # then we do not attempt to calculate the breakdowns at the imputation class level.
     # In this case the values previously calculated in the "civil defence fallback"
     # group will be used instead.
@@ -88,11 +88,12 @@ def expansion_impute(
 
 
 # @df_change_func_wrap
-def apply_expansion(df: pd.DataFrame, 
-                    master_values: List, 
-                    breakdown_dict: dict,
-                    threshold_num: int=3,
-    ):
+def apply_expansion(
+    df: pd.DataFrame,
+    master_values: List,
+    breakdown_dict: dict,
+    threshold_num: int = 3,
+):
 
     # Renaming this df to use in the for loop
     expanded_df = df.copy()
@@ -172,15 +173,15 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     breakdown_dict = config["breakdowns"]
     master_values = list(breakdown_dict)
 
-    # Obtain the "threshold_num" from the config 
+    # Obtain the "threshold_num" from the config
     # (this is the minimum viable number in an imputation class)
     threshold_num = config["imputation"]["sf_expansion_threshold"]
 
     # Run the `expansion_impute` function in a for-loop via `apply_expansion`
     expanded_df = apply_expansion(
-        filtered_df, 
-        master_values, 
-        breakdown_dict, 
+        filtered_df,
+        master_values,
+        breakdown_dict,
         threshold_num,
     )
 

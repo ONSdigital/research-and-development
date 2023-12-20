@@ -340,9 +340,7 @@ def hdfs_list_files(path: str, ext: str = None, order=None):
     # Filtering the files to just those with the required extension
     if ext:
         ext = f".{ext}"
-        file_paths = [
-            file for file in file_paths if os.path.splitext(file)[1] == ext
-        ]
+        file_paths = [file for file in file_paths if os.path.splitext(file)[1] == ext]
 
     return file_paths
 
