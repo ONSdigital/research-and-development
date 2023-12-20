@@ -43,8 +43,10 @@ def expansion_impute(
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
     to_expand_mask = short_mask
 
+    # Condition for positive values in the master column
+    pos_cond = group_copy[master_col] > 0
     # Calculate the number of non-zero long-form clear responders in the master column
-    threshold_check = len(group_copy.loc[(group_copy[master_col] > 0), master_col])
+    threshold_check = len(group_copy.loc[(long_responder_mask & pos_cond), master_col])
 
     # If there are fewer than "threshold_num" non-zero clear responders in the 
     # imputation class then do not attempt to calculate the breakdowns at the imputation 
@@ -83,8 +85,9 @@ def expansion_impute(
         # Write imputed value to all records
         group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
-    # Indicate how the short_form expansion has been computed
-    group_copy["sf_expansion_grouping"] = group_type
+    # Indicate how the short_form expansion has been computed, whether with the
+    # civil and defence fallback, or by imputation class.
+    group_copy[f"{master_col}_sf_exp_grouping"] = group_type
 
     return group_copy
 
