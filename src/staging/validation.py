@@ -645,7 +645,7 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("cora status mapper validation failed: " + str(ve))
 
 
-def flag_no_rand_spenders(df):
+def flag_no_rand_spenders(df, raise_or_warn):
     """
     Flags any records that answer "No" to "604" and also report their expenditure in "211" as more than 0.
 
@@ -653,14 +653,20 @@ def flag_no_rand_spenders(df):
     df (pandas.DataFrame): The input DataFrame.
 
     Returns:
-    pandas.DataFrame: A DataFrame of records that meet the conditions.
+        None
     """
     invalid_records = df.loc[(df["604"] == "No") & (df["211"] > 0)]
 
     if not invalid_records.empty:
-        ValidationLogger.error("Some records report no R&D, but spend in 211 > 0.")
-        ValidationLogger.error(invalid_records)
-        raise Exception("Some records report no R&D, but spend in 211 > 0.")
+        if raise_or_warn == "raise":
+            raise Exception("Some records report no R&D, but spend in 211 > 0.")
+        elif raise_or_warn == "warn":
+            total_invalid_spend = invalid_records["211"].sum()
+            ValidationLogger.error("Some records report no R&D, but spend in 211 > 0.")
+            ValidationLogger.error(
+                f"The total spend of 'No' R&D companies is £{int(total_invalid_spend)}"
+            )
+            ValidationLogger.error(invalid_records)
+
     else:
         ValidationLogger.debug("All records have valid R&D spend.")
-    return invalid_records
