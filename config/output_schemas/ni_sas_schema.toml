@@ -6,9 +6,9 @@ Deduced_Data_Type = "Int64"
 old_name = "period"
 Deduced_Data_Type = "Int64"
 
-# [entref]
-# old_name = "enterprisereference"
-# Deduced_Data_Type = "Int64"
+[entref]
+old_name = "enterprisereference"
+Deduced_Data_Type = "Int64"
 
 [wow]
 old_name = "wowenterprisereference"

@@ -20,30 +20,33 @@ def read_ni_files(
     """Read in CSV files and schemas for NI data."""
     # read in csv files as pandas dataframes
     paths = config[f"{config['global']['network_or_hdfs']}_paths"]
-    responses_file = paths["ni_responses_path"]
-    indicative_file = paths["ni_indicative_path"]
+    # responses_file = paths["ni_responses_path"]
+    # indicative_file = paths["ni_indicative_path"]
+    ni_full_response_file = paths["ni_indicative_path"]
 
     # raise error if the required files do not exist
-    check_file_exists(responses_file, raise_error=True)
-    check_file_exists(indicative_file, raise_error=True)
+    # check_file_exists(responses_file, raise_error=True)
+    # check_file_exists(indicative_file, raise_error=True)
+    check_file_exists(ni_full_response_file, raise_error=True)
 
     NIStagingLogger.info("Loading NI data from csv...")
 
     # It may be they don't want to use all the cols in the files
     # but they haven't decdided yet, so this way of selecting cols maybe useful.
-    wanted_indicative_cols = [
-        indicative_schema[i]["old_name"] for i in indicative_schema.keys()
-    ]
-    wanted_responses_cols = [
-        responses_schema[i]["old_name"] for i in responses_schema.keys()
-    ]
+    # wanted_indicative_cols = [
+    #     indicative_schema[i]["old_name"] for i in indicative_schema.keys()
+    # ]
+    # wanted_responses_cols = [
+    #     responses_schema[i]["old_name"] for i in responses_schema.keys()
+    # ]
 
-    indicative_df = read_csv(indicative_file, wanted_indicative_cols)
-    ni_responses_df = read_csv(responses_file, wanted_responses_cols)
+    # indicative_df = read_csv(indicative_file, wanted_indicative_cols)
+    # ni_responses_df = read_csv(responses_file, wanted_responses_cols)
+    ni_full_response_df = read_csv(ni_full_response_file)
 
     NIStagingLogger.info("Finished reading NI data.")
 
-    return indicative_df, ni_responses_df
+    return ni_full_response_file
 
 
 def rename_columns(
