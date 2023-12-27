@@ -639,3 +639,17 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("cora status mapper validation failed: " + str(ve))
+
+
+def flag_no_rand_spenders(df):
+    """
+    Flags any records that answer "No" to "604" and also report their expenditure in "211" as more than 0.
+
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame.
+
+    Returns:
+    pandas.DataFrame: A DataFrame of records that meet the conditions.
+    """
+    invalid_records = df.loc[(df["604"] == "No") & (df["211"] > 0)]
+    return invalid_records

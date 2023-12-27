@@ -365,6 +365,18 @@ def run_staging(
                 secondary_full_responses,
             )
 
+
+    # Flag invalid records
+    invalid_records = val.flag_no_rand_spenders(full_responses)
+
+    # If there are any invalid records, print them
+    if not invalid_records.empty:
+        StagingMainLogger.error("Some records report no R&D, but spend in 211 > 0.")
+        StagingMainLogger.error(invalid_records)
+        raise Exception("Some records report no R&D, but spend in 211 > 0.")
+    else:
+        StagingMainLogger.debug("All records have valid R&D spend.")
+
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
