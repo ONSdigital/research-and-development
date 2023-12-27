@@ -443,9 +443,13 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype("string")
             elif "datetime" in dtypes_dict[column]:
                 try:
-                    survey_df[column] = pd.to_datetime(survey_df[column], errors='coerce')
+                    survey_df[column] = pd.to_datetime(
+                        survey_df[column], errors="coerce"
+                    )
                 except TypeError:
-                    raise TypeError(f"Failed to convert column '{column}' to datetime. Please check the data.")
+                    raise TypeError(
+                        f"Failed to convert column '{column}' to datetime. Please check the data."
+                    )
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
@@ -652,4 +656,11 @@ def flag_no_rand_spenders(df):
     pandas.DataFrame: A DataFrame of records that meet the conditions.
     """
     invalid_records = df.loc[(df["604"] == "No") & (df["211"] > 0)]
+
+    if not invalid_records.empty:
+        ValidationLogger.error("Some records report no R&D, but spend in 211 > 0.")
+        ValidationLogger.error(invalid_records)
+        raise Exception("Some records report no R&D, but spend in 211 > 0.")
+    else:
+        ValidationLogger.debug("All records have valid R&D spend.")
     return invalid_records
