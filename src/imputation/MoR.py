@@ -78,7 +78,9 @@ def mor_preprocessing(df, backdata):
 
     clear_status_cond = backdata["status"].isin(good_statuses)
     # identify backdata rows that only consist of postcodes to eliminate this
-    postcode_only_cond = backdata["211"].isnull() & backdata["405"].isnull()
+    postcode_only_cond = (
+        backdata["211"].isnull() & backdata["405"].isnull() & backdata["602"].isnull()
+    )
     # Only pick up useful backdata
     backdata = backdata.loc[clear_status_cond & ~postcode_only_cond, :]
 
@@ -96,7 +98,7 @@ def carry_forwards(df, backdata, impute_vars):
     in the backdata is joined to each of the m instances in the original df,
     resulting in n*m rows.
     For rows where there is a match, we only want to keep one instance
-    For "Form sent out" statuses, the only instance has been set to 1, 
+    For "Form sent out" statuses, the only instance has been set to 1,
         so we keep that one.
     For "Check needed" statuses, we keep instance 0 only.
     Where there is no match, we keep all rows.
@@ -116,8 +118,8 @@ def carry_forwards(df, backdata, impute_vars):
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"
-    form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1) 
-    check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0) 
+    form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1)
+    check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0)
     keep_cond = no_match_cond | form_sent_out_cond | check_needed_cond
 
     df = df.copy().loc[keep_cond, :]
@@ -127,7 +129,7 @@ def carry_forwards(df, backdata, impute_vars):
 
     # replace the values of certain columns with the values from the back data
     # TODO: Check with methodology or BAU as to which other cols to take from backdata
-    # TODO: By default, columns not updated such as 4xx, 5xx will contain the current 
+    # TODO: By default, columns not updated such as 4xx, 5xx will contain the current
     # data, instance 0.
     replace_vars = ["instance", "200", "201", "601", "602"]
     for var in replace_vars:
@@ -234,9 +236,11 @@ def group_calc_link(group, target_vars, config):
         group = group.sort_values(f"{var}_gr")
 
         group[f"{var}_gr_trim"] = False
-        group.loc[non_null_mask, f"{var}_gr_trim"] = trim_bounds(
-            group.loc[non_null_mask, :], f"{var}_gr", config
-        ).loc[:, f"{var}_gr_trim"].values
+        group.loc[non_null_mask, f"{var}_gr_trim"] = (
+            trim_bounds(group.loc[non_null_mask, :], f"{var}_gr", config)
+            .loc[:, f"{var}_gr_trim"]
+            .values
+        )
 
         # If there are non-null, non-zero values in the group calculate the mean
         if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
