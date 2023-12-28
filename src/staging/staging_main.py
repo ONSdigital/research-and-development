@@ -433,21 +433,16 @@ def run_staging(
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
-    # Load cora mapper
-    StagingMainLogger.info("Loading Cora status mapper file")
-    cora_mapper_path = paths["cora_mapper_path"]
-    check_file_exists(cora_mapper_path, raise_error=True)
-    cora_mapper = read_csv(cora_mapper_path)
-    # validates and updates from int64 to string type
-    val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
+    # # Load cora mapper
+    # StagingMainLogger.info("Loading Cora status mapper file")
+    # cora_mapper_path = paths["cora_mapper_path"]
+    # check_file_exists(cora_mapper_path, raise_error=True)
+    # cora_mapper = read_csv(cora_mapper_path)
+    # # validates and updates from int64 to string type
+    # val.validate_data_with_schema(cora_mapper, "./config/cora_schema.toml")
 
-    # Debug begin
-    cora_mapper = cora_mapper.astype('str')
-    StagingMainLogger.info(f"Cora mapper coulms:\n{cora_mapper.dtypes}")
-    # Debug end
-    
-    cora_mapper = val.validate_cora_df(cora_mapper)
-    StagingMainLogger.info("Cora status mapper file loaded successfully...")
+    # cora_mapper = val.validate_cora_df(cora_mapper)
+    # StagingMainLogger.info("Cora status mapper file loaded successfully...")
 
     # Load ultfoc (Foreign Ownership) mapper
     StagingMainLogger.info("Loading Foreign Ownership File")
