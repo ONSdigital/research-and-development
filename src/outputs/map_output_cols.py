@@ -35,10 +35,8 @@ def join_pg_numeric(
 
 
 def join_fgn_ownership(
-        main_df: pd.DataFrame, 
-        mapper_df: pd.DataFrame, 
-        formtype: list = ["0001", "0006"]
-    ) -> pd.DataFrame:
+    main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
+) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 
@@ -117,7 +115,7 @@ def map_sizebands(
     return df
 
 
-def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
+def create_cora_status_col(df, main_col="statusencoded"):
     """Creates a new column named form_status by mapping
     the statusencoded column using a provided mapper.
 
@@ -126,7 +124,6 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
 
     Args:
         df (pd.DataFrame): main data containing responses
-        mapper_df (pd.DataFrame): mapper with cora status equivalents
         main_col (str, optional): Defaults to "statusencoded".
 
     Returns:
@@ -139,12 +136,8 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
         "form_status": [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400],
     }
 
-    # convert mapper df to dictionary
-    mapper_dict = dict(zip(mapper_df[main_col], mapper_df["form_status"]))
-
-    # Create a new column by mapping values from main_col using the
-    # mapper dictionary
-    df["form_status"] = df[main_col].map(mapper_dict)
+    # Create a new column by mapping values from main_col using the cora_dict
+    df["form_status"] = df[main_col].map(cora_dict)
 
     return df
 
