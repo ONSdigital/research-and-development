@@ -9,10 +9,10 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   load_historic_data: False
-  run_construction: True
-  run_ni_construction: False
+  run_construction: False
+  run_ni_construction: True
   load_manual_outliers: False
   load_manual_imputation: True
   load_backdata: True  # whether to load previous year data for MoR
@@ -22,19 +22,19 @@ global:
   apportion_sites: True
   # Output settings
   output_full_responses: False
-  output_ni_full_responses: False
+  output_ni_full_responses: True
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: True
+  output_estimation_qa: False
   output_imputation_qa: False
-  output_long_form: True
+  output_long_form: False
   output_short_form: False
-  output_gb_sas: True
-  output_ni_sas: False
+  output_gb_sas: False
+  output_ni_sas: True
   output_tau: True
-  output_intram_by_pg: True
-  output_intram_by_itl1: True
-  output_intram_by_civil_defence: True
+  output_intram_by_pg: False
+  output_intram_by_itl1: False
+  output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_status_filtered: False
   output_fte_total_qa: False
@@ -78,7 +78,7 @@ network_paths:
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/2021_NI_BERD_data_to_load.csv"
   ni_indicative_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/ias6627out_fixed_cols.csv"
-  ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_full responses.csv" # TESTER FILE
+  ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"

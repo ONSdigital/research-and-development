@@ -39,7 +39,7 @@ def run_construction(
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
         path_type = "construction_file_path_ni"
-        schema_path = "./config/construction_ni_schema.toml"
+        schema_path = "./config/construction_ni_schema_updated.toml"
     else:
         run_construction = config["global"]["run_construction"]
         path_type = "construction_file_path"
