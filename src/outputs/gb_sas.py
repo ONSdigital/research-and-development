@@ -42,7 +42,7 @@ def output_gb_sas(
     output_path = paths["output_path"]
 
     # Filter regions for GB only
-    df1 = df1.copy().loc[df1["region"].isin(regions()["GB"])]
+    df1 = df.copy().loc[df["region"].isin(regions()["GB"])]
 
     # Prepare the columns needed for outputs:
 
