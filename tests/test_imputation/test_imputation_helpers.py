@@ -4,10 +4,11 @@ from pandas import DataFrame as pandasDF
 from pandas._testing import assert_series_equal, assert_frame_equal
 
 from src.imputation.imputation_helpers import (
-    copy_first_to_group, 
-    fix_604_error, 
+    copy_first_to_group,
+    fix_604_error,
     create_r_and_d_instance,
 )
+
 
 class TestCopyFirstToGroup:
     """Unit tests for copy_first_to_group function."""
@@ -36,7 +37,7 @@ class TestCopyFirstToGroup:
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
-    
+
     def test_copy_first_to_group(self):
         """Test for function copy_first_to_group."""
         input_df = self.create_input_df()
@@ -53,7 +54,8 @@ class TestCopyFirstToGroup:
                 "Haha",
                 "Haha",
                 None,
-            ], name = "604"
+            ],
+            name="604",
         )
 
         result_df = copy_first_to_group(input_df, "604")
@@ -88,7 +90,7 @@ class TestFix604Error:
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
-    
+
     def create_expected_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
@@ -111,7 +113,7 @@ class TestFix604Error:
 
         expected_df = pandasDF(data=data, columns=input_cols)
         return expected_df
-    
+
     def test_fix_604_error(self):
         """Test for function fix_604_error."""
         input_df = self.create_input_df()
@@ -147,7 +149,7 @@ class TestCreateRAndDInstance:
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
-    
+
     def create_expected_df(self):
         """Create an input dataframe for the test."""
         input_cols = [
@@ -170,7 +172,7 @@ class TestCreateRAndDInstance:
 
         expected_df = pandasDF(data=data, columns=input_cols)
         return expected_df
-    
+
     def test_fix_604_error(self):
         """Test for function fix_604_error."""
         input_df = self.create_input_df()
