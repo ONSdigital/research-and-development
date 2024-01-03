@@ -413,7 +413,9 @@ def run_staging(
             snapshot_path, load_json, config, network_or_hdfs
         )
 
-        print(response_rate)  # TODO: We might want to use this in a QA output
+        StagingMainLogger.info(
+            f"Response rate: {response_rate}"
+        )  # TODO: We might want to use this in a QA output
 
         # Data validation of json or feather data
         val.check_data_shape(full_responses, raise_error=True)
