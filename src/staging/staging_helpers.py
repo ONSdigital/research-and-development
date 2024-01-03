@@ -145,7 +145,20 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
 
 
 def getmappername(mapper_path_key, split):
+    """
+    Extracts the mapper name from a given path key.
 
+    This function uses a regular expression to extract the name of the mapper from the provided key. 
+    The name is assumed to be the part of the key before the first underscore. 
+    If the 'split' parameter is True, underscores in the name are replaced with spaces.
+
+    Parameters:
+    mapper_path_key (str): The key from which to extract the mapper name.
+    split (bool): Whether to replace underscores in the name with spaces.
+
+    Returns:
+    str: The extracted mapper name.
+    """
     patt = re.compile(r"^(.*?)_path")
     mapper_name = re.search(patt, mapper_path_key).group(1)
 
