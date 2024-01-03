@@ -3,7 +3,7 @@ from numpy import random
 import logging
 import re
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Tuple, Dict
 
 from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
@@ -464,23 +464,54 @@ def write_snapshot_to_feather(
         )
 
 
+
 def stage_validate_harmonise_postcodes(
-    config, paths, full_responses, run_id, check_file_exists, read_csv, write_csv
-):
+    config: Dict, paths: Dict, full_responses: pd.DataFrame, run_id: str, 
+    check_file_exists: Callable, read_csv: Callable, write_csv: Callable
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Stage, validate and harmonise the postcode column
+    Stages, validates, and harmonises the postcode column in the provided DataFrame.
+
+    This function performs the following steps:
+    1. Loads a master list of postcodes from a CSV file.
+    2. Validates the postcode column in the full_responses DataFrame against the master list.
+    3. Writes any invalid postcodes to a CSV file.
+    4. Returns the original DataFrame and the master list of postcodes.
+
+    Parameters:
+    config (Dict): A dictionary containing configuration options.
+    paths (Dict): A dictionary containing paths to various files.
+    full_responses (pd.DataFrame): The DataFrame containing the data to be validated.
+    run_id (str): The run ID for this execution.
+    check_file_exists (Callable): A function that checks if a file exists.
+    read_csv (Callable): A function that reads a CSV file into a DataFrame.
+    write_csv (Callable): A function that writes a DataFrame to a CSV file.
+
+    Returns:
+    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame and the master list of postcodes.
     """
+    # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
+
+    # Load the master list of postcodes
     postcode_masterlist = paths["postcode_masterlist"]
     check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_mapper["pcd2"]
+
+    # Validate the postcode column in the full_responses DataFrame
     invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
+
+    # Log the saving of invalid postcodes to a file
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
+
+    # Save the invalid postcodes to a CSV file
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%Y-%m-%d")
     invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
+
+    # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
