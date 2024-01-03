@@ -3,24 +3,22 @@ import logging
 import pandas as pd
 import numpy as np
 
-from typing import Dict, List
-
 from src.imputation import apportionment as appt
 
 NIheadcountFTELogger = logging.getLogger(__name__)
 
 
-def create_ni_headcount_cols(df:pd.DataFrame) -> pd.DataFrame:
+def create_ni_headcount_cols(df: pd.DataFrame) -> pd.DataFrame:
     """Create and populate the headcount columns for the NI data.
 
     Example:
         df["headcount_res_m"] = df["501"]
-    
+
     Args:
         df (pd.DataFrame): The full NI dataframe.
-    
+
     Returns:
-        df (pd.DataFrame): The same data frame with new headcount columns 
+        df (pd.DataFrame): The same data frame with new headcount columns
     """
     # hc_dict is a dictionary from the apportionment module.
     # it is of the form {new_headcount_col : old_5xx_col}
@@ -39,18 +37,18 @@ def create_ni_headcount_cols(df:pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_ni_fte_cols(df:pd.DataFrame) -> pd.DataFrame:
+def create_ni_fte_cols(df: pd.DataFrame) -> pd.DataFrame:
     """Create and populate the FTE columns for the NI data.
 
     Example:
         df["emp_researcher"] = df["405"] if df["200"] == "C"
         df["emp_researcher"] = df["406"] if df["200"] == "D"
-    
+
     Args:
         df (pd.DataFrame): The full NI dataframe.
-    
+
     Returns:
-        df (pd.DataFrame): The same data frame with new FTE columns 
+        df (pd.DataFrame): The same data frame with new FTE columns
     """
     # fte_dict is a dictionary from the apportionment module.
     # it is of the form {new_fte_col : [old_col_civil, old_col_defence]}
@@ -64,20 +62,20 @@ def create_ni_fte_cols(df:pd.DataFrame) -> pd.DataFrame:
         civil_col = appt.fte_dict[fte_col][0]
         defence_col = appt.fte_dict[fte_col][1]
         # assign the new column depending on whether the reference is civil or defence
-        df.loc[(df["200"] == "C"), fte_col] = df[civil_col] 
+        df.loc[(df["200"] == "C"), fte_col] = df[civil_col]
         df.loc[(df["200"] == "D"), fte_col] = df[defence_col]
 
     return df
 
 
-def run_ni_headcount_fte(df:pd.DataFrame) -> pd.DataFrame:
+def run_ni_headcount_fte(df: pd.DataFrame) -> pd.DataFrame:
     """Run functions to create headcount and FTE cols for NI data.
 
     Args:
         df (pd.DataFrame): The full NI dataframe.
-    
+
     Returns:
-        df (pd.DataFrame): The same data frame with new headcount and FTE columns 
+        df (pd.DataFrame): The same data frame with new headcount and FTE columns
     """
     NIheadcountFTELogger.info("Creating headcount and FTE columns for NI data.")
 

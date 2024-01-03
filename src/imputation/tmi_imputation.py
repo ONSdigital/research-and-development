@@ -542,8 +542,8 @@ def run_tmi(
     mor_mask = full_df["imp_marker"].isin(["CF", "MoR"])
 
     # create logic to select rows for longform and shortform TMI
-    long_tmi_mask = ((full_df["formtype"] == formtype_long) & ~mor_mask)
-    short_tmi_mask = ((full_df["formtype"] == formtype_short) & ~mor_mask)
+    long_tmi_mask = (full_df["formtype"] == formtype_long) & ~mor_mask
+    short_tmi_mask = (full_df["formtype"] == formtype_short) & ~mor_mask
 
     # create dataframes to be used for longform TMI and short form census TMI
     longform_df = full_df.copy().loc[long_tmi_mask]
@@ -581,16 +581,13 @@ def run_tmi(
     full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
 
     # rearange the rows to put the manual_trim column at the end
-    cols = [col for col in full_df.columns if col != "manual_trim"] + [
-        "manual_trim"
-    ]
+    cols = [col for col in full_df.columns if col != "manual_trim"] + ["manual_trim"]
     full_df = full_df[cols]
 
     qa_cols = [col for col in full_qa_df.columns if col != "manual_trim"] + [
         "manual_trim"
     ]
     full_qa_df = full_qa_df[qa_cols]
-
 
     TMILogger.info("TMI imputation completed.")
     return full_df, full_qa_df
