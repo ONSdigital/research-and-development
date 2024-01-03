@@ -30,6 +30,7 @@ def read_ni_files(
 
     return ni_full_response_df
 
+
 def rename_columns(
     ni_full_responses_df: pd.DataFrame,
     ni_responses_schema: dict,
@@ -43,6 +44,7 @@ def rename_columns(
     ni_responses_df = ni_full_responses_df.rename(columns=ni_responses_rename_dict)
 
     return ni_responses_df
+
 
 def run_ni_staging(
     config: dict,
@@ -83,9 +85,7 @@ def run_ni_staging(
     )
 
     # Rename the columns
-    ni_responses_df = rename_columns(
-        ni_responses_df, ni_responses_schema
-    )
+    ni_responses_df = rename_columns(ni_responses_df, ni_responses_schema)
 
     # Responses are given an instance of one for the construction module
     # Instance will be dropped in outputs.

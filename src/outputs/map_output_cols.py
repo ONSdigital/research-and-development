@@ -35,10 +35,8 @@ def join_pg_numeric(
 
 
 def join_fgn_ownership(
-        main_df: pd.DataFrame,
-        mapper_df: pd.DataFrame,
-        formtype: list = ["0001", "0006"]
-    ) -> pd.DataFrame:
+    main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
+) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
 
@@ -150,10 +148,12 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
     return df
 
 
-def join_itl_regions(df: pd.DataFrame,
-                     postcode_mapper: pd.DataFrame,
-                     postcode_col="postcodes_harmonised",
-                     formtype: list = ["0001", "0006"]):
+def join_itl_regions(
+    df: pd.DataFrame,
+    postcode_mapper: pd.DataFrame,
+    postcode_col="postcodes_harmonised",
+    formtype: list = ["0001", "0006"],
+):
     """Joins the itl regions onto the full dataframe using the mapper provided
 
     Args:
