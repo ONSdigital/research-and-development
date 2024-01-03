@@ -16,8 +16,8 @@ def read_ni_files(
     check_file_exists: Callable,
     read_csv: Callable,
 ) -> Tuple:
-    """Read in CSV files and schemas for NI data."""
-    # read in csv files as pandas dataframes
+    """Read in CSV file and schema for NI data."""
+    # read in csv file as pandas dataframes
     paths = config[f"{config['global']['network_or_hdfs']}_paths"]
     ni_full_response_file = paths["ni_full_responses_path"]
 
@@ -34,8 +34,8 @@ def rename_columns(
     ni_full_responses_df: pd.DataFrame,
     ni_responses_schema: dict,
 ) -> pd.DataFrame:
+    """Rename the columns in CSV file for NI data."""
     # rename columns
-
     ni_responses_rename_dict = {
         ni_responses_schema[i]["old_name"]: i for i in ni_responses_schema.keys()
     }
@@ -77,12 +77,12 @@ def run_ni_staging(
     ni_responses_schema_path = "./config/ni_full_responses.toml"
     ni_responses_schema = val.load_schema(ni_responses_schema_path)
 
-    # # read in the NI csv files as two dataframes
+    # # read in the NI csv file
     ni_responses_df = read_ni_files(
         ni_responses_schema, config, check_file_exists, read_csv
     )
 
-    # Rename the columns of the two dataframes
+    # Rename the columns
     ni_responses_df = rename_columns(
         ni_responses_df, ni_responses_schema
     )
@@ -91,7 +91,7 @@ def run_ni_staging(
     # Instance will be dropped in outputs.
     ni_responses_df["instance"] = 1
 
-    # Validate the dataframes using the schema
+    # Validate the dataframe using the schema
     val.validate_data_with_schema(ni_responses_df, ni_responses_schema_path)
 
     # Optionally output the staged NI data

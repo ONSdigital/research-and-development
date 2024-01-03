@@ -35,8 +35,8 @@ def join_pg_numeric(
 
 
 def join_fgn_ownership(
-        main_df: pd.DataFrame, 
-        mapper_df: pd.DataFrame, 
+        main_df: pd.DataFrame,
+        mapper_df: pd.DataFrame,
         formtype: list = ["0001", "0006"]
     ) -> pd.DataFrame:
     """
@@ -45,6 +45,7 @@ def join_fgn_ownership(
     Args:
         main_df (pd.DataFrame): The main DataFrame.
         mapper_csv_path (pd.DataFrame): The mapper DataFrame.
+        formtype (list): List of the formtypes to run through function
 
     Returns:
         pd.DataFrame: The combined DataFrame resulting from the left join.
@@ -149,24 +150,40 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
     return df
 
 
-def join_itl_regions(df: pd.DataFrame, postcode_mapper: pd.DataFrame):
+def join_itl_regions(df: pd.DataFrame,
+                     postcode_mapper: pd.DataFrame,
+                     postcode_col="postcodes_harmonised",
+                     formtype: list = ["0001", "0006"]):
     """Joins the itl regions onto the full dataframe using the mapper provided
 
     Args:
         df (pd.DataFrame): Full dataframe
         postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
+        formtype (list): List of the formtypes to run through function
 
     Returns:
         df: Dataframe with column "ua_county" for regions
     """
     try:
-        # Perform left join
-        df = df.merge(
-            postcode_mapper, how="left", left_on="postcodes_harmonised", right_on="pcd2"
+        to_keep = df["formtype"].isin(formtype)
+
+        # filter for long and short forms only
+        filtered_df = df.copy().loc[to_keep]
+
+        # the remainder of the dataframe is the NI data
+        ni_df = df.copy().loc[~to_keep]
+
+        # Perform left join on filtered dataframe
+        df = filtered_df.merge(
+            postcode_mapper, how="left", left_on=postcode_col, right_on="pcd2"
         )
         df.drop(columns=["pcd2"], inplace=True)
 
-        return df
+        ni_df["itl"] = "N92000002"
+
+        complete_df = pd.concat([df, ni_df]).reset_index(drop=True)
+
+        return complete_df
 
     except Exception as e:
         raise ValueError(

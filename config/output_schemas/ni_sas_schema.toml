@@ -46,9 +46,9 @@ Deduced_Data_Type = "Int64"
 old_name = "form_status"
 Deduced_Data_Type = "Int64"
 
-# [reg_code]
-# old_name = "region"
-# Deduced_Data_Type = "str"
+[reg_code]
+old_name = "itl"
+Deduced_Data_Type = "str"
 
 [percent]
 old_name = "602"
