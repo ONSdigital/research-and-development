@@ -1,18 +1,18 @@
 """The main file for the staging and validation module."""
+# Core imports
 import logging
 from typing import Callable, Tuple
 from datetime import datetime
 import pandas as pd
 import os
 
-
+# Our own modules
 from src.staging import validation as val
 from src.staging import pg_conversion as pg
 import src.staging.staging_helpers as helpers
 
 
 StagingMainLogger = logging.getLogger(__name__)
-
 
 
 def run_staging(

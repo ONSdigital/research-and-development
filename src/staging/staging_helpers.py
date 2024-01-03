@@ -1,3 +1,5 @@
+"""All functions that are applied in staging_main.py"""
+# Core imports
 import pandas as pd
 from numpy import random
 import logging
@@ -5,6 +7,7 @@ import re
 from datetime import datetime
 from typing import Callable, Tuple, Dict
 
+# Our own modules
 from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import spp_parser, history_loader
@@ -66,7 +69,6 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
 
         else:
             return mystr[:target_len].ljust(target_len, " ")
-
 
 
 def fix_anon_data(responses_df, config):
@@ -148,8 +150,8 @@ def getmappername(mapper_path_key, split):
     """
     Extracts the mapper name from a given path key.
 
-    This function uses a regular expression to extract the name of the mapper from the provided key. 
-    The name is assumed to be the part of the key before the first underscore. 
+    This function uses a regular expression to extract the name of the mapper from the provided key.
+    The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
 
     Parameters:
@@ -318,9 +320,9 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
     """
     Loads and validates a snapshot of survey data from a JSON file.
 
-    This function reads a JSON file containing a snapshot of survey data, parses the 
-        data into contributors and responses dataframes, calculates the response rate, 
-        fixes any issues with anonymised data, validates the data against predefined 
+    This function reads a JSON file containing a snapshot of survey data, parses the
+        data into contributors and responses dataframes, calculates the response rate,
+        fixes any issues with anonymised data, validates the data against predefined
         schemas, combines the contributors and responses dataframes into a full responses
         dataframe, and validates the full responses dataframe against a combined schema.
 
@@ -375,7 +377,7 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
 
-    This function reads a JSON file containing a secondary snapshot of survey data, 
+    This function reads a JSON file containing a secondary snapshot of survey data,
     parses the data into contributors and responses dataframes, validates the data
     against predefined schemas, combines the contributors and responses dataframes into
     a full responses dataframe, and validates the full responses dataframe against a
@@ -387,7 +389,7 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
             snapshot data.
 
     Returns:
-        pandas.DataFrame: A DataFrame containing the full responses from the secondary 
+        pandas.DataFrame: A DataFrame containing the full responses from the secondary
             snapshot.
     """
     # Load secondary snapshot data
@@ -464,10 +466,14 @@ def write_snapshot_to_feather(
         )
 
 
-
 def stage_validate_harmonise_postcodes(
-    config: Dict, paths: Dict, full_responses: pd.DataFrame, run_id: str, 
-    check_file_exists: Callable, read_csv: Callable, write_csv: Callable
+    config: Dict,
+    paths: Dict,
+    full_responses: pd.DataFrame,
+    run_id: str,
+    check_file_exists: Callable,
+    read_csv: Callable,
+    write_csv: Callable,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Stages, validates, and harmonises the postcode column in the provided DataFrame.
@@ -515,4 +521,3 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
-
