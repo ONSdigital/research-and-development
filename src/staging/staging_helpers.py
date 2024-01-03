@@ -315,7 +315,24 @@ def load_snapshot_feather(feather_file, read_feather):
 
 
 def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
+    """
+    Loads and validates a snapshot of survey data from a JSON file.
 
+    This function reads a JSON file containing a snapshot of survey data, parses the 
+        data into contributors and responses dataframes, calculates the response rate, 
+        fixes any issues with anonymised data, validates the data against predefined 
+        schemas, combines the contributors and responses dataframes into a full responses
+        dataframe, and validates the full responses dataframe against a combined schema.
+
+    Parameters:
+        snapshot_path (str): The path to the JSON file containing the snapshot data.
+        load_json (function): The function to use to load the JSON file.
+        config (dict): A dictionary containing configuration options.
+        network_or_hdfs (str): A string indicating whether the data is being loaded from a network or HDFS.
+
+    Returns:
+        tuple: A tuple containing the full responses dataframe and the response rate.
+    """
     StagingHelperLogger.info("Loading SPP snapshot data from json file")
 
     # Load data from JSON file
