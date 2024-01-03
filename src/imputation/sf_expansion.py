@@ -48,9 +48,9 @@ def expansion_impute(
     # Calculate the number of non-zero long-form clear responders in the master column
     threshold_check = len(group_copy.loc[(long_responder_mask & pos_cond), master_col])
 
-    # If there are fewer than "threshold_num" non-zero clear responders in the 
-    # imputation class then do not attempt to calculate the breakdowns at the imputation 
-    # class level. In this case the values previously calculated in the 
+    # If there are fewer than "threshold_num" non-zero clear responders in the
+    # imputation class then do not attempt to calculate the breakdowns at the imputation
+    # class level. In this case the values previously calculated in the
     # "civil defence fallback" group will be used instead.
 
     if (group_type == "imp_class_group") & (threshold_check <= threshold_num):

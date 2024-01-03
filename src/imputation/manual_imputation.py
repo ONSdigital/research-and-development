@@ -1,6 +1,3 @@
-import os
-import glob
-from typing import Dict, Any
 import pandas as pd
 import logging
 
@@ -18,14 +15,15 @@ def add_trim_column(
 
     Args:
         df (pd.DataFrame): The DataFrame to add the new column to.
-        column_name (str, optional): The name of the new column. Defaults to 'manual_trim'.
+        column_name (str, optional): The name of the new column. 
         value (bool, optional): The default value for the new column. Defaults to False.
 
     Returns:
         pd.DataFrame: The DataFrame with the new column added.
 
     Raises:
-        ValueError: If the DataFrame is empty or the column already exists in the DataFrame.
+        ValueError: If the DataFrame is empty or the column already exists in the 
+        DataFrame.
     """
     if column_name in df.columns:
         ManualImputationLogger.info(

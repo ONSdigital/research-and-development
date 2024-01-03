@@ -3,8 +3,6 @@ import logging
 import pandas as pd
 import numpy as np
 
-from typing import Dict, List
-
 from src.imputation import apportionment as appt
 
 NIheadcountFTELogger = logging.getLogger(__name__)
