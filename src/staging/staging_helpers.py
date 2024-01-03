@@ -372,7 +372,24 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
 
 def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
+    """
+    Loads and validates a secondary snapshot of survey data from a JSON file.
 
+    This function reads a JSON file containing a secondary snapshot of survey data, 
+    parses the data into contributors and responses dataframes, validates the data
+    against predefined schemas, combines the contributors and responses dataframes into
+    a full responses dataframe, and validates the full responses dataframe against a
+    combined schema.
+
+    Parameters:
+        load_json (function): The function to use to load the JSON file.
+        secondary_snapshot_path (str): The path to the JSON file containing the secondary
+            snapshot data.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the full responses from the secondary 
+            snapshot.
+    """
     # Load secondary snapshot data
     StagingHelperLogger.info("Loading secondary snapshot data from json file")
     secondary_snapdata = load_json(secondary_snapshot_path)
