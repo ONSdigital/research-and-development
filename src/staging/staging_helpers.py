@@ -55,7 +55,6 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
             return mystr[:target_len].ljust(target_len, " ")
 
 
-
 def fix_anon_data(responses_df, config):
     """
     Fixes anonymised snapshot data for use in the DevTest environment.
