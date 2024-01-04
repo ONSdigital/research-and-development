@@ -15,14 +15,14 @@ def add_trim_column(
 
     Args:
         df (pd.DataFrame): The DataFrame to add the new column to.
-        column_name (str, optional): The name of the new column. 
+        column_name (str, optional): The name of the new column.
         value (bool, optional): The default value for the new column. Defaults to False.
 
     Returns:
         pd.DataFrame: The DataFrame with the new column added.
 
     Raises:
-        ValueError: If the DataFrame is empty or the column already exists in the 
+        ValueError: If the DataFrame is empty or the column already exists in the
         DataFrame.
     """
     if column_name in df.columns:
@@ -37,7 +37,7 @@ def add_trim_column(
     return df
 
 
-# check if any files are in imputation/manual_trimming folder and check if
+# check if any files are in imputation/manual_trim folder and check if
 # load_manual_imputation is True- if so load the file and any records which are marked
 # True in the manual_trim column will be excluded from the imputation process and will
 # be output as is. They will be marked as 'manual_trim' in the imp_marker column

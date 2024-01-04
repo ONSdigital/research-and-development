@@ -441,6 +441,15 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
             elif dtypes_dict[column] == "str":
                 survey_df[column] = survey_df[column].astype("string")
+            elif "datetime" in dtypes_dict[column]:
+                try:
+                    survey_df[column] = pd.to_datetime(
+                        survey_df[column], errors="coerce"
+                    )
+                except TypeError:
+                    raise TypeError(
+                        f"Failed to convert column '{column}' to datetime. Please check the data."
+                    )
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
@@ -634,3 +643,30 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("cora status mapper validation failed: " + str(ve))
+
+
+def flag_no_rand_spenders(df, raise_or_warn):
+    """
+    Flags any records that answer "No" to "604" and also report their expenditure in "211" as more than 0.
+
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame.
+
+    Returns:
+        None
+    """
+    invalid_records = df.loc[(df["604"] == "No") & (df["211"] > 0)]
+
+    if not invalid_records.empty:
+        if raise_or_warn == "raise":
+            raise Exception("Some records report no R&D, but spend in 211 > 0.")
+        elif raise_or_warn == "warn":
+            total_invalid_spend = invalid_records["211"].sum()
+            ValidationLogger.error("Some records report no R&D, but spend in 211 > 0.")
+            ValidationLogger.error(
+                f"The total spend of 'No' R&D companies is £{int(total_invalid_spend)}"
+            )
+            ValidationLogger.error(invalid_records)
+
+    else:
+        ValidationLogger.debug("All records have valid R&D spend.")
