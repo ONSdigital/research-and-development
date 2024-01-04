@@ -99,6 +99,13 @@ def run_imputation(
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
 
+    # After imputation, correction to ignore the "604" == "No" in any records with
+    # Status "check needed"
+    chk_mask = df["status"].str.contains("Check needed")
+    imputation_mask = df["imp_marker"].isin(["TMI", "CF", "MoR"])
+    # Changing all records that meet the criteria to "604" == "Yes"
+    df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
+
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
 
