@@ -59,8 +59,9 @@ def run_ni_staging(
     column names and cast to the required datatypes, based on toml schema. The
     columns are renamed, again based on the toml schema. The resulting
     dataframe can optionally be output for qa purposes.
-    The staged NI data is passed back to the pipeline, but is not used
-    except for the outputs module.
+    The staged NI data is passed back to the pipeline for optional NI construction.
+    Apart from construction, the NI data is not used for other pipeline modules
+    before the outputs module.
 
     Args:
         config (dict): The pipeline configuration
