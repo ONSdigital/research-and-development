@@ -36,7 +36,7 @@ def form_output_prep(
     )
 
     # Deal with "No" in 604, also eliminating spenders
-    flag_no_rand_spenders(estimated_df, "warn")
+    flag_no_rand_spenders(estimated_df, "error")
     no_rnd_spenders_filter = ~(
         (estimated_df["604"] == "No") & (estimated_df["211"] > 0)
     )
