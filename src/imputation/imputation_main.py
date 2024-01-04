@@ -101,10 +101,10 @@ def run_imputation(
 
     # After imputation, correction to ignore the "604" == "No" in any records with
     # Status "check needed"
-    chk_mask = df["status"].str.contains("Check needed")
-    imputation_mask = df["imp_marker"].isin(["TMI", "CF", "MoR"])
+    chk_mask = imputed_df["status"].str.contains("Check needed")
+    imputation_mask = imputed_df["imp_marker"].isin(["TMI", "CF", "MoR"])
     # Changing all records that meet the criteria to "604" == "Yes"
-    df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
+    imputed_df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
 
     # Run short form expansion
     imputed_df = run_sf_expansion(imputed_df, config)
