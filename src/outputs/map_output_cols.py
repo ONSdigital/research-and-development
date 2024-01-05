@@ -128,7 +128,7 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
 
-    # Ensure data in main_col values are integars, otherwise it will not map
+    # Ensure data in main_col are integars, otherwise it will not map
     df[main_col] = df[main_col].astype(int)
 
     # Create hardcoded dictionary for mapping
