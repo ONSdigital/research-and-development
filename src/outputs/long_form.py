@@ -49,7 +49,7 @@ def output_long_form(
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Create long form output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["frozen_longform_schema"]
+    schema_path = config["schema_paths"]["long_form_schema"]
     schema_dict = load_schema(schema_path)
     longform_output = create_output_df(df, schema_dict)
 
