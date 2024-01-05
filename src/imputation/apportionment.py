@@ -28,6 +28,7 @@ hc_dict = {
     "headcount_tot_f": "508",
 }
 
+
 def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate subtotals of q202 by reference.
 
@@ -68,13 +69,15 @@ def calc_fte_column(
     for new_col, old_cols in fte_dict.items():
         # create new apportionment column for the civil cases
         df.loc[(df["200"] == "C") & (df["tot_202_CD"] > 0), new_col] = round(
-            copy_first_to_group(df, old_cols[0]) * df["202"] / df["tot_202_CD"], round_val
+            copy_first_to_group(df, old_cols[0]) * df["202"] / df["tot_202_CD"],
+            round_val,
         )
         df.loc[(df["200"] == "C") & (df["tot_202_CD"] == 0), new_col] = 0
 
         # create new apportionment column for the defence cases
         df.loc[(df["200"] == "D") & (df["tot_202_CD"] > 0), new_col] = round(
-            copy_first_to_group(df, old_cols[1]) * df["202"] / df["tot_202_CD"], round_val
+            copy_first_to_group(df, old_cols[1]) * df["202"] / df["tot_202_CD"],
+            round_val,
         )
         df.loc[(df["200"] == "D") & (df["tot_202_CD"] == 0), new_col] = 0
 

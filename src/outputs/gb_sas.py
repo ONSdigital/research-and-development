@@ -9,7 +9,7 @@ from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df, regions
 from src.staging.pg_conversion import sic_to_pg_mapper
 
-OutputMainLogger = logging.getLogger(__name__)
+GbSasLogger = logging.getLogger(__name__)
 
 
 def output_gb_sas(
@@ -39,20 +39,17 @@ def output_gb_sas(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Filter out records that answer "no R&D"
-    df = df.copy().loc[~(df["604"] == "No")]
-
     # Filter regions for GB only
-    df = df.copy().loc[df["region"].isin(regions()["GB"])]
+    df1 = df.copy().loc[df["region"].isin(regions()["GB"])]
 
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
+    df1 = map_o.join_fgn_ownership(df1, ultfoc_mapper)
 
     # Fill in numeric PG for short forms and imputed long forms
-    df = sic_to_pg_mapper(
-        df,
+    df1 = sic_to_pg_mapper(
+        df1,
         sic_pg_num,
         target_col="pg_numeric",
         from_col="SIC 2007_CODE",
@@ -61,29 +58,30 @@ def output_gb_sas(
     )
 
     # Map to the CORA statuses from the statusencoded column
-    df = map_o.create_cora_status_col(df)
+    df1 = map_o.create_cora_status_col(df1)
+
 
     # Map the sizebands based on frozen employment
-    df = map_o.map_sizebands(df)
+    df1 = map_o.map_sizebands(df1)
 
     # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_mapper)
+    df1 = map_o.join_itl_regions(df1, postcode_mapper)
 
     # Create C_lnd_bl
-    df["C_lnd_bl"] = df["219"] + df["220"]
+    df1["C_lnd_bl"] = df1["219"] + df1["220"]
 
     # Create ovss_oth
-    df["ovss_oth"] = (
-        df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+    df1["ovss_oth"] = (
+        df1["243"] + df1["244"] + df1["245"] + df1["246"] + df1["247"] + df1["249"]
     )
 
     # Create oth_sc
-    df["oth_sc"] = df["242"] + df["248"] + df["250"]
+    df1["oth_sc"] = df1["242"] + df1["248"] + df1["250"]
 
     # Create GB SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["gb_sas_schema"]
     schema_dict = load_schema(schema_path)
-    output = create_output_df(df, schema_dict)
+    output = create_output_df(df1, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")

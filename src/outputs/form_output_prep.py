@@ -1,5 +1,6 @@
 import pandas as pd
 from src.staging.pg_conversion import run_pg_conversion
+from src.staging.validation import flag_no_rand_spenders
 
 
 def form_output_prep(
@@ -34,6 +35,13 @@ def form_output_prep(
         estimated_df["imp_marker"] == "R"
     )
 
+    # Deal with "No" in 604, also eliminating spenders
+    flag_no_rand_spenders(estimated_df, "error")
+    no_rnd_spenders_filter = ~(
+        (estimated_df["604"] == "No") & (estimated_df["211"] > 0)
+    )
+    estimated_df = estimated_df.copy().loc[no_rnd_spenders_filter]
+
     # filter estimated_df and weighted_df to only include clear or imputed statuses
     outputs_df = estimated_df.copy().loc[to_keep]
     tau_outputs_df = weighted_df.copy().loc[to_keep]
@@ -44,7 +52,7 @@ def form_output_prep(
     if ni_full_responses is not None:
         # Add required columns to NI data
         ni_full_responses = ni_full_responses.rename(
-            columns={"period_year":"period", "foc": "ultfoc"}
+            columns={"period_year": "period", "foc": "ultfoc"}
         )
         ni_full_responses["a_weight"] = 1
         ni_full_responses["604"] = "Yes"
