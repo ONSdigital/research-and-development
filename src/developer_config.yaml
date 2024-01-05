@@ -14,19 +14,20 @@ global:
   run_construction: False
   run_ni_construction: True
   load_manual_outliers: False
-  load_manual_imputation: True
+  load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
-  output_full_responses: True
+  output_full_responses: False
   output_ni_full_responses: False
+  output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_imputation_qa: False
+  output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
   output_gb_sas: True
@@ -96,6 +97,7 @@ network_paths:
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
   manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
+  apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"

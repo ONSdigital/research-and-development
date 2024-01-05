@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
-from itertools import chain
 
 from src.imputation import imputation_helpers as hlp
 from src.imputation import tmi_imputation as tmi
