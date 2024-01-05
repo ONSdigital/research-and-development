@@ -9,7 +9,7 @@ input_file = "outlier_test1.csv"
 # whether the unit test data is input or expected output
 in_or_output = "input"
 
-output_filename = f"new_{in_or_output}_function"
+output_filename = f"{in_or_output}_function"
 
 # read in the csv
 path1 = os.path.join(csv_path, input_file)
@@ -46,7 +46,7 @@ full_text = f'''def create_input_df(self):
     """Create an input dataframe for the test."""
     {in_or_output}_columns = [\n{col_string}{tab}]
         
-    data = [\n{tab}{rows_string}]   
+    data = [\n{tab}{rows_string}\n{tab}]   
 
     {in_or_output}_df = pandasDF(data=data, columns={in_or_output}_columns)
     return {in_or_output}_df
