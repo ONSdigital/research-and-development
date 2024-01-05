@@ -365,6 +365,9 @@ def run_staging(
                 secondary_full_responses,
             )
 
+    # Flag invalid records
+    val.flag_no_rand_spenders(full_responses, "raise")
+
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
@@ -389,7 +392,7 @@ def run_staging(
         manual_trim_df = read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         val.validate_data_with_schema(
-            manual_trim_df, "./config/manual_trimming_schema.toml"
+            manual_trim_df, "./config/manual_trim_schema.toml"
         )
         # Fill empty values with False
     else:

@@ -17,6 +17,7 @@ def output_ni_sas(
     write_csv: Callable,
     run_id: int,
     sic_pg_num: pd.DataFrame,
+    postcode_itl_mapper: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -31,6 +32,7 @@ def output_ni_sas(
         cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
+        postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
 
     """
 
@@ -52,6 +54,8 @@ def output_ni_sas(
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
+
+    df["itl"] = "N92000002"
 
     # Create C_lnd_bl
     df["C_lnd_bl"] = df["219"] + df["220"]

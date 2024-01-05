@@ -10,6 +10,42 @@ Deduced_Data_Type = "Int64"
 old_name = "current_sic"
 Deduced_Data_Type = "Int64"
 
+[legalstatus]
+old_name = "legal status"
+Deduced_Data_Type = "Int64"
+
+[referencename]
+old_name = "company name"
+Deduced_Data_Type = "object"
+
+[referencepostcode]
+old_name = "company postcode"
+Deduced_Data_Type = "object"
+
+[employment]
+old_name = "ru_emp"
+Deduced_Data_Type = "Int64"
+
+[turnover]
+old_name = "ru_turnover"
+Deduced_Data_Type = "Int64"
+
+[enterprisereference]
+old_name = "entref"
+Deduced_Data_Type = "object"
+
+[wowenterprisereference]
+old_name = "wowref"
+Deduced_Data_Type = "object"
+
+[foc]
+old_name = "ult FOC"
+Deduced_Data_Type = "object"
+
+[instance]
+old_name = "instance"
+Deduced_Data_Type = "Int64"
+
 [200]
 old_name = "q200"
 Deduced_Data_Type = "str"
@@ -38,8 +74,8 @@ Deduced_Data_Type = "float64"
 old_name = "q206"
 Deduced_Data_Type = "float64"
 
-[207 ]
-old_name = "q207 "
+[207]
+old_name = "q207"
 Deduced_Data_Type = "float64"
 
 [209]

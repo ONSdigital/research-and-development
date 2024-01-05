@@ -19,7 +19,7 @@ Max_values = "nan"
 Possible_Categorical_Values = ["nan"]
 
 
-[manual_trimming]
+[manual_trim]
 Description = "nan"
 Deduced_Data_Type = "boolean"
 Nullable = false
