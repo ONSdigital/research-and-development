@@ -55,7 +55,8 @@ def create_ni_fte_cols(df: pd.DataFrame) -> pd.DataFrame:
     new_fte_cols = list(appt.fte_dict.keys())
 
     df = df.copy()
-    df[new_fte_cols] = np.nan
+    for col in new_fte_cols:
+        df[col] = np.nan
 
     for fte_col in new_fte_cols:
         # create variable names for the old columns for the civil and defence cases

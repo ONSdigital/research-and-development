@@ -21,7 +21,7 @@ global:
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
-  output_full_responses: True
+  output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
   output_auto_outliers: False
