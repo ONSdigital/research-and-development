@@ -266,7 +266,6 @@ def run_staging(
             snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
-            cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
             postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
@@ -566,7 +565,6 @@ def run_staging(
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
-        cora_mapper,
         cellno_df,
         postcode_mapper,
         pg_num_alpha,

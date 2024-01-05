@@ -117,10 +117,7 @@ def map_sizebands(
 
 def create_cora_status_col(df, main_col="statusencoded"):
     """Creates a new column named form_status by mapping
-    the statusencoded column using a provided mapper.
-
-    NOTE: A dictionary of the mapper is also provided in the case
-    that a decison to not use a csv file is made.
+    the statusencoded column using a hardcoded dictionary.
 
     Args:
         df (pd.DataFrame): main data containing responses
@@ -130,11 +127,14 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
 
-    # Create hardcoded dictionary for mapping if csv is not used
-    cora_dict = {
-        "statusencoded": [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309],
-        "form_status": [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400],
-    }
+    # Ensure data in main_col values are integars, otherwise it will not map
+    df[main_col] = df[main_col].astype(int)
+
+    # Create hardcoded dictionary for mapping
+    status_before = [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309]
+    status_after = [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400]
+
+    cora_dict = dict(zip(status_before, status_after))
 
     # Create a new column by mapping values from main_col using the cora_dict
     df["form_status"] = df[main_col].map(cora_dict)

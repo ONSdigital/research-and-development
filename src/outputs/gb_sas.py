@@ -18,7 +18,6 @@ def output_gb_sas(
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
-    cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
 ):
@@ -31,7 +30,6 @@ def output_gb_sas(
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
@@ -63,7 +61,7 @@ def output_gb_sas(
     )
 
     # Map to the CORA statuses from the statusencoded column
-    df = map_o.create_cora_status_col(df, cora_mapper)
+    df = map_o.create_cora_status_col(df)
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)

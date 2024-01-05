@@ -28,7 +28,6 @@ def output_ni_sas(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
 
