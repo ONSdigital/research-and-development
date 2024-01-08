@@ -53,7 +53,6 @@ def run_staging(
             snapshot data
             manual_outliers (pd.DataFrame): Data with column for manual outliers,
             ultfoc_mapper (pd.DataFrame): Foreign ownership mapper,
-            cora_mapper (pd.DataFrame): CORA status mapper,
             cellno_df (pd.DataFrame): Cell numbers mapper,
             postcode_mapper (pd.DataFrame): Postcodes to Regional Code mapper,
             pg_alpha_num (pd.DataFrame): Product group alpha to numeric mapper.
@@ -226,16 +225,7 @@ def run_staging(
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
-    cora_mapper = helpers.load_valdiate_mapper(
-        "cora_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_cora_df,
-    )
-
+    # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = helpers.load_valdiate_mapper(
         "ultfoc_mapper_path",
         paths,
@@ -245,14 +235,8 @@ def run_staging(
         val.validate_data_with_schema,
         val.validate_ultfoc_df,
     )
-    # # Debug begin
-    # cora_mapper = cora_mapper.astype("str")
-    # StagingMainLogger.info(f"Cora mapper coulms:\n{cora_mapper.dtypes}")
-    # # Debug end
 
-    # cora_mapper = val.validate_cora_df(cora_mapper)
-    # StagingMainLogger.info("Cora status mapper file loaded successfully...")
-
+    # Load ITL mapper
     itl_mapper = helpers.load_valdiate_mapper(
         "itl_mapper_path",
         paths,
@@ -387,7 +371,6 @@ def run_staging(
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
-        cora_mapper,
         cellno_df,
         postcode_mapper,
         pg_num_alpha,

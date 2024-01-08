@@ -27,6 +27,7 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
+  output_imputation_qa: False
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
@@ -56,7 +57,7 @@ hdfs_paths:
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
-  cora_mapper_path: "/ons/rdbe_dev/mappers/2023/cora_mapper.csv"
+
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   output_path:  "/ons/rdbe_dev/outputs"
   cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
@@ -103,7 +104,6 @@ network_paths:
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
   sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
-  # pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv' - deprecated
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
