@@ -156,6 +156,7 @@ def run_outputs(
             write_csv,
             run_id,
             sic_pg_num,
+            postcode_mapper,
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
