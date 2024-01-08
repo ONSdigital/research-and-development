@@ -4,6 +4,7 @@ import pandas as pd
 from numpy import random
 import logging
 import re
+import os
 from datetime import datetime
 from typing import Callable, Tuple, Dict
 
@@ -150,7 +151,8 @@ def getmappername(mapper_path_key, split):
     """
     Extracts the mapper name from a given path key.
 
-    This function uses a regular expression to extract the name of the mapper from the provided key.
+    This function uses a regular expression to extract the name of the mapper from the 
+    provided key.
     The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
 
@@ -203,7 +205,7 @@ def load_valdiate_mapper(
 
     Raises:
         FileNotFoundError: If no file exists at the mapper path.
-        ValidationError: If the DataFrame fails schema validation or the validation function.
+        ValidationError: If the DataFrame fails schema validation or the validation func
     """
     # Get the path of the mapper from the paths dictionary
     mapper_path = paths[mapper_path_key]

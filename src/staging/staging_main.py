@@ -254,25 +254,17 @@ def run_staging(
     )
 
     # Loading cell number coverage
-    StagingMainLogger.info("Loading Cell Covarage File...")
-    cellno_path = paths["cellno_path"]
-    check_file_exists(cellno_path, raise_error=True)
-    cellno_df = read_csv(cellno_path)
-    StagingMainLogger.info("Covarage File Loaded Successfully...")
-
-    # # Loading PG alpha to numeric mapper - possibly, deprecated
-    # StagingMainLogger.info("Loading PG alpha to numeric File...")
-    # pg_alpha_num_path = paths["pg_alpha_num_path"]
-    # check_file_exists(pg_alpha_num_path, raise_error=True)
-    # pg_alpha_num = read_csv(pg_alpha_num_path)
-    # val.validate_data_with_schema(pg_alpha_num, "./config/pg_alpha_num_schema.toml")
-    # pg_alpha_num = val.validate_many_to_one(
-    #     pg_alpha_num, col_many="pg_alpha", col_one="pg_numeric"
-    # )
-    # StagingMainLogger.info("PG numeric to alpha File Loaded Successfully...")
+    cellno_df = helpers.load_valdiate_mapper(
+        "cellno_2022_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
 
     # Loading SIC to PG to alpha mapper
-
     sic_pg_alpha_mapper = helpers.load_valdiate_mapper(
         "sic_pg_alpha_mapper_path",
         paths,
@@ -378,10 +370,7 @@ def run_staging(
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
 
-    # If we didn't load a snapshot, leave the df as null
-    if not load_updated_snapshot:
-        secondary_full_responses = None
-
+    # Return staged BERD data, additional data and mappers
     return (
         full_responses,
         secondary_full_responses,
