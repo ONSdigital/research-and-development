@@ -60,8 +60,8 @@ hdfs_paths:
 
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   output_path:  "/ons/rdbe_dev/outputs"
-  cellno_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
-  itl_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
+  cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
+  itl_mapper_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   backdata_path: ""
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
@@ -81,7 +81,6 @@ network_paths:
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
-  ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
   ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
@@ -99,20 +98,21 @@ network_paths:
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
-  cellno_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
+  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
-  itl_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
-  sic_pg_utf_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
-  # pg_alpha_num_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_alpha_num.csv' - deprecated
-  pg_num_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
-  sic_pg_alpha_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
-  pg_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
-  itl1_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
-  ref_list_817_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
-  civil_defence_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
-  sic_division_detailed_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
+  cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
+  ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
+  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
+  civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
+  sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
   frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
   frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
@@ -122,6 +122,8 @@ schema_paths:
   intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
   intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
   manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
+  cora_mapper_schema: "/config/cora_schema.toml"
+  sic_pg_utf_schema : "/config/sic_pg_utf_schema.toml"
   status_filtered_schema: "config/output_schemas/status_filtered_schema.toml"
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"

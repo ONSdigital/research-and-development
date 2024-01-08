@@ -1,0 +1,11 @@
+[cell_no]
+Deduced_Data_Type = "Int64"
+
+[UNI_Count]
+Deduced_Data_Type = "Int64"
+
+[uni_employment]
+Deduced_Data_Type = "Int64"
+
+[uni_turnover]
+Deduced_Data_Type = "Int64"

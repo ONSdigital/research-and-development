@@ -49,7 +49,6 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
         from src.utils.local_file_mods import local_isfile as isfile
-        from src.utils.local_file_mods import local_list_files as list_files
 
         # from src.utils.local_file_mods import local_file_exists as file_exists
         from src.utils.local_file_mods import local_write_feather as write_feather
@@ -63,7 +62,6 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
         from src.utils.hdfs_mods import hdfs_isfile as isfile
-        from src.utils.hdfs_mods import hdfs_list_files as list_files
 
         # from src.utils.hdfs_mods import hdfs_file_exists as file_exists
         from src.utils.hdfs_mods import hdfs_write_feather as write_feather
@@ -105,6 +103,7 @@ def run_pipeline(start, config_path):
         backdata,
         pg_detailed,
         itl1_detailed,
+        reference_list,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
