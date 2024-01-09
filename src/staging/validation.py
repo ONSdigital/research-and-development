@@ -185,6 +185,7 @@ def validate_post_col(
     )
 
     df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(postcode_topup)
+    df["601"] = df["601"].apply(postcode_topup)
 
     ValidationLogger.info("All postcodes validated....")
 
@@ -333,9 +334,6 @@ def load_schema(file_path: str = "./config/contributors_schema.toml") -> dict:
         toml_dict = toml.load(file_path)
     else:
         # Return False if file does not exist
-        ValidationLogger.warning(
-            "Validation schema does not exist! Path may be incorrect"
-        )
         return file_exists
 
     return toml_dict
@@ -418,9 +416,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     # Load schema from toml
     dtypes_schema = load_schema(schema_path)
 
-    if not dtypes_schema:
-        raise FileNotFoundError(f"File at {schema_path} does not exist. Check path")
-
     # Create a dict for dtypes only
     dtypes_dict = {
         column_nm: dtypes_schema[column_nm]["Deduced_Data_Type"]
@@ -447,15 +442,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                 survey_df[column] = survey_df[column].astype(pd.Int64Dtype())
             elif dtypes_dict[column] == "str":
                 survey_df[column] = survey_df[column].astype("string")
-            elif "datetime" in dtypes_dict[column]:
-                try:
-                    survey_df[column] = pd.to_datetime(
-                        survey_df[column], errors="coerce"
-                    )
-                except TypeError:
-                    raise TypeError(
-                        f"Failed to convert column '{column}' to datetime. Please check the data."
-                    )
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
             ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
@@ -565,31 +551,22 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
 @time_logger_wrap
 @exception_wrap
-def validate_many_to_one(*args) -> pd.DataFrame:
+def validate_many_to_one(
+    mapper: pd.DataFrame, col_many: str, col_one: str
+) -> pd.DataFrame:
     """
-    Validates a many-to-one mapper DataFrame.
 
-    This function performs the following checks:
-    1. Checks if the mapper has two specified columns, referred to as 'col_many' and 'col_one'.
-    2. Selects and deduplicates 'col_many' and 'col_one'.
-    3. Checks that for each entry in 'col_many' there is exactly one corresponding entry in 'col_one'.
+    Validates a many to one mapper:
+    1. Checks if the mapper has two columns col_many and col_one.
+    2. Salects and deduplicates col_many and col_one.
+    3. Checks that for each entry in col_many there is exactly one entry in
+    col_one.
 
     Args:
-        *args: Variable length argument list. It should contain the following items in order:
-            - df (pd.DataFrame): The input mapper DataFrame.
-            - col_many (str): The name of the column with many entries.
-            - col_one (str): The name of the column with one entry.
-
-    Returns:
-        pd.DataFrame: The validated mapper DataFrame with deduplicated 'col_many' and 'col_one' columns.
-
-    Raises:
-        ValueError: If the mapper does not have the 'col_many' and 'col_one' columns, or if there are multiple entries in 'col_one' for any entry in 'col_many'.
+        df (pd.DataFrame): The input mapper
+        col_many (str): name of the column with many entries
+        col_one (str): name of the column with one entry
     """
-
-    mapper = args[0]
-    col_many = args[1]
-    col_one = args[2]
     try:
         # Check that expected column are present
         cols = mapper.columns
@@ -611,7 +588,7 @@ def validate_many_to_one(*args) -> pd.DataFrame:
             ValidationLogger.info(
                 "The following codes have multile mapping: \n {df_bad}"
             )
-            raise ValueError("Mapper is many to many")
+            raise ValueError(f"Mapper is many to many")
         return df
 
     except ValueError as ve:
@@ -648,7 +625,7 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
         df["contents_check"] = status_check & from_status_check
 
         # Check if there are any False values in the "contents_check" column
-        if (df["contents_check"] == False).any():  # noqa
+        if (df["contents_check"] == False).any():
             raise ValueError("Unexpected format within column contents")
 
         # Drop the "contents_check" column
@@ -658,30 +635,3 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("cora status mapper validation failed: " + str(ve))
-
-
-def flag_no_rand_spenders(df, raise_or_warn):
-    """
-    Flags any records that answer "No" to "604" and also report their expenditure in "211" as more than 0.
-
-    Parameters:
-    df (pandas.DataFrame): The input DataFrame.
-
-    Returns:
-        None
-    """
-    invalid_records = df.loc[(df["604"] == "No") & (df["211"] > 0)]
-
-    if not invalid_records.empty:
-        if raise_or_warn == "raise":
-            raise Exception("Some records report no R&D, but spend in 211 > 0.")
-        elif raise_or_warn == "warn":
-            total_invalid_spend = invalid_records["211"].sum()
-            ValidationLogger.error("Some records report no R&D, but spend in 211 > 0.")
-            ValidationLogger.error(
-                f"The total spend of 'No' R&D companies is £{int(total_invalid_spend)}"
-            )
-            ValidationLogger.error(invalid_records)
-
-    else:
-        ValidationLogger.debug("All records have valid R&D spend.")
