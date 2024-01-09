@@ -27,7 +27,6 @@ def run_outputs(
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
-    cora_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
@@ -51,7 +50,6 @@ def run_outputs(
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
         postcode_mapper (pd.DataFrame): Links postcode to region code
         itl_mapper (pd.DataFrame): Links region to ITL codes
         sic_pg_num (pd.DataFrame): Maps SIC to numeric PG
@@ -96,7 +94,6 @@ def run_outputs(
             write_csv,
             run_id,
             ultfoc_mapper,
-            cora_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
@@ -113,7 +110,6 @@ def run_outputs(
             write_csv,
             run_id,
             ultfoc_mapper,
-            cora_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -126,7 +122,6 @@ def run_outputs(
             write_csv,
             run_id,
             ultfoc_mapper,
-            cora_mapper,
             postcode_mapper,
             sic_pg_num,
         )
@@ -141,7 +136,6 @@ def run_outputs(
             write_csv,
             run_id,
             ultfoc_mapper,
-            cora_mapper,
             postcode_mapper,
             sic_pg_num,
         )
@@ -156,6 +150,7 @@ def run_outputs(
             write_csv,
             run_id,
             sic_pg_num,
+            postcode_mapper,
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
