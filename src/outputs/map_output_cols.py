@@ -63,7 +63,7 @@ def join_fgn_ownership(main_df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.Dat
 def map_sizebands(
     df: pd.DataFrame,
 ):
-    """Generate sizebands from the frozen employent column
+    """Generate sizebands from the frozen (IDBR) employent column
 
     Args:
         df (pd.DataFrame): The original dataframe
@@ -123,6 +123,8 @@ def create_cora_status_col(df, mapper_df, main_col="statusencoded"):
         "statusencoded": [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309],
         "form_status": [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400],
     }
+
+    print(f"Cora dict: {cora_dict}")
 
     # convert mapper df to dictionary
     mapper_dict = dict(zip(mapper_df[main_col], mapper_df["form_status"]))
