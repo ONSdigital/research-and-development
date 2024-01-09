@@ -4,7 +4,7 @@ from src.imputation.imputation_helpers import fill_sf_zeros
 from src.outputs.short_form import create_headcount_cols
 
 
-def run_short_to_long(df:pd.DataFrame) -> pd.DataFrame:
+def run_short_to_long(df: pd.DataFrame) -> pd.DataFrame:
     """Implement short form to long form conversion.
 
     Args:
@@ -18,7 +18,7 @@ def run_short_to_long(df:pd.DataFrame) -> pd.DataFrame:
     """
     # Fill shortform questions nulls with zeros for clear records
     df = fill_sf_zeros(df)
-    
+
     # create columns temporary "headcount_civil" and "headcount_defence"
     df = create_headcount_cols(df)
 

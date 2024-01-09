@@ -93,7 +93,6 @@ def output_short_form(
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
-    cora_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -105,8 +104,6 @@ def output_short_form(
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
-
 
     """
 
@@ -121,7 +118,7 @@ def output_short_form(
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
-    df = map_o.create_cora_status_col(df, cora_mapper)
+    df = map_o.create_cora_status_col(df)
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
