@@ -17,7 +17,6 @@ def output_long_form(
     write_csv: Callable,
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
-    cora_mapper: pd.DataFrame,
 ):
     """Run the outputs module on long forms.
 
@@ -28,7 +27,6 @@ def output_long_form(
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        cora_mapper (pd.DataFrame): used for adding cora "form_status" column
 
     """
 
@@ -37,7 +35,7 @@ def output_long_form(
     output_path = paths["output_path"]
 
     # Map to the CORA statuses from the statusencoded column
-    df = map_o.create_cora_status_col(df, cora_mapper)
+    df = map_o.create_cora_status_col(df)
 
     # Filter for long-forms/NI (status mapping has already been done)
     df = df.loc[((df["formtype"] == "0001") | (df["formtype"] == "0003"))]

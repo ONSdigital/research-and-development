@@ -9,11 +9,13 @@ from src._version import __version__ as version
 from src.utils.helpers import Config_settings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
+from src.northern_ireland.ni_staging import run_ni_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
+from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
 MainLogger = logging.getLogger(__name__)
@@ -48,7 +50,6 @@ def run_pipeline(start, config_path):
         from src.utils.local_file_mods import read_local_csv as read_csv
         from src.utils.local_file_mods import write_local_csv as write_csv
         from src.utils.local_file_mods import local_isfile as isfile
-        from src.utils.local_file_mods import local_list_files as list_files
 
         # from src.utils.local_file_mods import local_file_exists as file_exists
         from src.utils.local_file_mods import local_write_feather as write_feather
@@ -62,7 +63,6 @@ def run_pipeline(start, config_path):
         from src.utils.hdfs_mods import read_hdfs_csv as read_csv
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
         from src.utils.hdfs_mods import hdfs_isfile as isfile
-        from src.utils.hdfs_mods import hdfs_list_files as list_files
 
         # from src.utils.hdfs_mods import hdfs_file_exists as file_exists
         from src.utils.hdfs_mods import hdfs_write_feather as write_feather
@@ -83,6 +83,7 @@ def run_pipeline(start, config_path):
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
+
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
@@ -109,11 +110,10 @@ def run_pipeline(start, config_path):
 
     (
         full_responses,
-        secondary_full_responses,  #  may be needed later for freezing
+        secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
-        cora_mapper,
         cellno_df,
         postcode_mapper,
         pg_num_alpha,
@@ -122,6 +122,7 @@ def run_pipeline(start, config_path):
         backdata,
         pg_detailed,
         itl1_detailed,
+        reference_list,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
@@ -165,17 +166,26 @@ def run_pipeline(start, config_path):
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
-    outliered_responses = run_outliers(
+    outliered_responses_df = run_outliers(
         imputed_df, manual_outliers, config, write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses, weighted_responses = run_estimation(
-        outliered_responses, cellno_df, config, write_csv, run_id
+    estimated_responses_df, weighted_responses_df = run_estimation(
+        outliered_responses_df, cellno_df, config, write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
+
+    # Data processing: Apportionment to sites
+    estimated_responses_df = run_site_apportionment(
+        estimated_responses_df, config, write_csv, run_id, output_file=True
+    )
+    weighted_responses_df = run_site_apportionment(
+        weighted_responses_df, config, write_csv, run_id
+    )
+    MainLogger.info("Finished Site Apportionment module.")
 
     # Data processing: Regional Apportionment
 
@@ -190,13 +200,13 @@ def run_pipeline(start, config_path):
 
     # Run short  form output
     run_outputs(
-        estimated_responses,
-        weighted_responses,
+        estimated_responses_df,
+        weighted_responses_df,
+        ni_df,
         config,
         write_csv,
         run_id,
         ultfoc_mapper,
-        cora_mapper,
         postcode_mapper,
         itl_mapper,
         sic_pg_num,
@@ -204,6 +214,8 @@ def run_pipeline(start, config_path):
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
+        pg_num_alpha,
+        sic_pg_alpha,
     )
 
     MainLogger.info("Finished All Output modules.")

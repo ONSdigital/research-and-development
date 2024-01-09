@@ -35,10 +35,10 @@ def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df_from_hdfs = pd.read_csv(file)
+            df_from_hdfs = pd.read_csv(file, thousands=',')
         else:
             try:
-                df_from_hdfs = pd.read_csv(file, usecols=cols)
+                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=',')
             except Exception:
                 hdfs_logger.error(f"Could not find specified columns in {filepath}")
                 hdfs_logger.info("Columns specified: " + str(cols))
@@ -340,9 +340,7 @@ def hdfs_list_files(path: str, ext: str = None, order=None):
     # Filtering the files to just those with the required extension
     if ext:
         ext = f".{ext}"
-        file_paths = [
-            file for file in file_paths if os.path.splitext(file)[1] == ext
-        ]
+        file_paths = [file for file in file_paths if os.path.splitext(file)[1] == ext]
 
     return file_paths
 
