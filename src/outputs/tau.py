@@ -66,7 +66,7 @@ def output_tau(
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df, cora_mapper)
 
-    # Map the sizebands based on frozen employment
+    # Map the sizebands based on column "employment"
     df = map_o.map_sizebands(df)
 
     # Map the itl regions using the postcodes
