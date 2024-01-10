@@ -15,7 +15,7 @@ def pg_to_pg_mapper(
 ):
     """This function maps all values in one column to another column
     using a mapper file. This is applied to long forms only.
-    The default this is used for is PG numeric to letter conversion.
+    The default this is used for is PG numeric to letter (alpha) conversion.
 
     Args:
         df (pd.DataFrame): The dataset containing all the PG numbers
