@@ -32,6 +32,7 @@ def pg_to_pg_mapper(
 
     filtered_df = df.copy()
 
+    # Filter out any records which are not formtype == '0001'
     if "formtype" in filtered_df.columns:
         formtype_cond = filtered_df["formtype"] == "0001"
         filtered_df = filtered_df[formtype_cond]
@@ -54,14 +55,14 @@ def pg_to_pg_mapper(
     filtered_df[target_col] = filtered_df[pg_column].map(map_dict)
     filtered_df[target_col] = filtered_df[target_col].astype("category")
 
-    df.loc[
-        filtered_df.index,
-        f"{target_col}",
-    ] = filtered_df[target_col]
+    # df.loc[
+    #     filtered_df.index,
+    #     f"{target_col}",
+    # ] = filtered_df[target_col]
 
     PgLogger.info("Product groups successfully mapped to letters")
 
-    return df
+    return filtered_df
 
 
 def sic_to_pg_mapper(

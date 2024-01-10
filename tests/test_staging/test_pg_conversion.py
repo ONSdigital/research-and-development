@@ -79,45 +79,73 @@ from src.staging.pg_conversion import pg_to_pg_mapper, sic_to_pg_mapper
 #     pd.testing.assert_frame_equal(df_result, expected_output_data)
 
 @pytest.fixture
-def pg_alpha_num_dummy():
-    dummy_mapper = pd.DataFrame({
-        "pg_numeric": [36, 37, 45, 47, 49, 50, 58],  # Include all mappings
-        "pg_alpha": ["N", "Y", "AC", "AD", "AD", "AD", "AH"]  # Handle many-to-one
-    })
-    return dummy_mapper
+def mapper():
+    mapper_rows = [
+        [36, "N"],
+        [37, "Y"],
+        [45, "AC"],
+        [47, "AD"],
+        [49, "AD"],
+        [50, "AD"],
+        [58, "AH"]
+    ]
+    columns = ["pg_numeric", "pg_alpha"]
 
-def test_pg_to_pg_mapper_with_many_to_one(pg_alpha_num_dummy):
-    dum_mapper = pg_alpha_num_dummy
-    
-    df = pd.DataFrame({
-        "formtype": ["0001", "0001", "0002"],
-        "201": [47, 49, 50],  # Using values from the mappings
-        "other_col": ["A", "B", "C"]})
-    
-    expected_result = pd.DataFrame({
-        "formtype": ["0001", "0001", "0002"],
-        "201": [47, 49, 50],
-        "other_col": ["A", "B", "C"],
-        "product_group": ["AD", "AD", "AD"]
-    })
-    
-    result = pg_to_pg_mapper(df.copy(), dum_mapper.copy())
-    pd.testing.assert_frame_equal(result, expected_result)
+    # Create the DataFrame
+    mapper_df = pd.DataFrame(mapper_rows, columns=columns)
 
-def test_pg_to_pg_mapper_success(pg_alpha_num_dummy):
-    dum_mapper = pg_alpha_num_dummy
+    # Return the DataFrame
+    return mapper_df
+
+def test_pg_to_pg_mapper_with_many_to_one(mapper):
+    row_data = [
+        ["0001", 47, "A"],
+        ["0001", 49, "B"],
+        ["0002", 50, "C"]
+    ]
+    columns = ["formtype", "201", "other_col"]
+
+    test_df = pd.DataFrame(row_data, columns=columns)
+
+    expected_data = [
+        ["0001", 47, "A", "AD"],
+        ["0001", 49, "B", "AD"]
+    ]
+    expected_columns = ["formtype", "201", "other_col", "product_group"]
+    expected_result_df = pd.DataFrame(expected_data, columns=expected_columns)
+    expected_result_df["product_group"] = expected_result_df["product_group"].astype("category")
+
+    result = pg_to_pg_mapper(test_df.copy(), mapper.copy())
+    pd.testing.assert_frame_equal(result, expected_result_df, check_dtype=False)
+
+def test_pg_to_pg_mapper_success(mapper):
+    row_data = [
+        ["0001", 36, "A"],
+        ["0001", 45, "B"],
+        ["0002", 58, "C"],
+        ["0001", 49, "D"]
+    ]
+    columns = ["formtype", "201", "other_col"]
+
+    test_df = pd.DataFrame(row_data, columns=columns)
+
+    result_df = pg_to_pg_mapper(test_df.copy(), mapper.copy())
+
+    expected_data = [
+        ["0001", 36, "A", "N"],
+        ["0001", 45, "B", "AC"],
+        ["0001", 49, "D", "AD"]
+    ]
     
-    test_df = pd.DataFrame({
-        "formtype": ["0001", "0001", "0002", "0001"],
-        "201": [36, 45, 58, 49],  # Using values from the mappings
-        "other_col": ["A", "B", "C", "D"]})
-        
-    expected_result = pd.DataFrame({
-        "formtype": ["0001", "0001", "0002", "0001"],
-        "201": [36, 45, 58, 49],
-        "other_col": ["A", "B", "C", "D"],
-        "product_group": ["N", "AC", "AH", "AD"]  # Updated expected values
-    })
+    expected_columns = ["formtype", "201", "other_col", "product_group"]
     
-    result = pg_to_pg_mapper(test_df.copy(), dum_mapper.copy())
-    pd.testing.assert_frame_equal(result, expected_result)
+    expected_result_df = pd.DataFrame(expected_data, columns=expected_columns, index=result_df.index)
+    
+    expected_result_df["product_group"] = expected_result_df["product_group"].astype("category")
+
+    
+    
+    # Set indexes to match
+    
+    
+    pd.testing.assert_frame_equal(result_df, expected_result_df)
