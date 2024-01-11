@@ -123,7 +123,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished TAU output.")
 
@@ -137,7 +136,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 

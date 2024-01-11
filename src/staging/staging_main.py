@@ -217,7 +217,6 @@ def run_staging(
             backdata = pg.pg_to_pg_mapper(
                 backdata,
                 pg_num_alpha,
-                target_col="q201",
                 pg_column="q201",
             )
         StagingMainLogger.info("Backdata File Loaded Successfully...")

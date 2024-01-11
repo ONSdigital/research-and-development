@@ -18,7 +18,6 @@ def output_tau(
     run_id: int,
     ultfoc_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
-    sic_pg_num: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -30,8 +29,6 @@ def output_tau(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
-        pg_alpha_num (pd.DataFrame): mapper of alpha PG to numeric PG
-
     """
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
@@ -48,16 +45,6 @@ def output_tau(
 
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"])
-
-    # Fill in numeric PG for short forms and imputed long forms
-    df = sic_to_pg_mapper(
-        df,
-        sic_pg_num,
-        target_col="pg_numeric",
-        from_col="SIC 2007_CODE",
-        to_col="2016 > Form PG",
-        formtype=["0006", "0001", "0003"],
-    )
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)

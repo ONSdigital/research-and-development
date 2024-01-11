@@ -5,85 +5,33 @@ import numpy as np
 PgLogger = logging.getLogger(__name__)
 
 
-def pg_to_pg_mapper(
-    df: pd.DataFrame,
-    mapper: pd.DataFrame,
-    target_col: str = "product_group",
-    pg_column: str = "201",
-    from_col: str = "pg_numeric",
-    to_col: str = "pg_alpha",
-):
-    """This function maps all values in one column to another column
-    using a mapper file. This is applied to long forms only.
-    The default this is used for is PG numeric to letter conversion.
-
-    Args:
-        df (pd.DataFrame): The dataset containing all the PG numbers
-        mapper (pd.DataFrame): The mapper dataframe loaded using custom function
-        target_col (str, optional): The column we output the
-        mapped values to (product_group).
-        pg_column (str, optional): The column we want to convert (201).
-        from_col (str, optional): The column in the mapper that is used to map from.
-        to_col (str, optional): The column in the mapper that is used to map to.
-
-    Returns:
-        pd.DataFrame: A dataframe with all target column values mapped
-    """
-
-    filtered_df = df.copy()
-
-    if "formtype" in filtered_df.columns:
-        formtype_cond = filtered_df["formtype"] == "0001"
-        filtered_df = filtered_df[formtype_cond]
-
-    # Create a mapping dictionary from the 2 columns
-    map_dict = dict(zip(mapper[from_col], mapper[to_col]))
-    # Flag all PGs that don't have a corresponding map value
-    mapless_errors = []
-    for key, value in map_dict.items():
-        if str(value) == "nan":
-            mapless_errors.append(key)
-
-    if mapless_errors:
-        PgLogger.error(
-            f"Mapping doesnt exist for the following product groups: {mapless_errors}"
-        )
-    # Map using the dictionary taking into account the null values.
-    # Then convert to categorigal datatype
-    filtered_df[pg_column] = pd.to_numeric(filtered_df[pg_column], errors="coerce")
-    filtered_df[target_col] = filtered_df[pg_column].map(map_dict)
-    filtered_df[target_col] = filtered_df[target_col].astype("category")
-
-    df.loc[
-        filtered_df.index,
-        f"{target_col}",
-    ] = filtered_df[target_col]
-
-    PgLogger.info("Product groups successfully mapped to letters")
-
-    return df
-
-
 def sic_to_pg_mapper(
     df: pd.DataFrame,
     sicmapper: pd.DataFrame,
-    target_col: str = "product_group",
+    pg_column: str = "201",
     sic_column: str = "rusic",
-    from_col: str = "sic",
-    to_col: str = "pg_alpha",
-    formtype: str = ["0006"],
+    from_col: str = "SIC 2007_CODE",
+    to_col: str = "2016 > Form PG",
 ):
-    """This function maps all values in one column to another column
-    using a mapper file. This is only applied for short forms and unsampled
-    refs.
+    """Map from SIC code to PG numeric code where PG numeric is null.
 
-    The default this is used for is PG numeric to letter conversion.
+    Example initial dataframe:
+        reference | 201     | rusic
+    --------------------------------
+        1         | 53      | 2500   
+        2         | NaN     | 1600
+        3         | NaN     | 4300
+
+    returned dataframe:
+        reference | 201     | rusic
+    --------------------------------
+        1         | 53      | 2500   
+        2         | 45      | 1600
+        3         | 38      | 4300
 
     Args:
         df (pd.DataFrame): The dataset containing all the PG numbers.
-        sicmapper (pd.DataFrame): The mapper dataframe loaded using custom function.
-        target_col (str, optional): The column we output the
-        mapped values to (product_group).
+        sicmapper (pd.DataFrame): The SIC to pg numeric mapper.
         sic_column (str, optional): The column containing the SIC numbers.
         from_col (str, optional): The column in the mapper that is used to map from.
         to_col (str, optional): The column in the mapper that is used to map to.
@@ -92,12 +40,7 @@ def sic_to_pg_mapper(
         pd.DataFrame: A dataframe with all target column values mapped
     """
 
-    filtered_df = df.copy()
-
-    filtered_df = filtered_df[filtered_df["formtype"].isin(formtype)]
-
-    if "pg_numeric" in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df["pg_numeric"].isnull()]
+    df = df.copy()
 
     # Create a mapping dictionary from the 2 columns
     map_dict = dict(zip(sicmapper[from_col], sicmapper[to_col]))
@@ -111,20 +54,79 @@ def sic_to_pg_mapper(
         PgLogger.error(
             f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
         )
-    # Map to the target column using the dictionary taking into account the null values.
-    # Then convert to categorigal datatype
-    filtered_df[sic_column] = pd.to_numeric(filtered_df[sic_column], errors="coerce")
-    filtered_df[target_col] = filtered_df[sic_column].map(map_dict)
-    filtered_df[target_col] = filtered_df[target_col].astype("category")
+    # Map to the target column using the dictionary, null values only
+    df.loc[df[pg_column].isnull(), pg_column] = (
+        df.loc[df[pg_column].isnull(), sic_column].map(map_dict)
+    )
+
+    PgLogger.info("Product group nulls successfully mapped from SIC.")
+
+    return df
+
+
+def pg_to_pg_mapper(
+    df: pd.DataFrame,
+    mapper: pd.DataFrame,
+    pg_column: str = "201",
+    from_col: str = "pg_numeric",
+    to_col: str = "pg_alpha",
+):
+    """Map from PG numeric to PG alpha-numeric and create a new column.
+
+    The product group column (default: column 201) coped to a new column, "pg_numeric",
+    and then is updated from numeric to alpha-numeric using a mapping.
+
+    Example initial dataframe:
+        reference | 201     
+    ----------------------
+        1         | 53    
+        2         | 43     
+        3         | 33    
+
+    returned dataframe:
+        reference | 201     | pg_numeric
+    ------------------------------------
+        1         | AA      | 33
+        2         | B       | 43
+        3         | E       | 53
+
+
+    Args:
+        df (pd.DataFrame): The dataframe requiring mapping
+        mapper (pd.DataFrame): the PG numeric to alpha-numeric mapper
+        pg_column (str, optional): The column we want to convert (default 201).
+        from_col (str, optional): The column in the mapper that is used to map from.
+        to_col (str, optional): The column in the mapper that is used to map to.
+
+    Returns:
+        pd.DataFrame: A dataframe with all target column values mapped
+    """
 
     df = df.copy()
 
-    df.loc[
-        filtered_df.index,
-        f"{target_col}",
-    ] = filtered_df[target_col]
+    # Copy the numeric PG column to a new column
+    df["pg_numeric"] = df[pg_column].copy()
 
-    PgLogger.info("SIC numbers successfully mapped to PG letters")
+    # Create a mapping dictionary from the 2 columns
+    map_dict = dict(zip(mapper[from_col], mapper[to_col]))
+
+    # Flag all PGs that don't have a corresponding map value
+    mapless_errors = []
+    for key, value in map_dict.items():
+        if str(value) == "nan":
+            mapless_errors.append(key)
+
+    if mapless_errors:
+        PgLogger.error(
+            f"Mapping doesnt exist for the following product groups: {mapless_errors}"
+        )
+
+    df[pg_column] = df[pg_column].map(map_dict)
+
+    # Then convert the pg column and the new column to categorigal datatypes
+    df = df.astype({pg_column: "category", "pg_numeric": "category"})
+
+    PgLogger.info("Numeric product groups successfully mapped to letters.")
 
     return df
 
@@ -147,22 +149,10 @@ def run_pg_conversion(
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
+    # Where the
+    df = sic_to_pg_mapper(df, sic_pg_alpha, )
 
-    df["pg_numeric"] = df["201"].copy()
-
-    if target_col == "201":
-        target_col = "201_mapping"
-    else:
-        # Create a new column to store PGs
-        df[target_col] = np.nan
-
-    # SIC mapping for short forms
-    df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col)
-
-    # SIC mapping for NI
-    df = sic_to_pg_mapper(df, sic_pg_alpha, target_col=target_col, formtype=["0003"])
-
-    # PG mapping for long forms
+    # PG numeric to alpha_numeric mapping for long forms
     df = pg_to_pg_mapper(df, pg_num_alpha, target_col=target_col)
 
     # Overwrite the 201 column if target_col = 201
