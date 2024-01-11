@@ -69,8 +69,8 @@ hdfs_paths:
   manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
-  short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
-  long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
+  short_form_schema: "src/outputs/output_schemas/short_form_schema.toml"
+  long_form_schema: "src/outputs/output_schemas/long_form_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
@@ -114,8 +114,8 @@ network_paths:
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
-  frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
-  frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
+  short_form_schema: "config/output_schemas/short_form_schema.toml"
+  long_form_schema: "config/output_schemas/long_form_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   ni_sas_schema: "config/output_schemas/ni_sas_schema.toml"
