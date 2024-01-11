@@ -1,10 +1,10 @@
 """Utility functions  to be used in the imputation module."""
 import logging
-
-from typing import List
 import pandas as pd
-
+from typing import List, Dict, Callable
 from itertools import chain
+
+from src.outputs.status_filtered import output_status_filtered
 
 ImputationHelpersLogger = logging.getLogger(__name__)
 
@@ -219,3 +219,51 @@ def fill_sf_zeros(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[(sf_mask & clear_mask), q] = df.copy()[q].fillna(0)
 
     return df
+
+
+def tidy_imputation_dataframe(
+        df: pd.DataFrame,
+        config: Dict,
+        logger,
+        to_impute_cols: List,
+        write_csv: Callable,
+        run_id: int,
+        ) -> pd.DataFrame:
+    """Remove rows and columns not needed after imputation."""
+    # Create lists for the qa cols
+    imp_cols = [f"{col}_imputed" for col in to_impute_cols]
+
+    # Update the original breakdown questions and target variables with the imputed
+    df[to_impute_cols] = df[imp_cols]
+
+    # Remove all qa columns
+    to_drop = [
+        col
+        for col in df.columns
+        if (col.endswith("prev") | col.endswith("imputed") | col.endswith("link"))
+    ]
+    df = df.drop(columns=to_drop)
+
+    # Keep only clear and imputed records
+    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
+    to_keep = df["imp_marker"].isin(imputed_statuses) | (df["imp_marker"] == "R")
+
+    to_keep_df = df.copy().loc[to_keep]
+    filtered_output_df = df.copy().loc[~to_keep]
+
+    # change the value of the status column to 'imputed' for imputed statuses
+    condition = to_keep_df["status"].isin(imputed_statuses)
+    to_keep_df.loc[condition, "status"] = "imputed"
+
+    # Running status filtered full dataframe output for QA
+    if config["global"]["output_status_filtered"]:
+        logger.info("Starting status filtered output...")
+        output_status_filtered(
+            filtered_output_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        logger.info("Finished status filtered output.")
+
+    return to_keep_df
