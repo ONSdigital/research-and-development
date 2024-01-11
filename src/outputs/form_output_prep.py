@@ -1,5 +1,5 @@
 import pandas as pd
-from src.staging.pg_conversion import sic_to_pg_mapper
+from src.imputation.pg_conversion import run_pg_conversion
 from src.staging.validation import flag_no_rand_spenders
 
 
@@ -8,7 +8,7 @@ def form_output_prep(
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
 ):
 
     """Prepares the data for the outputs.
@@ -61,7 +61,11 @@ def form_output_prep(
         ni_full_responses["formtype"] = "0003"
 
         # Update column 201 (currently PG numeric) to alpha-numeric, mapping from SIC.
-        ni_full_responses = sic_to_pg_mapper(ni_full_responses, sic_pg_alpha)
+        ni_full_responses = run_pg_conversion(
+            ni_full_responses, 
+            pg_num_alpha, 
+            sic_pg_num
+        )
 
         # outputs_df = pd.concat([outputs_df, ni_full_responses])
         tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])

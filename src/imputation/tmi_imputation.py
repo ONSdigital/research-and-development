@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
 
-from src.staging.pg_conversion import sic_to_pg_mapper
+from src.imputation.pg_conversion import sic_to_pg_mapper
 from src.imputation.impute_civ_def import impute_civil_defence
 from src.imputation import expansion_imputation as ximp
 
@@ -425,7 +425,6 @@ def calculate_totals(df):
 
 def run_longform_tmi(
     longform_df: pd.DataFrame,
-    sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Function to run imputation end to end and returns the final
@@ -434,7 +433,6 @@ def run_longform_tmi(
     Args:
         longform_df (pd.DataFrame): the dataset filtered for long form entries
         target_variables (list): key variables
-        sic_mapper (pd.DataFrame): dataframe with sic mapper info
         config (Dict): the configuration settings
     Returns:
         final_df: dataframe with the imputed valued added
@@ -442,10 +440,7 @@ def run_longform_tmi(
         qa_df: qa dataframe
     """
     TMILogger.info("Starting TMI long form imputation.")
-
-    # TMI Step 1: impute the Product Group
-    df = impute_pg_by_sic(longform_df, sic_mapper)
-
+    df = longform_df.copy()
     # TMI Step 2: impute for R&D type (civil or defence)
     df = impute_civil_defence(df)
 
@@ -520,7 +515,6 @@ def run_shortform_tmi(
 
 def run_tmi(
     full_df: pd.DataFrame,
-    sic_mapper: pd.DataFrame,
     config: Dict[str, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Function to run imputation end to end and returns the final
@@ -528,7 +522,6 @@ def run_tmi(
         dataframe back to the pipeline
     Args:
         full_df (pd.DataFrame): the full responses spp dataframe
-        sic_mapper (pd.DataFrame): dataframe with sic to product group mapper info
         config (Dict): the configuration settings
     Returns:
         final_df(pd.DataFrame): dataframe with the imputed valued added and counts columns
@@ -553,7 +546,7 @@ def run_tmi(
     excluded_df = full_df.copy().loc[mor_mask]
 
     # apply TMI imputation to long forms and then short forms
-    longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, sic_mapper, config)
+    longform_tmi_df, qa_df_long = run_longform_tmi(longform_df, config)
 
     shortform_tmi_df, qa_df_short = run_shortform_tmi(shortform_df, config)
 

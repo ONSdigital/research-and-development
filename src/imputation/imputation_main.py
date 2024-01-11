@@ -7,6 +7,7 @@ from datetime import datetime
 from src.imputation import imputation_helpers as hlp
 from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
+from src.imputation.pg_conversion import run_pg_conversion, pg_to_pg_mapper
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
 from src.imputation.MoR import run_mor
@@ -21,7 +22,8 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
     manual_trimming_df: pd.DataFrame,
-    mapper: pd.DataFrame,
+    pg_num_alpha: pd.DataFrame,
+    sic_pg_num: pd.DataFrame,
     backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
@@ -48,6 +50,11 @@ def run_imputation(
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
     """
+    # Carry out product group conversion
+    df = run_pg_conversion(
+        df, pg_num_alpha, sic_pg_num, pg_column="201"
+    )
+
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
 
@@ -92,11 +99,24 @@ def run_imputation(
 
     # Run MoR
     if backdata is not None:
+        # Fix for different column names on network vs hdfs
+        if NETWORK_OR_HDFS == "network":
+            # Map PG numeric to alpha in column q201
+            # This isn't done on HDFS as the column is already mapped
+            backdata = pg_to_pg_mapper(
+                backdata,
+                pg_num_alpha,
+                pg_column="q201",
+                from_col= "pg_numeric",
+                to_col="pg_alpha",
+            )
+            backdata = backdata.drop("pg_numeric", axis=1)
+
         lf_target_vars = config["imputation"]["lf_target_vars"]
         df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms
-    imputed_df, qa_df = tmi.run_tmi(df, mapper, config)
+    imputed_df, qa_df = tmi.run_tmi(df, config)
 
     # After imputation, correction to ignore the "604" == "No" in any records with
     # Status "check needed"

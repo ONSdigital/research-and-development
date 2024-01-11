@@ -134,8 +134,8 @@ def pg_to_pg_mapper(
 def run_pg_conversion(
     df: pd.DataFrame,
     pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
-    target_col: str = "201",
+    sic_pg_num: pd.DataFrame,
+    pg_column: str = "201",
 ):
     """Run the product group mapping functions and return a
     dataframe with the correct mapping for each formtype.
@@ -143,21 +143,15 @@ def run_pg_conversion(
     Args:
         df (pd.DataFrame): Dataframe of full responses data
         mapper (pd.DataFrame): The mapper file used for PG conversion
-        target_col (str, optional): The column to be created
-        which stores mapped values.
+        pg_column: The original product group column
 
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
     # Where the
-    df = sic_to_pg_mapper(df, sic_pg_alpha, )
+    df = sic_to_pg_mapper(df, sic_pg_num, pg_column)
 
     # PG numeric to alpha_numeric mapping for long forms
-    df = pg_to_pg_mapper(df, pg_num_alpha, target_col=target_col)
-
-    # Overwrite the 201 column if target_col = 201
-    if target_col == "201_mapping":
-        df["201"] = df[target_col]
-        df = df.drop(columns=[target_col])
+    df = pg_to_pg_mapper(df, pg_num_alpha, pg_column)
 
     return df

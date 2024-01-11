@@ -6,7 +6,6 @@ from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
-from src.staging.pg_conversion import sic_to_pg_mapper
 
 OutputMainLogger = logging.getLogger(__name__)
 
