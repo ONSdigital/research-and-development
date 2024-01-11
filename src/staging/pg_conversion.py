@@ -51,14 +51,8 @@ def pg_to_pg_mapper(
         )
     # Map using the dictionary taking into account the null values.
     # Then convert to categorigal datatype
-    filtered_df[pg_column] = pd.to_numeric(filtered_df[pg_column], errors="coerce")
     filtered_df[target_col] = filtered_df[pg_column].map(map_dict)
     filtered_df[target_col] = filtered_df[target_col].astype("category")
-
-    # df.loc[
-    #     filtered_df.index,
-    #     f"{target_col}",
-    # ] = filtered_df[target_col]
 
     PgLogger.info("Product groups successfully mapped to letters")
 

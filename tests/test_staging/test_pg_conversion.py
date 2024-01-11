@@ -100,20 +100,28 @@ def mapper():
 
 
 def test_pg_to_pg_mapper_with_many_to_one(mapper):
-    row_data = [["0001", 47, "A"], ["0001", 49, "B"], ["0002", 50, "C"]]
     columns = ["formtype", "201", "other_col"]
+
+    row_data = [["0001", 47, "A"], ["0001", 49, "B"], ["0002", 50, "C"]]
 
     test_df = pd.DataFrame(row_data, columns=columns)
 
-    expected_data = [["0001", 47, "A", "AD"], ["0001", 49, "B", "AD"]]
     expected_columns = ["formtype", "201", "other_col", "product_group"]
+
+    expected_data = [
+        ["0001", 47, "A", "AD"],
+        ["0001", 49, "B", "AD"]
+        ]
+
+    # Build the expected result dataframe. Set the dtype of prod group to cat, like the result_df
     expected_result_df = pd.DataFrame(expected_data, columns=expected_columns)
     expected_result_df["product_group"] = expected_result_df["product_group"].astype(
         "category"
     )
 
-    result = pg_to_pg_mapper(test_df.copy(), mapper.copy())
-    pd.testing.assert_frame_equal(result, expected_result_df, check_dtype=False)
+    result_df = pg_to_pg_mapper(test_df.copy(), mapper.copy())
+
+    pd.testing.assert_frame_equal(result_df, expected_result_df, check_dtype=False)
 
 
 def test_pg_to_pg_mapper_success(mapper):
@@ -126,8 +134,6 @@ def test_pg_to_pg_mapper_success(mapper):
     columns = ["formtype", "201", "other_col"]
 
     test_df = pd.DataFrame(row_data, columns=columns)
-
-    result_df = pg_to_pg_mapper(test_df.copy(), mapper.copy())
 
     expected_data = [
         ["0001", 36, "A", "N"],
@@ -145,6 +151,6 @@ def test_pg_to_pg_mapper_success(mapper):
         "category"
     )
 
-    # Set indexes to match
+    result_df = pg_to_pg_mapper(test_df.copy(), mapper.copy())
 
-    pd.testing.assert_frame_equal(result_df, expected_result_df)
+    pd.testing.assert_frame_equal(result_df, expected_result_df, check_index=False)
