@@ -222,13 +222,13 @@ def fill_sf_zeros(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def tidy_imputation_dataframe(
-        df: pd.DataFrame,
-        config: Dict,
-        logger,
-        to_impute_cols: List,
-        write_csv: Callable,
-        run_id: int,
-        ) -> pd.DataFrame:
+    df: pd.DataFrame,
+    config: Dict,
+    logger: logging.Logger,
+    to_impute_cols: List,
+    write_csv: Callable,
+    run_id: int,
+) -> pd.DataFrame:
     """Remove rows and columns not needed after imputation."""
     # Create lists for the qa cols
     imp_cols = [f"{col}_imputed" for col in to_impute_cols]
@@ -247,15 +247,15 @@ def tidy_imputation_dataframe(
     to_drop += ["200_imp_marker", "211_trim", "305_trim", "manual_trim"]
     df = df.drop(columns=to_drop)
 
-    # Keep only clear and imputed records
-    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
-    to_keep = df["imp_marker"].isin(imputed_statuses) | (df["imp_marker"] == "R")
+    # Keep only imputed records and clear ("R")
+    imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
+    to_keep = df["imp_marker"].isin(imp_markers_to_keep) | (df["imp_marker"] == "R")
 
     to_keep_df = df.copy().loc[to_keep]
     filtered_output_df = df.copy().loc[~to_keep]
 
     # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df["status"].isin(imputed_statuses)
+    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
     to_keep_df.loc[condition, "status"] = "imputed"
 
     # Running status filtered full dataframe output for QA
