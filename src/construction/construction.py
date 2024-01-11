@@ -77,6 +77,9 @@ def run_construction(
     validate_data_with_schema(construction_df, schema_path)
     construction_df = construction_df.dropna(axis="columns", how="all")
 
+    # Prepare the short to long form constructions
+    updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
+
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
@@ -115,6 +118,28 @@ def run_construction(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
 
+    updated_snapshot_df = updated_snapshot_df.sort_values(
+        ["reference", "instance"], ascending=[True, True]
+    ).reset_index(drop=True)
+
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
+    return updated_snapshot_df
+
+
+def prepare_short_to_long(updated_snapshot_df, construction_df):
+    """Create addional instances for short to long construction"""
+    # Check which references are going to converted to long forms
+    short_to_long_refs = construction_df.loc[construction_df["short_to_long"] == True, "reference"].unique()
+    # Create conversion df
+    short_to_long_df = updated_snapshot_df[updated_snapshot_df["reference"].isin(short_to_long_refs)]
+
+    # Copy instance 0 record to create instance 1 and instance 2
+    short_to_long_df1 = short_to_long_df.copy()
+    short_to_long_df1["instance"] = 1
+    short_to_long_df2 = short_to_long_df.copy()
+    short_to_long_df2["instance"] = 2
+
+    # Add new instances to the updated snapshot df
+    updated_snapshot_df = pd.concat([updated_snapshot_df, short_to_long_df1, short_to_long_df2])
     return updated_snapshot_df
