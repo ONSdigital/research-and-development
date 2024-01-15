@@ -57,7 +57,7 @@ def run_outputs(
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
         pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_alpha (pd.DataFrame): Mapper for product group conversions (SIC to alpha)
+        sic_pg_num (pd.DataFrame): Mapper for product group conversions 
     """
 
     (
@@ -69,7 +69,7 @@ def run_outputs(
         weighted_df,
         ni_full_responses,
         pg_num_alpha,
-        sic_pg_alpha,
+        sic_pg_num,
     )
 
     # Running short form output
@@ -110,7 +110,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished TAU output.")
 
@@ -124,7 +123,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 
@@ -136,8 +134,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            sic_pg_num,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
