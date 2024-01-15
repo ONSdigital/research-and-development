@@ -11,7 +11,7 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   load_historic_data: False
-  run_construction: False
+  run_construction: True
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
@@ -87,7 +87,7 @@ network_paths:
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-  construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/JC_test_construction_file.csv"
+  construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
   # construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
   # construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test

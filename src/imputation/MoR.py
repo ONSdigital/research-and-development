@@ -124,15 +124,17 @@ def carry_forwards(df, backdata, impute_vars):
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
 
-    # replace the values of certain columns with the values from the back data
-    # TODO: Check with methodology or BAU as to which other cols to take from backdata
-    # TODO: By default, columns not updated such as 4xx, 5xx will contain the current
-    # data, instance 0.
+    # Replace the values of certain columns with the values from the back data
     replace_vars = ["instance", "200", "201", "601", "602", "604"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
+    
+    # Update the varibles to be imputed by the corresponding previous values, filling 
+    # nulls with zeros.
     for var in impute_vars:
-        df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
+        df.loc[match_cond, f"{var}_imputed"] = df.loc[
+            match_cond, f"{var}_prev"
+        ].fillna(0)
     df.loc[match_cond, "imp_marker"] = "CF"
 
     df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
