@@ -73,8 +73,10 @@ def pg_to_pg_mapper(
 ):
     """Map from PG numeric to PG alpha-numeric and create a new column.
 
-    The product group column (default: column 201) coped to a new column, "pg_numeric",
-    and then is updated from numeric to alpha-numeric using a mapping.
+    The mapper used is from a file named pg_num_alpha.csv
+
+    The product group column (default: column 201) is copied to a new column, 
+    "pg_numeric", and then the original column is mapped from numeric to alpha-numeric.
 
     Example initial dataframe:
         reference | 201     
@@ -137,18 +139,17 @@ def run_pg_conversion(
     sic_pg_num: pd.DataFrame,
     pg_column: str = "201",
 ):
-    """Run the product group mapping functions and return a
-    dataframe with the correct mapping for each formtype.
+    """Run the product group (PG) mapping functions.
 
     Args:
         df (pd.DataFrame): Dataframe of full responses data
-        mapper (pd.DataFrame): The mapper file used for PG conversion
-        pg_column: The original product group column
+        pg_num_alpha (pd.DataFrame): Mapper from numeric to alpha-numeric PG.
+        pg_column: The original product group column, default 201
 
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
-    # Where the
+    # Where product group is null, map it from SIC.
     df = sic_to_pg_mapper(df, sic_pg_num, pg_column)
 
     # PG numeric to alpha_numeric mapping for long forms
