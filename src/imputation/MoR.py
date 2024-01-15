@@ -10,6 +10,7 @@ from src.imputation.tmi_imputation import (
     calculate_totals,
 )
 
+
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
@@ -112,6 +113,8 @@ def carry_forwards(df, backdata, impute_vars):
     df = pd.merge(
         df, backdata, how="left", on="reference", suffixes=("", "_prev"), indicator=True
     )
+    # ensure the instance columns are still type "int" after merge
+    df = df.astype({"instance": "Int64", "instance_prev": "Int64"})
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"

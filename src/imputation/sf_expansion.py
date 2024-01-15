@@ -165,18 +165,43 @@ def apply_expansion(
     return expanded_df
 
 
+def prepare_short_form_constructed(df: pd.DataFrame, master_cols: List) -> pd.DataFrame:
+    """Prepare the constructed short form responses for sf expansion.
+    
+    The constructed records were removed from imputation, so it is necessary to copy
+    the master columns to the empty "imputed" master columns.
+    It is also necessary to create imputation classes for these records.
+
+    For example, column "211" needs to be copied to "211_imputed" in these cases.
+    """
+    sf_constructed_mask = (df.formtype == "0006") & (df.imp_marker == "constructed")
+
+    # Create imputation class for the short
+    df.loc[sf_constructed_mask, "imp_class"] = (
+        df.loc[sf_constructed_mask, "200"] + df.loc[sf_constructed_mask, "201"]
+    )
+
+    # Copy the values of the master columns to the corresponding "_imputed" column
+    for col in master_cols:
+        df.loc[sf_constructed_mask, f"{col}_imputed"] = df.loc[sf_constructed_mask, col]
+    
+    return df
+
+
 @df_change_func_wrap
 def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data."""
-
-    # Remove records that have the reference list variables
-    # and those that have "nan" in the imp class
-    filtered_df, excluded_df = split_df_on_imp_class(df)
-
     # Get dictionary of short form master keys (or target variables)
     # and breakdown variables
     breakdown_dict = config["breakdowns"]
     master_values = list(breakdown_dict)
+
+    # Prepare constructed short-form entries for sf expansion imputation
+    df = prepare_short_form_constructed(df, master_values)
+
+    # Remove records that have the reference list variables
+    # and those that have "nan" in the imp class
+    filtered_df, excluded_df = split_df_on_imp_class(df)
 
     # Obtain the "threshold_num" from the config
     # (this is the minimum viable number in an imputation class)
