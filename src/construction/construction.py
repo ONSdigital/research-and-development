@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable
 
 from src.staging.validation import validate_data_with_schema
+from src.staging.staging_helpers import postcode_topup
 from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
@@ -90,6 +91,10 @@ def run_construction(
         updated_snapshot_df = create_period_year(updated_snapshot_df)
         construction_df = create_period_year(construction_df)
 
+    # Set instance=1 so longforms with status 'Form sent out' match correctly
+    form_sent_condition = (updated_snapshot_df.formtype == "0001") & (updated_snapshot_df.status == "Form sent out")
+    updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
+
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
@@ -117,6 +122,19 @@ def run_construction(
     updated_snapshot_df = updated_snapshot_df.astype(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
+
+    # Long form records with a postcode in 601 use this as the postcode 
+    long_form_cond = (~updated_snapshot_df["601"].isnull())
+    updated_snapshot_df.loc[long_form_cond, "postcodes_harmonised"] = updated_snapshot_df["601"]
+
+    # Short form records with nothing in 601 use referencepostcode instead
+    short_form_cond = (updated_snapshot_df["601"].isnull()) & (~updated_snapshot_df["referencepostcode"].isnull())
+    updated_snapshot_df.loc[short_form_cond, "postcodes_harmonised"] = updated_snapshot_df["referencepostcode"]
+
+    # Top up all new postcodes so they're all eight characters exactly
+    postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
+    for col in postcode_cols:
+        updated_snapshot_df[col] = updated_snapshot_df[col].apply(postcode_topup)
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]

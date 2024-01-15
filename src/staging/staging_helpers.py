@@ -33,8 +33,7 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
     spaces and cuts the tail on the right.
     If there is only one part, keeps the first 8 characters and tops it up with
     spaces on the right if needed.
-    Empty input string would have zero parts and will return a string of
-    eight spaces.
+    Empty input string would have zero parts and will return an empty string.
 
     Args:
         mystr (str): Input postcode.
@@ -69,7 +68,7 @@ def postcode_topup(mystr: str, target_len: int = 8) -> str:
                 return (part1 + part2)[:target_len]
 
         else:
-            return mystr[:target_len].ljust(target_len, " ")
+            return ""
 
 
 def fix_anon_data(responses_df, config):

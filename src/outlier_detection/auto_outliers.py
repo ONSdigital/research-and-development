@@ -238,14 +238,6 @@ def run_auto_flagging(
 
     # loop through all columns to be flagged for outliers
     for value_col in flag_value_cols:
-        # to_numeric is needed to convert strings. However 'coerce'
-        # means values that
-        # can't be converted are represented by NaNs.
-        # TODO data validation and cleaning should replace the need for
-        # 'to_numeric'
-        # check ticket (RDRP-386)
-        df[value_col] = pd.to_numeric(df[value_col], errors="coerce")
-
         # Call function to add a flag for auto outliers in column value_col
         df = flag_outliers(df, upper_clip, lower_clip, value_col)
 
