@@ -28,26 +28,13 @@ def form_output_prep(
         filtered_output_df (pd.DataFrame): data noot used in outputs
 
     """
-
-    imputed_statuses = ["TMI", "CF", "MoR", "constructed"]
-
-    to_keep = estimated_df["imp_marker"].isin(imputed_statuses) | (
-        estimated_df["imp_marker"] == "R"
-    )
-
     # Deal with "No" in 604, also eliminating spenders
     flag_no_rand_spenders(estimated_df, "error")
     no_rnd_spenders_filter = ~(
         (estimated_df["604"] == "No") & (estimated_df["211"] > 0)
     )
-    estimated_df = estimated_df.copy().loc[no_rnd_spenders_filter]
-
-    # filter estimated_df and weighted_df to only include clear or imputed statuses
-    outputs_df = estimated_df.copy().loc[to_keep]
-    tau_outputs_df = weighted_df.copy().loc[to_keep]
-
-    # filter estimated_df for records not included in outputs
-    filtered_output_df = estimated_df.copy().loc[~to_keep]
+    outputs_df = estimated_df.copy().loc[no_rnd_spenders_filter]
+    tau_outputs_df = weighted_df.copy().loc[no_rnd_spenders_filter]
 
     if ni_full_responses is not None:
         # Add required columns to NI data
@@ -70,19 +57,10 @@ def form_output_prep(
         # outputs_df = pd.concat([outputs_df, ni_full_responses])
         tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])
 
-        # change the value of the status column to 'imputed' for imputed statuses
-        condition = outputs_df["status"].isin(imputed_statuses)
-        outputs_df.loc[condition, "status"] = "imputed"
-
-        return ni_full_responses, outputs_df, tau_outputs_df, filtered_output_df
+        return ni_full_responses, outputs_df, tau_outputs_df
 
     else:
-
-        # change the value of the status column to 'imputed' for imputed statuses
-        condition = outputs_df["status"].isin(imputed_statuses)
-        outputs_df.loc[condition, "status"] = "imputed"
-
         # create an empty ni_responses dataframe
         ni_full_responses = pd.DataFrame()
 
-        return ni_full_responses, outputs_df, tau_outputs_df, filtered_output_df
+        return ni_full_responses, outputs_df, tau_outputs_df

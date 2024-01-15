@@ -4,7 +4,6 @@ import pandas as pd
 from typing import Callable, Dict, Any
 
 from src.outputs.form_output_prep import form_output_prep
-from src.outputs.status_filtered import output_status_filtered
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
@@ -64,8 +63,7 @@ def run_outputs(
     (
         ni_full_responses,
         outputs_df,
-        tau_outputs_df,
-        filtered_output_df,
+        tau_outputs_df
     ) = form_output_prep(
         estimated_df,
         weighted_df,
@@ -73,17 +71,6 @@ def run_outputs(
         pg_num_alpha,
         sic_pg_num,
     )
-
-    # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        OutputMainLogger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished status filtered output.")
 
     # Running short form output
     if config["global"]["output_short_form"]:
