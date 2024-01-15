@@ -80,13 +80,13 @@ def run_construction(
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
-
-    # Prepare the short to long form constructions
-    updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
     construction_df["is_constructed"] = True
 
-    # Create period_year column, except for NI which already has it
+    # Run GB specific actions
     if not is_northern_ireland:
+        # Prepare the short to long form constructions (N/A to NI)
+        updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
+        # Create period_year column (NI already has it)
         updated_snapshot_df = create_period_year(updated_snapshot_df)
         construction_df = create_period_year(construction_df)
 
