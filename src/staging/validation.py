@@ -185,6 +185,7 @@ def validate_post_col(
     )
 
     df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(postcode_topup)
+    df["601"] = df["601"].apply(postcode_topup)
 
     ValidationLogger.info("All postcodes validated....")
 

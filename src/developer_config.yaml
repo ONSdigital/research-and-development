@@ -23,11 +23,11 @@ global:
   # Output settings
   output_full_responses: False
   output_ni_full_responses: False
+  output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
   output_apportionment_qa: False
-  output_imputation_qa: False
   output_long_form: False
   output_short_form: False
   output_gb_sas: False
