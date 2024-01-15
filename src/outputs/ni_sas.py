@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
-from src.imputation.pg_conversion import sic_to_pg_mapper
+from src.imputation.pg_conversion import run_pg_conversion
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -16,8 +16,6 @@ def output_ni_sas(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    sic_pg_num: pd.DataFrame,
-    postcode_itl_mapper: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -38,18 +36,6 @@ def output_ni_sas(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
-
-    # Prepare the columns needed for outputs:
-
-    # Fill in numeric PG where missing
-    df = sic_to_pg_mapper(
-        df,
-        sic_pg_num,
-        target_col="pg_numeric",
-        from_col="SIC 2007_CODE",
-        to_col="2016 > Form PG",
-        formtype=["0003"],
-    )
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
