@@ -54,6 +54,8 @@ def sic_to_pg_mapper(
         PgLogger.error(
             f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
         )
+        raise Exception("Errors in the SIC to PG numeric mapper.")
+    
     # Map to the target column using the dictionary, null values only
     df.loc[df[pg_column].isnull(), pg_column] = (
         df.loc[df[pg_column].isnull(), sic_column].map(map_dict)
@@ -122,6 +124,7 @@ def pg_to_pg_mapper(
         PgLogger.error(
             f"Mapping doesnt exist for the following product groups: {mapless_errors}"
         )
+        raise Exception("Errors in the PG numeric to alpha-numeric mapper.")
 
     df[pg_column] = df[pg_column].map(map_dict)
 
