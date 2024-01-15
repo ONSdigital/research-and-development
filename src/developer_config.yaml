@@ -9,7 +9,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   load_historic_data: False
   run_construction: False
   run_ni_construction: True
@@ -37,7 +37,7 @@ global:
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
-  output_status_filtered: False
+  output_status_filtered: True
   output_fte_total_qa: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
