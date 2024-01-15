@@ -8,7 +8,6 @@ import os
 
 # Our own modules
 from src.staging import validation as val
-from src.staging import pg_conversion as pg
 import src.staging.staging_helpers as helpers
 
 
@@ -210,16 +209,6 @@ def run_staging(
         #     backdata_path, "./config/backdata_schema.toml"
         # )
 
-        # Fix for different column names on network vs hdfs
-        if network_or_hdfs == "network":
-            # Map PG numeric to alpha in column q201
-            # This isn't done on HDFS as the column is already mapped
-            backdata = pg.pg_to_pg_mapper(
-                backdata,
-                pg_num_alpha,
-                target_col="q201",
-                pg_column="q201",
-            )
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
         backdata = None
@@ -286,11 +275,6 @@ def run_staging(
     sic_pg_utf_mapper = sic_pg_utf_mapper[cols_needed]
     mapper_path = paths["mapper_path"]
     write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
-
-    # Map PG from SIC/PG numbers to column '201'.
-    full_responses = pg.run_pg_conversion(
-        full_responses, pg_num_alpha, sic_pg_alpha_mapper, target_col="201"
-    )
 
     pg_detailed_mapper = helpers.load_valdiate_mapper(
         "pg_detailed_mapper_path",

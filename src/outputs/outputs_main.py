@@ -4,7 +4,6 @@ import pandas as pd
 from typing import Callable, Dict, Any
 
 from src.outputs.form_output_prep import form_output_prep
-from src.outputs.status_filtered import output_status_filtered
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
@@ -58,32 +57,20 @@ def run_outputs(
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
         pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_alpha (pd.DataFrame): Mapper for product group conversions (SIC to alpha)
+        sic_pg_num (pd.DataFrame): Mapper for product group conversions 
     """
 
     (
         ni_full_responses,
         outputs_df,
-        tau_outputs_df,
-        filtered_output_df,
+        tau_outputs_df
     ) = form_output_prep(
         estimated_df,
         weighted_df,
         ni_full_responses,
         pg_num_alpha,
-        sic_pg_alpha,
+        sic_pg_num,
     )
-
-    # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        OutputMainLogger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished status filtered output.")
 
     # Running short form output
     if config["global"]["output_short_form"]:
@@ -123,7 +110,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished TAU output.")
 
@@ -137,7 +123,6 @@ def run_outputs(
             run_id,
             ultfoc_mapper,
             postcode_mapper,
-            sic_pg_num,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 
@@ -149,8 +134,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            sic_pg_num,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
