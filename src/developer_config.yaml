@@ -12,7 +12,7 @@ global:
   load_ni_data: False
   load_historic_data: False
   run_construction: False
-  run_ni_construction: True
+  run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
@@ -26,8 +26,8 @@ global:
   output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
-  output_apportionment_qa: False
+  output_estimation_qa: True
+  output_apportionment_qa: True
   output_long_form: False
   output_short_form: False
   output_gb_sas: False
