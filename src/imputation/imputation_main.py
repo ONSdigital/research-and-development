@@ -141,13 +141,14 @@ def run_imputation(
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 
-    # Create names for imputed cols
-    imp_cols = [f"{col}_imputed" for col in to_impute_cols]
-
-    # Update the original breakdown questions and target variables with the imputed
-    imputed_df[to_impute_cols] = imputed_df[imp_cols]
-
-    # Drop imputed values from df
-    imputed_df = imputed_df.drop(columns=imp_cols)
-
+    # remove rows and columns no longer needed from the imputed dataframe
+    imputed_df = hlp.tidy_imputation_dataframe(
+        imputed_df,
+        config,
+        ImputationMainLogger,
+        to_impute_cols,
+        write_csv,
+        run_id, 
+    )
+    
     return imputed_df
