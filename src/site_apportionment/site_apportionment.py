@@ -82,6 +82,18 @@ def calculate_total_percent(df: pd.DataFrame, ref: str, period: str) -> pd.DataF
     df["site_percent_total"] = df.groupby([ref, period])["site_percent"].transform("sum")
     return df
 
+def filter_zero_percent(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Filters out rows where the total percent is zero.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    pd.DataFrame: The DataFrame with zero percent rows filtered out.
+    """
+    return df[df["site_percent_total"] != 0]
+
 
 def weights(df):
     """Calculates site weights based on the percents. Copies the precent value
@@ -103,14 +115,14 @@ def weights(df):
         called site_weight countaining the weights of each site, between 0 and 1
     """
     
+    # Clean the data ready for site apportionment
     df = clean_data(df, percent_col, instance_col)
 
     # Calculate the total percent for each reference and period
     df = calculate_total_percent(df, ref_col, period_col)
     
-
     # Filter out the rows where total percent is zero
-    dfc = dfc.copy()[dfc["site_percent_total"] != 0]
+    df = filter_zero_percent(df)
 
     # Compute weights
     dfc["site_weight"] = dfc["site_percent"] / dfc["site_percent_total"]
