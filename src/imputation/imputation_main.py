@@ -125,12 +125,13 @@ def run_imputation(
     # Changing all records that meet the criteria to "604" == "Yes"
     imputed_df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
 
-    # Run short form expansion
-    imputed_df = run_sf_expansion(imputed_df, config)
-
     # join constructed rows back to the imputed df
+    # Note that constructed rows need to be included in short form expansion
     if "is_constructed" in df.columns:
         imputed_df = pd.concat([imputed_df, constructed_df])
+
+    # Run short form expansion
+    imputed_df = run_sf_expansion(imputed_df, config)
 
     # join manually trimmed columns back to the imputed df
     if not trimmed_df.empty:
