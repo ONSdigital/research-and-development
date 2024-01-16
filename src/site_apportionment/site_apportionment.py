@@ -167,7 +167,7 @@ def calc_weights_for_sites(df: pd.DataFrame,
     return df
     
 
-# TODO: Move this to validation module
+# TODO: Move this to validation module and make it less specific to "NONE    "
 def clean_postcodes(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
     """
     Cleans "NONE" postcodes by replacing them with an empty string.
@@ -180,6 +180,23 @@ def clean_postcodes(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
         pd.DataFrame: The DataFrame with cleaned postcodes.
     """
     df.loc[df[postcode_col] == "NONE    ", postcode_col] = ""
+    return df
+    
+
+def set_short_form_percentages(df: pd.DataFrame, form_col: str, short_code: str, percent_col: str) -> pd.DataFrame:
+    """
+    Sets the percent column to 100 for short form records.
+    
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        form_col (str): The name of the form column.
+        short_code (str): The code for short forms.
+        percent_col (str): The name of the percent column.
+
+    Returns:
+        pd.DataFrame: The DataFrame with updated percentages for short forms.
+    """
+    df.loc[df[form_col] == short_code, percent_col] = 100
     return df
 
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
@@ -212,7 +229,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = clean_postcodes(df, postcode_col)
 
     # Set short form percentages to 100
-    df.loc[df[form_col] == short_code, percent_col] = 100
+    df = set_short_form_percentages(df, form_col, short_code, percent_col)
 
     # df_cols: original columns
     df_cols = list(df.columns)
