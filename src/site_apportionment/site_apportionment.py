@@ -48,6 +48,24 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
     df = df.merge(dfb, on=[ref, period], how="left")
     return df
 
+def clean_data(df: pd.DataFrame, percent: str, ins: str) -> pd.DataFrame:
+    """
+    Cleans the data by filling null values in the percent column with zero and creating a new column 'site_percent'.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+    percent (str): The name of the percent column.
+    ins (str): The name of the ins column.
+
+    Returns:
+    pd.DataFrame: The cleaned DataFrame.
+    """
+    df["site_percent"] = df[percent]
+    df["site_percent"].fillna(0, inplace=True)
+    df["site_percent"] = df["site_percent"] * df[ins].astype("bool")
+    return df
+
+
 
 def weights(df):
     """Calculates site weights based on the percents. Copies the precent value
@@ -68,12 +86,6 @@ def weights(df):
         (pd.DataFrame): A copy of original dataframe with an additional column
         called site_weight countaining the weights of each site, between 0 and 1
     """
-    dfc = df.copy()
-    dfc["site_percent"] = dfc[percent]
-    dfc["site_percent"].fillna(0, inplace=True)
-
-    # Set the percent for instance 0 to be 0
-    dfc["site_percent"] = dfc["site_percent"] * dfc[ins].astype("bool")
 
     # Calculate the total percent for each reference and period
     dfc["site_percent_total"] = dfc.groupby([ref, period])["site_percent"].transform(
