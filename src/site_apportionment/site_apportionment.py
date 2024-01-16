@@ -79,6 +79,9 @@ def calculate_total_percent(df: pd.DataFrame, ref: str, period: str) -> pd.DataF
     Returns:
         pd.DataFrame: The DataFrame with the total percent calculated.
     """
+    # Group the DataFrame by 'ref' and 'period', calculate the sum of 'site_percent' for each group,
+    # and assign the result to a new column 'site_percent_total'. The 'transform' function is used
+    # to ensure that the output is the same shape as the input, allowing it to be added as a new column.
     df["site_percent_total"] = df.groupby([ref, period])["site_percent"].transform("sum")
     return df
 
@@ -92,7 +95,8 @@ def filter_zero_percent(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
     pd.DataFrame: The DataFrame with zero percent rows filtered out.
     """
-    return df[df["site_percent_total"] != 0]
+    rows_that_are_not_zero = df["site_percent_total"] != 0
+    return df[rows_that_are_not_zero]
 
 
 def calculate_weights(df: pd.DataFrame) -> pd.DataFrame:
@@ -108,7 +112,7 @@ def calculate_weights(df: pd.DataFrame) -> pd.DataFrame:
     df["site_weight"] = df["site_percent"] / df["site_percent_total"]
     return df
 
-def clean_post_calculation(df: pd.DataFrame) -> pd.DataFrame:
+def clean_up_post_calc(df: pd.DataFrame) -> pd.DataFrame:
     """
     Drops unnecessary columns after weight calculation.
     
@@ -121,25 +125,28 @@ def clean_post_calculation(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=["site_percent", "site_percent_total"], axis=1)
 
 
-
-def weights(df):
-    """Calculates site weights based on the percents. Copies the precent value
-    from its original location (question 602) to a new column "site_percent".
-    If the percent value is Null, fills it with zero.
-
-    Adds all percents per RU reference and period and calculates
-    site_percent_total. If the total for a reference is zero, apportionment
-    cannot be done, and this reference is removed.
-    Re-noramalises the percent values by total, to compute site_weight. This
-    deals with the case when the users entered percents incorrectly, so they
-    don't sum up to 100.
-
-    Args:
-        df (pd.DataFrame): A dataframe containing all data
+def calc_weights_for_sites(df: pd.DataFrame,
+                           percent: str,
+                           ins: str,
+                           ref: str,
+                           period: str) -> pd.DataFrame:
+    """
+    Entry point function for the process to calculate weights for geographic sites.
+    
+    The weights are calculated using the formula:
+        weight = site_percent / site_percent_total
+    
+    The weights are then used to apportion expenditure of each reference across their sites.
+    
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+    percent (str): The name of the percent column.
+        ins (str): The name of the ins column.
+        ref (str): The name of the reference column.
+        period (str): The name of the period column.
 
     Returns:
-        (pd.DataFrame): A copy of original dataframe with an additional column
-        called site_weight countaining the weights of each site, between 0 and 1
+        pd.DataFrame: The DataFrame with weights calculated for each site.
     """
     
     # Clean the data ready for site apportionment
@@ -155,7 +162,7 @@ def weights(df):
     df = calculate_weights(df)
 
     # Remove unnecessary columns as they are no longer needed
-    df = clean_post_calculation(df)
+    df = clean_up_post_calc(df)
     
     return df
     
@@ -244,7 +251,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         )
 
     # Calculate weights
-    df_sites = weights(df_sites)
+    df_sites = calc_weights_for_sites(df_sites)
 
     #  Merge codes to sites to create a Cartesian product
     df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
