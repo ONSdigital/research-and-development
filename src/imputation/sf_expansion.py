@@ -178,7 +178,7 @@ def prepare_short_form_constructed(df: pd.DataFrame, master_cols: List) -> pd.Da
 
     # Create imputation class for the short
     df.loc[sf_constructed_mask, "imp_class"] = (
-        df.loc[sf_constructed_mask, "200"] + df.loc[sf_constructed_mask, "201"]
+        df.loc[sf_constructed_mask, "200"] + "_" + df.loc[sf_constructed_mask, "201"]
     )
 
     # Copy the values of the master columns to the corresponding "_imputed" column
