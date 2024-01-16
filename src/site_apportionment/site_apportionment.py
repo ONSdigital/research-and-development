@@ -8,15 +8,15 @@ from src.imputation.imputation_helpers import get_imputation_cols
 SitesApportionmentLogger = logging.getLogger(__name__)
 
 # Colunm names redefined for convenience
-ref = "reference"
-ins = "instance"
-period = "period"
-form = "formtype"
-postcode = "601" # "postcodes_harmonised"
-percent = "602"
-product = "201"
-pg_num = "pg_numeric"
-civdef = "200"
+ref_col = "reference"
+instance_col = "instance"
+period_col = "period"
+form_col = "formtype"
+postcode_col = "601" # "postcodes_harmonised"
+percent_col = "602"
+product_col = "201"
+pg_num_col = "pg_numeric"
+civdef_col = "200"
 
 # Long and short form codes
 short_code = "0006"
@@ -39,13 +39,13 @@ def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
     dfa = df.copy()
 
     # Select columns that we need
-    cols_need = [ref, period, code]
+    cols_need = [ref_col, period_col, code]
     dfa = dfa[cols_need]
     dfa = dfa[dfa[code].str.len() > 0]
     dfa = dfa.drop_duplicates()
-    dfb = dfa.groupby([ref, period]).agg("count").reset_index()
+    dfb = dfa.groupby([ref_col, period_col]).agg("count").reset_index()
     dfb.rename({code: code + "_count"}, axis="columns", inplace=True)
-    df = df.merge(dfb, on=[ref, period], how="left")
+    df = df.merge(dfb, on=[ref_col, period_col], how="left")
     return df
 
 def clean_data(df: pd.DataFrame, percent: str, ins: str) -> pd.DataFrame:
@@ -65,6 +65,22 @@ def clean_data(df: pd.DataFrame, percent: str, ins: str) -> pd.DataFrame:
     df["site_percent"] = df["site_percent"] * df[ins].astype("bool")
     return df
 
+
+def calculate_total_percent(df: pd.DataFrame, ref: str, period: str) -> pd.DataFrame:
+    """
+    Calculates the total percent for each reference and period and stores it in 
+        a new column 'site_percent_total'.
+    
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+        ref (str): The name of the reference column.
+        period (str): The name of the period column.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the total percent calculated.
+    """
+    df["site_percent_total"] = df.groupby([ref, period])["site_percent"].transform("sum")
+    return df
 
 
 def weights(df):
@@ -86,11 +102,12 @@ def weights(df):
         (pd.DataFrame): A copy of original dataframe with an additional column
         called site_weight countaining the weights of each site, between 0 and 1
     """
+    
+    df = clean_data(df, percent_col, instance_col)
 
     # Calculate the total percent for each reference and period
-    dfc["site_percent_total"] = dfc.groupby([ref, period])["site_percent"].transform(
-        "sum"
-    )
+    df = calculate_total_percent(df, ref_col, period_col)
+    
 
     # Filter out the rows where total percent is zero
     dfc = dfc.copy()[dfc["site_percent_total"] != 0]
@@ -131,10 +148,10 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         apportionment.
     """
     # Clean "NONE" postcodes
-    df.loc[df[postcode] == "NONE    ", postcode] = ""
+    df.loc[df[postcode_col] == "NONE    ", postcode_col] = ""
 
     # Set short form percentages to 100
-    df.loc[df[form] == short_code, percent] = 100
+    df.loc[df[form_col] == short_code, percent_col] = 100
 
     # df_cols: original columns
     df_cols = list(df.columns)
@@ -144,26 +161,26 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     value_cols = get_imputation_cols(config)
 
     # Calculate the number of unique non-blank postcodes
-    df = count_unique_codes_in_col(df, postcode)
+    df = count_unique_codes_in_col(df, postcode_col)
 
     # Condition of long forms, many sites, instance >=1, non-null postcodes
-    cond = (df[form] == long_code) & (df[postcode + "_count"] > 1) & (df[ins] >= 1)
+    cond = (df[form_col] == long_code) & (df[postcode_col + "_count"] > 1) & (df[instance_col] >= 1)
 
     # Dataframe dfm with many products - for apportionment and Cartesian product
     dfm = df.copy()[cond]
-    dfm = dfm.drop(columns=[postcode + "_count"], axis=1)
+    dfm = dfm.drop(columns=[postcode_col + "_count"], axis=1)
 
     # Dataframe with everything else - save unchanged
     df_out = df[~cond]
-    df_out = df_out.drop(columns=[postcode + "_count"], axis=1)
+    df_out = df_out.drop(columns=[postcode_col + "_count"], axis=1)
 
     # df_codes: dataframe with codes and numerical values
-    group_cols = [ref, period]
-    code_cols = [product, civdef, pg_num]
+    group_cols = [ref_col, period_col]
+    code_cols = [product_col, civdef_col, pg_num_col]
     df_codes = dfm.copy()[group_cols + code_cols + value_cols]
 
     # Remove blank products
-    df_codes = df_codes[df_codes[product].str.len() > 0]
+    df_codes = df_codes[df_codes[product_col].str.len() > 0]
 
     # # De-duplicate by summation - possibly, not needed
     df_codes = df_codes.groupby(group_cols + code_cols).agg(sum).reset_index()
@@ -173,11 +190,11 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_sites = dfm.copy()[site_cols]
 
     # Remove instances that have no postcodes
-    df_sites = df_sites[df_sites[postcode].str.len() > 0]
+    df_sites = df_sites[df_sites[postcode_col].str.len() > 0]
 
     # Check for postcode duplicates for QA
-    df_sites["site_count"] = df_sites.groupby(group_cols + [postcode])[
-        postcode
+    df_sites["site_count"] = df_sites.groupby(group_cols + [postcode_col])[
+        postcode_col
     ].transform("count")
     df_duplicate_sites = df_sites[df_sites["site_count"] > 1]
     num_duplicate_sites = df_duplicate_sites.shape[0]
@@ -203,7 +220,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_out = df_out.append(df_cart, ignore_index=True)
 
     # Sort by period, ref, instance in ascending order.
-    df_out = df_out.sort_values(by=[period, ref, ins], ascending=True).reset_index(
+    df_out = df_out.sort_values(by=[period_col, ref_col, instance_col], ascending=True).reset_index(
         drop=True
     )
 
