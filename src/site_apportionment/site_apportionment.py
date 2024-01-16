@@ -167,6 +167,20 @@ def calc_weights_for_sites(df: pd.DataFrame,
     return df
     
 
+# TODO: Move this to validation module
+def clean_postcodes(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
+    """
+    Cleans "NONE" postcodes by replacing them with an empty string.
+    
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        postcode_col (str): The name of the postcode column.
+
+    Returns:
+        pd.DataFrame: The DataFrame with cleaned postcodes.
+    """
+    df.loc[df[postcode_col] == "NONE    ", postcode_col] = ""
+    return df
 
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
@@ -195,7 +209,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         apportionment.
     """
     # Clean "NONE" postcodes
-    df.loc[df[postcode_col] == "NONE    ", postcode_col] = ""
+    df = clean_postcodes(df, postcode_col)
 
     # Set short form percentages to 100
     df.loc[df[form_col] == short_code, percent_col] = 100
