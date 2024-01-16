@@ -156,7 +156,8 @@ def run_pipeline(start, config_path):
     imputed_df = run_imputation(
         full_responses,
         manual_trimming_df,
-        sic_pg_alpha,
+        pg_num_alpha,
+        sic_pg_num,
         backdata,
         config,
         write_csv,
@@ -215,7 +216,7 @@ def run_pipeline(start, config_path):
         civil_defence_detailed,
         sic_division_detailed,
         pg_num_alpha,
-        sic_pg_alpha,
+        sic_pg_num,
     )
 
     MainLogger.info("Finished All Output modules.")

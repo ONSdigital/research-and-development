@@ -133,7 +133,7 @@ def output_short_form(
     df = run_shortform_prep(df, round_val=4)
 
     # Create short form output dataframe with required columns from schema
-    schema_path = config["schema_paths"]["shortform_schema"]
+    schema_path = config["schema_paths"]["short_form_schema"]
     schema_dict = load_schema(schema_path)
     shortform_output = create_output_df(df, schema_dict)
 
