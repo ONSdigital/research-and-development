@@ -95,6 +95,33 @@ def filter_zero_percent(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["site_percent_total"] != 0]
 
 
+def calculate_weights(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculates the weight for each site and stores it in a new column 'site_weight'.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    pd.DataFrame: The DataFrame with the weights calculated.
+    """
+    df["site_weight"] = df["site_percent"] / df["site_percent_total"]
+    return df
+
+def clean_post_calculation(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Drops unnecessary columns after weight calculation.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    pd.DataFrame: The DataFrame with unnecessary columns dropped.
+    """
+    return df.drop(columns=["site_percent", "site_percent_total"], axis=1)
+
+
+
 def weights(df):
     """Calculates site weights based on the percents. Copies the precent value
     from its original location (question 602) to a new column "site_percent".
@@ -125,12 +152,13 @@ def weights(df):
     df = filter_zero_percent(df)
 
     # Compute weights
-    dfc["site_weight"] = dfc["site_percent"] / dfc["site_percent_total"]
+    df = calculate_weights(df)
 
     # Remove unnecessary columns as they are no longer needed
-    dfc = dfc.drop(columns=["site_percent", "site_percent_total"], axis=1)
-
-    return dfc
+    df = clean_post_calculation(df)
+    
+    return df
+    
 
 
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
