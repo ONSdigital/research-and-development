@@ -1,7 +1,9 @@
+import logging
+
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
-from src.outlier_detection.auto_outliers import flag_outliers, decide_outliers
+from src.outlier_detection.auto_outliers import flag_outliers, decide_outliers, log_outlier_info, normal_round
 
 
 class TestOutlierFlagging:
@@ -158,3 +160,95 @@ class TestDecideOutliers:
         result_df = decide_outliers(input_df, flag_cols)
 
         assert_frame_equal(result_df, expected_df)
+
+
+class TestOutlierNumbers:
+    """Unit tests for log_outlier_info functtion."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "Reference",
+            "selectiontype",
+            "statusencoded",
+            "value_col",
+            "instance",
+            "value_col_outlier_flag"
+        ]
+
+        data = [
+            [1, "P", 210, 1, 0, True],
+            [2, "P", 211, 1000, 0, False],
+            [3, "X", 999, 0, 1, False],
+            [4, "X", 211, 50, 0, False],
+            [5, "P", 999, 50, 0, False],
+            [6, "P", 211, -1, 0, False],
+            [7, "P", 210, 50, 1, False],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
+
+    def test_log_outlier_info(self, caplog):
+        """Test for log_outlier_info function."""
+
+        input_df = self.create_input_df()
+
+        with caplog.at_level(logging.INFO):
+            log_outlier_info(input_df, "value_col")
+
+        assert "1 outliers were detected out of a total of 2 valid entries in column value_col" in caplog.text
+
+
+class TestNormalRound:
+    """Unit tests for _normal_round functtion."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "Reference",
+            "to_round",
+        ]
+
+        data = [
+            [1, 2.4],
+            [2, 2.5],
+            [3, 2.6],
+            [4, 3.4],
+            [5, 3.5],
+            [6, 3.6],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
+
+    def create_expected_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "Reference",
+            "to_round",
+            "rounded"
+        ]
+
+        data = [
+            [1, 2.4, 2],
+            [2, 2.5, 3],
+            [3, 2.6, 3],
+            [4, 3.4, 3],
+            [5, 3.5, 4],
+            [6, 3.6, 4],
+        ]
+
+        expected_df = pandasDF(data=data, columns=input_columns)
+        return expected_df
+
+    def test_normal_round(self):
+        """Test for decide_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        input_df["rounded"] = input_df.apply(
+            lambda row: normal_round(row["to_round"]), axis=1
+        )
+
+        assert_frame_equal(input_df, expected_df)

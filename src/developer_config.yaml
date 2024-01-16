@@ -11,7 +11,7 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   load_historic_data: False
-  run_construction: True
+  run_construction: False
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
@@ -24,7 +24,7 @@ global:
   output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
-  output_auto_outliers: False
+  output_auto_outliers: True
   output_outlier_qa : False
   output_estimation_qa: False
   output_apportionment_qa: False
