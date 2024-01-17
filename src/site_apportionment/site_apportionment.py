@@ -187,6 +187,7 @@ def clean_postcodes(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
 def set_short_form_percentages(df: pd.DataFrame, form_col: str, short_code: str, percent_col: str) -> pd.DataFrame:
     """
     Sets the percent column to 100 for short form records.
+    If the percent column for short forms is not blank, raises an error.
     
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -196,7 +197,14 @@ def set_short_form_percentages(df: pd.DataFrame, form_col: str, short_code: str,
 
     Returns:
         pd.DataFrame: The DataFrame with updated percentages for short forms.
+
+    Raises:
+        ValueError: If the percent column for short forms is not blank.
     """
+    short_forms = df[df[form_col] == short_code]
+    if not short_forms[percent_col].isna().all():
+        raise ValueError("Percent column for short forms should be blank.")
+    
     df.loc[df[form_col] == short_code, percent_col] = 100
     return df
 
