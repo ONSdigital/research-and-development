@@ -208,7 +208,7 @@ def set_short_form_percentages(df: pd.DataFrame, form_col: str, short_code: str,
     df.loc[df[form_col] == short_code, percent_col] = 100
     return df
 
-def split_dataframe(df: pd.DataFrame, form_col: str, long_code: str, postcode_col: str, instance_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def split_many_sites_df(df: pd.DataFrame, form_col: str, long_code: str, postcode_col: str, instance_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Splits the DataFrame into two based on certain conditions.
     
@@ -226,14 +226,14 @@ def split_dataframe(df: pd.DataFrame, form_col: str, long_code: str, postcode_co
     cond = (df[form_col] == long_code) & (df[postcode_col + "_count"] > 1) & (df[instance_col] >= 1)
 
     # Dataframe dfm with many products - for apportionment and Cartesian product
-    dfm = df.copy()[cond]
-    dfm = dfm.drop(columns=[postcode_col + "_count"], axis=1)
+    many_sites_df = df.copy()[cond]
+    many_sites_df = many_sites_df.drop(columns=[postcode_col + "_count"], axis=1)
 
     # Dataframe with everything else - save unchanged
     df_out = df[~cond]
     df_out = df_out.drop(columns=[postcode_col + "_count"], axis=1)
 
-    return dfm, df_out
+    return many_sites_df, df_out
 
 def spawn_column_lists(ref_col: str, period_col: str, product_col: str, civdef_col: str, pg_num_col: str) -> Tuple[List[str], List[str]]:
     """
@@ -323,21 +323,20 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = count_unique_codes_in_col(df, postcode_col)
 
     # Split the dataframe into two based on certain conditions
-    dfm, df_out = split_dataframe(df, form_col, long_code, postcode_col, instance_col)
+    multiple_sites_df, df_out = split_many_sites_df(df, form_col, long_code, postcode_col, instance_col)
 
     # Create a list of the value columns that we want to apportion
     # These are the same as the columns we impute so we use a function from imputation.
     value_cols = get_imputation_cols(config)
 
     # df_codes: dataframe with codes and numerical values
-    category_df = create_category_df(dfm, ref_col, period_col, civdef_col, pg_num_col, code_cols, value_cols)
-
+    category_df = create_category_df(multiple_sites_df, ref_col, period_col, civdef_col, pg_num_col, code_cols, value_cols)
 
     # df_sites: dataframe with postcodes, percents, and everyting else
     df_cols = list(df.columns)
     group_cols, code_cols = spawn_column_lists(ref_col, period_col, product_col, civdef_col, pg_num_col)
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
-    df_sites = dfm.copy()[site_cols]
+    df_sites = multiple_sites_df.copy()[site_cols]
 
     # Remove instances that have no postcodes
     df_sites = df_sites[df_sites[postcode_col].str.len() > 0]
