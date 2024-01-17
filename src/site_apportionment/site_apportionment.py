@@ -287,6 +287,24 @@ def create_category_df(df: pd.DataFrame,
 
     return category_df
 
+def create_df_sites(df: pd.DataFrame, df_cols: List[str], code_cols: List[str], value_cols: List[str]) -> pd.DataFrame:
+    """
+    Creates a DataFrame with postcodes, percents, and everything else.
+    
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        df_cols (List[str]): The columns of the DataFrame.
+        code_cols (List[str]): The code columns.
+        value_cols (List[str]): The value columns.
+
+    Returns:
+        pd.DataFrame: The DataFrame with postcodes, percents, and everything else.
+    """
+    site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
+    df_sites = df.copy()[site_cols]
+    return df_sites
+
+
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -335,17 +353,17 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # df_sites: dataframe with postcodes, percents, and everyting else
     df_cols = list(df.columns)
     group_cols, code_cols = spawn_column_lists(ref_col, period_col, product_col, civdef_col, pg_num_col)
-    site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
-    df_sites = multiple_sites_df.copy()[site_cols]
+    
+    sites_df = create_df_sites(multiple_sites_df, df_cols, code_cols, value_cols)
 
     # Remove instances that have no postcodes
-    df_sites = df_sites[df_sites[postcode_col].str.len() > 0]
+    sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
 
     # Check for postcode duplicates for QA
-    df_sites["site_count"] = df_sites.groupby(group_cols + [postcode_col])[
+    sites_df["site_count"] = sites_df.groupby(group_cols + [postcode_col])[
         postcode_col
     ].transform("count")
-    df_duplicate_sites = df_sites[df_sites["site_count"] > 1]
+    df_duplicate_sites = sites_df[sites_df["site_count"] > 1]
     num_duplicate_sites = df_duplicate_sites.shape[0]
     if num_duplicate_sites:
         SitesApportionmentLogger.info(
@@ -353,10 +371,10 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         )
 
     # Calculate weights
-    df_sites = calc_weights_for_sites(df_sites)
+    sites_df = calc_weights_for_sites(sites_df)
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = df_sites.merge(category_df, on=group_cols, how="inner")
+    df_cart = sites_df.merge(category_df, on=group_cols, how="inner")
 
     # Apply weights
     for value_col in value_cols:
