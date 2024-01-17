@@ -87,15 +87,21 @@ def run_construction(
     if not is_northern_ireland:
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.columns:
-            updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
+            updated_snapshot_df = prepare_short_to_long(
+                updated_snapshot_df, construction_df
+            )
         # Create period_year column (NI already has it)
         updated_snapshot_df = create_period_year(updated_snapshot_df)
         construction_df = create_period_year(construction_df)
         # Set instance=1 so longforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0001") & (updated_snapshot_df.status == "Form sent out")
+        form_sent_condition = (updated_snapshot_df.formtype == "0001") & (
+            updated_snapshot_df.status == "Form sent out"
+        )
         updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
         # Set instance=0 so shortforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (updated_snapshot_df.status == "Form sent out")
+        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
+            updated_snapshot_df.status == "Form sent out"
+        )
         updated_snapshot_df.loc[form_sent_condition, "instance"] = 0
 
     # NI data has no instance but needs an instance of 1
@@ -129,12 +135,18 @@ def run_construction(
     # Run GB specific actions
     if not is_northern_ireland:
         # Long form records with a postcode in 601 use this as the postcode
-        long_form_cond = (~updated_snapshot_df["601"].isnull())
-        updated_snapshot_df.loc[long_form_cond, "postcodes_harmonised"] = updated_snapshot_df["601"]
+        long_form_cond = ~updated_snapshot_df["601"].isnull()
+        updated_snapshot_df.loc[
+            long_form_cond, "postcodes_harmonised"
+        ] = updated_snapshot_df["601"]
 
         # Short form records with nothing in 601 use referencepostcode instead
-        short_form_cond = (updated_snapshot_df["601"].isnull()) & (~updated_snapshot_df["referencepostcode"].isnull())
-        updated_snapshot_df.loc[short_form_cond, "postcodes_harmonised"] = updated_snapshot_df["referencepostcode"]
+        short_form_cond = (updated_snapshot_df["601"].isnull()) & (
+            ~updated_snapshot_df["referencepostcode"].isnull()
+        )
+        updated_snapshot_df.loc[
+            short_form_cond, "postcodes_harmonised"
+        ] = updated_snapshot_df["referencepostcode"]
 
         # Top up all new postcodes so they're all eight characters exactly
         postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
@@ -142,7 +154,9 @@ def run_construction(
             updated_snapshot_df[col] = updated_snapshot_df[col].apply(postcode_topup)
 
     # Reset shortforms with status 'Form sent out' to instance=None
-    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (updated_snapshot_df.status == "Form sent out")
+    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
+        updated_snapshot_df.status == "Form sent out"
+    )
     updated_snapshot_df.loc[form_sent_condition, "instance"] = None
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
@@ -158,8 +172,8 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     """Create addional instances for short to long construction"""
     # Check which references are going to converted to long forms
     short_to_long_refs = construction_df.loc[
-        construction_df["short_to_long"] == True,"reference"
-        ].unique()
+        construction_df["short_to_long"] == True, "reference"
+    ].unique()
     # Create conversion df
     short_to_long_df = updated_snapshot_df[
         updated_snapshot_df["reference"].isin(short_to_long_refs)
