@@ -9,9 +9,9 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   load_historic_data: False
-  run_construction: True
+  run_construction: False
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
@@ -22,11 +22,12 @@ global:
   apportion_sites: True
   # Output settings
   output_full_responses: False
-  output_ni_full_responses: False
+  output_ni_full_responses: True
   output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
+  output_imputation_qa: False
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
@@ -56,7 +57,7 @@ hdfs_paths:
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
-
+   
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   output_path:  "/ons/rdbe_dev/outputs"
   cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
@@ -68,8 +69,8 @@ hdfs_paths:
   manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
-  short_form_schema: "src/outputs/output_schemas/short_form_schema.toml"
-  long_form_schema: "src/outputs/output_schemas/long_form_schema.toml"
+  short_form_schema: "src/outputs/output_schemas/frozen_shortform_schema.toml"
+  long_form_schema: "src/outputs/output_schemas/frozen_longform_schema.toml"
   export_path: /ons/rdbe_dev/outgoing_export
   feather_path: "/ons/rdbe_dev/staging/feather"
 network_paths:
@@ -77,7 +78,7 @@ network_paths:
   logs_foldername: "logs/run_logs"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
-  ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
+  ni_full_responses_path: "R:/BERD results 2022/N.I/N.I. Data File/2022 NI BERD Data for ONS, InHouse Spenders Only (JN).csv"
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
@@ -113,8 +114,8 @@ network_paths:
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
-  short_form_schema: "config/output_schemas/short_form_schema.toml"
-  long_form_schema: "config/output_schemas/long_form_schema.toml"
+  frozen_shortform_schema: "config/output_schemas/frozen_shortform_schema.toml"
+  frozen_longform_schema: "config/output_schemas/frozen_longform_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   ni_sas_schema: "config/output_schemas/ni_sas_schema.toml"
