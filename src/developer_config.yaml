@@ -31,9 +31,9 @@ global:
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
-  output_ni_sas: False
-  output_tau: False
+  output_gb_sas: True
+  output_ni_sas: True
+  output_tau: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
