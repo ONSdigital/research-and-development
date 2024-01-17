@@ -1,5 +1,6 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
+from typing import Tuple    
 import os
 import logging
 
@@ -199,6 +200,85 @@ def set_short_form_percentages(df: pd.DataFrame, form_col: str, short_code: str,
     df.loc[df[form_col] == short_code, percent_col] = 100
     return df
 
+def split_dataframe(df: pd.DataFrame, form_col: str, long_code: str, postcode_col: str, instance_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Splits the DataFrame into two based on certain conditions.
+    
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        form_col (str): The name of the form column.
+        long_code (str): The code for long forms.
+        postcode_col (str): The name of the postcode column.
+        instance_col (str): The name of the instance column.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
+    """
+    # Condition of long forms, many sites, instance >=1, non-null postcodes
+    cond = (df[form_col] == long_code) & (df[postcode_col + "_count"] > 1) & (df[instance_col] >= 1)
+
+    # Dataframe dfm with many products - for apportionment and Cartesian product
+    dfm = df.copy()[cond]
+    dfm = dfm.drop(columns=[postcode_col + "_count"], axis=1)
+
+    # Dataframe with everything else - save unchanged
+    df_out = df[~cond]
+    df_out = df_out.drop(columns=[postcode_col + "_count"], axis=1)
+
+    return dfm, df_out
+
+def spawn_column_lists(ref_col: str, period_col: str, product_col: str, civdef_col: str, pg_num_col: str) -> Tuple[List[str], List[str]]:
+    """
+    Creates lists of group columns and code columns.
+    
+    Args:
+        ref_col (str): The name of the ref column.
+        period_col (str): The name of the period column.
+        product_col (str): The name of the product column.
+        civdef_col (str): The name of the civdef column.
+        pg_num_col (str): The name of the pg_num column.
+
+    Returns:
+        Tuple[List[str], List[str]]: A tuple containing the list of group columns and the list of code columns.
+    """
+    group_cols = [ref_col, period_col]
+    code_cols = [product_col, civdef_col, pg_num_col]
+    
+    return group_cols, code_cols
+
+def create_category_df(df: pd.DataFrame,
+                    ref_col:str,
+                    period_col: str,
+                    civdef_col: str,
+                    pg_num_col: str,
+                    code_cols: str,
+                    value_cols: list) -> pd.DataFrame:
+    """
+    Creates a DataFrame with codes and numerical values.
+    
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        group_col_name (str): The name of the group column.
+        code_col_name (str): The name of the code column.
+        value_col_name (str): The name of the value column.
+
+    Returns:
+        pd.DataFrame: The DataFrame with codes and numerical values.
+    """
+    
+    group_cols, code_cols = spawn_column_lists(ref_col, period_col, product_col, civdef_col, pg_num_col)
+
+    # Make the dataframe with columns of codes and numerical values
+    category_df = df.copy()[group_cols + code_cols + value_cols]
+    
+    # Remove blank products
+    category_df = category_df[category_df[product_col].str.len() > 0]
+    
+    # De-duplicate by summation - possibly, not needed
+    category_df = category_df.groupby(group_cols + code_cols).agg(sum).reset_index()
+
+    return category_df
+
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -231,39 +311,23 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # Set short form percentages to 100
     df = set_short_form_percentages(df, form_col, short_code, percent_col)
 
-    # df_cols: original columns
-    df_cols = list(df.columns)
+        # Calculate the number of unique non-blank postcodes
+    df = count_unique_codes_in_col(df, postcode_col)
+
+    # Split the dataframe into two based on certain conditions
+    dfm, df_out = split_dataframe(df, form_col, long_code, postcode_col, instance_col)
 
     # Create a list of the value columns that we want to apportion
     # These are the same as the columns we impute so we use a function from imputation.
     value_cols = get_imputation_cols(config)
 
-    # Calculate the number of unique non-blank postcodes
-    df = count_unique_codes_in_col(df, postcode_col)
-
-    # Condition of long forms, many sites, instance >=1, non-null postcodes
-    cond = (df[form_col] == long_code) & (df[postcode_col + "_count"] > 1) & (df[instance_col] >= 1)
-
-    # Dataframe dfm with many products - for apportionment and Cartesian product
-    dfm = df.copy()[cond]
-    dfm = dfm.drop(columns=[postcode_col + "_count"], axis=1)
-
-    # Dataframe with everything else - save unchanged
-    df_out = df[~cond]
-    df_out = df_out.drop(columns=[postcode_col + "_count"], axis=1)
-
     # df_codes: dataframe with codes and numerical values
-    group_cols = [ref_col, period_col]
-    code_cols = [product_col, civdef_col, pg_num_col]
-    df_codes = dfm.copy()[group_cols + code_cols + value_cols]
+    category_df = create_category_df(dfm, ref_col, period_col, civdef_col, pg_num_col, code_cols, value_cols)
 
-    # Remove blank products
-    df_codes = df_codes[df_codes[product_col].str.len() > 0]
-
-    # # De-duplicate by summation - possibly, not needed
-    df_codes = df_codes.groupby(group_cols + code_cols).agg(sum).reset_index()
 
     # df_sites: dataframe with postcodes, percents, and everyting else
+    df_cols = list(df.columns)
+    group_cols, code_cols = spawn_column_lists(ref_col, period_col, product_col, civdef_col, pg_num_col)
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
     df_sites = dfm.copy()[site_cols]
 
@@ -285,7 +349,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_sites = calc_weights_for_sites(df_sites)
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
+    df_cart = df_sites.merge(category_df, on=group_cols, how="inner")
 
     # Apply weights
     for value_col in value_cols:
