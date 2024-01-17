@@ -85,14 +85,18 @@ def run_construction(
 
     # Run GB specific actions
     if not is_northern_ireland:
-        # Prepare the short to long form constructions (N/A to NI)
-        updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
+        # Prepare the short to long form constructions, if any (N/A to NI)
+        if "short_to_long" in construction_df.columns:
+            updated_snapshot_df = prepare_short_to_long(updated_snapshot_df, construction_df)
         # Create period_year column (NI already has it)
         updated_snapshot_df = create_period_year(updated_snapshot_df)
         construction_df = create_period_year(construction_df)
         # Set instance=1 so longforms with status 'Form sent out' match correctly
         form_sent_condition = (updated_snapshot_df.formtype == "0001") & (updated_snapshot_df.status == "Form sent out")
         updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
+        # Set instance=0 so shortforms with status 'Form sent out' match correctly
+        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (updated_snapshot_df.status == "Form sent out")
+        updated_snapshot_df.loc[form_sent_condition, "instance"] = 0
 
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
@@ -136,6 +140,10 @@ def run_construction(
         postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
         for col in postcode_cols:
             updated_snapshot_df[col] = updated_snapshot_df[col].apply(postcode_topup)
+
+    # Reset shortforms with status 'Form sent out' to instance=None
+    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (updated_snapshot_df.status == "Form sent out")
+    updated_snapshot_df.loc[form_sent_condition, "instance"] = None
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
