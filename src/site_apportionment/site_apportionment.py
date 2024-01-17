@@ -1,6 +1,6 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-from typing import Tuple    
+from typing import Tuple, List
 import os
 import logging
 
@@ -326,6 +326,53 @@ def count_duplicate_sites(sites_df: pd.DataFrame, group_cols: List[str], postcod
     
     return num_duplicate_sites
 
+def create_cartesian_product(df_sites: pd.DataFrame, df_codes: pd.DataFrame, group_cols: List[str], dfcols: list) -> pd.DataFrame:
+    """
+    Creates a 'Cartesian product' of product groups and sites.
+    
+    Args:
+        df_sites (pd.DataFrame): The DataFrame with sites.
+        df_codes (pd.DataFrame): The DataFrame with codes.
+        group_cols (List[str]): The columns to group by.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the Cartesian product.
+    
+    Example:
+        Suppose we have the following DataFrames:
+
+        df_sites:
+            site  group
+            A     1
+            B     1
+            C     2
+
+        df_codes:
+            code  group
+            X     1
+            Y     1
+            Z     2
+
+        And we call `create_cartesian_product(df_sites, df_codes, ['group'])`.
+
+        The resulting DataFrame would be:
+
+            site  group  code
+            A     1      X
+            A     1      Y
+            B     1      X
+            B     1      Y
+            C     2      Z
+    """
+    # Create a Cartesian product of product groups and sites
+    df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
+    
+    # Restore the original column order
+    df_cart = df_cart[dfcols]
+    
+    return df_cart
+
+
 def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -381,20 +428,20 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
 
     # Check for postcode duplicates for QA
-    num_duplicate_sites = count_duplicate_sites(sites_df, group_cols, postcode_col)
+    count_duplicate_sites(sites_df, group_cols, postcode_col)
 
     # Calculate weights
     sites_df = calc_weights_for_sites(sites_df)
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = sites_df.merge(category_df, on=group_cols, how="inner")
+    df_cart = create_cartesian_product(sites_df, category_df, group_cols, df_cols)
 
     # Apply weights
     for value_col in value_cols:
         df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
 
     # Restore the original column order
-    df_cart = df_cart[df_cols]
+    
 
     # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)
