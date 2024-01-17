@@ -128,8 +128,8 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309]
-    status_after = [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400]
+    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
+    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
 
     cora_dict = dict(zip(status_before, status_after))
 
