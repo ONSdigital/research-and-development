@@ -564,7 +564,7 @@ Deduced_Data_Type = "object"
 
 [statusencoded]
 old_name = "statusencoded"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "category"
 
 [postcodes_harmonised]
 old_name = "postcodes_harmonised"
