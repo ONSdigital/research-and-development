@@ -50,7 +50,7 @@ Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Cle
 
 [statusencoded]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "category"
 Nullable = false
 Current_Data_Type = "Int64"
 Length = 3
