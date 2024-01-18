@@ -78,6 +78,12 @@ def run_construction(
     validate_data_with_schema(construction_df, schema_path)
     construction_df = construction_df.dropna(axis="columns", how="all")
 
+    # Convert formtype to "0001" or "0006"
+    construction_df["formtype"] = construction_df["formtype"].astype('str')
+    construction_df["formtype"] = construction_df["formtype"].str.zfill(4)
+    construction_df["formtype"] = construction_df["formtype"].astype('category')
+
+
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False

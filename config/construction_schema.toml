@@ -430,7 +430,7 @@ Possible_categorical_Values = ["nan"]
 
 [instance]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
