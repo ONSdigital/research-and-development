@@ -153,11 +153,11 @@ def run_construction(
         for col in postcode_cols:
             updated_snapshot_df[col] = updated_snapshot_df[col].apply(postcode_topup)
 
-    # Reset shortforms with status 'Form sent out' to instance=None
-    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
-        updated_snapshot_df.status == "Form sent out"
-    )
-    updated_snapshot_df.loc[form_sent_condition, "instance"] = None
+        # Reset shortforms with status 'Form sent out' to instance=None
+        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
+            updated_snapshot_df.status == "Form sent out"
+        )
+        updated_snapshot_df.loc[form_sent_condition, "instance"] = None
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
