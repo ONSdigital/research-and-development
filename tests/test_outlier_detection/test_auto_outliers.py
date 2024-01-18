@@ -3,7 +3,7 @@ import logging
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 
-from src.outlier_detection.auto_outliers import flag_outliers, decide_outliers, log_outlier_info, normal_round
+import src.outlier_detection.auto_outliers as auto
 
 
 class TestOutlierFlagging:
@@ -102,7 +102,7 @@ class TestOutlierFlagging:
         upper_clip = 0.1
         lower_clip = 0
         value_col = "701"
-        result_df = flag_outliers(input_df, upper_clip, lower_clip, value_col)
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
 
         assert_frame_equal(result_df, expected_df)
 
@@ -157,7 +157,7 @@ class TestDecideOutliers:
         expected_df = self.create_expected_df()
 
         flag_cols = ["701", "702", "703"]
-        result_df = decide_outliers(input_df, flag_cols)
+        result_df = auto.decide_outliers(input_df, flag_cols)
 
         assert_frame_equal(result_df, expected_df)
 
@@ -195,7 +195,7 @@ class TestOutlierNumbers:
         input_df = self.create_input_df()
 
         with caplog.at_level(logging.INFO):
-            log_outlier_info(input_df, "value_col")
+            auto.log_outlier_info(input_df, "value_col")
 
         assert "1 outliers were detected out of a total of 2 valid entries in column value_col" in caplog.text
 
@@ -248,7 +248,13 @@ class TestNormalRound:
         expected_df = self.create_expected_df()
 
         input_df["rounded"] = input_df.apply(
-            lambda row: normal_round(row["to_round"]), axis=1
+            lambda row: auto.normal_round(row["to_round"]), axis=1
         )
 
         assert_frame_equal(input_df, expected_df)
+
+
+class TestOneValueOutlier:
+    """Unit tests for run_auto_flagging function."""
+    """Test case:
+    one value causes the whole RU ref to be an outlier"""
