@@ -64,6 +64,11 @@ def join_fgn_ownership(
         )
         combined_df.drop(columns=["ruref"], inplace=True)
 
+        # If foreign ownership is empty, we fill it with "GB" for long, short 
+        # and NI
+        combined_df["ultfoc"] = combined_df["ultfoc"].fillna("GB")
+
+
         main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
 
         return main_df
