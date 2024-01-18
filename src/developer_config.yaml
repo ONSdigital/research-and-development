@@ -17,7 +17,7 @@ global:
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: True
+  load_from_feather: False
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
