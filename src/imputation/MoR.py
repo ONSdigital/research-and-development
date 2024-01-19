@@ -223,6 +223,16 @@ def calculate_links(gr_df, target_vars, config):
     return gr_df[column_order].reset_index(drop=True)
 
 
+def get_threshold_value(config: dict) -> int:
+    """Read, validate and return threshold value from the config."""
+    threshold_num = config["imputation"]["mor_threshold"]
+    if (type(threshold_num) == int) & (threshold_num >=0):
+        return threshold_num
+    else:
+        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
+                        "of the config must be zero or a positive integer.")
+        
+
 def group_calc_link(group, target_vars, config):
     """Apply the MoR method to each group
 
@@ -244,8 +254,11 @@ def group_calc_link(group, target_vars, config):
             .values
         )
 
-        # If there are non-null, non-zero values in the group calculate the mean
-        if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
+        
+        threshold_num = get_threshold_value(config)
+        
+        # If there are non-null, non-zero values in the group calculate the mean        
+        if sum(~group[f"{var}_gr_trim"] & non_null_mask) <= threshold_num:
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
             ].mean()
