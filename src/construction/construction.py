@@ -78,9 +78,6 @@ def run_construction(
     validate_data_with_schema(construction_df, schema_path)
     construction_df = construction_df.dropna(axis="columns", how="all")
 
-    # Convert formtype to "0001", "0006" or "0003"
-    construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
-
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
@@ -88,6 +85,10 @@ def run_construction(
 
     # Run GB specific actions
     if not is_northern_ireland:
+
+        # Convert formtype to "0001" or "0006" (NI doesn't have a formtype until outputs)
+        construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
+
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.columns:
             updated_snapshot_df = prepare_short_to_long(
