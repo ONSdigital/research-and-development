@@ -78,11 +78,8 @@ def run_construction(
     validate_data_with_schema(construction_df, schema_path)
     construction_df = construction_df.dropna(axis="columns", how="all")
 
-    # Convert formtype to "0001" or "0006"
-    construction_df["formtype"] = construction_df["formtype"].astype('str')
-    construction_df["formtype"] = construction_df["formtype"].str.zfill(4)
-    construction_df["formtype"] = construction_df["formtype"].astype('category')
-
+    # Convert formtype to "0001", "0006" or "0003"
+    construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
 
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
@@ -196,3 +193,15 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
         [updated_snapshot_df, short_to_long_df1, short_to_long_df2]
     )
     return updated_snapshot_df
+
+
+def convert_formtype(formtype_value):
+    if pd.notnull(formtype_value):
+        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
+            return "0001"
+        elif formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006":
+            return "0006"
+        else:
+            return None
+    else:
+        return None
