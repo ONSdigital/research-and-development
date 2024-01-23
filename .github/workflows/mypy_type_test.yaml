@@ -9,24 +9,24 @@ on:
     branches: ["mypy_action"]
 
   # runs on version 20.04 of ubuntu
-  jobs:
-    mypy_type_test:
-      runs-on: ubuntu-20.04
-      name: Mypy
-      steps:
+jobs:
+  mypy_type_test:
+    runs-on: ubuntu-20.04
+    name: Mypy
+    steps:
 
 # 1) Checkout the code
-        - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 # 2) Set up Python
-        - name: Set up Python 3.8
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.8'
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
 
 # 3) Install Mypy
-        - name: Install Mypy
-          run: pip install mypy
+      - name: Install Mypy
+        run: pip install mypy
 # 4) Run Mypy
-        - name: Run Mypy
-          run: |
-            mypy --python-version 3.8 .
+      - name: Run Mypy
+        run: |
+          mypy --python-version 3.8 .
