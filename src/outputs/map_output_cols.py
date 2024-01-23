@@ -133,7 +133,7 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = [
+    status_before: List[str] = [
         "100",
         "101",
         "102",
@@ -146,7 +146,7 @@ def create_cora_status_col(df, main_col="statusencoded"):
         "304",
         "309",
     ]
-    status_after = [
+    status_after: List[str] = [
         "200",
         "100",
         "1000",
@@ -171,9 +171,9 @@ def create_cora_status_col(df, main_col="statusencoded"):
 def join_itl_regions(
     df: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
-    postcode_col="postcodes_harmonised",
-    formtype: list = ["0001", "0006"],
-):
+    postcode_col: str ="postcodes_harmonised",
+    formtype: List[str] = ["0001", "0006"],
+) -> pd.DataFrame:
     """Joins the itl regions onto the full dataframe using the mapper provided
 
     Args:
@@ -211,7 +211,7 @@ def join_itl_regions(
         )
 
 
-def map_to_numeric(df: pd.DataFrame):
+def map_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
     """Map q713 and q714 in dataframe from letters to numeric format
     Yes is mapped to 1
     No is mapped to 2
@@ -227,7 +227,7 @@ def map_to_numeric(df: pd.DataFrame):
 
     df = df.astype({"713": "object", "714": "object"})
     # Map the actual responses to the corresponding integer
-    mapper_dict = {"Yes": 1, "No": 2, "": 3}
+    mapper_dict: Dict[str, int] = {"Yes": 1, "No": 2, "": 3}
 
     df["713"] = df["713"].map(mapper_dict)
     df["714"] = df["714"].map(mapper_dict)
