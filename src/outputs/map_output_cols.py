@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+from typing import Dict
 
 
 def join_pg_numeric(
@@ -90,7 +91,7 @@ def map_sizebands(
         (pd.DataFrame): The dataframe with the sizebands column added
     """
     # Create a dictionary of sizeband parameters
-    sizeband_dict = {
+    sizeband_dict: Dict[str, int] = {
         1: {"min": 0, "max": 9},
         2: {"min": 10, "max": 99},
         3: {"min": 20, "max": 49},
@@ -132,10 +133,34 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
-    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
+    status_before = [
+        "100",
+        "101",
+        "102",
+        "200",
+        "201",
+        "210",
+        "211",
+        "302",
+        "303",
+        "304",
+        "309",
+    ]
+    status_after = [
+        "200",
+        "100",
+        "1000",
+        "400",
+        "500",
+        "600",
+        "800",
+        "1200",
+        "1300",
+        "900",
+        "1400",
+    ]
 
-    cora_dict = dict(zip(status_before, status_after))
+    cora_dict: Dict[str, str] = dict(zip(status_before, status_after))
 
     # Create a new column by mapping values from main_col using the cora_dict
     df["form_status"] = df[main_col].map(cora_dict)
