@@ -1,0 +1,39 @@
+name: Run mypy on pull request to develop
+
+# runs on every pull request to develop
+on:
+  # pull_request:
+  #   branches:
+  #     - develop
+  push:
+    branches:
+      - mypy_action
+# runs on version 20.04 of ubuntu
+jobs:
+  pytest-coverage-comment:
+    runs-on: ubuntu-20.04
+    steps:
+
+# 1) Checkout the code
+      - uses: actions/checkout@v3
+# 2) Removing PyDoop from the requirements.txt
+      - name: Remove pydoop requirements.txt
+        shell: bash -l {0}
+        run: |
+          awk '!/pydoop.*/' requirements.txt> temp && mv temp requirements.txt
+# 3) Set up Python
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+# # 4) Install dependencies from requirements.txt
+#       - name: Install dependencies
+#         run: pip install -r requirements.txt
+
+# 5) Install Mypy
+    - name: Install Mypy
+      run: pip install mypy
+    - name: Run Mypy
+      run: |
+        mypy --python-version 3.8 .
