@@ -8,11 +8,11 @@ on:
   push:
     branches:
       - mypy_action
-# runs on version 20.04 of ubuntu
-jobs:
-  pytest-coverage-comment:
-    runs-on: ubuntu-20.04
-    steps:
+  # runs on version 20.04 of ubuntu
+  jobs:
+    pytest-coverage-comment:
+      runs-on: ubuntu-20.04
+      steps:
 
 # 1) Checkout the code
       - uses: actions/checkout@v3
