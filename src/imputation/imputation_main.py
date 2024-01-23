@@ -32,14 +32,15 @@ def run_imputation(
     """Run all the processes for the imputation module.
 
     These processes are, in order:
-    1) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
-    2) Short to long form conversion: create new instances with short form questions
+    1) PG conversion: convert PG column (201) from numeric to alpha-numeric
+    2) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
+    3) Short to long form conversion: create new instances with short form questions
         mapped and apportioned to longform question equivalents
-    3) Mean of Ratios imputation: (forwards imputation) where back data is available,
+    4) Mean of Ratios imputation: (forwards imputation) where back data is available,
         with "carry forward" as fall back data exists for prev but not current period.
-    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
+    5) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
         allow mean of ratios or carried forward method
-    5) Short form expansion imputation: imputing for questions not asked in short forms
+    6) Short form expansion imputation: imputing for questions not asked in short forms
 
     Args:
         df (pd.DataFrame): the full responses spp data

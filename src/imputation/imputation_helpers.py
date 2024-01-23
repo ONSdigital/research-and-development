@@ -34,6 +34,40 @@ def get_imputation_cols(config: dict) -> list:
     return numeric_cols
 
 
+def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
+    """Create a dataframe mask based on listed options - retrun Bool column.
+    
+    Options include:
+        - 'clear_status': rows with one of the clear statuses
+        - 'instance_zero': rows with instance = 0
+        - 'instance_nonzero': rows with instance != 0
+        - 'no_r_and_d' : rows where q604 = 'No'
+        - 'postcode_only': rows in which there are no numeric values, only postcodes.
+    """
+    # Set an intial version of the boolean column to be returned
+    df["mask_col"] = False
+
+    if "clear_status" in options:
+        df["mask_col"] +=  df["status"].isin(["Clear", "Clear - overridden"])
+    
+    if "instance_zero" in options:
+        df["mask_col"] += df.loc[df.instance ==0]
+
+    elif "instance_nonzero" in options:
+        df["mask_col"] += df.loc[df.instance !=0]
+
+    if "no_r_and_d" in options:
+        df["mask_col"] += df.loc[df["604"]=="No"]
+
+    if "postcode_only" in options:
+        df["mask_col"] += df.loc[df["211"]].isnull() & ~df.loc[df["601"]].isnull()
+
+    if "excl_postcode_only" in options:
+        df["mask_col"] += ~(df.loc[df["211"]].isnull() & ~df.loc[df["601"]].isnull())
+
+    return df["mask_col"]
+
+
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     """Copy item in insance 0 to all other instances in a given reference.
 

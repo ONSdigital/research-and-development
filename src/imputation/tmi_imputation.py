@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
 
-from src.imputation.pg_conversion import sic_to_pg_mapper
+from src.imputation.imputation_helpers import create_mask
 from src.imputation.impute_civ_def import impute_civil_defence
 from src.imputation import expansion_imputation as ximp
 
@@ -24,34 +24,6 @@ def filter_by_column_content(
 ) -> pd.DataFrame:
     """Function to filter dataframe column by content."""
     return df[df[column].isin(column_content)].copy()
-
-
-def impute_pg_by_sic(df: pd.DataFrame, sic_mapper: pd.DataFrame) -> pd.DataFrame:
-    """Impute missing product groups for companies that do no r&d,
-    where instance = 1 and status = "Form sent out"
-    using the SIC number ('rusic').
-
-    Args:
-        df (pd.DataFrame): SPP dataframe from staging
-        sic_mapper (pd.DataFrame): SIC to PG mapper
-
-    Returns:
-        pd.DataFrame: Returns the original dataframe with new PGs
-        overwriting the missing values
-    """
-
-    df = df.copy()
-
-    # Filter for q604 = No or status = "Form sent out"
-    filtered_data = df.loc[(df["status"] == "Form sent out") | (df["604"] == "No")]
-
-    filtered_data = sic_to_pg_mapper(
-        filtered_data, sic_mapper, target_col="201", formtype=[formtype_long]
-    )
-
-    updated_df = apply_to_original(filtered_data, df)
-
-    return updated_df
 
 
 def create_imp_class_col(
@@ -100,51 +72,40 @@ def create_imp_class_col(
     return df
 
 
-def fill_zeros(df: pd.DataFrame, column: str) -> pd.DataFrame:
-    """Fills null values with zeros in a given column."""
-    return df[column].fillna(0).astype("float")
-
-
-def apply_fill_zeros(clear_df, df, target_variables: list):
+def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     """Applies the fill zeros function to filtered dataframes.
 
-    This will be applied to all target variables for clear responders
-    and all target variables for "No R&D".
+    A mask is created to identify clear responders, excluding instance zero rows, 
+    but exclude "postcode only" rows.
+
+    Zeros are then filled for the target values based on this mask, and the equivalent 
+    "_imputed" columns.
 
     Args:
-        clear_df (pd.DataFrame): The clear responders, excluding instance 0.
-        df (pd.DataFrame): The unfiltered dataframe
+        df (pd.DataFrame): The dataframe imputation is carried out on
+        target_variables (List): A list of the target variables
+
+    Returns:
+        pd.DataFrame: The same dataframe with required nulls filled with zeros.
     """
-    # only fill zeros where intance is not zero
-    clear_df = clear_df.loc[clear_df["instance"] != 0]
+    conditions_list = ["instance_nonzero", "clear_status", "excl_postcode_only"]
 
-    no_rd = filter_by_column_content(df, "604", ["No"])
-    no_rd = no_rd.loc[no_rd["instance"] != 0]
+    zerofill_mask = create_mask(df, conditions_list)
 
-    for i in target_variables:
-        clear_df[i] = fill_zeros(clear_df, i)
-        clear_df[f"{i}_imputed"] = fill_zeros(clear_df, f"{i}_imputed")
-        no_rd[i] = fill_zeros(clear_df, i)
-        no_rd[f"{i}_imputed"] = fill_zeros(no_rd, f"{i}_imputed")
 
-    df = apply_to_original(clear_df, df)
-    df = apply_to_original(no_rd, df)
+    for var in target_variables:
+        df.loc[zerofill_mask, var] = df.loc[zerofill_mask, var].fillna(0)
+        df.loc[zerofill_mask, f"{var}_imputed"] = df.loc[
+            zerofill_mask, f"{var}_imputed"].fillna(0)
 
-    # Return cleaned original dataset
     return df
 
 
 def tmi_pre_processing(df, target_variables_list: list) -> pd.DataFrame:
     """Function that brings together the steps needed before calculating
     the trimmed mean"""
-    filtered_df = df.loc[df["instance"] != 0]
-
-    # Filter for clear statuses
-    clear_statuses = ["210", "211"]
-    clear_df = filter_by_column_content(filtered_df, "statusencoded", clear_statuses)
-
-    # Fill zeros for no r&d and apply to original
-    df = apply_fill_zeros(clear_df, df, target_variables_list)
+    # Fill zeros for clear responders with no r&d
+    df = apply_fill_zeros(df, target_variables_list)
 
     # Calculate imputation classes for each row
     imp_df = create_imp_class_col(df, "200", "201", "imp_class")
