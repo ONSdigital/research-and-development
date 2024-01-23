@@ -1,6 +1,7 @@
 """Functions for the Mean of Ratios (MoR) methods."""
 import itertools
 import pandas as pd
+import numpy as np
 import re
 
 from src.imputation.apportionment import run_apportionment
@@ -65,6 +66,9 @@ def mor_preprocessing(df, backdata):
     cols = [col for col in list(backdata.columns) if p.match(col)]
     to_rename = {col: col[1:] for col in cols}
     backdata = backdata.rename(columns=to_rename)
+
+    # Add a QA column for the group size
+    df["cf_group_size"] = np.nan
 
     # TODO move this to imputation main
     # Select only values to be imputed
@@ -132,12 +136,16 @@ def carry_forwards(df, backdata, impute_vars):
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
     
-    # Update the varibles to be imputed by the corresponding previous values, filling 
-    # nulls with zeros.
+    # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
-        df.loc[match_cond, f"{var}_imputed"] = df.loc[
-            match_cond, f"{var}_prev"
+        df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
+
+        # fill nulls with zeros if col 211 is not null
+        fillna_cond = ~df["211"].isnull()
+        df.loc[match_cond & fillna_cond, f"{var}_imputed"] = df.loc[
+            match_cond & fillna_cond, f"{var}_imputed"
         ].fillna(0)
+
     df.loc[match_cond, "imp_marker"] = "CF"
 
     df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
@@ -149,7 +157,7 @@ def carry_forwards(df, backdata, impute_vars):
         if (column.endswith("_prev"))
         & (re.search("(.*)_prev|.*", column).group(1) not in impute_vars)
     ]
-    to_drop += ["_merge"]
+    to_drop += ["_merge", "cf_group_size"]
     df = df.drop(to_drop, axis=1)
     return df
 
@@ -212,7 +220,7 @@ def calculate_links(gr_df, target_vars, config):
     gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier
-    column_order = ["imp_class", "reference"] + list(
+    column_order = ["imp_class", "reference", "cf_group_size"] + list(
         itertools.chain(
             *[
                 (var, f"{var}_prev", f"{var}_gr", f"{var}_gr_trim", f"{var}_link")
@@ -241,6 +249,8 @@ def group_calc_link(group, target_vars, config):
         link_vars ([string]): List of the linked variables.
         config (Dict): Confuration settings
     """
+    valid_group_size = True
+
     for var in target_vars:
         # Create mask to not use 0s in mean calculation
         non_null_mask = pd.notnull(group[f"{var}_gr"])
@@ -254,11 +264,18 @@ def group_calc_link(group, target_vars, config):
             .values
         )
 
-        
-        threshold_num = get_threshold_value(config)
-        
-        # If there are non-null, non-zero values in the group calculate the mean        
-        if sum(~group[f"{var}_gr_trim"] & non_null_mask) <= threshold_num:
+        num_valid_vars = sum(~group[f"{var}_gr_trim"] & non_null_mask)
+
+        if var == "211":
+            group["cf_group_size"] = num_valid_vars
+            threshold_num = get_threshold_value(config)
+
+            if num_valid_vars < threshold_num:
+                valid_group_size = False
+
+        # If the group is a valid size, and there are non-null, non-zero values for this
+        # 'var', then calculate the mean        
+        if valid_group_size & (sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0):
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
             ].mean()
