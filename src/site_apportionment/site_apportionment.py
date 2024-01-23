@@ -1,27 +1,26 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-from typing import Tuple, List
-import os
+from typing import Tuple, List, Dict, Union
 import logging
 
 from src.imputation.imputation_helpers import get_imputation_cols
 
 SitesApportionmentLogger = logging.getLogger(__name__)
 
-# Colunm names redefined for convenience
-ref_col = "reference"
-instance_col = "instance"
-period_col = "period"
-form_col = "formtype"
-postcode_col = "601" # "postcodes_harmonised"
-percent_col = "602"
-product_col = "201"
-pg_num_col = "pg_numeric"
-civdef_col = "200"
+# Column names redefined for convenience
+ref_col: str = "reference"
+instance_col: str = "instance"
+period_col: str = "period"
+form_col: str = "formtype"
+postcode_col: str = "601" # "postcodes_harmonised"
+percent_col: str = "602"
+product_col: str = "201"
+pg_num_col: str = "pg_numeric"
+civdef_col: str = "200"
 
 # Long and short form codes
-short_code = "0006"
-long_code = "0001"
+short_code: str = "0006"
+long_code: str = "0001"
 
 
 def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
@@ -373,7 +372,59 @@ def create_cartesian_product(df_sites: pd.DataFrame, df_codes: pd.DataFrame, gro
     return df_cart
 
 
-def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+def weight_values(df: pd.DataFrame, value_cols: List[str], weight_col: str) -> pd.DataFrame:
+    """
+    Multiplies the specified columns by the weight column.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        value_cols (List[str]): The columns to be weighted.
+        weight_col (str): The column to use as weights.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the weighted columns.
+    """
+    
+    # George's original code:
+    # for value_col in value_cols:
+    #     df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
+    
+    df[value_cols] = df[value_cols].multiply(df[weight_col], axis=0)
+    return df
+
+def append_data(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+    """
+    Appends df2 to df1 ignoring the index.
+
+    Args:
+        df1 (pd.DataFrame): The first DataFrame.
+        df2 (pd.DataFrame): The second DataFrame.
+
+    Returns:
+        pd.DataFrame: The combined DataFrame.
+    """
+    combined_df = df1.append(df2, ignore_index=True)
+    
+    return combined_df
+
+
+def sort_data(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+    """
+    Sorts the DataFrame by the specified columns in ascending order.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to sort.
+        cols (List[str]): The columns to sort by.
+
+    Returns:
+        pd.DataFrame: The sorted DataFrame.
+    """
+    
+    sorted_df = df.sort_values(by=cols, ascending=True).reset_index(drop=True)
+    
+    return sorted_df 
+
+def apportion_sites(df: pd.DataFrame, config: Dict[str, Union[str, List[str]]]) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
     This is done using percents from question 602 to compute weights.
@@ -394,9 +445,10 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     Args:
         df (pd.DataFrame): Dataframe containing all input data.
+        config (Dict[str, Union[str, List[str]]]): Configuration dictionary.
 
     Returns:
-        (pd.DataFrame): A dataframe with the same columns, with applied site
+        pd.DataFrame: A dataframe with the same columns, with applied site
         apportionment.
     """
     # Clean "NONE" postcodes
@@ -413,13 +465,15 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     # Create a list of the value columns that we want to apportion
     # These are the same as the columns we impute so we use a function from imputation.
-    value_cols = get_imputation_cols(config)
+    value_cols: List[str] = get_imputation_cols(config)
 
     # df_codes: dataframe with codes and numerical values
     category_df = create_category_df(multiple_sites_df, ref_col, period_col, civdef_col, pg_num_col, code_cols, value_cols)
 
     # df_sites: dataframe with postcodes, percents, and everyting else
-    df_cols = list(df.columns)
+    df_cols: List[str] = list(df.columns)
+    group_cols: List[str]
+    code_cols: List[str]
     group_cols, code_cols = spawn_column_lists(ref_col, period_col, product_col, civdef_col, pg_num_col)
     
     sites_df = create_df_sites(multiple_sites_df, df_cols, code_cols, value_cols)
@@ -437,18 +491,13 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_cart = create_cartesian_product(sites_df, category_df, group_cols, df_cols)
 
     # Apply weights
-    for value_col in value_cols:
-        df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
-
-    # Restore the original column order
-    
-
+    df_cart = weight_values(df_cart, value_cols, "site_weight")
+        
     # Append the apportionned data back to the remaining unchanged data
-    df_out = df_out.append(df_cart, ignore_index=True)
+    df_out = append_data(df_out, df_cart)
 
     # Sort by period, ref, instance in ascending order.
-    df_out = df_out.sort_values(by=[period_col, ref_col, instance_col], ascending=True).reset_index(
-        drop=True
-    )
+    cols_to_sort_by: List[str] = [period_col, ref_col, instance_col]
+    df_out = sort_data(df_out, cols_to_sort_by)
 
     return df_out
