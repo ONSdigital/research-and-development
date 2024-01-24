@@ -24,7 +24,7 @@ Deduced_Data_Type = "Int64"
 
 [form]
 old_name = "formtype"
-Deduced_Data_Type = "category"
+Deduced_Data_Type = "str"
 
 [emp]
 old_name = "employment"
