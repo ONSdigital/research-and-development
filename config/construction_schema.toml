@@ -1554,15 +1554,6 @@ Possible_Categorical_Values = [ "nan",]
 q_code = ""
 old_ref = "nan"
 
-[postcodes_harmonised]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = false
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
 
 [force_imputation]
 Description = "nan"
