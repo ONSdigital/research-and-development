@@ -60,7 +60,7 @@ Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305,
 
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64ns"
+Deduced_Data_Type = "datetime64[ns]"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
@@ -90,7 +90,7 @@ Possible_Categorical_Values = ["nan"]
 
 [formtype]
 Description = "nan"
-Deduced_Data_Type = "category"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -360,7 +360,7 @@ Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "
 
 [birthdate]
 Description = "Datetime format = format=%d/%m/%Y"
-Deduced_Data_Type = "datetime64ns"
+Deduced_Data_Type = "datetime64[ns]"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -420,7 +420,7 @@ Possible_categorical_Values = ["nan"]
 
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64ns"
+Deduced_Data_Type = "datetime64[ns]"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
@@ -430,7 +430,7 @@ Possible_categorical_Values = ["nan"]
 
 [instance]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1553,16 +1553,6 @@ Max_values = "nan"
 Possible_Categorical_Values = [ "nan",]
 q_code = ""
 old_ref = "nan"
-
-[postcodes_harmonised]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = false
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
 
 [force_imputation]
 Description = "nan"

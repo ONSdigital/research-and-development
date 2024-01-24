@@ -66,6 +66,10 @@ def join_fgn_ownership(
 
         main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
 
+        # If foreign ownership is empty, we fill it with "GB" for long, short
+        # and NI
+        main_df["ultfoc"] = main_df["ultfoc"].fillna("GB")
+
         return main_df
 
     except Exception as e:
@@ -128,8 +132,8 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309]
-    status_after = [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400]
+    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
+    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
 
     cora_dict = dict(zip(status_before, status_after))
 
