@@ -23,28 +23,28 @@ short_code: str = "0006"
 long_code: str = "0001"
 
 
-def count_unique_codes_in_col(df: pd.DataFrame, code: str) -> pd.DataFrame:
-    """Calculates the number of unique non-empty codes in a column.
+def count_unique_postcodes_in_col(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
+    """Calculates the number of unique non-empty postcodes in a column.
 
     Args:
         df (pd.DataFrame): A dataframe containing all data
-        code (str): Name of the column containing codes
+        postcode_col (str): Name of the column containing postcodes
 
     Returns:
         (pd.DataFrame): A copy of original dataframe with an additional column
         called the same as code with suffix "_count" countaining the number of
-        unique non-empty codes
+        unique non-empty postcodes
     """
 
     dfa = df.copy()
 
     # Select columns that we need
-    cols_need = [ref_col, period_col, code]
+    cols_need = [ref_col, period_col, postcode_col]
     dfa = dfa[cols_need]
-    dfa = dfa[dfa[code].str.len() > 0]
+    dfa = dfa[dfa[postcode_col].str.len() > 0]
     dfa = dfa.drop_duplicates()
     dfb = dfa.groupby([ref_col, period_col]).agg("count").reset_index()
-    dfb.rename({code: code + "_count"}, axis="columns", inplace=True)
+    dfb.rename({postcode_col: postcode_col + "_count"}, axis="columns", inplace=True)
     df = df.merge(dfb, on=[ref_col, period_col], how="left")
     return df
 
@@ -131,7 +131,7 @@ def clean_up_post_calc(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def calc_weights_for_sites(
-    df: pd.DataFrame, percent: str, ins: str, ref: str, period: str
+    df: pd.DataFrame, percent_col: str, instance_col: str, ref_col: str, period_col: str
 ) -> pd.DataFrame:
     """
     Entry point function for the process to calculate weights for geographic sites.
@@ -240,9 +240,8 @@ def split_many_sites_df(
         & (df[instance_col] >= 1)
     )
 
-    # Dataframe dfm with many products - for apportionment and Cartesian product
+    # Dataframe many_sites_df with many products - for apportionment and Cartesian product
     many_sites_df = df.copy()[cond]
-    many_sites_df = many_sites_df.drop(columns=[postcode_col + "_count"], axis=1)
 
     # Dataframe with everything else - save unchanged
     df_out = df[~cond]
@@ -500,7 +499,7 @@ def apportion_sites(
     df = set_short_form_percentages(df, form_col, short_code, percent_col)
 
     # Calculate the number of unique non-blank postcodes
-    df = count_unique_codes_in_col(df, postcode_col)
+    df = count_unique_postcodes_in_col(df, postcode_col)
 
     # Split the dataframe into two based on certain conditions
     multiple_sites_df, df_out = split_many_sites_df(
@@ -532,6 +531,8 @@ def apportion_sites(
 
     sites_df = create_df_sites(multiple_sites_df, df_cols, code_cols, value_cols)
 
+    sites_df = sites_df.drop(columns=[postcode_col + "_count"], axis=1)
+
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
 
@@ -539,7 +540,9 @@ def apportion_sites(
     count_duplicate_sites(sites_df, group_cols, postcode_col)
 
     # Calculate weights
-    sites_df = calc_weights_for_sites(sites_df)
+    sites_df = calc_weights_for_sites(
+        sites_df, percent_col, instance_col, ref_col, period_col
+    )
 
     #  Merge codes to sites to create a Cartesian product
     df_cart = create_cartesian_product(sites_df, category_df, group_cols, df_cols)
