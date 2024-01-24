@@ -401,9 +401,6 @@ def create_cartesian_product(
     # Create a Cartesian product of product groups and sites
     df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
 
-    # Restore the original column order
-    df_cart = df_cart[dfcols]
-
     return df_cart
 
 
@@ -446,7 +443,9 @@ def append_data(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return combined_df
 
 
-def sort_data(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+def sort_data(
+    df: pd.DataFrame, cols: List[str], cols_ordered: List[str]
+) -> pd.DataFrame:
     """
     Sorts the DataFrame by the specified columns in ascending order.
 
@@ -457,6 +456,10 @@ def sort_data(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The sorted DataFrame.
     """
+
+    # Restore the original column order
+    cols_less_601_count = cols_ordered.remove("601_count")
+    df_cart = df_cart[cols_less_601_count]
 
     sorted_df = df.sort_values(by=cols, ascending=True).reset_index(drop=True)
 
@@ -492,6 +495,9 @@ def apportion_sites(
         pd.DataFrame: A dataframe with the same columns, with applied site
         apportionment.
     """
+    # Get the original columns set
+    orig_cols: List[str] = list(df.columns)
+
     # Clean "NONE" postcodes
     df = clean_postcodes(df, postcode_col)
 
@@ -511,7 +517,6 @@ def apportion_sites(
     value_cols: List[str] = get_imputation_cols(config)
 
     # df_sites: dataframe with postcodes, percents, and everyting else
-    df_cols: List[str] = list(df.columns)
     group_cols: List[str]
     code_cols: List[str]
     group_cols, code_cols = spawn_column_lists(
@@ -529,12 +534,8 @@ def apportion_sites(
         value_cols,
     )
 
-    sites_df = create_df_sites(multiple_sites_df, df_cols, code_cols, value_cols)
-
-    sites_df = sites_df.drop(columns=[postcode_col + "_count"], axis=1)
-
     # Remove instances that have no postcodes
-    sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
+    sites_df = category_df[category_df[postcode_col].str.len() > 0]
 
     # Check for postcode duplicates for QA
     count_duplicate_sites(sites_df, group_cols, postcode_col)
@@ -545,7 +546,7 @@ def apportion_sites(
     )
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = create_cartesian_product(sites_df, category_df, group_cols, df_cols)
+    df_cart = create_cartesian_product(sites_df, category_df, group_cols, orig_cols)
 
     # Apply weights
     df_cart = weight_values(df_cart, value_cols, "site_weight")
@@ -555,6 +556,6 @@ def apportion_sites(
 
     # Sort by period, ref, instance in ascending order.
     cols_to_sort_by: List[str] = [period_col, ref_col, instance_col]
-    df_out = sort_data(df_out, cols_to_sort_by)
+    df_out = sort_data(df_out, cols_to_sort_by, orig_cols)
 
     return df_out
