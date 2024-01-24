@@ -92,7 +92,6 @@ def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
 
     zerofill_mask = create_mask(df, conditions_list)
 
-
     for var in target_variables:
         df.loc[zerofill_mask, var] = df.loc[zerofill_mask, var].fillna(0)
         df.loc[zerofill_mask, f"{var}_imputed"] = df.loc[

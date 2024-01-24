@@ -44,26 +44,31 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
         - 'no_r_and_d' : rows where q604 = 'No'
         - 'postcode_only': rows in which there are no numeric values, only postcodes.
     """
-    # Set an intial version of the boolean column to be returned
-    df["mask_col"] = False
+    clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
+    instance_mask = df.instance == 0
+    no_r_and_d_mask = df["604"]=="No"
+    postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
 
-    if "clear_status" in options:
-        df["mask_col"] +=  df["status"].isin(["Clear", "Clear - overridden"])
+    # Set initial values for the mask series as a column in the dataframe
+    df["mask_col"] = False
     
+    if "clear_status" in options:
+        df["mask_col"] =  df["mask_col"] & clear_mask
+
     if "instance_zero" in options:
-        df["mask_col"] += df.loc[df.instance ==0]
+        df["mask_col"] = df["mask_col"] & instance_mask
 
     elif "instance_nonzero" in options:
-        df["mask_col"] += df.loc[df.instance !=0]
+        df["mask_col"] = df["mask_col"] & ~instance_mask
 
     if "no_r_and_d" in options:
-        df["mask_col"] += df.loc[df["604"]=="No"]
-
+        df["mask_col"] = df["mask_col"] & no_r_and_d_mask
+        
     if "postcode_only" in options:
-        df["mask_col"] += df.loc[df["211"]].isnull() & ~df.loc[df["601"]].isnull()
+        df["mask_col"] = df["mask_col"] & postcode_only_mask
 
     if "excl_postcode_only" in options:
-        df["mask_col"] += ~(df.loc[df["211"]].isnull() & ~df.loc[df["601"]].isnull())
+        df["mask_col"] = df["mask_col"] & ~postcode_only_mask
 
     return df["mask_col"]
 
