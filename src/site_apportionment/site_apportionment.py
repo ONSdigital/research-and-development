@@ -2,6 +2,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from typing import Tuple, List, Dict, Union
 import logging
+import numpy as np
 
 from src.imputation.imputation_helpers import get_imputation_cols
 
@@ -23,7 +24,35 @@ short_code: str = "0006"
 long_code: str = "0001"
 
 
-def count_unique_postcodes_in_col(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
+# def count_unique_postcodes_in_col(df: pd.DataFrame, postcode_col: str) -> pd.DataFrame:
+#     """Calculates the number of unique non-empty postcodes in a column.
+
+#     Args:
+#         df (pd.DataFrame): A dataframe containing all data
+#         postcode_col (str): Name of the column containing postcodes
+
+#     Returns:
+#         (pd.DataFrame): A copy of original dataframe with an additional column
+#         called the same as code with suffix "_count" countaining the number of
+#         unique non-empty postcodes
+#     """
+
+#     dfa = df.copy()
+
+#     # Select columns that we need
+#     cols_need = [ref_col, period_col, postcode_col]
+#     dfa = dfa[cols_need]
+#     dfa = dfa[dfa[postcode_col].str.len() > 0]
+#     dfa = dfa.drop_duplicates()
+#     dfb = dfa.groupby([ref_col, period_col]).agg("count").reset_index()
+#     dfb.rename({postcode_col: postcode_col + "_count"}, axis="columns", inplace=True)
+#     df = df.merge(dfb, on=[ref_col, period_col], how="left")
+#     return df
+
+
+def count_unique_postcodes_in_col(
+    df: pd.DataFrame, ref_col: str, period_col: str, postcode_col: str
+) -> pd.DataFrame:
     """Calculates the number of unique non-empty postcodes in a column.
 
     Args:
@@ -36,16 +65,16 @@ def count_unique_postcodes_in_col(df: pd.DataFrame, postcode_col: str) -> pd.Dat
         unique non-empty postcodes
     """
 
-    dfa = df.copy()
+    # Drop any NaNs or blanks
+    df = df.dropna(subset=[postcode_col])
 
-    # Select columns that we need
-    cols_need = [ref_col, period_col, postcode_col]
-    dfa = dfa[cols_need]
-    dfa = dfa[dfa[postcode_col].str.len() > 0]
-    dfa = dfa.drop_duplicates()
-    dfb = dfa.groupby([ref_col, period_col]).agg("count").reset_index()
-    dfb.rename({postcode_col: postcode_col + "_count"}, axis="columns", inplace=True)
-    df = df.merge(dfb, on=[ref_col, period_col], how="left")
+    # Create a column '601_count' counting the unique postcodes
+    df["601_count"] = (
+        df.groupby([ref_col, period_col])[postcode_col]
+        .transform("nunique")
+        .astype("Int64")
+    )
+
     return df
 
 
@@ -56,7 +85,7 @@ def clean_data(df: pd.DataFrame, percent: str, ins: str) -> pd.DataFrame:
     Parameters:
     df (pd.DataFrame): The input DataFrame.
     percent (str): The name of the percent column.
-    ins (str): The name of the ins column.
+    ins (str): The name of the instance column.
 
     Returns:
     pd.DataFrame: The cleaned DataFrame.
@@ -127,7 +156,13 @@ def clean_up_post_calc(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
     pd.DataFrame: The DataFrame with unnecessary columns dropped.
     """
-    return df.drop(columns=["site_percent", "site_percent_total"], axis=1)
+    # Old code
+    # df.drop(columns=["site_percent", "site_percent_total"], axis=1)
+
+    # Keeping only the columns we need ready for the merge
+    df = df[["reference", "period", "601_count", "site_percent", "site_weight"]]
+
+    return df
 
 
 def calc_weights_for_sites(
@@ -359,14 +394,18 @@ def count_duplicate_sites(
 
 
 def create_cartesian_product(
-    df_sites: pd.DataFrame, df_codes: pd.DataFrame, group_cols: List[str], dfcols: list
+    df_sites: pd.DataFrame, df_prod_class: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Creates a 'Cartesian product' of product groups and sites.
+    Creates a 'Cartesian product' of product classifications and sites.
+
+    'product classifications' are defined as the unique combination of civ/def,
+        product group (alpha) and product group (numeric)
 
     Args:
         df_sites (pd.DataFrame): The DataFrame with sites.
-        df_codes (pd.DataFrame): The DataFrame with codes.
+        df_prod_class (pd.DataFrame): The DataFrame with with the unique combination
+            of civ/def, product group (alpha) and product group (numeric)
         group_cols (List[str]): The columns to group by.
 
     Returns:
@@ -376,22 +415,22 @@ def create_cartesian_product(
         Suppose we have the following DataFrames:
 
         df_sites:
-            site  group
+            site  ref
             A     1
             B     1
             C     2
 
-        df_codes:
-            code  group
-            X     1
-            Y     1
-            Z     2
+        df_prod_class:
+            prod_class  ref
+            X           1
+            Y           1
+            Z           2
 
-        And we call `create_cartesian_product(df_sites, df_codes, ['group'])`.
+        And we call `create_cartesian_product(df_sites, df_prod_class)`.
 
         The resulting DataFrame would be:
 
-            site  group  code
+            site  ref    prod_class
             A     1      X
             A     1      Y
             B     1      X
@@ -399,7 +438,7 @@ def create_cartesian_product(
             C     2      Z
     """
     # Create a Cartesian product of product groups and sites
-    df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
+    df_cart = df_sites.merge(df_prod_class, on=["reference", "period"], how="inner")
 
     return df_cart
 
@@ -443,8 +482,8 @@ def append_data(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     return combined_df
 
 
-def sort_data(
-    df: pd.DataFrame, cols: List[str], cols_ordered: List[str]
+def sort_rows_order_cols(
+    df: pd.DataFrame, cols_to_sort_by: List[str], cols_in_order: List[str]
 ) -> pd.DataFrame:
     """
     Sorts the DataFrame by the specified columns in ascending order.
@@ -457,16 +496,23 @@ def sort_data(
         pd.DataFrame: The sorted DataFrame.
     """
 
-    # Restore the original column order
-    cols_less_601_count = cols_ordered.remove("601_count")
-    df_cart = df_cart[cols_less_601_count]
+    # Restore the original column order.
+    cols_to_be_removed = set(df.columns) - set(cols_in_order)
 
-    sorted_df = df.sort_values(by=cols, ascending=True).reset_index(drop=True)
+    # Log what columns are being lost
+    if len(cols_to_be_removed) > 0:
+        SitesApportionmentLogger.debug(f"Removing {cols_to_be_removed} from df_cart")
+    df = df[cols_in_order]
+
+    # Sort the rows on values in chosen columns
+    sorted_df = df.sort_values(by=cols_to_sort_by, ascending=True).reset_index(
+        drop=True
+    )
 
     return sorted_df
 
 
-def apportion_sites(
+def run_apportion_sites(
     df: pd.DataFrame, config: Dict[str, Union[str, List[str]]]
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
@@ -505,9 +551,9 @@ def apportion_sites(
     df = set_short_form_percentages(df, form_col, short_code, percent_col)
 
     # Calculate the number of unique non-blank postcodes
-    df = count_unique_postcodes_in_col(df, postcode_col)
+    df = count_unique_postcodes_in_col(df, ref_col, percent_col, postcode_col)
 
-    # Split the dataframe into two based on certain conditions
+    # Split the dataframe into two based on whether there's more than one site (postcode)
     multiple_sites_df, df_out = split_many_sites_df(
         df, form_col, long_code, postcode_col, instance_col
     )
@@ -535,7 +581,7 @@ def apportion_sites(
     )
 
     # Remove instances that have no postcodes
-    sites_df = category_df[category_df[postcode_col].str.len() > 0]
+    sites_df = multiple_sites_df[multiple_sites_df[postcode_col].str.len() > 0]
 
     # Check for postcode duplicates for QA
     count_duplicate_sites(sites_df, group_cols, postcode_col)
@@ -546,7 +592,7 @@ def apportion_sites(
     )
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = create_cartesian_product(sites_df, category_df, group_cols, orig_cols)
+    df_cart = create_cartesian_product(sites_df, category_df)
 
     # Apply weights
     df_cart = weight_values(df_cart, value_cols, "site_weight")
@@ -556,6 +602,6 @@ def apportion_sites(
 
     # Sort by period, ref, instance in ascending order.
     cols_to_sort_by: List[str] = [period_col, ref_col, instance_col]
-    df_out = sort_data(df_out, cols_to_sort_by, orig_cols)
+    df_out = sort_rows_order_cols(df_out, cols_to_sort_by, orig_cols)
 
     return df_out
