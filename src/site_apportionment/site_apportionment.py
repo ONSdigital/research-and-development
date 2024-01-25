@@ -2,7 +2,6 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from typing import Tuple, List, Dict, Union
 import logging
-import numpy as np
 
 from src.imputation.imputation_helpers import get_imputation_cols
 
