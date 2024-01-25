@@ -47,10 +47,11 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     )
     # Calculate totals as with TMI
     carried_forwards_df = calculate_totals(carried_forwards_df)
-    return (
-        pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True),
-        links_df,
-    )
+
+    imputed_df = pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True)
+    imputed_df = imputed_df.drop("cf_group_size", axis=1)
+
+    return imputed_df, links_df
 
 
 def mor_preprocessing(df, backdata):
@@ -157,7 +158,7 @@ def carry_forwards(df, backdata, impute_vars):
         if (column.endswith("_prev"))
         & (re.search("(.*)_prev|.*", column).group(1) not in impute_vars)
     ]
-    to_drop += ["_merge", "cf_group_size"]
+    to_drop += ["_merge"]
     df = df.drop(to_drop, axis=1)
     return df
 
