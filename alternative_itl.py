@@ -38,7 +38,7 @@ df_ref = pd.DataFrame({"postcode": []})
 df_ref["postcode"] = df["referencepostcode"]
 
 #%% Drop duplicates
-df = pd.concat([df_601, df_ref]).drop_duplicates().reset-index()
+df = pd.concat([df_601, df_ref]).drop_duplicates().reset_index()
 
 #%% Harmonise
 df["postcode"]= df["postcode"].apply(postcode_topup).drop_duplicates()
@@ -51,14 +51,14 @@ pc_cols = ["pcd2", "oslaua", "itl"]
 df_pc = pd.read_csv(postcodes_path, usecols=pc_cols)
 
 #%% Load itl
-itl_cols=["LAU121CD", "ITL121CD"]
+itl_cols=["LAD20CD", "LAU121CD", "ITL121CD"]
 df_itl = pd.read_csv(itl_path, usecols=itl_cols)
 
 #%% Merge postcodes to df
 df = df.merge(df_pc, how="left", left_on="postcode", right_on="pcd2")
 
 #%% Join itl traditional way
-df = df.merge(df_itl, how="left", left_on="itl", right_on="LAU121CD")
+df = df.merge(df_itl, how="left", left_on="itl", right_on="LAD20CD")
 df.rename(columns={"ITL121CD": "itl_old"}, inplace=True)
 
 #%% Join the new way
