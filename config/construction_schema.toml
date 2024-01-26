@@ -430,7 +430,7 @@ Possible_categorical_Values = ["nan"]
 
 [instance]
 Description = "nan"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "Int64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1555,6 +1555,16 @@ q_code = ""
 old_ref = "nan"
 
 [force_imputation]
+Description = "nan"
+Deduced_Data_Type = "boolean"
+Nullable = true
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[short_to_long]
 Description = "nan"
 Deduced_Data_Type = "boolean"
 Nullable = true
