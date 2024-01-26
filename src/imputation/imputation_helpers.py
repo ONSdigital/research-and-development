@@ -245,6 +245,7 @@ def tidy_imputation_dataframe(
 
     to_drop += ["200_original", "pg_sic_class", "empty_pgsic_group", "empty_pg_group"]
     to_drop += ["200_imp_marker", "211_trim", "305_trim", "manual_trim"]
+    
     df = df.drop(columns=to_drop)
 
     # Keep only imputed records and clear ("R")
