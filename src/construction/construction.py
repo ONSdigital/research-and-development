@@ -87,7 +87,8 @@ def run_construction(
     if not is_northern_ireland:
 
         # Convert formtype to "0001" or "0006" (NI doesn't have a formtype until outputs)
-        construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
+        if "formtype" in construction_df.columns:
+            construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
 
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.columns:
