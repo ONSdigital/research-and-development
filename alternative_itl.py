@@ -22,8 +22,8 @@ from src.staging.staging_helpers import postcode_topup
 
 
 #%%
-df_path = r"D:\data\res_dev\staged_BERD_full_responses.csv"
-postcodes_path = r"D:\data\res_dev\postcodes_full_head.csv"
+df_path = r"R:\BERD Results System Development 2023\DAP_emulation\staging\staging_qa\full_responses_qa\staged_BERD_full_responses_2024-01-05_v84.csv"
+postcodes_path = r"D:\data\res_dev\ONSPD_NOV_2022_UK.csv"
 itl_path = r"D:\data\res_dev\itl_gz.csv"
 
 #%% Load staged full responses
@@ -38,21 +38,35 @@ df_ref = pd.DataFrame({"postcode": []})
 df_ref["postcode"] = df["referencepostcode"]
 
 #%% Drop duplicates
-df = pd.concat([df_601, df_ref]).drop_duplicates()
+df = pd.concat([df_601, df_ref]).drop_duplicates().reset-index()
 
 #%% Harmonise
-df["postcode"]= df["postcode"].apply(postcode_topup)
+df["postcode"]= df["postcode"].apply(postcode_topup).drop_duplicates()
+
+#%% remove blanks
+df = df[df["postcode"].notnull()]
 
 #%% Load postcodes
 pc_cols = ["pcd2", "oslaua", "itl"]
 df_pc = pd.read_csv(postcodes_path, usecols=pc_cols)
 
 #%% Load itl
-itl_cols=["LAU121CD", ]
-df_itl = pd.read_csv(itl_path)
+itl_cols=["LAU121CD", "ITL121CD"]
+df_itl = pd.read_csv(itl_path, usecols=itl_cols)
 
 #%% Merge postcodes to df
 df = df.merge(df_pc, how="left", left_on="postcode", right_on="pcd2")
 
 #%% Join itl traditional way
-mapper = df_itl[["]]
+df = df.merge(df_itl, how="left", left_on="itl", right_on="LAU121CD")
+df.rename(columns={"ITL121CD": "itl_old"}, inplace=True)
+
+#%% Join the new way
+df = df.merge(df_itl, how="left", left_on="oslaua", right_on="LAU121CD")
+df.rename(columns={"ITL121CD": "itl_new"}, inplace=True)
+
+#%% Create Boolean
+df["itls_equal"] = df["itl_new"] == df["itl_old"] 
+#%% Save
+mypath = r"D:\data\res_dev\postcodes_alternative.csv"
+df.to_csv(mypath, index=None)
