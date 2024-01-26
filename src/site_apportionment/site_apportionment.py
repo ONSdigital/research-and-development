@@ -145,16 +145,22 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_out = df[~cond]
     df_out = df_out.drop(columns=[postcode + "_count"], axis=1)
 
-    # df_codes: dataframe with codes and numerical values
+    # df_categories: dataframe with codes and numerical values
     group_cols = [ref, period]
     code_cols = [product, civdef, pg_num]
-    df_codes = dfm.copy()[group_cols + code_cols + value_cols]
+    df_categories = dfm.copy()[group_cols + code_cols + value_cols]
 
+    #TODO: update to the following: 
+    # # ensure all three elements of the codes are notnull
+    # valid_code_cond = (
+    #     ~df[product_col].isnull() & ~df[civdef_col].isnull() & ~df[pg_num_col].isnull()
+    # )
+    # df_categories = df_categories.loc[valid_code_cond]
     # Remove blank products
-    df_codes = df_codes[df_codes[product].str.len() > 0]
+    df_categories = df_categories[df_categories[product].str.len() > 0]
 
     # # De-duplicate by summation - possibly, not needed
-    df_codes = df_codes.groupby(group_cols + code_cols).agg(sum).reset_index()
+    df_categories = df_categories.groupby(group_cols + code_cols).agg(sum).reset_index()
 
     # df_sites: dataframe with postcodes, percents, and everyting else
     site_cols = [x for x in df_cols if x not in (code_cols + value_cols)]
@@ -178,7 +184,7 @@ def apportion_sites(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df_sites = weights(df_sites)
 
     #  Merge codes to sites to create a Cartesian product
-    df_cart = df_sites.merge(df_codes, on=group_cols, how="inner")
+    df_cart = df_sites.merge(df_categories, on=group_cols, how="inner")
 
     # Apply weights
     for value_col in value_cols:

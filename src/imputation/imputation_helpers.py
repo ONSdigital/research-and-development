@@ -50,6 +50,7 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
     postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
 
     # Set initial values for the mask series as a column in the dataframe
+    df = df.copy()
     df["mask_col"] = False
     
     if "clear_status" in options:
@@ -279,11 +280,14 @@ def tidy_imputation_dataframe(
     to_drop = [
         col
         for col in df.columns
-        if (col.endswith("prev") | col.endswith("imputed") | col.endswith("link"))
+        if (
+            col.endswith("prev") | col.endswith("imputed") | col.endswith("link")
+            | col.endswith("sf_exp_grouping") | col.endswith("trim") 
+        )
     ]
 
     to_drop += ["200_original", "pg_sic_class", "empty_pgsic_group", "empty_pg_group"]
-    to_drop += ["200_imp_marker", "211_trim", "305_trim", "manual_trim"]
+    to_drop += ["200_imp_marker"]
     
     df = df.drop(columns=to_drop)
 
