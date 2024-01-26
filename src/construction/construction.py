@@ -86,9 +86,12 @@ def run_construction(
     # Run GB specific actions
     if not is_northern_ireland:
 
-        # Convert formtype to "0001" or "0006" (NI doesn't have a formtype until outputs)
+        # Convert formtype to "0001" or "0006"
+        # NI doesn't have a formtype until outputs
         if "formtype" in construction_df.columns:
-            construction_df["formtype"] = construction_df["formtype"].apply(convert_formtype)
+            construction_df["formtype"] = construction_df["formtype"].apply(
+                convert_formtype
+            )
 
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.columns:
@@ -183,15 +186,22 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     ].value_counts()
 
     # Create conversion df
-    short_to_long_df = updated_snapshot_df[updated_snapshot_df["reference"].isin(ref_count.index)]
+    short_to_long_df = updated_snapshot_df[
+        updated_snapshot_df["reference"].isin(ref_count.index)
+    ]
 
-    # For every short_to_long reference, this copies the instance 0 the relevant number of times,
+    # For every short_to_long reference,
+    # this copies the instance 0 the relevant number of times,
     # updating to the corresponding instance number
     for index, value in ref_count.items():
         for instance in range(1, value):
-            short_to_long_df_instance = short_to_long_df.loc[short_to_long_df["reference"] == index].copy()
+            short_to_long_df_instance = short_to_long_df.loc[
+                short_to_long_df["reference"] == index
+            ].copy()
             short_to_long_df_instance["instance"] = instance
-            updated_snapshot_df = pd.concat([updated_snapshot_df, short_to_long_df_instance])
+            updated_snapshot_df = pd.concat(
+                [updated_snapshot_df, short_to_long_df_instance]
+            )
 
     return updated_snapshot_df
 
@@ -200,7 +210,9 @@ def convert_formtype(formtype_value):
     if pd.notnull(formtype_value):
         if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
             return "0001"
-        elif formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006":
+        elif (
+            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
+        ):
             return "0006"
         else:
             return None
