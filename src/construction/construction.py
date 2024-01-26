@@ -175,25 +175,24 @@ def run_construction(
 
 def prepare_short_to_long(updated_snapshot_df, construction_df):
     """Create addional instances for short to long construction"""
-    # Check which references are going to converted to long forms
-    short_to_long_refs = construction_df.loc[
+
+    # Check which references are going to be converted to long forms
+    # and how many instances they have
+    ref_count = construction_df.loc[
         construction_df["short_to_long"] == True, "reference"
-    ].unique()
+    ].value_counts()
+
     # Create conversion df
-    short_to_long_df = updated_snapshot_df[
-        updated_snapshot_df["reference"].isin(short_to_long_refs)
-    ]
+    short_to_long_df = updated_snapshot_df[updated_snapshot_df["reference"].isin(ref_count.index)]
 
-    # Copy instance 0 record to create instance 1 and instance 2
-    short_to_long_df1 = short_to_long_df.copy()
-    short_to_long_df1["instance"] = 1
-    short_to_long_df2 = short_to_long_df.copy()
-    short_to_long_df2["instance"] = 2
+    # For every short_to_long reference, this copies the instance 0 the relevant number of times,
+    # updating to the corresponding instance number
+    for index, value in ref_count.items():
+        for instance in range(1, value):
+            short_to_long_df_instance = short_to_long_df.loc[short_to_long_df["reference"] == index].copy()
+            short_to_long_df_instance["instance"] = instance
+            updated_snapshot_df = pd.concat([updated_snapshot_df, short_to_long_df_instance])
 
-    # Add new instances to the updated snapshot df
-    updated_snapshot_df = pd.concat(
-        [updated_snapshot_df, short_to_long_df1, short_to_long_df2]
-    )
     return updated_snapshot_df
 
 
