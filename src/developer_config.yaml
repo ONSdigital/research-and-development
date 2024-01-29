@@ -155,6 +155,7 @@ imputation:
   upper_trim_perc: 15
   trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
   sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
   lf_target_vars:
     - "211"
     - "305"
