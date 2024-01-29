@@ -33,9 +33,6 @@ def set_short_form_percentages(df: pd.DataFrame) -> pd.DataFrame:
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        form_col (str): The name of the form column.
-        short_code (str): The code for short forms.
-        percent_col (str): The name of the percent column.
 
     Returns:
         pd.DataFrame: The DataFrame with updated percentages for short forms.
@@ -56,16 +53,12 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
 
     Args:
         df (pd.DataFrame): A dataframe containing all data
-        postcode_col (str): Name of the column containing postcodes
 
     Returns:
         (pd.DataFrame): A copy of original dataframe with an additional column
         called the same as code with suffix "_count" countaining the number of
         unique non-empty postcodes
     """
-    # remove a dodgy record (this should be done in validation)
-    df.loc[df[postcode_col] == "NONE    ", postcode_col] = ""
-
     dfa = df.copy()
 
     dfa = dfa[groupby_cols + [postcode_col]]
@@ -75,34 +68,6 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
     dfb = dfb.rename({postcode_col: postcode_col + "_count"}, axis="columns")
     df = df.merge(dfb, on=groupby_cols, how="left")
     return df
-
-# This is James' version, not sure why it's not working.
-# def count_unique_postcodes_in_col(
-#     df: pd.DataFrame, groupby_cols: List[str], postcode_col: str
-# ) -> pd.DataFrame:
-#     """Calculates the number of unique non-empty postcodes in a column.
-
-#     Args:
-#         df (pd.DataFrame): A dataframe containing all data
-#         postcode_col (str): Name of the column containing postcodes
-
-#     Returns:
-#         (pd.DataFrame): A copy of original dataframe with an additional column
-#         called the same as code with suffix "_count" countaining the number of
-#         unique non-empty postcodes
-#     """
-
-#     # Drop any NaNs or blanks
-#     df = df.dropna(subset=[postcode_col])
-
-#     # Create a column '601_count' counting the unique postcodes
-#     df["601_count"] = (
-#         df.groupby(groupby_cols)[postcode_col]
-#         .transform("nunique")
-#         .astype("Int64")
-#     )
-
-#     return df
 
 
 def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -115,14 +80,14 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
-    # Condition of long forms, many sites, instance >=1, non-null postcodes
+    # Condition of long forms, many sites, instance >=1
     cond = (
         (df[form_col] == long_code)
         & (df[postcode_col + "_count"] > 1)
         & (df[instance_col] >= 1)
     )
 
-    # Dataframe many_sites_df with many products - for apportionment and Cartesian product
+    # Dataframe many_sites_df with many products - for apportionment 
     many_sites_df = df.copy()[cond]
     many_sites_df = many_sites_df.drop(columns=[postcode_col + "_count"], axis=1)
 
@@ -133,13 +98,13 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     return many_sites_df, df_out
 
 
-def create_category_df(df: pd.DataFrame, value_cols) -> pd.DataFrame:
+def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     """
     Creates a DataFrame with codes and numerical values.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        config (Dict): The pipeline configuration setttings.
+        value_cols (List[str]): List of columns containing numeric values.
 
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
@@ -247,7 +212,7 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
 
 
 def create_cartesian_product(
-    df_sites: pd.DataFrame, df_prod_class: pd.DataFrame
+    sites_df: pd.DataFrame, category_df: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Creates a 'Cartesian product' of product classifications and sites.
@@ -256,8 +221,8 @@ def create_cartesian_product(
         product group (alpha) and product group (numeric)
 
     Args:
-        df_sites (pd.DataFrame): The DataFrame with sites.
-        df_prod_class (pd.DataFrame): The DataFrame with with the unique combination
+        sites_df (pd.DataFrame): The DataFrame with sites.
+        category_df (pd.DataFrame): The DataFrame with with the unique combination
             of civ/def, product group (alpha) and product group (numeric)
         group_cols (List[str]): The columns to group by.
 
@@ -267,31 +232,31 @@ def create_cartesian_product(
     Example:
         Suppose we have the following DataFrames:
 
-        df_sites:
-            site  ref
-            A     1
-            B     1
-            C     2
+        sites_df:
+            ref     site
+            1       A 
+            1       B 
+            2       C 
 
-        df_prod_class:
-            prod_class  ref
-            X           1
-            Y           1
-            Z           2
+        category_df:
+            ref     prod_class 
+            1       X  
+            1       Y  
+            2       Z         
 
-        And we call `create_cartesian_product(df_sites, df_prod_class)`.
+        And we call `create_cartesian_product(sites_df, category_df)`.
 
         The resulting DataFrame would be:
 
-            site  ref    prod_class
-            A     1      X
-            A     1      Y
-            B     1      X
-            B     1      Y
-            C     2      Z
+            ref     site    prod_class
+            1       A       X
+            1       A       Y
+            1       B       X
+            1       B       Y
+            2       C       Z
     """
     # Create a Cartesian product of product groups and sites
-    df_cart = df_sites.merge(df_prod_class, on=["reference", "period"], how="inner")
+    df_cart = sites_df.merge(category_df, on=["reference", "period"], how="inner")
 
     return df_cart
 
