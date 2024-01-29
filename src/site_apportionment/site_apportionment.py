@@ -89,13 +89,16 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
 
     # Dataframe many_sites_df with many products - for apportionment 
     many_sites_df = df.copy()[cond]
-    many_sites_df = many_sites_df.drop(columns=[postcode_col + "_count"], axis=1)
 
     # Dataframe with everything else - save unchanged
     df_out = df.copy()[~cond]
-    df_out = df_out.drop(columns=[postcode_col + "_count"], axis=1)
 
     return many_sites_df, df_out
+
+
+def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
+    """Return a mask for string values in column col that are not null."""
+    return df[col].str.len() > 0
 
 
 def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
@@ -109,18 +112,15 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
     """
+    # ensure all three elements of the codes are notnull
+    valid_code_cond = (
+        create_notnull_mask(df, product_col) 
+        & create_notnull_mask(df, civdef_col) 
+        & (df.loc[df[pg_num_col] > 0])
+    )   
+
     # Make the dataframe with columns of codes and numerical values
-    category_df = df.copy()[groupby_cols + code_cols + value_cols]
-
-    #TODO: update to the following: 
-    # # ensure all three elements of the codes are notnull
-    # valid_code_cond = (
-    #     ~df[product_col].isnull() & ~df[civdef_col].isnull() & ~df[pg_num_col].isnull()
-    # )
-    # category_df = category_df.loc[valid_code_cond]
-
-    # Remove blank products
-    category_df = category_df[category_df[product_col].str.len() > 0]
+    category_df = df.copy().loc[valid_code_cond][groupby_cols + code_cols + value_cols]
 
     # De-duplicate by summation - possibly, not needed
     category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
