@@ -2,6 +2,7 @@ import logging
 
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
+import numpy as np
 
 import src.outlier_detection.auto_outliers as auto
 from src.outlier_detection.outlier_main import run_outliers
@@ -277,7 +278,7 @@ class TestOneValueOutlier:
 
         data = [
             [1, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1],
-            [2, 0, "P", "0001", "210", 2020, 10, 1.2, 1.1],
+            [2, 0, "P", "0001", "210", 2020, 10, 1.2, 4.1],
             [3, 0, "P", "0001", "210", 2020, 10, 1.3, 1.1],
             [4, 0, "P", "0001", "210", 2020, 10, 1.4, 1.1],
             [5, 0, "P", "0001", "210", 2020, 10, 1.5, 1.1],
@@ -285,21 +286,7 @@ class TestOneValueOutlier:
             [7, 0, "P", "0001", "210", 2020, 10, 1.7, 1.1],
             [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
             [9, 0, "P", "0001", "210", 2020, 10, 1.9, 1.1],
-            [10, 0, "P", "0001", "210", 2020, 10, 2.0, 1.1],
-            [11, 0, "P", "0001", "210", 2020, 20, 2.1, 1.1],
-            [12, 0, "P", "0001", "210", 2020, 20, 2.2, 1.1],
-            [13, 0, "P", "0001", "210", 2020, 20, 2.3, 1.1],
-            [14, 0, "P", "0001", "210", 2020, 20, 2.4, 1.1],
-            [15, 0, "P", "0001", "210", 2020, 20, 2.5, 1.1],
-            [16, 0, "P", "0001", "210", 2020, 20, 2.6, 1.1],
-            [17, 0, "P", "0001", "210", 2020, 20, 2.7, 1.1],
-            [18, 0, "P", "0001", "210", 2020, 20, 2.8, 1.1],
-            [19, 0, "P", "0001", "210", 2020, 20, 2.9, 1.1],
-            [20, 0, "P", "0001", "210", 2020, 20, 3.0, 1.1],
-            [21, 0, "P", "0001", "210", 2020, 20, 0.0, 1.1],
-            [22, 0, "P", "0001", "210", 2020, 20, 0.0, 1.1],
-            [23, 0, "C", "0001", "210", 2020, 20, 4.0, 1.1],
-            [24, 0, "P", "0001", "999", 2020, 20, 5.0, 1.1],
+            [10, 0, "P", "0001", "210", 2020, 10, 4.1, 1.1]
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -319,34 +306,20 @@ class TestOneValueOutlier:
             "702",
             'auto_outlier',
             'manual_outlier',
-            'outlier',
+            'outlier'
         ]
 
         data = [
-            [1, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, False, False, False],
-            [2, 0, "P", "0001", "210", 2020, 10, 1.2, 1.1, False, False, False],
-            [3, 0, "P", "0001", "210", 2020, 10, 1.3, 1.1, False, False, False],
-            [4, 0, "P", "0001", "210", 2020, 10, 1.4, 1.1, False, False, False],
-            [5, 0, "P", "0001", "210", 2020, 10, 1.5, 1.1, False, False, False],
-            [6, 0, "P", "0001", "210", 2020, 10, 1.6, 1.1, False, False, False],
-            [7, 0, "P", "0001", "210", 2020, 10, 1.7, 1.1, False, False, False],
-            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, False, False],
-            [9, 0, "P", "0001", "210", 2020, 10, 1.9, 1.1, False, False, False],
-            [10, 0, "P", "0001", "210", 2020, 10, 2.0, 1.1, True, True, False],
-            [11, 0, "P", "0001", "210", 2020, 20, 2.1, 1.1, False, False, False],
-            [12, 0, "P", "0001", "210", 2020, 20, 2.2, 1.1, False, False, False],
-            [13, 0, "P", "0001", "210", 2020, 20, 2.3, 1.1, False, False, False],
-            [14, 0, "P", "0001", "210", 2020, 20, 2.4, 1.1, False, False, False],
-            [15, 0, "P", "0001", "210", 2020, 20, 2.5, 1.1, False, False, False],
-            [16, 0, "P", "0001", "210", 2020, 20, 2.6, 1.1, False, False, False],
-            [17, 0, "P", "0001", "210", 2020, 20, 2.7, 1.1, False, False, False],
-            [18, 0, "P", "0001", "210", 2020, 20, 2.8, 1.1, False, False, False],
-            [19, 0, "P", "0001", "210", 2020, 20, 2.9, 1.1, False, False, False],
-            [20, 0, "P", "0001", "210", 2020, 20, 3.0, 1.1, True, True, False],
-            [21, 0, "P", "0001", "210", 2020, 20, 0.0, 1.1, False, False, False],
-            [22, 0, "P", "0001", "210", 2020, 20, 0.0, 1.1, True, True, False],
-            [23, 0, "C", "0001", "210", 2020, 20, 4.0, 1.1, False, False, False],
-            [24, 0, "P", "0001", "999", 2020, 20, 5.0, 1.1, False, False, False],
+            [1, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, False, np.nan, False],
+            [2, 0, "P", "0001", "210", 2020, 10, 1.2, 4.1, True, np.nan, True],
+            [3, 0, "P", "0001", "210", 2020, 10, 1.3, 1.1, False, np.nan, False],
+            [4, 0, "P", "0001", "210", 2020, 10, 1.4, 1.1, False, np.nan, False],
+            [5, 0, "P", "0001", "210", 2020, 10, 1.5, 1.1, False, np.nan, False],
+            [6, 0, "P", "0001", "210", 2020, 10, 1.6, 1.1, False, np.nan, False],
+            [7, 0, "P", "0001", "210", 2020, 10, 1.7, 1.1, False, np.nan, False],
+            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [9, 0, "P", "0001", "210", 2020, 10, 1.9, 1.1, False, np.nan, False],
+            [10, 0, "P", "0001", "210", 2020, 10, 4.1, 1.1, True, np.nan, True]
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
@@ -359,8 +332,104 @@ class TestOneValueOutlier:
                              "output_auto_outliers": False,
                              "output_outlier_qa": False,
                              "load_manual_outliers": False},
-                  "outliers": {"upper_clip": 0.1,
-                               "lower_clip": 0,
+                  "outliers": {"upper_clip": 0.05,
+                               "lower_clip": 0.0,
+                               "flag_cols": ["701", "702"]},
+                  "network_paths": {"network_paths": "None",
+                                    "outliers_path": "None"}
+                  }
+
+        return config
+
+    def test_run_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+        config = self.generate_config()
+
+        result_df = run_outliers(input_df, None, config, None, None)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+
+class TestNoOutlier:
+    """Unit tests for run_auto_flagging function."""
+    """Test case:
+    no outliers contained in dataframe"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "formtype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "702"
+        ]
+
+        data = [
+            [1, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [2, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [3, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [4, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [5, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [6, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [7, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [9, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
+            [10, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1]
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "formtype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "702",
+            'auto_outlier',
+            'manual_outlier',
+            'outlier'
+        ]
+
+        data = [
+            [1, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [2, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [3, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [4, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [5, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [6, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [7, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [9, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
+            [10, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False]
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    # Get the config
+    def generate_config(val):
+        """Generate a dummy config file"""
+        config = {"global": {"network_or_hdfs": "network",
+                             "output_auto_outliers": False,
+                             "output_outlier_qa": False,
+                             "load_manual_outliers": False},
+                  "outliers": {"upper_clip": 0.05,
+                               "lower_clip": 0.0,
                                "flag_cols": ["701", "702"]},
                   "network_paths": {"network_paths": "None",
                                     "outliers_path": "None"}
