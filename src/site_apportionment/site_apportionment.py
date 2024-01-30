@@ -81,17 +81,28 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
     # Condition of long forms, many sites, instance >=1
-    cond = (
+    multi_cond = (
         (df[form_col] == long_code)
         & (df[postcode_col + "_count"] > 1)
         & (df[instance_col] >= 1)
     )
 
     # Dataframe many_sites_df with many products - for apportionment 
-    many_sites_df = df.copy()[cond]
+    many_sites_df = df.copy()[multi_cond]
 
     # Dataframe with everything else - save unchanged
-    df_out = df.copy()[~cond]
+    df_out = df.copy()[~multi_cond]
+
+    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
+    single_cond =  (
+        (df[form_col] == long_code)
+        & (df[postcode_col + "_count"] == 1)
+        & (df[instance_col] >= 1)
+        & create_notnull_mask(df, postcode_col)
+    )
+
+    # ensure that for long-form references with one postcode, the percentage is 100%
+    df_out.loc[single_cond, percent_col] = 100
 
     return many_sites_df, df_out
 
@@ -116,7 +127,6 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     valid_code_cond = (
         create_notnull_mask(df, product_col) 
         & create_notnull_mask(df, civdef_col) 
-        & (df.loc[df[pg_num_col] > 0])
     )   
 
     # Make the dataframe with columns of codes and numerical values
@@ -354,7 +364,7 @@ def run_apportion_sites(
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
 
-    # Split the dataframe into two based on whether there's more than one site (postcode)
+    # Split the dataframe in two based on whether there's more than one site (postcode)
     multiple_sites_df, df_out = split_many_sites_df(df)
 
     # category_df: dataframe with codes and numerical values

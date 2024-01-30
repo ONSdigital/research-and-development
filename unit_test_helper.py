@@ -4,7 +4,7 @@ import os
 
 # configuration settings
 csv_path = "D:/coding_projects/randd_test_data/"
-input_file = "outlier_test1.csv"
+input_file = "test.csv"
 
 # whether the unit test data is input or expected output
 in_or_output = "input"
@@ -20,7 +20,7 @@ df1 = pd.read_csv(path1)
 df1 = df1.astype(str)
 
 # add quotes to the strings in the columns that should show as string types
-string_cols = ["period"]
+string_cols = [] # ["period"]
 
 df1[string_cols] = df1[string_cols].applymap('"{}"'.format)
 
