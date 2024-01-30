@@ -243,27 +243,24 @@ def create_cartesian_product(
         Suppose we have the following DataFrames:
 
         sites_df:
-            ref     site
-            1       A 
-            1       B 
-            2       C 
+            ref     instance    site
+            1       1           A 
+            1       2           B 
 
         category_df:
             ref     prod_class 
             1       X  
             1       Y  
-            2       Z         
 
         And we call `create_cartesian_product(sites_df, category_df)`.
 
         The resulting DataFrame would be:
 
-            ref     site    prod_class
-            1       A       X
-            1       A       Y
-            1       B       X
-            1       B       Y
-            2       C       Z
+            ref    instance site    prod_class
+            1      1        A       X
+            1      1        A       Y
+            1      2        B       X
+            1      2        B       Y
     """
     # Create a Cartesian product of product groups and sites
     df_cart = sites_df.merge(category_df, on=["reference", "period"], how="inner")
@@ -285,10 +282,6 @@ def weight_values(
     Returns:
         pd.DataFrame: The DataFrame with the weighted columns.
     """
-
-    # George's original code:
-    # for value_col in value_cols:
-    #     df_cart[value_col] = df_cart[value_col] * df_cart["site_weight"]
 
     df[value_cols] = df[value_cols].multiply(df[weight_col], axis=0)
     return df
@@ -383,6 +376,24 @@ def run_apportion_sites(
 
     # Apply weights
     df_cart = weight_values(df_cart, value_cols, "site_weight")
+
+    # Restore the original order of columns
+    #debug begin
+    cart_cols = list(df_cart.columns)
+    OL = len(orig_cols)
+    CL = len(cart_cols) 
+    if CL == OL:
+        print(f"Lenghts are the same, {OL}")
+        same_titles = [orig_cols[x]==cart_cols[x] for x in range(OL)]
+        if min(same_titles) == 1:
+            print("column names are the same")
+        else:
+            print(f"Different column names, [{same_titles}]")
+    else:
+        print(f"Lengths are different, orig={OL}, cart={CL}")
+    # debug end
+
+    df_cart = df_cart[orig_cols]
 
     # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)
