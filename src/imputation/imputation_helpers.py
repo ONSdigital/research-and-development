@@ -4,8 +4,6 @@ import pandas as pd
 from typing import List, Dict, Callable
 from itertools import chain
 
-from src.outputs.status_filtered import output_status_filtered
-
 ImputationHelpersLogger = logging.getLogger(__name__)
 
 
@@ -291,26 +289,4 @@ def tidy_imputation_dataframe(
     
     df = df.drop(columns=to_drop)
 
-    # Keep only imputed records and clear ("R")
-    imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
-    to_keep = df["imp_marker"].isin(imp_markers_to_keep) | (df["imp_marker"] == "R")
-
-    to_keep_df = df.copy().loc[to_keep]
-    filtered_output_df = df.copy().loc[~to_keep]
-
-    # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
-    to_keep_df.loc[condition, "status"] = "imputed"
-
-    # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        logger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        logger.info("Finished status filtered output.")
-
-    return to_keep_df
+    return df

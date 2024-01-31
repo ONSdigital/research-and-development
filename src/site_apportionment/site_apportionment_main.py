@@ -39,7 +39,7 @@ def run_site_apportionment(
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
         SitesMainLogger.info("Starting apportionment to sites...")
-        df_out = sap.run_apportion_sites(df, config)
+        df_out = sap.run_apportion_sites(df, config, write_csv, run_id)
 
         # Output QA files
         if config["global"]["output_apportionment_qa"] & output_file:

@@ -1,9 +1,10 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-from typing import Tuple, List, Dict, Union
+from typing import Tuple, List, Dict, Callable, Union
 import logging
 
 from src.imputation.imputation_helpers import get_imputation_cols
+from src.outputs.status_filtered import output_status_filtered
 
 SitesApportionmentLogger = logging.getLogger(__name__)
 
@@ -132,8 +133,15 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
         & create_notnull_mask(df, civdef_col) 
     )   
 
+    # ensure that rows for the category_df are not "no mean found" or "no imputation"
+    imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
+    to_keep_cond = df["imp_marker"].isin(imp_markers_to_keep)
+
+    # condition for inclusion in the cateogry df
+    condition = valid_code_cond & to_keep_cond
+
     # Make the dataframe with columns of codes and numerical values
-    category_df = df.copy().loc[valid_code_cond][groupby_cols + code_cols + value_cols]
+    category_df = df.copy().loc[condition][groupby_cols + code_cols + value_cols]
 
     # De-duplicate by summation - possibly, not needed
     category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
@@ -319,8 +327,44 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
     return sorted_df
 
 
+def tidy_apportionment_dataframe(
+    df: pd.DataFrame,
+    config: Dict,
+    write_csv: Callable,
+    run_id: int,
+) -> pd.DataFrame:
+    """Remove rows and columns not needed after apportionment."""
+
+    # Keep only imputed, constructed and clear records ("R")
+    imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
+    to_keep = df["imp_marker"].isin(imp_markers_to_keep)
+
+    to_keep_df = df.copy().loc[to_keep]
+    filtered_output_df = df.copy().loc[~to_keep]
+
+    # change the value of the status column to 'imputed' for imputed statuses
+    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
+    to_keep_df.loc[condition, "status"] = "imputed"
+
+    # Running status filtered full dataframe output for QA
+    if config["global"]["output_status_filtered"]:
+        SitesApportionmentLogger.info("Starting status filtered output...")
+        output_status_filtered(
+            filtered_output_df,
+            config,
+            write_csv,
+            run_id,
+        )
+        SitesApportionmentLogger.info("Finished status filtered output.")
+
+    return to_keep_df
+
+
 def run_apportion_sites(
-    df: pd.DataFrame, config: Dict[str, Union[str, List[str]]]
+    df: pd.DataFrame, 
+    config: Dict[str, Union[str, List[str]]],
+    write_csv: Callable,
+    run_id: int,
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -402,7 +446,8 @@ def run_apportion_sites(
     df_out = df_out.append(df_cart, ignore_index=True)
 
     # Sort by period, ref, instance in ascending order.
-
     df_out = sort_rows_order_cols(df_out, orig_cols)
+
+    df_out = tidy_apportionment_dataframe(df_out, config, write_csv, run_id)
 
     return df_out
