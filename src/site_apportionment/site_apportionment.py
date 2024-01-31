@@ -425,21 +425,6 @@ def run_apportion_sites(
     df_cart = weight_values(df_cart, value_cols, "site_weight")
 
     # Restore the original order of columns
-    #debug begin
-    cart_cols = list(df_cart.columns)
-    OL = len(orig_cols)
-    CL = len(cart_cols) 
-    if CL == OL:
-        print(f"Lenghts are the same, {OL}")
-        same_titles = [orig_cols[x]==cart_cols[x] for x in range(OL)]
-        if min(same_titles) == 1:
-            print("column names are the same")
-        else:
-            print(f"Different column names, [{same_titles}]")
-    else:
-        print(f"Lengths are different, orig={OL}, cart={CL}")
-    # debug end
-
     df_cart = df_cart[orig_cols]
 
     # Append the apportionned data back to the remaining unchanged data
