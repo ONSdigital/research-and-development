@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 
 import src.site_apportionment.site_apportionment as sap
+from src.site_apportionment.status_filtered import remove_unwanted_records
 
 SitesMainLogger = logging.getLogger(__name__)
 
@@ -49,8 +50,13 @@ def run_site_apportionment(
             write_csv(f"{imp_path}/apportionment_qa/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")
+
+        # Remove records not needed after site apportionment
+        df_out = remove_unwanted_records(df_out, config, write_csv, run_id)
         return df_out
 
     else:
         SitesMainLogger.info("Apportionment to sites disabled, skipped")
+        # Remove records not needed after site apportionment
+        out = remove_unwanted_records(df, config, write_csv, run_id)
         return df

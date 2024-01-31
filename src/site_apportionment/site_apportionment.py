@@ -20,6 +20,7 @@ civdef_col: str = "200"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
+imp_qa_cols = ["imp_marker", "imp_class"]
 
 # Long and short form codes
 short_code: str = "0006"
@@ -132,8 +133,17 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
         & create_notnull_mask(df, civdef_col) 
     )   
 
+    # exclude imp_markers "no mean found" and "no imputation", and keep the required
+    imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
+    to_keep_cond = df["imp_marker"].isin(imp_markers_to_keep)
+
+    # the condition for filtering the category_df
+    condition = valid_code_cond & to_keep_cond
+
     # Make the dataframe with columns of codes and numerical values
-    category_df = df.copy().loc[valid_code_cond][groupby_cols + code_cols + value_cols]
+    category_df = df.copy().loc[condition]
+    
+    category_df = category_df[groupby_cols + code_cols + value_cols + imp_qa_cols]
 
     # De-duplicate by summation - possibly, not needed
     category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
@@ -320,7 +330,8 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
 
 def run_apportion_sites(
-    df: pd.DataFrame, config: Dict[str, Union[str, List[str]]]
+    df: pd.DataFrame, 
+    config: Dict[str, Union[str, List[str]]],
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -382,7 +393,8 @@ def run_apportion_sites(
 
     # Restore the original order of columns
     df_cart = df_cart[orig_cols]
-
+    df_out = df_out[orig_cols] 
+    
     # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)
 
