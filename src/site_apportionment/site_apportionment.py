@@ -70,9 +70,12 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Splits the DataFrame into two based on certain conditions.
+    Split dataframe into two based on whether there are sites or not.
+
+    All records that include postcodes in the postcode_col are used for site 
+    apportionment, and all orther records are included in a second dataframe.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -80,19 +83,6 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
-    # Condition of long forms, many sites, instance >=1
-    multi_cond = (
-        (df[form_col] == long_code)
-        & (df[postcode_col + "_count"] > 1)
-        & (df[instance_col] >= 1)
-    )
-
-    # Dataframe many_sites_df with many products - for apportionment 
-    many_sites_df = df.copy()[multi_cond]
-
-    # Dataframe with everything else - save unchanged
-    df_out = df.copy()[~multi_cond]
-
     # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
     single_cond =  (
         (df[form_col] == long_code)
@@ -102,9 +92,22 @@ def split_many_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     )
 
     # ensure that for long-form references with one postcode, the percentage is 100%
-    df_out.loc[single_cond, percent_col] = 100
+    df.loc[single_cond, percent_col] = 100
 
-    return many_sites_df, df_out
+    # Condition for records to apportion: long forms, at least one site, instance >=1
+    to_apportion_cond = (
+        (df[form_col] == long_code)
+        & (df[postcode_col + "_count"] >= 1)
+        & (df[instance_col] >= 1)
+    )
+
+    # Dataframe to_apportion_df with many products - for apportionment 
+    to_apportion_df = df.copy()[to_apportion_cond]
+
+    # Dataframe with everything else - save unchanged
+    df_out = df.copy()[~to_apportion_cond]
+
+    return to_apportion_df, df_out
 
 
 def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
@@ -358,7 +361,7 @@ def run_apportion_sites(
     df = count_unique_postcodes_in_col(df)
 
     # Split the dataframe in two based on whether there's more than one site (postcode)
-    multiple_sites_df, df_out = split_many_sites_df(df)
+    multiple_sites_df, df_out = split_sites_df(df)
 
     # category_df: dataframe with codes and numerical values
     category_df = create_category_df(multiple_sites_df, value_cols)
