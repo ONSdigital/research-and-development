@@ -142,9 +142,9 @@ def create_cora_status_col(df, main_col="statusencoded"):
     # so it only deals with rows with a value in the main col
     if "form_status" not in df.columns:
         df["form_status"] = None
-    df.loc[df["form_status"].isnull(), "form_status"] = (
-        df.loc[df["form_status"].isnull(), main_col].map(cora_dict)
-    )
+    df.loc[df["form_status"].isnull(), "form_status"] = df.loc[
+        df["form_status"].isnull(), main_col
+    ].map(cora_dict)
 
     return df
 
