@@ -150,7 +150,7 @@ def create_category_df(df: pd.DataFrame) -> pd.DataFrame:
     return category_df
 
 
-def count_duplicate_categories(cat_df: pd.DataFrame) -> pd.DataFrame:
+def count_duplicate_categories(cat_df: pd.DataFrame):
     """Counts the number of duplicate codes per reference in the DataFrame.
 
     Args:
@@ -173,9 +173,6 @@ def count_duplicate_categories(cat_df: pd.DataFrame) -> pd.DataFrame:
             f"There are {num_duplicate_cats} duplicate categories."
         )
         print(df_duplicate_cats[groupby_cols + code_cols + ["cat_count"]])
-
-    # De-duplicate by summation - possibly, not needed
-    category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
 
 
 def create_sites_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -398,11 +395,14 @@ def run_apportion_sites(
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
 
-    # Split the dataframe in two based on whether there's more than one site (postcode)
+    # Split the dataframe in two based on whether apportionment is needed
     to_apportion_df, df_out = split_sites_df(df)
 
-    # category_df: dataframe with codes and numerical values
+    # category_df: dataframe with codes and all columns except postcode
     category_df = create_category_df(to_apportion_df)
+
+    # Check for category duplicates for QA
+    count_duplicate_sites(category_df)
 
     sites_df = create_sites_df(to_apportion_df)
 
