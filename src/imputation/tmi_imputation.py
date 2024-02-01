@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
 
-from src.imputation.imputation_helpers import create_mask
 from src.imputation.impute_civ_def import impute_civil_defence
 from src.imputation import expansion_imputation as ximp
 
@@ -88,9 +87,11 @@ def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     Returns:
         pd.DataFrame: The same dataframe with required nulls filled with zeros.
     """
-    conditions_list = ["instance_nonzero", "clear_status", "excl_postcode_only"]
-
-    zerofill_mask = create_mask(df, conditions_list)
+    zerofill_mask = (
+        (df["instance"] != 0) &
+        (df["status"].isin(["Clear", "Clear - overridden"])) &
+        (df["211"].isnull() & ~df["601"].isnull())
+    )
 
     for var in target_variables:
         df.loc[zerofill_mask, var] = df.loc[zerofill_mask, var].fillna(0)
