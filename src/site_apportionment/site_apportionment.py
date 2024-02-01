@@ -162,8 +162,8 @@ def count_duplicate_categories(cat_df: pd.DataFrame):
         int: The number of duplicate sites.
     """
     cat_count_df = cat_df.copy()
-    cat_count_df["cat_count"] = cat_count_df.groupby(groupby_cols + [postcode_col])[
-        postcode_col
+    cat_count_df["cat_count"] = cat_count_df.groupby(groupby_cols + code_cols)[
+        "imp_marker"
     ].transform("count")
     df_duplicate_cats = cat_count_df[cat_count_df["cat_count"] > 1]
     num_duplicate_cats = df_duplicate_cats.shape[0]
@@ -402,7 +402,8 @@ def run_apportion_sites(
     category_df = create_category_df(to_apportion_df)
 
     # Check for category duplicates for QA
-    count_duplicate_sites(category_df)
+    #TODO THIS IS WIP
+    # count_duplicate_categories(category_df)
 
     sites_df = create_sites_df(to_apportion_df)
 
