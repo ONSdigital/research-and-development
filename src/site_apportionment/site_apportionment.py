@@ -98,16 +98,10 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
 
     # Condition for records to apportion: long forms, at least one site, instance >=1
     # and include only the clear and imputed statuses
-
-    status_cond = (
-        df.status.isin(["Clear", "Clear - overridden", "Form sent out", "Check needed"])
-    )
-
     to_apportion_cond = (
         (df[form_col] == long_code)
         & (df[postcode_col + "_count"] >= 1)
         & (df[instance_col] >= 1)
-        & status_cond
     )
 
     # Dataframe to_apportion_df with many products - for apportionment 
@@ -153,10 +147,35 @@ def create_category_df(df: pd.DataFrame) -> pd.DataFrame:
     # Include all columns except the site columns (postcode and percentage, also inst)
     category_df = category_df[[col for col in df.columns if col not in sites_cols]]
 
+    return category_df
+
+
+def count_duplicate_categories(cat_df: pd.DataFrame) -> pd.DataFrame:
+    """Counts the number of duplicate codes per reference in the DataFrame.
+
+    Args:
+        cat_df (pd.DataFrame): The input DataFrame.
+        group_cols (List[str]): The list of group columns.
+        postcode_col (str): The name of the postcode column.
+
+    Returns:
+        int: The number of duplicate sites.
+    """
+    cat_count_df = cat_df.copy()
+    cat_count_df["cat_count"] = cat_count_df.groupby(groupby_cols + [postcode_col])[
+        postcode_col
+    ].transform("count")
+    df_duplicate_cats = cat_count_df[cat_count_df["cat_count"] > 1]
+    num_duplicate_cats = df_duplicate_cats.shape[0]
+
+    if num_duplicate_cats:
+        SitesApportionmentLogger.info(
+            f"There are {num_duplicate_cats} duplicate categories."
+        )
+        print(df_duplicate_cats[groupby_cols + code_cols + ["cat_count"]])
+
     # De-duplicate by summation - possibly, not needed
     category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
-
-    return category_df
 
 
 def create_sites_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -171,6 +190,7 @@ def create_sites_df(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with postcodes, percents, and everything else.
     """
+
     sites_df = df.copy()[groupby_cols + sites_cols]
 
     # Remove instances that have no postcodes
