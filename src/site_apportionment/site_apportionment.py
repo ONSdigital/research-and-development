@@ -13,7 +13,7 @@ ref_col: str = "reference"
 instance_col: str = "instance"
 period_col: str = "period"
 form_col: str = "formtype"
-postcode_col: str = "601"  
+postcode_col: str = "601"
 percent_col: str = "602"
 product_col: str = "201"
 pg_num_col: str = "pg_numeric"
@@ -28,25 +28,43 @@ short_code: str = "0006"
 long_code: str = "0001"
 
 
-def set_short_form_percentages(df: pd.DataFrame) -> pd.DataFrame:
+def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Sets the percent column to 100 for short form records.
-    If the percent column for short forms is not blank, raises an error.
+    Sets the percent column to 100 for the following forms:
+    - short form records
+    - long forms, exactly 1 site, instance >=1 and notnull postcode
 
     Args:
         df (pd.DataFrame): The input DataFrame.
 
     Returns:
-        pd.DataFrame: The DataFrame with updated percentages for short forms.
+        pd.DataFrame: The DataFrame with updated percentages.
 
     Raises:
         ValueError: If the percent column for short forms is not blank.
     """
+    # If the percent column for short forms is not blank, raise an error.
     short_forms = df[df[form_col] == short_code]
     if not short_forms[percent_col].isna().all():
         raise ValueError("Percent column for short forms should be blank.")
-
     df.loc[df[form_col] == short_code, percent_col] = 100
+
+    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
+    single_cond =  (
+        (df[form_col] == long_code)
+        & (df[postcode_col + "_count"] == 1)
+        & (df[instance_col] >= 1)
+        & create_notnull_mask(df, postcode_col)
+    )
+    df.loc[single_cond, percent_col] = 100
+
+    # Condition for long forms with status = "Form sent out"
+    sent_out_condition = (
+        (df[form_col] == long_code)
+        & (df[status_col] == "Form sent out")
+    )
+    df.loc[sent_out_condition, postcode_col] = df.loc[sent_out_condition, "postcodes_harmonised"]
+    df.loc[sent_out_condition, percent_col] = 100
     return df
 
 
@@ -76,7 +94,7 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split dataframe into two based on whether there are sites or not.
 
-    All records that include postcodes in the postcode_col are used for site 
+    All records that include postcodes in the postcode_col are used for site
     apportionment, and all orther records are included in a second dataframe.
 
     Args:
@@ -85,17 +103,6 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
-    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
-    single_cond =  (
-        (df[form_col] == long_code)
-        & (df[postcode_col + "_count"] == 1)
-        & (df[instance_col] >= 1)
-        & create_notnull_mask(df, postcode_col)
-    )
-
-    # ensure that for long-form references with one postcode, the percentage is 100%
-    df.loc[single_cond, percent_col] = 100
-
     # Condition for records to apportion: long forms, at least one site, instance >=1
     # and include only the clear and imputed statuses
     to_apportion_cond = (
@@ -104,7 +111,7 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         & (df[instance_col] >= 1)
     )
 
-    # Dataframe to_apportion_df with many products - for apportionment 
+    # Dataframe to_apportion_df with many products - for apportionment
     to_apportion_df = df.copy()[to_apportion_cond]
 
     # Dataframe with everything else - save unchanged
@@ -130,9 +137,9 @@ def create_category_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     # ensure all three elements of the codes are notnull
     valid_code_cond = (
-        create_notnull_mask(df, product_col) 
-        & create_notnull_mask(df, civdef_col) 
-    )   
+        create_notnull_mask(df, product_col)
+        & create_notnull_mask(df, civdef_col)
+    )
 
     # exclude imp_markers "no mean found" and "no imputation", and keep the required
     imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
@@ -143,7 +150,7 @@ def create_category_df(df: pd.DataFrame) -> pd.DataFrame:
 
     # Make the dataframe with columns of codes and numerical values
     category_df = df.copy().loc[condition]
-    
+
     # Include all columns except the site columns (postcode and percentage, also inst)
     category_df = category_df[[col for col in df.columns if col not in sites_cols]]
 
@@ -279,13 +286,13 @@ def create_cartesian_product(
 
         sites_df:
             ref     instance    site
-            1       1           A 
-            1       2           B 
+            1       1           A
+            1       2           B
 
         category_df:
-            ref     prod_class 
-            1       X  
-            1       Y  
+            ref     prod_class
+            1       X
+            1       Y
 
         And we call `create_cartesian_product(sites_df, category_df)`.
 
@@ -352,7 +359,7 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
 
 def run_apportion_sites(
-    df: pd.DataFrame, 
+    df: pd.DataFrame,
     config: Dict[str, Union[str, List[str]]],
     write_csv: Callable,
     run_id: int,
@@ -389,11 +396,11 @@ def run_apportion_sites(
     # These are the same as the columns we impute so we use a function from imputation.
     value_cols: List[str] = get_imputation_cols(config)
 
-    # Set short form percentages to 100
-    df = set_short_form_percentages(df)
-
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
+
+    # Set short form percentages to 100
+    df = set_percentages(df)
 
     # Split the dataframe in two based on whether apportionment is needed
     to_apportion_df, df_out = split_sites_df(df)
@@ -421,11 +428,11 @@ def run_apportion_sites(
 
     # Restore the original order of columns
     df_cart = df_cart[orig_cols]
-    df_out = df_out[orig_cols] 
+    df_out = df_out[orig_cols]
 
     # Remove the unwanted imp_markers, "no mean found" and "no imputation"
     df_out = remove_unwanted_records(df_out, config, write_csv, run_id)
-    
+
     # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)
 
