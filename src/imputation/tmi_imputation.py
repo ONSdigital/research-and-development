@@ -88,9 +88,11 @@ def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     Returns:
         pd.DataFrame: The same dataframe with required nulls filled with zeros.
     """
-    conditions_list = ["instance_nonzero", "clear_status", "excl_postcode_only"]
-
-    zerofill_mask = create_mask(df, conditions_list)
+    zerofill_mask = (
+        create_mask(df, "instance_nonzero") &
+        create_mask(df, "clear_status") & 
+        create_mask(df, "excl_postcode_only")
+    )
 
     for var in target_variables:
         df.loc[zerofill_mask, var] = df.loc[zerofill_mask, var].fillna(0)

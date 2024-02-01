@@ -27,8 +27,8 @@ global:
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
-  output_status_filtered: False
-  output_apportionment_qa: False
+  output_status_filtered: True
+  output_apportionment_qa: True
   output_long_form: False
   output_short_form: False
   output_gb_sas: False

@@ -32,44 +32,50 @@ def get_imputation_cols(config: dict) -> list:
     return numeric_cols
 
 
-def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
-    """Create a dataframe mask based on listed options - retrun Bool column.
+def create_mask(df:pd.DataFrame, option: str)-> pd.Series:
+    """Create a dataframe mask based on 'option' - retrun Bool column.
     
-    Options include:
+    option include:
         - 'clear_status': rows with one of the clear statuses
+        - 'to_impute_status': rows with 'Form sent out' or 'Check needed'
         - 'instance_zero': rows with instance = 0
         - 'instance_nonzero': rows with instance != 0
         - 'no_r_and_d' : rows where q604 = 'No'
         - 'postcode_only': rows in which there are no numeric values, only postcodes.
     """
     clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
+    to_impute_status_mask = df["status"].isin(["Form sent out", "Check needed"])
     instance_mask = df.instance == 0
     no_r_and_d_mask = df["604"]=="No"
     postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
 
-    # Set initial values for the mask series as a column in the dataframe
     df = df.copy()
-    df["mask_col"] = False
     
-    if "clear_status" in options:
-        df["mask_col"] =  df["mask_col"] & clear_mask
+    if option == "clear_status":
+        mask = clear_mask
 
-    if "instance_zero" in options:
-        df["mask_col"] = df["mask_col"] & instance_mask
+    elif option == "to_impute_status":
+        mask = to_impute_status_mask
 
-    elif "instance_nonzero" in options:
-        df["mask_col"] = df["mask_col"] & ~instance_mask
+    elif option == "instance_zero":
+        mask = instance_mask
 
-    if "no_r_and_d" in options:
-        df["mask_col"] = df["mask_col"] & no_r_and_d_mask
+    elif option == "instance_nonzero":
+        mask = ~instance_mask
+
+    elif option == "no_r_and_d":
+        mask = no_r_and_d_mask
         
-    if "postcode_only" in options:
-        df["mask_col"] = df["mask_col"] & postcode_only_mask
+    elif option == "postcode_only":
+        mask = postcode_only_mask
 
-    if "excl_postcode_only" in options:
-        df["mask_col"] = df["mask_col"] & ~postcode_only_mask
+    elif option == "excl_postcode_only":
+        mask = ~postcode_only_mask
 
-    return df["mask_col"]
+    else:
+        raise ValueError(f"create_mask function parameter {option} is not valid.")
+
+    return mask
 
 
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:

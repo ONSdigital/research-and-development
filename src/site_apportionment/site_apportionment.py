@@ -1,9 +1,10 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-from typing import Tuple, List, Dict, Union
+from typing import Tuple, List, Dict, Union, Callable
 import logging
 
 from src.imputation.imputation_helpers import get_imputation_cols
+from src.site_apportionment.status_filtered import remove_unwanted_records
 
 SitesApportionmentLogger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ civdef_col: str = "200"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
-imp_qa_cols = ["imp_marker", "imp_class"]
+sites_cols = [instance_col, postcode_col, percent_col]
 
 # Long and short form codes
 short_code: str = "0006"
@@ -96,10 +97,17 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     df.loc[single_cond, percent_col] = 100
 
     # Condition for records to apportion: long forms, at least one site, instance >=1
+    # and include only the clear and imputed statuses
+
+    status_cond = (
+        df.status.isin(["Clear", "Clear - overridden", "Form sent out", "Check needed"])
+    )
+
     to_apportion_cond = (
         (df[form_col] == long_code)
         & (df[postcode_col + "_count"] >= 1)
         & (df[instance_col] >= 1)
+        & status_cond
     )
 
     # Dataframe to_apportion_df with many products - for apportionment 
@@ -116,13 +124,12 @@ def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
     return df[col].str.len() > 0
 
 
-def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
+def create_category_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Creates a DataFrame with codes and numerical values.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        value_cols (List[str]): List of columns containing numeric values.
 
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
@@ -143,7 +150,8 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     # Make the dataframe with columns of codes and numerical values
     category_df = df.copy().loc[condition]
     
-    category_df = category_df[groupby_cols + code_cols + value_cols + imp_qa_cols]
+    # Include all columns except the site columns (postcode and percentage, also inst)
+    category_df = category_df[[col for col in df.columns if col not in sites_cols]]
 
     # De-duplicate by summation - possibly, not needed
     category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
@@ -151,9 +159,7 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     return category_df
 
 
-def create_sites_df(
-    df: pd.DataFrame, orig_cols: List[str], value_cols: List[str]
-) -> pd.DataFrame:
+def create_sites_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Creates a DataFrame with postcodes, percents, and everything else.
 
@@ -165,8 +171,7 @@ def create_sites_df(
     Returns:
         pd.DataFrame: The DataFrame with postcodes, percents, and everything else.
     """
-    site_cols = [x for x in orig_cols if x not in (code_cols + value_cols)]
-    sites_df = df.copy()[site_cols]
+    sites_df = df.copy()[groupby_cols + sites_cols]
 
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
@@ -185,7 +190,7 @@ def count_duplicate_sites(sites_df: pd.DataFrame):
     Returns:
         int: The number of duplicate sites.
     """
-    site_count_df = sites_df[groupby_cols + [postcode_col]].copy()
+    site_count_df = sites_df.copy()
     site_count_df["site_count"] = site_count_df.groupby(groupby_cols + [postcode_col])[
         postcode_col
     ].transform("count")
@@ -332,6 +337,8 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 def run_apportion_sites(
     df: pd.DataFrame, 
     config: Dict[str, Union[str, List[str]]],
+    write_csv: Callable,
+    run_id: int,
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -372,12 +379,12 @@ def run_apportion_sites(
     df = count_unique_postcodes_in_col(df)
 
     # Split the dataframe in two based on whether there's more than one site (postcode)
-    multiple_sites_df, df_out = split_sites_df(df)
+    to_apportion_df, df_out = split_sites_df(df)
 
     # category_df: dataframe with codes and numerical values
-    category_df = create_category_df(multiple_sites_df, value_cols)
+    category_df = create_category_df(to_apportion_df)
 
-    sites_df = create_sites_df(multiple_sites_df, orig_cols, value_cols)
+    sites_df = create_sites_df(to_apportion_df)
 
     # Check for postcode duplicates for QA
     count_duplicate_sites(sites_df)
@@ -394,6 +401,9 @@ def run_apportion_sites(
     # Restore the original order of columns
     df_cart = df_cart[orig_cols]
     df_out = df_out[orig_cols] 
+
+    # Remove the unwanted imp_markers, "no mean found" and "no imputation"
+    df_out = remove_unwanted_records(df_out, config, write_csv, run_id)
     
     # Append the apportionned data back to the remaining unchanged data
     df_out = df_out.append(df_cart, ignore_index=True)

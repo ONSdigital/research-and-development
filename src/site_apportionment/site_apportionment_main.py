@@ -40,7 +40,7 @@ def run_site_apportionment(
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
         SitesMainLogger.info("Starting apportionment to sites...")
-        df_out = sap.run_apportion_sites(df, config)
+        df_out = sap.run_apportion_sites(df, config, write_csv, run_id)
 
         # Output QA files
         if config["global"]["output_apportionment_qa"] & output_file:
@@ -51,8 +51,6 @@ def run_site_apportionment(
 
         SitesMainLogger.info("Finished apportionment to sites.")
 
-        # Remove records not needed after site apportionment
-        df_out = remove_unwanted_records(df_out, config, write_csv, run_id)
         return df_out
 
     else:
