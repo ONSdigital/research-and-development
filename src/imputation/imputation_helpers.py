@@ -32,6 +32,11 @@ def get_imputation_cols(config: dict) -> list:
     return numeric_cols
 
 
+def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
+    """Return a mask for string values in column col that are not null."""
+    return df[col].str.len() > 0
+
+
 def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
     """Create a dataframe mask based on listed options - retrun Bool column.
     

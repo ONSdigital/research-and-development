@@ -45,7 +45,7 @@ def run_site_apportionment(
         if config["global"]["output_apportionment_qa"] & output_file:
             SitesMainLogger.info("Outputting Apportionment files.")
             tdate = datetime.now().strftime("%Y-%m-%d")
-            filename = f"estimated_df_apportioned_{tdate}_v{run_id}.csv"
+            filename = f"estimated_df_apportioned_{tdate}_v{run_id}_TEST.csv"
             write_csv(f"{imp_path}/apportionment_qa/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")

@@ -63,5 +63,5 @@ def output_intram_by_civil_defence(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_by_civil_defence{tdate}_v{run_id}.csv"
+    filename = f"output_intram_by_civil_defence{tdate}_v{run_id}_TEST.csv"
     write_csv(f"{output_path}/output_intram_by_civil_defence/{filename}", df_for_output)

@@ -31,5 +31,5 @@ def output_status_filtered(
     output_path = paths["output_path"]
 
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"status_filtered_qa_{tdate}_v{run_id}.csv"
+    filename = f"status_filtered_qa_{tdate}_v{run_id}_TEST.csv"
     write_csv(f"{output_path}/output_status_filtered_qa/{filename}", df)

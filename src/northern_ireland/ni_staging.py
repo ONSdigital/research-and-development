@@ -102,7 +102,7 @@ def run_ni_staging(
         NIStagingLogger.info("Starting output of staged NI data...")
         staging_folder = paths["ni_staging_output_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        staged_filename = f"staged_NI_full_responses_{tdate}_v{run_id}_TEST.csv"
         write_csv(f"{staging_folder}/{staged_filename}", ni_responses_df)
         NIStagingLogger.info("Finished output of staged NI data.")
     else:

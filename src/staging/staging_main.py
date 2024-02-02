@@ -342,7 +342,7 @@ def run_staging(
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = paths["staging_output_path"]
         tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+        staged_filename = f"staged_BERD_full_responses_{tdate}_v{run_id}_TEST.csv"
         write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:

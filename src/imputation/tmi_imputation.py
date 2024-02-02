@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Tuple, Any
 
+from src.imputation import imputation_helpers as hlp
 from src.imputation.impute_civ_def import impute_civil_defence
 from src.imputation import expansion_imputation as ximp
 
@@ -87,10 +88,13 @@ def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     Returns:
         pd.DataFrame: The same dataframe with required nulls filled with zeros.
     """
+    # Condition to exclude rows conaining no data and only postcodes
+    excl_postcode_only_mask = ~(df["211"].isnull() & hlp.create_notnull_mask(df, "601"))
+
     zerofill_mask = (
         (df["instance"] != 0) &
         (df["status"].isin(["Clear", "Clear - overridden"])) &
-        (df["211"].isnull() & ~df["601"].isnull())
+        excl_postcode_only_mask
     )
 
     for var in target_variables:
