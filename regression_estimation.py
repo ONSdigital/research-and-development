@@ -12,60 +12,50 @@ import pandas as pd
 from src.utils.local_file_mods import read_local_csv as read_csv
 from src.utils.local_file_mods import write_local_csv as write_csv
 
-#%%
-# configuration settings
-csv_path = "D:/coding_projects/randd_test_data/"
-input_file1 = "test.csv"
+#%% Configuration settings
 
-# whether the unit test data is input or expected output
-in_or_output = "input"
+# Input folder and file names
+in_fol = "D:/data/res_dev/regression\input/"
+in_file_old = "full_estimation_qa_2024-02-02_v106.csv"
+in_file_new = "full_estimation_qa_2024-02-02_v107_TEST.csv"
 
-output_filename = f"{in_or_output}_function"
+# Output folder and file
+out_fol = "D:/data/res_dev/regression/output/"
+out_file = "merged.csv"
 
-# read in the csv
-path1 = os.path.join(csv_path, input_file)
-df1 = pd.read_csv(path1)
+# Columns to select
+key_cols = ["reference", "instance", "200", "201", "formtype", "pg_numeric"]
+value_col = "211"
+other_cols = ["status", "imp_marker", "601", "602", "referencepostcode", "postcodes_harmonised"]
+tolerance = 0.001
+#%% Read files
+cols_read = key_cols + [value_col] + other_cols
+df_old = read_csv(in_fol+in_file_old)[cols_read]
+df_new = read_csv(in_fol+in_file_new)[cols_read]
 
+#%% Filter good statuses only
+imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
+df_old_good = df_old[df_old["imp_marker"].isin(imp_markers_to_keep)]
+df_new_good = df_new[df_new["imp_marker"].isin(imp_markers_to_keep)]
 
-# set all datatypes to string - we are outputting all the data as a string
-df1 = df1.astype(str)
+#%% sizes
+print(f"Old size: {df_old_good.shape}")
+print(f"New size: {df_new_good.shape}")
 
-# add quotes to the strings in the columns that should show as string types
-string_cols = [] # ["period"]
+#%% Join
+df_merge = df_old_good.merge(
+    df_new_good,
+    on=key_cols,
+    how="outer",
+    suffixes=("_old", "_new"),
+    indicator=True
+)
+#%% Compare the values
+df_merge["value_different"] = (
+    (df_merge[value_col + "_old"] - df_merge[value_col + "_new"])**2 > tolerance**2
+)
 
-df1[string_cols] = df1[string_cols].applymap('"{}"'.format)
+# %% Save output
+write_csv(out_fol + out_file, df_merge)
 
-# prepare the output formatting
-tab = " "*4
-
-col_list = df1.columns
-col_string = ""
-
-# create a new column that joins the contents of the other columns
-df1['output'] = f"{tab}["
-for col in df1.columns[:-1]:
-    df1["output"] += df1[col] + ", "
-    col_string += f'{tab}{tab}"{col}",\n'
-    
-df1['output'] += df1[df1.columns[-2]] + "],"
-
-# concatenate everything in the new column into a single string
-rows_string = df1["output"].str.cat(sep=f"\n{tab}")
-
-# join all the components into a final string for output
-full_text = f'''def create_input_df(self):
-    """Create an input dataframe for the test."""
-    {in_or_output}_columns = [\n{col_string}{tab}]
-        
-    data = [\n{tab}{rows_string}\n{tab}]   
-
-    {in_or_output}_df = pandasDF(data=data, columns={in_or_output}_columns)
-    return {in_or_output}_df
-    '''
-
-# write the prepared text to a txt file
-out_path = os.path.join(csv_path, output_filename + ".txt")
-
-text_file = open(out_path, "w")
-text_file.write(full_text)
-text_file.close()
+# %%
