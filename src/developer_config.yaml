@@ -21,12 +21,12 @@ global:
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
-  output_full_responses: False
+  output_full_responses: True
   output_ni_full_responses: True
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: False
+  output_estimation_qa: True
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
