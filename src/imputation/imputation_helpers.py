@@ -38,6 +38,7 @@ def create_mask(df:pd.DataFrame, option: str)-> pd.Series:
     option include:
         - 'clear_status': rows with one of the clear statuses
         - 'to_impute_status': rows with 'Form sent out' or 'Check needed'
+        - 'longform': longform records only
         - 'instance_zero': rows with instance = 0
         - 'instance_nonzero': rows with instance != 0
         - 'no_r_and_d' : rows where q604 = 'No'
@@ -45,6 +46,7 @@ def create_mask(df:pd.DataFrame, option: str)-> pd.Series:
     """
     clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
     to_impute_status_mask = df["status"].isin(["Form sent out", "Check needed"])
+    longform_mask = df["formtype"] == "0001"
     instance_mask = df.instance == 0
     no_r_and_d_mask = df["604"]=="No"
     postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
@@ -56,6 +58,9 @@ def create_mask(df:pd.DataFrame, option: str)-> pd.Series:
 
     elif option == "to_impute_status":
         mask = to_impute_status_mask
+
+    elif option == "longform_mask":
+        mask = longform_mask
 
     elif option == "instance_zero":
         mask = instance_mask
