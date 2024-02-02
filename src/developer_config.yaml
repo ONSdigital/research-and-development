@@ -9,7 +9,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   load_historic_data: False
   run_construction: False
   run_ni_construction: False
@@ -22,7 +22,7 @@ global:
   apportion_sites: True
   # Output settings
   output_full_responses: False
-  output_ni_full_responses: False
+  output_ni_full_responses: True
   output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -31,8 +31,8 @@ global:
   output_long_form: False
   output_short_form: False
   output_gb_sas: False
-  output_ni_sas: False
-  output_tau: False
+  output_ni_sas: True
+  output_tau: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
