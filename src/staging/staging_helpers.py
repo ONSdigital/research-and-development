@@ -117,7 +117,7 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
         df (pd.DataFrame): with cellnumber and selectiontype cols updated.
     """
     ref_list_filtered = ref_list_df.loc[
-        (ref_list_df.formtype == 1) & (ref_list_df.cellnumber != 817)
+        (ref_list_df.formtype == "1") & (ref_list_df.cellnumber != 817)
     ]
     df = pd.merge(
         full_df,
@@ -150,7 +150,7 @@ def getmappername(mapper_path_key, split):
     """
     Extracts the mapper name from a given path key.
 
-    This function uses a regular expression to extract the name of the mapper from the 
+    This function uses a regular expression to extract the name of the mapper from the
     provided key.
     The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
