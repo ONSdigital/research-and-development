@@ -63,10 +63,12 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     sent_out_condition = (
         (df[form_col] == long_code)
         & (df[status_col] == "Form sent out")
-        & (df[postcode_col] == None)
+        & (df[postcode_col + "_count"].isna())
+        & (df[postcode_col].isna())
     )
-    df.loc[sent_out_condition, postcode_col] = df.loc[sent_out_condition, "postcodes_harmonised"]
     df.loc[sent_out_condition, percent_col] = 100
+    df.loc[sent_out_condition, postcode_col] = df.loc[sent_out_condition, "postcodes_harmonised"]
+
     return df
 
 
