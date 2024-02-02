@@ -22,16 +22,21 @@ global:
   apportion_sites: True
   # Output settings
   output_full_responses: False
-  output_ni_full_responses: True
+  output_ni_full_responses: False
   output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
+<<<<<<< HEAD
   output_estimation_qa: False
   output_status_filtered: False
   output_apportionment_qa: False
+=======
+  output_estimation_qa: True
+  output_apportionment_qa: True
+>>>>>>> develop
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
+  output_gb_sas: True
   output_ni_sas: True
   output_tau: True
   output_intram_by_pg: False
