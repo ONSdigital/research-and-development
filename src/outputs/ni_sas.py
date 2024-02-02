@@ -43,15 +43,15 @@ def output_ni_sas(
     df["itl"] = "N92000002"
 
     # Create C_lnd_bl
-    df["C_lnd_bl"] = df["219"] + df["220"]
+    df["C_lnd_bl"] = df["219"].fillna(0) + df["220"].fillna(0)
 
     # Create ovss_oth
     df["ovss_oth"] = (
-        df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+        df["243"].fillna(0) + df["244"].fillna(0) + df["245"].fillna(0) + df["246"].fillna(0) + df["247"].fillna(0) + df["249"].fillna(0)
     )
 
     # Create oth_sc
-    df["oth_sc"] = df["242"] + df["248"] + df["250"]
+    df["oth_sc"] = df["242"].fillna(0) + df["248"].fillna(0) + df["250"].fillna(0)
 
     # Create NI SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["ni_sas_schema"]

@@ -53,15 +53,15 @@ def output_gb_sas(
     df1 = map_o.join_itl_regions(df1, postcode_mapper)
 
     # Create C_lnd_bl
-    df1["C_lnd_bl"] = df1["219"] + df1["220"]
+    df1["C_lnd_bl"] = df1["219"].fillna(0) + df1["220"].fillna(0)
 
     # Create ovss_oth
     df1["ovss_oth"] = (
-        df1["243"] + df1["244"] + df1["245"] + df1["246"] + df1["247"] + df1["249"]
+        df1["243"].fillna(0) + df1["244"].fillna(0) + df1["245"].fillna(0) + df1["246"].fillna(0) + df1["247"].fillna(0) + df1["249"].fillna(0)
     )
 
     # Create oth_sc
-    df1["oth_sc"] = df1["242"] + df1["248"] + df1["250"]
+    df1["oth_sc"] = df1["242"].fillna(0) + df1["248"].fillna(0) + df1["250"].fillna(0)
 
     # Create GB SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["gb_sas_schema"]
