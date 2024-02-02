@@ -62,7 +62,12 @@ def output_tau(
 
     # Create ovss_oth
     df["ovss_oth"] = (
-        df["243"].fillna(0) + df["244"].fillna(0) + df["245"].fillna(0) + df["246"].fillna(0) + df["247"].fillna(0) + df["249"].fillna(0)
+        df["243"].fillna(0)
+        + df["244"].fillna(0)
+        + df["245"].fillna(0)
+        + df["246"].fillna(0)
+        + df["247"].fillna(0)
+        + df["249"].fillna(0)
     )
 
     # Create oth_sc

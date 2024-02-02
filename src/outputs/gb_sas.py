@@ -57,7 +57,12 @@ def output_gb_sas(
 
     # Create ovss_oth
     df1["ovss_oth"] = (
-        df1["243"].fillna(0) + df1["244"].fillna(0) + df1["245"].fillna(0) + df1["246"].fillna(0) + df1["247"].fillna(0) + df1["249"].fillna(0)
+        df1["243"].fillna(0)
+        + df1["244"].fillna(0)
+        + df1["245"].fillna(0)
+        + df1["246"].fillna(0)
+        + df1["247"].fillna(0)
+        + df1["249"].fillna(0)
     )
 
     # Create oth_sc
