@@ -18,6 +18,7 @@ percent_col: str = "602"
 product_col: str = "201"
 pg_num_col: str = "pg_numeric"
 civdef_col: str = "200"
+status_col: str = "status"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
@@ -62,6 +63,7 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     sent_out_condition = (
         (df[form_col] == long_code)
         & (df[status_col] == "Form sent out")
+        & (df[postcode_col] == None)
     )
     df.loc[sent_out_condition, postcode_col] = df.loc[sent_out_condition, "postcodes_harmonised"]
     df.loc[sent_out_condition, percent_col] = 100
@@ -399,7 +401,7 @@ def run_apportion_sites(
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
 
-    # Set short form percentages to 100
+    # Set percentages to 100 in relevant rows
     df = set_percentages(df)
 
     # Split the dataframe in two based on whether apportionment is needed
