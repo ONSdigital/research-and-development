@@ -137,8 +137,14 @@ def create_cora_status_col(df, main_col="statusencoded"):
 
     cora_dict = dict(zip(status_before, status_after))
 
-    # Create a new column by mapping values from main_col using the cora_dict
-    df["form_status"] = df[main_col].map(cora_dict)
+    # Create a new column, if required, and map values from main_col
+    # using the cora_dict.  NI already have form_status,
+    # so it only deals with rows with a value in the main col
+    if "form_status" not in df.columns:
+        df["form_status"] = None
+    df.loc[df["form_status"].isnull(), "form_status"] = df.loc[
+        df["form_status"].isnull(), main_col
+    ].map(cora_dict)
 
     return df
 
