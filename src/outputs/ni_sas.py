@@ -59,5 +59,5 @@ def output_ni_sas(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_ni_sas_{tdate}_v{run_id}_TEST.csv"
+    filename = f"output_ni_sas_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_ni_sas/{filename}", output)

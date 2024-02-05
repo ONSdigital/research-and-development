@@ -60,7 +60,7 @@ def run_outliers(
     tdate = datetime.now().strftime("%Y-%m-%d")
     if config["global"]["output_auto_outliers"]:
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
-        file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}_TEST.csv"
+        file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
         write_csv(file_path, filtered_df)
         OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
     else:
@@ -85,7 +85,7 @@ def run_outliers(
     # Output the outlier flags for QA
     if config["global"]["output_outlier_qa"]:
         OutlierMainLogger.info("Starting output of Outlier QA data...")
-        filename = f"outliers_qa_{tdate}_v{run_id}_TEST.csv"
+        filename = f"outliers_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
     else:

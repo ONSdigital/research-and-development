@@ -148,9 +148,9 @@ def run_imputation(
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
         tdate = datetime.now().strftime("%Y-%m-%d")
-        trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}_TEST.csv"
-        links_filename = f"links_qa_{tdate}_v{run_id}_TEST.csv"
-        full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}_TEST.csv"
+        trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
+        links_filename = f"links_qa_{tdate}_v{run_id}.csv"
+        full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
 
         # create trimming qa dataframe with required columns from schema
         schema_path = config["schema_paths"]["manual_trimming_schema"]
