@@ -52,6 +52,18 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("Percent column for short forms should be blank.")
     df.loc[df[form_col] == short_code, percent_col] = 100
 
+    
+    # Condition for long forms with status = "Form sent out"
+    sent_out_condition = (
+        (df[form_col] == long_code)
+        & (df[status_col] == "Form sent out")
+        & (df[postcode_col + "_count"].isna())
+        & (df[postcode_col].isna())
+    )
+    df.loc[sent_out_condition, postcode_col] = (
+        df.loc[sent_out_condition, "postcodes_harmonised"])
+    df.loc[sent_out_condition, postcode_col + "_count"] = 1
+
     # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
     single_cond =  (
         (df[form_col] == long_code)
@@ -60,18 +72,6 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
         & create_notnull_mask(df, postcode_col)
     )
     df.loc[single_cond, percent_col] = 100
-
-    # Condition for long forms with status = "Form sent out"
-    sent_out_condition = (
-        (df[form_col] == long_code)
-        & (df[status_col] == "Form sent out")
-        & (df[postcode_col + "_count"].isna())
-        & (df[postcode_col].isna())
-    )
-    df.loc[sent_out_condition, percent_col] = 100
-    df.loc[sent_out_condition, postcode_col] = (
-        df.loc[sent_out_condition, "postcodes_harmonised"])
-    df.loc[sent_out_condition, postcode_col + "_count"] = 1
 
     return df
 
@@ -111,16 +111,6 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
-    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
-    single_cond = (
-        (df[form_col] == long_code)
-        & (df[postcode_col + "_count"] == 1)
-        & (df[instance_col] >= 1)
-        & create_notnull_mask(df, postcode_col)
-    )
-
-    # ensure that for long-form references with one postcode, the percentage is 100%
-    df.loc[single_cond, percent_col] = 100
 
     # Condition for records to apportion: long forms, at least one site, instance >=1
     to_apportion_cond = (
