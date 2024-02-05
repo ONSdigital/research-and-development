@@ -58,20 +58,13 @@ def output_tau(
     df = map_o.map_to_numeric(df)
 
     # Create C_lnd_bl
-    df["C_lnd_bl"] = df["219"].fillna(0) + df["220"].fillna(0)
+    df["C_lnd_bl"] = df[["219", "220"]].fillna(0).sum(axis=1)
 
     # Create ovss_oth
-    df["ovss_oth"] = (
-        df["243"].fillna(0)
-        + df["244"].fillna(0)
-        + df["245"].fillna(0)
-        + df["246"].fillna(0)
-        + df["247"].fillna(0)
-        + df["249"].fillna(0)
-    )
+    df["ovss_oth"] = df[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
 
     # Create oth_sc
-    df["oth_sc"] = df["242"].fillna(0) + df["248"].fillna(0) + df["250"].fillna(0)
+    df["oth_sc"] = df[["242", "248", "250"]].fillna(0).sum(axis=1)
 
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]
