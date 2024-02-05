@@ -138,5 +138,5 @@ def output_short_form(
     shortform_output = create_output_df(df, schema_dict)
 
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_short_form_{tdate}_v{run_id}_TEST.csv"
+    filename = f"output_short_form_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_short_form/{filename}", shortform_output)

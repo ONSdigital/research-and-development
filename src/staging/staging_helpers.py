@@ -515,7 +515,7 @@ def stage_validate_harmonise_postcodes(
     # Save the invalid postcodes to a CSV file
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}_TEST.csv"
+    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
 
     # Log the end of postcode validation

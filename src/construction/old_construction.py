@@ -187,12 +187,12 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     amendments_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_amendments_{tdate}_v{run_id}_TEST.csv",
+        f"construction_amendments_{tdate}_v{run_id}.csv",
     )
     additions_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_additions_{tdate}_v{run_id}_TEST.csv",
+        f"construction_additions_{tdate}_v{run_id}.csv",
     )
 
     # Check if the dataframes are empty before writing
@@ -243,7 +243,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%Y-%m-%d")
     construction_output_filepath = os.path.join(
-        paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}_TEST.csv"
+        paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv"
     )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
