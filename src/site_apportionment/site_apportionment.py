@@ -221,7 +221,7 @@ def create_sites_df(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        orig_cols (List[str]): Columns to group by: reference, period.
+        groupby_cols (List[str]): Columns to group by: reference, period.
         site_cols (List[str]): Columns of sites (instance, postcode, percent).
 
     Returns:
@@ -475,7 +475,7 @@ def run_apportion_sites(
     # Split the dataframe in two based on whether there's one or more postcodes
     multiple_sites_df, df_out = split_sites_df(df)
 
-    # category_df: dataframe with codes, imputation markker and numerical values
+    # category_df: dataframe with codes, textual and numerical values
     category_df = create_category_df(
         multiple_sites_df,
         orig_cols,
