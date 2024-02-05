@@ -121,6 +121,7 @@ def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
     """Return a mask for string values in column col that are not null."""
     return df[col].str.len() > 0
 
+
 def deduplicate_codes_values(
         df,
         group_cols,
@@ -128,9 +129,11 @@ def deduplicate_codes_values(
         category_cols,
         methods=["sum", "first"]
 )-> pd.DataFrame:
-    """Deduplicates a dataframe, so that it has only one unique combination of 
-    group cols. Numerical valies in value_cols are summed. From the
+    """Deduplicates a dataframe, so  it has only one unique combination of group cols. 
+    
+    Numerical valies in value_cols are summed. From the
     category_cols, we choose the first entry for deterministic behaviour.
+
     Args:
         df (pd.DataFrame): The input DataFrame.
         group_cols (List[str]): List of columns to group by.
@@ -169,8 +172,6 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
     """
-
-
     # Make the dataframe with columns of codes, marker and numerical values
     category_df = df.copy()[groupby_cols + code_cols + [marker_col] + value_cols]
 
@@ -181,7 +182,7 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     )
     category_df = category_df.loc[valid_code_cond]
 
-    # Remove "bad" imputation markers
+    # Remove "bad" imputation markers, "no imputation" and "no mean found."
     category_df = keep_good_markers(category_df)
 
     # De-duplicate - possibly, not needed
@@ -374,6 +375,7 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
     return sorted_df
 
+
 def keep_good_markers(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -406,6 +408,7 @@ def save_removed_markers(df, config, write_csv, run_id) -> None:
         SitesApportionmentLogger.info("Starting status filtered output...")
         output_status_filtered(filtered_output_df, config, write_csv, run_id)
         SitesApportionmentLogger.info("Finished status filtered output.")
+
 
 def run_apportion_sites(
     df: pd.DataFrame, 
