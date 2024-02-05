@@ -1,3 +1,4 @@
+from ast import literal_eval
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 from typing import Tuple, List, Dict, Callable, Union
@@ -19,6 +20,7 @@ product_col: str = "201"
 pg_num_col: str = "pg_numeric"
 civdef_col: str = "200"
 marker_col: str = "imp_marker"
+imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
@@ -86,7 +88,7 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
     # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
-    single_cond =  (
+    single_cond = (
         (df[form_col] == long_code)
         & (df[postcode_col + "_count"] == 1)
         & (df[instance_col] >= 1)
@@ -109,7 +111,7 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Dataframe with everything else - save unchanged
     df_out = df.copy()[~to_apportion_cond]
 
-    # Clean wrong statuses from df_out
+    # Remove "bad" imputation markers from df_out
     df_out = keep_good_markers(df_out)
 
     return to_apportion_df, df_out
@@ -125,11 +127,21 @@ def deduplicate_codes_values(
         value_cols,
         category_cols,
         methods=["sum", "first"]
-):
+)-> pd.DataFrame:
     """Deduplicates a dataframe, so that it has only one unique combination of 
     group cols. Numerical valies in value_cols are summed. From the
-    category_cols, we choose the first entry for deterministic behaviour."""
+    category_cols, we choose the first entry for deterministic behaviour.
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        group_cols (List[str]): List of columns to group by.
+        value_cols (List[str]): List of columns containing numeric values.
+        category_cols (List[str]): List of columns containing categpries.
+        methods (List[str]): List of aggregation methods for values (0, 
+        default method is sum) and categorties (1, default method is first).
 
+    Returns:
+        pd.DataFrame: De-duplicated dataframe
+    """
     agg_dict = {}
     
     for col in value_cols:
@@ -143,7 +155,12 @@ def deduplicate_codes_values(
 
 def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     """
-    Creates a DataFrame with codes and numerical values.
+    Creates a DataFrame with product group codes, imputation marker and 
+    numerical values. Removes rows that have Null product codes from 201 or 
+    in civil/defence columns.
+    Removes "bad" imputation markers.
+    De-duplicates, so there is just one unique combination of 
+    group codes for each reference and period. 
 
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -164,12 +181,10 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     )
     category_df = category_df.loc[valid_code_cond]
 
-    # Remove bad imputation markers
+    # Remove "bad" imputation markers
     category_df = keep_good_markers(category_df)
 
     # De-duplicate - possibly, not needed
-    # Value columns are summed
-    # Marker column - maximum value is kept
     category_df = deduplicate_codes_values(
         category_df,
         group_cols=groupby_cols + code_cols,
@@ -361,7 +376,6 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
 def keep_good_markers(
     df: pd.DataFrame,
-    imp_markers_to_keep=["R", "TMI", "CF", "MoR", "constructed"]
 ) -> pd.DataFrame:
     """Keeps only rows that have good values of marker column"""
     series_to_keep = df[marker_col].isin(imp_markers_to_keep)
@@ -369,36 +383,29 @@ def keep_good_markers(
 
 def tidy_apportionment_dataframe(
     df: pd.DataFrame,
-    config: Dict,
-    write_csv: Callable,
-    run_id: int,
 ) -> pd.DataFrame:
-    """Remove rows and columns not needed after apportionment."""
+    """Change the apportionment status to "imputed"  for all records we keep."""
 
-    # Keep only imputed, constructed and clear records ("R")
-    imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
-    # to_keep = df["imp_marker"].isin(imp_markers_to_keep)
-
-    to_keep_df = df.copy()# .loc[to_keep]
-    #filtered_output_df = df.copy().loc[~to_keep]
+    to_keep_df = df.copy()
 
     # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
+    condition = to_keep_df[marker_col].isin(imp_markers_to_keep)
     to_keep_df.loc[condition, "status"] = "imputed"
-
-    # Running status filtered full dataframe output for QA
-    # if config["global"]["output_status_filtered"]:
-    #     SitesApportionmentLogger.info("Starting status filtered output...")
-    #     output_status_filtered(
-    #         filtered_output_df,
-    #         config,
-    #         write_csv,
-    #         run_id,
-    #     )
-    #     SitesApportionmentLogger.info("Finished status filtered output.")
 
     return to_keep_df
 
+def save_removed_markers(df, config, write_csv, run_id) -> None:
+    """Saves the records that have bad imputation markers"""
+    
+    # Finding rows that will be removed later
+    to_remove = ~df[marker_col].isin(imp_markers_to_keep)
+    filtered_output_df = df.copy().loc[to_remove]
+
+    # Saving status filtered full dataframe output for QA
+    if config["global"]["output_status_filtered"]:
+        SitesApportionmentLogger.info("Starting status filtered output...")
+        output_status_filtered(filtered_output_df, config, write_csv, run_id)
+        SitesApportionmentLogger.info("Finished status filtered output.")
 
 def run_apportion_sites(
     df: pd.DataFrame, 
@@ -435,7 +442,8 @@ def run_apportion_sites(
     # Get the original columns set
     orig_cols: List[str] = list(df.columns)
     # Create a list of the value columns that we want to apportion
-    # These are the same as the columns we impute so we use a function from imputation.
+    # These are the same as the columns we impute so we use a function from 
+    # imputation.
     value_cols: List[str] = get_imputation_cols(config)
 
     # Set short form percentages to 100
@@ -444,12 +452,16 @@ def run_apportion_sites(
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
 
-    # Split the dataframe in two based on whether there's more than one site (postcode)
+    # Save the records that will be removed later as they have bad imp_marker
+    save_removed_markers(df, config, write_csv, run_id)
+
+    # Split the dataframe in two based on whether there's one or more postcodes
     multiple_sites_df, df_out = split_sites_df(df)
 
-    # category_df: dataframe with codes and numerical values
+    # category_df: dataframe with codes, imputation markker and numerical values
     category_df = create_category_df(multiple_sites_df, value_cols)
 
+    # sites_df: dataframe with sites, percents and everythung else
     sites_df = create_sites_df(multiple_sites_df, orig_cols, value_cols)
 
     # Check for postcode duplicates for QA
@@ -473,6 +485,6 @@ def run_apportion_sites(
     # Sort by period, ref, instance in ascending order.
     df_out = sort_rows_order_cols(df_out, orig_cols)
 
-    df_out = tidy_apportionment_dataframe(df_out, config, write_csv, run_id)
+    df_out = tidy_apportionment_dataframe(df_out)
 
     return df_out
