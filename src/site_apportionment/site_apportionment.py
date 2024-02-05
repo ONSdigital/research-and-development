@@ -167,9 +167,9 @@ def create_category_df(
 ) -> pd.DataFrame:
     """
     Creates a DataFrame with product group codes, numerical values and all other
-    categorical values, including imp_marker, exctept for instance, postcode and
+    textual values, including imp_marker, exctept for instance, postcode and
     percentage. 
-    Removes rows that have Null product codes from 201 or in civil/defence 
+    Removes rows that have Null product codes in 201 or in civil/defence 
     columns.
     Removes "bad" imputation markers.
     De-duplicates, so there is just one unique combination of 
@@ -217,7 +217,7 @@ def create_sites_df(
     df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str]
 ) -> pd.DataFrame:
     """
-    Creates a DataFrame with postcodes, percents, and everything else.
+    Creates a DataFrame with reference, period, instance, postcode and percent.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
