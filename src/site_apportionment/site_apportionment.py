@@ -18,6 +18,7 @@ percent_col: str = "602"
 product_col: str = "201"
 pg_num_col: str = "pg_numeric"
 civdef_col: str = "200"
+marker_col: str = "imp_marker"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
@@ -108,6 +109,9 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Dataframe with everything else - save unchanged
     df_out = df.copy()[~to_apportion_cond]
 
+    # Clean wrong statuses from df_out
+    df_out = keep_good_markers(df_out)
+
     return to_apportion_df, df_out
 
 
@@ -115,6 +119,27 @@ def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
     """Return a mask for string values in column col that are not null."""
     return df[col].str.len() > 0
 
+def deduplicate_codes_values(
+        df,
+        group_cols,
+        value_cols,
+        category_cols,
+        methods=["sum", "first"]
+):
+    """Deduplicates a dataframe, so that it has only one unique combination of 
+    group cols. Numerical valies in value_cols are summed. From the
+    category_cols, we choose the first entry for deterministic behaviour."""
+
+    agg_dict = {}
+    
+    for col in value_cols:
+        agg_dict.update({col: methods[0]})
+        
+    for col in category_cols:
+        agg_dict.update({col: methods[1]})
+
+    return df.groupby(group_cols).agg(agg_dict).reset_index()
+    
 
 def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     """
@@ -127,25 +152,32 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
     """
-    # ensure all three elements of the codes are notnull
+
+
+    # Make the dataframe with columns of codes, marker and numerical values
+    category_df = df.copy()[groupby_cols + code_cols + [marker_col] + value_cols]
+
+    # ensure the product group and C or D codes are notnull
     valid_code_cond = (
-        create_notnull_mask(df, product_col) 
-        & create_notnull_mask(df, civdef_col) 
-    )   
+        create_notnull_mask(df, product_col) &
+        create_notnull_mask(df, civdef_col) 
+    )
+    category_df = category_df.loc[valid_code_cond]
 
-    # ensure that rows for the category_df are not "no mean found" or "no imputation"
-    imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
-    to_keep_cond = df["imp_marker"].isin(imp_markers_to_keep)
+    # Remove bad imputation markers
+    category_df = keep_good_markers(category_df)
 
-    # condition for inclusion in the cateogry df
-    condition = valid_code_cond & to_keep_cond
-
-    # Make the dataframe with columns of codes and numerical values
-    category_df = df.copy().loc[condition][groupby_cols + code_cols + value_cols]
-
-    # De-duplicate by summation - possibly, not needed
-    category_df = category_df.groupby(groupby_cols + code_cols).agg(sum).reset_index()
-
+    # De-duplicate - possibly, not needed
+    # Value columns are summed
+    # Marker column - maximum value is kept
+    category_df = deduplicate_codes_values(
+        category_df,
+        group_cols=groupby_cols + code_cols,
+        value_cols=value_cols,
+        category_cols=[marker_col],
+        methods=["sum", "first"]
+    )
+   
     return category_df
 
 
@@ -163,7 +195,8 @@ def create_sites_df(
     Returns:
         pd.DataFrame: The DataFrame with postcodes, percents, and everything else.
     """
-    site_cols = [x for x in orig_cols if x not in (code_cols + value_cols)]
+    category_df_cols = (code_cols + value_cols + [marker_col])
+    site_cols = [x for x in orig_cols if x not in category_df_cols]
     sites_df = df.copy()[site_cols]
 
     # Remove instances that have no postcodes
@@ -326,6 +359,13 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
     return sorted_df
 
+def keep_good_markers(
+    df: pd.DataFrame,
+    imp_markers_to_keep=["R", "TMI", "CF", "MoR", "constructed"]
+) -> pd.DataFrame:
+    """Keeps only rows that have good values of marker column"""
+    series_to_keep = df[marker_col].isin(imp_markers_to_keep)
+    return df.copy().loc[series_to_keep]
 
 def tidy_apportionment_dataframe(
     df: pd.DataFrame,
@@ -337,25 +377,25 @@ def tidy_apportionment_dataframe(
 
     # Keep only imputed, constructed and clear records ("R")
     imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
-    to_keep = df["imp_marker"].isin(imp_markers_to_keep)
+    # to_keep = df["imp_marker"].isin(imp_markers_to_keep)
 
-    to_keep_df = df.copy().loc[to_keep]
-    filtered_output_df = df.copy().loc[~to_keep]
+    to_keep_df = df.copy()# .loc[to_keep]
+    #filtered_output_df = df.copy().loc[~to_keep]
 
     # change the value of the status column to 'imputed' for imputed statuses
     condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
     to_keep_df.loc[condition, "status"] = "imputed"
 
     # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        SitesApportionmentLogger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        SitesApportionmentLogger.info("Finished status filtered output.")
+    # if config["global"]["output_status_filtered"]:
+    #     SitesApportionmentLogger.info("Starting status filtered output...")
+    #     output_status_filtered(
+    #         filtered_output_df,
+    #         config,
+    #         write_csv,
+    #         run_id,
+    #     )
+    #     SitesApportionmentLogger.info("Finished status filtered output.")
 
     return to_keep_df
 
