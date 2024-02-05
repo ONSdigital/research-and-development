@@ -24,6 +24,7 @@ imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
+site_cols: List[str] = [instance_col, postcode_col, percent_col]
 
 # Long and short form codes
 short_code: str = "0006"
@@ -126,19 +127,19 @@ def deduplicate_codes_values(
         df,
         group_cols,
         value_cols,
-        category_cols,
+        textual_cols,
         methods=["sum", "first"]
 )-> pd.DataFrame:
     """Deduplicates a dataframe, so  it has only one unique combination of group cols. 
     
     Numerical valies in value_cols are summed. From the
-    category_cols, we choose the first entry for deterministic behaviour.
+    textual_cols, we choose the first entry for deterministic behaviour.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
         group_cols (List[str]): List of columns to group by.
         value_cols (List[str]): List of columns containing numeric values.
-        category_cols (List[str]): List of columns containing categpries.
+        textual_cols (List[str]): List of columns containing textual values.
         methods (List[str]): List of aggregation methods for values (0, 
         default method is sum) and categorties (1, default method is first).
 
@@ -150,17 +151,26 @@ def deduplicate_codes_values(
     for col in value_cols:
         agg_dict.update({col: methods[0]})
         
-    for col in category_cols:
+    for col in textual_cols:
         agg_dict.update({col: methods[1]})
 
     return df.groupby(group_cols).agg(agg_dict).reset_index()
     
 
-def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
+def create_category_df(
+    df: pd.DataFrame, 
+    orig_cols: List[str], 
+    groupby_cols: List[str], 
+    code_cols: List[str],
+    site_cols: List[str],
+    value_cols: List[str]
+) -> pd.DataFrame:
     """
-    Creates a DataFrame with product group codes, imputation marker and 
-    numerical values. Removes rows that have Null product codes from 201 or 
-    in civil/defence columns.
+    Creates a DataFrame with product group codes, numerical values and all other
+    categorical values, including imp_marker, exctept for instance, postcode and
+    percentage. 
+    Removes rows that have Null product codes from 201 or in civil/defence 
+    columns.
     Removes "bad" imputation markers.
     De-duplicates, so there is just one unique combination of 
     group codes for each reference and period. 
@@ -172,8 +182,9 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
     """
-    # Make the dataframe with columns of codes, marker and numerical values
-    category_df = df.copy()[groupby_cols + code_cols + [marker_col] + value_cols]
+    # Make the dataframe with columns of all columns except for site columns
+    category_cols = [x for x in orig_cols if x not in site_cols]
+    category_df = df.copy()[category_cols]
 
     # ensure the product group and C or D codes are notnull
     valid_code_cond = (
@@ -186,11 +197,16 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
     category_df = keep_good_markers(category_df)
 
     # De-duplicate - possibly, not needed
+    textual_cols = (
+        [x for x in category_cols if x not in (
+            groupby_cols + code_cols + value_cols
+        )]
+    )
     category_df = deduplicate_codes_values(
         category_df,
         group_cols=groupby_cols + code_cols,
         value_cols=value_cols,
-        category_cols=[marker_col],
+        textual_cols=textual_cols,
         methods=["sum", "first"]
     )
    
@@ -198,22 +214,20 @@ def create_category_df(df: pd.DataFrame, value_cols: List[str]) -> pd.DataFrame:
 
 
 def create_sites_df(
-    df: pd.DataFrame, orig_cols: List[str], value_cols: List[str]
+    df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str]
 ) -> pd.DataFrame:
     """
     Creates a DataFrame with postcodes, percents, and everything else.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        orig_cols (List[str]): The columns of the DataFrame.
-        value_cols (List[str]): The value columns.
+        orig_cols (List[str]): Columns to group by: reference, period.
+        site_cols (List[str]): Columns of sites (instance, postcode, percent).
 
     Returns:
-        pd.DataFrame: The DataFrame with postcodes, percents, and everything else.
+        pd.DataFrame: The DataFrame with sites.
     """
-    category_df_cols = (code_cols + value_cols + [marker_col])
-    site_cols = [x for x in orig_cols if x not in category_df_cols]
-    sites_df = df.copy()[site_cols]
+    sites_df = df.copy()[groupby_cols + site_cols]
 
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
@@ -462,10 +476,17 @@ def run_apportion_sites(
     multiple_sites_df, df_out = split_sites_df(df)
 
     # category_df: dataframe with codes, imputation markker and numerical values
-    category_df = create_category_df(multiple_sites_df, value_cols)
+    category_df = create_category_df(
+        multiple_sites_df,
+        orig_cols,
+        groupby_cols,
+        code_cols,
+        site_cols,
+        value_cols
+    )
 
     # sites_df: dataframe with sites, percents and everythung else
-    sites_df = create_sites_df(multiple_sites_df, orig_cols, value_cols)
+    sites_df = create_sites_df(multiple_sites_df, groupby_cols, site_cols)
 
     # Check for postcode duplicates for QA
     count_duplicate_sites(sites_df)
