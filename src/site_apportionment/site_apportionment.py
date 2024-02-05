@@ -383,6 +383,7 @@ def keep_good_markers(
     series_to_keep = df[marker_col].isin(imp_markers_to_keep)
     return df.copy().loc[series_to_keep]
 
+
 def tidy_apportionment_dataframe(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -395,6 +396,7 @@ def tidy_apportionment_dataframe(
     to_keep_df.loc[condition, "status"] = "imputed"
 
     return to_keep_df
+
 
 def save_removed_markers(df, config, write_csv, run_id) -> None:
     """Saves the records that have bad imputation markers"""
