@@ -101,8 +101,8 @@ def run_outputs(
         OutputMainLogger.info("Finished long form output.")
 
     # Filter out records that answer "no R&D" for all subsequent outputs
-    tau_outputs_df = tau_outputs_df.copy().loc[~(df["604"] == "No")]
-    outputs_df = outputs_df.copy().loc[~(df["604"] == "No")]
+    tau_outputs_df = tau_outputs_df.copy().loc[~(tau_outputs_df["604"] == "No")]
+    outputs_df = outputs_df.copy().loc[~(outputs_df["604"] == "No")]
 
     # Running TAU output
     if config["global"]["output_tau"]:
