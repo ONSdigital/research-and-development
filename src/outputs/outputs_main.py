@@ -57,7 +57,7 @@ def run_outputs(
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
         pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_num (pd.DataFrame): Mapper for product group conversions 
+        sic_pg_num (pd.DataFrame): Mapper for product group conversions
     """
 
     (
@@ -99,6 +99,10 @@ def run_outputs(
             ultfoc_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
+
+    # Filter out records that answer "no R&D" for all subsequent outputs
+    tau_outputs_df = tau_outputs_df.copy().loc[~(tau_outputs_df["604"] == "No")]
+    outputs_df = outputs_df.copy().loc[~(outputs_df["604"] == "No")]
 
     # Running TAU output
     if config["global"]["output_tau"]:
