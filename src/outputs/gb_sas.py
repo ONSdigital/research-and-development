@@ -56,7 +56,9 @@ def output_gb_sas(
     df1["C_lnd_bl"] = df1[["219", "220"]].fillna(0).sum(axis=1)
 
     # Create ovss_oth
-    df1["ovss_oth"] = df1[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
+    df1["ovss_oth"] = (
+        df1[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
+    )
 
     # Create oth_sc
     df1["oth_sc"] = df1[["242", "248", "250"]].fillna(0).sum(axis=1)

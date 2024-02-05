@@ -61,7 +61,9 @@ def output_tau(
     df["C_lnd_bl"] = df[["219", "220"]].fillna(0).sum(axis=1)
 
     # Create ovss_oth
-    df["ovss_oth"] = df[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
+    df["ovss_oth"] = (
+        df[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
+    )
 
     # Create oth_sc
     df["oth_sc"] = df[["242", "248", "250"]].fillna(0).sum(axis=1)
