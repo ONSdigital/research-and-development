@@ -34,9 +34,6 @@ def output_tau(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Filter out records that answer "no R&D"
-    df = df.copy().loc[~(df["604"] == "No")]
-
     # Filter out instance 0
     df = df.copy().loc[df.instance != 0]
 
