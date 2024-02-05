@@ -21,6 +21,7 @@ pg_num_col: str = "pg_numeric"
 civdef_col: str = "200"
 marker_col: str = "imp_marker"
 imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
+status_col: str = "status"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
@@ -30,25 +31,48 @@ short_code: str = "0006"
 long_code: str = "0001"
 
 
-def set_short_form_percentages(df: pd.DataFrame) -> pd.DataFrame:
+def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Sets the percent column to 100 for short form records.
-    If the percent column for short forms is not blank, raises an error.
+    Sets the percent column to 100 for the following forms:
+    - short form records
+    - long forms, exactly 1 site, instance >=1 and notnull postcode
 
     Args:
         df (pd.DataFrame): The input DataFrame.
 
     Returns:
-        pd.DataFrame: The DataFrame with updated percentages for short forms.
+        pd.DataFrame: The DataFrame with updated percentages.
 
     Raises:
         ValueError: If the percent column for short forms is not blank.
     """
+    # If the percent column for short forms is not blank, raise an error.
     short_forms = df[df[form_col] == short_code]
     if not short_forms[percent_col].isna().all():
         raise ValueError("Percent column for short forms should be blank.")
-
     df.loc[df[form_col] == short_code, percent_col] = 100
+
+    
+    # Condition for long forms with status = "Form sent out"
+    sent_out_condition = (
+        (df[form_col] == long_code)
+        & (df[status_col] == "Form sent out")
+        & (df[postcode_col + "_count"].isna())
+        & (df[postcode_col].isna())
+    )
+    df.loc[sent_out_condition, postcode_col] = (
+        df.loc[sent_out_condition, "postcodes_harmonised"])
+    df.loc[sent_out_condition, postcode_col + "_count"] = 1
+
+    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
+    single_cond =  (
+        (df[form_col] == long_code)
+        & (df[postcode_col + "_count"] == 1)
+        & (df[instance_col] >= 1)
+        & create_notnull_mask(df, postcode_col)
+    )
+    df.loc[single_cond, percent_col] = 100
+
     return df
 
 
@@ -87,16 +111,6 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
     """
-    # Condition for long forms, exactly 1 site, instance >=1 and notnull postcode
-    single_cond = (
-        (df[form_col] == long_code)
-        & (df[postcode_col + "_count"] == 1)
-        & (df[instance_col] >= 1)
-        & create_notnull_mask(df, postcode_col)
-    )
-
-    # ensure that for long-form references with one postcode, the percentage is 100%
-    df.loc[single_cond, percent_col] = 100
 
     # Condition for records to apportion: long forms, at least one site, instance >=1
     to_apportion_cond = (
@@ -451,11 +465,11 @@ def run_apportion_sites(
     # imputation.
     value_cols: List[str] = get_imputation_cols(config)
 
-    # Set short form percentages to 100
-    df = set_short_form_percentages(df)
-
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
+
+    # Set percentages to 100 in relevant rows
+    df = set_percentages(df)
 
     # Save the records that will be removed later as they have bad imp_marker
     save_removed_markers(df, config, write_csv, run_id)
