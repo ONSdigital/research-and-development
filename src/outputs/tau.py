@@ -34,12 +34,6 @@ def output_tau(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Filter out records that answer "no R&D"
-    df = df.copy().loc[~(df["604"] == "No")]
-
-    # Filter out instance 0
-    df = df.copy().loc[df.instance != 0]
-
     # Prepare the columns needed for outputs:
 
     # Join foriegn ownership column using ultfoc mapper
@@ -58,15 +52,15 @@ def output_tau(
     df = map_o.map_to_numeric(df)
 
     # Create C_lnd_bl
-    df["C_lnd_bl"] = df["219"] + df["220"]
+    df["C_lnd_bl"] = df[["219", "220"]].fillna(0).sum(axis=1)
 
     # Create ovss_oth
     df["ovss_oth"] = (
-        df["243"] + df["244"] + df["245"] + df["246"] + df["247"] + df["249"]
+        df[["243", "244", "245", "246", "247", "249"]].fillna(0).sum(axis=1)
     )
 
     # Create oth_sc
-    df["oth_sc"] = df["242"] + df["248"] + df["250"]
+    df["oth_sc"] = df[["242", "248", "250"]].fillna(0).sum(axis=1)
 
     # Create tau output dataframe with required columns from schema
     schema_path = config["schema_paths"]["tau_schema"]
@@ -75,5 +69,5 @@ def output_tau(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_tau_{tdate}_v{run_id}_TEST.csv"
+    filename = f"output_tau_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_tau/{filename}", tau_output)
