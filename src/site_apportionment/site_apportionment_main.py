@@ -37,14 +37,16 @@ def run_site_apportionment(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["apportionment_path"]
 
+    imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
+
     # Conditionally output the records to be removed
     if config["global"]["output_status_filtered"]:
-        osf.output_status_filtered(df, config, write_csv, run_id)
+        osf.output_status_filtered(df, imp_markers_to_keep, config, write_csv, run_id)
 
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
         SitesMainLogger.info("Starting apportionment to sites...")
-        df_out = sap.run_apportion_sites(df, config, write_csv, run_id)
+        df_out = sap.run_apportion_sites(df, imp_markers_to_keep, config)
 
         # Output QA files
         if config["global"]["output_apportionment_qa"] & output_file:

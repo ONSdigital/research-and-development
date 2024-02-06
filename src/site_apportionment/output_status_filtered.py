@@ -2,22 +2,24 @@
 import logging
 import pandas as pd
 from datetime import datetime
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, List, Any
 
 
 StatusFilteredLogger = logging.getLogger(__name__)
 
-imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
-marker_col: str = "imp_marker"
 
-def save_removed_markers(df: pd.DataFrame) -> pd.DataFrame:
+def save_removed_markers(
+        df: pd.DataFrame, 
+        imp_markers_to_keep: List[str]
+    ) -> pd.DataFrame:
     """Filter rows neither clear nor imputed for output QA, based on imp_marker."""
-    to_remove = ~df[marker_col].isin(imp_markers_to_keep)
+    to_remove = ~df["imp_marker"].isin(imp_markers_to_keep)
     return df.copy().loc[to_remove]
 
 
 def output_status_filtered(
     df: pd.DataFrame,
+    imp_markers_to_keep: List[str],
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -34,7 +36,7 @@ def output_status_filtered(
     StatusFilteredLogger.info("Starting status filtered output...")
 
     # filter the dataframe
-    filtered_df = save_removed_markers(df)
+    filtered_df = save_removed_markers(df, imp_markers_to_keep)
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
@@ -49,8 +51,9 @@ def output_status_filtered(
 
 def keep_good_markers(
     df: pd.DataFrame,
+    imp_markers_to_keep: List[str],
 ) -> pd.DataFrame:
     """Keep only rows that are clear or imputed, based on the imp_marker column."""
-    series_to_keep = df[marker_col].isin(imp_markers_to_keep)
+    series_to_keep = df["imp_marker"].isin(imp_markers_to_keep)
     return df.copy().loc[series_to_keep]
 

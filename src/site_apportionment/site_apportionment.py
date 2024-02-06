@@ -19,7 +19,6 @@ product_col: str = "201"
 pg_num_col: str = "pg_numeric"
 civdef_col: str = "200"
 marker_col: str = "imp_marker"
-imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
 status_col: str = "status"
 
 groupby_cols: List[str] = [ref_col, period_col]
@@ -98,7 +97,10 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def split_sites_df(
+        df: pd.DataFrame, 
+        imp_markers_to_keep: List[str]
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split dataframe into two based on whether there are sites or not.
 
@@ -126,7 +128,7 @@ def split_sites_df(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     df_out = df.copy()[~to_apportion_cond]
 
     # Remove "bad" imputation markers from df_out
-    df_out = keep_good_markers(df_out)
+    df_out = keep_good_markers(df_out, imp_markers_to_keep)
 
     return to_apportion_df, df_out
 
@@ -171,7 +173,8 @@ def deduplicate_codes_values(
     
 
 def create_category_df(
-    df: pd.DataFrame, 
+    df: pd.DataFrame,
+    imp_markers_to_keep: List[str],
     orig_cols: List[str], 
     groupby_cols: List[str], 
     code_cols: List[str],
@@ -207,7 +210,7 @@ def create_category_df(
     category_df = category_df.loc[valid_code_cond]
 
     # Remove "bad" imputation markers, "no imputation" and "no mean found."
-    category_df = keep_good_markers(category_df)
+    category_df = keep_good_markers(category_df, imp_markers_to_keep)
 
     # De-duplicate - possibly, not needed
     # In addition to the textual columns that belong to the responses, the list  below
@@ -409,9 +412,8 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
 def run_apportion_sites(
     df: pd.DataFrame, 
-    config: Dict[str, Union[str, List[str]]],
-    write_csv: Callable,
-    run_id: int,
+    imp_markers_to_keep,
+    config: Dict[str, Union[str, List[str]]]
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -453,11 +455,12 @@ def run_apportion_sites(
     df = set_percentages(df)
 
     # Split the dataframe in two based on whether there's one or more postcodes
-    to_apportion_df, df_out = split_sites_df(df)
+    to_apportion_df, df_out = split_sites_df(df, imp_markers_to_keep)
 
     # category_df: dataframe with codes, textual and numerical values
     category_df = create_category_df(
         to_apportion_df,
+        imp_markers_to_keep,
         orig_cols,
         groupby_cols,
         code_cols,
