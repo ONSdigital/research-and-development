@@ -39,7 +39,7 @@ def run_site_apportionment(
 
     # Conditionally output the records to be removed
     if config["global"]["output_status_filtered"]:
-        osf.save_removed_markers(df, config, write_csv, run_id)
+        osf.output_status_filtered(df, config, write_csv, run_id)
 
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
@@ -59,5 +59,5 @@ def run_site_apportionment(
     else:
         SitesMainLogger.info("Apportionment to sites disabled, skipped")
         # Remove records that are neither clear nor imputed, based on imputation marker.
-        filtered_df = sap.keep_good_markers(df_out)
+        filtered_df = sap.keep_good_markers(df)
         return filtered_df
