@@ -5,6 +5,7 @@ from typing import Callable, Dict, Any
 from datetime import datetime
 
 import src.site_apportionment.site_apportionment as sap
+import src.site_apportionment.output_status_filtered as osf
 
 SitesMainLogger = logging.getLogger(__name__)
 
@@ -36,6 +37,10 @@ def run_site_apportionment(
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["apportionment_path"]
 
+    # Conditionally output the records to be removed
+    if config["global"]["output_status_filtered"]:
+        osf.save_removed_markers(df, config, write_csv, run_id)
+
     # Check if this module needs to be applied
     if config["global"]["apportion_sites"]:
         SitesMainLogger.info("Starting apportionment to sites...")
@@ -53,4 +58,6 @@ def run_site_apportionment(
 
     else:
         SitesMainLogger.info("Apportionment to sites disabled, skipped")
-        return df
+        # Remove records that are neither clear nor imputed, based on imputation marker.
+        filtered_df = sap.keep_good_markers(df_out)
+        return filtered_df

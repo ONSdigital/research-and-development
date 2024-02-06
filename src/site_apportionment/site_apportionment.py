@@ -1,11 +1,10 @@
 from ast import literal_eval
 import pandas as pd
-from pandas.api.types import is_numeric_dtype
 from typing import Tuple, List, Dict, Callable, Union
 import logging
 
 from src.imputation.imputation_helpers import get_imputation_cols
-from src.outputs.status_filtered import output_status_filtered
+from src.site_apportionment.output_status_filtered import keep_good_markers
 
 SitesApportionmentLogger = logging.getLogger(__name__)
 
@@ -211,6 +210,10 @@ def create_category_df(
     category_df = keep_good_markers(category_df)
 
     # De-duplicate - possibly, not needed
+    # In addition to the textual columns that belong to the responses, the list  below
+    # also includes the numeric 9000 cols not needed in the pipeline, and the columns
+    # from the contributor data, originating in IDBR. These can also be aggregated using
+    # "first" as they are the same for all instances.
     textual_cols = (
         [x for x in category_cols if x not in (
             groupby_cols + code_cols + value_cols
@@ -404,14 +407,6 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
     return sorted_df
 
 
-def keep_good_markers(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    """Keeps only rows that have good values of marker column"""
-    series_to_keep = df[marker_col].isin(imp_markers_to_keep)
-    return df.copy().loc[series_to_keep]
-
-
 def tidy_apportionment_dataframe(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -424,20 +419,6 @@ def tidy_apportionment_dataframe(
     to_keep_df.loc[condition, "status"] = "imputed"
 
     return to_keep_df
-
-
-def save_removed_markers(df, config, write_csv, run_id) -> None:
-    """Saves the records that have bad imputation markers"""
-    
-    # Finding rows that will be removed later
-    to_remove = ~df[marker_col].isin(imp_markers_to_keep)
-    filtered_output_df = df.copy().loc[to_remove]
-
-    # Saving status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        SitesApportionmentLogger.info("Starting status filtered output...")
-        output_status_filtered(filtered_output_df, config, write_csv, run_id)
-        SitesApportionmentLogger.info("Finished status filtered output.")
 
 
 def run_apportion_sites(
@@ -485,15 +466,12 @@ def run_apportion_sites(
     # Set percentages to 100 in relevant rows
     df = set_percentages(df)
 
-    # Save the records that will be removed later as they have bad imp_marker
-    save_removed_markers(df, config, write_csv, run_id)
-
     # Split the dataframe in two based on whether there's one or more postcodes
-    multiple_sites_df, df_out = split_sites_df(df)
+    to_apportion_df, df_out = split_sites_df(df)
 
     # category_df: dataframe with codes, textual and numerical values
     category_df = create_category_df(
-        multiple_sites_df,
+        to_apportion_df,
         orig_cols,
         groupby_cols,
         code_cols,
@@ -502,7 +480,7 @@ def run_apportion_sites(
     )
 
     # sites_df: dataframe with sites, percents and everythung else
-    sites_df = create_sites_df(multiple_sites_df, groupby_cols, site_cols)
+    sites_df = create_sites_df(to_apportion_df, groupby_cols, site_cols)
 
     # Check for postcode duplicates for QA
     count_duplicate_sites(sites_df)

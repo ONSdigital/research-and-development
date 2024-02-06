@@ -15,12 +15,13 @@ from src.utils.local_file_mods import write_local_csv as write_csv
 #%% Configuration settings
 
 # Input folder and file names
-in_fol = "D:/data/res_dev/regression/input/"
+root_folder = "R:/BERD Results System Development 2023/DAP_emulation/"
+in_fol = "apportionment/apportionment_qa/"
 in_file_old = "estimated_df_apportioned_2024-02-05_v15.csv"
 in_file_new = "estimated_df_apportioned_2024-02-05_v472_TEST.csv"
 
 # Output folder and file
-out_fol = "D:/coding_projects/randd_regression"
+out_fol = "D:/coding_projects/randd_regression/"
 out_file = "apportion_merged.csv"
 
 # Columns to select
@@ -30,8 +31,8 @@ other_cols = ["instance", "status", "imp_marker",  "602", "referencepostcode", "
 tolerance = 0.001
 #%% Read files
 cols_read = key_cols + [value_col] + other_cols
-df_old = read_csv(in_fol+in_file_old)[cols_read]
-df_new = read_csv(in_fol+in_file_new)[cols_read]
+df_old = read_csv(root_folder + in_fol + in_file_old)[cols_read]
+df_new = read_csv(root_folder + in_fol + in_file_new)[cols_read]
 
 #%% Filter good statuses only
 imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
