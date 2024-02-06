@@ -407,20 +407,6 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
     return sorted_df
 
 
-def tidy_apportionment_dataframe(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    """Change the apportionment status to "imputed"  for all records we keep."""
-
-    to_keep_df = df.copy()
-
-    # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df[marker_col].isin(imp_markers_to_keep)
-    to_keep_df.loc[condition, "status"] = "imputed"
-
-    return to_keep_df
-
-
 def run_apportion_sites(
     df: pd.DataFrame, 
     config: Dict[str, Union[str, List[str]]],
@@ -502,7 +488,5 @@ def run_apportion_sites(
 
     # Sort by period, ref, instance in ascending order.
     df_out = sort_rows_order_cols(df_out, orig_cols)
-
-    df_out = tidy_apportionment_dataframe(df_out)
 
     return df_out
