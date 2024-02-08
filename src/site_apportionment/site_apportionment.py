@@ -13,7 +13,8 @@ ref_col: str = "reference"
 instance_col: str = "instance"
 period_col: str = "period"
 form_col: str = "formtype"
-postcode_col: str = "601"  
+postcode_col: str = "601"
+postcodes_harmonised_col: str = "postcodes_harmonised"  
 percent_col: str = "602"
 product_col: str = "201"
 pg_num_col: str = "pg_numeric"
@@ -23,7 +24,11 @@ status_col: str = "status"
 
 groupby_cols: List[str] = [ref_col, period_col]
 code_cols: List[str] = [product_col, civdef_col, pg_num_col]
-site_cols: List[str] = [instance_col, postcode_col, percent_col]
+site_cols: List[str] = [
+    instance_col, 
+    postcode_col, 
+    percent_col, 
+    postcodes_harmonised_col]
 
 # Long and short form codes
 short_code: str = "0006"
@@ -251,6 +256,14 @@ def create_sites_df(
 
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
+
+    # De-duplicate by summing percents
+    sites_df[percent_col] = sites_df[percent_col].fillna(0)
+    agg_dict = {instance_col: "first", percent_col: "sum"}
+    sites_df = sites_df.groupby(
+        groupby_cols + [postcode_col, postcodes_harmonised_col]
+    ).agg(agg_dict).reset_index()
+
     return sites_df
 
 
@@ -277,6 +290,7 @@ def count_duplicate_sites(sites_df: pd.DataFrame):
         SitesApportionmentLogger.info(
             f"There are {num_duplicate_sites} duplicate sites."
         )
+    
 
 
 def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.DataFrame:
