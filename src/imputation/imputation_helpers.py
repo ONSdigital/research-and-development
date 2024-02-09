@@ -4,8 +4,6 @@ import pandas as pd
 from typing import List, Dict, Callable
 from itertools import chain
 
-from src.outputs.status_filtered import output_status_filtered
-
 ImputationHelpersLogger = logging.getLogger(__name__)
 
 
@@ -32,6 +30,51 @@ def get_imputation_cols(config: dict) -> list:
     numeric_cols = master_cols + bd_cols + other_sum_cols
 
     return numeric_cols
+
+
+def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
+    """Return a mask for string values in column col that are not null."""
+    return df[col].str.len() > 0
+
+
+def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
+    """Create a dataframe mask based on listed options - retrun Bool column.
+    
+    Options include:
+        - 'clear_status': rows with one of the clear statuses
+        - 'instance_zero': rows with instance = 0
+        - 'instance_nonzero': rows with instance != 0
+        - 'no_r_and_d' : rows where q604 = 'No'
+        - 'postcode_only': rows in which there are no numeric values, only postcodes.
+    """
+    clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
+    instance_mask = df.instance == 0
+    no_r_and_d_mask = df["604"]=="No"
+    postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
+
+    # Set initial values for the mask series as a column in the dataframe
+    df = df.copy()
+    df["mask_col"] = False
+    
+    if "clear_status" in options:
+        df["mask_col"] =  df["mask_col"] & clear_mask
+
+    if "instance_zero" in options:
+        df["mask_col"] = df["mask_col"] & instance_mask
+
+    elif "instance_nonzero" in options:
+        df["mask_col"] = df["mask_col"] & ~instance_mask
+
+    if "no_r_and_d" in options:
+        df["mask_col"] = df["mask_col"] & no_r_and_d_mask
+        
+    if "postcode_only" in options:
+        df["mask_col"] = df["mask_col"] & postcode_only_mask
+
+    if "excl_postcode_only" in options:
+        df["mask_col"] = df["mask_col"] & ~postcode_only_mask
+
+    return df["mask_col"]
 
 
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
@@ -240,34 +283,15 @@ def tidy_imputation_dataframe(
     to_drop = [
         col
         for col in df.columns
-        if (col.endswith("prev") | col.endswith("imputed") | col.endswith("link"))
+        if (
+            col.endswith("prev") | col.endswith("imputed") | col.endswith("link")
+            | col.endswith("sf_exp_grouping") | col.endswith("trim") 
+        )
     ]
 
     to_drop += ["200_original", "pg_sic_class", "empty_pgsic_group", "empty_pg_group"]
-    to_drop += ["200_imp_marker", "211_trim", "305_trim", "manual_trim"]
+    to_drop += ["200_imp_marker"]
     
     df = df.drop(columns=to_drop)
 
-    # Keep only imputed records and clear ("R")
-    imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
-    to_keep = df["imp_marker"].isin(imp_markers_to_keep) | (df["imp_marker"] == "R")
-
-    to_keep_df = df.copy().loc[to_keep]
-    filtered_output_df = df.copy().loc[~to_keep]
-
-    # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
-    to_keep_df.loc[condition, "status"] = "imputed"
-
-    # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        logger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        logger.info("Finished status filtered output.")
-
-    return to_keep_df
+    return df

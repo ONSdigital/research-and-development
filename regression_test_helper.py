@@ -4,7 +4,7 @@ import os
 
 # configuration settings
 csv_path = "D:/coding_projects/randd_test_data/"
-input_file = "test.csv"
+input_file1 = "test.csv"
 
 # whether the unit test data is input or expected output
 in_or_output = "input"
