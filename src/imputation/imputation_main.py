@@ -129,9 +129,9 @@ def run_imputation(
     # check "no R&D" records have only an instance 0 and one instance 1
     check_df = imputed_df.copy().loc[imputed_df["604"] == "No"]["reference", "instance", "604"]
     check_df["ref_count"] = check_df.groupby("reference")["instance"].sum()
-    ImputationMainLogger.info("The following references are 'No R&D' "
-                              "but have too many rows:"
-                              check_df[check_df["ref_count"]> 1])
+    ImputationMainLogger.info("The following references are 'No R&D' ")
+    ImputationMainLogger.info( "but have too many rows:")
+    ImputationMainLogger.info(check_df[check_df["ref_count"]> 1])
     
     # join constructed rows back to the imputed df
     # Note that constructed rows need to be included in short form expansion
