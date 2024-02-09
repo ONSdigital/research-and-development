@@ -75,6 +75,16 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
         df["mask_col"] = df["mask_col"] & ~postcode_only_mask
 
     return df["mask_col"]
+def instance_fix(df: pd.DataFrame):
+    """Set instance to 1 for longforms with status 'Form sent out.'
+
+    References with status 'Form sent out' initially have a null in the instance
+    column.
+    """
+    mask = (df.formtype == "0001") & (df.status == "Form sent out")
+    df.loc[mask, "instance"] = 1
+
+    return df
 
 
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
@@ -161,30 +171,21 @@ def fix_604_error(df: pd.DataFrame) -> pd.Series:
     # Note: where any of the columns in the mask has a null value, the mask will be null
     to_remove_mask = to_remove_mask.fillna(False)
 
-    # output the references that contained data in error
-    removed_df = df.copy().loc[to_remove_mask][["reference", "instance", "604"]]
-    if not removed_df.empty:
-        ImputationHelpersLogger.info(
-            "The following 'No R&D' references have had invalid records removed: \n"
-            f"{removed_df}"
-        )
+    # Output all references with no R&D but more thank one instance
+    wrong_604_qa_df = get_604_error_df(df.copy().loc[to_remove_mask])
 
     # finally we remove unwanted rows
     filtered_df = df.copy().loc[~(to_remove_mask)]
 
-    return filtered_df
+    return filtered_df, wrong_604_qa_df
 
 
-def instance_fix(df: pd.DataFrame):
-    """Set instance to 1 for longforms with status 'Form sent out.'
-
-    References with status 'Form sent out' initially have a null in the instance
-    column.
-    """
-    mask = (df.formtype == "0001") & (df.status == "Form sent out")
-    df.loc[mask, "instance"] = 1
-
-    return df
+def get_604_error_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Save all references with no R&D but more than one instance for output."""
+    # get list of references with no R&D but more than one instance.
+    wrong_604_ref_list = list(df["reference"].unique())
+    wrong_604_qa_df = df.copy().loc[df.reference.isin(wrong_604_ref_list)]
+    return wrong_604_qa_df
 
 
 def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
@@ -202,7 +203,7 @@ def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
         (pd.DataFrame): The same dataframe with an instance 1 for "no R&D" refs.
     """
     # Ensure that in the case longforms with "no R&D" we only have one row
-    df = fix_604_error(df)
+    df, wrong_604_qa_df = fix_604_error(df)
 
     no_rd_mask = (df.formtype == "0001") & (df["604"] == "No")
     filtered_df = df.copy().loc[no_rd_mask]
@@ -212,7 +213,7 @@ def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
     updated_df = updated_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
-    return updated_df
+    return updated_df, wrong_604_qa_df
 
 
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
