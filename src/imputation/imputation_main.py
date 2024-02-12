@@ -70,7 +70,7 @@ def run_imputation(
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     df = hlp.instance_fix(df)
-    df, wrong_604_qa_df, wrong_604_ref_list = hlp.create_r_and_d_instance(df)
+    df, wrong_604_qa_df = hlp.create_r_and_d_instance(df)
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
@@ -119,20 +119,13 @@ def run_imputation(
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)
 
-    # After imputation, correction to ignore the "604" == "No" in any records with
+    # After imputation, correction to overwrite the "604" == "No" in any records with
     # Status "check needed"
     chk_mask = imputed_df["status"].str.contains("Check needed")
     imputation_mask = imputed_df["imp_marker"].isin(["TMI", "CF", "MoR"])
     # Changing all records that meet the criteria to "604" == "Yes"
     imputed_df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
 
-    # check "no R&D" records have only an instance 0 and one instance 1
-    check_df = imputed_df.copy().loc[imputed_df["604"] == "No"]["reference", "instance", "604"]
-    check_df["ref_count"] = check_df.groupby("reference")["instance"].sum()
-    ImputationMainLogger.info("The following references are 'No R&D' ")
-    ImputationMainLogger.info( "but have too many rows:")
-    ImputationMainLogger.info(check_df[check_df["ref_count"]> 1])
-    
     # join constructed rows back to the imputed df
     # Note that constructed rows need to be included in short form expansion
     if "is_constructed" in df.columns:

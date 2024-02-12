@@ -125,7 +125,37 @@ def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     return updated_col
 
 
-def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
+def get_mult_604_mask(df: pd.DataFrame) -> pd.Series:
+    """Return mask for long form references with "No" in col 604 but >1 instance.
+
+    Fill nulls as where any of the columns in the mask has a null value, 
+    the mask will be null"""
+    mult_604_mask = (
+        (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
+    ).fillna(False)
+    return mult_604_mask
+
+def filter_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Filter out rows with 604 error and create qa dataframe.
+    
+    Return the filtered data frame and a second qa dataframe with
+    all references with no R&D but more than one instance for output."""
+    mult_604_mask = get_mult_604_mask(df)
+
+    # get list of references with no R&D but more than one instance.
+    mult_604_df = df.copy().loc[mult_604_mask]
+    mult_604_ref_list = list(mult_604_df["reference"].unique())
+
+    # create qa dataframe containing all rows for instances with 604 error (inc inst 0)
+    mult_604_qa_df = df.copy().loc[df.reference.isin(mult_604_ref_list)]
+
+    # finally we remove unwanted rows
+    filtered_df = df.copy().loc[~(mult_604_mask)]
+
+    return filtered_df, mult_604_qa_df
+
+
+def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Copy 'Yes' or 'No' in insance 0 for q604 to all other instances for each ref.
 
     Note:
@@ -163,30 +193,22 @@ def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
     # Copy the "Yes" or "No" in col 604 to all other instances
     df["604"] = copy_first_to_group(df, "604")
 
-    # For long form references with "No" in col 604, keep only instance 0
-    to_remove_mask = (
-        (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
-    )
-
-    # Note: where any of the columns in the mask has a null value, the mask will be null
-    to_remove_mask = to_remove_mask.fillna(False)
-
     # Output all references with no R&D but more thank one instance
-    wrong_604_qa_df, wrong_604_ref_list = get_604_error_df(df, to_remove_mask)
+    filtered_df, mult_604_qa_df = filter_604_error(df)
 
-    # finally we remove unwanted rows
-    filtered_df = df.copy().loc[~(to_remove_mask)]
-
-    return filtered_df, wrong_604_qa_df, wrong_604_ref_list
+    return filtered_df, mult_604_qa_df
 
 
-def get_604_error_df(df: pd.DataFrame, mask) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Save all references with no R&D but more than one instance for output."""
-    # get list of references with no R&D but more than one instance.
-    get_ref_df = df.copy().loc[mask]
-    wrong_604_ref_list = list(get_ref_df["reference"].unique())
-    wrong_604_qa_df = df.copy().loc[df.reference.isin(wrong_604_ref_list)]
-    return wrong_604_qa_df, wrong_604_ref_list
+def check_604_fix(df) -> pd.DataFrame:
+    """Check the refs with no R&D have one instance 0 and one instance 1 only."""
+    mult_604_mask = get_mult_604_mask(df)
+    filtered_df = df.copy().loc[mult_604_mask][["reference", "instance"]]
+    filtered_df["ref_count"] = filtered_df.groupby("reference").transform(sum)
+
+    check_df = filtered_df.copy().loc[filtered_df.ref_count > 1]
+
+    filtered_df = df.copy().drop_duplicates(subset=["reference", "instance"])
+    return filtered_df, check_df
 
 
 def create_r_and_d_instance(
@@ -206,7 +228,7 @@ def create_r_and_d_instance(
         (pd.DataFrame): The same dataframe with an instance 1 for "no R&D" refs.
     """
     # Ensure that in the case longforms with "no R&D" we only have one row
-    df, wrong_604_qa_df, wrong_604_ref_list = fix_604_error(df)
+    df, mult_604_qa_df = fix_604_error(df)
 
     no_rd_mask = (df.formtype == "0001") & (df["604"] == "No")
     filtered_df = df.copy().loc[no_rd_mask]
@@ -216,7 +238,15 @@ def create_r_and_d_instance(
     updated_df = updated_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
-    return updated_df, wrong_604_qa_df, wrong_604_ref_list
+
+    # check that the fix has worked and drop duplicates for now if not
+    final_df, check_df = check_604_fix(updated_df)
+    #TODO: it shouldn't be necessary to drop duplicates if the fix works properly.
+    ImputationHelpersLogger.info("The following references are 'No R&D' ")
+    ImputationHelpersLogger.info( "but have too many rows- duplicates will be dropped:")
+    ImputationHelpersLogger.info(check_df)
+
+    return final_df, mult_604_qa_df
 
 
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:

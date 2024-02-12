@@ -7,6 +7,7 @@ from src.imputation.imputation_helpers import (
     copy_first_to_group,
     fix_604_error,
     create_r_and_d_instance,
+    check_604_fix
 )
 
 
@@ -119,8 +120,54 @@ class TestFix604Error:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df, qa_df, qa_list = fix_604_error(input_df)
+        result_df, qa_df = fix_604_error(input_df)
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)
+
+    def test_check_604_fix(self):
+        """Test for function check 604 fix"""
+        # Create an input dataframe for the test
+        input_cols = [
+            "reference",
+            "instance",
+            "200",
+            "604",
+            "formtype",
+        ]    
+        input_data = [
+            [1001, 0, None, "No", "0001"],
+            [2002, 0, None, "Yes", "0001"],
+            [3003, 0, None, "No", "0001"],
+            [3003, 1, "C", "No", "0001"],
+            [3003, 1, "C", "No", "0001"],
+            [4004, 0, None, None, "0001"],
+        ]
+   
+        exp_data = [
+            [1001, 0, None, "No", "0001"],
+            [2002, 0, None, "Yes", "0001"],
+            [3003, 0, None, "No", "0001"],
+            [3003, 1, "C", "No", "0001"],
+            [4004, 0, None, None, "0001"],
+        ]
+
+        expected_check_cols = [
+            "reference",
+            "instance",
+            "ref_count"
+        ]   
+        expected_check_data = [
+            [3003, 1, 2],
+            [3003, 1, 2],
+        ]
+
+        input_df = pandasDF(data=input_data, columns=input_cols)
+        expected_df = pandasDF(data=exp_data, columns=input_cols)
+        exp_check_df = pandasDF(data=expected_check_data, columns=expected_check_cols)
+
+        result_df, check_df = check_604_fix(input_df)
+
+        assert_frame_equal(result_df.reset_index(drop=True), expected_df)
+        assert_frame_equal(check_df.reset_index(drop=True), exp_check_df)
 
 
 class TestCreateRAndDInstance:
@@ -173,10 +220,10 @@ class TestCreateRAndDInstance:
         expected_df = pandasDF(data=data, columns=input_cols)
         return expected_df
 
-    def test_fix_604_error(self):
+    def test_create_r_and_d_instance(self):
         """Test for function fix_604_error."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df, qa_df, qa_list = create_r_and_d_instance(input_df)
+        result_df, qa_df = create_r_and_d_instance(input_df)
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)
