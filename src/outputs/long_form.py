@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
-from src.outputs.outputs_helpers import create_output_df, create_period_year
+from src.outputs.outputs_helpers import create_output_df
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -39,9 +39,6 @@ def output_long_form(
 
     # Filter for long-forms/NI (status mapping has already been done)
     df = df.loc[((df["formtype"] == "0001") | (df["formtype"] == "0003"))]
-
-    # Create a 'year' column
-    df = create_period_year(df)
 
     # Join foriegn ownership column using ultfoc mapper
     df = map_o.join_fgn_ownership(df, ultfoc_mapper)
