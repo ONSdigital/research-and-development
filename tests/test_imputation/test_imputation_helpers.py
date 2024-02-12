@@ -119,7 +119,7 @@ class TestFix604Error:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df = fix_604_error(input_df)
+        result_df, qa_df, qa_list = fix_604_error(input_df)
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)
 
 
@@ -178,5 +178,5 @@ class TestCreateRAndDInstance:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        result_df = create_r_and_d_instance(input_df)
+        result_df, qa_df, qa_list = create_r_and_d_instance(input_df)
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)

@@ -1,7 +1,7 @@
 """Utility functions  to be used in the imputation module."""
 import logging
 import pandas as pd
-from typing import List, Dict, Callable
+from typing import List, Dict, Tuple, Callable
 from itertools import chain
 
 ImputationHelpersLogger = logging.getLogger(__name__)
@@ -125,7 +125,7 @@ def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     return updated_col
 
 
-def fix_604_error(df: pd.DataFrame) -> pd.Series:
+def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
     """Copy 'Yes' or 'No' in insance 0 for q604 to all other instances for each ref.
 
     Note:
@@ -172,15 +172,15 @@ def fix_604_error(df: pd.DataFrame) -> pd.Series:
     to_remove_mask = to_remove_mask.fillna(False)
 
     # Output all references with no R&D but more thank one instance
-    wrong_604_qa_df = get_604_error_df(df, to_remove_mask)
+    wrong_604_qa_df, wrong_604_ref_list = get_604_error_df(df, to_remove_mask)
 
     # finally we remove unwanted rows
     filtered_df = df.copy().loc[~(to_remove_mask)]
 
-    return filtered_df, wrong_604_qa_df
+    return filtered_df, wrong_604_qa_df, wrong_604_ref_list
 
 
-def get_604_error_df(df: pd.DataFrame, mask):
+def get_604_error_df(df: pd.DataFrame, mask) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Save all references with no R&D but more than one instance for output."""
     # get list of references with no R&D but more than one instance.
     get_ref_df = df.copy().loc[mask]
@@ -189,7 +189,9 @@ def get_604_error_df(df: pd.DataFrame, mask):
     return wrong_604_qa_df, wrong_604_ref_list
 
 
-def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
+def create_r_and_d_instance(
+        df: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
     """Create a duplicate of long form records with no R&D and set instance to 1.
 
     These references initailly have one entry with instance 0.
