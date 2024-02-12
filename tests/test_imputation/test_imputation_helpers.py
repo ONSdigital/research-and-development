@@ -102,7 +102,7 @@ class TestFix604Error:
             "formtype",
         ]
 
-        data = [
+        filtered_data = [
             [1001, 0, None, "No", "0001"],
             [2002, 0, None, "Yes", "0001"],
             [3003, 0, None, "Haha", "0001"],
@@ -112,16 +112,26 @@ class TestFix604Error:
             [4004, 0, None, None, "0001"],
         ]
 
-        expected_df = pandasDF(data=data, columns=input_cols)
-        return expected_df
+        qa_data =  [
+            [1001, 0, None, "No", "0001"],
+            [1001, 1, "C", "No", "0001"],
+            [1001, 2, "C", "No", "0001"],
+            [1001, 3, "D", "No", "0001"],
+        ]
+        expected_filtered_df = pandasDF(data=filtered_data, columns=input_cols)
+        expected_qa_df = pandasDF(data=qa_data, columns=input_cols)
+        
+        return expected_filtered_df, expected_qa_df
 
     def test_fix_604_error(self):
         """Test for function fix_604_error."""
         input_df = self.create_input_df()
-        expected_df = self.create_expected_df()
+        expected_filtered_df, expected_qa_df = self.create_expected_df()
 
         result_df, qa_df = fix_604_error(input_df)
-        assert_frame_equal(result_df.reset_index(drop=True), expected_df)
+        assert_frame_equal(result_df.reset_index(drop=True), expected_filtered_df)
+        assert_frame_equal(qa_df.reset_index(drop=True), expected_qa_df)
+
 
     def test_check_604_fix(self):
         """Test for function check 604 fix"""

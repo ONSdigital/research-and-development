@@ -135,28 +135,12 @@ def get_mult_604_mask(df: pd.DataFrame) -> pd.Series:
     ).fillna(False)
     return mult_604_mask
 
-def filter_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Filter out rows with 604 error and create qa dataframe.
-    
-    Return the filtered data frame and a second qa dataframe with
-    all references with no R&D but more than one instance for output."""
-    mult_604_mask = get_mult_604_mask(df)
-
-    # get list of references with no R&D but more than one instance.
-    mult_604_df = df.copy().loc[mult_604_mask]
-    mult_604_ref_list = list(mult_604_df["reference"].unique())
-
-    # create qa dataframe containing all rows for instances with 604 error (inc inst 0)
-    mult_604_qa_df = df.copy().loc[df.reference.isin(mult_604_ref_list)]
-
-    # finally we remove unwanted rows
-    filtered_df = df.copy().loc[~(mult_604_mask)]
-
-    return filtered_df, mult_604_qa_df
-
 
 def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Copy 'Yes' or 'No' in insance 0 for q604 to all other instances for each ref.
+    """Filter out rows with 604 error and create qa dataframe with the rows with errors.
+    
+    Return the filtered data frame and a second qa dataframe with
+    all references with no R&D but more than one instance for output.
 
     Note:
         Occasionally we have noticed that an instance 1 containing a small amount of
@@ -177,24 +161,41 @@ def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         2         | 0           | "Yes"
         2         | 1           | nan
 
-    returned dataframe:
+    returned filtered dataframe:
         reference | instance    | "604"
     ---------------------------------
         1         | 0           | "No"
         2         | 0           | "Yes"
         2         | 1           | "Yes"
 
+    returned qa dataframe:
+        reference | instance    | "604"
+    ---------------------------------
+        1         | 0           | "No"
+        1         | 1           | "No"
+
+
     args:
         df (pd.DataFrame): The dataframe being prepared for imputation.
 
     returns:
         (pd.DataFrame): The dataframe with only instance 0 for "no r&d" refs.
+        (pd.DataFrame): The dataframe with references with > 1 insance but no r&d.
     """
     # Copy the "Yes" or "No" in col 604 to all other instances
     df["604"] = copy_first_to_group(df, "604")
 
-    # Output all references with no R&D but more thank one instance
-    filtered_df, mult_604_qa_df = filter_604_error(df)
+    mult_604_mask = get_mult_604_mask(df)
+
+    # get list of references with no R&D but more than one instance.
+    mult_604_df = df.copy().loc[mult_604_mask]
+    mult_604_ref_list = list(mult_604_df["reference"].unique())
+
+    # create qa dataframe containing all rows for instances with 604 error (inc inst 0)
+    mult_604_qa_df = df.copy().loc[df.reference.isin(mult_604_ref_list)]
+
+    # finally we remove unwanted rows
+    filtered_df = df.copy().loc[~(mult_604_mask)]
 
     return filtered_df, mult_604_qa_df
 
