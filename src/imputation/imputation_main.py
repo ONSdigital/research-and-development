@@ -70,7 +70,7 @@ def run_imputation(
 
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     df = hlp.instance_fix(df)
-    df = hlp.create_r_and_d_instance(df)
+    df, wrong_604_qa_df = hlp.create_r_and_d_instance(df)
 
     # remove records that have had construction applied before imputation
     if "is_constructed" in df.columns:
@@ -119,7 +119,7 @@ def run_imputation(
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)
 
-    # After imputation, correction to ignore the "604" == "No" in any records with
+    # After imputation, correction to overwrite the "604" == "No" in any records with
     # Status "check needed"
     chk_mask = imputed_df["status"].str.contains("Check needed")
     imputation_mask = imputed_df["imp_marker"].isin(["TMI", "CF", "MoR"])
@@ -151,6 +151,7 @@ def run_imputation(
         trim_qa_filename = f"trimming_qa_{tdate}_v{run_id}.csv"
         links_filename = f"links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"full_responses_imputed_{tdate}_v{run_id}.csv"
+        wrong_604_filename = f"wrong_604_error_qa_{tdate}_v{run_id}.csv"
 
         # create trimming qa dataframe with required columns from schema
         schema_path = config["schema_paths"]["manual_trimming_schema"]
@@ -160,7 +161,7 @@ def run_imputation(
         write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
-
+        write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe
