@@ -356,11 +356,8 @@ class TestOneValueOutlier:
         assert_frame_equal(result_df, expected_df)
 
 
-
-class TestNoOutlier:
-    """Unit tests for run_auto_flagging function."""
-    """Test case:
-    no outliers contained in dataframe"""
+class TestManyOutlierFlagging:
+    """Unit tests for flag_outliers function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -368,25 +365,18 @@ class TestNoOutlier:
             "reference",
             "instance",
             "selectiontype",
-            "formtype",
             "statusencoded",
             "period",
             "cellnumber",
             "701",
-            "702"
         ]
 
         data = [
-            [1, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [2, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [3, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [4, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [5, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [6, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [7, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [9, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1],
-            [10, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1]
+            [1, 0, "P", "210", 2020, 10, 1.1],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.1],
+            [4, 0, "P", "210", 2020, 10, 2.0],
+            [5, 0, "P", "210", 2020, 10, 2.0],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -398,55 +388,97 @@ class TestNoOutlier:
             "reference",
             "instance",
             "selectiontype",
-            "formtype",
             "statusencoded",
             "period",
             "cellnumber",
             "701",
-            "702",
-            'auto_outlier',
-            'manual_outlier',
-            'outlier'
+            "701_outlier_flag",
         ]
 
         data = [
-            [1, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [2, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [3, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [4, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [5, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [6, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [7, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [8, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [9, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False],
-            [10, 0, "P", "0001", "210", 2020, 10, 1.8, 1.1, False, np.nan, False]
+            [1, 0, "P", "210", 2020, 10, 1.1, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.1, False],
+            [4, 0, "P", "210", 2020, 10, 2.0, True],
+            [5, 0, "P", "210", 2020, 10, 2.0, True],
+
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
         return expected_df
 
-    # Get the config
-    def generate_config(val):
-        """Generate a dummy config file"""
-        config = {"global": {"network_or_hdfs": "network",
-                             "output_auto_outliers": False,
-                             "output_outlier_qa": False,
-                             "load_manual_outliers": False},
-                  "outliers": {"upper_clip": 0.05,
-                               "lower_clip": 0.0,
-                               "flag_cols": ["701", "702"]},
-                  "network_paths": {"network_paths": "None",
-                                    "outliers_path": "None"}
-                  }
-
-        return config
-
-    def test_run_outliers(self):
+    def test_flag_outliers(self):
         """Test for flag_outliers function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
-        config = self.generate_config()
 
-        result_df = run_outliers(input_df, None, config, None, None)
+        upper_clip = 0.3
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestNoOutliers:
+    """Unit tests for flag_outliers function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.1],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.1],
+            [4, 0, "P", "210", 2020, 10, 1.1],
+            [5, 0, "P", "210", 2020, 10, 1.1],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.1, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.1, False],
+            [4, 0, "P", "210", 2020, 10, 1.1, False],
+            [5, 0, "P", "210", 2020, 10, 1.1, False],
+
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.2
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
 
         assert_frame_equal(result_df, expected_df)
