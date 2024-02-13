@@ -52,6 +52,10 @@ def form_output_prep(
         ni_full_responses["602"] = 100
         ni_full_responses["formtype"] = "0003"
 
+        # Rename "turnover" to "frozenturnover"
+        ni_full_responses.rename(
+            columns={"turnover": "frozenturnover"}, inplace=True)
+
         # Update column 201 (currently PG numeric) to alpha-numeric, mapping from SIC.
         ni_full_responses = run_pg_conversion(
             ni_full_responses, pg_num_alpha, sic_pg_num
