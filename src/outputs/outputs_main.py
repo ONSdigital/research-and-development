@@ -60,6 +60,9 @@ def run_outputs(
         sic_pg_num (pd.DataFrame): Mapper for product group conversions
     """
 
+    # Remove instance 0 from weighted df, so that it does not go to Tau outputs
+    weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
+
     (
         ni_full_responses,
         outputs_df,
