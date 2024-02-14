@@ -3,6 +3,7 @@ import logging
 from pandas._testing import assert_frame_equal
 from pandas import DataFrame as pandasDF
 import numpy as np
+import pytest
 
 import src.outlier_detection.auto_outliers as auto
 from src.outlier_detection.outlier_main import run_outliers
@@ -203,64 +204,9 @@ class TestOutlierNumbers:
         assert "1 outliers were detected out of a total of 2 valid entries in column value_col" in caplog.text
 
 
-class TestNormalRound:
-    """Unit tests for normal_round function."""
-
-    def create_input_df(self):
-        """Create an input dataframe for the test."""
-        input_columns = [
-            "Reference",
-            "to_round",
-        ]
-
-        data = [
-            [1, 2.4],
-            [2, 2.5],
-            [3, 2.6],
-            [4, 3.4],
-            [5, 3.5],
-            [6, 3.6],
-        ]
-
-        input_df = pandasDF(data=data, columns=input_columns)
-        return input_df
-
-    def create_expected_df(self):
-        """Create an input dataframe for the test."""
-        input_columns = [
-            "Reference",
-            "to_round",
-            "rounded"
-        ]
-
-        data = [
-            [1, 2.4, 2],
-            [2, 2.5, 3],
-            [3, 2.6, 3],
-            [4, 3.4, 3],
-            [5, 3.5, 4],
-            [6, 3.6, 4],
-        ]
-
-        expected_df = pandasDF(data=data, columns=input_columns)
-        return expected_df
-
-    def test_normal_round(self):
-        """Test for decide_outliers function."""
-        input_df = self.create_input_df()
-        expected_df = self.create_expected_df()
-
-        input_df["rounded"] = input_df.apply(
-            lambda row: auto.normal_round(row["to_round"]), axis=1
-        )
-
-        assert_frame_equal(input_df, expected_df)
-
-
 class TestOneValueOutlier:
-    """Unit tests for run_auto_flagging function."""
-    """Test case:
-    one value causes the whole RU ref to be an outlier"""
+    """Unit test for one value causes the whole RU ref to be an outlier"""
+    """Using run_auto_flagging function to allow for multiple outlier cols"""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -356,72 +302,9 @@ class TestOneValueOutlier:
         assert_frame_equal(result_df, expected_df)
 
 
-class TestManyOutlierFlagging:
-    """Unit tests for flag_outliers function."""
-
-    def create_input_df(self):
-        """Create an input dataframe for the test."""
-        input_cols = [
-            "reference",
-            "instance",
-            "selectiontype",
-            "statusencoded",
-            "period",
-            "cellnumber",
-            "701",
-        ]
-
-        data = [
-            [1, 0, "P", "210", 2020, 10, 1.1],
-            [2, 0, "P", "210", 2020, 10, 1.1],
-            [3, 0, "P", "210", 2020, 10, 1.1],
-            [4, 0, "P", "210", 2020, 10, 2.0],
-            [5, 0, "P", "210", 2020, 10, 2.0],
-        ]
-
-        input_df = pandasDF(data=data, columns=input_cols)
-        return input_df
-
-    def create_expected_df(self):
-        """Create dataframe for the expected output of the test."""
-        exp_cols = [
-            "reference",
-            "instance",
-            "selectiontype",
-            "statusencoded",
-            "period",
-            "cellnumber",
-            "701",
-            "701_outlier_flag",
-        ]
-
-        data = [
-            [1, 0, "P", "210", 2020, 10, 1.1, False],
-            [2, 0, "P", "210", 2020, 10, 1.1, False],
-            [3, 0, "P", "210", 2020, 10, 1.1, False],
-            [4, 0, "P", "210", 2020, 10, 2.0, True],
-            [5, 0, "P", "210", 2020, 10, 2.0, True],
-
-        ]
-
-        expected_df = pandasDF(data=data, columns=exp_cols)
-        return expected_df
-
-    def test_flag_outliers(self):
-        """Test for flag_outliers function."""
-        input_df = self.create_input_df()
-        expected_df = self.create_expected_df()
-
-        upper_clip = 0.3
-        lower_clip = 0
-        value_col = "701"
-        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
-
-        assert_frame_equal(result_df, expected_df)
-
-
 class TestNoOutliers:
     """Unit tests for flag_outliers function."""
+    """No outliers to calculate"""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -476,9 +359,569 @@ class TestNoOutliers:
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        upper_clip = 0.2
+        upper_clip = 0
         lower_clip = 0
         value_col = "701"
         result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
 
         assert_frame_equal(result_df, expected_df)
+
+
+class TestRoundingOutliers1:
+    """Unit tests for flag_outliers function."""
+    """Checking correct rounding 1/5"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.2],
+            [4, 0, "P", "210", 2020, 10, 1.3],
+            [5, 0, "P", "210", 2020, 10, 1.4],
+            [6, 0, "P", "210", 2020, 10, 1.5],
+            [7, 0, "P", "210", 2020, 10, 1.6],
+            [8, 0, "P", "210", 2020, 10, 1.7],
+            [9, 0, "P", "210", 2020, 10, 1.8],
+            [10, 0, "P", "210", 2020, 10, 1.9],
+            [11, 0, "P", "210", 2020, 10, 2.0],
+            [12, 0, "P", "210", 2020, 10, 2.1],
+            [13, 0, "P", "210", 2020, 10, 2.2],
+            [14, 0, "P", "210", 2020, 10, 2.3],
+            [15, 0, "P", "210", 2020, 10, 2.4],
+            [16, 0, "P", "210", 2020, 10, 2.5],
+            [17, 0, "P", "210", 2020, 10, 2.6],
+            [18, 0, "P", "210", 2020, 10, 2.7],
+            [19, 0, "P", "210", 2020, 10, 2.8],
+            [20, 0, "P", "210", 2020, 10, 2.9],
+            [21, 0, "P", "210", 2020, 10, 1.0],
+            [22, 0, "P", "210", 2020, 10, 1.1],
+            [23, 0, "P", "210", 2020, 10, 1.2],
+            [24, 0, "P", "210", 2020, 10, 1.3],
+            [25, 0, "P", "210", 2020, 10, 1.4],
+            [26, 0, "P", "210", 2020, 10, 1.5],
+            [27, 0, "P", "210", 2020, 10, 1.6],
+            [28, 0, "P", "210", 2020, 10, 1.7],
+            [29, 0, "P", "210", 2020, 10, 1.8],
+            [30, 0, "P", "210", 2020, 10, 1.9],
+            [31, 0, "P", "210", 2020, 10, 2.0],
+            [32, 0, "P", "210", 2020, 10, 2.1],
+            [33, 0, "P", "210", 2020, 10, 2.2],
+            [34, 0, "P", "210", 2020, 10, 2.3],
+            [35, 0, "P", "210", 2020, 10, 2.4],
+            [36, 0, "P", "210", 2020, 10, 2.5],
+            [37, 0, "P", "210", 2020, 10, 2.6],
+            [38, 0, "P", "210", 2020, 10, 2.7],
+            [39, 0, "P", "210", 2020, 10, 2.8],
+            [40, 0, "P", "210", 2020, 10, 2.9],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.2, False],
+            [4, 0, "P", "210", 2020, 10, 1.3, False],
+            [5, 0, "P", "210", 2020, 10, 1.4, False],
+            [6, 0, "P", "210", 2020, 10, 1.5, False],
+            [7, 0, "P", "210", 2020, 10, 1.6, False],
+            [8, 0, "P", "210", 2020, 10, 1.7, False],
+            [9, 0, "P", "210", 2020, 10, 1.8, False],
+            [10, 0, "P", "210", 2020, 10, 1.9, False],
+            [11, 0, "P", "210", 2020, 10, 2.0, False],
+            [12, 0, "P", "210", 2020, 10, 2.1, False],
+            [13, 0, "P", "210", 2020, 10, 2.2, False],
+            [14, 0, "P", "210", 2020, 10, 2.3, False],
+            [15, 0, "P", "210", 2020, 10, 2.4, False],
+            [16, 0, "P", "210", 2020, 10, 2.5, False],
+            [17, 0, "P", "210", 2020, 10, 2.6, False],
+            [18, 0, "P", "210", 2020, 10, 2.7, False],
+            [19, 0, "P", "210", 2020, 10, 2.8, False],
+            [20, 0, "P", "210", 2020, 10, 2.9, True],
+            [21, 0, "P", "210", 2020, 10, 1.0, False],
+            [22, 0, "P", "210", 2020, 10, 1.1, False],
+            [23, 0, "P", "210", 2020, 10, 1.2, False],
+            [24, 0, "P", "210", 2020, 10, 1.3, False],
+            [25, 0, "P", "210", 2020, 10, 1.4, False],
+            [26, 0, "P", "210", 2020, 10, 1.5, False],
+            [27, 0, "P", "210", 2020, 10, 1.6, False],
+            [28, 0, "P", "210", 2020, 10, 1.7, False],
+            [29, 0, "P", "210", 2020, 10, 1.8, False],
+            [30, 0, "P", "210", 2020, 10, 1.9, False],
+            [31, 0, "P", "210", 2020, 10, 2.0, False],
+            [32, 0, "P", "210", 2020, 10, 2.1, False],
+            [33, 0, "P", "210", 2020, 10, 2.2, False],
+            [34, 0, "P", "210", 2020, 10, 2.3, False],
+            [35, 0, "P", "210", 2020, 10, 2.4, False],
+            [36, 0, "P", "210", 2020, 10, 2.5, False],
+            [37, 0, "P", "210", 2020, 10, 2.6, False],
+            [38, 0, "P", "210", 2020, 10, 2.7, False],
+            [39, 0, "P", "210", 2020, 10, 2.8, False],
+            [40, 0, "P", "210", 2020, 10, 2.9, True],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.05
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestRoundingOutliers2:
+    """Unit tests for flag_outliers function."""
+    """Checking correct rounding 2/5"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.2],
+            [4, 0, "P", "210", 2020, 10, 1.3],
+            [5, 0, "P", "210", 2020, 10, 1.4],
+            [6, 0, "P", "210", 2020, 10, 1.5],
+            [7, 0, "P", "210", 2020, 10, 1.6],
+            [8, 0, "P", "210", 2020, 10, 1.7],
+            [9, 0, "P", "210", 2020, 10, 1.8],
+            [10, 0, "P", "210", 2020, 10, 1.9],
+            [11, 0, "P", "210", 2020, 10, 2.0],
+            [12, 0, "P", "210", 2020, 10, 2.1],
+            [13, 0, "P", "210", 2020, 10, 2.2],
+            [14, 0, "P", "210", 2020, 10, 2.3],
+            [15, 0, "P", "210", 2020, 10, 2.4],
+            [16, 0, "P", "210", 2020, 10, 2.5],
+            [17, 0, "P", "210", 2020, 10, 2.6],
+            [18, 0, "P", "210", 2020, 10, 2.7],
+            [19, 0, "P", "210", 2020, 10, 2.8],
+            [20, 0, "P", "210", 2020, 10, 2.9],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.2, False],
+            [4, 0, "P", "210", 2020, 10, 1.3, False],
+            [5, 0, "P", "210", 2020, 10, 1.4, False],
+            [6, 0, "P", "210", 2020, 10, 1.5, False],
+            [7, 0, "P", "210", 2020, 10, 1.6, False],
+            [8, 0, "P", "210", 2020, 10, 1.7, False],
+            [9, 0, "P", "210", 2020, 10, 1.8, False],
+            [10, 0, "P", "210", 2020, 10, 1.9, False],
+            [11, 0, "P", "210", 2020, 10, 2.0, False],
+            [12, 0, "P", "210", 2020, 10, 2.1, False],
+            [13, 0, "P", "210", 2020, 10, 2.2, False],
+            [14, 0, "P", "210", 2020, 10, 2.3, False],
+            [15, 0, "P", "210", 2020, 10, 2.4, False],
+            [16, 0, "P", "210", 2020, 10, 2.5, False],
+            [17, 0, "P", "210", 2020, 10, 2.6, False],
+            [18, 0, "P", "210", 2020, 10, 2.7, False],
+            [19, 0, "P", "210", 2020, 10, 2.8, False],
+            [20, 0, "P", "210", 2020, 10, 2.9, True],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.05
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestRoundingOutliers3:
+    """Unit tests for flag_outliers function."""
+    """Checking correct rounding 3/5"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.2],
+            [4, 0, "P", "210", 2020, 10, 1.3],
+            [5, 0, "P", "210", 2020, 10, 1.4],
+            [6, 0, "P", "210", 2020, 10, 1.5],
+            [7, 0, "P", "210", 2020, 10, 1.6],
+            [8, 0, "P", "210", 2020, 10, 1.7],
+            [9, 0, "P", "210", 2020, 10, 1.8],
+            [10, 0, "P", "210", 2020, 10, 1.9],
+            [11, 0, "P", "210", 2020, 10, 2.0],
+            [12, 0, "P", "210", 2020, 10, 2.1],
+            [13, 0, "P", "210", 2020, 10, 2.2],
+            [14, 0, "P", "210", 2020, 10, 2.3],
+            [15, 0, "P", "210", 2020, 10, 2.4],
+            [16, 0, "P", "210", 2020, 10, 2.5],
+            [17, 0, "P", "210", 2020, 10, 2.6],
+            [18, 0, "P", "210", 2020, 10, 2.7],
+            [19, 0, "P", "210", 2020, 10, 2.8],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.2, False],
+            [4, 0, "P", "210", 2020, 10, 1.3, False],
+            [5, 0, "P", "210", 2020, 10, 1.4, False],
+            [6, 0, "P", "210", 2020, 10, 1.5, False],
+            [7, 0, "P", "210", 2020, 10, 1.6, False],
+            [8, 0, "P", "210", 2020, 10, 1.7, False],
+            [9, 0, "P", "210", 2020, 10, 1.8, False],
+            [10, 0, "P", "210", 2020, 10, 1.9, False],
+            [11, 0, "P", "210", 2020, 10, 2.0, False],
+            [12, 0, "P", "210", 2020, 10, 2.1, False],
+            [13, 0, "P", "210", 2020, 10, 2.2, False],
+            [14, 0, "P", "210", 2020, 10, 2.3, False],
+            [15, 0, "P", "210", 2020, 10, 2.4, False],
+            [16, 0, "P", "210", 2020, 10, 2.5, False],
+            [17, 0, "P", "210", 2020, 10, 2.6, False],
+            [18, 0, "P", "210", 2020, 10, 2.7, False],
+            [19, 0, "P", "210", 2020, 10, 2.8, True],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.05
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestRoundingOutliers4:
+    """Unit tests for flag_outliers function."""
+    """Checking correct rounding 4/5"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.2],
+            [4, 0, "P", "210", 2020, 10, 1.3],
+            [5, 0, "P", "210", 2020, 10, 1.4],
+            [6, 0, "P", "210", 2020, 10, 1.5],
+            [7, 0, "P", "210", 2020, 10, 1.6],
+            [8, 0, "P", "210", 2020, 10, 1.7],
+            [9, 0, "P", "210", 2020, 10, 1.8],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.2, False],
+            [4, 0, "P", "210", 2020, 10, 1.3, False],
+            [5, 0, "P", "210", 2020, 10, 1.4, False],
+            [6, 0, "P", "210", 2020, 10, 1.5, False],
+            [7, 0, "P", "210", 2020, 10, 1.6, False],
+            [8, 0, "P", "210", 2020, 10, 1.7, False],
+            [9, 0, "P", "210", 2020, 10, 1.8, False],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.05
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestRoundingOutliers5:
+    """Unit tests for flag_outliers function."""
+    """Checking correct rounding 5/5"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.2],
+            [4, 0, "P", "210", 2020, 10, 1.3],
+            [5, 0, "P", "210", 2020, 10, 1.4],
+            [6, 0, "P", "210", 2020, 10, 1.5],
+            [7, 0, "P", "210", 2020, 10, 1.6],
+            [8, 0, "P", "210", 2020, 10, 1.7],
+            [9, 0, "P", "210", 2020, 10, 1.8],
+            [10, 0, "P", "210", 2020, 10, 1.9],
+            [11, 0, "P", "210", 2020, 10, 2.0],
+            [12, 0, "P", "210", 2020, 10, 2.1],
+            [13, 0, "P", "210", 2020, 10, 2.2],
+            [14, 0, "P", "210", 2020, 10, 2.3],
+            [15, 0, "P", "210", 2020, 10, 2.4],
+            [16, 0, "P", "210", 2020, 10, 2.5],
+            [17, 0, "P", "210", 2020, 10, 2.6],
+            [18, 0, "P", "210", 2020, 10, 2.7],
+            [19, 0, "P", "210", 2020, 10, 2.8],
+            [20, 0, "P", "210", 2020, 10, 2.9],
+            [21, 0, "P", "210", 2020, 10, 1.0],
+            [22, 0, "P", "210", 2020, 10, 1.1],
+            [23, 0, "P", "210", 2020, 10, 1.2],
+            [24, 0, "P", "210", 2020, 10, 1.3],
+            [25, 0, "P", "210", 2020, 10, 1.4],
+            [26, 0, "P", "210", 2020, 10, 1.5],
+            [27, 0, "P", "210", 2020, 10, 1.6],
+            [28, 0, "P", "210", 2020, 10, 1.7],
+            [29, 0, "P", "210", 2020, 10, 1.8],
+            [30, 0, "P", "210", 2020, 10, 1.9],
+            [31, 0, "P", "210", 2020, 10, 2.0],
+            [32, 0, "P", "210", 2020, 10, 2.1],
+            [33, 0, "P", "210", 2020, 10, 2.2],
+            [34, 0, "P", "210", 2020, 10, 2.3],
+            [35, 0, "P", "210", 2020, 10, 2.4],
+            [36, 0, "P", "210", 2020, 10, 2.5],
+            [37, 0, "P", "210", 2020, 10, 2.6],
+            [38, 0, "P", "210", 2020, 10, 2.7],
+            [39, 0, "P", "210", 2020, 10, 2.8],
+            [40, 0, "P", "210", 2020, 10, 2.9],
+            [41, 0, "P", "210", 2020, 10, 1.5],
+            [42, 0, "P", "210", 2020, 10, 1.5],
+            [43, 0, "P", "210", 2020, 10, 1.5],
+            [44, 0, "P", "210", 2020, 10, 1.5],
+            [45, 0, "P", "210", 2020, 10, 1.5],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.0, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.2, False],
+            [4, 0, "P", "210", 2020, 10, 1.3, False],
+            [5, 0, "P", "210", 2020, 10, 1.4, False],
+            [6, 0, "P", "210", 2020, 10, 1.5, False],
+            [7, 0, "P", "210", 2020, 10, 1.6, False],
+            [8, 0, "P", "210", 2020, 10, 1.7, False],
+            [9, 0, "P", "210", 2020, 10, 1.8, False],
+            [10, 0, "P", "210", 2020, 10, 1.9, False],
+            [11, 0, "P", "210", 2020, 10, 2.0, False],
+            [12, 0, "P", "210", 2020, 10, 2.1, False],
+            [13, 0, "P", "210", 2020, 10, 2.2, False],
+            [14, 0, "P", "210", 2020, 10, 2.3, False],
+            [15, 0, "P", "210", 2020, 10, 2.4, False],
+            [16, 0, "P", "210", 2020, 10, 2.5, False],
+            [17, 0, "P", "210", 2020, 10, 2.6, False],
+            [18, 0, "P", "210", 2020, 10, 2.7, False],
+            [19, 0, "P", "210", 2020, 10, 2.8, False],
+            [20, 0, "P", "210", 2020, 10, 2.9, True],
+            [21, 0, "P", "210", 2020, 10, 1.0, False],
+            [22, 0, "P", "210", 2020, 10, 1.1, False],
+            [23, 0, "P", "210", 2020, 10, 1.2, False],
+            [24, 0, "P", "210", 2020, 10, 1.3, False],
+            [25, 0, "P", "210", 2020, 10, 1.4, False],
+            [26, 0, "P", "210", 2020, 10, 1.5, False],
+            [27, 0, "P", "210", 2020, 10, 1.6, False],
+            [28, 0, "P", "210", 2020, 10, 1.7, False],
+            [29, 0, "P", "210", 2020, 10, 1.8, False],
+            [30, 0, "P", "210", 2020, 10, 1.9, False],
+            [31, 0, "P", "210", 2020, 10, 2.0, False],
+            [32, 0, "P", "210", 2020, 10, 2.1, False],
+            [33, 0, "P", "210", 2020, 10, 2.2, False],
+            [34, 0, "P", "210", 2020, 10, 2.3, False],
+            [35, 0, "P", "210", 2020, 10, 2.4, False],
+            [36, 0, "P", "210", 2020, 10, 2.5, False],
+            [37, 0, "P", "210", 2020, 10, 2.6, False],
+            [38, 0, "P", "210", 2020, 10, 2.7, False],
+            [39, 0, "P", "210", 2020, 10, 2.8, False],
+            [40, 0, "P", "210", 2020, 10, 2.9, True],
+            [41, 0, "P", "210", 2020, 10, 1.5, False],
+            [42, 0, "P", "210", 2020, 10, 1.5, False],
+            [43, 0, "P", "210", 2020, 10, 1.5, False],
+            [44, 0, "P", "210", 2020, 10, 1.5, False],
+            [45, 0, "P", "210", 2020, 10, 1.5, False],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0.05
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestValidateConfigZero:
+    """Unit tests for validate_config function."""
+
+    def test_validate_config(self, caplog):
+        """Test for log_outlier_info function."""
+
+        with caplog.at_level(logging.WARNING):
+            auto.validate_config(0.0, 0.0, ["701", "702", "703"])
+
+        assert "upper_clip and lower_clip both zero:" in caplog.text
+
+
+class TestValidateConfigMinus:
+    """Unit tests for validate_config function."""
+
+    def test_validate_config(self, caplog):
+        """Test for log_outlier_info function."""
+
+        with pytest.raises(ImportError):
+            auto.validate_config(-1.0, 0.0, ["701", "702", "703"])
+
+        #assert "upper_clip and lower_clip cannot be negative:" in caplog.text

@@ -99,6 +99,22 @@ def flag_outliers(
     # Filter for valid sampled data and positive values in the value column
     filtered_df = filter_valid(df, value_col)
 
+    def _normal_round(x: float) -> int:
+        """Simple rounding, so that 0.5 rounds to 1,
+        as opposed to default banking rounding that rounds halves
+        to nearest even integers.
+
+        Args:
+            x (float): Fractional number to be rounded
+        Returns:
+            int: Rounded value
+        """
+        f = math.floor(x)
+        if x - f < 0.5:
+            return f
+        else:
+            return f + 1
+
     # Add group count - how many RU refs there are in a cell, perod
     filtered_df["group_count"] = filtered_df.groupby(groupby_cols)[value_col].transform(
         "count"
@@ -107,13 +123,13 @@ def flag_outliers(
     # Rank margins
     filtered_df["high"] = filtered_df["group_count"] * upper_clip
     filtered_df["high_rounded"] = filtered_df.apply(
-        lambda row: normal_round(row["high"]), axis=1
+        lambda row: _normal_round(row["high"]), axis=1
     )
     filtered_df["upper_band"] = filtered_df["group_count"] - filtered_df["high_rounded"]
 
     filtered_df["low"] = filtered_df["group_count"] * lower_clip
     filtered_df["lower_band"] = filtered_df.apply(
-        lambda row: normal_round(row["low"]), axis=1
+        lambda row: _normal_round(row["low"]), axis=1
     )
 
     # Ranks of RU refs in each group, depending on their value
@@ -259,20 +275,3 @@ def apply_short_form_filters(
     filtered_df = df[form_cond & sel_cond & ins_cond]
 
     return filtered_df
-
-
-def normal_round(x: float) -> int:
-    """Simple rounding, so that 0.5 rounds to 1,
-    as opposed to default banking rounding that rounds halves
-    to nearest even integers.
-
-    Args:
-        x (float): Fractional number to be rounded
-    Returns:
-        int: Rounded value
-    """
-    f = math.floor(x)
-    if x - f < 0.5:
-        return f
-    else:
-        return f + 1
