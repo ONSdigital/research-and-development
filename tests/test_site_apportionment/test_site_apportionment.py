@@ -1,9 +1,15 @@
 import pandas as pd
 import numpy as np
+import pytest
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
 
-from src.site_apportionment.site_apportionment import create_notnull_mask
+from src.site_apportionment.site_apportionment import create_notnull_mask, count_unique_postcodes_in_col
+
+
+# Global variables
+postcode_col = "601"
+groupby_cols = ['reference', 'period']
 
 
 class TestCreateNotnullMask():
@@ -58,3 +64,83 @@ class TestCreateNotnullMask():
         result = create_notnull_mask(input_df, "col")
         expected_output = self.create_exp_output()
         assert_series_equal(result, expected_output)
+        
+# Function to create a sample dataframe
+def create_sample_df():
+        np.random.seed(43)  # for reproducibility
+        data = {
+            'reference': [4990000000 + i for i in range(0, 42*10, 42)],
+            'period': [202212 for _ in range(0, 42*10, 42)],
+            '601': ['AB1 2CD', 'AB1 2CD', 'EF3 4GH', 'IJ5 6KL', 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
+            'headcount_dummy': np.random.randint(1, 100, size=10),
+            '211_dummy': np.random.randint(1, 100, size=10)
+        } # dummy columns will be dropped in the count_unique_postcodes_in_col function
+        return pd.DataFrame(data)
+
+def test_count_unique_postcodes_in_col_positive():
+    df = create_sample_df()
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(df)
+
+    # Expected output
+    expected_data = {
+        'reference': [4990000000 + i for i in range(0, 42*10, 42)],
+        'period': [202212 for _ in range(0, 42*10, 42)],
+        postcode_col: ['AB1 2CD', 'AB1 2CD', 'EF3 4GH', 'IJ5 6KL', 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
+        'postcode_col_count': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    }
+    expected_df = pandasDF(expected_data)
+
+    # Check if the output is as expected
+    pd.testing.assert_frame_equal(result_df, expected_df)
+
+def test_count_unique_postcodes_in_col_negative():
+    df = create_sample_df()
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(df)
+
+    # Expected output
+    expected_data = {
+        'reference': [4990000000 + i for i in range(10)],
+        'period': [202212 for _ in range(10)],
+        postcode_col: ['AB1 2CD', 'AB1 2CD', 'EF3 4GH', 'IJ5 6KL', 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
+        'postcode_col_count': [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    }
+    expected_df = pandasDF(expected_data)
+
+    # Check if the output is not as expected
+    with pytest.raises(AssertionError):
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+
+# Function to create a sample dataframe
+def create_df_with_missing_postcodes_df():
+    np.random.seed(0)  # for reproducibility
+    data = {
+        'reference': [4990000000 + i for i in range(10)],
+        'period': [202212 for _ in range(10)],
+        postcode_col: ['AB1 2CD', '', ' ', np.nan, 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
+        'headcount_dummy': np.random.randint(1, 100, size=10),
+        '211_dummy': np.random.randint(1, 100, size=10)
+    }
+    return pd.DataFrame(data)
+
+def test_count_unique_postcodes_null_codes():
+    df = create_df_with_missing_postcodes_df()
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(df)
+
+    # Expected output
+    expected_data = {
+        'reference': [4990000000, 4990000004, 4990000005, 4990000006, 4990000007, 4990000008, 4990000009],
+        'period': [202212, 202212, 202212, 202212, 202212, 202212, 202212],
+        postcode_col: ['AB1 2CD', 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
+        'postcode_col_count': [1, 1, 1, 1, 1, 1, 1]
+    }
+    expected_df = pd.DataFrame(expected_data)
+
+    # Check if the output is as expected
+    pd.testing.assert_frame_equal(result_df, expected_df)
