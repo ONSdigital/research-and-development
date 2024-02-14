@@ -924,4 +924,67 @@ class TestValidateConfigMinus:
         with pytest.raises(ImportError):
             auto.validate_config(-1.0, 0.0, ["701", "702", "703"])
 
-        #assert "upper_clip and lower_clip cannot be negative:" in caplog.text
+
+class TestFilterValid:
+    """Unit tests for filter_valid function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 1, "P", "210", 2020, 10, 1.1],
+            [2, 0, "P", "210", 2020, 10, 1.2],
+            [3, 0, "P", "999", 2020, 10, 1.3],
+            [4, 0, "C", "210", 2020, 10, 1.4],
+            [5, 0, "P", "210", 2020, 10, 0],
+            [6, 0, "P", "210", 2020, 10, 1.6],
+            [7, 0, "P", "210", 2020, 10, 1.7],
+            [8, 0, "P", "210", 2020, 10, 1.8],
+            [9, 0, "P", "210", 2020, 10, 1.9],
+            [10, 1, "C", "999", 2020, 10, 2.0],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [2, 0, "P", "210", 2020, 10, 1.2],
+            [6, 0, "P", "210", 2020, 10, 1.6],
+            [7, 0, "P", "210", 2020, 10, 1.7],
+            [8, 0, "P", "210", 2020, 10, 1.8],
+            [9, 0, "P", "210", 2020, 10, 1.9],
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_filter_valid(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        value_col = "701"
+        result_df = auto.filter_valid(input_df, value_col)
+
+        assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
