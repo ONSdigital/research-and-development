@@ -8,9 +8,11 @@ import pytest
 import src.outlier_detection.auto_outliers as auto
 
 
-# Two tests for `validate_config()`:
+# Four tests for `validate_config()`:
 # Test for warning (where both clips = 0)
-# Test for error (where a lip is a minus number)
+# Test for error (where a clip is a minus number)
+# Test for error (where a clip is over 1)
+# Test for error (where flag_value_cols is not a list)
 
 class TestValidateConfigZero:
     """Unit tests for validate_config function."""
@@ -34,8 +36,29 @@ class TestValidateConfigMinus:
             auto.validate_config(-1.0, 0.0, ["701", "702", "703"])
 
 
-# One test for `filter_valid()`:
+class TestValidateConfigOverOne:
+    """Unit tests for validate_config function."""
+
+    def test_validate_config(self, caplog):
+        """Test for validate_config function."""
+
+        with pytest.raises(ImportError):
+            auto.validate_config(0.0, 2.0, ["701", "702", "703"])
+
+
+class TestValidateConfigNotList:
+    """Unit tests for validate_config function."""
+
+    def test_validate_config(self, caplog):
+        """Test for validate_config function."""
+
+        with pytest.raises(ImportError):
+            auto.validate_config(0.05, 0.0, ("701", "702", "703"))
+
+
+# Two tests for `filter_valid()`:
 # Test that the filtering removes the correct rows
+# Test an error is raised if df empty, and log returned
 
 
 class TestFilterValid:
@@ -101,6 +124,37 @@ class TestFilterValid:
         result_df = auto.filter_valid(input_df, value_col)
 
         assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+
+
+class TestFilterValidEmpty:
+    """Unit tests for filter_valid function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def test_filter_valid(self, caplog):
+        """Test for filter_valid function."""
+        input_df = self.create_input_df()
+
+        with pytest.raises(ValueError):
+            auto.filter_valid(input_df, "701")
+
+        assert "has no valid returns for outliers" in caplog.text
 
 
 # Seven tests for `flag_outliers()`:
