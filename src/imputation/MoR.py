@@ -1,8 +1,10 @@
 """Functions for the Mean of Ratios (MoR) methods."""
 import itertools
 import pandas as pd
+import numpy as np
 import re
 
+from src.staging.staging_helpers import postcode_topup
 from src.imputation.apportionment import run_apportionment
 from src.imputation.tmi_imputation import (
     create_imp_class_col,
@@ -46,10 +48,11 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     )
     # Calculate totals as with TMI
     carried_forwards_df = calculate_totals(carried_forwards_df)
-    return (
-        pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True),
-        links_df,
-    )
+
+    imputed_df = pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True)
+    imputed_df = imputed_df.drop("cf_group_size", axis=1)
+
+    return imputed_df, links_df
 
 
 def mor_preprocessing(df, backdata):
@@ -65,6 +68,9 @@ def mor_preprocessing(df, backdata):
     cols = [col for col in list(backdata.columns) if p.match(col)]
     to_rename = {col: col[1:] for col in cols}
     backdata = backdata.rename(columns=to_rename)
+
+    # Add a QA column for the group size
+    df["cf_group_size"] = np.nan
 
     # TODO move this to imputation main
     # Select only values to be imputed
@@ -127,17 +133,29 @@ def carry_forwards(df, backdata, impute_vars):
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
 
+    # Apply the postcode top-up to clean the postcodes in col 601 of the back data
+    df.loc[match_cond, "601_prev"] = df.loc[match_cond, "601_prev"].apply(
+        postcode_topup
+    )
+
     # Replace the values of certain columns with the values from the back data
     replace_vars = ["instance", "200", "201", "601", "602", "604"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
+
+    # Update the postcodes_harmonised column from the updated column 601
+    df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
     
-    # Update the varibles to be imputed by the corresponding previous values, filling 
-    # nulls with zeros.
+    # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
-        df.loc[match_cond, f"{var}_imputed"] = df.loc[
-            match_cond, f"{var}_prev"
+        df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
+
+        # fill nulls with zeros if col 211 is not null
+        fillna_cond = ~df["211"].isnull()
+        df.loc[match_cond & fillna_cond, f"{var}_imputed"] = df.loc[
+            match_cond & fillna_cond, f"{var}_imputed"
         ].fillna(0)
+
     df.loc[match_cond, "imp_marker"] = "CF"
 
     df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
@@ -212,7 +230,7 @@ def calculate_links(gr_df, target_vars, config):
     gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier
-    column_order = ["imp_class", "reference"] + list(
+    column_order = ["imp_class", "reference", "cf_group_size"] + list(
         itertools.chain(
             *[
                 (var, f"{var}_prev", f"{var}_gr", f"{var}_gr_trim", f"{var}_link")
@@ -223,6 +241,16 @@ def calculate_links(gr_df, target_vars, config):
     return gr_df[column_order].reset_index(drop=True)
 
 
+def get_threshold_value(config: dict) -> int:
+    """Read, validate and return threshold value from the config."""
+    threshold_num = config["imputation"]["mor_threshold"]
+    if (type(threshold_num) == int) & (threshold_num >=0):
+        return threshold_num
+    else:
+        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
+                        "of the config must be zero or a positive integer.")
+        
+
 def group_calc_link(group, target_vars, config):
     """Apply the MoR method to each group
 
@@ -231,6 +259,8 @@ def group_calc_link(group, target_vars, config):
         link_vars ([string]): List of the linked variables.
         config (Dict): Confuration settings
     """
+    valid_group_size = True
+
     for var in target_vars:
         # Create mask to not use 0s in mean calculation
         non_null_mask = pd.notnull(group[f"{var}_gr"])
@@ -244,8 +274,18 @@ def group_calc_link(group, target_vars, config):
             .values
         )
 
-        # If there are non-null, non-zero values in the group calculate the mean
-        if sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0:
+        num_valid_vars = sum(~group[f"{var}_gr_trim"] & non_null_mask)
+
+        if var == "211":
+            group["cf_group_size"] = num_valid_vars
+            threshold_num = get_threshold_value(config)
+
+            if num_valid_vars < threshold_num:
+                valid_group_size = False
+
+        # If the group is a valid size, and there are non-null, non-zero values for this
+        # 'var', then calculate the mean        
+        if valid_group_size & (sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0):
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
             ].mean()
