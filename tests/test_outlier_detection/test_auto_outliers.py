@@ -8,6 +8,10 @@ import pytest
 import src.outlier_detection.auto_outliers as auto
 
 
+# Two tests for `validate_config()`:
+# Test for warning (where both clips = 0)
+# Test for error (where a lip is a minus number)
+
 class TestValidateConfigZero:
     """Unit tests for validate_config function."""
 
@@ -28,6 +32,10 @@ class TestValidateConfigMinus:
 
         with pytest.raises(ImportError):
             auto.validate_config(-1.0, 0.0, ["701", "702", "703"])
+
+
+# One test for `filter_valid()`:
+# Test that the filtering removes the correct rows
 
 
 class TestFilterValid:
@@ -93,6 +101,16 @@ class TestFilterValid:
         result_df = auto.filter_valid(input_df, value_col)
 
         assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+
+
+# Seven tests for `flag_outliers()`:
+# Test the correct rows are flagged as outliers
+# Test that no outliers are flagged if both clips = 0
+# Tests for the rounding for the number of outliers flag is correct -
+# this is done in five tests where the clip remains the same, but the size
+# of the dataframe changes (there is a `_normal_rounding()` function
+# within `flag_outliers()` to change rounding from banking rounding to
+# simple rounding)
 
 
 class TestOutlierFlagging:
@@ -189,6 +207,71 @@ class TestOutlierFlagging:
         expected_df = self.create_expected_df()
 
         upper_clip = 0.1
+        lower_clip = 0
+        value_col = "701"
+        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+
+        assert_frame_equal(result_df, expected_df)
+
+
+class TestNoOutliers:
+    """Unit tests for flag_outliers function."""
+    """No outliers to calculate"""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.1],
+            [2, 0, "P", "210", 2020, 10, 1.1],
+            [3, 0, "P", "210", 2020, 10, 1.1],
+            [4, 0, "P", "210", 2020, 10, 1.1],
+            [5, 0, "P", "210", 2020, 10, 1.1],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_df(self):
+        """Create dataframe for the expected output of the test."""
+        exp_cols = [
+            "reference",
+            "instance",
+            "selectiontype",
+            "statusencoded",
+            "period",
+            "cellnumber",
+            "701",
+            "701_outlier_flag",
+        ]
+
+        data = [
+            [1, 0, "P", "210", 2020, 10, 1.1, False],
+            [2, 0, "P", "210", 2020, 10, 1.1, False],
+            [3, 0, "P", "210", 2020, 10, 1.1, False],
+            [4, 0, "P", "210", 2020, 10, 1.1, False],
+            [5, 0, "P", "210", 2020, 10, 1.1, False],
+
+        ]
+
+        expected_df = pandasDF(data=data, columns=exp_cols)
+        return expected_df
+
+    def test_flag_outliers(self):
+        """Test for flag_outliers function."""
+        input_df = self.create_input_df()
+        expected_df = self.create_expected_df()
+
+        upper_clip = 0
         lower_clip = 0
         value_col = "701"
         result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
@@ -732,6 +815,10 @@ class TestRoundingOutliers5:
         assert_frame_equal(result_df, expected_df)
 
 
+# One test for `decide_outliers()`:
+# Test that one outlier flag will flag the whole row as an outlier
+
+
 class TestDecideOutliers:
     """Unit tests for decide_outliers function."""
 
@@ -787,6 +874,10 @@ class TestDecideOutliers:
         assert_frame_equal(result_df, expected_df)
 
 
+# One test for `log_outlier_info()`:
+# Test for information log of outliers detected
+
+
 class TestLogOutlierNumbers:
     """Unit tests for log_outlier_info function."""
 
@@ -825,56 +916,9 @@ class TestLogOutlierNumbers:
         assert "1 outliers were detected out of a total of 2 valid entries in column value_col" in caplog.text
 
 
-class TestShortFormFilter:
-    """Unit tests for apply_short_form_filters function."""
-
-    def create_input_df(self):
-        """Create an input dataframe for the test."""
-        input_cols = [
-            "reference",
-            "instance",
-            "selectiontype",
-            "formtype",
-        ]
-
-        data = [
-            [1, 0, "P", "0006"],
-            [2, 1, "P", "0006"],
-            [3, 0, "C", "0006"],
-            [4, 0, "P", "0001"],
-            [5, 1, "C", "0001"],
-        ]
-
-        input_df = pandasDF(data=data, columns=input_cols)
-        return input_df
-
-    def create_expected_df(self):
-        """Create dataframe for the expected output of the test."""
-        exp_cols = [
-            "reference",
-            "instance",
-            "selectiontype",
-            "formtype",
-        ]
-
-        data = [
-            [1, 0, "P", "0006"],
-        ]
-
-        expected_df = pandasDF(data=data, columns=exp_cols)
-        return expected_df
-
-    def test_filter_valid(self):
-        """Test for flag_outliers function."""
-        input_df = self.create_input_df()
-        expected_df = self.create_expected_df()
-
-        form_type_no: str = "0006"
-        sel_type: str = "P"
-
-        result_df = auto.apply_short_form_filters(input_df, form_type_no, sel_type)
-
-        assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+# One test for `run_auto_flagging()`:
+# Test that the auto outliering runs correctly end to end and that
+# one outlier flag will flag the whole row as an outlier
 
 
 class TestOneValueOutlier:
@@ -966,9 +1010,12 @@ class TestOneValueOutlier:
         assert_frame_equal(result_df, expected_df)
 
 
-class TestNoOutliers:
-    """Unit tests for flag_outliers function."""
-    """No outliers to calculate"""
+# One test for `apply_short_form_filter()`:
+# Test that the short form filtering removes the correct rows
+
+
+class TestShortFormFilter:
+    """Unit tests for apply_short_form_filters function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -976,18 +1023,15 @@ class TestNoOutliers:
             "reference",
             "instance",
             "selectiontype",
-            "statusencoded",
-            "period",
-            "cellnumber",
-            "701",
+            "formtype",
         ]
 
         data = [
-            [1, 0, "P", "210", 2020, 10, 1.1],
-            [2, 0, "P", "210", 2020, 10, 1.1],
-            [3, 0, "P", "210", 2020, 10, 1.1],
-            [4, 0, "P", "210", 2020, 10, 1.1],
-            [5, 0, "P", "210", 2020, 10, 1.1],
+            [1, 0, "P", "0006"],
+            [2, 1, "P", "0006"],
+            [3, 0, "C", "0006"],
+            [4, 0, "P", "0001"],
+            [5, 1, "C", "0001"],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -999,34 +1043,25 @@ class TestNoOutliers:
             "reference",
             "instance",
             "selectiontype",
-            "statusencoded",
-            "period",
-            "cellnumber",
-            "701",
-            "701_outlier_flag",
+            "formtype",
         ]
 
         data = [
-            [1, 0, "P", "210", 2020, 10, 1.1, False],
-            [2, 0, "P", "210", 2020, 10, 1.1, False],
-            [3, 0, "P", "210", 2020, 10, 1.1, False],
-            [4, 0, "P", "210", 2020, 10, 1.1, False],
-            [5, 0, "P", "210", 2020, 10, 1.1, False],
-
+            [1, 0, "P", "0006"],
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
         return expected_df
 
-    def test_flag_outliers(self):
+    def test_filter_valid(self):
         """Test for flag_outliers function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
-        upper_clip = 0
-        lower_clip = 0
-        value_col = "701"
-        result_df = auto.flag_outliers(input_df, upper_clip, lower_clip, value_col)
+        form_type_no: str = "0006"
+        sel_type: str = "P"
 
-        assert_frame_equal(result_df, expected_df)
+        result_df = auto.apply_short_form_filters(input_df, form_type_no, sel_type)
+
+        assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
 
