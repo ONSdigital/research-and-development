@@ -6,15 +6,13 @@ import numpy as np
 import pytest
 
 import src.outlier_detection.auto_outliers as auto
-from src.outlier_detection.outlier_main import run_outliers
-
 
 
 class TestValidateConfigZero:
     """Unit tests for validate_config function."""
 
     def test_validate_config(self, caplog):
-        """Test for log_outlier_info function."""
+        """Test for validate_config function."""
 
         with caplog.at_level(logging.WARNING):
             auto.validate_config(0.0, 0.0, ["701", "702", "703"])
@@ -26,7 +24,7 @@ class TestValidateConfigMinus:
     """Unit tests for validate_config function."""
 
     def test_validate_config(self, caplog):
-        """Test for log_outlier_info function."""
+        """Test for validate_config function."""
 
         with pytest.raises(ImportError):
             auto.validate_config(-1.0, 0.0, ["701", "702", "703"])
@@ -87,7 +85,7 @@ class TestFilterValid:
         return expected_df
 
     def test_filter_valid(self):
-        """Test for flag_outliers function."""
+        """Test for filter_valid function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
 
