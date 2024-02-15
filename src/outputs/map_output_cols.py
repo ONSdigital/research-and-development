@@ -66,6 +66,10 @@ def join_fgn_ownership(
 
         main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
 
+        # If foreign ownership is empty, we fill it with "GB" for long, short
+        # and NI
+        main_df["ultfoc"] = main_df["ultfoc"].fillna("GB")
+
         return main_df
 
     except Exception as e:
@@ -128,13 +132,19 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = [100, 101, 102, 200, 201, 210, 211, 302, 303, 304, 309]
-    status_after = [200, 100, 1000, 400, 500, 600, 800, 1200, 1300, 900, 1400]
+    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
+    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
 
     cora_dict = dict(zip(status_before, status_after))
 
-    # Create a new column by mapping values from main_col using the cora_dict
-    df["form_status"] = df[main_col].map(cora_dict)
+    # Create a new column, if required, and map values from main_col
+    # using the cora_dict.  NI already have form_status,
+    # so it only deals with rows with a value in the main col
+    if "form_status" not in df.columns:
+        df["form_status"] = None
+    df.loc[df["form_status"].isnull(), "form_status"] = df.loc[
+        df["form_status"].isnull(), main_col
+    ].map(cora_dict)
 
     return df
 

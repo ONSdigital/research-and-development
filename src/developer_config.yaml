@@ -9,7 +9,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   load_historic_data: False
   run_construction: False
   run_ni_construction: False
@@ -24,21 +24,22 @@ global:
   output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
-  output_auto_outliers: True
+  output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
-  output_ni_sas: False
-  output_tau: False
+  output_gb_sas: True
+  output_ni_sas: True
+  output_tau: True
   output_intram_by_pg: False
   output_intram_by_itl1: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
-  output_status_filtered: False
   output_fte_total_qa: False
+  output_status_filtered: False
+
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -155,6 +156,7 @@ imputation:
   upper_trim_perc: 15
   trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
   sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
   lf_target_vars:
     - "211"
     - "305"

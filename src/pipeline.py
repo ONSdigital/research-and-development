@@ -162,10 +162,10 @@ def run_pipeline(start, config_path):
 
     # Data processing: Apportionment to sites
     estimated_responses_df = run_site_apportionment(
-        estimated_responses_df, config, write_csv, run_id, output_file=True
+        estimated_responses_df, config, write_csv, run_id, "estimated", output_file=True
     )
     weighted_responses_df = run_site_apportionment(
-        weighted_responses_df, config, write_csv, run_id
+        weighted_responses_df, config, write_csv, run_id, "weighted", output_file=True
     )
     MainLogger.info("Finished Site Apportionment module.")
 

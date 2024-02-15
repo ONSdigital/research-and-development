@@ -1,10 +1,8 @@
 """Utility functions  to be used in the imputation module."""
 import logging
 import pandas as pd
-from typing import List, Dict, Callable
+from typing import List, Dict, Tuple, Callable
 from itertools import chain
-
-from src.outputs.status_filtered import output_status_filtered
 
 ImputationHelpersLogger = logging.getLogger(__name__)
 
@@ -32,6 +30,61 @@ def get_imputation_cols(config: dict) -> list:
     numeric_cols = master_cols + bd_cols + other_sum_cols
 
     return numeric_cols
+
+
+def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
+    """Return a mask for string values in column col that are not null."""
+    return df[col].str.len() > 0
+
+
+def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
+    """Create a dataframe mask based on listed options - retrun Bool column.
+    
+    Options include:
+        - 'clear_status': rows with one of the clear statuses
+        - 'instance_zero': rows with instance = 0
+        - 'instance_nonzero': rows with instance != 0
+        - 'no_r_and_d' : rows where q604 = 'No'
+        - 'postcode_only': rows in which there are no numeric values, only postcodes.
+    """
+    clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
+    instance_mask = df.instance == 0
+    no_r_and_d_mask = df["604"]=="No"
+    postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
+
+    # Set initial values for the mask series as a column in the dataframe
+    df = df.copy()
+    df["mask_col"] = False
+    
+    if "clear_status" in options:
+        df["mask_col"] =  df["mask_col"] & clear_mask
+
+    if "instance_zero" in options:
+        df["mask_col"] = df["mask_col"] & instance_mask
+
+    elif "instance_nonzero" in options:
+        df["mask_col"] = df["mask_col"] & ~instance_mask
+
+    if "no_r_and_d" in options:
+        df["mask_col"] = df["mask_col"] & no_r_and_d_mask
+        
+    if "postcode_only" in options:
+        df["mask_col"] = df["mask_col"] & postcode_only_mask
+
+    if "excl_postcode_only" in options:
+        df["mask_col"] = df["mask_col"] & ~postcode_only_mask
+
+    return df["mask_col"]
+def instance_fix(df: pd.DataFrame):
+    """Set instance to 1 for longforms with status 'Form sent out.'
+
+    References with status 'Form sent out' initially have a null in the instance
+    column.
+    """
+    mask = (df.formtype == "0001") & (df.status == "Form sent out")
+    df.loc[mask, "instance"] = 1
+
+    return df
 
 
 def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
@@ -72,8 +125,22 @@ def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
     return updated_col
 
 
-def fix_604_error(df: pd.DataFrame) -> pd.Series:
-    """Copy 'Yes' or 'No' in insance 0 for q604 to all other instances for each ref.
+def get_mult_604_mask(df: pd.DataFrame) -> pd.Series:
+    """Return mask for long form references with "No" in col 604 but >1 instance.
+
+    Fill nulls as where any of the columns in the mask has a null value, 
+    the mask will be null"""
+    mult_604_mask = (
+        (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
+    ).fillna(False)
+    return mult_604_mask
+
+
+def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Filter out rows with 604 error and create qa dataframe with the rows with errors.
+    
+    Return the filtered data frame and a second qa dataframe with
+    all references with no R&D but more than one instance for output.
 
     Note:
         Occasionally we have noticed that an instance 1 containing a small amount of
@@ -94,57 +161,60 @@ def fix_604_error(df: pd.DataFrame) -> pd.Series:
         2         | 0           | "Yes"
         2         | 1           | nan
 
-    returned dataframe:
+    returned filtered dataframe:
         reference | instance    | "604"
     ---------------------------------
         1         | 0           | "No"
         2         | 0           | "Yes"
         2         | 1           | "Yes"
 
+    returned qa dataframe:
+        reference | instance    | "604"
+    ---------------------------------
+        1         | 0           | "No"
+        1         | 1           | "No"
+
+
     args:
         df (pd.DataFrame): The dataframe being prepared for imputation.
 
     returns:
         (pd.DataFrame): The dataframe with only instance 0 for "no r&d" refs.
+        (pd.DataFrame): The dataframe with references with > 1 insance but no r&d.
     """
     # Copy the "Yes" or "No" in col 604 to all other instances
     df["604"] = copy_first_to_group(df, "604")
 
-    # For long form references with "No" in col 604, keep only instance 0
-    to_remove_mask = (
-        (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
-    )
+    mult_604_mask = get_mult_604_mask(df)
 
-    # Note: where any of the columns in the mask has a null value, the mask will be null
-    to_remove_mask = to_remove_mask.fillna(False)
+    # get list of references with no R&D but more than one instance.
+    mult_604_df = df.copy().loc[mult_604_mask]
+    mult_604_ref_list = list(mult_604_df["reference"].unique())
 
-    # output the references that contained data in error
-    removed_df = df.copy().loc[to_remove_mask][["reference", "instance", "604"]]
-    if not removed_df.empty:
-        ImputationHelpersLogger.info(
-            "The following 'No R&D' references have had invalid records removed: \n"
-            f"{removed_df}"
-        )
+    # create qa dataframe containing all rows for instances with 604 error (inc inst 0)
+    mult_604_qa_df = df.copy().loc[df.reference.isin(mult_604_ref_list)]
 
     # finally we remove unwanted rows
-    filtered_df = df.copy().loc[~(to_remove_mask)]
+    filtered_df = df.copy().loc[~(mult_604_mask)]
 
-    return filtered_df
-
-
-def instance_fix(df: pd.DataFrame):
-    """Set instance to 1 for longforms with status 'Form sent out.'
-
-    References with status 'Form sent out' initially have a null in the instance
-    column.
-    """
-    mask = (df.formtype == "0001") & (df.status == "Form sent out")
-    df.loc[mask, "instance"] = 1
-
-    return df
+    return filtered_df, mult_604_qa_df
 
 
-def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
+def check_604_fix(df) -> pd.DataFrame:
+    """Check the refs with no R&D have one instance 0 and one instance 1 only."""
+    mult_604_mask = get_mult_604_mask(df)
+    filtered_df = df.copy().loc[mult_604_mask][["reference", "instance"]]
+    filtered_df["ref_count"] = filtered_df.groupby("reference").transform(sum)
+
+    check_df = filtered_df.copy().loc[filtered_df.ref_count > 1]
+
+    filtered_df = df.copy().drop_duplicates(subset=["reference", "instance"])
+    return filtered_df, check_df
+
+
+def create_r_and_d_instance(
+        df: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
     """Create a duplicate of long form records with no R&D and set instance to 1.
 
     These references initailly have one entry with instance 0.
@@ -159,7 +229,7 @@ def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
         (pd.DataFrame): The same dataframe with an instance 1 for "no R&D" refs.
     """
     # Ensure that in the case longforms with "no R&D" we only have one row
-    df = fix_604_error(df)
+    df, mult_604_qa_df = fix_604_error(df)
 
     no_rd_mask = (df.formtype == "0001") & (df["604"] == "No")
     filtered_df = df.copy().loc[no_rd_mask]
@@ -169,7 +239,15 @@ def create_r_and_d_instance(df: pd.DataFrame) -> pd.DataFrame:
     updated_df = updated_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
-    return updated_df
+
+    # check that the fix has worked and drop duplicates for now if not
+    final_df, check_df = check_604_fix(updated_df)
+    #TODO: it shouldn't be necessary to drop duplicates if the fix works properly.
+    ImputationHelpersLogger.info("The following references are 'No R&D' ")
+    ImputationHelpersLogger.info( "but have too many rows- duplicates will be dropped:")
+    ImputationHelpersLogger.info(check_df)
+
+    return final_df, mult_604_qa_df
 
 
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
@@ -240,33 +318,15 @@ def tidy_imputation_dataframe(
     to_drop = [
         col
         for col in df.columns
-        if (col.endswith("prev") | col.endswith("imputed") | col.endswith("link"))
+        if (
+            col.endswith("prev") | col.endswith("imputed") | col.endswith("link")
+            | col.endswith("sf_exp_grouping") | col.endswith("trim") 
+        )
     ]
 
     to_drop += ["200_original", "pg_sic_class", "empty_pgsic_group", "empty_pg_group"]
-    to_drop += ["200_imp_marker", "211_trim", "305_trim", "manual_trim"]
+    to_drop += ["200_imp_marker"]
+    
     df = df.drop(columns=to_drop)
 
-    # Keep only imputed records and clear ("R")
-    imp_markers_to_keep = ["TMI", "CF", "MoR", "constructed"]
-    to_keep = df["imp_marker"].isin(imp_markers_to_keep) | (df["imp_marker"] == "R")
-
-    to_keep_df = df.copy().loc[to_keep]
-    filtered_output_df = df.copy().loc[~to_keep]
-
-    # change the value of the status column to 'imputed' for imputed statuses
-    condition = to_keep_df["imp_marker"].isin(imp_markers_to_keep)
-    to_keep_df.loc[condition, "status"] = "imputed"
-
-    # Running status filtered full dataframe output for QA
-    if config["global"]["output_status_filtered"]:
-        logger.info("Starting status filtered output...")
-        output_status_filtered(
-            filtered_output_df,
-            config,
-            write_csv,
-            run_id,
-        )
-        logger.info("Finished status filtered output.")
-
-    return to_keep_df
+    return df
