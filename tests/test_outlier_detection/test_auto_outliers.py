@@ -1119,3 +1119,50 @@ class TestShortFormFilter:
 
         assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
 
+
+# One test for `_normal_round()`:
+# Test that the rounding function is working correctly
+
+# class TestNormalRound:
+#     """Unit tests for normal_round function."""
+#     def create_input_df(self):
+#         """Create an input dataframe for the test."""
+#         input_columns = [
+#             "Reference",
+#             "to_round",
+#         ]
+#         data = [
+#             [1, 2.4],
+#             [2, 2.5],
+#             [3, 2.6],
+#             [4, 3.4],
+#             [5, 3.5],
+#             [6, 3.6],
+#         ]
+#         input_df = pandasDF(data=data, columns=input_columns)
+#         return input_df
+#     def create_expected_df(self):
+#         """Create an input dataframe for the test."""
+#         input_columns = [
+#             "Reference",
+#             "to_round",
+#             "rounded"
+#         ]
+#         data = [
+#             [1, 2.4, 2],
+#             [2, 2.5, 3],
+#             [3, 2.6, 3],
+#             [4, 3.4, 3],
+#             [5, 3.5, 4],
+#             [6, 3.6, 4],
+#         ]
+#         expected_df = pandasDF(data=data, columns=input_columns)
+#         return expected_df
+#     def test_normal_round(self):
+#         """Test for decide_outliers function."""
+#         input_df = self.create_input_df()
+#         expected_df = self.create_expected_df()
+#         input_df["rounded"] = input_df.apply(
+#             lambda row: auto.normal_round(row["to_round"]), axis=1
+#         )
+#         assert_frame_equal(input_df, expected_df)
