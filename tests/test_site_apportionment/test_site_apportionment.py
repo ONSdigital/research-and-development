@@ -3,8 +3,81 @@ import numpy as np
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
 
-from src.site_apportionment.site_apportionment import create_notnull_mask
+from src.site_apportionment.site_apportionment import (
+    create_notnull_mask,
+    set_percentages,
+    count_unique_postcodes_in_col,
+)
 
+class TestSetPercentages():
+    """Tests for the set_percentages function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "instance",
+            "formtype",
+            "status",
+            "postcodes_harmonised",
+            "601",
+            "602",
+            "601_count",
+        ]
+            
+        data = [
+            [1, 0, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
+            [1, 1, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
+            [1, 2, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
+            [2, 0, "0001", "Clear", "NP20 6YY", np.nan, np.nan, 2.0],
+            [2, 1, "0001", "Clear", "CB1 3NF", "CB1 3NF", 60.0, 2.0],
+            [2, 2, "0001", "Clear", "BA1 5DA", "BA1 5DA", 40.0, 2.0],
+            [3, 0, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
+            [3, 1, "0001", "Clear", "DE72 3AU", "DE72 3AU", np.nan, 1.0],
+            [3, 2, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
+            [4, 1, "0001", "Form sent out", "CF10 BZZ", np.nan, np.nan, 0.0],
+        ]   
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
+    
+    def create_exp_output_df(self):
+        """Create an input dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "instance",
+            "formtype",
+            "status",
+            "postcodes_harmonised",
+            "601",
+            "602",
+            "601_count",
+        ]
+            
+        data = [
+            [1, 0, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
+            [1, 1, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
+            [1, 2, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
+            [2, 0, "0001", "Clear", "NP20 6YY", np.nan, np.nan, 2.0],
+            [2, 1, "0001", "Clear", "CB1 3NF", "CB1 3NF", 60.0, 2.0],
+            [2, 2, "0001", "Clear", "BA1 5DA", "BA1 5DA", 40.0, 2.0],
+            [3, 0, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
+            [3, 1, "0001", "Clear", "DE72 3AU", "DE72 3AU", 100.0, 1.0],
+            [3, 2, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
+            [4, 1, "0001", "Form sent out", "CF10 BZZ", "CF10 BZZ", 100.0, 1.0],
+        ]   
+
+        exp_output_df = pandasDF(data=data, columns=exp_output_columns)
+        return exp_output_df
+    
+    
+    def test_set_percentage(self):
+        input_df = self.create_input_df()
+        expected_output_df = self.create_exp_output_df()
+
+        result_df = set_percentages(input_df)
+        assert_frame_equal(result_df, expected_output_df)
+   
 
 class TestCreateNotnullMask():
     """Tests for the function create_not_null_mask."""
@@ -121,12 +194,12 @@ class TestCreateNotnullMask():
         ]
             
         data = [
-            [0, 1,      np.nan, np.nan, True,   True,   np.nan, np.nan],
-            [1, "a",    np.nan, np.nan, True,   True,   1.0,    True],
-            [2, "",     np.nan, True,   True,   True,   0.0,    np.nan],
-            [3, pd.NA,  True,   np.nan, np.nan, np.nan, np.nan, np.nan],
-            [4, np.nan, True,   np.nan, np.nan, np.nan, np.nan, np.nan],
-            [5, " ",    np.nan, np.nan, True,   True,   1.0,    True],
+            [0, 1,      np.nan, np.nan, True,   True,   np.nan, np.nan],  #noqa
+            [1, "a",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
+            [2, "",     np.nan, True,   True,   True,   0.0,    np.nan],  #noqa
+            [3, pd.NA,  True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
+            [4, np.nan, True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
+            [5, " ",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
         ]   
 
         expected_df = pandasDF(data=data, columns=expected_columns)

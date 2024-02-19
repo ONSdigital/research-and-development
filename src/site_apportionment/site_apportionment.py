@@ -37,9 +37,11 @@ long_code: str = "0001"
 
 def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Sets the percent column to 100 for the following forms:
-    - short form records
+    Set percentage column to 100 for short forms and single site long forms.
+
+    The condtitions for the long forms needing 100 in the percentage column are:
     - long forms, exactly 1 site, instance >=1 and notnull postcode
+    - long forms with status "Form sent out"
 
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -61,7 +63,7 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     sent_out_condition = (
         (df[form_col] == long_code)
         & (df[status_col] == "Form sent out")
-        & (df[postcode_col + "_count"].isna())
+        & (df[postcode_col + "_count"] == 0)
         & (df[postcode_col].isna())
     )
     df.loc[sent_out_condition, postcode_col] = (
