@@ -18,24 +18,26 @@ class TestSetPercentages():
             "reference",
             "instance",
             "formtype",
-            "status",
-            "postcodes_harmonised",
             "601",
             "602",
             "601_count",
+            "status",
+            "imp_marker",
+            "postcodes_harmonised",
         ]
             
         data = [
-            [1, 0, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
-            [1, 1, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
-            [1, 2, "0006", "Clear", "NP10 5XX", np.nan, np.nan, 0.0],
-            [2, 0, "0001", "Clear", "NP20 6YY", np.nan, np.nan, 2.0],
-            [2, 1, "0001", "Clear", "CB1 3NF", "CB1 3NF", 60.0, 2.0],
-            [2, 2, "0001", "Clear", "BA1 5DA", "BA1 5DA", 40.0, 2.0],
-            [3, 0, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
-            [3, 1, "0001", "Clear", "DE72 3AU", "DE72 3AU", np.nan, 1.0],
-            [3, 2, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
-            [4, 1, "0001", "Form sent out", "CF10 BZZ", np.nan, np.nan, 0.0],
+            [1, 0, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
+            [1, 1, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
+            [1, 2, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
+            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY"],
+            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
+            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Clear", "R", "NP30 7ZZ"],
+            [3, 1, "0001", "DE72 3AU", np.nan, 1.0, "Clear", "R", "DE72 3AU"],
+            [3, 2, "0001", np.nan, np.nan, 1.0, "Clear", "R", "NP30 7ZZ"],
+            [4, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "TMI", "CF10 BZZ"],
+            [5, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "No mean found", "SA50 5BE"],
         ]   
 
         input_df = pandasDF(data=data, columns=input_columns)
@@ -47,29 +49,30 @@ class TestSetPercentages():
             "reference",
             "instance",
             "formtype",
-            "status",
-            "postcodes_harmonised",
             "601",
             "602",
             "601_count",
+            "status",
+            "imp_marker",
+            "postcodes_harmonised",
         ]
             
         data = [
-            [1, 0, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
-            [1, 1, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
-            [1, 2, "0006", "Clear", "NP10 5XX", np.nan, 100.0, 0.0],
-            [2, 0, "0001", "Clear", "NP20 6YY", np.nan, np.nan, 2.0],
-            [2, 1, "0001", "Clear", "CB1 3NF", "CB1 3NF", 60.0, 2.0],
-            [2, 2, "0001", "Clear", "BA1 5DA", "BA1 5DA", 40.0, 2.0],
-            [3, 0, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
-            [3, 1, "0001", "Clear", "DE72 3AU", "DE72 3AU", 100.0, 1.0],
-            [3, 2, "0001", "Clear", "NP30 7ZZ", np.nan, np.nan, 1.0],
-            [4, 1, "0001", "Form sent out", "CF10 BZZ", "CF10 BZZ", 100.0, 1.0],
+            [1, 0, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
+            [1, 1, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
+            [1, 2, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
+            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY"],
+            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
+            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Clear", "R", "NP30 7ZZ"],
+            [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Clear", "R", "DE72 3AU"],
+            [3, 2, "0001", np.nan, np.nan, 1.0, "Clear", "R", "NP30 7ZZ"],
+            [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ"],
+            [5, 1, "0001", "SA50 5BE", 100.0, 1.0, "Form sent out", "No mean found", "SA50 5BE"],
         ]   
 
         exp_output_df = pandasDF(data=data, columns=exp_output_columns)
         return exp_output_df
-    
     
     def test_set_percentage(self):
         input_df = self.create_input_df()

@@ -63,7 +63,7 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     sent_out_condition = (
         (df[form_col] == long_code)
         & (df[status_col] == "Form sent out")
-        & (df[postcode_col + "_count"] == 0)
+        & (df[postcode_col + "_count"].isna())
         & (df[postcode_col].isna())
     )
     df.loc[sent_out_condition, postcode_col] = (
@@ -111,7 +111,7 @@ def split_sites_df(
     """
     Split dataframe into two based on whether there are sites or not.
 
-    All records that include postcodes in the postcode_col are used for site 
+    All long form records that include postcodes in the postcode_col are used for site 
     apportionment, and all orther records are included in a second dataframe.
 
     Args:
