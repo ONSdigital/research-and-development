@@ -4,10 +4,10 @@ import os
 
 # configuration settings
 csv_path = "D:/coding_projects/randd_test_data/"
-input_file = "test.csv"
+input_file = "percent_test.csv"
 
-# whether the unit test data is input or expected output
-in_or_output = "input"
+# whether the unit test data is input or expected output (set "input" or "exp_output")
+in_or_output = "exp_output"
 
 output_filename = f"{in_or_output}_function"
 
@@ -15,26 +15,55 @@ output_filename = f"{in_or_output}_function"
 path1 = os.path.join(csv_path, input_file)
 df1 = pd.read_csv(path1)
 
+# specify string columns- these will have quotes applied
+string_cols = ["formtype", "601", "status", "postcodes_harmonised"]
+
+# specify float columns
+float_cols = ["601_count"]
 
 # set all datatypes to string - we are outputting all the data as a string
 df1 = df1.astype(str)
 
-# add quotes to the strings in the columns that should show as string types
-string_cols = [] # ["period"]
+# if formtype is in the columns, convert to 0001 and 0006
+if "formtype" in df1.columns:
+    df1.formtype = df1.formtype.str.zfill(4)
 
-df1[string_cols] = df1[string_cols].applymap('"{}"'.format)
+
+def add_quotes(x):
+    """add quotes to the strings in the columns that should show as string types."""
+    x = '"' + x + '"'
+    return x
+
+def format_float(x):
+    """Add a point and a zero for columns that should show as floats."""
+    if "." in x:
+        return x
+    else:
+        return x + ".0"
+
+for c in string_cols:
+    df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(add_quotes, 1)
+
+for c in float_cols:
+    df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(format_float, 1)  
+
+# replace nulls, which are now  rendered "nan" since we made all columns strings,
+# with "np.nan" for output
+df1 = df1.replace("nan", "np.nan")
 
 # prepare the output formatting
 tab = " "*4
 
+# create the text to represent a list of the columns
 col_list = df1.columns
 col_string = ""
+for col in df1.columns:
+    col_string += f'{tab}{tab}"{col}",\n'
 
 # create a new column that joins the contents of the other columns
 df1['output'] = f"{tab}["
-for col in df1.columns[:-1]:
+for col in df1.columns[:-2]:
     df1["output"] += df1[col] + ", "
-    col_string += f'{tab}{tab}"{col}",\n'
     
 df1['output'] += df1[df1.columns[-2]] + "],"
 
@@ -42,7 +71,7 @@ df1['output'] += df1[df1.columns[-2]] + "],"
 rows_string = df1["output"].str.cat(sep=f"\n{tab}")
 
 # join all the components into a final string for output
-full_text = f'''def create_input_df(self):
+full_text = f'''def create_{in_or_output}_df(self):
     """Create an input dataframe for the test."""
     {in_or_output}_columns = [\n{col_string}{tab}]
         
