@@ -31,7 +31,7 @@ old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [turn]
-old_name = "turnover"
+old_name = "frozenturnover"
 Deduced_Data_Type = "Int64"
 
 [f_owner]

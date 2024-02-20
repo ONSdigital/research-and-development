@@ -26,7 +26,7 @@ Deduced_Data_Type = "object"
 old_name = "ru_emp"
 Deduced_Data_Type = "Int64"
 
-[turnover]
+[frozenturnover]
 old_name = "ru_turnover"
 Deduced_Data_Type = "Int64"
 

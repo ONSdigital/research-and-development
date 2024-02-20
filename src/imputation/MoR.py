@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import re
 
+from src.staging.staging_helpers import postcode_topup
 from src.imputation.apportionment import run_apportionment
 from src.imputation.tmi_imputation import (
     create_imp_class_col,
@@ -132,10 +133,18 @@ def carry_forwards(df, backdata, impute_vars):
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
 
+    # Apply the postcode top-up to clean the postcodes in col 601 of the back data
+    df.loc[match_cond, "601_prev"] = df.loc[match_cond, "601_prev"].apply(
+        postcode_topup
+    )
+
     # Replace the values of certain columns with the values from the back data
     replace_vars = ["instance", "200", "201", "601", "602", "604"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
+
+    # Update the postcodes_harmonised column from the updated column 601
+    df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
     
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
