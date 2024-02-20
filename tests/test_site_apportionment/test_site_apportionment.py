@@ -70,61 +70,29 @@ class TestCreateNotnullMask:
 
 # Function to create a sample dataframe
 def create_sample_df():
+    """
+    Creates a sample DataFrame using predefined data and columns.
+
+    Returns:
+        pd.DataFrame: The created DataFrame.
+    """
     expected_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
     expected_data = [
-        [
-            4990000000,
-            4990000000,
-            4990000084,
-            4990000126,
-            4990000126,
-            4990000126,
-            4990000252,
-            4990000294,
-            4990000336,
-            4990000378,
-        ],
-        [
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-            202212,
-        ],
-        [
-            "AB1 2CD",
-            "B27 2CD",
-            "EF3 4GH",
-            "IJ5 6KL",
-            "MN7 8OP",
-            "QR9 10ST",
-            "UV1 2WX",
-            "YZ3 4AB",
-            "CD5 6EF",
-            "GH7 8IJ",
-        ],
-        [5663, 242, 8020, 3877, 2756, 8832, 7084, 3188, 62, 1180],
-        [
-            8855030,
-            5949501,
-            5085659,
-            5808144,
-            8889091,
-            4722201,
-            7058606,
-            1828472,
-            3262548,
-            9348647,
-        ],
-    ]
+    [4990000000, 202212, "AB1 2CD", 5663, 8855030],
+    [4990000000, 202212, "B27 2CD", 242, 5949501],
+    [4990000084, 202212, "EF3 4GH", 8020, 5085659],
+    [4990000126, 202212, "IJ5 6KL", 3877, 5808144],
+    [4990000126, 202212, "MN7 8OP", 2756, 8889091],
+    [4990000126, 202212, "QR9 10ST", 8832, 4722201],
+    [4990000252, 202212, "UV1 2WX", 7084, 7058606],
+    [4990000294, 202212, "YZ3 4AB", 3188, 1828472],
+    [4990000336, 202212, "CD5 6EF", 62, 3262548],
+    [4990000378, 202212, "GH7 8IJ", 1180, 9348647]
+]
 
     expected_data_dict = {col: data for col, data in zip(expected_cols, expected_data)}
+    
     return pd.DataFrame.from_dict(data=expected_data_dict)
 
 
@@ -135,36 +103,20 @@ def test_count_unique_postcodes_in_col_positive():
     result_df = count_unique_postcodes_in_col(df)
 
     # Expected output
-    expected_data = {
-        "reference": [4990000000 + i for i in range(0, 42 * 10, 42)],
-        "period": [202212 for _ in range(10)],
-        postcode_col: [
-            "AB1 2CD",
-            "B27 2CD",
-            "EF3 4GH",
-            "IJ5 6KL",
-            "MN7 8OP",
-            "QR9 10ST",
-            "UV1 2WX",
-            "YZ3 4AB",
-            "CD5 6EF",
-            "GH7 8IJ",
-        ],
-        "headcount_dummy": [5663, 242, 8020, 3877, 2756, 8832, 7084, 3188, 62, 1180],
-        "211_dummy": [
-            8855030,
-            5949501,
-            5085659,
-            5808144,
-            8889091,
-            4722201,
-            7058606,
-            1828472,
-            3262548,
-            9348647,
-        ],
-        f"{postcode_col}_count": [2, 2, 1, 3, 3, 3, 1, 1, 1, 1],
-    }
+    
+    expected_cols = ['reference', 'period', '601', 'headcount_dummy', '211_dummy', '601_count']
+    
+    
+    expected_data = [[4990000000, 202212, 'AB1 2CD', 5663, 8855030, 2],
+                     [4990000042, 202212, 'B27 2CD', 242, 5949501, 2],
+                     [4990000084, 202212, 'EF3 4GH', 8020, 5085659, 1],
+                     [4990000126, 202212, 'IJ5 6KL', 3877, 5808144, 3],
+                     [4990000168, 202212, 'MN7 8OP', 2756, 8889091, 3],
+                     [4990000210, 202212, 'QR9 10ST', 8832, 4722201, 3],
+                     [4990000252, 202212, 'UV1 2WX', 7084, 7058606, 1],
+                     [4990000294, 202212, 'YZ3 4AB', 3188, 1828472, 1],
+                     [4990000336, 202212, 'CD5 6EF', 62, 3262548, 1],
+                     [4990000378, 202212, 'GH7 8IJ', 1180, 9348647, 1]]
     expected_df = pandasDF(expected_data)
 
     # Check if the output is as expected
