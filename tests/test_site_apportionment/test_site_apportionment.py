@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import pytest
+# import pytest
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
 
@@ -76,9 +76,9 @@ def create_sample_df():
     Returns:
         pd.DataFrame: The created DataFrame.
     """
-    expected_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
+    sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
-    expected_data = [
+    sample_data = [
     [4990000000, 202212, "AB1 2CD", 5663, 8855030],
     [4990000000, 202212, "B27 2CD", 242, 5949501],
     [4990000084, 202212, "EF3 4GH", 8020, 5085659],
@@ -89,11 +89,10 @@ def create_sample_df():
     [4990000294, 202212, "YZ3 4AB", 3188, 1828472],
     [4990000336, 202212, "CD5 6EF", 62, 3262548],
     [4990000378, 202212, "GH7 8IJ", 1180, 9348647]
-]
+    ]
 
-    expected_data_dict = {col: data for col, data in zip(expected_cols, expected_data)}
     
-    return pd.DataFrame.from_dict(data=expected_data_dict)
+    return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
 def test_count_unique_postcodes_in_col_positive():
@@ -103,21 +102,22 @@ def test_count_unique_postcodes_in_col_positive():
     result_df = count_unique_postcodes_in_col(df)
 
     # Expected output
-    
     expected_cols = ['reference', 'period', '601', 'headcount_dummy', '211_dummy', '601_count']
     
     
-    expected_data = [[4990000000, 202212, 'AB1 2CD', 5663, 8855030, 2],
-                     [4990000042, 202212, 'B27 2CD', 242, 5949501, 2],
-                     [4990000084, 202212, 'EF3 4GH', 8020, 5085659, 1],
-                     [4990000126, 202212, 'IJ5 6KL', 3877, 5808144, 3],
-                     [4990000168, 202212, 'MN7 8OP', 2756, 8889091, 3],
-                     [4990000210, 202212, 'QR9 10ST', 8832, 4722201, 3],
-                     [4990000252, 202212, 'UV1 2WX', 7084, 7058606, 1],
-                     [4990000294, 202212, 'YZ3 4AB', 3188, 1828472, 1],
-                     [4990000336, 202212, 'CD5 6EF', 62, 3262548, 1],
-                     [4990000378, 202212, 'GH7 8IJ', 1180, 9348647, 1]]
-    expected_df = pandasDF(expected_data)
+    expected_data = [
+        [4990000000, 202212, 'AB1 2CD', 5663, 8855030, 2],
+        [4990000000, 202212, 'B27 2CD', 242, 5949501, 2],
+        [4990000084, 202212, 'EF3 4GH', 8020, 5085659, 1],
+        [4990000126, 202212, 'IJ5 6KL', 3877, 5808144, 3],
+        [4990000126, 202212, 'MN7 8OP', 2756, 8889091, 3],
+        [4990000126, 202212, 'QR9 10ST', 8832, 4722201, 3],
+        [4990000252, 202212, 'UV1 2WX', 7084, 7058606, 1],
+        [4990000294, 202212, 'YZ3 4AB', 3188, 1828472, 1],
+        [4990000336, 202212, 'CD5 6EF', 62, 3262548, 1],
+        [4990000378, 202212, 'GH7 8IJ', 1180, 9348647, 1]]
+    
+    expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
 
     # Check if the output is as expected
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
