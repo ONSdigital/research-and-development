@@ -8,6 +8,7 @@ from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     set_percentages,
     split_sites_df,
+    deduplicate_codes_values,
 )
 
 @pytest.fixture
@@ -162,6 +163,69 @@ class TestSplitSitesDf():
 
         assert_frame_equal(result_df_out.reset_index(drop=True), exp_df_out)
 
+
+class TestDeduplicateCodeValues():
+    """Tests for the deduplicate_codes_values function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "period",
+            "200",
+            "201",
+            "pg_numeric",
+            "211",
+            "251",
+        ]
+            
+        data = [
+            [111, "2020", "C", "A", 42, 5000.0, "Yes"],
+            [111, "2020", "C", "A", 42, 777.0, "No"],
+            [111, "2020", "D", "B", 37, 300.0, "Yes"],
+            [222, "2020", "C", "A", 61, 1000.0, "Yes"],
+            [222, "2020", "C", "A", 63, 500.0, "No"],
+        ]   
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
+        
+    def create_exp_output_df(self):
+        """Create an input dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "period",
+            "200",
+            "201",
+            "pg_numeric",
+            "211",
+            "251",
+        ]
+            
+        data = [
+            [111, "2020", "C", "A", 42, 5777.0, "Yes"],
+            [111, "2020", "D", "B", 37, 300.0, "Yes"],
+            [222, "2020", "C", "A", 61, 1000.0, "Yes"],
+            [222, "2020", "C", "A", 63, 500.0, "No"],
+        ]   
+
+        exp_output_df = pandasDF(data=data, columns=exp_output_columns)
+        return exp_output_df
+    
+    def test_deduplicate_codes_values(self):
+        """Test for the deduplicate_codes_values function."""
+        input_df = self.create_input_df()
+        exp_df = self.create_exp_output_df()
+
+        result_df = deduplicate_codes_values(
+            input_df,
+            ["reference", "period", "200", "201", "pg_numeric"],
+            ["211"],
+            ["251"]
+        )
+
+        assert_frame_equal(result_df.reset_index(drop=True), exp_df)
+    
 
 class TestCreateNotnullMask():
     """Tests for the function create_not_null_mask."""
