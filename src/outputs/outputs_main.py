@@ -11,6 +11,7 @@ from src.outputs.gb_sas import output_gb_sas
 from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
+from src.outputs.intram_uk_itl2 import output_intram_uk_itl2
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
@@ -167,6 +168,20 @@ def run_outputs(
             postcode_mapper,
             itl_mapper,
             itl1_detailed,
+        )
+        OutputMainLogger.info("Finished  Intram by ITL1 output.")
+
+    # Running Intram UK by ITL2
+    if config["global"]["output_intram_uk_itl2"]:
+        OutputMainLogger.info("Starting  Intram UK by ITL2 output...")
+        output_intram_uk_itl2(
+            outputs_df,
+            ni_full_responses,
+            config,
+            write_csv,
+            run_id,
+            postcode_mapper,
+            itl_mapper,
         )
         OutputMainLogger.info("Finished  Intram by ITL1 output.")
 

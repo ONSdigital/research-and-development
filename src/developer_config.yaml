@@ -35,6 +35,7 @@ global:
   output_tau: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
+  output_intram_uk_itl2: True
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False
@@ -110,6 +111,7 @@ network_paths:
   sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
   itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  itl2_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl2_detailed.csv"
   ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
