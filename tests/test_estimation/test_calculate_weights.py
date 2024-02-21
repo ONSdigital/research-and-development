@@ -167,7 +167,7 @@ def test_calculate_weighting_factor_filter():
     data = [
         [1, '12', "P", "210", "0006", 0, 1, True],
         [2, 14, "P", "211", "0006", 0, 2, False],
-        [2, 16, "P", "210", "0006", 0, 2, False],
+        [2, 16, "P", "210", "0006", 1, 2, False],
         [4, 18, "P", "210", "0006", 0, 4, False],
         [1, '20', "X", "210", "0006", 0, 5, False],
         [3, 1, "P", "999", "0006", 0, 1, False],
@@ -198,7 +198,7 @@ def test_calculate_weighting_factor_filter():
     data = [
         [1, 12.0, "P", "210", "0006", 0, 1, True, 6.3],
         [2, 14.0, "P", "211", "0006", 0, 2, False, 4.0],
-        [2, 16.0, "P", "210", "0006", 0, 2, False, 4.0],
+        [2, 16.0, "P", "210", "0006", 1, 2, False, 4.0],
         [4, 18.0, "P", "210", "0006", 0, 4, False, 8.0],
         [1, 20.0, "X", "210", "0006", 0, 5, False, 1.0],     # dropped by filter (selectiontype)
         [3, 1.0, "P", "999", "0006", 0, 1, False, 1.0],      # dropped by filter (statusencoded)
@@ -235,7 +235,8 @@ def test_calculate_weighting_factor_filter():
 
 
 def test_calculate_weighting_factor_709_with_missing():
-    """Test for calculate_weighting_factor for 709 numeric"""
+    """Test for calculate_weighting_factor for 709 numeric
+    with missing value"""
 
     input_cols = [
         "reference",
@@ -284,7 +285,8 @@ def test_calculate_weighting_factor_709_with_missing():
 
 
 def test_calculate_weighting_factor_709_no_missing():
-    """Test for calculate_weighting_factor for 709 numeric"""
+    """Test for calculate_weighting_factor for 709 numeric
+    without missing value"""
 
     input_cols = [
         "reference",
