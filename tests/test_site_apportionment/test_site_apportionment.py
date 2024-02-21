@@ -179,8 +179,9 @@ def create_sample_blank_postcodes_df():
     
     sample_data =    [
         [4990000126, 202212, "IJ5 6KL", 3877, 5808144],
-        [4990000126, 202212, "",        2756, 8889091], #blank string as postcode
-        [4990000126, 202212, "   ",     8832, 4722201], # whitespace as postcode
+        [4990000126, 202212, "",        3877, 5808144], #blank string as postcode
+        [4990000126, 202212, "   ",     3877, 5808144], # whitespace as postcode
+        [4990000126, 202212, None,      3877, 5808144] 
         ]
     
     # Create the DataFrame
@@ -190,6 +191,9 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     """This test checks that the function count_unique_postcodes_in_col can handle blank postcodes.
     
     The blanks are represented by an empty string and a string with only whitespace.
+    
+    Typical representations of missing data in Pandas 'object' columns are empty strings 
+    and None, so None is also tested for.
     """
 
     sample_df = create_sample_blank_postcodes_df()
@@ -202,8 +206,9 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     
     expected_data = [
         [4990000126, 202212, "IJ5 6KL", 3877, 5808144, 1],
-        [4990000126, 202212, "",        2756, 8889091, 1],
-        [4990000126, 202212, "   ",     8832, 4722201, 1], 
+        [4990000126, 202212, "",        3877, 5808144, 1],
+        [4990000126, 202212, "   ",     3877, 5808144, 1],
+        [4990000126, 202212, None,      3877, 5808144, 1] 
     ]
     
     # Make sure the expected data is in a DataFrame
@@ -211,7 +216,53 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     
     # Check if the output is as expected
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
+
+def create_sample_blank_postcodes_df():
     
+    sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
+    
+    nan_as_str = str(np.nan)
+    
+    sample_data =    [
+        [4990000126, 202212, "IJ5 6KL", 3877, 5808144],
+        [4990000126, 202212, np.nan,        3877, 5808144], # Numpy nan as postcode
+        [4990000126, 202212, nan_as_str,     3877, 5808144], # string representation of numpy nan as postcode
+        [4990000126, 202212, None,           3877, 5808144], # None as postcode
+        ]
+    
+    # Create the DataFrame
+    return pd.DataFrame(data=sample_data, columns=sample_cols)
+
+def test_count_unique_postcodes_in_col_nan_postcodes():
+    """This test checks that the function count_unique_postcodes_in_col can handle NaN postcodes.
+    
+    The NaNs are represented by np.nan and the string representation of np.nan, 'nan'.
+    
+    As the data is read from a file, received from SPP, missing values may be 
+     represented as the string 'nan' so this might be worth testing for.
+    """
+
+    sample_df = create_sample_blank_postcodes_df()
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(sample_df)
+
+    # Expected output
+    expected_cols = ['reference', 'period', '601', "headcount_dummy", "211_dummy", '601_count']
+    
+    nan_as_str = str(np.nan)
+    
+    expected_data = [
+        [4990000126, 202212, "IJ5 6KL", 3877, 5808144, 1],
+        [4990000126, 202212, np.nan,        3877, 5808144, 1],
+        [4990000126, 202212, nan_as_str,     3877, 5808144, 1],
+    ]
+    
+    # Make sure the expected data is in a DataFrame
+    expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
+    
+    # Check if the output is as expected
+    pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
     
 def create_sample_missing_columns_df():
     """
@@ -237,7 +288,6 @@ def create_sample_missing_columns_df():
     [4990000378, 202212, 1180, 9348647]
     ]
 
-    
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
