@@ -9,6 +9,7 @@ from src.site_apportionment.site_apportionment import (
     set_percentages,
     split_sites_df,
     deduplicate_codes_values,
+    calc_weights_for_sites,
 )
 
 @pytest.fixture
@@ -227,6 +228,67 @@ class TestDeduplicateCodeValues():
         assert_frame_equal(result_df.reset_index(drop=True), exp_df)
     
 
+class TestCalcWeightsForSites():
+    """Tests for the calc_weights_for_sites function."""
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "period",
+            "instance",
+            "601",
+            "602",
+            "postcodes_harmonised",
+        ]
+            
+        data = [
+            [111, "2020", 1, "AB15 3GU", 0, "AB15 3GU"],
+            [111, "2020", 2, "BA1 5DA", 0, "BA1 5DA"],
+            [222, "2020", 1, "CB1 3NF", 60, "CB1 3NF"],
+            [222, "2020", 2, "DE72 3AU", 40, "BA1 5DA"],
+            [333, "2020", 1, "EH10 7DZ", 10, "DE72 3AU"],
+            [333, "2020", 2, "FL27 3DE", 20, "NP30 7ZZ"],
+            [333, "2020", 3, "GL14 1DD", 50, "CF10 BZZ"],
+            [444, "2020", 1, "HA3 2BE", 100, "SA50 5BE"],
+        ]   
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
+    
+    def create_exp_output_df(self):
+        """Create an input dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "period",
+            "instance",
+            "601",
+            "602",
+            "postcodes_harmonised",
+            "site_weight",
+        ]
+            
+        data = [
+            [222, "2020", 1, "CB1 3NF", 60, "CB1 3NF", 0.6],
+            [222, "2020", 2, "DE72 3AU", 40, "BA1 5DA", 0.4],
+            [333, "2020", 1, "EH10 7DZ", 10, "DE72 3AU", 0.125],
+            [333, "2020", 2, "FL27 3DE", 20, "NP30 7ZZ", 0.25],
+            [333, "2020", 3, "GL14 1DD", 50, "CF10 BZZ", 0.625],
+            [444, "2020", 1, "HA3 2BE", 100, "SA50 5BE", 1.0],
+        ]   
+
+        exp_output_df = pandasDF(data=data, columns=exp_output_columns)
+        return exp_output_df
+    
+    def test_calc_weights_for_sites(self):
+        """Test for the cacl_weights_for_sites function."""
+        input_df = self.create_input_df()
+        exp_df = self.create_exp_output_df()
+
+        result_df = calc_weights_for_sites(input_df, ["reference", "period"])
+
+        assert_frame_equal(result_df.reset_index(drop=True), exp_df)
+    
+
 class TestCreateNotnullMask():
     """Tests for the function create_not_null_mask."""
     def create_input_df(self):
@@ -238,8 +300,8 @@ class TestCreateNotnullMask():
             [111, "a"],
             [222, ""],
             [333, pd.NA],
-            [4, np.nan],
-            [5, " "],
+            [444, np.nan],
+            [555, " "],
         ]   
 
         input_df = pandasDF(data=data, columns=input_columns)
@@ -275,8 +337,8 @@ class TestCreateNotnullMask():
             [111, "a", True, np.nan, np.nan, True, True, 1.0, True],
             [222, "", False, np.nan, True, True, True, 0.0, np.nan],
             [333, pd.NA, False, True, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [4, np.nan, False, True, np.nan, np.nan, np.nan, np.nan, np.nan],
-            [5, " ", True, np.nan, np.nan, True, True, 1.0, True],    
+            [444, np.nan, False, True, np.nan, np.nan, np.nan, np.nan, np.nan],
+            [555, " ", True, np.nan, np.nan, True, True, 1.0, True],    
         ]   
 
         expected_df = pandasDF(data=data, columns=expected_columns)
@@ -346,8 +408,8 @@ class TestCreateNotnullMask():
             [111, "a",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
             [222, "",     np.nan, True,   True,   True,   0.0,    np.nan],  #noqa
             [333, pd.NA,  True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
-            [4, np.nan, True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
-            [5, " ",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
+            [444, np.nan, True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
+            [555, " ",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
         ]   
 
         expected_df = pandasDF(data=data, columns=expected_columns)

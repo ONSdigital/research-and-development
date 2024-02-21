@@ -319,7 +319,6 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
     """
     # Create a new column with cleaned site percentage values
     df["site_percent"] = df[percent_col].fillna(0)
-    df.loc[(df.instance == 0), "site_percent"] = 0
 
     # Calculate the total percent for each reference and period
     df["site_percent_total"] = df.groupby(groupby_cols)["site_percent"].transform(
