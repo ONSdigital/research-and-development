@@ -10,6 +10,7 @@ from src.site_apportionment.site_apportionment import (
     split_sites_df,
     deduplicate_codes_values,
     calc_weights_for_sites,
+    create_cartesian_product,
 )
 
 @pytest.fixture
@@ -250,6 +251,7 @@ class TestCalcWeightsForSites():
             [333, "2020", 2, "FL27 3DE", 20, "NP30 7ZZ"],
             [333, "2020", 3, "GL14 1DD", 50, "CF10 BZZ"],
             [444, "2020", 1, "HA3 2BE", 100, "SA50 5BE"],
+            [555, "2020", 1, "IP24 8XX", 100, "IP24 8XX"],
         ]   
 
         input_df = pandasDF(data=data, columns=input_columns)
@@ -274,6 +276,7 @@ class TestCalcWeightsForSites():
             [333, "2020", 2, "FL27 3DE", 20, "NP30 7ZZ", 0.25],
             [333, "2020", 3, "GL14 1DD", 50, "CF10 BZZ", 0.625],
             [444, "2020", 1, "HA3 2BE", 100, "SA50 5BE", 1.0],
+            [555, "2020", 1, "IP24 8XX", 100, "IP24 8XX", 1.0],
         ]   
 
         exp_output_df = pandasDF(data=data, columns=exp_output_columns)
@@ -287,8 +290,107 @@ class TestCalcWeightsForSites():
         result_df = calc_weights_for_sites(input_df, ["reference", "period"])
 
         assert_frame_equal(result_df.reset_index(drop=True), exp_df)
-    
 
+
+class TestCreateCartesianProduct():
+    """Tests for the create_cartesian_product function."""
+    def create_sites_input_df(self):
+        """Create an input dataframe for the test."""
+        sites_input_columns = [
+            "reference",
+            "period",
+            "instance",
+            "601",
+            "602",
+            "postcodes_harmonised",
+            "site_weights",
+        ]
+            
+        sites_data = [
+            [222, "2020", 1, "CB1 3NF", 60, "CB1 3NF", 0.6],
+            [222, "2020", 2, "DE72 3AU", 40, "DE72 3AU", 0.4],
+            [222, "2021", 1, "CB1 3NF", 70, "CB1 3NF", 0.7],
+            [222, "2021", 2, "DE72 3AU", 30, "DE72 3AU", 0.3],
+            [333, "2020", 1, "EH10 7DZ", 10, "EH10 7DZ", 0.125],
+            [333, "2020", 2, "FL27 3DE", 20, "FL27 3DE", 0.25],
+            [333, "2020", 3, "GL14 1DD", 50, "GL14 1DD", 0.625],
+            [444, "2020", 1, "HA3 2BE", 100, "HA3 2BE", 1.0],
+            [555, "2020", 1, "IP24 8XX", 100, "IP24 8XX", 1.0],
+        ]   
+
+        sites_input_df = pandasDF(data=sites_data, columns=sites_input_columns)
+        return sites_input_df
+    
+    def create_category_input_df(self):
+        """Create an input dataframe for the test."""
+        category_input_columns = [
+            "reference",
+            "period",
+            "200",
+            "201",
+            "pg_numeric",
+            "211",
+        ]
+            
+        category_data = [
+            [111, "2020", "C", "AA", 34, 3000],
+            [111, "2020", "C", "A", 42, 5700],
+            [111, "2020", "D", "B", 37, 2000],
+            [222, "2020", "C", "A", 61, 1000],
+            [222, "2020", "C", "A", 63, 500],
+            [222, "2021", "C", "A", 61, 2000],
+            [333, "2020", "C", "E", 24, 100],
+            [444, "2020", "D", "F", 31, 240],
+        ]   
+
+        category_input_df = pandasDF(data=category_data, columns=category_input_columns)
+        return category_input_df
+    
+    def create_exp_output_df(self):
+        """Create an input dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "period",
+            "instance",
+            "601",
+            "602",
+            "postcodes_harmonised",
+            "site_weights",
+            "200",
+            "201",
+            "pg_numeric",
+            "211",
+        ]
+            
+        data = [
+            [222, "2020", 1, "CB1 3NF", 60, "CB1 3NF", 0.6, "C", "A", 61, 1000],
+            [222, "2020", 1, "CB1 3NF", 60, "CB1 3NF", 0.6, "C", "A", 63, 500],
+            [222, "2020", 2, "DE72 3AU", 40, "DE72 3AU", 0.4, "C", "A", 61, 1000],
+            [222, "2020", 2, "DE72 3AU", 40, "DE72 3AU", 0.4, "C", "A", 63, 500],
+            [222, "2021", 1, "CB1 3NF", 70, "CB1 3NF", 0.7, "C", "A", 61, 2000],
+            [222, "2021", 2, "DE72 3AU", 30, "DE72 3AU", 0.3, "C", "A", 61, 2000],
+            [333, "2020", 1, "EH10 7DZ", 10, "EH10 7DZ", 0.125, "C", "E", 24, 100],
+            [333, "2020", 2, "FL27 3DE", 20, "FL27 3DE", 0.25, "C", "E", 24, 100],
+            [333, "2020", 3, "GL14 1DD", 50, "GL14 1DD", 0.625, "C", "E", 24, 100],
+            [444, "2020", 1, "HA3 2BE", 100, "HA3 2BE", 1.0, "D", "F", 31, 240],
+        ]   
+
+        exp_output_df = pandasDF(data=data, columns=exp_output_columns)
+        return exp_output_df
+        
+    
+    def test_create_cartesian_product(self):
+        """Test for the create_cartesian_product function."""
+        category_input_df = self.create_category_input_df()
+        sites_input_df = self.create_sites_input_df()
+
+        exp_output_df = self.create_exp_output_df()
+
+        result_df = create_cartesian_product(sites_input_df, category_input_df)
+
+        assert_frame_equal(result_df.reset_index(drop=True), exp_output_df)
+    
+    
 class TestCreateNotnullMask():
     """Tests for the function create_not_null_mask."""
     def create_input_df(self):
