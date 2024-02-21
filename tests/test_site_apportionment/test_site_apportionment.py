@@ -301,32 +301,116 @@ def test_count_unique_postcodes_in_col_negative_2():
         result_df = count_unique_postcodes_in_col(df)
 
 
-# # Function to create a sample dataframe
-# def create_df_with_missing_postcodes_df():
-#     np.random.seed(0)  # for reproducibility
-#     data = {
-#         'reference': [4990000000 + i for i in range(10)],
-#         'period': [202212 for _ in range(10)],
-#         postcode_col: ['AB1 2CD', '', ' ', np.nan, 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
-#         'headcount_dummy': np.random.randint(1, 100, size=10),
-#         '211_dummy': np.random.randint(1, 100, size=10)
-#     }
-#     return pd.DataFrame(data)
+def test_drop_duplicates():
+    # Define the input DataFrame
+    df = pd.DataFrame({
+        'groupby_col1': ['A', 'A', 'B', 'B', 'B'],
+        'groupby_col2': ['X', 'X', 'Y', 'Y', 'Y'],
+        'postcode_col': ['123', '123', '456', '456', '789'],
+    })
 
-# def test_count_unique_postcodes_null_codes():
-#     df = create_df_with_missing_postcodes_df()
+    # Define the expected output DataFrame
+    expected_df = pd.DataFrame({
+        'groupby_col1': ['A', 'B', 'B'],
+        'groupby_col2': ['X', 'Y', 'Y'],
+        'postcode_col': ['123', '456', '789'],
+    })
 
-#     # Apply the function
-#     result_df = count_unique_postcodes_in_col(df)
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(df)
 
-#     # Expected output
-#     expected_data = {
-#         'reference': [4990000000, 4990000004, 4990000005, 4990000006, 4990000007, 4990000008, 4990000009],
-#         'period': [202212, 202212, 202212, 202212, 202212, 202212, 202212],
-#         postcode_col: ['AB1 2CD', 'MN7 8OP', 'QR9 10ST', 'UV1 2WX', 'YZ3 4AB', 'CD5 6EF', 'GH7 8IJ'],
-#         'postcode_col_count': [1, 1, 1, 1, 1, 1, 1]
-#     }
-#     expected_df = pd.DataFrame(expected_data)
+    # Check that the resulting DataFrame matches the expected output
+    pd.testing.assert_frame_equal(result_df, expected_df)
 
-#     # Check if the output is as expected
-#     pd.testing.assert_frame_equal(result_df, expected_df)
+
+def create_repitious_dataframe():
+    # Define the data and columns separately
+    sample_data = [
+        [4990000000, 202212, 'SW1A 1AA'],
+        [4990000000, 202212, 'SW1A 1AA'],
+        [4990000126, 202212, 'EC1A 1BB'],
+        [4990000126, 202212, 'EC1A 1BB'],
+        [4990000126, 202212, 'W1A 0AX'],
+    ]
+    sample_cols = ['reference', 'period', '601']
+
+    # Create the input DataFrame
+    df = pd.DataFrame(sample_data, columns=sample_cols)
+    return df
+
+  
+def test_count_unique_postcodes_drop_duplicates():
+    """This tests that the function can handle a DataFrame with repitious data.
+    
+    Within the function the repitious records are dropped, but later merged back on. 
+    The counting operation is tested here, and the ability of the function to add the 
+    original dropped data back onto the returned dataframe. 
+    """
+    repitious_dataframe= create_repitious_dataframe()
+
+    # Define the expected output data and columns
+    expected_data = [
+        [4990000000, 202212, 'SW1A 1AA', 1],
+        [4990000000, 202212, 'SW1A 1AA', 1],
+        [4990000126, 202212, 'EC1A 1BB', 2],
+        [4990000126, 202212, 'EC1A 1BB', 2],
+        [4990000126, 202212, 'W1A 0AX', 2]
+        ,
+    ]
+    expected_columns = ['reference', 'period', '601', '601_count']
+
+    # Create the expected output DataFrame
+    expected_df = pd.DataFrame(expected_data, columns=expected_columns)
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(repitious_dataframe)
+
+    # Check that the resulting DataFrame matches the expected output
+    pd.testing.assert_frame_equal(result_df, expected_df)
+    
+
+def create_not_uniformly_repitious_df():
+    # Define the data and columns separately
+    sample_data = [
+        [4990000000, 202212, 'SW1A 1AA', 10, 100],
+        [4990000000, None,   'SW1A 1AA', 10, 100], # missing period
+        [4990000126, 202212, 'EC1A 1BB', 20, 200],
+        [4990000126, 202212, 'EC1A 1BB', None, 200], # missing headcount
+        [4990000126, 202212, 'W1A 0AX', 20, 200],
+        [4990000126, 202212, 'W1A 0AX', None, None], # missing headcount and 211
+        [None,       202212, 'W1A 0AX', 20, 200], # missing reference
+    ]
+    sample_cols = ['reference', 'period', '601', 'dummy_headcount', 'dummy_211']
+
+    # Create the input DataFrame
+    df = pd.DataFrame(sample_data, columns=sample_cols)
+    return df
+
+def test_count_unique_postcodes_drop_duplicates_with_missing_values():
+    """
+    This test checks that the function count_unique_postcodes_in_col can handle missing values in the input DataFrame.
+    """
+    # Create the input DataFrame
+    df = create_not_uniformly_repitious_df()
+
+    # Define the expected output data and columns
+    expected_data = [
+        [4990000000, 202212, 'SW1A 1AA', 10, 100, 1],
+        [4990000000, np.nan, 'SW1A 1AA', 10, 100, 1],
+        [4990000126, 202212, 'EC1A 1BB', 20, 200, 2],
+        [4990000126, 202212, 'EC1A 1BB', None, 200, 2],
+        [4990000126, 202212, 'W1A 0AX',  20, 200, 2],
+        [4990000126, 202212, 'W1A 0AX', None, None, 2],
+        [None,       202212, 'W1A 0AX', 20, 200, np.nan]
+    ]
+    expected_columns = ['reference', 'period', '601', 'dummy_headcount', 'dummy_211', '601_count']
+
+    # Create the expected output DataFrame
+    expected_df = pd.DataFrame(expected_data, columns=expected_columns)
+
+    # Apply the function
+    result_df = count_unique_postcodes_in_col(df)
+
+    # Check that the resulting DataFrame matches the expected output
+    pd.testing.assert_frame_equal(result_df, expected_df)
+    
