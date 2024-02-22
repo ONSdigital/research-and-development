@@ -8,8 +8,8 @@ from typing import List
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     count_unique_postcodes_in_col,
-    deduplicate_codes_values,
-)  # create_category_df, keep_good_markers,
+    deduplicate_codes_values
+) #create_category_df, keep_good_markers
 
 
 # Global variables
@@ -71,7 +71,7 @@ class TestCreateNotnullMask:
 
 
 # Function to create a sample dataframe
-def create_category_test_df_2():
+def create_category_test_df():
     """
     Creates a sample DataFrame using predefined data and columns.
 
@@ -97,33 +97,26 @@ def create_category_test_df_2():
 
 
 def test_count_unique_postcodes_in_col_positive():
-    df = create_category_test_df_2()
+    df = create_category_test_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(df)
 
     # Expected output
-    expected_cols = [
-        "reference",
-        "period",
-        "601",
-        "headcount_dummy",
-        "211_dummy",
-        "601_count",
-    ]
+    expected_cols = ['reference', 'period', '601', 'headcount_dummy', '211_dummy', '601_count']
+
 
     expected_data = [
-        [4990000000, 202212, "AB1 2CD", 5663, 8855030, 2],
-        [4990000000, 202212, "B27 2CD", 242, 5949501, 2],
-        [4990000084, 202212, "EF3 4GH", 8020, 5085659, 1],
-        [4990000126, 202212, "IJ5 6KL", 3877, 5808144, 3],
-        [4990000126, 202212, "MN7 8OP", 2756, 8889091, 3],
-        [4990000126, 202212, "QR9 10ST", 8832, 4722201, 3],
-        [4990000252, 202212, "UV1 2WX", 7084, 7058606, 1],
-        [4990000294, 202212, "YZ3 4AB", 3188, 1828472, 1],
-        [4990000336, 202212, "CD5 6EF", 62, 3262548, 1],
-        [4990000378, 202212, "GH7 8IJ", 1180, 9348647, 1],
-    ]
+        [4990000000, 202212, 'AB1 2CD', 5663, 8855030, 2],
+        [4990000000, 202212, 'B27 2CD', 242, 5949501, 2],
+        [4990000084, 202212, 'EF3 4GH', 8020, 5085659, 1],
+        [4990000126, 202212, 'IJ5 6KL', 3877, 5808144, 3],
+        [4990000126, 202212, 'MN7 8OP', 2756, 8889091, 3],
+        [4990000126, 202212, 'QR9 10ST', 8832, 4722201, 3],
+        [4990000252, 202212, 'UV1 2WX', 7084, 7058606, 1],
+        [4990000294, 202212, 'YZ3 4AB', 3188, 1828472, 1],
+        [4990000336, 202212, 'CD5 6EF', 62, 3262548, 1],
+        [4990000378, 202212, 'GH7 8IJ', 1180, 9348647, 1]]
 
     expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
 
@@ -131,7 +124,7 @@ def test_count_unique_postcodes_in_col_positive():
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
 
-def create_sample_missing_postcodes_df():
+def create_sample_repeated_postcodes_df():
     """
     Creates a sample DataFrame using predefined data and columns.
 
@@ -141,44 +134,32 @@ def create_sample_missing_postcodes_df():
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
     sample_data = [
-        [4990000000, 202212, "B27 2CD", 5663, 8855030],
-        [4990000000, 202212, "B27 2CD", 242, 5949501],  # repeated postcode
-        [4990000084, 202212, "EF3 4GH", 8020, 5085659],
-        [4990000252, 202212, "UV1 2WX", 7084, 7058606],
-        [4990000294, 202212, "YZ3 4AB", 3188, 1828472],
-        [4990000336, 202212, "CD5 6EF", 62, 3262548],
-        [4990000378, 202212, "GH7 8IJ", 1180, 9348647],
+    [4990000000, 202212, "B27 2CD", 5663, 8855030],
+    [4990000000, 202212, "B27 2CD", 5663, 8855030], #repeated postcode
+    [4990000084, 202212, "B27 2CD", 8020, 5085659], # repeated postcode but for different ref
+    [4990000252, 202212, "UV1 2WX", 8020, 5085659],
+
     ]
+
 
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
-
-def test_count_unique_postcodes_in_col_negative_1():
+def test_count_unique_postcodes_in_col_repetitive():
     """
     Test the function count_unique_postcodes_in_col."""
-    df = create_sample_missing_postcodes_df()
+    df = create_sample_repeated_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(df)
 
     # Expected output
-    expected_cols = [
-        "reference",
-        "period",
-        "601",
-        "headcount_dummy",
-        "211_dummy",
-        "601_count",
-    ]
+    expected_cols = ['reference', 'period', '601', "headcount_dummy", "211_dummy", '601_count']
 
     expected_data = [
-        [4990000000, 202212, "B27 2CD", 5663, 8855030, 2],
-        [4990000001, 202212, "B27 2CD", 242, 5949501, 2],
-        [4990000002, 202212, "EF3 4GH", 8020, 5085659, 2],
-        [4990000006, 202212, "UV1 2WX", 7084, 7058606, 2],
-        [4990000007, 202212, "YZ3 4AB", 3188, 1828472, 2],
-        [4990000008, 202212, "CD5 6EF", 62, 3262548, 2],
-        [4990000009, 202212, "GH7 8IJ", 1180, 9348647, 2],
+        [4990000000, 202212, "B27 2CD", 5663, 8855030, 1],
+        [4990000000, 202212, "B27 2CD", 5663, 8855030, 1], # repeated postcode but for the same ref
+        [4990000002, 202212, "B27 2CD", 8020, 5085659, 2], # postcode again repeated but for different ref
+        [4990000002, 202212, 'UV1 2WX', 8020, 5085659, 2] # postcode_count should be 2
     ]
 
     expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
@@ -192,12 +173,12 @@ def create_sample_blank_postcodes_df():
 
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
-    sample_data = [
+    sample_data =    [
         [4990000126, 202212, "IJ5 6KL", 3877, 5808144],
-        [4990000126, 202212, "", 3877, 5808144],  # blank string as postcode
-        [4990000126, 202212, "   ", 3877, 5808144],  # whitespace as postcode
-        [4990000126, 202212, None, 3877, 5808144],
-    ]
+        [4990000126, 202212, "",        3877, 5808144], #blank string as postcode
+        [4990000126, 202212, "   ",     3877, 5808144], # whitespace as postcode
+        [4990000126, 202212, None,      3877, 5808144]
+        ]
 
     # Create the DataFrame
     return pd.DataFrame(data=sample_data, columns=sample_cols)
@@ -218,20 +199,13 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     result_df = count_unique_postcodes_in_col(sample_df)
 
     # Expected output
-    expected_cols = [
-        "reference",
-        "period",
-        "601",
-        "headcount_dummy",
-        "211_dummy",
-        "601_count",
-    ]
+    expected_cols = ['reference', 'period', '601', "headcount_dummy", "211_dummy", '601_count']
 
     expected_data = [
         [4990000126, 202212, "IJ5 6KL", 3877, 5808144, 1],
-        [4990000126, 202212, "", 3877, 5808144, 1],
-        [4990000126, 202212, "   ", 3877, 5808144, 1],
-        [4990000126, 202212, None, 3877, 5808144, 1],
+        [4990000126, 202212, "",        3877, 5808144, 1],
+        [4990000126, 202212, "   ",     3877, 5808144, 1],
+        [4990000126, 202212, None,      3877, 5808144, 1]
     ]
 
     # Make sure the expected data is in a DataFrame
@@ -240,25 +214,18 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     # Check if the output is as expected
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
-
-def create_sample_blank_postcodes_df():
+def create_sample_nan_postcodes_df():
 
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
     nan_as_str = str(np.nan)
 
-    sample_data = [
+    sample_data =    [
         [4990000126, 202212, "IJ5 6KL", 3877, 5808144],
-        [4990000126, 202212, np.nan, 3877, 5808144],  # Numpy nan as postcode
-        [
-            4990000126,
-            202212,
-            nan_as_str,
-            3877,
-            5808144,
-        ],  # string representation of numpy nan as postcode
-        [4990000126, 202212, None, 3877, 5808144],  # None as postcode
-    ]
+        [4990000126, 202212, np.nan,        3877, 5808144], # Numpy nan as postcode
+        [4990000126, 202212, nan_as_str,     3877, 5808144], # string representation of numpy nan as postcode
+        [4990000126, 202212, None,           3877, 5808144], # None as postcode
+        ]
 
     # Create the DataFrame
     return pd.DataFrame(data=sample_data, columns=sample_cols)
@@ -273,7 +240,7 @@ def test_count_unique_postcodes_in_col_nan_postcodes():
      represented as the string 'nan' so this might be worth testing for.
     """
 
-    sample_df = create_sample_blank_postcodes_df()
+    sample_df = create_sample_nan_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(sample_df)
@@ -330,40 +297,14 @@ def create_sample_missing_columns_df():
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
-def test_count_unique_postcodes_in_col_negative_2():
+def test_count_unique_postcodes_in_col_missigng_col():
     """Checks that an error is raised when the postcode column is missing."""
 
     df = create_sample_missing_columns_df()
 
     # Apply the function
     with pytest.raises(KeyError):
-        result_df = count_unique_postcodes_in_col(df)
-
-
-def test_drop_duplicates():
-    # Define the input DataFrame
-    df = pd.DataFrame(
-        {
-            "groupby_col1": ["A", "A", "B", "B", "B"],
-            "groupby_col2": ["X", "X", "Y", "Y", "Y"],
-            "postcode_col": ["123", "123", "456", "456", "789"],
-        }
-    )
-
-    # Define the expected output DataFrame
-    expected_df = pd.DataFrame(
-        {
-            "groupby_col1": ["A", "B", "B"],
-            "groupby_col2": ["X", "Y", "Y"],
-            "postcode_col": ["123", "456", "789"],
-        }
-    )
-
-    # Apply the function
-    result_df = count_unique_postcodes_in_col(df)
-
-    # Check that the resulting DataFrame matches the expected output
-    pd.testing.assert_frame_equal(result_df, expected_df)
+        count_unique_postcodes_in_col(df)
 
 
 def create_repitious_dataframe():
@@ -536,18 +477,34 @@ def test_count_unique_postcodes_drop_duplicates_with_missing_values():
 
 class TestCreateCategoryDF:
     def test_deduplicate_codes_values(self):
-        # Define the data and columns separately
-        sample_data = [
-            ["A", 1, 10, "x"],
-            ["A", 1, 20, "y"],
-            ["B", 2, 30, "z"],
-            ["B", 2, 40, "w"],
-            ["C", 3, 50, "v"],
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "period",
+            "instance",
+            "postcodes_harmonised",
+            "305",
+            "yes_no_col",
+            "602",
+            "201",
+            "pg_numeric",
+            "200",
+            "value_col",
         ]
-        sample_cols = ["reference", "group_col2", "value_col", "textual_col"]
+            
+        data = [
+            [400000200, 2012, np.nan, "B27 6AG", 10, "yes", 70, "A", 1, "C", 5053, 5053],
+            [400000200, 2012, np.nan, "B16 9NH", 100, "no", 10, "B", 2, "D", 4840635, 4840635],
+            [400000200, 2012, np.nan, "LS21 1PP", 190, "yes", 20, "C", 3, "C", 1213540, 1213540],
+            [400000030, 2000, np.nan, "B27 6AG", 280, "no", 70, "A", 1, "D", 6555656, 6555656],
+            [400000030, 2000, np.nan, "B16 9NH", 370, "yes", 10, "B", 2, "C", 5054, 5054],
+            [400000030, 2000, np.nan, "LS21 1PP", 460, "no", 20, "C", 3, "D", 4840636, 4840636],
+            [400000030, 2012, np.nan, "MX21 2TP", 550, "yes", 50, "A", 1, "C", 1213541, 1213541],
+            [400000030, 2012, np.nan, "B16 9NH", 640, "no", 50, "B", 2, "D", 6555657, 6555657],
+        ]   
 
-        # Create the DataFrame
-        df = pd.DataFrame(sample_data, columns=sample_cols)
+        input_df = pandasDF(data=data, columns=input_columns)
+        return input_df
 
         # Define the expected output data and columns
         expected_data = [
@@ -560,23 +517,22 @@ class TestCreateCategoryDF:
         # Create the expected output DataFrame
         expected_df = pd.DataFrame(expected_data, columns=expected_cols)
 
-        # Column names redefined for convenience
+        # These variables are defined globally in site_apportionment.py
         instance_col: str = "instance"
         postcodes_harmonised_col: str = "postcodes_harmonised"
-        percent_col: str = "602"
         product_col: str = "201"
         pg_num_col: str = "pg_numeric"
         civdef_col: str = "200"
 
         # Define the parameters for the function
-        value_cols = ["value_col"]
+        value_cols = ["305"]
         code_cols: List[str] = [product_col, civdef_col, pg_num_col]
         site_cols: List[str] = [
             instance_col,
             postcode_col,
-            percent_col,
             postcodes_harmonised_col,
         ]
+        # Code copied from function to recreate various column lists 
         orig_cols: List[str] = df.columns.tolist()
         category_cols = [x for x in orig_cols if x not in site_cols]
         textual_cols = [
@@ -632,7 +588,7 @@ class TestCreateCategoryDF:
     #     site_cols = ['postcode_col']
 
     # Create fake value columns
-    value_cols = ["dummy_headcount", "dummy_211"]
+    # value_cols = ["dummy_headcount", "dummy_211"]
 
 
 #     # Apply the function
