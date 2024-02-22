@@ -3,14 +3,13 @@ import numpy as np
 import pytest
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
+from typing import List
 
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     count_unique_postcodes_in_col,
-    create_category_df
-)
-
-from src.utils.helpers import Config_settings, get_imputation_cols
+    deduplicate_codes_values
+) #create_category_df, keep_good_markers,
 
 
 # Global variables
@@ -419,53 +418,113 @@ def test_count_unique_postcodes_drop_duplicates_with_missing_values():
     pd.testing.assert_frame_equal(result_df, expected_df)
     
 
-def create_category_test_df_3():
-    # Define the data and columns separately
-    sample_data = [
-        [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100],
-        [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100], # duplicate, that should get deduped
-        [4990000000, 202212, 'SW1A 1AA', None, 'C1', 'bad', 10, 100], # bad status that should get dropped
-        [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'good', 20, 200],
-        [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'no mean found', 20, 200], # bad status that should get dropped
-        [4990000126, 202212, 'W1A 0AX', 'P2', None, 'good', 20, 200],
-    ]
-    sample_cols = ['reference', 'period', 'postcode_col', 'product_col', 'civdef_col', 'imp_marker', 'dummy_headcount', 'dummy_211']
+# def create_category_test_df_3():
+#     # Define the data and columns separately
+#     sample_data = [
+#         [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100],
+#         [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100], # duplicate, that should get deduped
+#         [4990000000, 202212, 'SW1A 1AA', None, 'C1', 'bad', 10, 100], # bad status that should get dropped
+#         [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'good', 20, 200],
+#         [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'no mean found', 20, 200], # bad status that should get dropped
+#         [4990000126, 202212, 'W1A 0AX', 'P2', None, 'good', 20, 200],
+#     ]
+#     sample_cols = ['reference', 'period', 'postcode_col', 'product_col', 'civdef_col', 'imp_marker', 'dummy_headcount', 'dummy_211']
 
-    # Create the DataFrame
-    df = pd.DataFrame(sample_data, columns=sample_cols)
+#     # Create the DataFrame
+#     df = pd.DataFrame(sample_data, columns=sample_cols)
     
-    return df
+#     return df
 
 
-def test_create_category_df():
-    # Create the input DataFrame
-    sample_df = create_category_test_df_3()
+# def test_create_category_df():
+#     # Create the input DataFrame
+#     sample_df = create_category_test_df_3()
 
-    # Define the expected output data and columns
-    expected_data = [
-        [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100],
-        [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'good', 20, 200],
-    ]
-    expected_cols = ['reference', 'period', 'postcode_col', 'product_col', 'civdef_col', 'imp_marker', 'dummy_headcount', 'dummy_211']
+#     # Define the expected output data and columns
+#     expected_data = [
+#         [4990000000, 202212, 'SW1A 1AA', 'P1', 'C1', 'good', 10, 100],
+#         [4990000126, 202212, 'EC1A 1BB', 'P2', 'C2', 'good', 20, 200],
+#     ]
+#     expected_cols = ['reference', 'period', 'postcode_col', 'product_col', 'civdef_col', 'imp_marker', 'dummy_headcount', 'dummy_211']
 
-    # Create the expected output DataFrame
-    expected_df = pd.DataFrame(expected_data, columns=expected_cols)
+#     # Create the expected output DataFrame
+#     expected_df = pd.DataFrame(expected_data, columns=expected_cols)
 
-    # Define the parameters for the function
-    imp_markers_to_keep = ['good']
-    orig_cols = sample_df.columns.tolist()
+#     # Define the parameters for the function
+#     imp_markers_to_keep = ['good']
+#     orig_cols = sample_df.columns.tolist()
 
-    # Include the definitions
-    code_cols = ['product_col', 'civdef_col']
-    site_cols = ['postcode_col']
+#     # Include the definitions
+#     code_cols = ['product_col', 'civdef_col']
+#     site_cols = ['postcode_col']
     
-    # load config in order to get the value columns
-    value_cols = ["dummy_headcount", "dummy_211"]
+#     # load config in order to get the value columns
+#     value_cols = ["dummy_headcount", "dummy_211"]
     
-    # Apply the function
-    result_df = create_category_df(
-        sample_df, imp_markers_to_keep, orig_cols, groupby_cols, code_cols, site_cols, value_cols
-    )
+#     # Apply the function
+#     result_df = create_category_df(
+#         sample_df, imp_markers_to_keep, orig_cols, groupby_cols, code_cols, site_cols, value_cols
+#     )
 
-    # Check that the resulting DataFrame matches the expected output
-    pd.testing.assert_frame_equal(result_df, expected_df)
+#     # Check that the resulting DataFrame matches the expected output
+#     pd.testing.assert_frame_equal(result_df, expected_df)
+
+# Create a class to test all componenets of create_category_df function, 
+# including `create_notnull_mask`, `keep_good_markers` and `deduplicate_codes_values` functions
+
+class TestCreateCategoryDF:
+    
+    def test_deduplicate_codes_values(self):
+        # Define the data and columns separately
+        sample_data = [
+            ['A', 1, 10, 'x'],
+            ['A', 1, 20, 'y'],
+            ['B', 2, 30, 'z'],
+            ['B', 2, 40, 'w'],
+            ['C', 3, 50, 'v'],
+        ]
+        sample_cols = ['reference', 'group_col2', 'value_col', 'textual_col']
+
+        # Create the DataFrame
+        df = pd.DataFrame(sample_data, columns=sample_cols)
+
+        # Define the expected output data and columns
+        expected_data = [
+            ['A', 1, 30, 'x'],
+            ['B', 2, 70, 'z'],
+            ['C', 3, 50, 'v'],
+        ]
+        expected_cols = ['group_col1', 'period', '211', 'textual_col']
+
+        # Create the expected output DataFrame
+        expected_df = pd.DataFrame(expected_data, columns=expected_cols)
+
+        # Column names redefined for convenience
+        instance_col: str = "instance"
+        postcodes_harmonised_col: str = "postcodes_harmonised"  
+        percent_col: str = "602"
+        product_col: str = "201"
+        pg_num_col: str = "pg_numeric"
+        civdef_col: str = "200"
+
+        # Define the parameters for the function
+        value_cols = ['value_col']
+        code_cols: List[str] = [product_col, civdef_col, pg_num_col]
+        site_cols: List[str] = [instance_col, postcode_col, percent_col, postcodes_harmonised_col]
+        orig_cols: List[str] = df.columns.tolist()
+        category_cols = [x for x in orig_cols if x not in site_cols]
+        textual_cols = [x for x in category_cols if x not in (
+                groupby_cols + code_cols + value_cols
+            )]
+        methods = ["sum", "first"]
+
+        # Apply the function
+        result_df = deduplicate_codes_values(
+            df, groupby_cols, value_cols, textual_cols, methods
+        )
+
+        # Check that the resulting DataFrame matches the expected output
+        pd.testing.assert_frame_equal(result_df, expected_df)
+        
+        
+        
