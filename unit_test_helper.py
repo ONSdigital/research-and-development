@@ -45,7 +45,7 @@ for c in string_cols:
     df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(add_quotes, 1)
 
 for c in float_cols:
-    df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(format_float, 1)  
+    df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(format_float, 1)
 
 # replace nulls, which are now  rendered "nan" since we made all columns strings,
 # with "np.nan" for output
@@ -64,7 +64,7 @@ for col in df1.columns:
 df1['output'] = f"{tab}["
 for col in df1.columns[:-2]:
     df1["output"] += df1[col] + ", "
-    
+
 df1['output'] += df1[df1.columns[-2]] + "],"
 
 # concatenate everything in the new column into a single string
@@ -72,10 +72,10 @@ rows_string = df1["output"].str.cat(sep=f"\n{tab}")
 
 # join all the components into a final string for output
 full_text = f'''def create_{in_or_output}_df(self):
-    """Create an input dataframe for the test."""
+    """Create an {in_or_output} dataframe for the test."""
     {in_or_output}_columns = [\n{col_string}{tab}]
-        
-    data = [\n{tab}{rows_string}\n{tab}]   
+
+    data = [\n{tab}{rows_string}\n{tab}]
 
     {in_or_output}_df = pandasDF(data=data, columns={in_or_output}_columns)
     return {in_or_output}_df
