@@ -3,16 +3,12 @@ import numpy as np
 import pytest
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
-from typing import List
+# from typing import List
 
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
-    count_unique_postcodes_in_col,
-    deduplicate_codes_values,
-) #create_category_df, keep_good_markers,
-
-
-)
+    count_unique_postcodes_in_col
+) #create_category_df, keep_good_markers, deduplicate_codes_values
 
 
 # Global variables
@@ -173,7 +169,7 @@ def test_count_unique_postcodes_in_col_repetitive():
         pd.testing.assert_frame_equal(result_df, expected_df)
 
 
-def create_sample_nan_postcodes_df():
+def create_sample_blank_postcodes_df():
 
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
@@ -196,7 +192,7 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     and None, so None is also tested for.
     """
 
-    sample_df = create_sample_nan_postcodes_df()
+    sample_df = create_sample_blank_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(sample_df)
@@ -292,14 +288,14 @@ def create_sample_missing_columns_df():
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
-def test_count_unique_postcodes_in_col_missing_col():
+def test_count_unique_postcodes_in_col_missigng_col():
     """Checks that an error is raised when the postcode column is missing."""
 
     df = create_sample_missing_columns_df()
 
     # Apply the function
     with pytest.raises(KeyError):
-        result_df = count_unique_postcodes_in_col(df)
+        count_unique_postcodes_in_col(df)
 
 
 def create_repitious_dataframe():
