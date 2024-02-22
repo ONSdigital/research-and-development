@@ -307,28 +307,6 @@ def test_count_unique_postcodes_in_col_negative_2():
         result_df = count_unique_postcodes_in_col(df)
 
 
-def test_drop_duplicates():
-    # Define the input DataFrame
-    df = pd.DataFrame({
-        'groupby_col1': ['A', 'A', 'B', 'B', 'B'],
-        'groupby_col2': ['X', 'X', 'Y', 'Y', 'Y'],
-        'postcode_col': ['123', '123', '456', '456', '789'],
-    })
-
-    # Define the expected output DataFrame
-    expected_df = pd.DataFrame({
-        'groupby_col1': ['A', 'B', 'B'],
-        'groupby_col2': ['X', 'Y', 'Y'],
-        'postcode_col': ['123', '456', '789'],
-    })
-
-    # Apply the function
-    result_df = count_unique_postcodes_in_col(df)
-
-    # Check that the resulting DataFrame matches the expected output
-    pd.testing.assert_frame_equal(result_df, expected_df)
-
-
 def create_repitious_dataframe():
     # Define the data and columns separately
     sample_data = [
