@@ -128,7 +128,7 @@ def test_count_unique_postcodes_in_col_positive():
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
 
-def create_sample_missing_postcodes_df():
+def create_sample_repeated_postcodes_df():
     """
     Creates a sample DataFrame using predefined data and columns.
 
@@ -150,10 +150,10 @@ def create_sample_missing_postcodes_df():
 
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
-def test_count_unique_postcodes_in_col_negative_1():
+def test_count_unique_postcodes_in_col_repetitive():
     """
     Test the function count_unique_postcodes_in_col."""
-    df = create_sample_missing_postcodes_df()
+    df = create_sample_repeated_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(df)
