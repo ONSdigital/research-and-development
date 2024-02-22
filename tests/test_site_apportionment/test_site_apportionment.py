@@ -139,12 +139,10 @@ def create_sample_repeated_postcodes_df():
 
     sample_data = [
     [4990000000, 202212, "B27 2CD", 5663, 8855030],
-    [4990000000, 202212, "B27 2CD", 242, 5949501], #repeated postcode
-    [4990000084, 202212, "EF3 4GH", 8020, 5085659],
-    [4990000252, 202212, "UV1 2WX", 7084, 7058606],
-    [4990000294, 202212, "YZ3 4AB", 3188, 1828472],
-    [4990000336, 202212, "CD5 6EF", 62, 3262548],
-    [4990000378, 202212, "GH7 8IJ", 1180, 9348647]
+    [4990000000, 202212, "B27 2CD", 5663, 8855030], #repeated postcode
+    [4990000084, 202212, "B27 2CD", 8020, 5085659], # repeated postcode but for different ref
+    [4990000252, 202212, "UV1 2WX", 8020, 5085659],
+
     ]
 
 
@@ -162,13 +160,10 @@ def test_count_unique_postcodes_in_col_repetitive():
     expected_cols = ['reference', 'period', '601', "headcount_dummy", "211_dummy", '601_count']
 
     expected_data = [
-        [4990000000, 202212, "B27 2CD", 5663, 8855030, 2],
-        [4990000001, 202212, "B27 2CD", 242, 5949501, 2],
-        [4990000002, 202212, "EF3 4GH", 8020, 5085659, 2],
-        [4990000006, 202212, 'UV1 2WX', 7084, 7058606, 2],
-        [4990000007, 202212, 'YZ3 4AB', 3188, 1828472, 2],
-        [4990000008, 202212, 'CD5 6EF', 62, 3262548, 2],
-        [4990000009, 202212, 'GH7 8IJ', 1180, 9348647, 2]
+        [4990000000, 202212, "B27 2CD", 5663, 8855030, 1],
+        [4990000000, 202212, "B27 2CD", 5663, 8855030, 1], # repeated postcode but for the same ref
+        [4990000002, 202212, "B27 2CD", 8020, 5085659, 2], # postcode again repeated but for different ref
+        [4990000002, 202212, 'UV1 2WX', 8020, 5085659, 2] # postcode_count should be 2
     ]
 
     expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
@@ -178,7 +173,7 @@ def test_count_unique_postcodes_in_col_repetitive():
         pd.testing.assert_frame_equal(result_df, expected_df)
 
 
-def create_sample_blank_postcodes_df():
+def create_sample_nan_postcodes_df():
 
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
@@ -201,7 +196,7 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     and None, so None is also tested for.
     """
 
-    sample_df = create_sample_blank_postcodes_df()
+    sample_df = create_sample_nan_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(sample_df)
@@ -222,7 +217,7 @@ def test_count_unique_postcodes_in_col_blank_postcodes():
     # Check if the output is as expected
     pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)
 
-def create_sample_blank_postcodes_df():
+def create_sample_nan_postcodes_df():
 
     sample_cols = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
 
@@ -247,7 +242,7 @@ def test_count_unique_postcodes_in_col_nan_postcodes():
      represented as the string 'nan' so this might be worth testing for.
     """
 
-    sample_df = create_sample_blank_postcodes_df()
+    sample_df = create_sample_nan_postcodes_df()
 
     # Apply the function
     result_df = count_unique_postcodes_in_col(sample_df)
@@ -297,7 +292,7 @@ def create_sample_missing_columns_df():
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
-def test_count_unique_postcodes_in_col_negative_2():
+def test_count_unique_postcodes_in_col_missing_col():
     """Checks that an error is raised when the postcode column is missing."""
 
     df = create_sample_missing_columns_df()
