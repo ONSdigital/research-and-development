@@ -420,9 +420,3 @@ def test_count_unique_postcodes_drop_duplicates_with_missing_values():
 
     # Check that the resulting DataFrame matches the expected output
     pd.testing.assert_frame_equal(result_df, expected_df)
-
-
-
-
-
-
