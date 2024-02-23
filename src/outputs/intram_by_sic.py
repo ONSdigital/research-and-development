@@ -1,4 +1,4 @@
-"""The main file for the Intram by SIC output."""
+"""The main file for the BERD Intram by SIC output."""
 import logging
 import pandas as pd
 from datetime import datetime
