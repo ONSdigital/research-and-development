@@ -1,4 +1,4 @@
-"""The main file for the total FTE output."""
+"""The main file for the BERD total FTE output."""
 import logging
 import pandas as pd
 from datetime import datetime

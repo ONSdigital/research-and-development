@@ -35,6 +35,7 @@ global:
   output_tau: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
+  output_intram_uk_itl2: True
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False
@@ -100,7 +101,7 @@ network_paths:
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
-  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
   sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
