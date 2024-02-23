@@ -1,8 +1,8 @@
 """Implement apportionment of headcount and FTE."""
 import logging
-import pandas as pd
-
 from typing import Dict, List
+
+import pandas as pd
 
 from src.imputation.imputation_helpers import copy_first_to_group
 
