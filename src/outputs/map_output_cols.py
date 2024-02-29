@@ -66,7 +66,7 @@ def join_fgn_ownership(
         # If the filtered_df already had "ultfoc", which is the case for TAU, 
         # then after merging we will have two columns, ultfoc_x - blank, not 
         # needed, and ultfoc_y - with the codes we need. The following  section
-        # rentames ultfoc_y to ultfoc, removes ultfoc_x and restores the 
+        # renames ultfoc_y to ultfoc, removes ultfoc_x and restores the 
         # original column order.
         old_cols = list(main_df.columns)
         new_cols = list(combined_df.columns)

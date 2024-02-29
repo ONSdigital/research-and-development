@@ -14,10 +14,11 @@ OutputMainLogger = logging.getLogger(__name__)
 def output_frozen_group(
     df_gb: pd.DataFrame,
     df_ni: pd.DataFrame,
+    ultfoc_mapper: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    deduplicate: Boolean = True
+    deduplicate: bool = True
 ):
     """Creates a "frozen group" output  for the
     entire UK. Combines BERD and NI data. Selects the columns we need for this
@@ -29,6 +30,7 @@ def output_frozen_group(
     Args:
         df_gb (pd.DataFrame): The GB microdata with weights applied
         df_ ni (pd.DataFrame): The NI microdata; weights are 1
+        ultfoc_mappe (pd.DataFrame): Ultimate foreign owner mappper.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -43,26 +45,28 @@ def output_frozen_group(
 
     # Categorical columns that we have in BERD and NI data
     category_columns = [
-        "period_year", "reference", "formtype", "status", 
-        "wowenterprisereference", "rusic", "ultfoc"
+        "employment", "ultfoc", "period_year", "reference", "formtype", 
+        "wowenterprisereference", "rusic",
     ]
     
     # Numerical value columns that we have in BERD and NI data
     value_columns = [
-        "employment", "emp_researcher", "emp_technician", "emp_other", 
+        "emp_researcher", "emp_technician", "emp_other", 
         "emp_total", "202", "203", "204", "205", "206", "207", "209", "210", 
-        "211", "212", "213", "214", "216", "218", "219", "220", "221", "222",
+        "211", "212", "214", "216", "218", "219", "220", "221", "222",
         "223", "225", "226", "227", "228", "229", "237", "242", "243", "244",
         "245", "246", "247", "248", "249", "302", "303", "304", "305",
         "headcount_res_m", "headcount_res_f", "headcount_tec_m", 
         "headcount_tec_f", "headcount_oth_m", "headcount_oth_f",
         "headcount_oth_f",
-        "250", "251", "307", "308", "309", "252", "253", "254", "255", "256",
-        "257", "258",
+        "250", "251", "307", "308", "309", 
     ]
 
-    # Columns we create in this module
-    create_columns = ["sizeband", ]
+    # Columkns that we don't need for the output, but we read so we can transform them to other columns
+    transform_columns = ["statusencoded"]
+
+    # Columns we create in this module from other columns using mappers
+    create_columns = ["sizeband", "form_status"]
 
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
@@ -70,18 +74,33 @@ def output_frozen_group(
     ]
 
     # Columns that we don't have that should have zero values
+    # The numerical questions starting with q, like q208, are needed for the 
+    # output. If it's without q, then we have it in our data.
     zero_columns = [
-        "data_source", "q208", "q215", "q224", "q230", "q231", "q232", "q233",
-        "q234", "q235", "q236", "q238", "q239", "q240", "q241", 
+        "data_source", "q208", "q213", "q215", "q224", "q230", "q231", "q232", 
+        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241", "q252", 
+        "q253", "q254", "q255", "q256", "q257", "q258",
     ]
 
     # Select the columns we need
-    need_columns = category_columns + value_columns
-    df_gb = df_gb[need_columns]
-    df_ni = df_ni[need_columns]
+    need_columns = category_columns + transform_columns + value_columns
+    df_gb["ultfoc"] = pd.NA
+    df_gb_need = df_gb[need_columns]
+
+    # Create  statusencoded for NI "210", so it maps to Cora status "600"
+    df_ni["statusencoded"] = "210"
+
+    # Select NI columns that we need
+    df_ni_need = df_ni[need_columns]
 
     # Concatinate GB and NI
-    df = df_gb.append(df_ni, ignore_index=True)
+    df = df_gb_need.append(df_ni_need, ignore_index=True)
+
+    # Join foriegn ownership column using ultfoc mapper
+    df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"]) 
+
+    # Map to the CORA statuses from the statusencoded column
+    df = map_o.create_cora_status_col(df)
 
     # Add size bands
     df = map_o.map_sizebands(df)
@@ -95,7 +114,7 @@ def output_frozen_group(
             "sum"
         )
     else:
-        df_agg = df
+        df_agg = df[category_columns + create_columns + value_columns]
 
     # Create blank and zero columns
     df_agg = df_agg.reindex(
@@ -104,7 +123,7 @@ def output_frozen_group(
 
     # Assign blank values
     blank_values = [pd.NA] * len(blank_columns)
-    df_agg[blank_cols] = blank_values
+    df_agg[blank_columns] = blank_values
     
     # Assign zero values
     zero_values = [0] * len(zero_columns)

@@ -39,7 +39,7 @@ old_name = "formtype"
 Deduced_Data_Type = "int64"
 
 [form_status]
-old_name = "status"
+old_name = "form_status"
 Deduced_Data_Type = "int64"
 
 [data_source]
