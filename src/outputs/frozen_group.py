@@ -33,6 +33,7 @@ def output_frozen_group(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
+        deduplicate (Boolean): If true, the results are deduplicated.
 
     """
 
@@ -40,7 +41,6 @@ def output_frozen_group(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Definitions
     # Categorical columns that we have in BERD and NI data
     category_columns = [
         "period_year", "reference", "formtype", "status", 
@@ -69,11 +69,11 @@ def output_frozen_group(
         "freeze_id", "period", "cell_id", "period_contributor_id",
     ]
 
+    # Columns that we don't have that should have zero values
     zero_columns = [
         "data_source", "q208", "q215", "q224", "q230", "q231", "q232", "q233",
         "q234", "q235", "q236", "q238", "q239", "q240", "q241", 
     ]
-
 
     # Select the columns we need
     need_columns = category_columns + value_columns
@@ -97,7 +97,7 @@ def output_frozen_group(
     else:
         df_agg = df
 
-    # Add blank and zero columns
+    # Create blank and zero columns
     df_agg = df_agg.reindex(
         columns=df_agg.columns.tolist() + blank_columns + zero_columns
     )

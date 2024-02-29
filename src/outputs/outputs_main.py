@@ -192,6 +192,7 @@ def run_outputs(
         output_frozen_group(
             outputs_df,
             ni_full_responses,
+            ultfoc_mapper, 
             config,
             write_csv,
             run_id,
