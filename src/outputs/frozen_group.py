@@ -45,8 +45,8 @@ def output_frozen_group(
 
     # Categorical columns that we have in BERD and NI data
     category_columns = [
-        "employment", "ultfoc", "period_year", "reference", "formtype", 
-        "wowenterprisereference", "rusic",
+        "period_year", "reference", "employment", "ultfoc", 
+        "formtype", "form_status", "wowenterprisereference", "rusic",
     ]
     
     # Numerical value columns that we have in BERD and NI data
@@ -62,11 +62,6 @@ def output_frozen_group(
         "250", "251", "307", "308", "309", 
     ]
 
-    # Columkns that we don't need for the output, but we read so we can transform them to other columns
-    transform_columns = ["statusencoded"]
-
-    # Columns we create in this module from other columns using mappers
-    create_columns = ["sizeband", "form_status"]
 
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
@@ -82,40 +77,34 @@ def output_frozen_group(
         "q253", "q254", "q255", "q256", "q257", "q258",
     ]
 
+    # Join foriegn ownership column using ultfoc mapper for GB
+    df_gb = map_o.join_fgn_ownership(df_gb, ultfoc_mapper, formtype=["0001", "0006"]) 
+    
+    # Map to the CORA statuses from the statusencoded column
+    df_gb = map_o.create_cora_status_col(df_gb)
+    
     # Select the columns we need
-    need_columns = category_columns + transform_columns + value_columns
-    df_gb["ultfoc"] = pd.NA
+    need_columns = category_columns +  value_columns
     df_gb_need = df_gb[need_columns]
-
-    # Create  statusencoded for NI "210", so it maps to Cora status "600"
-    df_ni["statusencoded"] = "210"
-
-    # Select NI columns that we need
     df_ni_need = df_ni[need_columns]
 
     # Concatinate GB and NI
     df = df_gb_need.append(df_ni_need, ignore_index=True)
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"]) 
-
-    # Map to the CORA statuses from the statusencoded column
-    df = map_o.create_cora_status_col(df)
-
-    # Add size bands
-    df = map_o.map_sizebands(df)
-    
+  
     # Deduplicate by aggregation
     if deduplicate:
         df_agg = aggregate_output(
             df, 
-            category_columns + create_columns, 
+            category_columns, 
             value_columns, 
             "sum"
         )
     else:
-        df_agg = df[category_columns + create_columns + value_columns]
-
+        df_agg = df[category_columns + value_columns]
+    
+    # Add size bands
+    df = map_o.map_sizebands(df)
+    
     # Create blank and zero columns
     df_agg = df_agg.reindex(
         columns=df_agg.columns.tolist() + blank_columns + zero_columns
