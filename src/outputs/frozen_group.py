@@ -83,7 +83,6 @@ def output_frozen_group(
     # Concatinate GB and NI
     df = df_gb.append(df_ni, ignore_index=True)
 
-
     # Add size bands
     df = map_o.map_sizebands(df)
     
@@ -102,12 +101,16 @@ def output_frozen_group(
     df_agg = df_agg.reindex(
         columns=df_agg.columns.tolist() + blank_columns + zero_columns
     )
-    blank_values = [pd.NA for x in blank_columns]
+
+    # Assign blank values
+    blank_values = [pd.NA] * len(blank_columns)
     df_agg[blank_cols] = blank_values
-    zero_values = [0 for x in zero_columns]
-    df_agg[zero_columns] = blankzero_values_values
+    
+    # Assign zero values
+    zero_values = [0] * len(zero_columns)
+    df_agg[zero_columns] = zero_values
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_uk_itl{level}_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_intram_uk_itl{level}/{filename}", df_agg)
+    filename = f"output_frozen_group_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_frozen_group/{filename}", df_agg)
