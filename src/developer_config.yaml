@@ -40,6 +40,7 @@ global:
   output_intram_by_sic: False
   output_fte_total_qa: False
   output_status_filtered: False
+  output_frozen_group: True
 
 years:
   current_year: 2022 # TODO: put this in the userconfig
@@ -129,6 +130,7 @@ schema_paths:
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
+  frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
 
 
 # Export config for users
