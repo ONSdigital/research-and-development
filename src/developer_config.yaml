@@ -35,7 +35,7 @@ global:
   output_tau: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
-  output_intram_uk_itl2: True
+  output_intram_uk_itl2: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False

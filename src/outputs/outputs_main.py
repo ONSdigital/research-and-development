@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable, Dict, Any
 
 from src.outputs.form_output_prep import form_output_prep
+from src.outputs.frozen_group import output_frozen_group
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
@@ -184,6 +185,18 @@ def run_outputs(
             itl_mapper,
         )
         OutputMainLogger.info("Finished  Intram UK by ITL 1 and 2 output.")
+
+    # Running frozen geoup
+    if config["global"]["output_frozen_group"]:
+        OutputMainLogger.info("Starting frozen group output...")
+        output_frozen_group(
+            outputs_df,
+            ni_full_responses,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished  frozen group output.")
 
     # Running Intram by civil or defence
     if config["global"]["output_intram_by_civil_defence"]:
