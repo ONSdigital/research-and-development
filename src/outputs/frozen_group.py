@@ -47,9 +47,9 @@ def output_frozen_group(
 
     # Categorical columns that we have in BERD and NI data
     category_columns = [
-        "period_year", "reference", "employment", "ultfoc",
-        "formtype", "form_status", "wowenterprisereference", "rusic",
-        "250", "251", "307", "308", "309", "200", "201"
+        "period_year", "reference","200", "201", "formtype",
+        "employment", "ultfoc", "form_status",
+        "wowenterprisereference", "rusic",
     ]
 
     # Numerical value columns that we have in BERD and NI data
@@ -61,7 +61,7 @@ def output_frozen_group(
         "245", "246", "247", "248", "249", "302", "303", "304", "305",
         "headcount_res_m", "headcount_res_f", "headcount_tec_m",
         "headcount_tec_f", "headcount_oth_m", "headcount_oth_f",
-        "headcount_total",
+        "headcount_total", "250", "251", "307", "308", "309",
     ]
 
     # Columns that we don't have that should have pd.NA values
