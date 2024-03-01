@@ -65,11 +65,7 @@ def run_outputs(
     # Remove instance 0 from weighted df, so that it does not go to Tau outputs
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
-    (
-        ni_full_responses,
-        outputs_df,
-        tau_outputs_df
-    ) = form_output_prep(
+    (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
         estimated_df,
         weighted_df,
         ni_full_responses,
