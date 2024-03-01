@@ -1,4 +1,4 @@
-"""The main file for the Intram by Civil or Defence output."""
+"""The main file for the BERD Intram by Civil or Defence output."""
 import logging
 import pandas as pd
 import numpy as np

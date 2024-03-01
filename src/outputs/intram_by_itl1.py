@@ -1,4 +1,4 @@
-"""The main file for the Intram by PG output."""
+"""The main file for the BERD Intram by ITL 1 output."""
 import logging
 import pandas as pd
 from datetime import datetime
