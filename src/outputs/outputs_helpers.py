@@ -62,7 +62,7 @@ def aggregate_output(
     agg_method: str = "sum",
 ) -> pd.DataFrame:
 
-    """Groups the datadrame by key columns and aggregates the value columns
+    """Groups the dataframe by key columns and aggregates the value columns
     using a specified aggregation method.
 
     Args:

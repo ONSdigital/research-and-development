@@ -139,7 +139,7 @@ old_name = "216"
 Deduced_Data_Type = "int64"
 
 [q217]
-old_name = "217"
+old_name = "q217"
 Deduced_Data_Type = "int64"
 
 [q218]
@@ -358,6 +358,6 @@ Deduced_Data_Type = "int64"
 old_name = "q257"
 Deduced_Data_Type = "int64"
 
-[q258 ]
-old_name = "q258 "
+[q258]
+old_name = "q258"
 Deduced_Data_Type = "int64"

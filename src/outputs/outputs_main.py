@@ -186,13 +186,13 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished  Intram UK by ITL 1 and 2 output.")
 
-    # Running frozen geoup
+    # Running frozen group
     if config["global"]["output_frozen_group"]:
         OutputMainLogger.info("Starting frozen group output...")
         output_frozen_group(
             outputs_df,
             ni_full_responses,
-            ultfoc_mapper, 
+            ultfoc_mapper,
             config,
             write_csv,
             run_id,
