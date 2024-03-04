@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import logging
+import pytest
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
 
@@ -65,6 +66,7 @@ class TestSortRowsOrderCols():
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
+
         input_columns = [
             "instance",
             "Forth",
@@ -90,8 +92,10 @@ class TestSortRowsOrderCols():
         input_df = pandasDF(data=data, columns=input_columns)
         return input_df
 
+
     def create_output_df(self):
         """Create an output dataframe for the test."""
+
         output_columns = [
             "reference",
             "period",
@@ -115,8 +119,9 @@ class TestSortRowsOrderCols():
         expected_df = pandasDF(data=data, columns=output_columns)
         return expected_df
 
+
     def test_sort_rows_order_cols(self, caplog):
-        """Unit test for soting rows and ordering cols."""
+        """Unit test for sorting rows and ordering cols."""
 
         cols_in_order = ["reference", "period", "instance", "Forth"]
 
@@ -128,3 +133,42 @@ class TestSortRowsOrderCols():
 
             assert "Removing {'Remove'} from df_cart" in caplog.text
             assert_frame_equal(result_df, expected_df)
+
+
+    def create_input_df_missing_col(self):
+        """Create an input dataframe for missing col test."""
+
+        input_columns = [
+            "instance",
+            "reference",
+            "Remove",
+            "period",
+        ]
+
+        data = [
+            [2, 3, "test", 22],
+            [1, 3, "test", 21],
+            [np.nan, 3, "test", 22],
+            [2, 1, "test", 21],
+            [1, 1, "test", 22],
+            [2, 1, "test", 22],
+            [1, 4, "test", 21],
+            [1, 2, "test", 22],
+            [1, 1, "test", 21],
+            [3, 1, "test", 22],
+
+        ]
+
+        input_missing_col_df = pandasDF(data=data, columns=input_columns)
+        return input_missing_col_df
+
+
+    def test_sort_rows_missing_cols(self, caplog):
+        """Unit test for ordering cols with missing col."""
+
+        cols_in_order = ["reference", "period", "instance", "Forth"]
+
+        input_df = self.create_input_df_missing_col()
+
+        with pytest.raises(KeyError):
+            sort_rows_order_cols(input_df, cols_in_order)
