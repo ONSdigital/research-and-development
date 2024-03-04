@@ -1,7 +1,6 @@
 """The main file for the frozen group output."""
 
 import logging
-from xmlrpc.client import Boolean
 import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
@@ -37,7 +36,7 @@ def output_frozen_group(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        deduplicate (Boolean): If true, the results are deduplicated.
+        deduplicate (bool): If true, the results are deduplicated.
 
     """
 
