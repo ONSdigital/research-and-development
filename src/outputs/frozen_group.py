@@ -21,12 +21,12 @@ def output_frozen_group(
     run_id: int,
     deduplicate: bool = True
 ):
-    """Creates a "frozen group" output  for the
-    entire UK. Combines BERD and NI data. Selects the columns we need for this
-    type of output. De-duplicates the dataframe, combining the values of
-    multiple sites in one record. Adds blank columns and zero columns -
-    they need to be in the output for back-compatibility, but we don't have any
-    data. output CSV files.
+    """Creates a "frozen group" output  for the entire UK. In BERD (GB) data, 
+    creates foreign ownership and cora status. Selects the columns we need for
+    this type of output. Combines BERD and NI data. Adds size bands. De-
+    duplicates the dataframe, combining the values of multiple sites in one
+    record. Adds blank columns and zero columns - they need to be in the output
+    for back-compatibility, but we don't have any data. output CSV files.
 
     Args:
         df_gb (pd.DataFrame): The GB microdata with weights applied
@@ -36,7 +36,7 @@ def output_frozen_group(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        deduplicate (bool): If true, the results are deduplicated.
+        deduplicate (bool): If true, the data is deduplicated by aggregation.
 
     """
 
