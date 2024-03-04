@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import logging
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal, assert_series_equal
 
@@ -114,13 +115,15 @@ class TestSortRowsOrderCols():
         expected_df = pandasDF(data=data, columns=output_columns)
         return expected_df
 
-    def test_sort_rows_order_cols(self):
+    def test_sort_rows_order_cols(self, caplog):
 
         cols_in_order = ["reference", "period", "instance", "Forth"]
 
         input_df = self.create_input_df()
         expected_df = self.create_output_df()
 
-        result_df = sort_rows_order_cols(input_df, cols_in_order)
+        with caplog.at_level(logging.DEBUG):
+            result_df = sort_rows_order_cols(input_df, cols_in_order)
 
-        assert_frame_equal(result_df, expected_df)
+            assert "Removing {'Remove'} from df_cart" in caplog.text
+            assert_frame_equal(result_df, expected_df)
