@@ -91,7 +91,7 @@ class TestSortRowsOrderCols():
         return input_df
 
     def create_output_df(self):
-        """Create an input dataframe for the test."""
+        """Create an output dataframe for the test."""
         output_columns = [
             "reference",
             "period",
@@ -116,6 +116,7 @@ class TestSortRowsOrderCols():
         return expected_df
 
     def test_sort_rows_order_cols(self, caplog):
+        """Unit test for soting rows and ordering cols."""
 
         cols_in_order = ["reference", "period", "instance", "Forth"]
 
