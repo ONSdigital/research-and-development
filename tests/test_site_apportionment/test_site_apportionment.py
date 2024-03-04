@@ -136,8 +136,8 @@ def create_sample_repeated_postcodes_df():
     sample_data = [
     [4990000000, 202212, "B27 2CD", 5663, 8855030],
     [4990000000, 202212, "B27 2CD", 5663, 8855030], #repeated postcode
-    [4990000084, 202212, "B27 2CD", 8020, 5085659], # repeated postcode but for different ref
-    [4990000252, 202212, "UV1 2WX", 8020, 5085659],
+    [4990000002, 202212, "B27 2CD", 8020, 5085659], # repeated postcode but for different ref
+    [4990000002, 202212, "UV1 2WX", 8020, 5085659],
 
     ]
 
@@ -165,8 +165,7 @@ def test_count_unique_postcodes_in_col_repetitive():
     expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
 
     # Check if the output is not as expected
-    with pytest.raises(AssertionError):
-        pd.testing.assert_frame_equal(result_df, expected_df)
+    assert_frame_equal(result_df, expected_df)
 
 
 def create_sample_blank_postcodes_df():
@@ -288,7 +287,7 @@ def create_sample_missing_columns_df():
     return pd.DataFrame(data=sample_data, columns=sample_cols)
 
 
-def test_count_unique_postcodes_in_col_missigng_col():
+def test_count_unique_postcodes_in_col_missing_col():
     """Checks that an error is raised when the postcode column is missing."""
 
     df = create_sample_missing_columns_df()
