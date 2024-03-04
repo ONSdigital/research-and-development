@@ -284,7 +284,8 @@ def create_sample_missing_columns_df():
     [4990000378, 202212, 1180, 9348647]
     ]
 
-    return pd.DataFrame(data=sample_data, columns=sample_cols)
+    df = pd.DataFrame(data=sample_data, columns=sample_cols)
+    return df
 
 
 def test_count_unique_postcodes_in_col_missing_col():
