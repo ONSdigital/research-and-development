@@ -1,9 +1,10 @@
 """The main file for the frozen group output."""
 
 import logging
+from typing import Callable, Dict, Any
+
 import pandas as pd
 from datetime import datetime
-from typing import Callable, Dict, Any
 
 from src.outputs.outputs_helpers import aggregate_output, create_output_df
 import src.outputs.map_output_cols as map_o
@@ -20,8 +21,8 @@ def output_frozen_group(
     write_csv: Callable,
     run_id: int,
     deduplicate: bool = True
-):
-    """Creates a "frozen group" output  for the entire UK. In BERD (GB) data, 
+) -> None:
+    """Creates a "frozen group" output  for the entire UK. In BERD (GB) data,
     creates foreign ownership and cora status. Selects the columns we need for
     this type of output. Combines BERD and NI data. Adds size bands. De-
     duplicates the dataframe, combining the values of multiple sites in one
@@ -38,6 +39,9 @@ def output_frozen_group(
         run_id (int): The current run id
         deduplicate (bool): If true, the data is deduplicated by aggregation.
 
+    Returns:
+        None
+
     """
 
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
@@ -46,7 +50,7 @@ def output_frozen_group(
 
     # Categorical columns that we have in BERD and NI data
     category_columns = [
-        "period_year", "reference","200", "201", "formtype",
+        "period_year", "reference", "200", "201", "formtype",
         "employment", "ultfoc", "form_status",
         "wowenterprisereference", "rusic",
     ]
@@ -57,16 +61,16 @@ def output_frozen_group(
         "emp_total", "202", "203", "204", "205", "206", "207", "209", "210",
         "211", "212", "214", "216", "218", "219", "220", "221", "222",
         "223", "225", "226", "227", "228", "229", "237", "242", "243", "244",
-        "245", "246", "247", "248", "249", "302", "303", "304", "305",
+        "245", "246", "247", "248", "249", "250", "302", "303", "304", "305",
         "headcount_res_m", "headcount_res_f", "headcount_tec_m",
         "headcount_tec_f", "headcount_oth_m", "headcount_oth_f",
-        "headcount_total", "250", 
+        "headcount_total",
     ]
 
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
-        "freeze_id", "period", "cell_id", "period_contributor_id", "data_source", 
-        "q251", "q252", "q307", "q308", "q309",
+        "freeze_id", "period", "cell_id", "period_contributor_id",
+        "data_source", "q251", "q252", "q307", "q308", "q309",
     ]
 
     # Columns that we don't have that should have zero values
@@ -74,7 +78,7 @@ def output_frozen_group(
     # output. If it's without q, then we have it in our data.
     zero_columns = [
         "q208", "q213", "q215", "q217", "q224", "q230", "q231", "q232",
-        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241", 
+        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241",
         "q253", "q254", "q255", "q256", "q257", "q258",
     ]
 
@@ -85,12 +89,12 @@ def output_frozen_group(
     df_gb = map_o.create_cora_status_col(df_gb)
 
     # Select the columns we need
-    need_columns = category_columns +  value_columns
+    need_columns = category_columns + value_columns
     df_gb_need = df_gb[need_columns]
     df_ni_need = df_ni[need_columns]
 
     # Concatinate GB and NI
-    df = df_gb_need.append(df_ni_need, ignore_index=True)
+    df = pd.concat([df_gb_need, df_ni_need], ignore_index=True, axis=0)
 
     # Deduplicate by aggregation
     if deduplicate:
@@ -128,3 +132,5 @@ def output_frozen_group(
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"output_frozen_group_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_frozen_group/{filename}", output)
+
+    return None

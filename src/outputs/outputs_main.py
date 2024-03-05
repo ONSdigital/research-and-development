@@ -193,7 +193,7 @@ def run_outputs(
             write_csv,
             run_id,
         )
-        OutputMainLogger.info("Finished  frozen group output.")
+        OutputMainLogger.info("Finished frozen group output.")
 
     # Running Intram by civil or defence
     if config["global"]["output_intram_by_civil_defence"]:
