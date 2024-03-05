@@ -30,8 +30,8 @@ def output_frozen_group(
 
     Args:
         df_gb (pd.DataFrame): The GB microdata with weights applied
-        df_ ni (pd.DataFrame): The NI microdata; weights are 1
-        ultfoc_mappe (pd.DataFrame): Ultimate foreign owner mappper.
+        df_ni (pd.DataFrame): The NI microdata; weights are 1
+        ultfoc_mapper (pd.DataFrame): Ultimate foreign owner mappper.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
@@ -60,20 +60,21 @@ def output_frozen_group(
         "245", "246", "247", "248", "249", "302", "303", "304", "305",
         "headcount_res_m", "headcount_res_f", "headcount_tec_m",
         "headcount_tec_f", "headcount_oth_m", "headcount_oth_f",
-        "headcount_total", "250", "251", "307", "308", "309",
+        "headcount_total", "250", 
     ]
 
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
-        "freeze_id", "period", "cell_id", "period_contributor_id",
+        "freeze_id", "period", "cell_id", "period_contributor_id", "data_source", 
+        "q251", "q252", "q307", "q308", "q309",
     ]
 
     # Columns that we don't have that should have zero values
     # The numerical questions starting with q, like q208, are needed for the
     # output. If it's without q, then we have it in our data.
     zero_columns = [
-        "data_source", "q208", "q213", "q215", "q217", "q224", "q230", "q231", "q232",
-        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241", "q252",
+        "q208", "q213", "q215", "q217", "q224", "q230", "q231", "q232",
+        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241", 
         "q253", "q254", "q255", "q256", "q257", "q258",
     ]
 
@@ -100,7 +101,7 @@ def output_frozen_group(
             "sum"
         )
     else:
-        df_agg = df[category_columns + value_columns]
+        df_agg = df
 
     # Add size bands
     df_agg = map_o.map_sizebands(df_agg)
@@ -110,13 +111,13 @@ def output_frozen_group(
         columns=df_agg.columns.tolist() + blank_columns + zero_columns
     )
 
-    # Assign blank values
-    blank_values = [pd.NA] * len(blank_columns)
-    df_agg[blank_columns] = blank_values
+    # Create blank columns and assign blank values
+    for bcol in blank_columns:
+        df_agg[bcol] = pd.NA
 
-    # Assign zero values
-    zero_values = [0] * len(zero_columns)
-    df_agg[zero_columns] = zero_values
+    # Create columns for zero values and assign zero values
+    for zcol in zero_columns:
+        df_agg[zcol] = 0
 
     # Create frozen group output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_group_schema"]
