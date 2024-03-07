@@ -62,18 +62,18 @@ def join_fgn_ownership(
             mapper_df, how="left", left_on="reference", right_on="ruref"
         )
         combined_df.drop(columns=["ruref"], inplace=True)
-        
-        # If the filtered_df already had "ultfoc", which is the case for TAU, 
-        # then after merging we will have two columns, ultfoc_x - blank, not 
+
+        # If the filtered_df already had "ultfoc", which is the case for TAU,
+        # then after merging we will have two columns, ultfoc_x - blank, not
         # needed, and ultfoc_y - with the codes we need. The following  section
-        # renames ultfoc_y to ultfoc, removes ultfoc_x and restores the 
+        # renames ultfoc_y to ultfoc, removes ultfoc_x and restores the
         # original column order.
         old_cols = list(main_df.columns)
         new_cols = list(combined_df.columns)
         if "ultfoc_y" in new_cols:
             combined_df = combined_df.rename(columns={"ultfoc_y": "ultfoc"})
             combined_df = combined_df[old_cols]
-         
+
 
         main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
 
@@ -230,4 +230,35 @@ def map_to_numeric(df: pd.DataFrame):
 
     # Return columns as integers
     df = df.astype({"713": "Int64", "714": "Int64"})
+    return df
+
+
+def map_FG_cols_to_numeric(
+    df: pd.DataFrame,
+    col_list: list = ["251", "307", "308","309"]):
+    """Map specified cols in dataframe from letters to numeric format
+    Yes is mapped to 1
+    No is mapped to 2
+    Unanswered is mapped to 3
+
+    Args:
+        df (pd.DataFrame): The original dataframe
+
+    Returns:
+        df: Dataframe with numeric values for specified cols
+    """
+
+    for col in col_list:
+        df[col] = df[col].astype("object")
+        # Map the actual responses to the corresponding integer
+        mapper_dict = {"Yes": 1, "No": 2, "": 3}
+
+        df[col] = df[col].map(mapper_dict)
+
+        # Convert all nulls to unanswered (map to 3)
+        df.loc[df[col].isnull(), col] = 3
+
+        # Return columns as integers
+        df[col] = df[col].astype("Int64")
+
     return df
