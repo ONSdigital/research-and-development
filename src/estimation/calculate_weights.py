@@ -31,7 +31,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
 
 
 def calculate_weighting_factor(
-    df: pd.DataFrame, cellno_dict, exp_col: str = "709"
+    df: pd.DataFrame, cellno_dict: dict, exp_col: str = "709"
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Calculate the weighting factor 'a' for each cell in the survery data
 
@@ -51,7 +51,7 @@ def calculate_weighting_factor(
 
     Args:
         df (pd.DataFrame): The input df containing survey data
-        cellno_dict (_type_): Dictionary of cellnumbers and UNI_counts
+        cellno_dict (dict): Dictionary of cellnumbers and UNI_counts
         exp_col (str, optional): The column that is used to calculate n.
 
     Returns:
