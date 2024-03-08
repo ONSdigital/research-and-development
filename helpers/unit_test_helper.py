@@ -7,7 +7,7 @@ csv_path = "D:/coding_projects/randd_test_data/"
 input_file = "percent_test.csv"
 
 # whether the unit test data is input or expected output (set "input" or "exp_output")
-in_or_output = "exp_output"
+in_or_output = "input" # "exp_output"
 
 output_filename = f"{in_or_output}_function"
 
@@ -16,7 +16,7 @@ path1 = os.path.join(csv_path, input_file)
 df1 = pd.read_csv(path1)
 
 # specify string columns- these will have quotes applied
-string_cols = ["formtype", "601", "status", "postcodes_harmonised"]
+string_cols = ["formtype", "601", "status", "imp_marker", "postcodes_harmonised"]
 
 # specify float columns
 float_cols = ["601_count"]
