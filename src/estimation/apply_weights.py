@@ -1,8 +1,9 @@
 """"Apply the esimation weights to short form questions"""
-import pandas as pd
 import logging
 from typing import Dict, Any, Tuple, List
 from itertools import chain
+
+import pandas as pd
 
 AppWeights_Logger = logging.getLogger(__name__)
 
@@ -10,7 +11,7 @@ AppWeights_Logger = logging.getLogger(__name__)
 def apply_weights(
     df: pd.DataFrame, config: Dict[str, Any], round_val: int = 4
 ) -> Tuple[pd.DataFrame, List]:
-    """Apply the estimation weights to short from questions.
+    """Apply the estimation weights to short form questions.
 
     Args:
         df (pd.DataFrame): The dataframe weights are calculated for.
