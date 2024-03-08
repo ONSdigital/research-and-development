@@ -48,11 +48,14 @@ def output_frozen_group(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
+    df_gb = map_o.map_FG_cols_to_numeric(df_gb)
+    df_ni = map_o.map_FG_cols_to_numeric(df_ni)
+
     # Categorical columns that we have in BERD and NI data
     category_columns = [
         "period_year", "reference", "200", "201", "formtype",
         "employment", "ultfoc", "form_status",
-        "wowenterprisereference", "rusic",
+        "wowenterprisereference", "rusic", "251", "307", "308","309",
     ]
 
     # Numerical value columns that we have in BERD and NI data
@@ -70,7 +73,7 @@ def output_frozen_group(
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
         "freeze_id", "period", "cell_id", "period_contributor_id",
-        "data_source", "q251", "q252", "q307", "q308", "q309",
+        "data_source",
     ]
 
     # Columns that we don't have that should have zero values
@@ -79,7 +82,7 @@ def output_frozen_group(
     zero_columns = [
         "q208", "q213", "q215", "q217", "q224", "q230", "q231", "q232",
         "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241",
-        "q253", "q254", "q255", "q256", "q257", "q258",
+        "q252", "q253", "q254", "q255", "q256", "q257", "q258",
     ]
 
     # Join foriegn ownership column using ultfoc mapper for GB
