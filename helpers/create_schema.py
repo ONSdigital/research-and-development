@@ -8,20 +8,17 @@ import pandas as pd
 import os
 
 # Imputation file location and name
-common_dir = "R:\\BERD Results System Development 2023\\DAP_emulation\\"
-output_dir = "imputation\\imputation_qa"
+input_dir = "D:\\work\\data\\res_dev"
 
-pref = "full_responses_imputed"
-suff = "_2023-11-16_v340.csv"
+pref = "Frozen_Group_Data2021_244 (1)"
+suff = ".csv"
 
 # Output folder for all schemas
 out_dir = r"config\output_schemas"
 
 # Read the top 10 rows, inferrring the schema from csv
-mydir = common_dir + output_dir
-mypath = os.path.join(mydir, pref + suff)
+mypath = os.path.join(input_dir, pref + suff)
 df = pd.read_csv(mypath, nrows=10)
-df = df.drop("index", axis=1)
 
 # Get column names  as data types as dict of strings
 types = dict(df.dtypes)

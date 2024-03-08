@@ -1,0 +1,11 @@
+["Area Code (ITL1)"]
+old_name = "None"
+Deduced_Data_Type = "str"
+
+["Region (ITL1)"]
+old_name = "None"
+Deduced_Data_Type = "str"
+
+["2022 Total q211"]
+old_name = "None"
+Deduced_Data_Type = "float64"

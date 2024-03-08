@@ -37,9 +37,11 @@ long_code: str = "0001"
 
 def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Sets the percent column to 100 for the following forms:
-    - short form records
+    Set percentage column to 100 for short forms and single site long forms.
+
+    The condtitions for the long forms needing 100 in the percentage column are:
     - long forms, exactly 1 site, instance >=1 and notnull postcode
+    - long forms with status "Form sent out"
 
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -56,14 +58,16 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("Percent column for short forms should be blank.")
     df.loc[df[form_col] == short_code, percent_col] = 100
 
-    
-    # Condition for long forms with status = "Form sent out"
+    # Condition for long forms with status "Form sent out"
+    # Note: those imputed by MoR will have had the postcode column imputed, so we check
+    # for null in the postcode count column
     sent_out_condition = (
         (df[form_col] == long_code)
         & (df[status_col] == "Form sent out")
         & (df[postcode_col + "_count"].isna())
         & (df[postcode_col].isna())
     )
+    # Update records matching the sent_out_condition with a postcode and count of 1
     df.loc[sent_out_condition, postcode_col] = (
         df.loc[sent_out_condition, "postcodes_harmonised"])
     df.loc[sent_out_condition, postcode_col + "_count"] = 1
@@ -109,14 +113,18 @@ def split_sites_df(
     """
     Split dataframe into two based on whether there are sites or not.
 
-    All records that include postcodes in the postcode_col are used for site 
-    apportionment, and all orther records are included in a second dataframe.
+    This will be the basis on whether or not records are included in site apportionment.
+
+    All long form records that include postcodes in the postcode_col are used for site 
+    apportionment, and all orther records, including short forms, are included in a 
+    second dataframe.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames.
+        Tuple[pd.DataFrame, pd.DataFrame]: One dataframe with records to be apportioned,
+            and a second containing all other records.
     """
 
     # Condition for records to apportion: long forms, at least one site, instance >=1
@@ -133,6 +141,7 @@ def split_sites_df(
     df_out = df.copy()[~to_apportion_cond]
 
     # Remove "bad" imputation markers from df_out
+    # NOTE: Probably this isn't needed: can't think of a case where it would be.
     df_out = keep_good_markers(df_out, imp_markers_to_keep)
 
     return to_apportion_df, df_out
@@ -214,7 +223,7 @@ def create_category_df(
     )
     category_df = category_df.loc[valid_code_cond]
 
-    # Remove "bad" imputation markers, "no imputation" and "no mean found."
+    # Remove "bad" imputation markers, "no_imputation" and "No mean found."
     category_df = keep_good_markers(category_df, imp_markers_to_keep)
 
     # De-duplicate - possibly, not needed
@@ -310,7 +319,6 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
     """
     # Create a new column with cleaned site percentage values
     df["site_percent"] = df[percent_col].fillna(0)
-    df.loc[(df.instance == 0), "site_percent"] = 0
 
     # Calculate the total percent for each reference and period
     df["site_percent_total"] = df.groupby(groupby_cols)["site_percent"].transform(
