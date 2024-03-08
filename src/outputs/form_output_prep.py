@@ -43,9 +43,7 @@ def form_output_prep(
 
     if ni_full_responses is not None:
         # Add required columns to NI data
-        ni_full_responses = ni_full_responses.rename(
-            columns={"foc": "ultfoc"}
-        )
+        ni_full_responses = ni_full_responses.rename(columns={"foc": "ultfoc"})
         ni_full_responses["a_weight"] = 1
         ni_full_responses["604"] = "Yes"
         ni_full_responses["form_status"] = 600
