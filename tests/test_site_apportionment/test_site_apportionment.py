@@ -1,10 +1,12 @@
-import pandas as pd
-import numpy as np
+# Standard Library Imports
 import logging
 import pytest
-from pandas import DataFrame as pandasDF
-from pandas._testing import assert_frame_equal, assert_series_equal
 
+# Third Part Imports
+import pandas as pd
+import numpy as np
+
+# Local Imports
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     set_percentages,
@@ -15,6 +17,11 @@ from src.site_apportionment.site_apportionment import (
     sort_rows_order_cols,
     create_sites_df
 )
+
+# Define easier pandas usages
+pandasDF = pd.DataFrame
+assert_frame_equal = pd._testing.assert_frame_equal
+assert_series_equal = pd._testing.assert_series_equal
 
 @pytest.fixture
 def create_exp_percent_test_output_df():
