@@ -641,7 +641,14 @@ class TestCreateSitesDf(object):
 
     @pytest.fixture(scope="function")
     def create_sites_df_input(self):
-        """Input df for create_sites_df tests."""
+        """
+        Input df for create_sites_df tests.
+        
+        This input data consists of:
+        1. Columns that will be dropped
+        2. NaN's in used columns (601, 602)
+        3. Combinations of Postcodes/Periods/References to create multiple groups
+        """
         input_cols = [
             "reference",
             "instance",
@@ -654,12 +661,11 @@ class TestCreateSitesDf(object):
             "postcodes_harmonised",
             "period"
         ]
-
         input_data = [
-            [1, 0, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
-            [1, 1, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
-            [1, 2, "0006", "NP44 2NZ", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
-            [2, 0, "0001", "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP20 6YY", "202102"],
+            [1, 0, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+            [1, 1, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+            [1, 2, "0006", "NP44 2NZ", 100.0, np.nan, "Clear", "R", "NP44 2NZ", "202101"],
+            [2, 0, "0001", "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
             [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"],
         ]
         input_df = pandasDF(data=input_data, columns=input_cols)
@@ -668,6 +674,7 @@ class TestCreateSitesDf(object):
     
     @pytest.fixture(autouse=True)
     def set_attrs(self):
+        """Set class attributes that are passed as parameters."""
         self.groupby_cols = ["reference", "period"]
         self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
     
@@ -688,6 +695,7 @@ class TestCreateSitesDf(object):
             create_sites_df_input, 
             self.groupby_cols,
             self.site_cols)
+        # assert the resultant dataframe is as expected
         assert len(output) == 3, f"Output df has {len(output)} row. Expected 3"
         expected_columns = ["reference",
                             "period",
@@ -699,3 +707,11 @@ class TestCreateSitesDf(object):
         assert np.array_equal(output["602"], [100.0, 200.0, 0.0]), (
             "Column 602 (percent_col) has unexpected values."
         )
+        assert np.array_equal(output["instance"], [2, 0, 0]), (
+            "Column 602 (percent_col) has unexpected values."
+        )
+        expected_postcodes = ["NP44 2NZ", "RH12 1XL"]
+        assert np.array_equal(
+            sorted(output["601"].unique()),
+            sorted(expected_postcodes)
+            ), "Postcodes not as expected"
