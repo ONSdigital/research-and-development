@@ -1,6 +1,6 @@
 from ast import literal_eval
 import pandas as pd
-from typing import Tuple, List, Dict, Callable, Union
+from typing import Tuple, List, Dict, Union
 import logging
 
 from src.imputation.imputation_helpers import get_imputation_cols
