@@ -95,8 +95,8 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
 
     Returns:
         (pd.DataFrame): A copy of original dataframe with an additional column
-        called the same as code with suffix "_count" countaining the number of
-        unique non-empty postcodes
+            called the same as code with suffix "_count" countaining the number of
+            unique non-empty postcodes
     """
     dfa = df.copy()
 
@@ -124,6 +124,7 @@ def split_sites_df(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
+        imp_markers_to_keep (List[str]): A list of markers to keep.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: One dataframe with records to be apportioned,
@@ -173,7 +174,7 @@ def deduplicate_codes_values(
         value_cols (List[str]): List of columns containing numeric values.
         textual_cols (List[str]): List of columns containing textual values.
         methods (List[str]): List of aggregation methods for values (0, 
-        default method is sum) and categorties (1, default method is first).
+            default method is sum) and categorties (1, default method is first).
 
     Returns:
         pd.DataFrame: De-duplicated dataframe
@@ -210,6 +211,11 @@ def create_category_df(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
+        imp_markers_to_keep (List[str]): List of imputation markers to keep.
+        orig_cols (List[str]): List of original columns.
+        groupby_cols (List[str]): List of columns to group by.
+        code_cols (List[str]): List of code columns.
+        site_cols (List[str]): List of site column.
         value_cols (List[str]): List of columns containing numeric values.
 
     Returns:
@@ -279,14 +285,12 @@ def create_sites_df(
     return sites_df
 
 
-def count_duplicate_sites(sites_df: pd.DataFrame):
+def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
     """
     Counts the number of duplicate sites in the DataFrame.
 
     Args:
         sites_df (pd.DataFrame): The input DataFrame.
-        group_cols (List[str]): The list of group columns.
-        postcode_col (str): The name of the postcode column.
 
     Returns:
         int: The number of duplicate sites.
@@ -316,6 +320,7 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
 
     Parameters:
         df (pd.DataFrame): The input DataFrame.
+        groupby_cols (List[str]): List of columns to group by.
 
     Returns:
         pd.DataFrame: The DataFrame with weights calculated for each site.
@@ -353,7 +358,6 @@ def create_cartesian_product(
         sites_df (pd.DataFrame): The DataFrame with sites.
         category_df (pd.DataFrame): The DataFrame with with the unique combination
             of civ/def, product group (alpha) and product group (numeric)
-        group_cols (List[str]): The columns to group by.
 
     Returns:
         pd.DataFrame: The DataFrame with the Cartesian product.
@@ -412,7 +416,7 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
     Args:
         df (pd.DataFrame): The DataFrame to sort.
-        cols (List[str]): The columns to sort by.
+        cols_in_order (List[str]): The columns to sort by.
 
     Returns:
         pd.DataFrame: The sorted DataFrame.
@@ -437,7 +441,7 @@ def sort_rows_order_cols(df: pd.DataFrame,  cols_in_order: List[str]) -> pd.Data
 
 def run_apportion_sites(
     df: pd.DataFrame, 
-    imp_markers_to_keep,
+    imp_markers_to_keep: List[str],
     config: Dict[str, Union[str, List[str]]]
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
@@ -460,11 +464,12 @@ def run_apportion_sites(
 
     Args:
         df (pd.DataFrame): Dataframe containing all input data.
+        imp_markers_to_keep (List[str]): A list of imputation markers to keep.
         config (Dict[str, Union[str, List[str]]]): Configuration dictionary.
 
     Returns:
         pd.DataFrame: A dataframe with the same columns, with applied site
-        apportionment.
+            apportionment.
     """
     # Get the original columns set
     orig_cols: List[str] = list(df.columns)
