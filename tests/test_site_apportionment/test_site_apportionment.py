@@ -12,7 +12,8 @@ from src.site_apportionment.site_apportionment import (
     deduplicate_codes_values,
     calc_weights_for_sites,
     create_cartesian_product,
-    sort_rows_order_cols
+    sort_rows_order_cols,
+    create_sites_df
 )
 
 @pytest.fixture
@@ -634,3 +635,67 @@ class TestSortRowsOrderCols():
 
         with pytest.raises(KeyError):
             sort_rows_order_cols(input_df, cols_in_order)
+
+class TestCreateSitesDf(object):
+    """Tests for create_sites_df."""
+
+    @pytest.fixture(scope="function")
+    def create_sites_df_input(self):
+        """Input df for create_sites_df tests."""
+        input_cols = [
+            "reference",
+            "instance",
+            "formtype",
+            "601",
+            "602",
+            "601_count",
+            "status",
+            "imp_marker",
+            "postcodes_harmonised",
+            "period"
+        ]
+
+        input_data = [
+            [1, 0, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
+            [1, 1, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
+            [1, 2, "0006", "NP44 2NZ", 100.0, np.nan, "Clear", "R", "NP10 5XX", "202101"],
+            [2, 0, "0001", "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP20 6YY", "202102"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"],
+        ]
+        input_df = pandasDF(data=input_data, columns=input_cols)
+
+        return input_df
+    
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        self.groupby_cols = ["reference", "period"]
+        self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
+    
+    def test_create_sites_df_raises(self, create_sites_df_input):
+        """Tests for create_sites_df when invalid data is passed."""
+        # test when a required column is missing
+        no_period = create_sites_df_input.copy()
+        no_period.drop("period", axis=1, inplace=True)
+        with pytest.raises(KeyError, match=r".*period.*not in index"):
+            create_sites_df(no_period, self.groupby_cols, self.site_cols)
+        # cols passed not in list[str] format
+        with pytest.raises(TypeError, match="unsupported operand type.*"):
+            create_sites_df(create_sites_df_input, 3, self.site_cols)
+
+    def test_create_sites_df_on_pass(self, create_sites_df_input):
+        """General tests for create_sites_df."""
+        output = create_sites_df(
+            create_sites_df_input, 
+            self.groupby_cols,
+            self.site_cols)
+        assert len(output) == 3, f"Output df has {len(output)} row. Expected 3"
+        expected_columns = ["reference",
+                            "period",
+                            "instance",
+                            "601",
+                            "602",
+                            "postcodes_harmonised"]
+        assert sorted(expected_columns) == sorted(output.columns.values)
+        assert np.array_equal(output["602"], [100.0, 200.0, 0.0]), (
+            "Column 602 (percent_col) has unexpected values."
+        )
