@@ -670,10 +670,12 @@ class TestCreateSitesDf(object):
         ]
         input_data = [
             [1, 0, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-            [1, 1, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-            [1, 2, "0006", "NP44 2NZ", 100.0, np.nan, "Clear", "R", "NP44 2NZ", "202101"],
+            [1, 1, "0006", "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+            [1, 2, "0006", "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
+            [1, 2, "0006", "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
             [2, 0, "0001", "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"],
+            [2, 1, "0001", "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
         ]
         input_df = pandasDF(data=input_data, columns=input_cols)
 
@@ -711,13 +713,13 @@ class TestCreateSitesDf(object):
                             "602",
                             "postcodes_harmonised"]
         assert sorted(expected_columns) == sorted(output.columns.values)
-        assert np.array_equal(output["602"], [100.0, 200.0, 0.0]), (
+        assert np.array_equal(output["602"], [225.0, 100.0, 50.0]), (
             "Column 602 (percent_col) has unexpected values."
         )
-        assert np.array_equal(output["instance"], [2, 0, 0]), (
+        assert np.array_equal(output["instance"], [0, 2, 0]), (
             "Column 602 (percent_col) has unexpected values."
         )
-        expected_postcodes = ["NP44 2NZ", "RH12 1XL"]
+        expected_postcodes = ["NP44 2NZ", "RH12 1XL", "RH12 1XZ"]
         assert np.array_equal(
             sorted(output["601"].unique()),
             sorted(expected_postcodes)
