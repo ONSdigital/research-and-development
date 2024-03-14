@@ -13,7 +13,8 @@ from src.site_apportionment.site_apportionment import (
     calc_weights_for_sites,
     create_cartesian_product,
     sort_rows_order_cols,
-    weight_values
+    weight_values,
+    create_category_df
 )
 
 @pytest.fixture
@@ -642,10 +643,11 @@ class TestWeightValues(object):
     
     @pytest.fixture(scope="function")
     def weight_values_test_df(self):
+        """Test data for weight_values."""
         frame = {
             "reference": [0, 1, 2, 3, 4],
             "val_col_1": [10, 14, 16, 18, 6],# test using ints rather than float
-            "val_col_2": [3.5, 4.5, 10, np.nan, 0],# test nan+0+floats
+            "val_col_2": [3.5, 4.5, 10, np.nan, 0],# test np.nan+0+floats
             "weight_col": [1.5, 1.5, 1.0, 2.0, 3.0]
                 }
         return pandasDF(frame)
@@ -669,8 +671,170 @@ class TestWeightValues(object):
                                 self.value_cols, 
                                 self.weight_col)
         assert np.array_equal(output["val_col_1"],
-                       [11.0, 16.8, 16.0, 36.0, 18.0])
+                       [15.0, 21.0, 16.0, 36.0, 18.0])
         assert np.array_equal(output["val_col_2"],
-                       [5.25, 6.75, 10.0, np.nan, 0.0])
+                       [5.25, 6.75, 10.0, np.nan, 0.0], equal_nan=True)
         
+
+class TestCreateCategoryDf(object):
+    """Tests for create_category_df."""
+
+    @pytest.fixture(scope="function")
+    def category_df_input(self):
+        """Test data for create_category_df."""
+        frame = {'reference': {0: 49900000404,
+            1: 49900000404,
+            2: 49900000404,
+            3: 49900000408,
+            4: 49900000408,
+            5: 49900000407,
+            6: 49900000576,
+            7: 49900000960,
+            8: 49900000960,
+            9: 49900001029},
+            'instance': {0: 0.0,
+            1: 1.0,
+            2: 2.0,
+            3: 0.0,
+            4: 1.0,
+            5: 2.0,
+            6: 1.0,
+            7: 0.0,
+            8: 1.0,
+            9: 1.0},
+            'period': {0: 202212,
+            1: 202212,
+            2: 202212,
+            3: 202212,
+            4: 202212,
+            5: 202212,
+            6: 202212,
+            7: 202212,
+            8: 202212,
+            9: 202212},
+            'imp_marker': {0: 'R',
+            1: 'R',
+            2: 'R',
+            3: 'R',
+            4: 'R',
+            5: 'test',
+            6: 'TMI',
+            7: 'R',
+            8: 'R',
+            9: 'TMI'},
+            '201': {0: 'AA',
+            1: 'AA',
+            2: 'AA',
+            3: 'I',
+            4: 'AA',
+            5: 'AA',
+            6: 'AA',
+            7: 'AA',
+            8: 'AA',
+            9: 'I'},
+            '200': {0: np.nan,
+            1: 'C',
+            2: 'D',
+            3: np.nan,
+            4: 'C',
+            5: 'D',
+            6: 'C',
+            7: np.nan,
+            8: 'C',
+            9: 'C'},
+            'pg_numeric': {0: np.nan,
+            1: 29,
+            2: 29,
+            3: 32,
+            4: 33,
+            5: np.nan,
+            6: np.nan,
+            7: 1,
+            8: 23,
+            9: 5},
+            '601': {0: np.nan,
+            1: np.nan,
+            2: np.nan,
+            3: np.nan,
+            4: np.nan,
+            5: np.nan,
+            6: np.nan,
+            7: np.nan,
+            8: np.nan,
+            9: np.nan},
+            '602': {0: 100.0,
+            1: 100.0,
+            2: 100.0,
+            3: 100.0,
+            4: 100.0,
+            5: 100.0,
+            6: np.nan,
+            7: np.nan,
+            8: np.nan,
+            9: np.nan},
+            '210': {0: np.nan,
+            1: 243600.0379,
+            2: 0.0,
+            3: np.nan,
+            4: 0.0,
+            5: 0.0,
+            6: 0.0,
+            7: np.nan,
+            8: np.nan,
+            9: 833.3333}}
+    
+        return pd.DataFrame(frame)
+
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes to pass to functions for testing."""
+        self.imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
+        self.groupby_cols = ["reference", "period"]
+        self.code_cols = ["201", "200", "pg_numeric"]
+        # excluding postcode_harmonised as it is irrelevant to this test
+        self.site_cols = ["instance", "601", "602"]
+        self.value_cols = ["210"]
+
+    def test_create_category_df_raises(self, category_df_input):
+        """Defensive tests for create_category_df."""
+        pass
+
+    def test_create_category_df_on_pass(self, category_df_input):
+        """General tests for create_category_df."""
+        output = create_category_df(category_df_input,
+                                    self.imp_markers_to_keep,
+                                    category_df_input.columns,
+                                    self.groupby_cols,
+                                    self.code_cols,
+                                    self.site_cols,
+                                    self.value_cols)
+    
+        # assert correct number of rows
+        assert len(output) == 5, "Unexpected number of records in output."
+        # assert group code nan dropped
+        GC_NAN_CONDS = (output["201"].isin(["I"])
+                        &
+                        output["reference"].isin([49900000408]))
+        assert len(output[GC_NAN_CONDS]) == 0, "nan group code not removed"
+        # assert that bad imp marker removed
+        print(output["reference"].isin([49900000407]))
+        assert len((output[output["reference"].isin([49900000407])])) == 0,(
+            "Bad imp marker not removed"
+        ) 
+        
+        
+    def test_create_category_df_drops_duplicates(self, category_df_input):
+        """Test that create_category_df de-duplicates."""
+        output = create_category_df(category_df_input.append(category_df_input.iloc[0]),
+                                    self.imp_markers_to_keep,
+                                    category_df_input.columns,
+                                    self.groupby_cols,
+                                    self.code_cols,
+                                    self.site_cols,
+                                    self.value_cols)
+        DUPLICATE_CONDS = (output["reference"].isin([49900000404])
+                           &
+                           output["200"].isin(["C"]))
+        assert len(output[DUPLICATE_CONDS]) == 1, "Duplicates not removed"
+
         
