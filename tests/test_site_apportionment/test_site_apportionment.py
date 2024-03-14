@@ -12,7 +12,8 @@ from src.site_apportionment.site_apportionment import (
     deduplicate_codes_values,
     calc_weights_for_sites,
     create_cartesian_product,
-    sort_rows_order_cols
+    sort_rows_order_cols,
+    weight_values
 )
 
 @pytest.fixture
@@ -634,3 +635,42 @@ class TestSortRowsOrderCols():
 
         with pytest.raises(KeyError):
             sort_rows_order_cols(input_df, cols_in_order)
+
+
+class TestWeightValues(object):
+    """Tests for weight_values."""
+    
+    @pytest.fixture(scope="function")
+    def weight_values_test_df(self):
+        frame = {
+            "reference": [0, 1, 2, 3, 4],
+            "val_col_1": [10, 14, 16, 18, 6],# test using ints rather than float
+            "val_col_2": [3.5, 4.5, 10, np.nan, 0],# test nan+0+floats
+            "weight_col": [1.5, 1.5, 1.0, 2.0, 3.0]
+                }
+        return pandasDF(frame)
+    
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes to pass to function."""
+        self.value_cols = ["val_col_1", "val_col_2"]
+        self.weight_col = "weight_col"
+
+    def test_weight_values_raises(self, weight_values_test_df):
+        """Tests for raises in weight_values."""
+        with pytest.raises(KeyError, match=".*not_weight_col.*"):
+            weight_values(weight_values_test_df, 
+                          self.value_cols, 
+                          "not_weight_col")
+
+    def test_weight_values_on_pass(self, weight_values_test_df):
+        """General tests for weight_values."""
+        output = weight_values(weight_values_test_df,
+                                self.value_cols, 
+                                self.weight_col)
+        assert np.array_equal(output["val_col_1"],
+                       [11.0, 16.8, 16.0, 36.0, 18.0])
+        assert np.array_equal(output["val_col_2"],
+                       [5.25, 6.75, 10.0, np.nan, 0.0])
+        
+        
