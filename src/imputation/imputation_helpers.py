@@ -2,34 +2,8 @@
 import logging
 import pandas as pd
 from typing import List, Dict, Tuple, Callable
-from itertools import chain
 
 ImputationHelpersLogger = logging.getLogger(__name__)
-
-
-def get_imputation_cols(config: dict) -> list:
-    """Return a list of numeric columns to use for imputation.
-
-    These include columns of the form 2xx, 3xx, also the columns of the form
-    emp_xx (which have been apportioned across product groups from the 4xx columns) and
-    headcount_xx (which have been apportioned across proudct gropues from the 5xx cols)
-
-    Args:
-        config (dict): The pipeline configuration settings.
-
-    Returns:
-        numeric_cols (list): A list of all the columns imputation is applied to.
-    """
-    master_cols = list(config["breakdowns"].keys())
-    bd_qs_lists = list(config["breakdowns"].values())
-    bd_cols = list(chain(*bd_qs_lists))
-
-    sum_cols = config["imputation"]["sum_cols"]
-    other_sum_cols = [c for c in sum_cols if c not in master_cols]
-
-    numeric_cols = master_cols + bd_cols + other_sum_cols
-
-    return numeric_cols
 
 
 def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:

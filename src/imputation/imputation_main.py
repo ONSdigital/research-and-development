@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
 
+from src.utils.helpers import get_numeric_cols
 from src.imputation import imputation_helpers as hlp
 from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
@@ -84,7 +85,7 @@ def run_imputation(
         ]
 
     # Get a list of all the target values and breakdown columns from the config
-    to_impute_cols = hlp.get_imputation_cols(config)
+    to_impute_cols = get_numeric_cols(config)
 
     # Create new columns to hold the imputed values
     for col in to_impute_cols:
@@ -113,7 +114,7 @@ def run_imputation(
             )
             backdata = backdata.drop("pg_numeric", axis=1)
 
-        lf_target_vars = config["imputation"]["lf_target_vars"]
+        lf_target_vars = config["variables"]["lf_target_vars"]
         df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms

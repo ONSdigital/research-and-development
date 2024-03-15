@@ -1,9 +1,9 @@
 from ast import literal_eval
 import pandas as pd
-from typing import Tuple, List, Dict, Callable, Union
+from typing import Tuple, List, Dict, Union
 import logging
 
-from src.imputation.imputation_helpers import get_imputation_cols
+from src.utils.helpers import get_numeric_cols
 from src.site_apportionment.output_status_filtered import keep_good_markers
 
 SitesApportionmentLogger = logging.getLogger(__name__)
@@ -468,7 +468,7 @@ def run_apportion_sites(
     # Create a list of the value columns that we want to apportion
     # These are the same as the columns we impute so we use a function from 
     # imputation.
-    value_cols: List[str] = get_imputation_cols(config)
+    value_cols: List[str] = get_numeric_cols(config)
 
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)

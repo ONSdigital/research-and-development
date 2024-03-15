@@ -1,7 +1,7 @@
 """The main file for the frozen group output."""
 
 import logging
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, Any, List
 
 import pandas as pd
 from datetime import datetime
@@ -9,6 +9,7 @@ from datetime import datetime
 from src.outputs.outputs_helpers import aggregate_output, create_output_df
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
+from src.utils.helpers import get_numeric_cols
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -59,16 +60,8 @@ def output_frozen_group(
     ]
 
     # Numerical value columns that we have in BERD and NI data
-    value_columns = [
-        "emp_researcher", "emp_technician", "emp_other",
-        "emp_total", "202", "203", "204", "205", "206", "207", "209", "210",
-        "211", "212", "214", "216", "218", "219", "220", "221", "222",
-        "223", "225", "226", "227", "228", "229", "237", "242", "243", "244",
-        "245", "246", "247", "248", "249", "250", "302", "303", "304", "305",
-        "headcount_res_m", "headcount_res_f", "headcount_tec_m",
-        "headcount_tec_f", "headcount_oth_m", "headcount_oth_f",
-        "headcount_total",
-    ]
+    # These are the same as the columns we impute so we use a function from imputation.
+    value_columns = get_numeric_cols(config)
 
     # Columns that we don't have that should have pd.NA values
     blank_columns = [
@@ -79,11 +72,7 @@ def output_frozen_group(
     # Columns that we don't have that should have zero values
     # The numerical questions starting with q, like q208, are needed for the
     # output. If it's without q, then we have it in our data.
-    zero_columns = [
-        "q208", "q213", "q215", "q217", "q224", "q230", "q231", "q232",
-        "q233", "q234", "q235", "q236", "q238", "q239", "q240", "q241",
-        "q252", "q253", "q254", "q255", "q256", "q257", "q258",
-    ]
+    zero_columns = config["other_variables"]["zero_questions"]
 
     # Join foriegn ownership column using ultfoc mapper for GB
     df_gb = map_o.join_fgn_ownership(df_gb, ultfoc_mapper, formtype=["0001", "0006"])

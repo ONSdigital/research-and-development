@@ -409,7 +409,7 @@ def run_longform_tmi(
     # TMI Step 2: impute for R&D type (civil or defence)
     df = impute_civil_defence(df)
 
-    lf_target_variables = config["imputation"]["lf_target_vars"]
+    lf_target_variables = config["variables"]["lf_target_vars"]
     df = tmi_pre_processing(df, lf_target_variables)
 
     TMILogger.info("Starting TMI mean calculations.")
