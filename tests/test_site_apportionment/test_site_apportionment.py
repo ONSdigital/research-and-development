@@ -797,7 +797,15 @@ class TestCreateCategoryDf(object):
 
     def test_create_category_df_raises(self, category_df_input):
         """Defensive tests for create_category_df."""
-        pass
+        # simple test passing wrong input type to a param
+        with pytest.raises(TypeError, match="can only concatenate list.*int.*list"):
+            create_category_df(category_df_input,
+                                self.imp_markers_to_keep,
+                                category_df_input.columns,
+                                self.groupby_cols,
+                                6,
+                                self.site_cols,
+                                self.value_cols)
 
     def test_create_category_df_on_pass(self, category_df_input):
         """General tests for create_category_df."""
@@ -817,11 +825,12 @@ class TestCreateCategoryDf(object):
                         output["reference"].isin([49900000408]))
         assert len(output[GC_NAN_CONDS]) == 0, "nan group code not removed"
         # assert that bad imp marker removed
-        print(output["reference"].isin([49900000407]))
         assert len((output[output["reference"].isin([49900000407])])) == 0,(
             "Bad imp marker not removed"
         ) 
-        
+        # assert value_col (210) as e expected
+        expected = [243600.0379, 0.0, 0.0, 0.0, 833.3333]
+        assert sorted(expected) == sorted(output["210"].to_list())    
         
     def test_create_category_df_drops_duplicates(self, category_df_input):
         """Test that create_category_df de-duplicates."""
