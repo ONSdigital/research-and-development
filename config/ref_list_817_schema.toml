@@ -30,7 +30,7 @@ Possible_Categorical_Values = ["C"]
 
 [formtype]
 Description = "nan"
-Deduced_Data_Type = "category"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"

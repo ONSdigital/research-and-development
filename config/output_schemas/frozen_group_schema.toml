@@ -1,0 +1,363 @@
+[freeze_id]
+old_name = "freeze_id"
+Deduced_Data_Type = "object"
+
+[period]
+old_name = "period"
+Deduced_Data_Type = "object"
+
+[period_year]
+old_name = "period_year"
+Deduced_Data_Type = "Int64"
+
+[cell_id]
+old_name = "cell_id"
+Deduced_Data_Type = "object"
+
+[sizeband]
+old_name = "sizeband"
+Deduced_Data_Type = "Int64"
+
+[civ_or_def]
+old_name = "200"
+Deduced_Data_Type = "object"
+
+[product_group]
+old_name = "201"
+Deduced_Data_Type = "object"
+
+[ru_ref]
+old_name = "reference"
+Deduced_Data_Type = "int64"
+
+[period_contributor_id]
+old_name = "period_contributor_id"
+Deduced_Data_Type = "object"
+
+[form_type]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
+
+[form_status]
+old_name = "form_status"
+Deduced_Data_Type = "int64"
+
+[data_source]
+old_name = "data_source"
+Deduced_Data_Type = "int64"
+
+[employee_count]
+old_name = "employment"
+Deduced_Data_Type = "int64"
+
+[wowentref]
+old_name = "wowenterprisereference"
+Deduced_Data_Type = "object"
+
+[current_sic]
+old_name = "rusic"
+Deduced_Data_Type = "int64"
+
+[foreign_owner]
+old_name = "ultfoc"
+Deduced_Data_Type = "object"
+
+[emp_researcher]
+old_name = "emp_researcher"
+Deduced_Data_Type = "float64"
+
+[emp_technician]
+old_name = "emp_technician"
+Deduced_Data_Type = "float64"
+
+[emp_other]
+old_name = "emp_other"
+Deduced_Data_Type = "float64"
+
+[emp_total]
+old_name = "emp_total"
+Deduced_Data_Type = "float64"
+
+[q202]
+old_name = "202"
+Deduced_Data_Type = "int64"
+
+[q203]
+old_name = "203"
+Deduced_Data_Type = "int64"
+
+[q204]
+old_name = "204"
+Deduced_Data_Type = "int64"
+
+[q205]
+old_name = "205"
+Deduced_Data_Type = "int64"
+
+[q206]
+old_name = "206"
+Deduced_Data_Type = "int64"
+
+[q207]
+old_name = "207"
+Deduced_Data_Type = "int64"
+
+[q208]
+old_name = "q208"
+Deduced_Data_Type = "int64"
+
+[q209]
+old_name = "209"
+Deduced_Data_Type = "int64"
+
+[q210]
+old_name = "210"
+Deduced_Data_Type = "int64"
+
+[q211]
+old_name = "211"
+Deduced_Data_Type = "int64"
+
+[q212]
+old_name = "212"
+Deduced_Data_Type = "int64"
+
+[q213]
+old_name = "q213"
+Deduced_Data_Type = "int64"
+
+[q214]
+old_name = "214"
+Deduced_Data_Type = "int64"
+
+[q215]
+old_name = "q215"
+Deduced_Data_Type = "int64"
+
+[q216]
+old_name = "216"
+Deduced_Data_Type = "int64"
+
+[q217]
+old_name = "q217"
+Deduced_Data_Type = "int64"
+
+[q218]
+old_name = "218"
+Deduced_Data_Type = "int64"
+
+[q219]
+old_name = "219"
+Deduced_Data_Type = "int64"
+
+[q220]
+old_name = "220"
+Deduced_Data_Type = "int64"
+
+[q221]
+old_name = "221"
+Deduced_Data_Type = "int64"
+
+[q222]
+old_name = "222"
+Deduced_Data_Type = "int64"
+
+[q223]
+old_name = "223"
+Deduced_Data_Type = "int64"
+
+[q224]
+old_name = "q224"
+Deduced_Data_Type = "int64"
+
+[q225]
+old_name = "225"
+Deduced_Data_Type = "int64"
+
+[q226]
+old_name = "226"
+Deduced_Data_Type = "int64"
+
+[q227]
+old_name = "227"
+Deduced_Data_Type = "int64"
+
+[q228]
+old_name = "228"
+Deduced_Data_Type = "int64"
+
+[q229]
+old_name = "229"
+Deduced_Data_Type = "int64"
+
+[q230]
+old_name = "q230"
+Deduced_Data_Type = "int64"
+
+[q231]
+old_name = "q231"
+Deduced_Data_Type = "int64"
+
+[q232]
+old_name = "q232"
+Deduced_Data_Type = "int64"
+
+[q233]
+old_name = "q233"
+Deduced_Data_Type = "int64"
+
+[q234]
+old_name = "q234"
+Deduced_Data_Type = "int64"
+
+[q235]
+old_name = "q235"
+Deduced_Data_Type = "int64"
+
+[q236]
+old_name = "q236"
+Deduced_Data_Type = "int64"
+
+[q237]
+old_name = "237"
+Deduced_Data_Type = "int64"
+
+[q238]
+old_name = "q238"
+Deduced_Data_Type = "int64"
+
+[q239]
+old_name = "q239"
+Deduced_Data_Type = "int64"
+
+[q240]
+old_name = "q240"
+Deduced_Data_Type = "int64"
+
+[q241]
+old_name = "q241"
+Deduced_Data_Type = "int64"
+
+[q242]
+old_name = "242"
+Deduced_Data_Type = "int64"
+
+[q243]
+old_name = "243"
+Deduced_Data_Type = "int64"
+
+[q244]
+old_name = "244"
+Deduced_Data_Type = "int64"
+
+[q245]
+old_name = "245"
+Deduced_Data_Type = "int64"
+
+[q246]
+old_name = "246"
+Deduced_Data_Type = "int64"
+
+[q247]
+old_name = "247"
+Deduced_Data_Type = "int64"
+
+[q248]
+old_name = "248"
+Deduced_Data_Type = "int64"
+
+[q249]
+old_name = "249"
+Deduced_Data_Type = "int64"
+
+[q302]
+old_name = "302"
+Deduced_Data_Type = "int64"
+
+[q303]
+old_name = "303"
+Deduced_Data_Type = "int64"
+
+[q304]
+old_name = "304"
+Deduced_Data_Type = "int64"
+
+[q305]
+old_name = "305"
+Deduced_Data_Type = "int64"
+
+[headcount_res_m]
+old_name = "headcount_res_m"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f]
+old_name = "headcount_res_f"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m]
+old_name = "headcount_tec_m"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f]
+old_name = "headcount_tec_f"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m]
+old_name = "headcount_oth_m"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f]
+old_name = "headcount_oth_f"
+Deduced_Data_Type = "float64"
+
+[headcount_total]
+old_name = "headcount_total"
+Deduced_Data_Type = "float64"
+
+[q250]
+old_name = "250"
+Deduced_Data_Type = "int64"
+
+[q251]
+old_name = "251"
+Deduced_Data_Type = "int64"
+
+[q307]
+old_name = "307"
+Deduced_Data_Type = "int64"
+
+[q308]
+old_name = "308"
+Deduced_Data_Type = "int64"
+
+[q309]
+old_name = "309"
+Deduced_Data_Type = "int64"
+
+[q252]
+old_name = "q252"
+Deduced_Data_Type = "int64"
+
+[q253]
+old_name = "q253"
+Deduced_Data_Type = "int64"
+
+[q254]
+old_name = "q254"
+Deduced_Data_Type = "int64"
+
+[q255]
+old_name = "q255"
+Deduced_Data_Type = "int64"
+
+[q256]
+old_name = "q256"
+Deduced_Data_Type = "int64"
+
+[q257]
+old_name = "q257"
+Deduced_Data_Type = "int64"
+
+[q258]
+old_name = "q258"
+Deduced_Data_Type = "int64"

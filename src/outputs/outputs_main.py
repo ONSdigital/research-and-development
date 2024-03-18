@@ -4,6 +4,7 @@ import pandas as pd
 from typing import Callable, Dict, Any
 
 from src.outputs.form_output_prep import form_output_prep
+from src.outputs.frozen_group import output_frozen_group
 from src.outputs.short_form import output_short_form
 from src.outputs.long_form import output_long_form
 from src.outputs.tau import output_tau
@@ -11,6 +12,7 @@ from src.outputs.gb_sas import output_gb_sas
 from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.outputs.intram_by_itl1 import output_intram_by_itl1
+from src.outputs.intram_uk_itl_1_2 import output_intram_uk_itl_1_2
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
@@ -57,14 +59,13 @@ def run_outputs(
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
         pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_num (pd.DataFrame): Mapper for product group conversions 
+        sic_pg_num (pd.DataFrame): Mapper for product group conversions
     """
 
-    (
-        ni_full_responses,
-        outputs_df,
-        tau_outputs_df
-    ) = form_output_prep(
+    # Remove instance 0 from weighted df, so that it does not go to Tau outputs
+    weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
+
+    (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
         estimated_df,
         weighted_df,
         ni_full_responses,
@@ -99,6 +100,10 @@ def run_outputs(
             ultfoc_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
+
+    # Filter out records that answer "no R&D" for all subsequent outputs
+    tau_outputs_df = tau_outputs_df.copy().loc[~(tau_outputs_df["604"] == "No")]
+    outputs_df = outputs_df.copy().loc[~(outputs_df["604"] == "No")]
 
     # Running TAU output
     if config["global"]["output_tau"]:
@@ -162,6 +167,33 @@ def run_outputs(
             itl1_detailed,
         )
         OutputMainLogger.info("Finished  Intram by ITL1 output.")
+
+    # Running Intram UK by ITL 1 and 2
+    if config["global"]["output_intram_uk_itl2"]:
+        OutputMainLogger.info("Starting  Intram UK by ITL 1 and 2 output...")
+        output_intram_uk_itl_1_2(
+            outputs_df,
+            ni_full_responses,
+            config,
+            write_csv,
+            run_id,
+            postcode_mapper,
+            itl_mapper,
+        )
+        OutputMainLogger.info("Finished  Intram UK by ITL 1 and 2 output.")
+
+    # Running frozen group
+    if config["global"]["output_frozen_group"]:
+        OutputMainLogger.info("Starting frozen group output...")
+        output_frozen_group(
+            outputs_df,
+            ni_full_responses,
+            ultfoc_mapper,
+            config,
+            write_csv,
+            run_id,
+        )
+        OutputMainLogger.info("Finished frozen group output.")
 
     # Running Intram by civil or defence
     if config["global"]["output_intram_by_civil_defence"]:

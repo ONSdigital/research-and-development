@@ -1,6 +1,7 @@
 import pandas as pd
 from src.imputation.pg_conversion import run_pg_conversion
 from src.staging.validation import flag_no_rand_spenders
+from src.outputs.outputs_helpers import create_period_year
 
 
 def form_output_prep(
@@ -33,14 +34,16 @@ def form_output_prep(
     no_rnd_spenders_filter = ~(
         (estimated_df["604"] == "No") & (estimated_df["211"] > 0)
     )
+
     outputs_df = estimated_df.copy().loc[no_rnd_spenders_filter]
+    outputs_df = create_period_year(outputs_df)
+
     tau_outputs_df = weighted_df.copy().loc[no_rnd_spenders_filter]
+    tau_outputs_df = create_period_year(tau_outputs_df)
 
     if ni_full_responses is not None:
         # Add required columns to NI data
-        ni_full_responses = ni_full_responses.rename(
-            columns={"period_year": "period", "foc": "ultfoc"}
-        )
+        ni_full_responses = ni_full_responses.rename(columns={"foc": "ultfoc"})
         ni_full_responses["a_weight"] = 1
         ni_full_responses["604"] = "Yes"
         ni_full_responses["form_status"] = 600
@@ -49,9 +52,7 @@ def form_output_prep(
 
         # Update column 201 (currently PG numeric) to alpha-numeric, mapping from SIC.
         ni_full_responses = run_pg_conversion(
-            ni_full_responses, 
-            pg_num_alpha, 
-            sic_pg_num
+            ni_full_responses, pg_num_alpha, sic_pg_num
         )
 
         # outputs_df = pd.concat([outputs_df, ni_full_responses])

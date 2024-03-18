@@ -9,9 +9,9 @@ global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   load_historic_data: False
-  run_construction: True
+  run_construction: False
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
@@ -35,10 +35,13 @@ global:
   output_tau: False
   output_intram_by_pg: False
   output_intram_by_itl1: False
+  output_intram_uk_itl2: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
-  output_status_filtered: False
   output_fte_total_qa: False
+  output_status_filtered: False
+  output_frozen_group: True
+
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -101,7 +104,7 @@ network_paths:
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
   cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
-  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl.csv'
+  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
   sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
@@ -129,6 +132,7 @@ schema_paths:
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
+  frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
 
 
 # Export config for users
@@ -166,6 +170,7 @@ imputation:
   upper_trim_perc: 15
   trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
   sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
   lf_target_vars:
     - "211"
     - "305"

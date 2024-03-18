@@ -62,7 +62,7 @@ def aggregate_output(
     agg_method: str = "sum",
 ) -> pd.DataFrame:
 
-    """Groups the datadrame by key columns and aggregates the value columns
+    """Groups the dataframe by key columns and aggregates the value columns
     using a specified aggregation method.
 
     Args:
@@ -102,6 +102,7 @@ def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Extracted the year from period and crated new columns 'period_year'
+    df = df.copy()
     df["period_year"] = df["period"].astype("str").str[:4]
     df["period_year"] = df["period_year"].apply(pd.to_numeric, errors="coerce")
 

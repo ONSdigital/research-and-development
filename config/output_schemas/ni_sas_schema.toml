@@ -3,7 +3,7 @@ old_name = "reference"
 Deduced_Data_Type = "Int64"
 
 [period]
-old_name = "period"
+old_name = "period_year"
 Deduced_Data_Type = "Int64"
 
 [entref]
@@ -24,14 +24,14 @@ Deduced_Data_Type = "Int64"
 
 [form]
 old_name = "formtype"
-Deduced_Data_Type = "category"
+Deduced_Data_Type = "str"
 
 [emp]
 old_name = "employment"
 Deduced_Data_Type = "Int64"
 
 [turn]
-old_name = "turnover"
+old_name = "frozenturnover"
 Deduced_Data_Type = "Int64"
 
 [f_owner]
@@ -98,7 +98,7 @@ Deduced_Data_Type ="Int64"
 old_name = "207"
 Deduced_Data_Type ="Int64"
 
-[C_lnd_bl]
+[c_lnd_bl]
 old_name = "C_lnd_bl"
 Deduced_Data_Type = "Int64"
 
