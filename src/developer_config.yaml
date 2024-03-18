@@ -4,8 +4,8 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings
-  dev_test : True
-  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
+  dev_test : False
+  network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
@@ -40,8 +40,7 @@ global:
   output_intram_by_sic: False
   output_fte_total_qa: False
   output_status_filtered: False
-  output_frozen_group: True
-
+  output_frozen_group: False
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
@@ -56,8 +55,6 @@ hdfs_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
-  ni_responses_path: None
-  ni_indicative_path: None
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
@@ -136,19 +133,6 @@ schema_paths:
 
 
 # Export config for users
-export_choices:
-  copy_or_move_files: "copy"
-  export_shortform: None # Can be set to None
-  export_tau: None # Can be set to None
-  export_gb_sas: None # Can be set to None
-  export_intram_by_pg: None # Can be set to None
-  export_intram_by_itl1: None # Can be set to None
-  export_intram_by_civil_defence: None # TODO structure of output (no col heads) means this currently doesn't work
-  export_intram_by_sic: "output_intram_by_sic_2023-12-06_v68.csv" # Can be set to None
-  export_status_filtered: None # Can be set to None
-  export_fte_total_qa: "total_fte_qa_2023-12-06_v68.csv" # Can be set to None
-  export_longform: None # Can be set to None
-
 
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
