@@ -720,7 +720,7 @@ class TestCreateSitesDf(object):
         assert np.array_equal(output["602"], [225.0, 100.0, 50.0]), (
             "Column 602 (percent_col) has unexpected values."
         )
-        assert np.array_equal(output["instance"], [0, 3, 0"f]), (
+        assert np.array_equal(output["instance"], [0, 3, 0]), (
             "Column 'instance' has unexpected values."
         )
         expected_postcodes = ["NP44 2NZ", "RH12 1XL", "RH12 1XZ"]
