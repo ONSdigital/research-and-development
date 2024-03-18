@@ -12,7 +12,8 @@ from src.site_apportionment.site_apportionment import (
     deduplicate_codes_values,
     calc_weights_for_sites,
     create_cartesian_product,
-    sort_rows_order_cols
+    sort_rows_order_cols,
+    count_unique_postcodes_in_col
 )
 
 @pytest.fixture
@@ -634,3 +635,57 @@ class TestSortRowsOrderCols():
 
         with pytest.raises(KeyError):
             sort_rows_order_cols(input_df, cols_in_order)
+
+
+class TestCountUniquePostcodesInCol(object):
+    """Tesst for count_unique_postcodes_in_col."""
+
+    @pytest.fixture(scope="function")
+    def count_postcode_input_df(self):
+        """Input data for tests for count_unique_postcodes_in_col."""
+        data = [
+        [4990000000, 202212, "AB1 2CD", 5663, 8855030],
+        [4990000000, 202212, "B27 2CD", 242, 5949501],
+        [4990000006, 202212, "B23 2CD", 247, 5949508],
+        [4990000084, 202212, "EF3 4GH", 8020, 5085659],
+        [4990000126, 202212, "IJ5 6KL", 2756, 5808144],
+        [4990000126, 202212, "MN7 8OP", 2756, 5808144],
+        [4990000252, 202212, "UV1 2WX", 7084, 7058606],
+    ]
+        columns = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
+        return pandasDF(data=data, columns=columns)
+
+    def test_count_unique_unique_postcodes_in_col(self, count_postcode_input_df):
+        """General tests for count_postcode_input_df."""
+        # no changes to data
+        output = count_unique_postcodes_in_col(count_postcode_input_df)
+        assert np.array_equal(
+            output["601_count"], 
+            [2, 2, 1, 1, 2, 2, 1]                              
+                              ), "Function not working as expected."
+        # test duplicate row does not add unique PC
+        input = count_postcode_input_df.copy()
+        input.loc[len(input)] = input.loc[len(input)-1]
+        output = count_unique_postcodes_in_col(input)
+        assert np.array_equal(
+            output["601_count"], 
+            [2, 2, 1, 1, 2, 2, 1, 1]                           
+                              ), "Duplicate rows not handled correctly."
+        # assert blank postcodes (empty string)
+        input = count_postcode_input_df.copy()
+        input["601"][1] = ""
+        output = count_unique_postcodes_in_col(input)
+        assert np.array_equal(
+            output["601_count"], 
+            [1, 1, 1, 1, 2, 2, 1]                              
+                              ), "Empty strings not handled correctly."
+        # assert that nans don't count
+        input = count_postcode_input_df.copy()
+        input["601"][1] = np.nan
+        output = count_unique_postcodes_in_col(input)
+        assert np.array_equal(
+            output["601_count"], 
+            [1, 1, 1, 1, 2, 2, 1]                              
+                              ), "NaNs not ignored."
+        
+
