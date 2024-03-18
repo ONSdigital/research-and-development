@@ -180,7 +180,6 @@ def run_pipeline(start, config_path):
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
-    # Run short  form output
     run_outputs(
         estimated_responses_df,
         weighted_responses_df,
