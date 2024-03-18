@@ -655,6 +655,12 @@ class TestCountUniquePostcodesInCol(object):
         columns = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
         return pandasDF(data=data, columns=columns)
 
+    def test_count_unique_postcodes_in_col_raises(self, count_postcode_input_df):
+        """Defensive tests for count_postcode_input_df."""
+        count_postcode_input_df.drop("601", axis=1, inplace=True)
+        with pytest.raises(KeyError, match=".*601.* not in index.*"):
+            count_unique_postcodes_in_col(count_postcode_input_df)
+
     def test_count_unique_unique_postcodes_in_col(self, count_postcode_input_df):
         """General tests for count_postcode_input_df."""
         # no changes to data
