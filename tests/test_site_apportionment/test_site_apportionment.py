@@ -670,10 +670,13 @@ class TestWeightValues(object):
         output = weight_values(weight_values_test_df,
                                 self.value_cols, 
                                 self.weight_col)
-        assert np.array_equal(output["val_col_1"],
-                       [15.0, 21.0, 16.0, 36.0, 18.0])
-        assert np.array_equal(output["val_col_2"],
-                       [5.25, 6.75, 10.0, np.nan, 0.0], equal_nan=True)
+        exp_out = pandasDF({
+            "reference": [0, 1, 2, 3, 4],
+            "val_col_1": [15.0, 21.0, 16.0, 36.0, 18.0],# test using ints rather than float
+            "val_col_2": [5.25, 6.75, 10.0, np.nan, 0.0],# test np.nan+0+floats
+            "weight_col": [1.5, 1.5, 1.0, 2.0, 3.0]
+                })
+        assert output.equals(exp_out), "weight_values not acting as expected."
         
 
 class TestCreateCategoryDf(object):
@@ -682,6 +685,9 @@ class TestCreateCategoryDf(object):
     @pytest.fixture(scope="function")
     def category_df_input(self):
         """Test data for create_category_df."""
+        columns = ['reference', 'instance', 'period', 'imp_marker', '201', 
+                   '200', 'pg_numeric', '601', '602', '210']
+        
         data = [[49900000404, 0.0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
                 [49900000404, 1.0, 202212, 'R', 'AA', 'C', 29.0, np.nan, 100.0, 243600.0379],
                 [49900000404, 2.0, 202212, 'R', 'AA', 'D', 29.0, np.nan, 100.0, 0.0],
@@ -692,9 +698,6 @@ class TestCreateCategoryDf(object):
                 [49900000960, 0.0, 202212, 'R', 'AA', np.nan, 1.0, np.nan, np.nan, np.nan],
                 [49900000960, 1.0, 202212, 'R', 'AA', 'C', 23.0, np.nan, np.nan, np.nan],
                 [49900001029, 1.0, 202212, 'TMI', 'I', 'C', 5.0, np.nan, np.nan, 833.3333]]
-        
-        columns = ['reference', 'instance', 'period', 'imp_marker', '201', 
-                   '200', 'pg_numeric', '601', '602', '210']
         
         return pd.DataFrame(data=data, columns=columns)
 
