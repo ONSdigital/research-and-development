@@ -708,26 +708,21 @@ class TestCreateSitesDf(object):
             self.groupby_cols,
             self.site_cols)
         # assert the resultant dataframe is as expected
-        assert len(output) == 3, f"Output df has {len(output)} row. Expected 3"
-        expected_columns = ["reference",
-                            "period",
-                            "instance",
-                            "601",
-                            "602",
-                            "postcodes_harmonised"]
-        print(output)
-        assert sorted(expected_columns) == sorted(output.columns.values)
-        assert np.array_equal(output["602"], [225.0, 100.0, 50.0]), (
-            "Column 602 (percent_col) has unexpected values."
+        exp_columns = ["reference",
+                        "period",
+                        "601",
+                        "postcodes_harmonised",
+                        "instance",
+                        "602",]
+        exp_data = [
+            [1, '202101', 'RH12 1XL', 'RH12 1XL', 0, 225.0],
+            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 3, 100.0],
+            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 0, 50.0],
+            ]
+        expected = pandasDF(data=exp_data, columns=exp_columns)
+        assert output.equals(expected), (
+            "create_sites_df not behaving as expected."
         )
-        assert np.array_equal(output["instance"], [0, 3, 0]), (
-            "Column 'instance' has unexpected values."
-        )
-        expected_postcodes = ["NP44 2NZ", "RH12 1XL", "RH12 1XZ"]
-        assert np.array_equal(
-            sorted(output["601"].unique()),
-            sorted(expected_postcodes)
-            ), "Postcodes not as expected"
 
 
 class TestCountDuplicateSites(object):
