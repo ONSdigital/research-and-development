@@ -688,12 +688,14 @@ class TestCreateCategoryDf(object):
         columns = ['reference', 'instance', 'period', 'imp_marker', '201', 
                    '200', 'pg_numeric', '601', '602', '210']
         
+        # data includes:
+
         data = [[49900000404, 0.0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
                 [49900000404, 1.0, 202212, 'R', 'AA', 'C', 29.0, np.nan, 100.0, 243600.0379],
                 [49900000404, 2.0, 202212, 'R', 'AA', 'D', 29.0, np.nan, 100.0, 0.0],
-                [49900000408, 0.0, 202212, 'R', 'I', np.nan, 32.0, np.nan, 100.0, np.nan],
+                [49900000408, 0.0, 202212, 'R', 'I', np.nan, 32.0, np.nan, 100.0, np.nan], # group code nan (dropped)
                 [49900000408, 1.0, 202212, 'R', 'AA', 'C', 33.0, np.nan, 100.0, 0.0],
-                [49900000407, 2.0, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0],
+                [49900000407, 2.0, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0], # bad imp marker
                 [49900000576, 1.0, 202212, 'TMI', 'AA', 'C', np.nan, np.nan, np.nan, 0.0],
                 [49900000960, 0.0, 202212, 'R', 'AA', np.nan, 1.0, np.nan, np.nan, np.nan],
                 [49900000960, 1.0, 202212, 'R', 'AA', 'C', 23.0, np.nan, np.nan, np.nan],
@@ -732,24 +734,26 @@ class TestCreateCategoryDf(object):
                                     self.code_cols,
                                     self.site_cols,
                                     self.value_cols)
-    
-        # assert correct number of rows
-        assert len(output) == 5, "Unexpected number of records in output."
-        # assert group code nan dropped
-        GC_NAN_CONDS = (output["201"].isin(["I"])
-                        &
-                        output["reference"].isin([49900000408]))
-        assert len(output[GC_NAN_CONDS]) == 0, "nan group code not removed"
-        # assert that bad imp marker removed
-        assert len((output[output["reference"].isin([49900000407])])) == 0,(
-            "Bad imp marker not removed"
-        ) 
-        # assert value_col (210) as e expected
-        expected = [243600.0379, 0.0, 0.0, 0.0, 833.3333]
-        assert sorted(expected) == sorted(output["210"].to_list())    
+        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
+                        "210", "imp_marker"]
+        exp_data = [
+            [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
+            [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
+            [49900000408, 202212, "AA", "C", 33.0, 0.0000, "R"],
+            [49900000960, 202212, "AA", "C", 23.0, 0.0000, "R"],
+            [49900001029, 202212, "I", "C", 5.0, 833.3333, "TMI"]
+                        ]
+        expected = pandasDF(data=exp_data, columns=exp_cols)
+        assert output.equals(expected), (
+            "create_category_df not acting as expected"
+            )
+  
         
     def test_create_category_df_drops_duplicates(self, category_df_input):
         """Test that create_category_df de-duplicates."""
+        # reduce input data to the first four rows
+        category_df_input = category_df_input.loc[:3]
+        # add duplicate row and pass to create_category_df
         output = create_category_df(category_df_input.append(category_df_input.iloc[0]),
                                     self.imp_markers_to_keep,
                                     category_df_input.columns,
@@ -757,9 +761,15 @@ class TestCreateCategoryDf(object):
                                     self.code_cols,
                                     self.site_cols,
                                     self.value_cols)
-        DUPLICATE_CONDS = (output["reference"].isin([49900000404])
-                           &
-                           output["200"].isin(["C"]))
-        assert len(output[DUPLICATE_CONDS]) == 1, "Duplicates not removed"
+        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
+                        "210", "imp_marker"]
+        exp_data = [
+            [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
+            [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
+                        ]
+        expected = pandasDF(data=exp_data, columns=exp_cols)
+        assert output.equals(expected), (
+            "Duplicates not dropped by create_category_df."
+        )
 
         
