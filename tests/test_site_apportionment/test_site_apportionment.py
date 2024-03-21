@@ -645,12 +645,16 @@ class TestCountUniquePostcodesInCol(object):
         """Input data for tests for count_unique_postcodes_in_col."""
         data = [
         [4990000000, 202212, "AB1 2CD", 5663, 8855030],
-        [4990000000, 202212, "B27 2CD", 242, 5949501],
+        [4990000000, 202212, "AB1 4FD", 5663, 8855030],
+        [4990000000, 202212, np.nan, 242, 5949501], # test nan
         [4990000006, 202212, "B23 2CD", 247, 5949508],
-        [4990000084, 202212, "EF3 4GH", 8020, 5085659],
+        [4990000006, 202212, "B23 2CD", 247, 5949508], #duplicate row
         [4990000126, 202212, "IJ5 6KL", 2756, 5808144],
-        [4990000126, 202212, "MN7 8OP", 2756, 5808144],
-        [4990000252, 202212, "UV1 2WX", 7084, 7058606],
+        [4990000126, 202212, "", 2756, 5808144], # test empty string
+        [4990000126, 202212, "UV1 2WX", 7084, 7056067],
+        [4990000106, 202212, "UV1 2WX", 1023, 7034606],
+        [4990000106, 202212, "NP1 3TY", 1023, 7034606],
+        [4990000106, 202212, "BD3 2EX", 1023, 7034606], # no issues (3 PCs)
     ]
         columns = ["reference", "period", "601", "headcount_dummy", "211_dummy"]
         return pandasDF(data=data, columns=columns)
@@ -663,35 +667,25 @@ class TestCountUniquePostcodesInCol(object):
 
     def test_count_unique_unique_postcodes_in_col(self, count_postcode_input_df):
         """General tests for count_postcode_input_df."""
-        # no changes to data
+        exp_columns = ["reference", "period", "601", "headcount_dummy", 
+                       "211_dummy", "601_count"]
+        exp_data = [
+        [4990000000, 202212, "AB1 2CD", 5663, 8855030, 2],
+        [4990000000, 202212, "AB1 4FD", 5663, 8855030, 2],
+        [4990000000, 202212, np.nan, 242, 5949501, 2], # test nan
+        [4990000006, 202212, "B23 2CD", 247, 5949508, 1],
+        [4990000006, 202212, "B23 2CD", 247, 5949508, 1], #duplicate row
+        [4990000126, 202212, "IJ5 6KL", 2756, 5808144, 2],
+        [4990000126, 202212, "", 2756, 5808144, 2], # test empty string
+        [4990000126, 202212, "UV1 2WX", 7084, 7056067, 2],
+        [4990000106, 202212, "UV1 2WX", 1023, 7034606, 3],
+        [4990000106, 202212, "NP1 3TY", 1023, 7034606, 3],
+        [4990000106, 202212, "BD3 2EX", 1023, 7034606, 3],
+    ]
+        exp_out = pandasDF(data=exp_data, columns=exp_columns)
         output = count_unique_postcodes_in_col(count_postcode_input_df)
-        assert np.array_equal(
-            output["601_count"], 
-            [2, 2, 1, 1, 2, 2, 1]                              
-                              ), "Function not working as expected."
-        # test duplicate row does not add unique PC
-        input = count_postcode_input_df.copy()
-        input.loc[len(input)] = input.loc[len(input)-1]
-        output = count_unique_postcodes_in_col(input)
-        assert np.array_equal(
-            output["601_count"], 
-            [2, 2, 1, 1, 2, 2, 1, 1]                           
-                              ), "Duplicate rows not handled correctly."
-        # assert blank postcodes (empty string)
-        input = count_postcode_input_df.copy()
-        input["601"][1] = ""
-        output = count_unique_postcodes_in_col(input)
-        assert np.array_equal(
-            output["601_count"], 
-            [1, 1, 1, 1, 2, 2, 1]                              
-                              ), "Empty strings not handled correctly."
-        # assert that nans don't count
-        input = count_postcode_input_df.copy()
-        input["601"][1] = np.nan
-        output = count_unique_postcodes_in_col(input)
-        assert np.array_equal(
-            output["601_count"], 
-            [1, 1, 1, 1, 2, 2, 1]                              
-                              ), "NaNs not ignored."
+        assert exp_out.equals(output), (
+            "count_unique_postcodes_in_col not behaving aas expected"
+            )
         
 
