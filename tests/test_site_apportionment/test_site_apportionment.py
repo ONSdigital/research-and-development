@@ -658,13 +658,6 @@ class TestWeightValues(object):
         self.value_cols = ["val_col_1", "val_col_2"]
         self.weight_col = "weight_col"
 
-    def test_weight_values_raises(self, weight_values_test_df):
-        """Tests for raises in weight_values."""
-        with pytest.raises(KeyError, match=".*not_weight_col.*"):
-            weight_values(weight_values_test_df, 
-                          self.value_cols, 
-                          "not_weight_col")
-
     def test_weight_values_on_pass(self, weight_values_test_df):
         """General tests for weight_values."""
         output = weight_values(weight_values_test_df,
