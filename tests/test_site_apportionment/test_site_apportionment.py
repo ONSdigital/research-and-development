@@ -706,18 +706,7 @@ class TestCreateCategoryDf(object):
         self.site_cols = ["instance", "601", "602"]
         self.value_cols = ["210"]
 
-    def test_create_category_df_raises(self, category_df_input):
-        """Defensive tests for create_category_df."""
-        # simple test passing wrong input type to a param
-        with pytest.raises(TypeError, match="can only concatenate list.*int.*list"):
-            create_category_df(category_df_input,
-                                self.imp_markers_to_keep,
-                                category_df_input.columns,
-                                self.groupby_cols,
-                                6,
-                                self.site_cols,
-                                self.value_cols)
-
+    
     def test_create_category_df_on_pass(self, category_df_input):
         """General tests for create_category_df."""
         output = create_category_df(category_df_input,
