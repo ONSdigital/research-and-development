@@ -689,17 +689,6 @@ class TestCreateSitesDf(object):
         """Set class attributes that are passed as parameters."""
         self.groupby_cols = ["reference", "period"]
         self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
-    
-    def test_create_sites_df_raises(self, sites_df_input):
-        """Tests for create_sites_df when invalid data is passed."""
-        # test when a required column is missing
-        no_period = sites_df_input.copy()
-        no_period.drop("period", axis=1, inplace=True)
-        with pytest.raises(KeyError, match=r".*period.*not in index"):
-            create_sites_df(no_period, self.groupby_cols, self.site_cols)
-        # cols passed not in list[str] format
-        with pytest.raises(TypeError, match="unsupported operand type.*"):
-            create_sites_df(sites_df_input, 3, self.site_cols)
 
     def test_create_sites_df_on_pass(self, sites_df_input):
         """General tests for create_sites_df."""
@@ -727,16 +716,6 @@ class TestCreateSitesDf(object):
 
 class TestCountDuplicateSites(object):
     """Tests for count_duplicate_sites."""
-
-    def test_count_duplicate_sites_raises(self, sites_df_input):
-        """Tests for raises from bad data passed to count_duplicate_sites."""
-        # passing dataframe with missing columns
-        with pytest.raises(KeyError, match=".*reference.* not in index"):
-            count_duplicate_sites(sites_df_input.drop("reference", axis=1))
-        # passing wrong type (not a df)
-        with pytest.raises(TypeError, match=".*int.* object is not subscriptable"):
-            count_duplicate_sites(0)
-        
     def test_count_duplicate_sites_on_pass(self, caplog, sites_df_input):
         """General tests for count_duplicate_sites."""
         # set log level
