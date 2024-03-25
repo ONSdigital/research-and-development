@@ -33,7 +33,8 @@ global:
   output_gb_sas: False
   output_ni_sas: False
   output_tau: False
-  output_intram_by_pg: False
+  output_intram_by_pg_gb: True
+  output_intram_by_pg_uk: True
   output_intram_by_itl1: False
   output_intram_uk_itl2: False
   output_intram_by_civil_defence: False

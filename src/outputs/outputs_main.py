@@ -43,12 +43,12 @@ def run_outputs(
 
     Args:
         estimated_df (pd.DataFrame): The main dataset containing
-        short and long form output
+            short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         ni_full_responses(pd.DataFrame): Dataset with all NI data
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
-         This will be the hdfs or network version depending on settings.
+            This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): Links postcode to region code
@@ -142,17 +142,30 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
-    # Running Intram by PG output
-    if config["global"]["output_intram_by_pg"]:
-        OutputMainLogger.info("Starting  Intram by PG output...")
+    # Running Intram by PG output (UK)
+    if config["global"]["output_intram_by_pg_gb"]:
+        OutputMainLogger.info("Starting  Intram by PG (GB) output...")
         output_intram_by_pg(
             outputs_df,
+            pg_detailed,
             config,
             write_csv,
             run_id,
-            pg_detailed,
         )
-        OutputMainLogger.info("Finished  Intram by PG output.")
+        OutputMainLogger.info("Finished Intram by PG (GB) output.")
+    
+    # Running Intram by PG output (GB)
+    if config["global"]["output_intram_by_pg_uk"]:
+        OutputMainLogger.info("Startin Intram by PG (UK) output...")
+        output_intram_by_pg(
+            outputs_df,
+            pg_detailed,
+            config,
+            write_csv,
+            run_id,
+            ni_full_responses
+        )
+        OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
     # Running Intram by ITL1
     if config["global"]["output_intram_by_itl1"]:
