@@ -666,12 +666,15 @@ class TestWeightValues(object):
 
         columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
 
-        data = [[0, 15.0, 5.25, 1.5],
-               [1, 21.9, 6.75, 1.5],
-               [2, 16.0, 10.0, 1.0],
-               [3, 36.0, np.nan, 2.0]
-               [4, 18.0, 0.0, 3.0]]
-        exp_out = pandasDF(datae=data, columns=columns)
+        data = [
+            [0, 15.0, 5.25, 1.5],
+            [1, 21.0, 6.75, 1.5],
+            [2, 16.0, 10.0, 1.0],
+            [3, 36.0, np.nan, 2.0],
+            [4, 18.0, 0.0, 3.0],
+               ]
+        exp_out = pandasDF(data=data, columns=columns)
+        print(output)
         assert output.equals(exp_out), "weight_values not acting as expected."
         
 
