@@ -8,48 +8,21 @@ import src.estimation.calculate_weights as calw
 from pandas._testing import assert_frame_equal, assert_series_equal
 
 
-# Four tests for calc_lower_n:
+# Three tests for calc_lower_n:
 # testing calc_lower_n where duplicate refs
 # testing calc_lower_n where missing col
 # testing calc_lower_n where nan in reference
-# testing calc_lower_n where nan in exp_col
 
 
-def test_calc_lower_n():
-    """Test for calc_lower_n with duplicate refs."""
-
-    input_cols = [
-        "reference",
-        "709",
+@pytest.mark.parametrize(
+    "cols, msg, exp_col",
+    [
+        (["ref", "709"], f"'reference' or 709 missing.", "709"),
+        (["reference", "706"], f"'reference' or 707 missing.", "707")
     ]
-
-    data = [
-        [1, 'A'],
-        [2, 'B'],
-        [2, 'C'],
-        [4, 'D'],
-        [1, 'E'],
-    ]
-
-    input_df = pd.DataFrame(data=data, columns=input_cols)
-
-    # Call calc_lower_n function
-    actual_result = calw.calc_lower_n(input_df)
-
-    # Defined expected result
-    expected_result = 3
-
-    assert actual_result == expected_result
-
-
-def test_calc_lower_n_missing_col():
+)
+def test_calc_lower_n_missing_col(cols, msg, exp_col):
     """Test for calc_lower_n with missing col"""
-
-    input_cols = [
-        "ref",
-        "709",
-    ]
-
     data = [
         [1, 'A'],
         [2, 'B'],
@@ -57,12 +30,11 @@ def test_calc_lower_n_missing_col():
         [4, 'D'],
         [1, 'E'],
     ]
+    input_df = pd.DataFrame(data=data, columns=cols)
 
-    input_df = pd.DataFrame(data=data, columns=input_cols)
-
-
-    with pytest.raises(ValueError):
-        calw.calc_lower_n(input_df)
+    with pytest.raises(ValueError) as error_msg:
+        calw.calc_lower_n(input_df, exp_col)
+    assert str(error_msg.value) == msg
 
 
 def test_calc_lower_n_nan_ref():
@@ -77,33 +49,6 @@ def test_calc_lower_n_nan_ref():
         [1, 'A'],
         [2, 'B'],
         [np.nan, 'C'],
-        [4, 'D'],
-        [1, 'E'],
-    ]
-
-    input_df = pd.DataFrame(data=data, columns=input_cols)
-
-    # Call calc_lower_n function
-    actual_result = calw.calc_lower_n(input_df)
-
-    # Defined expected result
-    expected_result = 3
-
-    assert actual_result == expected_result
-
-
-def test_calc_lower_n_nan_col():
-    """Test for calc_lower_n with nan in reference."""
-
-    input_cols = [
-        "reference",
-        "709",
-    ]
-
-    data = [
-        [1, 'A'],
-        [2, 'B'],
-        [2, np.nan],
         [4, 'D'],
         [1, 'E'],
     ]
@@ -145,7 +90,7 @@ def test_calculate_weighting_factor_missing_col():
 
     input_df = pd.DataFrame(data=data, columns=input_cols)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"The column essential 'outlier' is missing"):
         calw.calculate_weighting_factor(input_df, None, "709")
 
 
@@ -234,9 +179,9 @@ def test_calculate_weighting_factor_filter():
     assert_frame_equal(result_qa_df, expected_qa_df, check_exact=False, rtol=0.01)
 
 
-def test_calculate_weighting_factor_709_with_missing():
+def test_calculate_weighting_factor_709_no_missing():
     """Test for calculate_weighting_factor for 709 numeric
-    with missing value"""
+    with no missing value"""
 
     input_cols = [
         "reference",
@@ -284,9 +229,9 @@ def test_calculate_weighting_factor_709_with_missing():
     assert_series_equal(result_df["709"], expected_df["709"], check_dtype=True)
 
 
-def test_calculate_weighting_factor_709_no_missing():
+def test_calculate_weighting_factor_709_with_missing():
     """Test for calculate_weighting_factor for 709 numeric
-    without missing value"""
+    with missing value"""
 
     input_cols = [
         "reference",

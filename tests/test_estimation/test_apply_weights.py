@@ -140,4 +140,4 @@ def test_apply_weights():
     input_columns.remove("reference"); input_columns.remove("a_weight")
 
     assert_frame_equal(result_df, exp_output_df, check_like=True, check_exact=False, rtol=0.05)
-    assert cols_list.sort() == input_columns.sort()
+    assert sorted(cols_list) == sorted(input_columns), "input column list and returned column list are not equal"
