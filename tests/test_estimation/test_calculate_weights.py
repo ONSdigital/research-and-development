@@ -14,6 +14,27 @@ from pandas._testing import assert_frame_equal, assert_series_equal
 # testing calc_lower_n where nan in reference
 
 
+def test_calc_lower_n():
+    """Test for calc_lower_n with duplicate refs."""
+    input_cols = [
+        "reference",
+        "709",
+    ]
+    data = [
+        [1, 'A'],
+        [2, 'B'],
+        [2, 'C'],
+        [4, 'D'],
+        [1, 'E'],
+    ]
+    input_df = pd.DataFrame(data=data, columns=input_cols)
+    # Call calc_lower_n function
+    actual_result = calw.calc_lower_n(input_df)
+    # Defined expected result
+    expected_result = 3
+    assert actual_result == expected_result
+
+
 @pytest.mark.parametrize(
     "cols, msg, exp_col",
     [
