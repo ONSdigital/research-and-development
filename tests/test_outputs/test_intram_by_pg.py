@@ -105,21 +105,21 @@ class TestOutputIntramByPG(object):
         return input_df
 
     
-    def test_output_intram_by_pg_raises(self, tmp_path_factory):
+    def test_output_intram_by_pg_raises(self, tmp_path):
         """Defensive tests for output_intram_by_pg."""
-        self.setup_tmp_dir(tmp_path_factory)
+        self.setup_tmp_dir(pathlib.Path(tmp_path))
 
 
     def test_output_intram_by_pg_gb(self, 
-                                    tmp_path_factory,
+                                    tmp_path,
                                     input_data_gb):
         """Tests for output_intram_by_pg without NI data."""
-        self.setup_tmp_dir(tmp_path_factory)
+        self.setup_tmp_dir(pathlib.Path(tmp_path))
 
 
     def test_output_intram_by_pg_uk(self, 
-                                    tmp_path_factory,
+                                    tmp_path,
                                     input_data_gb,
                                     input_data_ni):
         """Tests for output_intram_by_pg with NI data."""
-        self.setup_tmp_dir(tmp_path_factory)
+        self.setup_tmp_dir(pathlib.Path(tmp_path))
