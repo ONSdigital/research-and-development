@@ -6,7 +6,7 @@ from pandas._testing import assert_frame_equal
 
 
 class TestApplyWeights():
-    """Test for apply_weights"""
+    """Test for apply_weights()"""
     # Tests that estimation cols are created, correctly calculated and rounded
     # Includes a np.nan and 0
     # Tests the cols_list output is correct
@@ -14,6 +14,7 @@ class TestApplyWeights():
 
     # Create config dictionary
     def create_config_dict(self):
+        """Creates config dictionary for test"""
         config = {"estimation": {"numeric_cols": ["701", "702", "703"]},
                   "breakdowns": {"211": ["202", "203", "204"],
                                  "305": ["302", "303", "304"],
@@ -25,6 +26,7 @@ class TestApplyWeights():
 
     # Create an input dataframe for the test
     def create_input_df(self):
+        """Creates input df for test"""
         input_columns = [
             "reference",
             "701",
@@ -72,6 +74,7 @@ class TestApplyWeights():
 
     # Create an expected dataframe for the test
     def create_expected_output(self):
+        """Creates expected output df for test"""
         exp_output_columns = [
             "reference",
             "701",
@@ -142,6 +145,7 @@ class TestApplyWeights():
         return exp_output_df
 
     def test_apply_weights(self):
+        """Test for apply_weights()"""
 
         config = self.create_config_dict()
         input_df, input_columns = self.create_input_df()
