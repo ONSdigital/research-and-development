@@ -32,7 +32,7 @@ def test_calc_lower_n():
     actual_result = calw.calc_lower_n(input_df)
     # Defined expected result
     expected_result = 3
-    assert actual_result == expected_result
+    assert actual_result == expected_result, ("calc_lower_n not behaving as expected")
 
 
 @pytest.mark.parametrize(
@@ -55,7 +55,7 @@ def test_calc_lower_n_missing_col(cols, msg, exp_col):
 
     with pytest.raises(ValueError) as error_msg:
         calw.calc_lower_n(input_df, exp_col)
-    assert str(error_msg.value) == msg
+    assert str(error_msg.value) == msg, ("calc_lower_n not behaving as expected")
 
 
 def test_calc_lower_n_nan_ref():
@@ -82,7 +82,7 @@ def test_calc_lower_n_nan_ref():
     # Defined expected result
     expected_result = 3
 
-    assert actual_result == expected_result
+    assert actual_result == expected_result, ("calc_lower_n not behaving as expected")
 
 
 # Five tests for calculate_weighting_factor:
