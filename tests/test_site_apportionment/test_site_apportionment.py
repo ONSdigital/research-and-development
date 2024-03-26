@@ -644,13 +644,15 @@ class TestWeightValues(object):
     @pytest.fixture(scope="function")
     def weight_values_test_df(self):
         """Test data for weight_values."""
-        frame = {
-            "reference": [0, 1, 2, 3, 4],
-            "val_col_1": [10, 14, 16, 18, 6],# test using ints rather than float
-            "val_col_2": [3.5, 4.5, 10, np.nan, 0],# test np.nan+0+floats
-            "weight_col": [1.5, 1.5, 1.0, 2.0, 3.0]
-                }
-        return pandasDF(frame)
+        columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
+        data = [
+            [ 0 , 10 ,  3.5,  1.5],
+            [ 1 , 14 ,  4.5,  1.5],
+            [ 2 , 16 , 10 ,  1. ],
+            [ 3 , 18. ,  np.nan,  2. ],
+            [ 4 ,  6 ,  0 ,  3. ]
+            ]
+        return pandasDF(data=data, columns=columns)
     
     @pytest.fixture(autouse=True)
     def set_attrs(self):
@@ -689,16 +691,16 @@ class TestCreateCategoryDf(object):
         
         # data includes:
 
-        data = [[49900000404, 0.0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
-                [49900000404, 1.0, 202212, 'R', 'AA', 'C', 29.0, np.nan, 100.0, 243600.0379],
-                [49900000404, 2.0, 202212, 'R', 'AA', 'D', 29.0, np.nan, 100.0, 0.0],
-                [49900000408, 0.0, 202212, 'R', 'I', np.nan, 32.0, np.nan, 100.0, np.nan], # group code nan (dropped)
-                [49900000408, 1.0, 202212, 'R', 'AA', 'C', 33.0, np.nan, 100.0, 0.0],
-                [49900000407, 2.0, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0], # bad imp marker
-                [49900000576, 1.0, 202212, 'TMI', 'AA', 'C', np.nan, np.nan, np.nan, 0.0],
-                [49900000960, 0.0, 202212, 'R', 'AA', np.nan, 1.0, np.nan, np.nan, np.nan],
-                [49900000960, 1.0, 202212, 'R', 'AA', 'C', 23.0, np.nan, np.nan, np.nan],
-                [49900001029, 1.0, 202212, 'TMI', 'I', 'C', 5.0, np.nan, np.nan, 833.3333]]
+        data = [[49900000404, 0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
+                [49900000404, 1, 202212, 'R', 'AA', 'C', 29, np.nan, 100.0, 243600.0379],
+                [49900000404, 2, 202212, 'R', 'AA', 'D', 29, np.nan, 100.0, 0.0],
+                [49900000408, 0, 202212, 'R', 'I', np.nan, 32, np.nan, 100.0, np.nan], # group code nan (dropped)
+                [49900000408, 1, 202212, 'R', 'AA', 'C', 33, np.nan, 100.0, 0.0],
+                [49900000407, 2, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0], # bad imp marker
+                [49900000576, 1, 202212, 'TMI', 'AA', 'C', np.nan, np.nan, np.nan, 0.0],
+                [49900000960, 0, 202212, 'R', 'AA', np.nan, 1, np.nan, np.nan, np.nan],
+                [49900000960, 1, 202212, 'R', 'AA', 'C', 23, np.nan, np.nan, np.nan],
+                [49900001029, 1, 202212, 'TMI', 'I', 'C', 5, np.nan, np.nan, 833.3333]]
         
         return pd.DataFrame(data=data, columns=columns)
 
