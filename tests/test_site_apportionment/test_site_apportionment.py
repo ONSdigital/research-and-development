@@ -1,10 +1,12 @@
-import pandas as pd
-import numpy as np
+# Standard Library Imports
 import logging
 import pytest
-from pandas import DataFrame as pandasDF
-from pandas._testing import assert_frame_equal, assert_series_equal
 
+# Third Part Imports
+import pandas as pd
+import numpy as np
+
+# Local Imports
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     set_percentages,
@@ -12,8 +14,17 @@ from src.site_apportionment.site_apportionment import (
     deduplicate_codes_values,
     calc_weights_for_sites,
     create_cartesian_product,
-    sort_rows_order_cols
+    sort_rows_order_cols,
+    create_sites_df,
+    count_duplicate_sites,
+    weight_values,
+    create_category_df
 )
+
+# Define easier pandas usages
+pandasDF = pd.DataFrame
+assert_frame_equal = pd._testing.assert_frame_equal
+assert_series_equal = pd._testing.assert_series_equal
 
 @pytest.fixture
 def create_exp_percent_test_output_df():
@@ -634,3 +645,210 @@ class TestSortRowsOrderCols():
 
         with pytest.raises(KeyError):
             sort_rows_order_cols(input_df, cols_in_order)
+
+
+@pytest.fixture(scope="function")
+def sites_df_input():
+    """
+    Input df for create_sites_df tests.
+    
+    This input data consists of:
+    1. Columns that will be dropped
+    2. NaN's in used columns (601, 602)
+    3. Combinations of Postcodes/Periods/References to create multiple groups
+    """
+    input_cols = [
+        "reference",
+        "instance",
+        "601",
+        "602",
+        "601_count",
+        "status",
+        "imp_marker",
+        "postcodes_harmonised",
+        "period"
+    ]
+    input_data = [
+        [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 3, "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
+        [1, 4, "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
+        [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [2, 2,  "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [3, 1, np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
+    ]
+    input_df = pandasDF(data=input_data, columns=input_cols)
+
+    return input_df
+
+
+class TestCreateSitesDf(object):
+    """Tests for create_sites_df."""
+    
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes that are passed as parameters."""
+        self.groupby_cols = ["reference", "period"]
+        self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
+
+    def test_create_sites_df_on_pass(self, sites_df_input):
+        """General tests for create_sites_df."""
+        output = create_sites_df(
+            sites_df_input, 
+            self.groupby_cols,
+            self.site_cols)
+        # assert the resultant dataframe is as expected
+        exp_columns = ["reference",
+                        "period",
+                        "601",
+                        "postcodes_harmonised",
+                        "instance",
+                        "602",]
+        exp_data = [
+            [1, '202101', 'RH12 1XL', 'RH12 1XL', 1, 225.0],
+            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 4, 100.0],
+            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 1, 50.0],
+            ]
+        expected = pandasDF(data=exp_data, columns=exp_columns)
+        assert output.equals(expected), (
+            "create_sites_df not behaving as expected."
+        )
+
+
+class TestCountDuplicateSites(object):
+    """Tests for count_duplicate_sites."""
+    def test_count_duplicate_sites_on_pass(self, caplog, sites_df_input):
+        """General tests for count_duplicate_sites."""
+        # set log level
+        caplog.set_level(logging.INFO)
+        count_duplicate_sites(sites_df_input)
+        # parse logs and assert
+        log_records = [record.msg for record in caplog.records]
+        expected_log_message = "There are 5 duplicate sites."
+        assert log_records[0] == expected_log_message, (
+            "Duplicate sites not added to logger at level INFO."
+        )
+class TestWeightValues(object):
+    """Tests for weight_values."""
+    
+    @pytest.fixture(scope="function")
+    def weight_values_test_df(self):
+        """Test data for weight_values."""
+        columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
+        data = [
+            [ 0 , 10 ,  3.5,  1.5],
+            [ 1 , 14 ,  4.5,  1.5],
+            [ 2 , 16 , 10 ,  1. ],
+            [ 3 , 18. ,  np.nan,  2. ],
+            [ 4 ,  6 ,  0 ,  3. ]
+            ]
+        return pandasDF(data=data, columns=columns)
+    
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes to pass to function."""
+        self.value_cols = ["val_col_1", "val_col_2"]
+        self.weight_col = "weight_col"
+
+    def test_weight_values_on_pass(self, weight_values_test_df):
+        """General tests for weight_values."""
+        output = weight_values(weight_values_test_df,
+                                self.value_cols, 
+                                self.weight_col)
+
+        columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
+
+        data = [
+            [0, 15.0, 5.25, 1.5],
+            [1, 21.0, 6.75, 1.5],
+            [2, 16.0, 10.0, 1.0],
+            [3, 36.0, np.nan, 2.0],
+            [4, 18.0, 0.0, 3.0],
+               ]
+        exp_out = pandasDF(data=data, columns=columns)
+        assert output.equals(exp_out), "weight_values not acting as expected."
+        
+
+class TestCreateCategoryDf(object):
+    """Tests for create_category_df."""
+
+    @pytest.fixture(scope="function")
+    def category_df_input(self):
+        """Test data for create_category_df."""
+        columns = ['reference', 'instance', 'period', 'imp_marker', '201', 
+                   '200', 'pg_numeric', '601', '602', '210']
+        
+        # data includes:
+
+        data = [[49900000404, 0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
+                [49900000404, 1, 202212, 'R', 'AA', 'C', 29, np.nan, 100.0, 243600.0379],
+                [49900000404, 2, 202212, 'R', 'AA', 'D', 29, np.nan, 100.0, 0.0],
+                [49900000408, 0, 202212, 'R', 'I', np.nan, 32, np.nan, 100.0, np.nan], # group code nan (dropped)
+                [49900000408, 1, 202212, 'R', 'AA', 'C', 33, np.nan, 100.0, 0.0],
+                [49900000407, 2, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0], # bad imp marker
+                [49900000576, 1, 202212, 'TMI', 'AA', 'C', np.nan, np.nan, np.nan, 0.0],
+                [49900000960, 0, 202212, 'R', 'AA', np.nan, 1, np.nan, np.nan, np.nan],
+                [49900000960, 1, 202212, 'R', 'AA', 'C', 23, np.nan, np.nan, np.nan],
+                [49900001029, 1, 202212, 'TMI', 'I', 'C', 5, np.nan, np.nan, 833.3333]]
+        
+        return pd.DataFrame(data=data, columns=columns)
+
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes to pass to functions for testing."""
+        self.imp_markers_to_keep = ["R", "TMI", "CF", "MoR", "constructed"]
+        self.groupby_cols = ["reference", "period"]
+        self.code_cols = ["201", "200", "pg_numeric"]
+        # excluding postcode_harmonised as it is irrelevant to this test
+        self.site_cols = ["instance", "601", "602"]
+        self.value_cols = ["210"]
+
+    
+    def test_create_category_df_on_pass(self, category_df_input):
+        """General tests for create_category_df."""
+        output = create_category_df(category_df_input,
+                                    self.imp_markers_to_keep,
+                                    category_df_input.columns,
+                                    self.groupby_cols,
+                                    self.code_cols,
+                                    self.site_cols,
+                                    self.value_cols)
+        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
+                        "210", "imp_marker"]
+        exp_data = [
+            [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
+            [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
+            [49900000408, 202212, "AA", "C", 33.0, 0.0000, "R"],
+            [49900000960, 202212, "AA", "C", 23.0, 0.0000, "R"],
+            [49900001029, 202212, "I", "C", 5.0, 833.3333, "TMI"]
+                        ]
+        expected = pandasDF(data=exp_data, columns=exp_cols)
+        assert output.equals(expected), (
+            "create_category_df not acting as expected"
+            )
+  
+        
+    def test_create_category_df_drops_duplicates(self, category_df_input):
+        """Test that create_category_df de-duplicates."""
+        # reduce input data to the first four rows
+        category_df_input = category_df_input.loc[:3]
+        # add duplicate row and pass to create_category_df
+        output = create_category_df(category_df_input.append(category_df_input.iloc[0]),
+                                    self.imp_markers_to_keep,
+                                    category_df_input.columns,
+                                    self.groupby_cols,
+                                    self.code_cols,
+                                    self.site_cols,
+                                    self.value_cols)
+        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
+                        "210", "imp_marker"]
+        exp_data = [
+            [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
+            [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
+                        ]
+        expected = pandasDF(data=exp_data, columns=exp_cols)
+        assert output.equals(expected), (
+            "Duplicates not dropped by create_category_df."
+        )
+
+        
