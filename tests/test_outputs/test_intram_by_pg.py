@@ -40,7 +40,7 @@ else:
 class TestOutputIntramByPG(object):
     """Tests for output_intram_bt_pg."""
     
-    def setup_tmp_dir(self, path: pathlib.Path) -> None:
+    def setup_tmp_dir(self, path: pathlib.Path) -> pathlib.Path:
         """Set up the output directory given a temp path."""
         # create output dirs
         output_parent = os.path.join(path, "outputs")
@@ -48,11 +48,12 @@ class TestOutputIntramByPG(object):
         os.makedirs(output_child)
         # update config
         PATHS["output_path"] = output_parent
-        return None
+        return pathlib.Path(output_child)
 
 
     @pytest.fixture(scope="function")
     def pg_detailed_df(self) -> pd.DataFrame:
+        """A fixture containing the detailed product group mapper."""
         pg_detailed_mapper = load_valdiate_mapper(
             "pg_detailed_mapper_path",
             PATHS,
@@ -105,21 +106,104 @@ class TestOutputIntramByPG(object):
         return input_df
 
     
-    def test_output_intram_by_pg_raises(self, tmp_path):
+    def exp_out_gb():
+        """The expected output of output_intram_by_pg (no NI data)."""
+        columns = [
+            'Detailed product groups (Alphabetical product groups A-AH)',
+            '2023 (Current period)',
+            'Notes'
+            ]
+        data = [
+            ['Total', 31826985.822200004, 'Total q211 across all PG'],
+            ['Food products and beverages; Tobacco products', 282622.6444,
+                'Total q211 for PG C'],
+            ['Textiles, clothing and leather products', 79911.0, 'Total q211 for PG D'],
+            ['Rubber and plastic products', 489056.3334, 'Total q211 for PG I'],
+            ['Construction', 90163.1053, 'Total q211 for PG Z'],
+            ['Wholesale and retail trade', 4628363.6364, 'Total q211 for PG AA'],
+            ['Miscellaneous business activities; Technical testing and analysis',
+                2196.1027, 'Total q211 for PG AD'],
+            ['Software Development', 26254673.0, 'Total q211 for PG AH']
+        ]
+        return pd.DataFrame(data=data, columns=columns)
+    
+
+    def exp_out_uk():
+        """The expected output of output_intram_by_pg (NI data)."""
+        columns = [
+            'Detailed product groups (Alphabetical product groups A-AH)',
+            '2023 (Current period)',
+            'Notes'
+            ]
+        data = [
+            ['Total', 31828339.822200004, 'Total q211 across all PG'],
+            ['Food products and beverages; Tobacco products', 282649.6444,
+                'Total q211 for PG C'],
+            ['Textiles, clothing and leather products' ,79929.0, 'Total q211 for PG D'],
+            ['Pulp, paper and paper products; Printing; Wood and straw products',
+                41.0, 'Total q211 for PG E'],
+            ['Chemicals and chemical products', 102.0 ,'Total q211 for PG G'],
+            ['Rubber and plastic products', 489684.3334 ,'Total q211 for PG I'],
+            ['Other non-metallic mineral products', 138.0, 'Total q211 for PG J'],
+            ['Construction', 90163.1053, 'Total q211 for PG Z'],
+            ['Wholesale and retail trade', 4628620.6364, 'Total q211 for PG AA'],
+            ['Miscellaneous business activities; Technical testing and analysis',
+                2339.1027, 'Total q211 for PG AD'],
+            ['Software Development', 26254673.0, 'Total q211 for PG AH']
+        ]
+        return pd.DataFrame(data=data, columns=columns)
+
+
+    def test_output_intram_by_pg_raises(self,
+                                        tmp_path,
+                                        input_data_gb,
+                                        pg_detailed_df):
         """Defensive tests for output_intram_by_pg."""
         self.setup_tmp_dir(pathlib.Path(tmp_path))
+        # checks NI dataset is a dataframe
+        error_msg = ".*ni_df.* expected type pd.DataFrame. Got .*int.*"
+        with pytest.raises(TypeError, match=error_msg):
+            output_intram_by_pg(
+                gb_df=input_data_gb,
+                pg_detailed=pg_detailed_df,
+                config=config,
+                write_csv=write_csv,
+                run_id=1,
+                ni_df=1
+                )
+            
 
-
-    def test_output_intram_by_pg_gb(self, 
-                                    tmp_path,
-                                    input_data_gb):
-        """Tests for output_intram_by_pg without NI data."""
-        self.setup_tmp_dir(pathlib.Path(tmp_path))
-
-
-    def test_output_intram_by_pg_uk(self, 
-                                    tmp_path,
-                                    input_data_gb,
-                                    input_data_ni):
-        """Tests for output_intram_by_pg with NI data."""
-        self.setup_tmp_dir(pathlib.Path(tmp_path))
+    @pytest.mark.parametrize(
+            "ni, exp_out",
+            (
+                [False, exp_out_gb()],
+                [True, exp_out_uk()]
+            )
+            )
+    def test_output_intram_by_pg(self, 
+                                ni,
+                                exp_out,
+                                tmp_path,
+                                input_data_gb,
+                                input_data_ni,
+                                pg_detailed_df):
+        """Tests for output_intram_by_pg."""
+        pth = self.setup_tmp_dir(pathlib.Path(tmp_path))
+        if not ni:
+            input_data_ni = None
+        output_intram_by_pg(
+                gb_df=input_data_gb,
+                pg_detailed=pg_detailed_df,
+                config=config,
+                write_csv=write_csv,
+                run_id=1,
+                ni_df=input_data_ni
+                )
+        # assert output saved
+        found_paths = os.listdir(pth)
+        assert len(found_paths) > 0, "Outputs not saved."
+        output = pd.read_csv(os.path.join(pth, found_paths[0]))
+        # refine df
+        output = output[output["2023 (Current period)"] > 0].reset_index(drop=True)
+        # assert output is correct
+        assert output.equals(exp_out), "Output not as expected."

@@ -45,7 +45,7 @@ def output_intram_by_pg(
         # defence
         if not isinstance(ni_df, pd.DataFrame):
             raise TypeError(
-                f"'ni_df' expected type pd.Dataframe. Got {type(ni_df)}"
+                f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
                 )
         # work out cols to select
         cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
