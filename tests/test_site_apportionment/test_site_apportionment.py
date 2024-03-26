@@ -12,7 +12,8 @@ from src.site_apportionment.site_apportionment import (
     deduplicate_codes_values,
     calc_weights_for_sites,
     create_cartesian_product,
-    sort_rows_order_cols
+    sort_rows_order_cols,
+    count_unique_postcodes_in_col
 )
 
 @pytest.fixture
@@ -634,3 +635,51 @@ class TestSortRowsOrderCols():
 
         with pytest.raises(KeyError):
             sort_rows_order_cols(input_df, cols_in_order)
+
+
+class TestCountUniquePostcodesInCol(object):
+    """Tesst for count_unique_postcodes_in_col."""
+
+    @pytest.fixture(scope="function")
+    def count_postcode_input_df(self):
+        """Input data for tests for count_unique_postcodes_in_col."""
+        data = [
+        [3990000000, 202212, "AB1 2CD", 60, 56631, 8855030],
+        [3990000000, 202212, "AB1 4FD", 20, 56631, 8855030],
+        [3990000000, 202212, np.nan, 20, 2422, 5949501], # test nan
+        [3990000006, 202212, "B23 2CD", 100, 2437, 5949508],
+        [3990000006, 202212, "B23 2CD", 100, 2437, 5949508], #duplicate row
+        [3990000126, 202212, "IJ5 6KL", 60, 27566, 5808144],
+        [3990000126, 202212, "", 10, 27566, 5808144], # test empty string
+        [3990000126, 202212, "UV1 2WX", 15, 70784, 7056067],# dup ref, period, 601
+        [3990000126, 202212, "UV1 2WX", 15, 10123, 7034606],
+        [3990000106, 202212, "NP1 3TY", 50, 10123, 7034606],
+        [3990000106, 202212, "BD3 2EX", 50, 10123, 7034606], # no issues (3 PCs)
+    ]
+        columns = ["reference", "period", "601", "602", "headcount_dummy", "211_dummy"]
+        return pandasDF(data=data, columns=columns)
+
+    def test_count_unique_unique_postcodes_in_col(self, count_postcode_input_df):
+        """General tests for count_postcode_input_df."""
+        exp_columns = ["reference", "period", "601", "602", "headcount_dummy", 
+                       "211_dummy", "601_count"]
+        exp_data = [
+        [3990000000, 202212, "AB1 2CD", 60, 56631, 8855030, 2],
+        [3990000000, 202212, "AB1 4FD", 20, 56631, 8855030, 2],
+        [3990000000, 202212, np.nan, 20, 2422, 5949501, 2], # test nan
+        [3990000006, 202212, "B23 2CD", 100, 2437, 5949508, 1],
+        [3990000006, 202212, "B23 2CD", 100, 2437, 5949508, 1], #duplicate row
+        [3990000126, 202212, "IJ5 6KL", 60, 27566, 5808144, 2],
+        [3990000126, 202212, "", 10, 27566, 5808144, 2], # test empty string
+        [3990000126, 202212, "UV1 2WX", 15, 70784, 7056067, 2],
+        [3990000126, 202212, "UV1 2WX", 15, 10123, 7034606, 2],
+        [3990000106, 202212, "NP1 3TY", 50, 10123, 7034606, 2],
+        [3990000106, 202212, "BD3 2EX", 50, 10123, 7034606, 2],
+    ]
+        exp_out = pandasDF(data=exp_data, columns=exp_columns)
+        output = count_unique_postcodes_in_col(count_postcode_input_df)
+        assert exp_out.equals(output), (
+            "count_unique_postcodes_in_col not behaving aas expected"
+            )
+        
+
