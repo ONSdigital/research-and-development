@@ -1,10 +1,12 @@
-import pandas as pd
-import numpy as np
+# Standard Library Imports
 import logging
 import pytest
-from pandas import DataFrame as pandasDF
-from pandas._testing import assert_frame_equal, assert_series_equal
 
+# Third Part Imports
+import pandas as pd
+import numpy as np
+
+# Local Imports
 from src.site_apportionment.site_apportionment import (
     create_notnull_mask,
     set_percentages,
@@ -13,9 +15,16 @@ from src.site_apportionment.site_apportionment import (
     calc_weights_for_sites,
     create_cartesian_product,
     sort_rows_order_cols,
+    create_sites_df,
+    count_duplicate_sites,
     weight_values,
     create_category_df
 )
+
+# Define easier pandas usages
+pandasDF = pd.DataFrame
+assert_frame_equal = pd._testing.assert_frame_equal
+assert_series_equal = pd._testing.assert_series_equal
 
 @pytest.fixture
 def create_exp_percent_test_output_df():
@@ -638,6 +647,87 @@ class TestSortRowsOrderCols():
             sort_rows_order_cols(input_df, cols_in_order)
 
 
+@pytest.fixture(scope="function")
+def sites_df_input():
+    """
+    Input df for create_sites_df tests.
+    
+    This input data consists of:
+    1. Columns that will be dropped
+    2. NaN's in used columns (601, 602)
+    3. Combinations of Postcodes/Periods/References to create multiple groups
+    """
+    input_cols = [
+        "reference",
+        "instance",
+        "601",
+        "602",
+        "601_count",
+        "status",
+        "imp_marker",
+        "postcodes_harmonised",
+        "period"
+    ]
+    input_data = [
+        [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 3, "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
+        [1, 4, "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
+        [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [2, 2,  "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [3, 1, np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
+    ]
+    input_df = pandasDF(data=input_data, columns=input_cols)
+
+    return input_df
+
+
+class TestCreateSitesDf(object):
+    """Tests for create_sites_df."""
+    
+    @pytest.fixture(autouse=True)
+    def set_attrs(self):
+        """Set class attributes that are passed as parameters."""
+        self.groupby_cols = ["reference", "period"]
+        self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
+
+    def test_create_sites_df_on_pass(self, sites_df_input):
+        """General tests for create_sites_df."""
+        output = create_sites_df(
+            sites_df_input, 
+            self.groupby_cols,
+            self.site_cols)
+        # assert the resultant dataframe is as expected
+        exp_columns = ["reference",
+                        "period",
+                        "601",
+                        "postcodes_harmonised",
+                        "instance",
+                        "602",]
+        exp_data = [
+            [1, '202101', 'RH12 1XL', 'RH12 1XL', 1, 225.0],
+            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 4, 100.0],
+            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 1, 50.0],
+            ]
+        expected = pandasDF(data=exp_data, columns=exp_columns)
+        assert output.equals(expected), (
+            "create_sites_df not behaving as expected."
+        )
+
+
+class TestCountDuplicateSites(object):
+    """Tests for count_duplicate_sites."""
+    def test_count_duplicate_sites_on_pass(self, caplog, sites_df_input):
+        """General tests for count_duplicate_sites."""
+        # set log level
+        caplog.set_level(logging.INFO)
+        count_duplicate_sites(sites_df_input)
+        # parse logs and assert
+        log_records = [record.msg for record in caplog.records]
+        expected_log_message = "There are 5 duplicate sites."
+        assert log_records[0] == expected_log_message, (
+            "Duplicate sites not added to logger at level INFO."
+        )
 class TestWeightValues(object):
     """Tests for weight_values."""
     
@@ -676,7 +766,6 @@ class TestWeightValues(object):
             [4, 18.0, 0.0, 3.0],
                ]
         exp_out = pandasDF(data=data, columns=columns)
-        print(output)
         assert output.equals(exp_out), "weight_values not acting as expected."
         
 
