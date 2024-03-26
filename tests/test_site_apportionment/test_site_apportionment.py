@@ -660,7 +660,6 @@ def sites_df_input():
     input_cols = [
         "reference",
         "instance",
-        "formtype",
         "601",
         "602",
         "601_count",
@@ -670,13 +669,13 @@ def sites_df_input():
         "period"
     ]
     input_data = [
-        [1, 0, "0006", "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-        [1, 1, "0006", "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-        [1, 2, "0006", "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
-        [1, 3, "0006", "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
-        [2, 0, "0001", "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [2, 1, "0001", "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
+        [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
+        [1, 3, "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
+        [1, 4, "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
+        [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [2, 2,  "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [3, 1, np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
     ]
     input_df = pandasDF(data=input_data, columns=input_cols)
 
@@ -706,9 +705,9 @@ class TestCreateSitesDf(object):
                         "instance",
                         "602",]
         exp_data = [
-            [1, '202101', 'RH12 1XL', 'RH12 1XL', 0, 225.0],
-            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 3, 100.0],
-            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 0, 50.0],
+            [1, '202101', 'RH12 1XL', 'RH12 1XL', 1, 225.0],
+            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 4, 100.0],
+            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 1, 50.0],
             ]
         expected = pandasDF(data=exp_data, columns=exp_columns)
         assert output.equals(expected), (
@@ -767,7 +766,6 @@ class TestWeightValues(object):
             [4, 18.0, 0.0, 3.0],
                ]
         exp_out = pandasDF(data=data, columns=columns)
-        print(output)
         assert output.equals(exp_out), "weight_values not acting as expected."
         
 
