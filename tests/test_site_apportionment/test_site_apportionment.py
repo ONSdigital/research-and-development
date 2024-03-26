@@ -651,8 +651,8 @@ class TestCountUniquePostcodesInCol(object):
         [3990000006, 202212, "B23 2CD", 2437, 5949508], #duplicate row
         [3990000126, 202212, "IJ5 6KL", 27566, 5808144],
         [3990000126, 202212, "", 27566, 5808144], # test empty string
-        [3990000126, 202212, "UV1 2WX", 70784, 7056067],
-        [3990000106, 202212, "UV1 2WX", 10123, 7034606],
+        [3990000126, 202212, "UV1 2WX", 70784, 7056067],# dup ref, period, 601
+        [3990000126, 202212, "UV1 2WX", 10123, 7034606],
         [3990000106, 202212, "NP1 3TY", 10123, 7034606],
         [3990000106, 202212, "BD3 2EX", 10123, 7034606], # no issues (3 PCs)
     ]
@@ -672,12 +672,13 @@ class TestCountUniquePostcodesInCol(object):
         [3990000126, 202212, "IJ5 6KL", 27566, 5808144, 2],
         [3990000126, 202212, "", 27566, 5808144, 2], # test empty string
         [3990000126, 202212, "UV1 2WX", 70784, 7056067, 2],
-        [3990000106, 202212, "UV1 2WX", 10123, 7034606, 3],
-        [3990000106, 202212, "NP1 3TY", 10123, 7034606, 3],
-        [3990000106, 202212, "BD3 2EX", 10123, 7034606, 3],
+        [3990000126, 202212, "UV1 2WX", 10123, 7034606, 2],
+        [3990000106, 202212, "NP1 3TY", 10123, 7034606, 2],
+        [3990000106, 202212, "BD3 2EX", 10123, 7034606, 2],
     ]
         exp_out = pandasDF(data=exp_data, columns=exp_columns)
         output = count_unique_postcodes_in_col(count_postcode_input_df)
+        print(output)
         assert exp_out.equals(output), (
             "count_unique_postcodes_in_col not behaving aas expected"
             )
