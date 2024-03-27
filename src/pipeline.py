@@ -91,7 +91,7 @@ def run_pipeline(start, config_path):
 
     (
         full_responses,
-        secondary_full_responses,  #  may be needed later for freezing
+        secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
         ultfoc_mapper,
         itl_mapper,
@@ -180,7 +180,6 @@ def run_pipeline(start, config_path):
     # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
-    # Run short frozen form output
     run_outputs(
         estimated_responses_df,
         weighted_responses_df,
