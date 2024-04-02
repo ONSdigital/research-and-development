@@ -11,8 +11,6 @@ import pandas as pd
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.utils.helpers import Config_settings
-from src.staging.validation import validate_data_with_schema
-from src.staging.staging_helpers import load_valdiate_mapper
 
 # read config file
 config_path = os.path.join("src", "developer_config.yaml")
@@ -27,14 +25,10 @@ PATHS = config[f"{LOCATION}_paths"]
 TestLogger = logging.getLogger(__name__)
 
 # import the correct write_csv (assumption config is correct)
-if LOCATION == "network":
+if LOCATION.lower() == "network":
     from src.utils.local_file_mods import write_local_csv as write_csv
-    from src.utils.local_file_mods import local_file_exists as check_file_exists
-    from src.utils.local_file_mods import read_local_csv as read_csv
 else:
     from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-    from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
-    from src.utils.hdfs_mods import read_hdfs_csv as read_csv
 
 
 class TestOutputIntramByPG(object):
@@ -49,21 +43,6 @@ class TestOutputIntramByPG(object):
         # update config
         PATHS["output_path"] = output_parent
         return pathlib.Path(output_child)
-
-
-    @pytest.fixture(scope="function")
-    def pg_detailed_df(self) -> pd.DataFrame:
-        """A fixture containing the detailed product group mapper."""
-        pg_detailed_mapper = load_valdiate_mapper(
-            "pg_detailed_mapper_path",
-            PATHS,
-            check_file_exists,
-            read_csv,
-            TestLogger,
-            validate_data_with_schema,
-            None,
-        )
-        return pg_detailed_mapper
 
 
     @pytest.fixture(scope="function")
@@ -105,7 +84,31 @@ class TestOutputIntramByPG(object):
         input_df = pd.DataFrame(data=data, columns=columns)
         return input_df
 
-    
+
+    @pytest.fixture(scope="session")
+    def pg_detailed_df(self) -> pd.DataFrame:
+        """pg_detailed mapper, including a subset of PGs"""
+        columns = ['ranking', 'pg_alpha', 'Detailed product groups (Alphabetical product groups A-AH)', 'Notes']
+        data = [
+            [1, 'total', 'Total', 'Total q211 across all PG'],
+            [4, 'C', 'Food products and beverages; Tobacco products',
+                'Total q211 for PG C'],
+            [5, 'D', 'Textiles, clothing and leather products', 'Total q211 for PG D'],
+            [6, 'E', 'Pulp, paper and paper products; Printing; Wood and straw products',
+                'Total q211 for PG E'],
+            [8, 'G', 'Chemicals and chemical products', 'Total q211 for PG G'],
+            [10, 'I', 'Rubber and plastic products', 'Total q211 for PG I'],
+            [11, 'J', 'Other non-metallic mineral products', 'Total q211 for PG J'],
+            [27, 'Z', 'Construction', 'Total q211 for PG Z'],
+            [28, 'AA', 'Wholesale and retail trade', 'Total q211 for PG AA'],
+            [31, 'AD', 'Miscellaneous business activities; Technical testing and analysis', 
+                'Total q211 for PG AD'],
+            [35, 'AH', 'Software Development', 'Total q211 for PG AH']
+        ]
+        mapper = pd.DataFrame(data=data, columns=columns)
+        return mapper
+
+
     def exp_out_gb():
         """The expected output of output_intram_by_pg (no NI data)."""
         columns = [
