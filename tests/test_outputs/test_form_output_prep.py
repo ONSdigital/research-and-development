@@ -22,7 +22,7 @@ class TestFormOutputPrep(object):
             "reference", 
             "instance", 
             "period",
-            "201"
+            "201",
             "202",
             "211",
             "602", 
@@ -32,19 +32,19 @@ class TestFormOutputPrep(object):
             "pg_numeric"
         ]
         data = [
-            [49900000404, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'Yes',
+            [39900000404, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'Yes',
                 6.727272727272728, 6, 40],
-            [49900000404, 1, 202212, 'AA', 3146383.9595, 4628363.6364, 100.0,
+            [39900000404, 1, 202212, 'AA', 3146383.9595, 4628363.6364, 100.0,
                 'Yes', 6.727272727272728, 6, 40],
-            [49900000404, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'Yes',
+            [39900000404, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'Yes',
                 6.727272727272728, 6, 40],
-            [49900000408, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'No', 1.0, 6, 40],
-            [49900000408, 1, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
-            [49900000408, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
-            [49900000576, 1, 202212, 'AA', 0.0, 0.0, 100.0, np.nan, 1.0, 1, 40],
-            [49900000960, 0, 202212, 'AA', np.nan, np.nan, np.nan, 'No', 1.0, 1, 40],
-            [49900000960, 1, 202212, 'AA', np.nan, 0.0, np.nan, 'No', 1.0, 1, 40],
-            [49900001029, 1, 202212, 'I', 119376.5, 244543.1667, 100.0, np.nan,
+            [39900000408, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'No', 1.0, 6, 40],
+            [39900000408, 1, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
+            [39900000408, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
+            [39900000576, 1, 202212, 'AA', 0.0, 0.0, 100.0, np.nan, 1.0, 1, 40],
+            [39900000960, 0, 202212, 'AA', np.nan, np.nan, np.nan, 'No', 1.0, 1, 40],
+            [39900000960, 1, 202212, 'AA', np.nan, 0.0, np.nan, 'No', 1.0, 1, 40],
+            [39900001029, 1, 202212, 'I', 119376.5, 244543.1667, 100.0, np.nan,
                 1.0, 1, 14]
         ]
         estimated_df = pd.DataFrame(data=data, columns=columns)
@@ -61,7 +61,7 @@ class TestFormOutputPrep(object):
             "reference", 
             "instance", 
             "period",
-            "201" #pg
+            "201", #pg
             "202",
             "211",
             "602", 
@@ -71,19 +71,19 @@ class TestFormOutputPrep(object):
             "pg_numeric"
         ]
         data = [
-            [49900000404, 1, 202212, 'AA', 467705.7237114774, 688000.0, 100.0,
+            [39900000404, 1, 202212, 'AA', 467705.7237114774, 688000.0, 100.0,
                 'Yes', 6.727272727272728, 6, 40],
-            [49900000404, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'Yes',
+            [39900000404, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'Yes',
                 6.727272727272728, 6, 40],
-            [49900000408, 1, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
-            [49900000408, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
-            [49900000576, 1, 202212, 'AA', 0.0, 0.0, 100.0, np.nan, 1.0, 1, 40],
-            [49900000960, 1, 202212, 'AA', np.nan, 0.0, np.nan, 'No', 1.0, 1, 40],
-            [49900001029, 1, 202212, 'I', 119376.5, 244543.16666666663, 100.0,
+            [39900000408, 1, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
+            [39900000408, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6, 40],
+            [39900000576, 1, 202212, 'AA', 0.0, 0.0, 100.0, np.nan, 1.0, 1, 40],
+            [39900000960, 1, 202212, 'AA', np.nan, 0.0, np.nan, 'No', 1.0, 1, 40],
+            [39900001029, 1, 202212, 'I', 119376.5, 244543.16666666663, 100.0,
                 np.nan, 1.0, 1, 14],
-            [49900001031, 1, 202212, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6, 30],
-            [49900001031, 2, 202212, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6, 30],
-            [49900001032, 1, 202212, 'I', 119376.5, 244543.16666666663, 100.0,
+            [39900001031, 1, 202212, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6, 30],
+            [39900001031, 2, 202212, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6, 30],
+            [39900001032, 1, 202212, 'I', 119376.5, 244543.16666666663, 100.0,
                 np.nan, 1.0, 1, 14]
         ]
         weighted_df = pd.DataFrame(data=data, columns=columns)
@@ -105,16 +105,16 @@ class TestFormOutputPrep(object):
             "rusic" #sic
         ]
         data = [
-            [49900001577, 1, 'GB ', 0.72, np.nan, 10130],
-            [49900006060, 1, 'GB ', 0.6, np.nan, 20120],
-            [49900008752, 1, 'GB ', 0.72, np.nan, 46420],
-            [49900008762, 1, 'GB ', 6.9, np.nan, 22230],
-            [49900008767, 1, 'GB ', 0.72, np.nan, 14190],
-            [49900008807, 1, 'GB ', 0.0, np.nan, 46390],
-            [49900008914, 1, 'US ', 0.0, np.nan, 17219],
-            [49900008968, 1, 'GB ', 1.44, np.nan, 46420],
-            [49900009016, 1, 'GB ', 4.0, np.nan, 71129],
-            [49900009078, 1, 'GB ', 0.72, np.nan, 23610]
+            [39900001577, 1, 'GB ', 0.72, np.nan, 10130],
+            [39900006060, 1, 'GB ', 0.6, np.nan, 20120],
+            [39900008752, 1, 'GB ', 0.72, np.nan, 46420],
+            [39900008762, 1, 'GB ', 6.9, np.nan, 22230],
+            [39900008767, 1, 'GB ', 0.72, np.nan, 14190],
+            [39900008807, 1, 'GB ', 0.0, np.nan, 46390],
+            [39900008914, 1, 'US ', 0.0, np.nan, 17219],
+            [39900008968, 1, 'GB ', 1.44, np.nan, 46420],
+            [39900009016, 1, 'GB ', 4.0, np.nan, 71129],
+            [39900009078, 1, 'GB ', 0.72, np.nan, 23610]
         ]
         ni_full_responses = pd.DataFrame(data=data, columns=columns)
         return ni_full_responses
@@ -168,7 +168,191 @@ class TestFormOutputPrep(object):
         pg_num_alpha = pd.DataFrame(data=data, columns=columns)
         return pg_num_alpha
     
+
+    @pytest.fixture(scope="function")
+    def ni_expected(self) -> pd.DataFrame:
+        columns = [
+            'reference',
+            'instance',
+            'ultfoc',
+            '407',
+            '201',
+            'rusic',
+            'a_weight',
+            '604',
+            'form_status',
+            '602',
+            'formtype',
+            'pg_numeric'
+        ]
+        data = [
+            [39900001577, 1, 'GB ', 0.72, 'C', 10130, 1, 'Yes', 600, 100,
+                "0003", 3.0],
+            [39900006060, 1, 'GB ', 0.6, 'G', 20120, 1, 'Yes', 600, 100, "0003",
+                12.0],
+            [39900008752, 1, 'GB ', 0.72, 'AA', 46420, 1, 'Yes', 600, 100,
+                "0003", 40.0],
+            [39900008762, 1, 'GB ', 6.9, np.nan, 22230, 1, 'Yes', 600, 100, "0003",
+                np.nan],
+            [39900008767, 1, 'GB ', 0.72, 'D', 14190, 1, 'Yes', 600, 100,
+                "0003", 6.0],
+            [39900008807, 1, 'GB ', 0.0, 'AA', 46390, 1, 'Yes', 600, 100,
+                "0003", 40.0],
+            [39900008914, 1, 'US ', 0.0, 'E', 17219, 1, 'Yes', 600, 100, "0003",
+                9.0],
+            [39900008968, 1, 'GB ', 1.44, 'AA', 46420, 1, 'Yes', 600, 100,
+                "0003", 40.0],
+            [39900009016, 1, 'GB ', 4.0, 'AD', 71129, 1, 'Yes', 600, 100,
+                "0003", 50.0],
+            [39900009078, 1, 'GB ', 0.72, 'J', 23610, 1, 'Yes', 600, 100,
+                "0003", 15.0]
+        ]
+        ni_expected = pd.DataFrame(data=data, columns=columns)
+        ni_expected["201"] = ni_expected["201"].astype("category")
+        ni_expected["pg_numeric"] = ni_expected["pg_numeric"].astype("category")
+        return ni_expected
     
+
+    @pytest.fixture(scope="function")
+    def full_output_expected(self) -> pd.DataFrame:
+        columns = [
+            'reference',
+            'instance',
+            'period',
+            '201',
+            '202',
+            '211',
+            '602',
+            '604',
+            'a_weight',
+            'formtype', 
+            'pg_numeric', 
+            'period_year'
+        ]
+        data = [
+            [39900000404, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'Yes',
+                6.7272727272727275, 6, 40, 2022],
+            [39900000404, 1, 202212, 'AA', 3146383.9595, 4628363.6364,
+                100.0, 'Yes', 6.7272727272727275, 6, 40, 2022],
+            [39900000404, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'Yes',
+                6.7272727272727275, 6, 40, 2022],
+            [39900000408, 0, 202212, 'AA', np.nan, np.nan, 100.0, 'No', 1.0, 6,
+                40, 2022],
+            [39900000408, 1, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6,
+                40, 2022],
+            [39900000408, 2, 202212, 'AA', 0.0, 0.0, 100.0, 'No', 1.0, 6,
+                  40, 2022],
+            [39900000576, 1, 202212, 'AA', 0.0, 0.0, 100.0, np.nan, 1.0, 1,
+                40, 2022],
+            [39900000960, 0, 202212, 'AA', np.nan, np.nan, np.nan, 'No', 1.0, 1, 40,
+                2022],
+            [39900000960, 1, 202212, 'AA', np.nan, 0.0, np.nan, 'No', 1.0, 1, 40,
+                2022],
+            [39900001029, 1, 202212, 'I', 119376.5, 244543.1667, 100.0,
+                np.nan, 1.0, 1, 14, 2022]
+        ]
+        full_outputs = pd.DataFrame(data=data, columns=columns)
+        return full_outputs
+    
+
+    @pytest.fixture(scope="function")
+    def tau_expected(self) -> pd.DataFrame:
+        columns = [
+            'reference',
+            'instance',
+            'period',
+            '201',
+            '202',
+            '211',
+            '602',
+            '604',
+            'a_weight',
+            'formtype',
+            'pg_numeric',
+            'period_year',
+            'ultfoc',
+            '407',
+            'rusic',
+            'form_status']
+        data = [
+            [39900001031, 1, 202212.0, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6,
+                30.0, 2022.0, np.nan, np.nan, np.nan, np.nan],
+            [39900001031, 2, 202212.0, 'U', 0.0, 0.0, 100.0, 'No', 49.0, 6,
+                30.0, 2022.0, np.nan, np.nan, np.nan, np.nan],
+            [39900001032, 1, 202212.0, 'I', 119376.5, 244543.16666666663,
+                100.0, np.nan, 1.0, 1, 14.0, 2022.0, np.nan, np.nan, np.nan, np.nan],
+            [39900001577, 1, np.nan, 'C', np.nan, np.nan, 100.0, 'Yes', 1.0, "0003", 3.0,
+                np.nan, 'GB ', 0.72, 10130.0, 600.0],
+            [39900006060, 1, np.nan, 'G', np.nan, np.nan, 100.0, 'Yes', 1.0, "0003", 12.0,
+                np.nan, 'GB ', 0.6, 20120.0, 600.0],
+            [39900008752, 1, np.nan, 'AA', np.nan, np.nan, 100.0, 'Yes', 1.0, "0003", 40.0,
+                np.nan, 'GB ', 0.72, 46420.0, 600.0],
+            [39900008762, 1, np.nan, np.nan, np.nan, np.nan, 100.0, 'Yes', 1.0, "0003", np.nan,
+                np.nan, 'GB ', 6.9, 22230.0, 600.0]
+        ]
+        full_outputs = pd.DataFrame(data=data, columns=columns)
+        return full_outputs
+
+
+    def test_form_output_prep_with_ni(self,
+                                    estimated_df,
+                                    weighted_df,
+                                    ni_full_responses,
+                                    sic_pg_num,
+                                    pg_num_alpha,
+                                    ni_expected,
+                                    full_output_expected,
+                                    tau_expected):
+        """General tests for form_output_prep."""
+        output = form_output_prep(estimated_df, weighted_df, ni_full_responses, pg_num_alpha, sic_pg_num)
+        # assert the function outputs as expected
+        assert isinstance(output, tuple), (
+            "Output of form_output_prep is not a tuple."
+            )
+        assert len(output) == 3, (
+            "Output of form_output_prep is unexpected length."
+        )
+        (ni_outputs, full_outputs, tau_outputs) = output
+        pd.testing.assert_frame_equal(
+            left=ni_outputs,
+            right=ni_expected,
+        )
+        pd.testing.assert_frame_equal(
+            left=full_outputs,
+            right=full_output_expected,
+        )
+        pd.testing.assert_frame_equal(
+            left=tau_outputs.iloc[7:14].reset_index(drop=True),
+            right=tau_expected,
+        )
+
+
+    def test_form_output_prep_no_ni(self,
+                                    estimated_df,
+                                    weighted_df,
+                                    ni_full_responses,
+                                    sic_pg_num,
+                                    pg_num_alpha,
+                                    full_output_expected,
+                                    tau_expected):
+        """General tests for form_output_prep (no NI data)."""
+        output = form_output_prep(estimated_df, weighted_df, None, pg_num_alpha, sic_pg_num)
+        # assert the function outputs as expected
+        assert isinstance(output, tuple), (
+            "Output of form_output_prep is not a tuple."
+            )
+        assert len(output) == 3, (
+            "Output of form_output_prep is unexpected length."
+        )
+        (ni_outputs, full_outputs, tau_outputs) = output
+        pd.testing.assert_frame_equal(
+            left=ni_outputs,
+            right=pd.DataFrame(),
+        )
+        pd.testing.assert_frame_equal(
+            left=full_outputs,
+            right=full_output_expected,
+        )
 
     
     
