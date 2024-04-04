@@ -332,7 +332,7 @@ class TestFormOutputPrep(object):
 
     def test_form_output_prep_no_ni(self,
                                     estimated_df,
-                                    weighted_df,git st
+                                    weighted_df,
                                     sic_pg_num,
                                     pg_num_alpha,
                                     full_output_expected):
