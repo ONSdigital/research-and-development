@@ -55,7 +55,7 @@ class TestCreateOutputDF(object):
     
     @pytest.fixture(scope="function")
     def create_output_df_schema(self):
-        """Test scheme for create_output_df."""
+        """Test schema for create_output_df."""
         schema = {
             "col_1": {"old_name": "old_col_1"},
             "col_2": {"old_name": "old_col_2"},
@@ -91,6 +91,82 @@ class TestRegions(object):
 
 class TestAggregateOutput(object):
     """Tests for aggregate_output."""
+
+    @pytest.fixture(scope="function")
+    def aggregate_output_input(self):
+        """Input data for aggregate_output tests."""
+        columns = ["key_col_1", "key_col_2", "value_col"]
+        data = [
+            [1, 1, 1.25],
+            [1, 2, 1.3],
+            [1, 2, 4.3],
+            [2, 1, 1.0],
+            [2, 1, 9.1],
+            [3, 1, 12.0],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+    
+    @pytest.fixture(scope="function")
+    def aggregate_output_output_sum(self):
+        """Expected output data from aggregate_output."""
+        columns = ["key_col_1", "key_col_2", "value_col"]
+        data = [
+            [1, 1, 1.25],
+            [1, 2, 5.6],
+            [2, 1, 10.1],
+            [3, 1, 12.0],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+    
+    @pytest.fixture(scope="function")
+    def aggregate_output_output_first(self):
+        """Expected output data from aggregate_output."""
+        columns = ["key_col_1", "key_col_2", "value_col"]
+        data = [
+            [1, 1, 1.25],
+            [1, 2, 1.3],
+            [2, 1, 1.0],
+            [3, 1, 12.0],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+    
+    @pytest.mark.parametrize(
+            "case", [
+                ("sum"),
+                ("first")
+            ]
+            )
+    def test_aggregate_output_sum(
+            self,
+            aggregate_output_input,
+            aggregate_output_output_sum,
+            aggregate_output_output_first,
+            case
+            ):
+        """Tests for aggregate_output using sum as the aggregation method."""
+        # get output
+        output = aggregate_output(
+            df=aggregate_output_input,
+            key_cols=["key_col_1", "key_col_2"],
+            value_cols=["value_col"],
+            agg_method=case
+            )
+        # determine expected output
+        if case == "sum":
+            expected = aggregate_output_output_sum
+        elif case == "first":
+            expected = aggregate_output_output_first
+        else:
+            raise ValueError("'case' must be one of ['sum', 'first']")
+        # assert output is correct
+        assert output.equals(expected), (
+            "aggregate_output not behaving as expected."
+        )
+
+    
 
 
 class TestCreatePeriodYear(object):
