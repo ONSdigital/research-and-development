@@ -294,15 +294,17 @@ class TestFormOutputPrep(object):
         return full_outputs
 
 
-    def test_form_output_prep_with_ni(self,
-                                    estimated_df,
-                                    weighted_df,
-                                    ni_full_responses,
-                                    sic_pg_num,
-                                    pg_num_alpha,
-                                    ni_expected,
-                                    full_output_expected,
-                                    tau_expected):
+    def test_form_output_prep_with_ni(
+            self,
+            estimated_df,
+            weighted_df,
+            ni_full_responses,
+            sic_pg_num,
+            pg_num_alpha,
+            ni_expected,
+            full_output_expected,
+            tau_expected
+        ):
         """General tests for form_output_prep."""
         output = form_output_prep(estimated_df, weighted_df, ni_full_responses, pg_num_alpha, sic_pg_num)
         # assert the function outputs as expected
@@ -330,12 +332,14 @@ class TestFormOutputPrep(object):
         )
 
 
-    def test_form_output_prep_no_ni(self,
-                                    estimated_df,
-                                    weighted_df,
-                                    sic_pg_num,
-                                    pg_num_alpha,
-                                    full_output_expected):
+    def test_form_output_prep_no_ni(
+            self,
+            estimated_df,
+            weighted_df,
+            sic_pg_num,
+            pg_num_alpha,
+            full_output_expected
+        ):
         """General tests for form_output_prep (no NI data)."""
         output = form_output_prep(estimated_df, weighted_df, None, pg_num_alpha, sic_pg_num)
         # assert the function outputs as expected
