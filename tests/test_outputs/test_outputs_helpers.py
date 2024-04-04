@@ -4,6 +4,7 @@ import pytest
 
 # Third Party Imports
 import pandas as pd
+import numpy as np
 
 # Local Imports
 from src.outputs.outputs_helpers import (
@@ -15,6 +16,61 @@ from src.outputs.outputs_helpers import (
 
 class TestCreateOutputDF(object):
     """Tests for create_output_df."""
+
+    def create_output_df_data(self, case: str = "i") -> pd.DataFrame:
+        """Input dataframe for create_output_df tests.
+
+        Args:
+            case (str, optional):
+                Whether or not to return the input or output data. Options 
+                include 'i' and 'o'. Defaults to 'i'.
+        
+        Returns:
+            pd.DataFrame: The dataframe containing the test data.
+
+        Raises:
+            TypeError: Raised if case is not of type 'str'.
+            ValueError: Raised if case is not one of 'o' or 'i'.
+        """
+        # defences
+        if not isinstance(case, str):
+            raise TypeError(f"'case' expected type 'str'. Got {type(case)}")
+        if case not in ["i", "o"]:
+            raise ValueError(f"'case' must be one of ['i', 'e']. Got {case}")
+        # create test data
+        if case == "i":
+            columns = ["old_col_1", "old_col_2", "not_inc"]
+        else:
+            columns = ["col_1", "col_2", "not_inc"]
+        data = [
+            [1, "1", np.nan],
+            [2, "2", np.nan],
+            [3, "3", np.nan],
+            [4, "4", np.nan],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        if case == "o":
+            df.drop("not_inc", axis=1, inplace=True)
+        return df
+    
+    @pytest.fixture(scope="function")
+    def create_output_df_schema(self):
+        """Test scheme for create_output_df."""
+        schema = {
+            "col_1": {"old_name": "old_col_1"},
+            "col_2": {"old_name": "old_col_2"},
+        }
+        return schema
+
+    def test_create_output_df(self, create_output_df_schema):
+        """General tests for create_output_df."""
+        output = create_output_df(
+            self.create_output_df_data(case="i"),
+            create_output_df_schema
+                                  )
+        assert (output.equals(self.create_output_df_data(case="o"))), (
+            "create_output_df not behaving as expected."
+        )
 
 
 class TestRegions(object):
