@@ -91,18 +91,15 @@ class TestOutputIntramByPG(object):
         columns = ['ranking', 'pg_alpha', 'Detailed product groups (Alphabetical product groups A-AH)', 'Notes']
         data = [
             [1, 'total', 'Total', 'Total q211 across all PG'],
-            [4, 'C', 'Food products and beverages; Tobacco products',
-                'Total q211 for PG C'],
+            [4, 'C', 'Food products and beverages; Tobacco products', 'Total q211 for PG C'],
             [5, 'D', 'Textiles, clothing and leather products', 'Total q211 for PG D'],
-            [6, 'E', 'Pulp, paper and paper products; Printing; Wood and straw products',
-                'Total q211 for PG E'],
+            [6, 'E', 'Pulp, paper and paper products; Printing; Wood and straw products', 'Total q211 for PG E'],
             [8, 'G', 'Chemicals and chemical products', 'Total q211 for PG G'],
             [10, 'I', 'Rubber and plastic products', 'Total q211 for PG I'],
             [11, 'J', 'Other non-metallic mineral products', 'Total q211 for PG J'],
             [27, 'Z', 'Construction', 'Total q211 for PG Z'],
             [28, 'AA', 'Wholesale and retail trade', 'Total q211 for PG AA'],
-            [31, 'AD', 'Miscellaneous business activities; Technical testing and analysis', 
-                'Total q211 for PG AD'],
+            [31, 'AD', 'Miscellaneous business activities; Technical testing and analysis', 'Total q211 for PG AD'],
             [35, 'AH', 'Software Development', 'Total q211 for PG AH']
         ]
         mapper = pd.DataFrame(data=data, columns=columns)
@@ -118,14 +115,12 @@ class TestOutputIntramByPG(object):
             ]
         data = [
             ['Total', 31826985.822200004, 'Total q211 across all PG'],
-            ['Food products and beverages; Tobacco products', 282622.6444,
-                'Total q211 for PG C'],
+            ['Food products and beverages; Tobacco products', 282622.6444, 'Total q211 for PG C'],
             ['Textiles, clothing and leather products', 79911.0, 'Total q211 for PG D'],
             ['Rubber and plastic products', 489056.3334, 'Total q211 for PG I'],
             ['Construction', 90163.1053, 'Total q211 for PG Z'],
             ['Wholesale and retail trade', 4628363.6364, 'Total q211 for PG AA'],
-            ['Miscellaneous business activities; Technical testing and analysis',
-                2196.1027, 'Total q211 for PG AD'],
+            ['Miscellaneous business activities; Technical testing and analysis', 2196.1027, 'Total q211 for PG AD'],
             ['Software Development', 26254673.0, 'Total q211 for PG AH']
         ]
         return pd.DataFrame(data=data, columns=columns)
@@ -140,27 +135,26 @@ class TestOutputIntramByPG(object):
             ]
         data = [
             ['Total', 31828339.822200004, 'Total q211 across all PG'],
-            ['Food products and beverages; Tobacco products', 282649.6444,
-                'Total q211 for PG C'],
+            ['Food products and beverages; Tobacco products', 282649.6444, 'Total q211 for PG C'],
             ['Textiles, clothing and leather products' ,79929.0, 'Total q211 for PG D'],
-            ['Pulp, paper and paper products; Printing; Wood and straw products',
-                41.0, 'Total q211 for PG E'],
+            ['Pulp, paper and paper products; Printing; Wood and straw products', 41.0, 'Total q211 for PG E'],
             ['Chemicals and chemical products', 102.0 ,'Total q211 for PG G'],
             ['Rubber and plastic products', 489684.3334 ,'Total q211 for PG I'],
             ['Other non-metallic mineral products', 138.0, 'Total q211 for PG J'],
             ['Construction', 90163.1053, 'Total q211 for PG Z'],
             ['Wholesale and retail trade', 4628620.6364, 'Total q211 for PG AA'],
-            ['Miscellaneous business activities; Technical testing and analysis',
-                2339.1027, 'Total q211 for PG AD'],
+            ['Miscellaneous business activities; Technical testing and analysis', 2339.1027, 'Total q211 for PG AD'],
             ['Software Development', 26254673.0, 'Total q211 for PG AH']
         ]
         return pd.DataFrame(data=data, columns=columns)
 
 
-    def test_output_intram_by_pg_raises(self,
-                                        tmp_path,
-                                        input_data_gb,
-                                        pg_detailed_df):
+    def test_output_intram_by_pg_raises(
+            self,
+            tmp_path,
+            input_data_gb,
+            pg_detailed_df
+        ):
         """Defensive tests for output_intram_by_pg."""
         self.setup_tmp_dir(pathlib.Path(tmp_path))
         # checks NI dataset is a dataframe
@@ -183,13 +177,15 @@ class TestOutputIntramByPG(object):
                 [True, exp_out_uk()]
             )
             )
-    def test_output_intram_by_pg(self, 
-                                ni,
-                                exp_out,
-                                tmp_path,
-                                input_data_gb,
-                                input_data_ni,
-                                pg_detailed_df):
+    def test_output_intram_by_pg(
+        self, 
+        ni,
+        exp_out,
+        tmp_path,
+        input_data_gb,
+        input_data_ni,
+        pg_detailed_df
+    ):
         """Tests for output_intram_by_pg."""
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path))
         if not ni:
