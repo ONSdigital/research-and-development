@@ -92,7 +92,7 @@ def join_fgn_ownership(
 def map_sizebands(
     df: pd.DataFrame,
 ):
-    """Generate sizebands from the frozen employent column
+    """Generate sizebands from the frozen (IDBR) employent column
 
     Args:
         df (pd.DataFrame): The original dataframe
