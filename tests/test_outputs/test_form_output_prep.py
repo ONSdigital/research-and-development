@@ -313,14 +313,17 @@ class TestFormOutputPrep(object):
             "Output of form_output_prep is unexpected length."
         )
         (ni_outputs, full_outputs, tau_outputs) = output
+        # assert ni outputs are correct
         pd.testing.assert_frame_equal(
             left=ni_outputs,
             right=ni_expected,
         )
+        # assert full outputs are correct
         pd.testing.assert_frame_equal(
             left=full_outputs,
             right=full_output_expected,
         )
+        # assert combined (tau) outputs are correct
         pd.testing.assert_frame_equal(
             left=tau_outputs.iloc[7:14].reset_index(drop=True),
             right=tau_expected,
@@ -329,12 +332,10 @@ class TestFormOutputPrep(object):
 
     def test_form_output_prep_no_ni(self,
                                     estimated_df,
-                                    weighted_df,
-                                    ni_full_responses,
+                                    weighted_df,git st
                                     sic_pg_num,
                                     pg_num_alpha,
-                                    full_output_expected,
-                                    tau_expected):
+                                    full_output_expected):
         """General tests for form_output_prep (no NI data)."""
         output = form_output_prep(estimated_df, weighted_df, None, pg_num_alpha, sic_pg_num)
         # assert the function outputs as expected
@@ -345,10 +346,12 @@ class TestFormOutputPrep(object):
             "Output of form_output_prep is unexpected length."
         )
         (ni_outputs, full_outputs, tau_outputs) = output
+        # assert NI outputs are correct (empty df)
         pd.testing.assert_frame_equal(
             left=ni_outputs,
             right=pd.DataFrame(),
         )
+        # assert full outputs are correct
         pd.testing.assert_frame_equal(
             left=full_outputs,
             right=full_output_expected,
