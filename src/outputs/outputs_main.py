@@ -142,7 +142,7 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished NI SAS output.")
 
-    # Running Intram by PG output (UK)
+    # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
         OutputMainLogger.info("Starting  Intram by PG (GB) output...")
         output_intram_by_pg(
@@ -154,7 +154,7 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
     
-    # Running Intram by PG output (GB)
+    # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
         OutputMainLogger.info("Startin Intram by PG (UK) output...")
         output_intram_by_pg(
