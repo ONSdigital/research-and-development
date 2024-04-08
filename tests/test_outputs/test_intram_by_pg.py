@@ -34,11 +34,12 @@ else:
 class TestOutputIntramByPG(object):
     """Tests for output_intram_bt_pg."""
     
-    def setup_tmp_dir(self, path: pathlib.Path) -> pathlib.Path:
+    def setup_tmp_dir(self, path: pathlib.Path, ni: bool = True) -> pathlib.Path:
         """Set up the output directory given a temp path."""
         # create output dirs
         output_parent = os.path.join(path, "outputs")
-        output_child = os.path.join(output_parent, "output_intram_by_pg")
+        output_child = os.path.join(output_parent, 
+                                    f"output_intram_by_pg_{'gb' if not ni else 'uk'}")
         os.makedirs(output_child)
         # update config
         PATHS["output_path"] = output_parent
@@ -187,7 +188,7 @@ class TestOutputIntramByPG(object):
         pg_detailed_df
     ):
         """Tests for output_intram_by_pg."""
-        pth = self.setup_tmp_dir(pathlib.Path(tmp_path))
+        pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
         if not ni:
             input_data_ni = None
         output_intram_by_pg(
