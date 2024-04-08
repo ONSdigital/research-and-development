@@ -144,7 +144,7 @@ def run_outputs(
 
     # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
-        OutputMainLogger.info("Starting  Intram by PG (GB) output...")
+        OutputMainLogger.info("Starting Intram by PG (GB) output...")
         output_intram_by_pg(
             outputs_df,
             pg_detailed,
@@ -156,7 +156,7 @@ def run_outputs(
     
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
-        OutputMainLogger.info("Startin Intram by PG (UK) output...")
+        OutputMainLogger.info("Starting Intram by PG (UK) output...")
         output_intram_by_pg(
             outputs_df,
             pg_detailed,

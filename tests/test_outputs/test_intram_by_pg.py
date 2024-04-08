@@ -32,7 +32,7 @@ else:
 
 
 class TestOutputIntramByPG(object):
-    """Tests for output_intram_bt_pg."""
+    """Tests for output_intram_by_pg."""
     
     def setup_tmp_dir(self, path: pathlib.Path, ni: bool = True) -> pathlib.Path:
         """Set up the output directory given a temp path."""
@@ -128,7 +128,7 @@ class TestOutputIntramByPG(object):
     
 
     def exp_out_uk():
-        """The expected output of output_intram_by_pg (NI data)."""
+        """The expected output of output_intram_by_pg (with NI data)."""
         columns = [
             'Detailed product groups (Alphabetical product groups A-AH)',
             '2023 (Current period)',
