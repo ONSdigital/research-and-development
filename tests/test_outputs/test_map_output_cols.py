@@ -79,3 +79,59 @@ class TestJoinPgNumeric(object):
         assert output.equals(exp_output), (
             "Output from join_pg_numeric not as expected."
         )
+
+
+class TestJoinFgnOwnership(object):
+    """Tests for join_fgn_ownership."""
+    @pytest.fixture(scope="function")
+    def main_input(self):
+        """main_df input data."""
+        columns = ["test_col", "formtype", "reference", "ultfoc"]
+        data = [
+            [1, "0006", 21, "filler"],
+            [2, "0001", 22, "filler"],
+            [3, "0001", 23, "filler"],
+            [4, np.nan, 24, "filler"] # null
+            [5, "0002", 25, "filler"] # non-accepeted formtype
+                ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+
+    @pytest.fixture(scope="function")
+    def mapper_input(self):
+        """mapper_df input data."""
+        columns = ["ruref", "ultfoc"]
+        data = [
+            [21, "uf1"],
+            [22, "uf2"],
+            [23, "uf3"]
+                ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+
+    @pytest.fixture(scope="function")
+    def exp_output(self):
+        """expected output data."""
+        columns = []
+        data = [
+
+                ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+
+    def test_join_pg_numeric(
+            self,
+            main_input,
+            mapper_input,
+            exp_output
+            ):
+        """General tests for join_pg_numeric"""
+        output = join_pg_numeric(main_input, mapper_input, ["201"])
+        print(output)
+        print(exp_output)
+        assert output.equals(exp_output), (
+            "Output from join_pg_numeric not as expected."
+        )
