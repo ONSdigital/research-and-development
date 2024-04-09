@@ -103,7 +103,7 @@ def map_sizebands(
     # Create a dictionary of sizeband parameters
     sizeband_dict = {
         1: {"min": 0, "max": 9},
-        2: {"min": 10, "max": 99},
+        2: {"min": 10, "max": 19},
         3: {"min": 20, "max": 49},
         4: {"min": 50, "max": 99},
         5: {"min": 100, "max": 249},

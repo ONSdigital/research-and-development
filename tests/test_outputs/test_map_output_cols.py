@@ -135,3 +135,49 @@ class TestJoinFgnOwnership(object):
         assert output.equals(exp_output), (
             "Output from join_fgn_ownership not as expected."
         )
+
+
+class TestMapSizebands(object):
+    """Tests for map_sizebands."""
+
+    @pytest.fixture(scope="function")
+    def input_data(self):
+        """input data for map_sizebands tests."""
+        columns = ["col1", "employment"]
+        data = [
+            [1, 5],
+            [2, 15],
+            [3, 25],
+            [4, 55],
+            [5, 150],
+            [6, 300]
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def expected_output(self):
+        """expected output data for map_sizebands tests."""
+        columns = ["col1", "employment", "sizeband"]
+        data = [
+            [1, 5, 1],
+            [2, 15, 2],
+            [3, 25, 3],
+            [4, 55, 4],
+            [5, 150, 5],
+            [6, 300, 6]
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        df["sizeband"] = df["sizeband"].astype("Int64")
+        return df
+    
+
+    def test_map_sizebands(self, input_data, expected_output):
+        """General tests for map_sizebands."""
+        output = map_sizebands(input_data)
+        print(expected_output)
+        print(output)
+        assert output.equals(expected_output), (
+            "map_sizebands not working as expected."
+        )
