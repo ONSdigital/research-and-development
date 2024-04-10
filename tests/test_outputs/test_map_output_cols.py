@@ -356,3 +356,37 @@ class TestMapToNumeric(object):
         assert output.equals(expected_output), (
             "map_to_numeric not behaving as expected."
         )
+
+
+class TestMapFGColsToNumeric(object):
+    """Tests for map_fg_cols_to_numeric."""
+
+    @pytest.fixture(scope="function")
+    def input_data(self):
+        """Input data for map_fg_cols_to_numeric tests."""
+        columns = ["col1", "FG_col"]
+        data = [
+            [1, "Yes"],
+            [2, "No"],
+            [3, ""],
+            [4, np.nan]
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def expected_output(self):
+        """Input data for map_fg_cols_to_numeric tests."""
+        columns = ["col1", "FG_col"]
+        data = [
+            [1, 1],
+            [2, 2],
+            [3, 3],
+            [4, 3],
+        ]
+        df["FG_col"] = df["FG_col"].astype("Int64")
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+     
