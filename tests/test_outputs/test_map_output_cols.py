@@ -342,6 +342,11 @@ class TestMapToNumeric(object):
             [4, 3, 3]
         ]
         df = pd.DataFrame(columns=columns, data=data)
+        type_dict = {
+            "713": "Int64",
+            "714": "Int64"
+            }
+        df = df.astype(type_dict)
         return df
     
 
