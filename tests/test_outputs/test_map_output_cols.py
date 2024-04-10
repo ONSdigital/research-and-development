@@ -312,3 +312,42 @@ class TestJoinITLRegions(object):
         assert output.equals(expected_output), (
             "join_itl_regions not behaving as expected."
         )
+
+    
+class TestMapToNumeric(object):
+    """Tests for map_to_numeric."""
+
+    @pytest.fixture(scope="function")
+    def input_data(self):
+        """Input data for map_to_numeric tests."""
+        columns = ["col1", "713", "714"]
+        data = [
+            [1, "Yes", "Yes"],
+            [2, "No", "No"],
+            [3, "", ""],
+            [4, np.nan, np.nan]
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def expected_output(self):
+        """Expected output for map_to_numeric tests."""
+        columns = ["col1", "713", "714"]
+        data = [
+            [1, 1, 1],
+            [2, 2, 2],
+            [3, 3, 3],
+            [4, 3, 3]
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    def test_map_to_numeric(self, input_data, expected_output):
+        """General tests for map_to_numeric."""
+        output = map_to_numeric(input_data)
+        assert output.equals(expected_output), (
+            "map_to_numeric not behaving as expected."
+        )
