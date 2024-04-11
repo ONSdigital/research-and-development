@@ -271,7 +271,9 @@ def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
         postcode_col
     ].transform("count")
     df_duplicate_sites = site_count_df[site_count_df["site_count"] > 1]
-    num_duplicate_sites = df_duplicate_sites.shape[0]
+    num_duplicate_sites = len(
+        df_duplicate_sites.groupby(["reference", "period", postcode_col])
+    )
 
     if num_duplicate_sites:
         # display number of duplicate sites
