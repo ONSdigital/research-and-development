@@ -1,10 +1,14 @@
 """Tests for 'staging_helpers.py'."""
 # Standard Library Imports
 import pytest
+import pathlib
+import os
+from typing import Tuple
 
 # Third Party Imports
 import pandas as pd
 import numpy as np
+import pyarrow.feather as feather
 
 # Local Imports
 from src.staging.staging_helpers import (
@@ -20,6 +24,7 @@ from src.staging.staging_helpers import (
     write_snapshot_to_feather,
     stage_validate_harmonise_postcodes
 )
+from src.utils.local_file_mods import local_file_exists as check_file_exists
 
 
 # class TestPostcodeTopup(object):
@@ -189,4 +194,69 @@ class TestGetMapperName(object):
         # without split
         assert getmappername(test_str, False) == "cellno_2022", (
             "getmappername not behaving as expected when split=False"
+        )
+
+
+# load_validate_mapper
+
+
+# load_historic_data
+
+
+class TestCheckSnapshotFeatherExists(object):
+    """Tests for check_snapshot_feather_exists."""
+
+    def create_feather_files(
+            self,
+            dir: pathlib.Path,
+            first: bool,
+            second: bool
+        ) -> Tuple[pathlib.Path, pathlib.Path]:
+        """Create feather files in a given path for testing."""
+        empty_df = pd.DataFrame()
+        # define feather paths
+        f_path = os.path.join(dir, "first_feather.feather")
+        s_path = os.path.join(dir, "second_feather.feather")
+        # create feather files accordingly
+        if first:
+            feather.write_feather(empty_df.copy(), f_path)
+        if second:
+            feather.write_feather(empty_df.copy(), s_path)
+        return (pathlib.Path(f_path), pathlib.Path(s_path))
+
+    
+    @pytest.mark.parametrize(
+            "first, second, check_both, result",
+            (
+                [True, False, False, True], # create first, check first
+                [True, False, True, False], # create first, check both
+                [False, True, False, False], # create second, check first
+                [False, True, True, False], # create second, check both
+                [True, True, True, True], # create both, check both
+                [True, True, False, True] # create both, check first
+            )
+    )
+    def test_check_snapshot_feather_exists(
+            self,
+            tmp_path,
+            first: bool,
+            second: bool,
+            check_both: bool,
+            result: bool,
+        ):
+        """General tests for check_snapshot_feather_exists."""
+        # create feather files
+        (a, b) = self.create_feather_files(tmp_path, first, second)
+        # define config
+        config = {"global": {"load_updated_snapshot": check_both}}
+        # get result
+        output = check_snapshot_feather_exists(
+            config=config,
+            check_file_exists=check_file_exists,
+            feather_file_to_check=a,
+            secondary_feather_file=b
+        )
+        # assert result
+        assert output == result, (
+            "check_snapshot_feather_exists not behaving as expected."
         )
