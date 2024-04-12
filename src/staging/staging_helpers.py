@@ -119,7 +119,7 @@ def getmappername(mapper_path_key, split):
     return mapper_name
 
 
-def load_valdiate_mapper(
+def load_validate_mapper(
     mapper_path_key,
     paths,
     file_exists_func,

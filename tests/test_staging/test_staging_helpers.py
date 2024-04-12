@@ -12,7 +12,7 @@ from src.staging.staging_helpers import (
     fix_anon_data,
     update_ref_list,
     getmappername,
-    load_valdiate_mapper,
+    load_validate_mapper,
     load_historic_data,
     check_snapshot_feather_exists,
     load_val_snapshot_json,
