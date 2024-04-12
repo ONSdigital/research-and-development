@@ -175,3 +175,18 @@ class TestUpdateRefList(object):
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
         
+
+class TestGetMapperName(object):
+    """Tests for getmappername."""
+
+    def test_getmappername(self):
+        """General tests for getmappername."""
+        test_str = "cellno_2022_path"
+        # with split
+        assert getmappername(test_str, True) == "cellno 2022", (
+            "getmappername not behaving as expected when split=True"
+        )
+        # without split
+        assert getmappername(test_str, False) == "cellno_2022", (
+            "getmappername not behaving as expected when split=False"
+        )
