@@ -49,4 +49,63 @@ from src.staging.staging_helpers import (
 #             lambda x: postcode_topup(x)
 #             )
 #         print(output)
-        
+
+
+class TestFixAnonData(object):
+    """Tests for fix_anon_data."""
+
+    @pytest.fixture(scope="function")
+    def dummy_config(self) -> dict:
+        """Config used for test data."""
+        config = {
+            "devtest": {
+                "seltype_list": [1, 2, 3, 5, 6, 7, 9, 10]
+            }
+                }
+        return config
+    
+
+    @pytest.fixture(scope="function")
+    def input_data(self):
+        """Input data for fix_anon_data tests."""
+        columns = ["col1"]
+        data = [
+            [1],
+            [2],
+            [3],
+            [4],
+            [5],
+            [6],
+            [7],
+            [8],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def expected_output(self):
+        """Expected output for fix_anon_data tests"""
+        columns = ["col1", "instance", "selectiontype", "cellnumber"]
+        data = [
+            [1, 0, "L", 3],
+            [2, 0, "P", 9],
+            [3, 0, "L", 3],
+            [4, 0, "L", 3],
+            [5, 0, "P", 10],
+            [6, 0, "P", 6],
+            [7, 0, "L", 5],
+            [8, 0, "C", 10],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+
+    def test_fix_anon_data(self, input_data, dummy_config, expected_output):
+        """General tests for fix_anon_data."""
+        output = fix_anon_data(input_data, dummy_config)
+        assert(output.equals(expected_output)), (
+            "fix_anon_data not behaving as expected."
+        )
+
+    
