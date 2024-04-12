@@ -11,20 +11,23 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def output_intram_by_pg(
-    df: pd.DataFrame,
+    gb_df: pd.DataFrame,
+    pg_detailed: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    pg_detailed,
+    ni_df: pd.DataFrame = None
 ):
     """Run the outputs module.
 
     Args:
-        df (pd.DataFrame): The dataset main with weights not applied
+        gb_df (pd.DataFrame): The dataset main with weights not applied
+        pg_detailed (pd.DataFrame): Detailed info for the product groups.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
-         This will be the hdfs or network version depending on settings.
+            This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
+        ni_df (pd.DataFrame): The NI datasets without weights applied.
 
     """
 
@@ -32,12 +35,27 @@ def output_intram_by_pg(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    # Group by PG and aggregate intram
+    # assign columns for easier use
     key_col = "201"
     value_col = "211"
     agg_method = "sum"
 
-    df_agg = aggregate_output(df, [key_col], [value_col], agg_method)
+    # evaluate if NI data is included and clean
+    if ni_df is not None:
+        # defence
+        if not isinstance(ni_df, pd.DataFrame):
+            raise TypeError(
+                f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
+                )
+        # work out cols to select
+        cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
+        gb_df = gb_df[cols_to_keep]
+        ni_df = ni_df[cols_to_keep]
+        gb_df = gb_df.append(ni_df)
+        
+
+    # Group by PG and aggregate intram
+    df_agg = aggregate_output(gb_df, [key_col], [value_col], agg_method)
 
     # Create Total and concatinate it to df_agg
     value_tot = df_agg[value_col].sum()
@@ -63,5 +81,5 @@ def output_intram_by_pg(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_by_pg_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_intram_by_pg/{filename}", df_merge)
+    filename = f"output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}_{tdate}_v{run_id}.csv"
+    write_csv(f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}", df_merge)
