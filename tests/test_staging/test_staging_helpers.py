@@ -19,12 +19,16 @@ from src.staging.staging_helpers import (
     load_validate_mapper,
     load_historic_data,
     check_snapshot_feather_exists,
+    load_snapshot_feather,
     load_val_snapshot_json,
     load_validate_secondary_snapshot,
     write_snapshot_to_feather,
     stage_validate_harmonise_postcodes
 )
-from src.utils.local_file_mods import local_file_exists as check_file_exists
+from src.utils.local_file_mods import (
+    local_file_exists as check_file_exists,
+    local_read_feather as read_feather
+)
 
 
 # class TestPostcodeTopup(object):
@@ -259,4 +263,23 @@ class TestCheckSnapshotFeatherExists(object):
         # assert result
         assert output == result, (
             "check_snapshot_feather_exists not behaving as expected."
+        )
+
+
+class TestLoadSnapshotFeather(object):
+    """Tests for load_snapshot_feather."""
+
+    def test_load_snapshot_feather(self, tmp_path):
+        """General tests for load_snapshot_feather."""
+        # create 'snapshot'
+        empty_df = pd.DataFrame({"test": [1, 2, 3]})
+        path = os.path.join(tmp_path, "snapshot_test.feather")
+        feather.write_feather(empty_df, path)
+        # test loading 'snapshot'
+        snapshot = load_snapshot_feather(path, read_feather)
+        assert np.array_equal(snapshot.test, [1, 2, 3]), (
+            "load_snapshot_feather not behaving as expected"
+        )
+        assert len(snapshot.columns) == 1, (
+            "Snapshot df has more columnss than expected."
         )
