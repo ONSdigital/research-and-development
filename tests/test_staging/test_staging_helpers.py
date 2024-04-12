@@ -27,7 +27,8 @@ from src.staging.staging_helpers import (
 )
 from src.utils.local_file_mods import (
     local_file_exists as check_file_exists,
-    local_read_feather as read_feather
+    local_read_feather as read_feather,
+    local_write_feather as write_feather
 )
 
 
@@ -283,3 +284,61 @@ class TestLoadSnapshotFeather(object):
         assert len(snapshot.columns) == 1, (
             "Snapshot df has more columnss than expected."
         )
+
+
+class TestWriteSnapshotToFeather(object):
+    """Tests for write_snapshot_to_feather."""
+
+    @pytest.fixture(scope="function")
+    def f1(self):
+        """Snapshot 1 test data."""
+        f1 = pd.DataFrame(
+            {"f1": [1]}
+        )
+        return f1
+    
+
+    @pytest.fixture(scope="function")
+    def f2(self):
+        """Snapshot 2 test data."""
+        f2 = pd.DataFrame(
+            {"f2": [1]}
+        )
+        return f2
+
+
+    def test_write_snapshot_to_feather_both(self, tmp_path, f1, f2):
+        """General tests for write_snapshot_to_feather."""
+        # write 'feathers'
+        write_snapshot_to_feather(
+            tmp_path,
+            "snap_1",
+            f1,
+            write_feather,
+            "snap_2",
+            f2
+        )
+        # assert feathers has been written
+        files = os.listdir(tmp_path)
+        expected_paths = ['snap_1_corrected.feather', 'snap_2.feather']
+        assert np.array_equal(
+            sorted(files), sorted(expected_paths)
+        ), ("write_snapshot_to_feather not behaving as expected (both)")
+
+
+    def test_write_snapshot_to_feather_single(self, tmp_path, f1):
+        """General tests for write_snapshot_to_feather."""
+        # write 'feathers'
+        write_snapshot_to_feather(
+            tmp_path,
+            "snap_1",
+            f1,
+            write_feather,
+            "snap_2",
+        )
+        # assert feathers has been written
+        files = os.listdir(tmp_path)
+        expected_paths = ['snap_1_corrected.feather']
+        assert np.array_equal(
+            sorted(files), sorted(expected_paths)
+        ), ("write_snapshot_to_feather not behaving as expected (single)")
