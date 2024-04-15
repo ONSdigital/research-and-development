@@ -4,6 +4,7 @@ import pytest
 import pathlib
 import os
 from typing import Tuple
+from datetime import date
 
 # Third Party Imports
 import pandas as pd
@@ -28,7 +29,9 @@ from src.staging.staging_helpers import (
 from src.utils.local_file_mods import (
     local_file_exists as check_file_exists,
     local_read_feather as read_feather,
-    local_write_feather as write_feather
+    local_write_feather as write_feather,
+    read_local_csv as read_csv,
+    write_local_csv as write_csv
 )
 
 
@@ -202,7 +205,7 @@ class TestGetMapperName(object):
         )
 
 
-# load_validate_mapper
+# load_validate_mapper [CANT TEST: TOO MANY HARD CODED PATHS]
 
 
 # load_historic_data
@@ -286,6 +289,11 @@ class TestLoadSnapshotFeather(object):
         )
 
 
+# load_val_snapshot_json [CANT TEST: TOO MANY HARD CODED PATHS]
+
+
+# load_validate_secondary_snapshot [CANT TEST: TOO MANY HARD CODED PATHS]
+
 class TestWriteSnapshotToFeather(object):
     """Tests for write_snapshot_to_feather."""
 
@@ -342,3 +350,142 @@ class TestWriteSnapshotToFeather(object):
         assert np.array_equal(
             sorted(files), sorted(expected_paths)
         ), ("write_snapshot_to_feather not behaving as expected (single)")
+
+
+class TestStageValidateHarmonisePostcodes(object):
+    """Tests for stage_validate_harmonise_postcodes."""
+
+    @pytest.fixture(scope="function")
+    def config(self) -> pd.DataFrame:
+        """Test config."""
+        config = {"global": {"postcode_csv_check": True}}
+        return config
+    
+
+    def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
+        """Test paths."""
+        paths = {
+            "postcode_path": pc_path,
+            "postcode_masterlist": pc_ml
+        }
+        return paths
+    
+
+    @pytest.fixture(scope="function")
+    def full_responses(self) -> pd.DataFrame:
+        """Test data for stag_validate_harmonise_postcodes."""
+        columns = ["reference", "instance", "formtype", "601", "referencepostcode"]
+        data = [
+            [39900000404, 0.0, 6, np.nan, "NP442NZ"], # add white space
+            [39900000404, 1.0, 6, "NP442NZ", "NP442NZ"],
+            [39900000960, 0.0, 1, np.nan, "CE1 4OY"], # add white space
+            [39900000960, 1.0, 1, "CE1 4OY", "CE1 4OY"],
+            [39900001530, 0.0, 6, "CE2", "CE2"], # invalid
+            [39900001601, 0.0, 1, np.nan, 'RH12 1XL'], # normal
+            [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL'],
+            [39900003110, 0.0, 6, np.nan, "CE11 8IU"], # convert character cases
+            [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
+            [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
+            [38880003110, 0.0, 6, np.nan, "NP22 8UI"], # not in postcode list
+            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"]
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    def postcode_masterlist(self, dir: pathlib.Path) -> pathlib.Path:
+        """Write the postcode masterlist and return path."""
+        postcode_df = pd.DataFrame(
+            {"pcd2": ["NP44 2NZ", "CE1  4OY", "RH12 1XL", "CE11 8IU"]}
+        )
+        save_path = pathlib.Path(os.path.join(dir, "postcodes_masterlist.csv"))
+        postcode_df.to_csv(save_path)
+        return save_path
+    
+
+    @pytest.fixture(scope="function")
+    def full_responses_output(self) -> pd.DataFrame:
+        """Expected output for full_responses."""
+        columns = [
+            'reference', 
+            'instance',
+            'formtype',
+            '601', 
+            'referencepostcode',
+            'postcodes_harmonised',
+        ]
+        data = [
+            [39900000404, 0.0, 6, np.nan, 'NP442NZ', 'NP44 2NZ'],
+            [39900000404, 1.0, 6, 'NP44 2NZ', 'NP442NZ', 'NP44 2NZ'],
+            [39900000960, 0.0, 1, np.nan, 'CE1 4OY', 'CE1  4OY'],
+            [39900000960, 1.0, 1, 'CE1  4OY', 'CE1 4OY', 'CE1  4OY'],
+            [39900001530, 0.0, 6, '     CE2', 'CE2', np.nan],
+            [39900001601, 0.0, 1, np.nan, 'RH12 1XL', 'RH12 1XL'],
+            [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL', 'RH12 1XL'],
+            [39900003110, 0.0, 6, np.nan, 'CE11 8IU', 'CE11 8IU'],
+            [39900003110, 1.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
+            [39900003110, 2.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
+            [38880003110, 0.0, 6, np.nan, 'NP22 8UI', np.nan],
+            [38880003110, 1.0, 6, 'NP22 8UI', 'NP22 8UI', np.nan]
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def pc_mapper_output(self) -> pd.DataFrame:
+        """Expected output for postcode_mapper"""
+        columns = ["Unnamed: 0", "pcd2"]
+        data = [
+            [0, "NP44 2NZ"],
+            [1, "CE1  4OY"],
+            [2, "RH12 1XL"],
+            [3, "CE11 8IU"],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+    
+    def get_todays_date(self) -> str:
+        """Get the date in the format YYYY-MM-DD. Used for filenames."""
+        today = date.today()
+        today_str = today.strftime(r"%Y-%m-%d")
+        return today_str
+
+
+    def test_stage_validate_harmonise_postcodes(
+            self, 
+            full_responses, 
+            config,
+            pc_mapper_output,
+            full_responses_output,
+            tmp_path
+        ):
+        """General tests for stage_validate_harmonise_postcodes."""
+        pc_path = self.postcode_masterlist(tmp_path)
+        paths = self.create_paths(tmp_path, pc_path)
+        fr, pm = stage_validate_harmonise_postcodes(
+            config=config,
+            paths=paths,
+            full_responses=full_responses,
+            run_id=1,
+            check_file_exists=check_file_exists,
+            read_csv=read_csv,
+            write_csv=write_csv
+        )
+        # test direct function outputs
+        assert fr.equals(full_responses_output), (
+            "full_responses output from stage_validate_harmonise_postcodes not"
+            " as expected."
+        )
+        assert pm.equals(pc_mapper_output), (
+            "postcode_mapper output from stage_validate_harmonise_postcodes not"
+            " as expected."
+        )
+        # assert that invalid postcodes have been saved out
+        files = os.listdir(tmp_path)
+        filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        assert (filename in files), (
+            "stage_validate_harmonise_postcodes failed to save out invalid PCs"
+        )
+        
