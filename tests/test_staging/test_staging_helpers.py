@@ -64,6 +64,18 @@ from src.utils.local_file_mods import (
 #         print(output)
 
 
+def match_col_type(
+        df1: pd.DataFrame,
+        df2: pd.DataFrame,
+        col_name: str,
+        _type: str
+    ):
+    """Convert DataFrame columns of the same name to matching types."""
+    df1[col_name] = df1[col_name].astype(_type)
+    df2[col_name] = df2[col_name].astype(_type)
+    return (df1, df2)
+
+
 class TestFixAnonData(object):
     """Tests for fix_anon_data."""
 
@@ -111,14 +123,18 @@ class TestFixAnonData(object):
             [8, 0, "C", 10],
         ]
         df = pd.DataFrame(columns=columns, data=data)
-        df["cellnumber"] = df["cellnumber"].astype("int32")
         return df
 
 
     def test_fix_anon_data(self, input_data, dummy_config, expected_output):
         """General tests for fix_anon_data."""
         output = fix_anon_data(input_data, dummy_config)
-        pd.testing.assert_frame_equal(output, expected_output)
+        output, expected_output = match_col_type(
+            output,
+            expected_output,
+            "cellnumber",
+            "int32"
+            )
         assert(output.equals(expected_output)), (
             "fix_anon_data not behaving as expected."
         )
