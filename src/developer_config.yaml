@@ -21,26 +21,26 @@ global:
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
-  output_full_responses: False
-  output_ni_full_responses: False
-  output_imputation_qa: False
-  output_auto_outliers: False
-  output_outlier_qa : False
-  output_estimation_qa: False
-  output_apportionment_qa: False
-  output_long_form: False
-  output_short_form: False
-  output_gb_sas: False
-  output_ni_sas: False
-  output_tau: False
-  output_intram_by_pg: False
-  output_intram_by_itl1: False
-  output_intram_uk_itl2: False
-  output_intram_by_civil_defence: False
-  output_intram_by_sic: False
-  output_fte_total_qa: False
-  output_status_filtered: False
-  output_frozen_group: False
+  output_full_responses: True
+  output_ni_full_responses: True
+  output_imputation_qa: True
+  output_auto_outliers: True
+  output_outlier_qa : True
+  output_estimation_qa: True
+  output_apportionment_qa: True
+  output_long_form: True
+  output_short_form: True
+  output_gb_sas: True
+  output_ni_sas: True
+  output_tau: True
+  output_intram_by_pg: True
+  output_intram_by_itl1: True
+  output_intram_uk_itl2: True
+  output_intram_by_civil_defence: True
+  output_intram_by_sic: True
+  output_fte_total_qa: True
+  output_status_filtered: True
+  output_frozen_group: True
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig

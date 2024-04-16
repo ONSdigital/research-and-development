@@ -5,9 +5,6 @@ import numpy as np
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.outputs_helpers import aggregate_output
-
-
 OutputMainLogger = logging.getLogger(__name__)
 
 
@@ -43,7 +40,7 @@ def output_intram_by_civil_defence(
     value_col = "211"
     agg_method = "sum"
 
-    df_agg = aggregate_output(df, [key_col], [value_col], agg_method)
+    df_agg = df.groupby([key_col]).agg(agg_method)
 
     # Merge with output table
     df_merge = civil_defence_detailed.merge(

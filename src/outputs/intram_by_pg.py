@@ -4,9 +4,6 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.outputs_helpers import aggregate_output
-
-
 OutputMainLogger = logging.getLogger(__name__)
 
 
@@ -35,9 +32,8 @@ def output_intram_by_pg(
     # Group by PG and aggregate intram
     key_col = "201"
     value_col = "211"
-    agg_method = "sum"
 
-    df_agg = aggregate_output(df, [key_col], [value_col], agg_method)
+    df_agg = df.groupby([key_col]).agg("sum")
 
     # Create Total and concatinate it to df_agg
     value_tot = df_agg[value_col].sum()
