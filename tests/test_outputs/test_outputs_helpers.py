@@ -36,7 +36,7 @@ class TestCreateOutputDF(object):
         if not isinstance(case, str):
             raise TypeError(f"'case' expected type 'str'. Got {type(case)}")
         if case not in ["i", "o"]:
-            raise ValueError(f"'case' must be one of ['i', 'e']. Got {case}")
+            raise ValueError(f"'case' must be one of ['i', 'o']. Got {case}")
         # create test data
         if case == "i":
             columns = ["old_col_1", "old_col_2", "not_inc"]
@@ -109,7 +109,7 @@ class TestAggregateOutput(object):
     
     @pytest.fixture(scope="function")
     def aggregate_output_output_sum(self):
-        """Expected output data from aggregate_output."""
+        """Expected output data from aggregate_output (using sum)."""
         columns = ["key_col_1", "key_col_2", "value_col"]
         data = [
             [1, 1, 1.25],
@@ -122,7 +122,7 @@ class TestAggregateOutput(object):
     
     @pytest.fixture(scope="function")
     def aggregate_output_output_first(self):
-        """Expected output data from aggregate_output."""
+        """Expected output data from aggregate_output (using first)."""
         columns = ["key_col_1", "key_col_2", "value_col"]
         data = [
             [1, 1, 1.25],
@@ -139,14 +139,14 @@ class TestAggregateOutput(object):
                 ("first")
             ]
             )
-    def test_aggregate_output_sum(
+    def test_aggregate_output(
             self,
             aggregate_output_input,
             aggregate_output_output_sum,
             aggregate_output_output_first,
             case
             ):
-        """Tests for aggregate_output using sum as the aggregation method."""
+        """Tests for aggregate_output using different aggregation methods."""
         # get output
         output = aggregate_output(
             df=aggregate_output_input,
