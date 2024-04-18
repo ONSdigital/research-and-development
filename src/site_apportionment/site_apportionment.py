@@ -256,6 +256,36 @@ def create_category_df(
     return category_df
 
 
+def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
+    """
+    Counts the number of duplicate sites in the DataFrame.
+
+    Args:
+        sites_df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        int: The number of duplicate sites.
+    """
+    site_count_df = sites_df[groupby_cols + [postcode_col]].copy()
+    site_count_df["site_count"] = site_count_df.groupby(groupby_cols + [postcode_col])[
+        postcode_col
+    ].transform("count")
+    df_duplicate_sites = site_count_df[site_count_df["site_count"] > 1]
+    num_duplicate_sites = len(
+        df_duplicate_sites.groupby(["reference", "period", postcode_col])
+    )
+
+    if num_duplicate_sites:
+        # display number of duplicate sites
+        SitesApportionmentLogger.info(
+            f"There are {num_duplicate_sites} duplicate sites."
+        )
+        # shows duplicate site df
+        SitesApportionmentLogger.info(
+            f"Duplicates sites DF: \n{df_duplicate_sites.to_string()}"
+        )
+    
+
 def create_sites_df(
     df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str]
 ) -> pd.DataFrame:
@@ -275,6 +305,9 @@ def create_sites_df(
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
 
+    # Check for postcode duplicates for QA
+    count_duplicate_sites(sites_df)
+
     # De-duplicate by summing percents
     sites_df[percent_col] = sites_df[percent_col].fillna(0)
     agg_dict = {instance_col: "first", percent_col: "sum"}
@@ -283,30 +316,6 @@ def create_sites_df(
     ).agg(agg_dict).reset_index()
 
     return sites_df
-
-
-def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
-    """
-    Counts the number of duplicate sites in the DataFrame.
-
-    Args:
-        sites_df (pd.DataFrame): The input DataFrame.
-
-    Returns:
-        int: The number of duplicate sites.
-    """
-    site_count_df = sites_df[groupby_cols + [postcode_col]].copy()
-    site_count_df["site_count"] = site_count_df.groupby(groupby_cols + [postcode_col])[
-        postcode_col
-    ].transform("count")
-    df_duplicate_sites = site_count_df[site_count_df["site_count"] > 1]
-    num_duplicate_sites = df_duplicate_sites.shape[0]
-
-    if num_duplicate_sites:
-        SitesApportionmentLogger.info(
-            f"There are {num_duplicate_sites} duplicate sites."
-        )
-    
 
 
 def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.DataFrame:
@@ -500,9 +509,6 @@ def run_apportion_sites(
 
     # sites_df: dataframe with sites, percents and everythung else
     sites_df = create_sites_df(to_apportion_df, groupby_cols, site_cols)
-
-    # Check for postcode duplicates for QA
-    count_duplicate_sites(sites_df)
 
     # Calculate weights
     sites_df = calc_weights_for_sites(sites_df, groupby_cols)

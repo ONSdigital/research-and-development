@@ -724,7 +724,7 @@ class TestCountDuplicateSites(object):
         count_duplicate_sites(sites_df_input)
         # parse logs and assert
         log_records = [record.msg for record in caplog.records]
-        expected_log_message = "There are 5 duplicate sites."
+        expected_log_message = "There are 2 duplicate sites."
         assert log_records[0] == expected_log_message, (
             "Duplicate sites not added to logger at level INFO."
         )
