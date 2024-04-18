@@ -118,7 +118,7 @@ class TestJoinFgnOwnership(object):
             [2, "0001", 22, "uf2"],
             [3, "0001", 23, "uf3"],
             [4, np.nan, 24, "GB"], # filled with GB
-            [5, "0002", 25, "uf4"] # filled with GB
+            [5, "0002", 25, "uf4"] 
                 ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -146,8 +146,8 @@ class TestMapSizebands(object):
         columns = ["col1", "employment"]
         data = [
             [1, 5],
-            [2, 15],
-            [3, 25],
+            [2, 10],
+            [3, 20],
             [4, 55],
             [5, 150],
             [6, 300]
@@ -162,8 +162,8 @@ class TestMapSizebands(object):
         columns = ["col1", "employment", "sizeband"]
         data = [
             [1, 5, 1],
-            [2, 15, 2],
-            [3, 25, 3],
+            [2, 10, 2],
+            [3, 20, 3],
             [4, 55, 4],
             [5, 150, 5],
             [6, 300, 6]
