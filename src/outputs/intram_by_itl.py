@@ -39,7 +39,7 @@ def save_detailed_csv(
     Raises:
         FileExistsError: An error raised if overwrite is false and the file
             already exists.
-            
+
     """
     date = datetime.now().strftime("%Y-%m-%d")
     save_name = f"{title}_{date}_v{run_id}.csv"
@@ -73,37 +73,39 @@ def rename_itl(df: pd.DataFrame, itl: int) -> pd.DataFrame:
 
 def output_intram_by_itl(
         df_gb: pd.DataFrame,
-        df_ni: pd.DataFrame,
         config: Dict[str, Any],
         write_csv: Callable,
         run_id: int,
         postcode_mapper: pd.DataFrame,
-        itl_mapper: pd.DataFrame
+        itl_mapper: pd.DataFrame,
+        df_ni: pd.DataFrame = None,
         ):
     """Generate outputs aggregated to ITL levels 1 and 2.
 
     Args:
-        df_gb (pd.DataFrame): GB microdata with weights applied
-        df_ni (pd.DataFrame): NI microdate (weights are 1)
-        config (Dict[str, Any]): Project config
+        df_gb (pd.DataFrame): GB microdata with weights applied.
+        config (Dict[str, Any]): Project config.
         write_csv (Callable): A function to write to a csv file.
-        run_id (int): The current run ID
+        run_id (int): The current run ID.
         postcode_mapper (pd.DataFrame): Postcode to regional code mapping df.
         itl_mapper (pd.DataFrame): Regional code to ITL levels mapping df.
+        df_ni (pd.DataFrame): NI microdate (weights are 1).
 
     """
     # Declare Config Values
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
     
-    # Add missing columns to ni
-    df_ni["postcodes_harmonised"] = pd.NA
+    # Subset GB Data
+    df_gb = df_gb[["postcodes_harmonised", "formtype", "211"]]
 
-    # Select needed columns and combine
-    col_needed = ["postcodes_harmonised", "formtype", "211"]
-    df_gb = df_gb[col_needed]
-    df_ni = df_ni[col_needed]
-    df = df_gb.append(df_ni, ignore_index=True).copy()
+    if df_ni is not None:
+        # Clean NI data and join
+        df_ni["postcodes_harmonised"] = pd.NA
+        df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
+        df_gb = df_gb.append(df_ni, ignore_index=True).copy()
+    
+    df = df_gb
 
     # Join Aggregation Cols
     df = map_o.join_itl_regions(df, postcode_mapper)
@@ -116,24 +118,28 @@ def output_intram_by_itl(
     itl2 = df.groupby(GEO_COLS).agg({"211": "sum"}).reset_index()
     itl1 = itl2.drop(GEO_COLS[:2], axis=1).copy()
     itl1 = itl1.groupby(GEO_COLS[2:]).agg({"211": "sum"}).copy().reset_index()
-    # clean data
+
+    # Clean data rady for export
     itl2.drop(GEO_COLS[2:], axis=1, inplace=True)
     rename_itl(itl1, 1)
     rename_itl(itl2, 2)
 
-    
-
-    # export outputs
-    for i, itl in enumerate([itl1, itl2], start=1):
-        output_dir = f"{OUTPUT_PATH}/output_intram_uk_itl{i}/"
+    # Export UK outputs
+    area = "gb" if not df_ni is not None else "uk"
+    itl_dfs = [{"1": itl1}, {"2": itl2}]
+    for itl in itl_dfs:
+        i = [k for k in itl][0]
+        itl_df = itl[i]
+        output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
         save_detailed_csv(
-            df=itl,
+            df=itl_df,
             dir=output_dir,
-            title=f"output_intram_uk_itl{i}",
+            title=f"output_intram_{area}_itl{i}",
             run_id=run_id,
             write_csv=write_csv,
             overwrite=True
         )
+    
     
 
 

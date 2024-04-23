@@ -16,8 +16,7 @@ from src.outputs.tau import output_tau
 from src.outputs.gb_sas import output_gb_sas
 from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.outputs.intram_by_itl1 import output_intram_by_itl1
-from src.outputs.intram_uk_itl_1_2 import output_intram_by_itl
+from src.outputs.intram_by_itl import output_intram_by_itl
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
@@ -172,37 +171,36 @@ def run_outputs(
         )
         OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
-    # Running Intram by ITL1
-    if config["global"]["output_intram_by_itl1"] and not config["global"]["output_intram_uk_itl2"]:
-        OutputMainLogger.info("Starting  Intram by ITL1 output...")
+    # Running Intram by ITL (GB)
+    if config["global"]["output_intram_gb_itl"]:
+        OutputMainLogger.info("Starting Intram by ITL (GB) output...")
         start = datetime.now()
-        output_intram_by_itl1(
+        output_intram_by_itl(
             outputs_df,
             config,
             write_csv,
             run_id,
             postcode_mapper,
             itl_mapper,
-            itl1_detailed,
         )
         OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
-        OutputMainLogger.info("Finished Intram by ITL1 output.")
+        OutputMainLogger.info("Finished Intram by ITL (GB) output.")
 
-    # Running Intram UK by ITL 1 and 2
-    if config["global"]["output_intram_uk_itl2"]:
-        OutputMainLogger.info("Starting Intram UK by ITL 1 and 2 output...")
+    # Running Intram by ITL (UK)
+    if config["global"]["output_intram_uk_itl"]:
+        OutputMainLogger.info("Starting Intram by ITL (UK) output...")
         start = datetime.now()
         output_intram_by_itl(
             outputs_df,
-            ni_full_responses,
             config, 
             write_csv,
             run_id,
             postcode_mapper,
             itl_mapper,
+            ni_full_responses,
         )
         OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
-        OutputMainLogger.info("Finished Intram UK by ITL 1 and 2 output.")
+        OutputMainLogger.info("Finished Intram by ITL (UK) output.")
 
     # Running frozen group
     if config["global"]["output_frozen_group"]:
