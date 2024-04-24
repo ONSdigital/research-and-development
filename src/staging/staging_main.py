@@ -162,6 +162,12 @@ def run_staging(
         check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
+        manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
+            False
+        )
+        manual_outliers = manual_outliers.drop_duplicates(
+            subset=["reference"], keep="first"
+        )
         val.validate_data_with_schema(
             manual_outliers, "./config/manual_outliers_schema.toml"
         )
@@ -178,10 +184,15 @@ def run_staging(
         wanted_cols = ["reference", "instance", "manual_trim"]
         manual_trim_df = read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+        manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
+        print(len(manual_trim_df))
+        manual_trim_df = manual_trim_df.drop_duplicates(
+            subset=["reference", "instance"], keep="first"
+        )
         val.validate_data_with_schema(
             manual_trim_df, "./config/manual_trim_schema.toml"
         )
-        # Fill empty values with False
+        print(len(manual_trim_df))
     else:
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
