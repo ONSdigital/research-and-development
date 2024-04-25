@@ -2,6 +2,7 @@
 # Standard Library Imports
 import pytest
 import os
+import pathlib
 from datetime import datetime
 
 # Third Party Imports
@@ -89,7 +90,7 @@ class TestSaveDetailedCSV(object):
 
 class TestRenameItl(object):
     """Tests for renamed_itl."""
-    def test_data(self, itl) -> pd.DataFrame:
+    def get_test_data(self, itl: str) -> pd.DataFrame:
         """Test data for rename_itl tests."""
         columns = [f"ITL{itl}21CD", f"ITL{itl}21NM"]
         data = [
@@ -102,12 +103,12 @@ class TestRenameItl(object):
     def test_rename_itl(self):
         """General tests for rename_itl."""
         # read in sample df's
-        data_1 = self.test_data(itl=1)
-        data_2 = self.test_data(itl=2)
+        data_1 = self.get_test_data(itl=1)
+        data_2 = self.get_test_data(itl=2)
         # assert column name changes
         data_1 = rename_itl(data_1, 1)
         data_2 = rename_itl(data_2, 2)
-        data_1_missing = rename_itl(data_1, 2) # no changes
+        data_1_missing = rename_itl(data_1.copy(), 2) # no changes
         assert (
             np.array_equal(
                 data_1.columns,
@@ -123,9 +124,149 @@ class TestRenameItl(object):
         assert (
             np.array_equal(
                 data_1_missing.columns, 
-                ["Area Code (ITL2)", "Region (ITL2)"]
+                ["Area Code (ITL1)", "Region (ITL1)"]
             )
         ), "ITL1 columns did not remain the same."
 
 
+class TestOutputIntramByItl(object):
+    """Tests for output_intram_by_itl."""
 
+    @pytest.fixture(scope="function")
+    def gb_input_data(self):
+        """GB input data for output_intram_by_itl tests."""
+        columns = [
+            "postcodes_harmonised", "formtype", "211"
+        ]
+        data = [
+            ['YO25 6TH', "0006", 337266.6667],
+            ['CF33 6NU', "0006", 14061.6883],
+            ['NP44 3HQ', "0006", 345523.98],
+            ['W4   5YA', "0001", 0.0],
+            ['GU30 7RP', "0001", 200.0],
+            ['TA20 2GB', "0001", 1400.0],
+            ['TA21 8NL', "0001", 134443.0],
+            ['TA21 8NL', "0001", 15463.5],
+            ['SP10 3SD', "0006", 0.0],
+            ['SP10 3SD', "0001", 12345678.0]
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+
+    @pytest.fixture(scope="function")
+    def ni_input_data(self) -> pd.DataFrame:
+        """UK input data for output_intram_by_itl tests."""
+        columns = ["formtype", "211"]
+        data = [
+            ["0003", 213.0],
+            ["0003",  25.0],
+            ["0003",  75.0],
+            ["0003", 167.0]
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def postcode_mapper(self) -> pd.DataFrame:
+        """Postcode mapper for output_intram_by_itl tests."""
+        columns = ['pcd2', 'itl']
+        data = [
+            ['CF33 6NU', 'W06000013'],
+            ['GU30 7RP', 'E07000085'],
+            ['NP44 3HQ', 'W06000020'],
+            ['SP10 3SD', 'E07000093'],
+            ['TA20 2GB', 'E07000189'],
+            ['TA21 8NL', 'E07000246'],
+            ['W4   5YA', 'E09000018'],
+            ['YO25 6TH', 'E06000011']
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def itl_mapper(self) -> pd.DataFrame:
+        """ITL mapper for output_intram_by_itl tests."""
+        columns = ["LAU121CD", "ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
+        data = [
+            ['E06000011', 'TLE1', 'East Yorkshire and Northern Lincolnshire',
+                'TLE', 'Yorkshire and The Humber'],
+            ['E09000018', 'TLI7', 'Outer London - West and North West', 'TLI',
+                'London'],
+            ['E07000189', 'TLK2', 'Dorset and Somerset', 'TLK',
+                'South West (England)'],
+            ['E07000246', 'TLK2', 'Dorset and Somerset', 'TLK',
+                'South West (England)'],
+            ['W06000020', 'TLL1', 'West Wales and The Valleys', 'TLL',
+                'Wales'],
+            ['W06000013', 'TLL1', 'West Wales and The Valleys', 'TLL',
+                'Wales'],
+            ['E07000085', 'TLJ3', 'Hampshire and Isle of Wight', 'TLJ',
+                'South East (England)'],
+            ['E07000093', 'TLJ3', 'Hampshire and Isle of Wight', 'TLJ',
+                'South East (England)']
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    def create_dummy_config(self, path: pathlib.Path):
+        """Create dummy config to provide output paths"""
+        config = {
+            "global": {"network_or_hdfs": "network"}, # no impact for test
+            "network_paths": {"output_path": path}
+        }
+        return config
+
+
+    def setup_output_dir(
+            self,
+            path: pathlib.Path,
+            region: str,
+        ) -> list:
+        """Create output directories for outputs to be saved to."""
+        paths = []
+        for i in [1, 2]:
+            new_dir = os.path.join(path, f"output_intram_{region}_itl{i}")
+            os.mkdir(new_dir)
+            paths.append(new_dir)
+        return paths
+    
+
+    def get_dfs_from_paths(self, paths: list) -> list:
+        """Get the df's from a list of directories."""
+        dfs = {}
+        for path in paths:
+            files = [
+                os.path.join(path, fpath) for fpath in os.listdir(path) if 
+                fpath.endswith(".csv")
+                ]
+            for file in files:
+                dfs[os.path.basename(file)] = pd.read_csv(file)
+        return dfs
+
+    def test_output_intram_by_itl_gb(
+            self, 
+            tmp_path,
+            gb_input_data,
+            postcode_mapper,
+            itl_mapper,
+            write_csv_func
+        ):
+        """General tests for output_intram_by_itl with no NI data."""
+        config = self.create_dummy_config(tmp_path)
+        output_paths = self.setup_output_dir(tmp_path, "gb")
+        # save outputs
+        output_intram_by_itl(
+            df_gb=gb_input_data,
+            config=config,
+            write_csv=write_csv_func,
+            run_id=1,
+            postcode_mapper=postcode_mapper,
+            itl_mapper=itl_mapper
+        )
+        outputs_dfs = self.get_dfs_from_paths(output_paths)
+        
+        

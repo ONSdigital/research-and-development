@@ -66,7 +66,7 @@ def rename_itl(df: pd.DataFrame, itl: int) -> pd.DataFrame:
         f"ITL{itl}21NM": f"Region (ITL{itl})",
         "211": "2022 Total q211"
     }
-    df = df.rename(mapper=renamer)
+    df = df.rename(mapper=renamer, axis=1)
     return df
 
 
@@ -88,7 +88,7 @@ def output_intram_by_itl(
         run_id (int): The current run ID.
         postcode_mapper (pd.DataFrame): Postcode to regional code mapping df.
         itl_mapper (pd.DataFrame): Regional code to ITL levels mapping df.
-        df_ni (pd.DataFrame): NI microdate (weights are 1).
+        df_ni (pd.DataFrame): NI microdate (weights are 1), defaults to None.
 
     """
     # Declare Config Values

@@ -27,4 +27,3 @@ def write_csv_func() -> Callable:
     else:
         from src.utils.hdfs_mods import write_hdfs_csv as write_csv
     return write_csv
-
