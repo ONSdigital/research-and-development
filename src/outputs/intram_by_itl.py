@@ -11,7 +11,6 @@ from typing import Callable, Dict, Any, Union
 import pandas as pd
 
 # Local Imports
-from src.outputs.outputs_helpers import aggregate_output
 import src.outputs.map_output_cols as map_o
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ def save_detailed_csv(
         run_id: int,
         write_csv: Callable,
         overwrite: bool = True
-        ):
+        ): 
     """Save a df as a csv with a detailed filename.
 
     Args:
