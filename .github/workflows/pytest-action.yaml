@@ -48,9 +48,9 @@ jobs:
           junitxml-path: ./junit_result.xml
 # 7) Get a full coverage report
       - name: Run Tests and Generate Coverage Report
-      run: |
-        coverage run -m pytest
-        coverage xml
+        run: 
+          coverage run -m pytest
+          coverage xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
