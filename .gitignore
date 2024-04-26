@@ -904,6 +904,9 @@ docs/reference/api/*
 # Ignore Sphinx documentation link checking folder
 docs/_linkcheck/
 
+# logs files
+logs/*
+
 # Utility bat file for ssh key
 add_ssh_key.bat
 
