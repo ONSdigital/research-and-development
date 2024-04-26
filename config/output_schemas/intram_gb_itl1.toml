@@ -2,14 +2,10 @@
 old_name = "None"
 Deduced_Data_Type = "str"
 
-["Country or region (ITL1)"]
+["Region (ITL1)"]
 old_name = "None"
 Deduced_Data_Type = "str"
 
-["2023"]
+["2022 Total q211"]
 old_name = "None"
 Deduced_Data_Type = "float64"
-
-["Notes"]
-old_name = "None"
-Deduced_Data_Type = "str"
