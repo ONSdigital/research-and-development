@@ -906,6 +906,7 @@ docs/_linkcheck/
 
 # logs files
 logs/*
+!logs/main.log
 
 # Utility bat file for ssh key
 add_ssh_key.bat
