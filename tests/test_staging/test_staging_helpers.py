@@ -35,35 +35,6 @@ from src.utils.local_file_mods import (
 )
 
 
-# class TestPostcodeTopup(object):
-#     """Tests for postcode_topup."""
-
-#     @pytest.fixture(scope="function")
-#     def input_data(self):
-#         """Input data for postcode_topup tests."""
-#         columns = ["key", "postcode"]
-#         data = [
-#             [1, "NP44 2NZ"], # normal
-#             [2, "np44 2nz"], # lower case
-#             [3, "NP4 2NZ"], # only 7 chars
-#             [4, "NP44 2NZ 7Y"], # extra parts
-#             [5, "NP44 2NZZ"], # 9 chars (extra)
-#             [6, "NP442NZ"], # one part, 7 chars
-#             [7, ""], #empty str
-#         ]
-#         df = pd.DataFrame(columns=columns, data=data)
-#         return df
-    
-
-#     def test_postcode_topup(self, input_data):
-#         """General tests for postcode_topup."""
-#         output = input_data.copy()
-#         output["postcode"] = output["postcode"].apply(
-#             lambda x: postcode_topup(x)
-#             )
-#         print(output)
-
-
 def match_col_type(
         df1: pd.DataFrame,
         df2: pd.DataFrame,
