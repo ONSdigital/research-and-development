@@ -120,8 +120,8 @@ def output_intram_by_itl(
 
     # Clean data rady for export
     itl2.drop(GEO_COLS[2:], axis=1, inplace=True)
-    rename_itl(itl1, 1)
-    rename_itl(itl2, 2)
+    itl1 = rename_itl(itl1, 1)
+    itl2 = rename_itl(itl2, 2)
 
     # Export UK outputs
     area = "gb" if not df_ni is not None else "uk"

@@ -90,6 +90,7 @@ class TestSaveDetailedCSV(object):
 
 class TestRenameItl(object):
     """Tests for renamed_itl."""
+
     def get_test_data(self, itl: str) -> pd.DataFrame:
         """Test data for rename_itl tests."""
         columns = [f"ITL{itl}21CD", f"ITL{itl}21NM"]
@@ -212,6 +213,66 @@ class TestOutputIntramByItl(object):
         return df
     
 
+    @pytest.fixture(scope="function")
+    def gb_itl1_output(self) -> pd.DataFrame:
+        """Expected output for GB - ITL1."""
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "2022 Total q211"]
+        data = [
+            ['TLE', 'Yorkshire and The Humber', 337266.6667],
+            ['TLI', 'London', 0.0],
+            ['TLJ', 'South East (England)', 12345878.0],
+            ['TLK', 'South West (England)', 151306.5],
+            ['TLL', 'Wales', 359585.6683],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def gb_itl2_output(self) -> pd.DataFrame:
+        """Expected output for GB - ITL2."""
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "2022 Total q211"]
+        data = [
+            ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
+            ['TLI7', 'Outer London - West and North West', 0.0],
+            ['TLJ3', 'Hampshire and Isle of Wight', 12345878.0],
+            ['TLK2', 'Dorset and Somerset', 151306.5],
+            ['TLL1', 'West Wales and The Valleys', 359585.6683],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+
+    @pytest.fixture(scope="function")
+    def uk_itl1_output(self) -> pd.DataFrame:
+        """Expected output for UK - ITL1."""
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "2022 Total q211"]
+        data = [
+            ['TLE', 'Yorkshire and The Humber', 337266.6667],
+            ['TLI', 'London', 0.0],
+            ['TLJ', 'South East (England)', 12345878.0],
+            ['TLK', 'South West (England)', 151306.5],
+            ['TLL', 'Wales', 359585.6683],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+    
+
+    @pytest.fixture(scope="function")
+    def uk_itl2_output(self) -> pd.DataFrame:
+        """Expected output for UK - ITL2."""
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "2022 Total q211"]
+        data = [
+            ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
+            ['TLI7', 'Outer London - West and North West', 0.0],
+            ['TLJ3', 'Hampshire and Isle of Wight', 12345878.0],
+            ['TLK2', 'Dorset and Somerset', 151306.5],
+            ['TLL1', 'West Wales and The Valleys', 359585.6683],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+
     def create_dummy_config(self, path: pathlib.Path):
         """Create dummy config to provide output paths"""
         config = {
@@ -247,13 +308,16 @@ class TestOutputIntramByItl(object):
                 dfs[os.path.basename(file)] = pd.read_csv(file)
         return dfs
 
+
     def test_output_intram_by_itl_gb(
             self, 
             tmp_path,
             gb_input_data,
             postcode_mapper,
             itl_mapper,
-            write_csv_func
+            write_csv_func,
+            gb_itl1_output,
+            gb_itl2_output
         ):
         """General tests for output_intram_by_itl with no NI data."""
         config = self.create_dummy_config(tmp_path)
@@ -267,6 +331,48 @@ class TestOutputIntramByItl(object):
             postcode_mapper=postcode_mapper,
             itl_mapper=itl_mapper
         )
-        outputs_dfs = self.get_dfs_from_paths(output_paths)
-        
+        output_dfs = self.get_dfs_from_paths(output_paths)
+        keys = list(output_dfs.keys())
+        pd.testing.assert_frame_equal(output_dfs[keys[0]], gb_itl1_output)
+        assert output_dfs[keys[0]].equals(gb_itl1_output), (
+            "GB ITL1 Output Not as Expected."
+        )
+        assert output_dfs[keys[1]].equals(gb_itl2_output), (
+            "GB ITL2 Output Not as Expected."
+        )
+
+
+    def test_output_intram_by_itl_uk(
+        self, 
+        tmp_path,
+        gb_input_data,
+        postcode_mapper,
+        itl_mapper,
+        write_csv_func,
+        ni_input_data,
+        uk_itl1_output,
+        uk_itl2_output
+    ):
+        """General tests for output_intram_by_itl with NI data."""
+        config = self.create_dummy_config(tmp_path)
+        output_paths = self.setup_output_dir(tmp_path, "uk")
+        # save outputs
+        output_intram_by_itl(
+            df_gb=gb_input_data,
+            config=config,
+            write_csv=write_csv_func,
+            run_id=1,
+            postcode_mapper=postcode_mapper,
+            itl_mapper=itl_mapper,
+            df_ni=ni_input_data
+        )
+        output_dfs = self.get_dfs_from_paths(output_paths)
+        keys = list(output_dfs.keys())
+        assert output_dfs[keys[0]].equals(uk_itl1_output), (
+            "UK ITL1 Output Not as Expected."
+        )
+        assert output_dfs[keys[1]].equals(uk_itl2_output), (
+            "UK ITL2 Output Not as Expected."    
+        )
+
         
