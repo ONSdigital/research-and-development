@@ -905,10 +905,11 @@ docs/reference/api/*
 docs/_linkcheck/
 
 # logs files
-logs/*
-!logs/logs.md
+/logs/*
 !logs/.gitkeep
-!logs/run_logs/*.*
+!logs/logs.md
+!logs/run_logs
+!logs/run_logs/.gitkeep
 
 # Utility bat file for ssh key
 add_ssh_key.bat
