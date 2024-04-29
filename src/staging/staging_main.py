@@ -186,7 +186,7 @@ def run_staging(
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
-    pg_num_alpha = helpers.load_valdiate_mapper(
+    pg_num_alpha = helpers.load_validate_mapper(
         "pg_num_alpha_mapper_path",
         paths,
         check_file_exists,
@@ -215,7 +215,7 @@ def run_staging(
         StagingMainLogger.info("Loading of Backdata File skipped")
 
     # Load ultfoc (Foreign Ownership) mapper
-    ultfoc_mapper = helpers.load_valdiate_mapper(
+    ultfoc_mapper = helpers.load_validate_mapper(
         "ultfoc_mapper_path",
         paths,
         check_file_exists,
@@ -226,7 +226,7 @@ def run_staging(
     )
 
     # Load ITL mapper
-    itl_mapper = helpers.load_valdiate_mapper(
+    itl_mapper = helpers.load_validate_mapper(
         "itl_mapper_path",
         paths,
         check_file_exists,
@@ -237,7 +237,7 @@ def run_staging(
     )
 
     # Loading cell number coverage
-    cellno_df = helpers.load_valdiate_mapper(
+    cellno_df = helpers.load_validate_mapper(
         "cellno_2022_path",
         paths,
         check_file_exists,
@@ -248,7 +248,7 @@ def run_staging(
     )
 
     # Loading SIC to PG to alpha mapper
-    sic_pg_alpha_mapper = helpers.load_valdiate_mapper(
+    sic_pg_alpha_mapper = helpers.load_validate_mapper(
         "sic_pg_alpha_mapper_path",
         paths,
         check_file_exists,
@@ -260,7 +260,7 @@ def run_staging(
         "pg_alpha",
     )
 
-    sic_pg_utf_mapper = helpers.load_valdiate_mapper(
+    sic_pg_utf_mapper = helpers.load_validate_mapper(
         "sic_pg_utf_mapper_path",
         paths,
         check_file_exists,
@@ -276,7 +276,7 @@ def run_staging(
     mapper_path = paths["mapper_path"]
     write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
 
-    pg_detailed_mapper = helpers.load_valdiate_mapper(
+    pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
         paths,
         check_file_exists,
@@ -287,7 +287,7 @@ def run_staging(
     )
 
     # Loading ITL1 detailed mapper
-    itl1_detailed_mapper = helpers.load_valdiate_mapper(
+    itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
         paths,
         check_file_exists,
@@ -300,7 +300,7 @@ def run_staging(
     # Loading ru_817_list mapper
     load_ref_list_mapper = config["global"]["load_reference_list"]
     if load_ref_list_mapper:
-        ref_list_817_mapper = helpers.load_valdiate_mapper(
+        ref_list_817_mapper = helpers.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
             check_file_exists,
@@ -316,7 +316,7 @@ def run_staging(
         ref_list_817_mapper = pd.DataFrame()
 
     # Loading Civil or Defence detailed mapper
-    civil_defence_detailed_mapper = helpers.load_valdiate_mapper(
+    civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
         paths,
         check_file_exists,
@@ -327,7 +327,7 @@ def run_staging(
     )
 
     # Loading SIC division detailed mapper
-    sic_division_detailed_mapper = helpers.load_valdiate_mapper(
+    sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
         paths,
         check_file_exists,
