@@ -370,7 +370,7 @@ class TestStageValidateHarmonisePostcodes(object):
             [39900001530, 0.0, 6, "CE2", "CE2"], # invalid
             [39900001601, 0.0, 1, np.nan, 'RH12 1XL'], # normal
             [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU"], # convert character cases
+            [39900003110, 0.0, 6, np.nan, "CE11 8IU"], 
             [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
             [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
             [38880003110, 0.0, 6, np.nan, "NP22 8UI"], # not in postcode list
