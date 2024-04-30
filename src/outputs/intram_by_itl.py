@@ -64,7 +64,7 @@ def rename_itl(df: pd.DataFrame, itl: int) -> pd.DataFrame:
     renamer = {
         f"ITL{itl}21CD": f"Area Code (ITL{itl})",
         f"ITL{itl}21NM": f"Region (ITL{itl})",
-        "211": "2022 Total q211"
+        "211": "Year Total q211"
     }
     df = df.rename(mapper=renamer, axis=1)
     return df
