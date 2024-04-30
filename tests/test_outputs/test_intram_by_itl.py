@@ -216,7 +216,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def gb_itl1_output(self) -> pd.DataFrame:
         """Expected output for GB - ITL1."""
-        columns = ["Area Code (ITL1)", "Region (ITL1)", "2022 Total q211"]
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year Total q211"]
         data = [
             ['TLE', 'Yorkshire and The Humber', 337266.6667],
             ['TLI', 'London', 0.0],
@@ -231,7 +231,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def gb_itl2_output(self) -> pd.DataFrame:
         """Expected output for GB - ITL2."""
-        columns = ["Area Code (ITL2)", "Region (ITL2)", "2022 Total q211"]
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year Total q211"]
         data = [
             ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
             ['TLI7', 'Outer London - West and North West', 0.0],
@@ -246,7 +246,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def uk_itl1_output(self) -> pd.DataFrame:
         """Expected output for UK - ITL1."""
-        columns = ["Area Code (ITL1)", "Region (ITL1)", "2022 Total q211"]
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year Total q211"]
         data = [
             ['TLE', 'Yorkshire and The Humber', 337266.6667],
             ['TLI', 'London', 0.0],
@@ -261,7 +261,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def uk_itl2_output(self) -> pd.DataFrame:
         """Expected output for UK - ITL2."""
-        columns = ["Area Code (ITL2)", "Region (ITL2)", "2022 Total q211"]
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year Total q211"]
         data = [
             ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
             ['TLI7', 'Outer London - West and North West', 0.0],
