@@ -5,8 +5,9 @@ from numpy import random
 import logging
 import re
 import os
+import pathlib
 from datetime import datetime
-from typing import Callable, Tuple, Dict
+from typing import Callable, Tuple, Dict, Union
 
 # Our own modules
 from src.utils.wrappers import time_logger_wrap
@@ -372,47 +373,40 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
     return secondary_full_responses
 
 
-def write_snapshot_to_feather(
-    feather_dir_path: str,
-    snapshot_name: str,
-    full_responses: pd.DataFrame,
-    write_feather,
-    secondary_snapshot_name: str,
-    secondary_full_responses: pd.DataFrame = None,
+def df_to_feather(
+        dir: Union[pathlib.Path, str],
+        save_name: str,
+        df: pd.DataFrame,
+        write_feather: Callable,
+        overwrite: bool = True
 ) -> None:
-    """
-    Writes the provided DataFrames to feather files.
-
-    This function writes the `full_responses` DataFrame to a feather file named
-    "{snapshot_name}_corrected.feather", and the `secondary_full_responses`
-    DataFrame to a feather file named "{secondary_snapshot_name}.feather".
-    Both files are written to the provided `feather_path`.
+    """_summary_
 
     Args:
-        feather_path (str): The path where the feather files will be written.
-        snapshot_name (str): The name of the snapshot for the `full_responses`
-        DataFrame.
-        full_responses (pd.DataFrame): The DataFrame to write to the
-        "{snapshot_name}_corrected.feather" file.
-        secondary_snapshot_name (str): The name of the snapshot for the
-        `secondary_full_responses` DataFrame.
-        secondary_full_responses (pd.DataFrame): The DataFrame to write to the
-        "{secondary_snapshot_name}.feather" file.
+        dir (Union[pathlib.Path, str]): The save directory of the feather file.
+        save_name (str): The save name of the feather file.
+        df (pd.DataFrame): The df to save out as a .feather file.
+        write_feather (Callable): A function that write out a feather.
+        overwrite (bool, optional): Whether or not to overwrite files saved
+            under the same name. Defaults to True.
+
+    Raises:
+        FileNotFoundError: Raised if the passed directory does not exist.
+        FileExistsError: Raised if overwrite=False and the file already exists.
     """
-
-    feather_file = f"{snapshot_name}_corrected.feather"
-    feather_file_path = os.path.join(feather_dir_path, feather_file)
-    write_feather(feather_file_path, full_responses)
-    StagingHelperLogger.info(f"Written {feather_file} to {feather_dir_path}")
-
-    if secondary_full_responses is not None:
-        secondary_feather_file = os.path.join(
-            feather_dir_path, f"{secondary_snapshot_name}.feather"
+    # defences
+    if not os.path.exists(dir):
+        raise FileNotFoundError(f"The passed directory ({dir}) does not exist")
+    fpath = os.path.join(dir, save_name)
+     # ensure path is feather file
+    if os.path.splitext(fpath)[1].lower() != ".feather":
+        fpath = f"{fpath}.feather"
+    if not overwrite and os.path.exists(fpath):
+        raise FileExistsError(
+            f"File already saved at {fpath}. Pass overwrite=True if you would "
+            "like to overwrite it."
         )
-        write_feather(secondary_feather_file, secondary_full_responses)
-        StagingHelperLogger.info(
-            f"Written {secondary_snapshot_name}.feather to {feather_dir_path}"
-        )
+    write_feather(fpath, df)
 
 
 def stage_validate_harmonise_postcodes(

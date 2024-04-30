@@ -1,8 +1,8 @@
 """Tests for 'staging_helpers.py'."""
 # Standard Library Imports
+import os
 import pytest
 import pathlib
-import os
 from typing import Tuple
 from datetime import date
 
@@ -13,7 +13,6 @@ import pyarrow.feather as feather
 
 # Local Imports
 from src.staging.staging_helpers import (
-    # postcode_topup,
     fix_anon_data,
     update_ref_list,
     getmappername,
@@ -23,7 +22,7 @@ from src.staging.staging_helpers import (
     load_snapshot_feather,
     load_val_snapshot_json,
     load_validate_secondary_snapshot,
-    write_snapshot_to_feather,
+    df_to_feather,
     stage_validate_harmonise_postcodes
 )
 from src.utils.local_file_mods import (
@@ -281,8 +280,8 @@ class TestLoadSnapshotFeather(object):
 
 # load_validate_secondary_snapshot [CANT TEST: TOO MANY HARD CODED PATHS]
 
-class TestWriteSnapshotToFeather(object):
-    """Tests for write_snapshot_to_feather."""
+class TestDfToFeather(object):
+    """Tests for df_to_Feather."""
 
     @pytest.fixture(scope="function")
     def f1(self):
@@ -293,51 +292,84 @@ class TestWriteSnapshotToFeather(object):
         return f1
     
 
-    @pytest.fixture(scope="function")
-    def f2(self):
-        """Snapshot 2 test data."""
-        f2 = pd.DataFrame(
-            {"f2": [1]}
-        )
-        return f2
-
-
-    def test_write_snapshot_to_feather_both(self, tmp_path, f1, f2):
-        """General tests for write_snapshot_to_feather."""
-        # write 'feathers'
-        write_snapshot_to_feather(
+    def test_df_to_feather_defences(self, tmp_path, f1):
+        """Defensive tests for df_to_feather."""
+        # test invalid save location
+        fake_path = "test_test/test/this_is_a_test"
+        match = rf"The passed directory.*{fake_path}.*"
+        with pytest.raises(FileNotFoundError, match=match):
+            df_to_feather(
+                fake_path,
+                "test",
+                f1,
+                write_feather
+            )
+        # test raise for file already exists
+        df_to_feather(
             tmp_path,
-            "snap_1",
+            "test",
+            f1,
+            write_feather
+        )
+        match = r"File already saved at .*"
+        with pytest.raises(FileExistsError, match=match):
+            df_to_feather(
+                tmp_path,
+                "test",
+                f1,
+                write_feather,
+                False,
+            )
+
+
+    def test_df_to_feather(self, tmp_path, f1):
+        """General tests for df_to_feather."""
+        # default save
+        df_to_feather(
+            tmp_path,
+            "test.feather",
             f1,
             write_feather,
-            "snap_2",
-            f2
+            False,
         )
-        # assert feathers has been written
-        files = os.listdir(tmp_path)
-        expected_paths = ['snap_1_corrected.feather', 'snap_2.feather']
-        assert np.array_equal(
-            sorted(files), sorted(expected_paths)
-        ), ("write_snapshot_to_feather not behaving as expected (both)")
-
-
-    def test_write_snapshot_to_feather_single(self, tmp_path, f1):
-        """General tests for write_snapshot_to_feather."""
-        # write 'feathers'
-        write_snapshot_to_feather(
+        assert os.path.exists(os.path.join(tmp_path, "test.feather")), (
+            "Feather not saved out correctly."
+        )
+        # save without .feather extension passed
+        df_to_feather(
             tmp_path,
-            "snap_1",
+            "test2",
             f1,
             write_feather,
-            "snap_2",
+            False,
         )
-        # assert feathers has been written
-        files = os.listdir(tmp_path)
-        expected_paths = ['snap_1_corrected.feather']
-        assert np.array_equal(
-            sorted(files), sorted(expected_paths)
-        ), ("write_snapshot_to_feather not behaving as expected (single)")
-
+        assert os.path.exists(os.path.join(tmp_path, "test2.feather")), (
+            ".feather. extension not applied to path."
+        )
+        # test with overwrite=True
+        # using try/except since nullcontext not supported in python=3.6
+        try:
+            df_to_feather(
+                tmp_path,
+                "test2",
+                f1,
+                write_feather,
+                True,
+            )
+        except Exception as e:
+            raise Exception(f"Overwriting feather file caused error: {e}")
+        # test with two file extensions (one non-feather)
+        df_to_feather(
+            tmp_path,
+            "test3.test",
+            f1,
+            write_feather,
+            False,
+        )
+        assert os.path.exists(os.path.join(tmp_path, "test3.test.feather")), (
+            ".feather. extension not applied when another extension exists."
+        )
+        
 
 class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
