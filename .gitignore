@@ -100,10 +100,6 @@ target/
 !notebooks/.gitkeep
 !notebooks/.README.md
 .ipynb_checkpoints
-*.ipynb
-
-# Exclusion for notebooks directory
-!notebooks/*.ipynb
 
 # IPython
 profile_default/
