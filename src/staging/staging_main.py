@@ -185,14 +185,12 @@ def run_staging(
         manual_trim_df = read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
-        print(len(manual_trim_df))
         manual_trim_df = manual_trim_df.drop_duplicates(
             subset=["reference", "instance"], keep="first"
         )
         val.validate_data_with_schema(
             manual_trim_df, "./config/manual_trim_schema.toml"
         )
-        print(len(manual_trim_df))
     else:
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
