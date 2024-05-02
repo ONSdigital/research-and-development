@@ -2,6 +2,7 @@ name: Run pytest on pull request to develop
 
 # runs on every pull request to develop
 on:
+  push:
   pull_request:
     branches:
       - develop
@@ -46,3 +47,18 @@ jobs:
           coverage-path-prefix: src/
           junitxml-title: Summary of tests
           junitxml-path: ./junit_result.xml
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          badges-directory: .github/badges
+          generate-coverage-badge: true
+          coverage-badge-filename: jacoco.svg
+          generate-branches-badge: true
+          branches-badge-filename: branches.svg
+          generate-summary: true
+          summary-filename: coverage-summary.json
+          coverage-label: coverage
+          branches-label: branches
+          colors: '#4c1 #97ca00 #a4a61d #dfb317 #fe7d37 #e05d44'
+          intervals: 100 90 80 70 60 0
+          workflow-summary-heading: JaCoCo Test Coverage Summary
