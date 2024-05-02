@@ -33,7 +33,7 @@ def output_intram_by_pg(
     key_col = "201"
     value_col = "211"
 
-    df_agg = df.groupby([key_col]).agg("sum")
+    df_agg = df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
 
     # Create Total and concatinate it to df_agg
     value_tot = df_agg[value_col].sum()
