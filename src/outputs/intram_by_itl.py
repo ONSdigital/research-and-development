@@ -23,13 +23,13 @@ def save_detailed_csv(
         run_id: int,
         write_csv: Callable,
         overwrite: bool = True
-        ): 
+    ): 
     """Save a df as a csv with a detailed filename.
 
     Args:
         df (pd.DataFrame): The dataframe to save
         dir (Union[pathlib.Path, str]): The directory to save the dataframe to.
-        title (str): The filename to save the df as (excluding data, run id).
+        title (str): The filename to save the df as (excluding date, run id).
         run_id (int): The current run ID.
         write_csv (Callable): A function to write to a csv file.
         overwrite (bool, optional): Whether or not to overwrite any current 
@@ -119,16 +119,14 @@ def output_intram_by_itl(
     itl1 = itl1.groupby(GEO_COLS[2:]).agg({"211": "sum"}).copy().reset_index()
 
     # Clean data rady for export
-    itl2.drop(GEO_COLS[2:], axis=1, inplace=True)
+    itl2 = itl2.drop(GEO_COLS[2:], axis=1)
     itl1 = rename_itl(itl1, 1)
     itl2 = rename_itl(itl2, 2)
 
     # Export UK outputs
-    area = "gb" if not df_ni is not None else "uk"
-    itl_dfs = [{"1": itl1}, {"2": itl2}]
-    for itl in itl_dfs:
-        i = [k for k in itl][0]
-        itl_df = itl[i]
+    area = "gb" if df_ni is None else "uk"
+    itl_dfs = [itl1, itl2]
+    for i, itl_df in enumerate(itl_dfs, start=1):
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
         save_detailed_csv(
             df=itl_df,
