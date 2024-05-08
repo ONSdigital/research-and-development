@@ -77,7 +77,9 @@ def output_intram_uk_itl_1_2(
         itl_text = itl_levels_dict[level]["itl_text"]
     
         # Group by ITL and aggregate the values by summation
-        df_agg = df.groupby([itl_code, itl_text]).agg("sum")
+        df_agg = df.groupby(
+            [itl_code, itl_text]
+        ).agg({value_col: "sum"}).reset_index()
 
         # Sort by ITL code
         df_agg = df_agg.sort_values(itl_code, axis=0, ascending=True)

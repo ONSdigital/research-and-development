@@ -48,7 +48,8 @@ def output_intram_by_itl1(
     # Group by ITL level 1 and aggregate intram
     value_col = "211"
     agg_method = "sum"
-    df_agg = df.groupby([itl_code]).agg("sum")
+    #df_agg = df.groupby([itl_code]).agg("sum")
+    df_agg = df.groupby([itl_code]).agg({value_col: "sum"}).reset_index()
 
     # Create UK total
     value_uk = df_agg[value_col].sum()

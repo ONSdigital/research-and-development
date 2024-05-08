@@ -101,7 +101,7 @@ def output_frozen_group(
 
     # Deduplicate by aggregation
     if deduplicate:
-        df = df.groupby(category_columns).agg("sum")
+        df_agg = df.groupby(category_columns).agg("sum").reset_index()
     else:
         df_agg = df
 
