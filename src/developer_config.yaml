@@ -33,12 +33,13 @@ global:
   output_gb_sas: False
   output_ni_sas: False
   output_tau: False
-  output_intram_by_pg: True
-  output_intram_by_itl1: True
-  output_intram_uk_itl2: True
-  output_intram_by_civil_defence: True
-  output_intram_by_sic: True
-  output_fte_total_qa: True
+  output_intram_by_pg_gb: False
+  output_intram_by_pg_uk: False
+  output_intram_by_itl1: False
+  output_intram_uk_itl2: False
+  output_intram_by_civil_defence: False
+  output_intram_by_sic: False
+  output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: True
 years:

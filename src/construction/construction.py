@@ -3,8 +3,7 @@ import logging
 import pandas as pd
 from typing import Callable
 
-from src.staging.validation import validate_data_with_schema
-from src.staging.staging_helpers import postcode_topup
+from src.staging.validation import validate_data_with_schema, postcode_topup
 from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
