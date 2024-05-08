@@ -51,7 +51,7 @@ def output_intram_by_pg(
 
 
     # Group by PG and aggregate intram
-    df_agg = df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
+    df_agg = gb_df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
 
     # Create Total and concatinate it to df_agg
     value_tot = df_agg[value_col].sum()
