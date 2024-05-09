@@ -2,7 +2,7 @@
 
 *Insert detailed bullet points about your changes here!*
 
-*Insert any instructions to help the reviewer, e.g. "install new requirements from `environment.yml`"*
+*Insert any instructions to help the reviewer, e.g. "install new requirements from `requirements.txt`"*
 
 *Let the reviewer know what data files are needed (and if applicable, where they are to be found)
 
