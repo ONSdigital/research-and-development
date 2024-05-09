@@ -4,6 +4,7 @@
 import logging
 import pathlib
 import os
+import re
 from datetime import datetime
 from typing import Callable, Dict, Any, Union
 
@@ -61,12 +62,16 @@ def rename_itl(df: pd.DataFrame, itl: int) -> pd.DataFrame:
     Returns:
         pd.DataFrame: A df with the renamed ITL columns.
     """
-    renamer = {
-        f"ITL{itl}21CD": f"Area Code (ITL{itl})",
-        f"ITL{itl}21NM": f"Region (ITL{itl})",
-        "211": "Year Total q211"
-    }
-    df = df.rename(mapper=renamer, axis=1)
+    renamer = {"211": "Year Total q211"}
+    for col in df.columns:
+        cd = re.search(rf"^ITL{itl}[0-9]*CD$", col)
+        if cd:
+            renamer[cd.group()] = f"Area Code (ITL{itl})"
+            continue
+        nm = re.search(rf"^ITL{itl}[0-9]*NM$", col)
+        if nm:
+            renamer[nm.group()] = f"Region (ITL{itl})"
+        df = df.rename(mapper=renamer, axis=1)
     return df
 
 
