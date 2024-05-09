@@ -4,9 +4,6 @@ import pandas as pd
 from datetime import datetime
 from typing import Callable, Dict, Any
 
-from src.outputs.outputs_helpers import aggregate_output
-
-
 OutputMainLogger = logging.getLogger(__name__)
 
 
@@ -38,7 +35,6 @@ def output_intram_by_pg(
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
-    agg_method = "sum"
 
     # evaluate if NI data is included and clean
     if ni_df is not None:
@@ -52,10 +48,10 @@ def output_intram_by_pg(
         gb_df = gb_df[cols_to_keep]
         ni_df = ni_df[cols_to_keep]
         gb_df = gb_df.append(ni_df)
-        
+
 
     # Group by PG and aggregate intram
-    df_agg = aggregate_output(gb_df, [key_col], [value_col], agg_method)
+    df_agg = gb_df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
 
     # Create Total and concatinate it to df_agg
     value_tot = df_agg[value_col].sum()
