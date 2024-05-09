@@ -152,13 +152,14 @@ def run_staging(
                 write_feather
 
             )
-            helpers.df_to_feather(
-                feather_path,
-                s_feather_fname,
-                secondary_full_responses,
-                write_feather
+            if secondary_full_responses is not None:
+                helpers.df_to_feather(
+                    feather_path,
+                    s_feather_fname,
+                    secondary_full_responses,
+                    write_feather
 
-            )
+                )
             
 
     # Flag invalid records
