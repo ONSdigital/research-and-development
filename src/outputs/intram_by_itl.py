@@ -24,7 +24,7 @@ def save_detailed_csv(
         run_id: int,
         write_csv: Callable,
         overwrite: bool = True
-): 
+):
     """Save a df as a csv with a detailed filename.
 
     Args:
@@ -33,7 +33,7 @@ def save_detailed_csv(
         title (str): The filename to save the df as (excluding date, run id).
         run_id (int): The current run ID.
         write_csv (Callable): A function to write to a csv file.
-        overwrite (bool, optional): Whether or not to overwrite any current 
+        overwrite (bool, optional): Whether or not to overwrite any current
             files saved under the same name. Defaults to True.
 
     Raises:
@@ -83,7 +83,7 @@ def output_intram_by_itl(
         postcode_mapper: pd.DataFrame,
         itl_mapper: pd.DataFrame,
         df_ni: pd.DataFrame = None,
-        ):
+):
     """Generate outputs aggregated to ITL levels 1 and 2.
 
     Args:
@@ -99,7 +99,7 @@ def output_intram_by_itl(
     # Declare Config Values
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
-    
+
     # Subset GB Data
     df_gb = df_gb[["postcodes_harmonised", "formtype", "211"]]
 
@@ -108,7 +108,7 @@ def output_intram_by_itl(
         df_ni["postcodes_harmonised"] = pd.NA
         df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
         df_gb = df_gb.append(df_ni, ignore_index=True).copy()
-    
+
     df = df_gb
 
     # Join Aggregation Cols
@@ -131,7 +131,7 @@ def output_intram_by_itl(
     # Export UK outputs
     area = "gb" if df_ni is None else "uk"
     itl_dfs = [itl1, itl2]
-    for i, itl_df in enumerate(itl_dfs,  start=1):
+    for i, itl_df in enumerate(itl_dfs, start=1):
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
         save_detailed_csv(
             df=itl_df,
@@ -141,7 +141,3 @@ def output_intram_by_itl(
             write_csv=write_csv,
             overwrite=True
         )
-    
-    
-
-
