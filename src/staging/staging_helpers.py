@@ -323,7 +323,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
     return full_responses, res_rate
 
 
-def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
+def load_validate_secondary_snapshot(load_json, secondary_snapshot_path, config, network_or_hdfs):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
 
@@ -350,6 +350,11 @@ def load_validate_secondary_snapshot(load_json, secondary_snapshot_path):
     secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(
         secondary_snapdata
     )
+
+    # applied fix as secondary responses does not include instance column:
+    # already a fix in place for DevTest environment (see load_val_snapshot_json())
+    if network_or_hdfs == "network":
+        secondary_responses_df["instance"] = 0
 
     # Validate secondary snapshot data
     StagingHelperLogger.info("Validating secondary snapshot data...")
