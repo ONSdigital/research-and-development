@@ -101,16 +101,14 @@ def output_intram_by_itl(
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
 
     # Subset GB Data
-    df_gb = df_gb[["postcodes_harmonised", "formtype", "211"]]
+    df = df_gb[["postcodes_harmonised", "formtype", "211"]]
 
     if df_ni is not None:
         # Clean NI data and join
         df_ni["postcodes_harmonised"] = pd.NA
         df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
-        df_gb = df_gb.append(df_ni, ignore_index=True).copy()
-
-    df = df_gb
-
+        df = df.append(df_ni, ignore_index=True).copy()
+S
     # Join Aggregation Cols
     df = map_o.join_itl_regions(df, postcode_mapper)
     df = df.merge(itl_mapper, how="left", left_on="itl", right_on="LAU121CD")
