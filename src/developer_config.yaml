@@ -58,21 +58,41 @@ runlog_writer: ## developer config
 hdfs_paths:
   root: "/ons/rdbe_dev/" # dev config
   logs_foldername: "/ons/rdbe_dev/logs/run_logs" # dev config
-  # staging paths
+  # staging input paths
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  ni_full_responses_path: "" 
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   feather_path: "/ons/rdbe_dev/staging/feather"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
-  # Outliers and imputation input files
-  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
 
+  # Imputation and outliers input paths
   backdata_path: ""
+  manual_imp_trim_path: ""
+  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+  outliers_path: ""
+
+  # Construction paths  
+  construction_file_path: ""
+  construction_file_path_ni: ""
+  # construction_add_path: ""
+  # construction_amend_path: ""
+
   # mapper paths
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
   cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
   itl_mapper_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
+  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
+  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
+  pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  # cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" ### DELETE
+  itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
+  civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
+  sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 
   # module folder paths - we could move these to the dev config - another job is to get rid of those we don't use.
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
@@ -86,8 +106,8 @@ hdfs_paths:
   export_path: /ons/rdbe_dev/outgoing_export
 
 network_paths:
-  root: "R:/BERD Results System Development 2023/DAP_emulation/"
-  logs_foldername: "logs/run_logs"
+  root: "R:/BERD Results System Development 2023/DAP_emulation/" # dev config
+  logs_foldername: "logs/run_logs" # dev config
   # staging input paths
   # snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
@@ -95,13 +115,15 @@ network_paths:
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
+  feather_path: ""
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
-  backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
 
   # Imputation and outliers input paths
+  backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
   manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
+
   # Construction paths  
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
@@ -109,24 +131,23 @@ network_paths:
   # construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
 
 # mapper paths
-  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
-  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
-  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
-  feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
-  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
-  cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
-  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
+  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
   pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  # cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" ### DELETE
   itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
   ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 
-  # output folder paths - ## for dev config  
+  # output folder paths - ## keep in user config (I've changed my mind)
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
+  feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
   ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
   imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
@@ -134,7 +155,7 @@ network_paths:
   construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
   apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
-
+  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
 
 schema_paths:
   short_form_schema: "config/output_schemas/short_form_schema.toml"
