@@ -135,7 +135,7 @@ network_paths:
   apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
   output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
 
-  
+
 schema_paths:
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
@@ -153,10 +153,21 @@ schema_paths:
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
   frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
 
-# All these below to move to the dev config
+# imputatoin parameters for user
+imputation:
+  lower_trim_perc: 15
+  upper_trim_perc: 15
+  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
+  sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
+
+# Outliering parameters for user
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
+
+# All these below to move to the dev config
+outliers: # note we have the same key in the user config, care needed when joining configs
     flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
 devtest:
     seltype_list: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19, 21, 22, 23, 25, 26, 27, 29, 30, 31, 33, 34, 35, 37, 38, 39]
@@ -169,12 +180,7 @@ run_log_sql:
     log_mode: "append"
 estimation:
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
-imputation:
-  lower_trim_perc: 15
-  upper_trim_perc: 15
-  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
-  sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
-  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
+imputation: # note we have the same key in the user config- I want us to move these var names somewhere else.
   lf_target_vars:
     - "211"
     - "305"
