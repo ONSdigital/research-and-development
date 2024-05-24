@@ -1,26 +1,28 @@
 global:
-  # Logging settings
+  # Logging settings ## dev config
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
   table_config: "SingleLine"
-  # Environment settings
+  # Environment settings ## dev config
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
-  # Staging and validation settings
+  # Staging and validation settings ## user config
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: True
   load_historic_data: False
+  load_reference_list: True # the reference list corrections should always be loaded in year 1
+  # Construction settings
   run_construction: False
   run_ni_construction: False
+  # Outliers and imputation input settings
   load_manual_outliers: False
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
-  load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Apportionment to sites settings
   apportion_sites: True
-  # Output settings
+  # QA output settings
   output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
@@ -28,6 +30,7 @@ global:
   output_outlier_qa : False
   output_estimation_qa: False
   output_apportionment_qa: False
+  # Final output settings
   output_long_form: False
   output_short_form: False
   output_gb_sas: False
@@ -45,61 +48,67 @@ global:
 years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
-runlog_writer:
+runlog_writer: ## developer config
     write_csv: True # Write the runlog to a CSV file
     write_hdf5: False # Write the runlog to an HDF5 file
     write_sql: False # Write the runlog to a SQL database
     display: False # Display the runlog in the terminal
     log_path: "/ons/rdbe_dev/"
+# We need both hdfs and network paths in the github repo, but in the gitlab one hdfs only
 hdfs_paths:
-  root: "/ons/rdbe_dev/"
-  logs_foldername: "/ons/rdbe_dev/logs/run_logs"
+  root: "/ons/rdbe_dev/" # dev config
+  logs_foldername: "/ons/rdbe_dev/logs/run_logs" # dev config
+  # staging paths
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
-  ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
+  feather_path: "/ons/rdbe_dev/staging/feather"
+  history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
+  # Outliers and imputation input files
+  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
 
-  staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
-  output_path:  "/ons/rdbe_dev/outputs"
+  backdata_path: ""
+  # mapper paths
+  ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
   cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
   itl_mapper_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
-  history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
-  backdata_path: ""
-  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+
+  # module folder paths - we could move these to the dev config - another job is to get rid of those we don't use.
+  staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   imputation_path: "/ons/rdbe_dev/imputation"
   manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   outliers_path: "/ons/rdbe_dev/outliers"
   estimation_path:  "/ons/rdbe_dev/estimation"
-  short_form_schema: "src/outputs/output_schemas/short_form_schema.toml"
-  long_form_schema: "src/outputs/output_schemas/long_form_schema.toml"
+  output_path:  "/ons/rdbe_dev/outputs"
+  # short_form_schema: "src/outputs/output_schemas/short_form_schema.toml" # DELETE
+  # long_form_schema: "src/outputs/output_schemas/long_form_schema.toml" # DELETE
   export_path: /ons/rdbe_dev/outgoing_export
-  feather_path: "/ons/rdbe_dev/staging/feather"
+
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs"
-  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  # staging input paths
+  # snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
-  staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
-  staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
-  ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
-  outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
+
+  # Imputation and outliers input paths
+  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
+  # Construction paths  
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
   # construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
   # construction_amend_path:  "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_amendments_2023-10-31_v2.csv" # TODO Need to test
-  estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
-  imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
-  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
-  apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
-  output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
+
+# mapper paths
   cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
   export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
   itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
@@ -115,6 +124,18 @@ network_paths:
   ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+
+  # output folder paths - ## for dev config  
+  staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
+  staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
+  ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
+  imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
+  estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
+  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
+  apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
+  output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
+
+  
 schema_paths:
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
@@ -132,9 +153,7 @@ schema_paths:
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
   frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
 
-
-# Export config for users
-
+# All these below to move to the dev config
 outliers:
     upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
     lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
