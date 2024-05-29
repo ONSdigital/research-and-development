@@ -20,20 +20,7 @@ def check_log_invalid_postcodes(validation_df):
     ]
 
     # Save to df
-    invalid_df = pd.DataFrame(
-        {
-            "reference": validation_df.loc[
-                invalid_pattern_postcodes.index, "reference"
-            ],
-            "instance": validation_df.loc[invalid_pattern_postcodes.index, "instance"],
-            "formtype": validation_df.loc[invalid_pattern_postcodes.index, "formtype"],
-            "postcode_issue": "invalid pattern / format",
-            "incorrect_postcode": invalid_pattern_postcodes,
-            "postcode_source": validation_df.loc[
-                invalid_pattern_postcodes.index, "postcode_source"
-            ],
-        }
-    )
+    invalid_df = create_issue_df(validation_df, invalid_pattern_postcodes, "invalid pattern / format")
 
     # Log the invalid postcodes
     ValidationLogger.warning(
@@ -81,18 +68,7 @@ def check_log_unreal_postcodes(validation_df, valid_postcode_pattern_df, postcod
     )
 
     # Save to df
-    unreal_df = pd.DataFrame(
-        {
-            "reference": validation_df.loc[unreal_postcodes.index, "reference"],
-            "instance": validation_df.loc[unreal_postcodes.index, "instance"],
-            "formtype": validation_df.loc[unreal_postcodes.index, "formtype"],
-            "postcode_issue": "not found in masterlist",
-            "incorrect_postcode": unreal_postcodes,
-            "postcode_source": validation_df.loc[
-                unreal_postcodes.index, "postcode_source"
-            ],
-        }
-    )
+    unreal_df = create_issue_df(validation_df, unreal_postcodes, "not found in masterlist")
 
     # Log the unreal postcodes
     ValidationLogger.warning(
@@ -106,16 +82,16 @@ def check_log_unreal_postcodes(validation_df, valid_postcode_pattern_df, postcod
 
 
 def format_postcodes(postcode):
-    if not isinstance(postcode, str) or not postcode.strip():
-        return None
 
-    formatted_postcode = postcode.upper().strip().replace(" ", "")
+    if pd.notna(postcode):
 
-    if len(formatted_postcode) >= 5:
-        index = len(formatted_postcode) - 3
-        spaces_needed = 8 - len(formatted_postcode)
-        if spaces_needed > 0:
-            return formatted_postcode[:index] + ' ' * spaces_needed + formatted_postcode[index:]
+        formatted_postcode = postcode.upper().strip().replace(" ", "")
+
+        if len(formatted_postcode) >= 5:
+            index = len(formatted_postcode) - 3
+            spaces_needed = 8 - len(formatted_postcode)
+            if spaces_needed > 0:
+                return formatted_postcode[:index] + ' ' * spaces_needed + formatted_postcode[index:]
 
 
 @exception_wrap
@@ -177,6 +153,23 @@ def check_pcs_real(
         ]
 
     return unreal_postcodes
+
+
+def create_issue_df(full_df, flagged_df, warning):
+    issue_df = pd.DataFrame(
+        {
+            "reference": full_df.loc[flagged_df.index, "reference"],
+            "instance": full_df.loc[flagged_df.index, "instance"],
+            "formtype": full_df.loc[flagged_df.index, "formtype"],
+            "postcode_issue": warning,
+            "incorrect_postcode": flagged_df,
+            "postcode_source": full_df.loc[
+                flagged_df.index, "postcode_source"
+            ],
+        }
+    )
+
+    return issue_df
 
 
 def combine_issue_postcodes(df, invalid_df, invalid_pattern_postcodes, unreal_df, unreal_postcodes):
