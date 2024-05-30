@@ -248,8 +248,6 @@ def combine_issue_postcodes(
         could not be matched against masterlist
 
     Returns:
-        df (pd.DataFrame): Updated original dataeframe with any invalid
-        postcodes removed from postcodes_harmonised
         combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the information
         required for the postcode issue output, across all issues
     """
@@ -276,12 +274,24 @@ def combine_issue_postcodes(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-
-
     return combined_invalid_postcodes_df
 
 
-def update_full_responses(df, combined_invalid_postcodes_df):
+def update_full_responses(
+    df: pd.DataFrame,
+    combined_invalid_postcodes_df: pd.DataFrame):
+    """Updates the full response dataframe to exclude invalid postcodes
+    from postcodes_harmonised and format.
+
+    Args:
+        df (pd.DataFrame): Original full dataframe
+        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the information
+        required for the postcode issue output, across all issues
+
+    Returns:
+        df (pd.DataFrame): Updated original dataeframe with any invalid
+        postcodes removed from postcodes_harmonised
+    """
 
     df["postcodes_harmonised"] = df["postcodes_harmonised"].where(
         ~df["postcodes_harmonised"].isin(
