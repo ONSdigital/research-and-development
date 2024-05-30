@@ -297,6 +297,7 @@ def update_full_responses(
         other=None,
     )
     df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(format_postcodes)
+    df["601"] = df["601"].apply(format_postcodes)
 
     return df
 
