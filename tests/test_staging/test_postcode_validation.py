@@ -20,24 +20,21 @@ class TestFormatPostcode(object):
         """Input data for postcode_topup tests."""
         columns = ["key", "postcode"]
         data = [
-            [1, "NP44 2NZ"], # normal
-            [2, "np44 2nz"], # lower case
-            [3, "NP4 2NZ"], # only 7 chars
-            [4, "NP44 2NZ 7Y"], # extra parts
-            [5, "NP44 2NZZ"], # 9 chars (extra)
-            [6, "NP442NZ"], # one part, 7 chars
-            [7, ""], #empty str
+            [1, "NP44 2NZ"],  # normal
+            [2, "np44 2nz"],  # lower case
+            [3, "NP4 2NZ"],  # only 7 chars
+            [4, "NP44 2NZ 7Y"],  # extra parts
+            [5, "NP44 2NZZ"],  # 9 chars (extra)
+            [6, "NP442NZ"],  # one part, 7 chars
+            [7, ""],  # empty str
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-
     def test_format_postcodes(self, input_data):
         """General tests for postcode_topup."""
         output = input_data.copy()
-        output["postcode"] = output["postcode"].apply(
-            lambda x: format_postcodes(x)
-            )
+        output["postcode"] = output["postcode"].apply(lambda x: format_postcodes(x))
         print(output)
 
 
@@ -78,7 +75,9 @@ def mock_get_masterlist(postcode_masterlist):
 # Test case for run_full_postcode_process
 def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr("src.staging.postcode_validation.get_masterlist", mock_get_masterlist)
+    monkeypatch.setattr(
+        "src.staging.postcode_validation.get_masterlist", mock_get_masterlist
+    )
 
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
@@ -182,7 +181,9 @@ def test_validate_postcode():
 def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr("src.staging.postcode_validation.get_masterlist", mock_get_masterlist)
+    monkeypatch.setattr(
+        "src.staging.postcode_validation.get_masterlist", mock_get_masterlist
+    )
 
     # Use the fake path
     postcode_masterlist = "path/to/mock_masterlist.csv"
@@ -190,7 +191,9 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     config = generate_config(True)
 
     check_real_df = test_data_df.copy()
-    check_real_df["postcodes_harmonised"] = check_real_df["postcodes_harmonised"].apply(format_postcodes)
+    check_real_df["postcodes_harmonised"] = check_real_df["postcodes_harmonised"].apply(
+        format_postcodes
+    )
 
     # Call the function under test
     result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
@@ -212,7 +215,9 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
 
 def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr("src.staging.postcode_validation.get_masterlist", mock_get_masterlist)
+    monkeypatch.setattr(
+        "src.staging.postcode_validation.get_masterlist", mock_get_masterlist
+    )
 
     # Use the fake path
     postcode_masterlist = "path/to/masterlist.csv"
@@ -220,7 +225,9 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
     config = generate_config(True)
 
     check_real_df = test_data_df.copy()
-    check_real_df["postcodes_harmonised"] = check_real_df["postcodes_harmonised"].apply(format_postcodes)
+    check_real_df["postcodes_harmonised"] = check_real_df["postcodes_harmonised"].apply(
+        format_postcodes
+    )
 
     # Call the function under test
     unreal_postcodes = check_pcs_real(
