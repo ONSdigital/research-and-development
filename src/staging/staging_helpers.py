@@ -430,7 +430,8 @@ def stage_validate_harmonise_postcodes(
 
     This function performs the following steps:
     1. Loads a master list of postcodes from a CSV file.
-    2. Validates the postcode column in the full_responses DataFrame against the master list.
+    2. Validates the postcode column in the full_responses DataFrame against
+        the master list.
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
@@ -444,7 +445,8 @@ def stage_validate_harmonise_postcodes(
     write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame and the master list of postcodes.
+    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+    and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")

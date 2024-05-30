@@ -19,8 +19,8 @@ def check_log_invalid_postcodes(validation_df: pd.DataFrame):
 
     Returns:
         invalid_df (pd.DataFrame):  Dataframe with postcodes for issue output (invalid)
-        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
-        did not pass pattern validation
+        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows
+        where postcodes did not pass pattern validation
     """
     # Apply the pattern validation function
     invalid_pattern_postcodes = validation_df.loc[
@@ -69,7 +69,7 @@ def check_log_unreal_postcodes(
     validation_df: pd.DataFrame,
     valid_postcode_pattern_df: pd.DataFrame,
     postcode_masterlist: pd.DataFrame,
-    config: dict
+    config: dict,
 ):
     """This function runs a check for unrecognised postcodes.
 
@@ -201,10 +201,7 @@ def check_pcs_real(
     return unreal_postcodes
 
 
-def create_issue_df(
-    full_df: pd.DataFrame,
-    flagged_df: pd.DataFrame,
-    warning: str):
+def create_issue_df(full_df: pd.DataFrame, flagged_df: pd.DataFrame, warning: str):
     """Creates a dataframe containing specific issues
 
     Args:
@@ -241,15 +238,15 @@ def combine_issue_postcodes(
     Args:
         df (pd.DataFrame): The original dataframe
         invalid_df (pd.DataFrame):  Dataframe with postcodes for issue output (invalid)
-        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
-        did not pass pattern validation
+        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows
+        where postcodes did not pass pattern validation
         unreal_df (pd.DataFrame):  Dataframe with postcodes for issue output (unreal)
         unreal_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
         could not be matched against masterlist
 
     Returns:
-        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the information
-        required for the postcode issue output, across all issues
+        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the
+        information required for the postcode issue output, across all issues
     """
 
     # Combine the two lists for logging
@@ -278,15 +275,15 @@ def combine_issue_postcodes(
 
 
 def update_full_responses(
-    df: pd.DataFrame,
-    combined_invalid_postcodes_df: pd.DataFrame):
+    df: pd.DataFrame, combined_invalid_postcodes_df: pd.DataFrame
+):
     """Updates the full response dataframe to exclude invalid postcodes
     from postcodes_harmonised and format.
 
     Args:
         df (pd.DataFrame): Original full dataframe
-        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the information
-        required for the postcode issue output, across all issues
+        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing
+        the information required for the postcode issue output, across all issues
 
     Returns:
         df (pd.DataFrame): Updated original dataeframe with any invalid
