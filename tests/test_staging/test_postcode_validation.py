@@ -109,7 +109,7 @@ def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
             "postcodes_harmonised": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
-    df_result = run_full_postcode_process(df_valid, fake_path, config)
+    df, df_result = run_full_postcode_process(df_valid, fake_path, config)
     exp_output1 = pd.DataFrame(
         columns=[
             "reference",

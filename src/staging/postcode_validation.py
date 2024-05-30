@@ -8,8 +8,20 @@ from src.utils.wrappers import time_logger_wrap, exception_wrap
 ValidationLogger = logging.getLogger(__name__)
 
 
-def check_log_invalid_postcodes(validation_df):
+def check_log_invalid_postcodes(validation_df: pd.DataFrame):
+    """Function to run the check for invalid postcode patterns.
 
+    Validation check is applied and the invalid postcodes are logged and
+    outputted as a dataframe
+
+    Args:
+        validation_df (pd.DataFrame): Copy of the full dataframe
+
+    Returns:
+        invalid_df (pd.DataFrame):  Dataframe with postcodes for issue output (invalid)
+        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
+        did not pass pattern validation
+    """
     # Apply the pattern validation function
     invalid_pattern_postcodes = validation_df.loc[
         ~validation_df["postcodes_harmonised"].apply(validate_postcode_pattern),
@@ -54,22 +66,38 @@ def validate_postcode_pattern(pcode: str) -> bool:
 
 
 def check_log_unreal_postcodes(
-    validation_df, valid_postcode_pattern_df, postcode_masterlist, config
+    validation_df: pd.DataFrame,
+    valid_postcode_pattern_df: pd.DataFrame,
+    postcode_masterlist: pd.DataFrame,
+    config: dict
 ):
+    """This function runs a check for unrecognised postcodes.
+
+    Postcodes are formatted and checked against the ONS masterlist
+
+    Args:
+        validation_df (pd.DataFrame): Copy of the full dataframe
+        valid_postcode_pattern_df (pd.DataFrame): Dataframe containing only rows where
+        postcodes passed pattern validation
+        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
+        postocdes to check against
+        config (dict): Dictionary containing config settings
+
+    Returns:
+        unreal_df (pd.DataFrame):  Dataframe with postcodes for issue output (unreal)
+        unreal_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
+        could not be matched against masterlist
+    """
 
     # Clean postcodes to match the masterlist
+    valid_postcode_pattern_df = valid_postcode_pattern_df.copy()
     valid_postcode_pattern_df["postcodes_harmonised"] = valid_postcode_pattern_df[
         "postcodes_harmonised"
     ].apply(format_postcodes)
 
-    # Only validate not null postcodes for the column "601"
-    valid_postcode_pattern_df = valid_postcode_pattern_df.loc[
-        ~valid_postcode_pattern_df["postcodes_harmonised"].isnull()
-    ]
-
     # Create a list of postcodes not found in masterlist in col "postcodes_harmonised"
     unreal_postcodes = check_pcs_real(
-        valid_postcode_pattern_df,
+        validation_df,
         valid_postcode_pattern_df,
         postcode_masterlist,
         config,
@@ -84,15 +112,21 @@ def check_log_unreal_postcodes(
     ValidationLogger.warning(
         f"These postcodes are not found in the ONS postcode list: {unreal_postcodes.to_list()}"  # noqa
     )
-
     ValidationLogger.warning(
         f"Number of postcodes not found in the ONS postcode list: {len(unreal_postcodes.to_list())}"  # noqa
     )
     return unreal_df, unreal_postcodes
 
 
-def format_postcodes(postcode):
+def format_postcodes(postcode: str):
+    """Formats a postcode to eight characters and capitalise.
 
+    Args:
+        postcode (str): Postcode to format
+
+    Returns:
+        formatted_postcode (str): Postcode in correct format
+    """
     if pd.notna(postcode):
 
         formatted_postcode = postcode.upper().strip().replace(" ", "")
@@ -141,6 +175,7 @@ def check_pcs_real(
         run the comparison against
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
         postocdes to check against
+        config (dict): Dictionary containing config settings
 
     Returns:
         unreal_postcodes (pd.DataFrame): A dataframe containing all the
@@ -166,7 +201,21 @@ def check_pcs_real(
     return unreal_postcodes
 
 
-def create_issue_df(full_df, flagged_df, warning):
+def create_issue_df(
+    full_df: pd.DataFrame,
+    flagged_df: pd.DataFrame,
+    warning: str):
+    """Creates a dataframe containing specific issues
+
+    Args:
+        full_df (pd.DataFrame): Copy of the full dataframe.
+        flagged_df (pd.DataFrame): The rows containing postcodes with issues
+        warning (str): Message to confirm the issue with specific batch of postcodes
+
+    Returns:
+        issue_df (pd.DataFrame): A dataframe containing the information required for the
+        postcode issue output
+    """
     issue_df = pd.DataFrame(
         {
             "reference": full_df.loc[flagged_df.index, "reference"],
@@ -182,8 +231,29 @@ def create_issue_df(full_df, flagged_df, warning):
 
 
 def combine_issue_postcodes(
-    df, invalid_df, invalid_pattern_postcodes, unreal_df, unreal_postcodes
+    invalid_df: pd.DataFrame,
+    invalid_pattern_postcodes: pd.DataFrame,
+    unreal_df: pd.DataFrame,
+    unreal_postcodes: pd.DataFrame,
 ):
+    """Combines the issues from each stage of validation for output and logging
+
+    Args:
+        df (pd.DataFrame): The original dataframe
+        invalid_df (pd.DataFrame):  Dataframe with postcodes for issue output (invalid)
+        invalid_pattern_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
+        did not pass pattern validation
+        unreal_df (pd.DataFrame):  Dataframe with postcodes for issue output (unreal)
+        unreal_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
+        could not be matched against masterlist
+
+    Returns:
+        df (pd.DataFrame): Updated original dataeframe with any invalid
+        postcodes removed from postcodes_harmonised
+        combined_invalid_postcodes_df (pd.DataFrame): A dataframe containing the information
+        required for the postcode issue output, across all issues
+    """
+
     # Combine the two lists for logging
     combined_invalid_postcodes = pd.concat(
         [unreal_postcodes, invalid_pattern_postcodes]
@@ -206,15 +276,22 @@ def combine_issue_postcodes(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    # update df to exclude any invalid/unreal postcode entries
+
+
+    return combined_invalid_postcodes_df
+
+
+def update_full_responses(df, combined_invalid_postcodes_df):
+
     df["postcodes_harmonised"] = df["postcodes_harmonised"].where(
         ~df["postcodes_harmonised"].isin(
             combined_invalid_postcodes_df["incorrect_postcode"]
         ),
         other=None,
     )
+    df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(format_postcodes)
 
-    return df, combined_invalid_postcodes_df
+    return df
 
 
 @time_logger_wrap
@@ -261,7 +338,7 @@ def run_full_postcode_process(
         axis=1,
     )
 
-    # Check for invalid entries in postcode column
+    # Check for invalid entries in postcodes_harmonised column
     invalid_df, invalid_pattern_postcodes = check_log_invalid_postcodes(validation_df)
 
     # Remove the invalid pattern postcodes before checking if they are real
@@ -269,17 +346,19 @@ def run_full_postcode_process(
         ~validation_df.index.isin(invalid_pattern_postcodes.index.to_list())
     ]
 
+    # Check for unreal entries in postcodes_harmonised column
     unreal_df, unreal_postcodes = check_log_unreal_postcodes(
         validation_df, valid_postcode_pattern_df, postcode_masterlist, config
     )
 
-    df, combined_invalid_postcodes_df = combine_issue_postcodes(
-        df, invalid_df, invalid_pattern_postcodes, unreal_df, unreal_postcodes
+    # Combine the issue df for invalid and unreal postcodes for output and logging
+    combined_invalid_postcodes_df = combine_issue_postcodes(
+        invalid_df, invalid_pattern_postcodes, unreal_df, unreal_postcodes
     )
 
-    df["postcodes_harmonised"] = df["postcodes_harmonised"].apply(format_postcodes)
-    df["601"] = df["601"].apply(format_postcodes)
+    # update df to exclude any invalid/unreal postcode entries, and format cols
+    full_responses = update_full_responses(df, combined_invalid_postcodes_df)
 
     ValidationLogger.info("All postcodes validated....")
 
-    return combined_invalid_postcodes_df
+    return full_responses, combined_invalid_postcodes_df

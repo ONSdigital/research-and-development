@@ -456,7 +456,7 @@ def stage_validate_harmonise_postcodes(
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
-    invalid_df = pcval.run_full_postcode_process(
+    full_responses, invalid_df = pcval.run_full_postcode_process(
         full_responses, postcode_masterlist, config
     )
 
