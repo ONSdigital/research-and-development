@@ -59,7 +59,7 @@ class TestFixAnonData(object):
             }
                 }
         return config
-    
+
 
     @pytest.fixture(scope="function")
     def input_data(self):
@@ -77,7 +77,7 @@ class TestFixAnonData(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
+
 
     @pytest.fixture(scope="function")
     def expected_output(self):
@@ -128,7 +128,7 @@ class TestUpdateRefList(object):
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
-    
+
 
     @pytest.fixture(scope="function")
     def ref_list_input(self):
@@ -140,8 +140,8 @@ class TestUpdateRefList(object):
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
-    
-    
+
+
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
@@ -155,7 +155,7 @@ class TestUpdateRefList(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
+
 
     def test_update_ref_list(self, full_input_df, ref_list_input, expected_output):
         """General tests for update_ref_list."""
@@ -174,7 +174,7 @@ class TestUpdateRefList(object):
         )
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
-        
+
 
 class TestGetMapperName(object):
     """Tests for getmappername."""
@@ -219,7 +219,7 @@ class TestCheckSnapshotFeatherExists(object):
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
 
-    
+
     @pytest.mark.parametrize(
             "first, second, check_both, result",
             (
@@ -291,7 +291,7 @@ class TestWriteSnapshotToFeather(object):
             {"f1": [1]}
         )
         return f1
-    
+
 
     @pytest.fixture(scope="function")
     def f2(self):
@@ -347,7 +347,7 @@ class TestStageValidateHarmonisePostcodes(object):
         """Test config."""
         config = {"global": {"postcode_csv_check": True}}
         return config
-    
+
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
         """Test paths."""
@@ -356,29 +356,29 @@ class TestStageValidateHarmonisePostcodes(object):
             "postcode_masterlist": pc_ml
         }
         return paths
-    
+
 
     @pytest.fixture(scope="function")
     def full_responses(self) -> pd.DataFrame:
         """Test data for stag_validate_harmonise_postcodes."""
         columns = ["reference", "instance", "formtype", "601", "referencepostcode"]
         data = [
-            [39900000404, 0.0, 6, np.nan, "NP442NZ"], # add white space
+            [39900000404, 0.0, 6, None, "NP442NZ"], # add white space
             [39900000404, 1.0, 6, "NP442NZ", "NP442NZ"],
-            [39900000960, 0.0, 1, np.nan, "CE1 4OY"], # add white space
+            [39900000960, 0.0, 1, None, "CE1 4OY"], # add white space
             [39900000960, 1.0, 1, "CE1 4OY", "CE1 4OY"],
             [39900001530, 0.0, 6, "CE2", "CE2"], # invalid
-            [39900001601, 0.0, 1, np.nan, 'RH12 1XL'], # normal
+            [39900001601, 0.0, 1, None, 'RH12 1XL'], # normal
             [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU"], 
+            [39900003110, 0.0, 6, None, "CE11 8IU"],
             [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
             [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
-            [38880003110, 0.0, 6, np.nan, "NP22 8UI"], # not in postcode list
+            [38880003110, 0.0, 6, None, "NP22 8UI"], # not in postcode list
             [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"]
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
+
 
     def postcode_masterlist(self, dir: pathlib.Path) -> pathlib.Path:
         """Write the postcode masterlist and return path."""
@@ -388,36 +388,36 @@ class TestStageValidateHarmonisePostcodes(object):
         save_path = pathlib.Path(os.path.join(dir, "postcodes_masterlist.csv"))
         postcode_df.to_csv(save_path)
         return save_path
-    
+
 
     @pytest.fixture(scope="function")
     def full_responses_output(self) -> pd.DataFrame:
         """Expected output for full_responses."""
         columns = [
-            'reference', 
+            'reference',
             'instance',
             'formtype',
-            '601', 
+            '601',
             'referencepostcode',
             'postcodes_harmonised',
         ]
         data = [
-            [39900000404, 0.0, 6, np.nan, 'NP442NZ', 'NP44 2NZ'],
+            [39900000404, 0.0, 6, None, 'NP442NZ', 'NP44 2NZ'],
             [39900000404, 1.0, 6, 'NP44 2NZ', 'NP442NZ', 'NP44 2NZ'],
-            [39900000960, 0.0, 1, np.nan, 'CE1 4OY', 'CE1  4OY'],
+            [39900000960, 0.0, 1, None, 'CE1 4OY', 'CE1  4OY'],
             [39900000960, 1.0, 1, 'CE1  4OY', 'CE1 4OY', 'CE1  4OY'],
-            [39900001530, 0.0, 6, '     CE2', 'CE2', np.nan],
-            [39900001601, 0.0, 1, np.nan, 'RH12 1XL', 'RH12 1XL'],
+            [39900001530, 0.0, 6, 'CE2     ', 'CE2', None],
+            [39900001601, 0.0, 1, None, 'RH12 1XL', 'RH12 1XL'],
             [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, 'CE11 8IU', 'CE11 8IU'],
+            [39900003110, 0.0, 6, None, 'CE11 8IU', 'CE11 8IU'],
             [39900003110, 1.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
             [39900003110, 2.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
-            [38880003110, 0.0, 6, np.nan, 'NP22 8UI', np.nan],
-            [38880003110, 1.0, 6, 'NP22 8UI', 'NP22 8UI', np.nan]
+            [38880003110, 0.0, 6, None, 'NP22 8UI', None],
+            [38880003110, 1.0, 6, 'NP22 8UI', 'NP22 8UI', None]
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
+
 
     @pytest.fixture(scope="function")
     def pc_mapper_output(self) -> pd.DataFrame:
@@ -432,7 +432,7 @@ class TestStageValidateHarmonisePostcodes(object):
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-    
+
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""
         today = date.today()
@@ -441,8 +441,8 @@ class TestStageValidateHarmonisePostcodes(object):
 
 
     def test_stage_validate_harmonise_postcodes(
-            self, 
-            full_responses, 
+            self,
+            full_responses,
             config,
             pc_mapper_output,
             full_responses_output,
@@ -475,4 +475,4 @@ class TestStageValidateHarmonisePostcodes(object):
         assert (filename in files), (
             "stage_validate_harmonise_postcodes failed to save out invalid PCs"
         )
-        
+

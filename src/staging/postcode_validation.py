@@ -92,6 +92,9 @@ def format_postcodes(postcode):
             spaces_needed = 8 - len(formatted_postcode)
             if spaces_needed > 0:
                 return formatted_postcode[:index] + ' ' * spaces_needed + formatted_postcode[index:]
+        elif len(formatted_postcode) < 5:
+            spaces_needed = 8 - len(formatted_postcode)
+            return formatted_postcode + ' ' * spaces_needed
 
 
 @exception_wrap
@@ -114,15 +117,9 @@ def check_pcs_real(
 ):
     """Checks if the postcodes are real against a masterlist of actual postcodes.
 
-    In the masterlist, all postcodes are 7 characters long, therefore the
-    reference are formatted to match this format.
+    The checks are done on a copy of dataframe with the invalid postcodes removed.
 
-    All postcodes above 7 characters are stripped of whitespaces.
-    All postcodes less than 7 characters have added whitespaces in the middle.
-
-    This formatting is applied to a copy dataframe so the original is unchanged.
-
-    The final output are the postcodes from the original dataframe
+    The final output are the postcodes from the original dataframe.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
@@ -195,7 +192,7 @@ def combine_issue_postcodes(df, invalid_df, invalid_pattern_postcodes, unreal_df
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    # update df to exclude any invalid postcode entries
+    # update df to exclude any invalid/unreal postcode entries
     df["postcodes_harmonised"] = df["postcodes_harmonised"].where(
         ~df["postcodes_harmonised"].isin(
             combined_invalid_postcodes_df["incorrect_postcode"]

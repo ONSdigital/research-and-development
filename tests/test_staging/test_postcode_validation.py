@@ -57,7 +57,7 @@ def test_data_dict():
         "formtype": [0, 0, 0, 0],
         "601": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
         "referencepostcode": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
-        # "postcodes_harmonised": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
+        "postcodes_harmonised": ["NP10 8XG", "SW1P 4DF", "HIJ 789", "KL1M 2NO"],
     }
 
 
