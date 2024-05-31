@@ -2,11 +2,12 @@
 # Core Python modules
 import time
 import logging
+from copy import deepcopy
 
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.helpers import Config_settings
+from src.utils.config import safeload_yaml, validate_unique_keys, merge_configs
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
@@ -20,7 +21,7 @@ from src.outputs.outputs_main import run_outputs
 MainLogger = logging.getLogger(__name__)
 
 
-def run_pipeline(start, config_path):
+def run_pipeline(start, user_config_path, dev_config_path):
     """The main pipeline.
 
     Args:
@@ -30,12 +31,14 @@ def run_pipeline(start, config_path):
         used.
     """
     # load config
-    conf_obj = Config_settings(config_path)
-    config = conf_obj.config_dict
+    user_config = safeload_yaml(user_config_path)
+    dev_config = safeload_yaml(dev_config_path)
+    # validate config
 
-    # import yaml
-    # with open(config_path, "r") as file:
-    #     config = yaml.safe_load(file)
+    # combine configs
+    config = merge_configs(user_config, dev_config)
+    del user_config
+    del dev_config
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -78,7 +81,8 @@ def run_pipeline(start, config_path):
 
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
-    MainLogger.info(f"Reading config from {config_path}.")
+    MainLogger.info(f"Reading user config from {user_config_path}.")
+    MainLogger.info(f"Reading developer config from {dev_config_path}.")
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")

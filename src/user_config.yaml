@@ -1,0 +1,104 @@
+config_validation:
+  validate: True
+  path: None
+global:
+  # Staging and validation settings
+  postcode_csv_check: False
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
+  load_ni_data: True
+  load_historic_data: False
+  # Construction Settings
+  run_construction: False
+  run_ni_construction: False
+  load_manual_outliers: False
+  load_manual_imputation: False
+  load_backdata: True  # whether to load previous year data for MoR
+  # QA output settings
+  output_full_responses: False
+  output_ni_full_responses: False
+  output_imputation_qa: False
+  output_auto_outliers: False
+  output_outlier_qa : False
+  output_estimation_qa: False
+  output_apportionment_qa: False
+  # Final output settings
+  output_long_form: False
+  output_short_form: False
+  output_gb_sas: False
+  output_ni_sas: False
+  output_tau: False
+  output_intram_by_pg_gb: False
+  output_intram_by_pg_uk: False
+  output_intram_by_itl1: False
+  output_intram_uk_itl2: False
+  output_intram_by_civil_defence: False
+  output_intram_by_sic: False
+  output_fte_total_qa: False
+  output_status_filtered: False
+  output_frozen_group: False
+years:
+  current_year: 2022 # TODO: put this in the userconfig
+  previous_years_to_load: 1 # TODO: put this in the userconfig
+hdfs_paths:
+  root: "/ons/rdbe_dev/"
+  logs_foldername: "/ons/rdbe_dev/logs/run_logs"
+  # staging input paths
+  snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  ni_full_responses_path: "" 
+  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
+  postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
+  feather_path: "/ons/rdbe_dev/staging/feather"
+  history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
+  # Imputation and outliers input paths
+  backdata_path: ""
+  manual_imp_trim_path: ""
+  manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+  outliers_path: ""
+  # Construction paths  
+  construction_file_path: ""
+  construction_file_path_ni: ""
+  # mapper paths
+  ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
+  cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
+  itl_mapper_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
+  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
+  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
+  pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
+  itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
+  ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
+  civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
+  sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+  # output folder paths
+  staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
+  imputation_path: "/ons/rdbe_dev/imputation"
+  manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
+  outliers_path: "/ons/rdbe_dev/outliers"
+  estimation_path:  "/ons/rdbe_dev/estimation"
+  output_path:  "/ons/rdbe_dev/outputs"
+  export_path: /ons/rdbe_dev/outgoing_export
+network_paths:
+  # output folder paths 
+  staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
+  feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
+  staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
+  ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
+  imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
+  estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
+  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
+  apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
+  output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
+  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
+# Export config for users
+outliers:
+  upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
+  lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
+imputation:
+  lower_trim_perc: 15
+  upper_trim_perc: 15
+  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
+  sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
+  
