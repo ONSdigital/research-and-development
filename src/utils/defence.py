@@ -45,7 +45,16 @@ def _validate_str_is_path(path: str, param_nm: str, warn: bool=False):
         param_nm (str): The parameter name (for error raising).
         warn (bool, optional): Whether or not to warn. Defaults to False.
     """
-    pass
+    unix = path.replace("\\", "/")
+    realpath = os.path.realpath(unix)
+    # ensure it can be converted to a path
+    try:
+        pathlib.Path(realpath)
+    except Exception as e:
+        raise TypeError(
+            "Path passed is not valid: {path}. Full error:\n{e}"
+        )
+
 
 
 def _validate_file_extension(
