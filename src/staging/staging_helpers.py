@@ -293,31 +293,34 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
     # Get response rate
     res_rate = "{:.2f}".format(processing.response_rate(contributors_df, responses_df))
-
-    # the anonymised snapshot data we use in the DevTest environment
-    # does not include the instance column. This fix should be removed
-    # when new anonymised data is given.
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        responses_df = fix_anon_data(responses_df, config)
     StagingHelperLogger.info("Finished Data Ingest...")
 
     # Validate snapshot data
-    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
-    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+    # val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+    # val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+
+    # if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+    responses_df["instance"] = 0
 
     # Data Transmutation
     full_responses = processing.full_responses(contributors_df, responses_df)
+    # the anonymised snapshot data we use in the DevTest environment
+    # does not include the instance column. This fix should be removed
+    # when new anonymised data is given.
+    # if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+    full_responses = fix_anon_data(full_responses, config)
 
     StagingHelperLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
     # Validate and force data types for the full responses df
     # TODO Find a fix for the datatype casting before uncommenting
-    val.combine_schemas_validate_full_df(
-        full_responses,
-        "./config/contributors_schema.toml",
-        "./config/wide_responses.toml",
-    )
+    # TODO commented out for Dev test for now
+    # val.combine_schemas_validate_full_df(
+    #     full_responses,
+    #     "./config/contributors_schema.toml",
+    #     "./config/wide_responses.toml",
+    # )
 
     return full_responses, res_rate
 

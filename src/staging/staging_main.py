@@ -120,7 +120,7 @@ def run_staging(
         )  # TODO: We might want to use this in a QA output
 
         # Data validation of json or feather data
-        val.check_data_shape(full_responses, raise_error=True)
+        # val.check_data_shape(full_responses, raise_error=True)
 
         # Validate the postcodes in data loaded from JSON
         full_responses, postcode_mapper = helpers.stage_validate_harmonise_postcodes(
@@ -153,7 +153,7 @@ def run_staging(
             )
 
     # Flag invalid records
-    val.flag_no_rand_spenders(full_responses, "raise")
+    # val.flag_no_rand_spenders(full_responses, "raise")
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file

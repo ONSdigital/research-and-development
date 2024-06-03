@@ -11,15 +11,15 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: True
   load_historic_data: False
-  load_reference_list: True # the reference list corrections should always be loaded in year 1
+  load_reference_list: False # the reference list corrections should always be loaded in year 1
   # Construction settings
   run_construction: False
   run_ni_construction: False
   # Outliers and imputation input settings
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: True  # whether to load previous year data for MoR
-  load_from_feather: True
+  load_backdata: False  # whether to load previous year data for MoR
+  load_from_feather: False
   # Apportionment to sites settings
   apportion_sites: True
   # QA output settings
