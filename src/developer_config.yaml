@@ -4,12 +4,12 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings ## dev config
-  dev_test : False
-  network_or_hdfs: network #whether to load from hdfs or network (local Python)
+  dev_test : True
+  network_or_hdfs: hdfs #whether to load from hdfs or network (local Python)
   # Staging and validation settings ## user config
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   load_historic_data: False
   load_reference_list: False # the reference list corrections should always be loaded in year 1
   # Construction settings
@@ -23,7 +23,7 @@ global:
   # Apportionment to sites settings
   apportion_sites: True
   # QA output settings
-  output_full_responses: False
+  output_full_responses: True
   output_ni_full_responses: False
   output_imputation_qa: False
   output_auto_outliers: False
@@ -61,7 +61,7 @@ hdfs_paths:
   # staging input paths
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
-  ni_full_responses_path: "" 
+  ni_full_responses_path: ""
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
@@ -71,7 +71,7 @@ hdfs_paths:
   manual_imp_trim_path: "/ons/rdbe_dev/imputation/manual_trimming"
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
 
-  # Construction paths  
+  # Construction paths
   construction_file_path: ""
   construction_file_path_ni: ""
   # construction_add_path: ""
@@ -85,13 +85,13 @@ hdfs_paths:
   sic_pg_alpha_mapper_path: '/ons/rdbe_dev/mappers/sic_pg_alpha.csv'
   sic_pg_utf_mapper_path: '/ons/rdbe_dev/mappers/SIC_to_PG_UTF-8.csv'
   pg_detailed_mapper_path: "/ons/rdbe_dev/mappers/pg_detailed.csv"
-  pg_num_alpha_mapper_path: '/ons/rdbe_dev/mappers/2023/pg_num_alpha.csv'
+  pg_num_alpha_mapper_path: '/ons/rdbe_dev/mappers/pg_num_alpha.csv'
   itl1_detailed_mapper_path: "/ons/rdbe_dev/mappers/itl1_detailed.csv"
-  ref_list_817_mapper_path: "/ons/rdbe_dev/mappers/2023/2023/BERD_2022_ref_list.csv"
+  ref_list_817_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "/ons/rdbe_dev/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "/ons/rdbe_dev/mappers/sic_div_detailed.csv"
 
-  # module folder paths 
+  # module folder paths
   staging_output_path: "/ons/rdbe_dev/staging/staging_qa/full_responses_qa"
   feather_path: "/ons/rdbe_dev/staging/feather"
   ni_staging_output_path: ""
@@ -121,7 +121,7 @@ network_paths:
   manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
 
-  # Construction paths  
+  # Construction paths
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
   # construction_add_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/construction_additions_2023-11-06_v5.csv" # TODO Need to test
