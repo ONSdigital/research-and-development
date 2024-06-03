@@ -14,7 +14,7 @@ import src.staging.staging_helpers as helpers
 StagingMainLogger = logging.getLogger(__name__)
 
 
-def run_staging(
+def run_staging(  # noqa
     config: dict,
     check_file_exists: Callable,
     load_json: Callable,
@@ -120,6 +120,7 @@ def run_staging(
         )  # TODO: We might want to use this in a QA output
 
         # Data validation of json or feather data
+        # TODO: this temp switched off while working on dev_test_branch
         # val.check_data_shape(full_responses, raise_error=True)
 
         # Validate the postcodes in data loaded from JSON
@@ -153,6 +154,7 @@ def run_staging(
             )
 
     # Flag invalid records
+    # TODO: this temp switched off while working on dev_test_branch
     # val.flag_no_rand_spenders(full_responses, "raise")
 
     if config["global"]["load_manual_outliers"]:
