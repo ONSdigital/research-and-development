@@ -2,7 +2,7 @@
 
 *Insert detailed bullet points about your changes here!*
 
-*Insert any instructions to help the reviewer, e.g. "install new requirements from `environment.yml`"*
+*Insert any instructions to help the reviewer, e.g. "install new requirements from `requirements.txt`"*
 
 *Let the reviewer know what data files are needed (and if applicable, where they are to be found)
 
@@ -47,7 +47,7 @@ Any new code includes all the following forms of documentation:
 
 # Peer Review Section
 
-- [ ] All requirements install from (updated) `environment.yaml`
+- [ ] All requirements install from (updated) `requirements.txt`
 - [ ] Documentation has been created and is clear - **check the working document**
 - [ ] Doctrings ([Google format](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)) have been created and accurately describe the function's functionality
 - [ ] Unit tests pass, or if not present _a new ticket to create tests has been created_

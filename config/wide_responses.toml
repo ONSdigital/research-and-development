@@ -24,7 +24,7 @@ old_ref = "nan"
 
 [102]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -958,7 +958,7 @@ old_ref = "None"
 
 [9000]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -970,7 +970,7 @@ old_ref = "nan"
 
 [9001]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -982,7 +982,7 @@ old_ref = "nan"
 
 [9002]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -994,7 +994,7 @@ old_ref = "nan"
 
 [9003]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1006,7 +1006,7 @@ old_ref = "nan"
 
 [9004]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1018,7 +1018,7 @@ old_ref = "nan"
 
 [9005]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1030,7 +1030,7 @@ old_ref = "nan"
 
 [9006]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1066,7 +1066,7 @@ old_ref = "nan"
 
 [9009]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1078,7 +1078,7 @@ old_ref = "nan"
 
 [9010]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1090,7 +1090,7 @@ old_ref = "nan"
 
 [9011]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1102,7 +1102,7 @@ old_ref = "nan"
 
 [9012]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
@@ -1114,7 +1114,7 @@ old_ref = "nan"
 
 [9013]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "float64"
 Nullable = "nan"
 Current_Data_Type = "object"
 Length = "nan"
