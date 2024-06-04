@@ -16,12 +16,8 @@ from src.staging.staging_helpers import (
     fix_anon_data,
     update_ref_list,
     getmappername,
-    load_validate_mapper,
-    load_historic_data,
     check_snapshot_feather_exists,
     load_snapshot_feather,
-    load_val_snapshot_json,
-    load_validate_secondary_snapshot,
     df_to_feather,
     stage_validate_harmonise_postcodes
 )
@@ -39,7 +35,7 @@ def match_col_type(
         df2: pd.DataFrame,
         col_name: str,
         _type: str
-    ):
+):
     """Convert DataFrame columns of the same name to matching types."""
     df1[col_name] = df1[col_name].astype(_type)
     df2[col_name] = df2[col_name].astype(_type)
@@ -56,9 +52,8 @@ class TestFixAnonData(object):
             "devtest": {
                 "seltype_list": [1, 2, 3, 5, 6, 7, 9, 10]
             }
-                }
+        }
         return config
-    
 
     @pytest.fixture(scope="function")
     def input_data(self):
@@ -76,7 +71,6 @@ class TestFixAnonData(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
 
     @pytest.fixture(scope="function")
     def expected_output(self):
@@ -95,7 +89,6 @@ class TestFixAnonData(object):
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-
     def test_fix_anon_data(self, input_data, dummy_config, expected_output):
         """General tests for fix_anon_data."""
         output = fix_anon_data(input_data, dummy_config)
@@ -104,8 +97,8 @@ class TestFixAnonData(object):
             expected_output,
             "cellnumber",
             "int32"
-            )
-        assert(output.equals(expected_output)), (
+        )
+        assert (output.equals(expected_output)), (
             "fix_anon_data not behaving as expected."
         )
 
@@ -127,7 +120,6 @@ class TestUpdateRefList(object):
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
-    
 
     @pytest.fixture(scope="function")
     def ref_list_input(self):
@@ -139,8 +131,7 @@ class TestUpdateRefList(object):
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
-    
-    
+
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
@@ -154,7 +145,6 @@ class TestUpdateRefList(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
 
     def test_update_ref_list(self, full_input_df, ref_list_input, expected_output):
         """General tests for update_ref_list."""
@@ -162,7 +152,6 @@ class TestUpdateRefList(object):
         assert (output.equals(expected_output)), (
             "update_ref_list not behaving as expected"
         )
-
 
     def test_update_ref_list_raises(self, full_input_df, ref_list_input):
         """Test the raises in update_ref_list."""
@@ -173,7 +162,7 @@ class TestUpdateRefList(object):
         )
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
-        
+
 
 class TestGetMapperName(object):
     """Tests for getmappername."""
@@ -191,12 +180,6 @@ class TestGetMapperName(object):
         )
 
 
-# load_validate_mapper [CANT TEST: TOO MANY HARD CODED PATHS]
-
-
-# load_historic_data
-
-
 class TestCheckSnapshotFeatherExists(object):
     """Tests for check_snapshot_feather_exists."""
 
@@ -205,7 +188,7 @@ class TestCheckSnapshotFeatherExists(object):
             dir: pathlib.Path,
             first: bool,
             second: bool
-        ) -> Tuple[pathlib.Path, pathlib.Path]:
+    ) -> Tuple[pathlib.Path, pathlib.Path]:
         """Create feather files in a given path for testing."""
         empty_df = pd.DataFrame()
         # define feather paths
@@ -218,17 +201,16 @@ class TestCheckSnapshotFeatherExists(object):
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
 
-    
     @pytest.mark.parametrize(
-            "first, second, check_both, result",
-            (
-                [True, False, False, True], # create first, check first
-                [True, False, True, False], # create first, check both
-                [False, True, False, False], # create second, check first
-                [False, True, True, False], # create second, check both
-                [True, True, True, True], # create both, check both
-                [True, True, False, True] # create both, check first
-            )
+        "first, second, check_both, result",
+        (
+            [True, False, False, True],  # create first, check first
+            [True, False, True, False],  # create first, check both
+            [False, True, False, False],  # create second, check first
+            [False, True, True, False],  # create second, check both
+            [True, True, True, True],  # create both, check both
+            [True, True, False, True]  # create both, check first
+        )
     )
     def test_check_snapshot_feather_exists(
             self,
@@ -237,7 +219,7 @@ class TestCheckSnapshotFeatherExists(object):
             second: bool,
             check_both: bool,
             result: bool,
-        ):
+    ):
         """General tests for check_snapshot_feather_exists."""
         # create feather files
         (a, b) = self.create_feather_files(tmp_path, first, second)
@@ -290,7 +272,6 @@ class TestDfToFeather(object):
             {"f1": [1]}
         )
         return f1
-    
 
     def test_df_to_feather_defences(self, tmp_path, f1):
         """Defensive tests for df_to_feather."""
@@ -320,7 +301,6 @@ class TestDfToFeather(object):
                 write_feather,
                 False,
             )
-
 
     def test_df_to_feather(self, tmp_path, f1):
         """General tests for df_to_feather."""
@@ -369,7 +349,7 @@ class TestDfToFeather(object):
         assert os.path.exists(os.path.join(tmp_path, "test3.test.feather")), (
             ".feather. extension not applied when another extension exists."
         )
-        
+
 
 class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
@@ -379,7 +359,6 @@ class TestStageValidateHarmonisePostcodes(object):
         """Test config."""
         config = {"global": {"postcode_csv_check": True}}
         return config
-    
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
         """Test paths."""
@@ -388,29 +367,27 @@ class TestStageValidateHarmonisePostcodes(object):
             "postcode_masterlist": pc_ml
         }
         return paths
-    
 
     @pytest.fixture(scope="function")
     def full_responses(self) -> pd.DataFrame:
         """Test data for stag_validate_harmonise_postcodes."""
         columns = ["reference", "instance", "formtype", "601", "referencepostcode"]
         data = [
-            [39900000404, 0.0, 6, np.nan, "NP442NZ"], # add white space
+            [39900000404, 0.0, 6, np.nan, "NP442NZ"],  # add white space
             [39900000404, 1.0, 6, "NP442NZ", "NP442NZ"],
-            [39900000960, 0.0, 1, np.nan, "CE1 4OY"], # add white space
+            [39900000960, 0.0, 1, np.nan, "CE1 4OY"],  # add white space
             [39900000960, 1.0, 1, "CE1 4OY", "CE1 4OY"],
-            [39900001530, 0.0, 6, "CE2", "CE2"], # invalid
-            [39900001601, 0.0, 1, np.nan, 'RH12 1XL'], # normal
+            [39900001530, 0.0, 6, "CE2", "CE2"],  # invalid
+            [39900001601, 0.0, 1, np.nan, 'RH12 1XL'],  # normal
             [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU"], 
+            [39900003110, 0.0, 6, np.nan, "CE11 8IU"],
             [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
             [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
-            [38880003110, 0.0, 6, np.nan, "NP22 8UI"], # not in postcode list
+            [38880003110, 0.0, 6, np.nan, "NP22 8UI"],  # not in postcode list
             [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"]
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
 
     def postcode_masterlist(self, dir: pathlib.Path) -> pathlib.Path:
         """Write the postcode masterlist and return path."""
@@ -420,16 +397,15 @@ class TestStageValidateHarmonisePostcodes(object):
         save_path = pathlib.Path(os.path.join(dir, "postcodes_masterlist.csv"))
         postcode_df.to_csv(save_path)
         return save_path
-    
 
     @pytest.fixture(scope="function")
     def full_responses_output(self) -> pd.DataFrame:
         """Expected output for full_responses."""
         columns = [
-            'reference', 
+            'reference',
             'instance',
             'formtype',
-            '601', 
+            '601',
             'referencepostcode',
             'postcodes_harmonised',
         ]
@@ -449,7 +425,6 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-    
 
     @pytest.fixture(scope="function")
     def pc_mapper_output(self) -> pd.DataFrame:
@@ -464,22 +439,20 @@ class TestStageValidateHarmonisePostcodes(object):
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-    
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""
         today = date.today()
         today_str = today.strftime(r"%Y-%m-%d")
         return today_str
 
-
     def test_stage_validate_harmonise_postcodes(
-            self, 
-            full_responses, 
+            self,
+            full_responses,
             config,
             pc_mapper_output,
             full_responses_output,
             tmp_path
-        ):
+    ):
         """General tests for stage_validate_harmonise_postcodes."""
         pc_path = self.postcode_masterlist(tmp_path)
         paths = self.create_paths(tmp_path, pc_path)
@@ -507,4 +480,3 @@ class TestStageValidateHarmonisePostcodes(object):
         assert (filename in files), (
             "stage_validate_harmonise_postcodes failed to save out invalid PCs"
         )
-        

@@ -163,7 +163,6 @@ def run_staging(
 
                 )
 
-
     # Flag invalid records
     val.flag_no_rand_spenders(full_responses, "raise")
 
