@@ -3,7 +3,7 @@
 import pandas as pd
 
 # configuration settings
-survey_year = 2022
+survey_year = 2020
 # Input folder and file names
 root_fol = "R:/BERD Results System Development 2023/DAP_emulation/"
 in_fol = root_fol + "ONS_Postcode_Reference/"
@@ -14,6 +14,15 @@ out_fol = root_fol + f"{survey_year}_surveys/mappers/"
 out_file = "postcodes_mapper_reduced.csv"
 
 key_cols = ["pcd2", "itl"]
+
+# validate the inputs
+# test the survey year is a valid year as an integer
+if not ((survey_year > 2020) and (survey_year < 2035)):
+    msg = f"""The survey_year value {survey_year} is not valid.
+           Enter an integer between 2021 and 2034"""
+    raise Exception(msg)
+
+# check the input and output paths are valid
 
 # Read in files
 
