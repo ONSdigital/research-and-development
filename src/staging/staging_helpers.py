@@ -131,21 +131,30 @@ def load_validate_mapper(
     *args,
 ):
     """
-    Loads a specified mapper, validates it using a schema and an optional validation function.
+    Loads a specified mapper, validates it using a schema and an optional
+    validation function.
 
-    This function first retrieves the path of the mapper from the provided paths dictionary using the mapper_path_key.
-    It then checks if the file exists at the mapper path. If the file exists, it is read into a DataFrame.
-    The DataFrame is then validated against a schema, which is located at a path constructed from the mapper name.
-    If a validation function is provided, it is called with the DataFrame and any additional arguments.
+    This function first retrieves the path of the mapper from the provided paths
+    dictionary using the mapper_path_key. It then checks if the file exists at
+    the mapper path. If the file exists, it is read into a DataFrame. The
+    DataFrame is then validated against a schema, which is located at a path
+    constructed from the mapper name. If a validation function is provided, it
+    is called with the DataFrame and any additional arguments.
 
     Args:
-        mapper_path_key (str): The key to retrieve the mapper path from the paths dictionary.
+        mapper_path_key (str): The key to retrieve the mapper path from the
+        paths dictionary.
+
         paths (dict): A dictionary containing paths.
-        file_exists_func (Callable): A function to check if a file exists at a given path.
-        read_csv_func (Callable): A function to read a CSV file into a DataFrame.
+        file_exists_func (Callable): A function to check if a file exists at a
+        given path.
+        read_csv_func (Callable): A function to read a CSV file into a
+        DataFrame.
         logger (logging.Logger): A logger to log information and errors.
-        val_with_schema_func (Callable): A function to validate a DataFrame against a schema.
-        validation_func (Callable, optional): An optional function to perform additional validation on the DataFrame.
+        val_with_schema_func (Callable): A function to validate a DataFrame
+        against a schema.
+        validation_func (Callable, optional): An optional function to perform
+        additional validation on the DataFrame.
         *args: Additional arguments to pass to the validation function.
 
     Returns:
@@ -270,20 +279,24 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
     """
     Loads and validates a snapshot of survey data from a JSON file.
 
-    This function reads a JSON file containing a snapshot of survey data, parses the
-        data into contributors and responses dataframes, calculates the response rate,
-        fixes any issues with anonymised data, validates the data against predefined
-        schemas, combines the contributors and responses dataframes into a full responses
-        dataframe, and validates the full responses dataframe against a combined schema.
+    This function reads a JSON file containing a snapshot of survey data, parses
+        the data into contributors and responses dataframes, calculates the
+        response rate, fixes any issues with anonymised data, validates the data
+        against predefined schemas, combines the contributors and responses
+        dataframes into a full responses dataframe, and validates the full
+        responses dataframe against a combined schema.
 
     Parameters:
-        snapshot_path (str): The path to the JSON file containing the snapshot data.
+        snapshot_path (str): The path to the JSON file containing the snapshot
+        data.
         load_json (function): The function to use to load the JSON file.
         config (dict): A dictionary containing configuration options.
-        network_or_hdfs (str): A string indicating whether the data is being loaded from a network or HDFS.
+        network_or_hdfs (str): A string indicating whether the data is being
+        loaded from a network or HDFS.
 
     Returns:
-        tuple: A tuple containing the full responses dataframe and the response rate.
+        tuple: A tuple containing the full responses dataframe and the response
+        rate.
     """
     StagingHelperLogger.info("Loading SPP snapshot data from json file")
 
@@ -323,24 +336,26 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
     return full_responses, res_rate
 
 
-def load_validate_secondary_snapshot(load_json, secondary_snapshot_path, config, network_or_hdfs):
+def load_validate_secondary_snapshot(
+        load_json, secondary_snapshot_path, config, network_or_hdfs
+):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
 
-    This function reads a JSON file containing a secondary snapshot of survey data,
-    parses the data into contributors and responses dataframes, validates the data
-    against predefined schemas, combines the contributors and responses dataframes into
-    a full responses dataframe, and validates the full responses dataframe against a
-    combined schema.
+    This function reads a JSON file containing a secondary snapshot of survey
+    data, parses the data into contributors and responses dataframes, validates
+    the data against predefined schemas, combines the contributors and responses
+    dataframes into a full responses dataframe, and validates the full responses
+    dataframe against a combined schema.
 
     Parameters:
         load_json (function): The function to use to load the JSON file.
-        secondary_snapshot_path (str): The path to the JSON file containing the secondary
-            snapshot data.
+        secondary_snapshot_path (str): The path to the JSON file containing the
+        secondary snapshot data.
 
     Returns:
-        pandas.DataFrame: A DataFrame containing the full responses from the secondary
-            snapshot.
+        pandas.DataFrame: A DataFrame containing the full responses from the
+        secondary snapshot.
     """
     # Load secondary snapshot data
     StagingHelperLogger.info("Loading secondary snapshot data from json file")
@@ -403,7 +418,7 @@ def df_to_feather(
     if not os.path.exists(dir):
         raise FileNotFoundError(f"The passed directory ({dir}) does not exist")
     fpath = os.path.join(dir, save_name)
-     # ensure path is feather file
+    # ensure path is feather file
     if os.path.splitext(fpath)[1].lower() != ".feather":
         fpath = f"{fpath}.feather"
     if not overwrite and os.path.exists(fpath):
@@ -424,25 +439,29 @@ def stage_validate_harmonise_postcodes(
     write_csv: Callable,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Stages, validates, and harmonises the postcode column in the provided DataFrame.
+    Stages, validates, and harmonises the postcode column in the provided
+    DataFrame.
 
     This function performs the following steps:
     1. Loads a master list of postcodes from a CSV file.
-    2. Validates the postcode column in the full_responses DataFrame against the master list.
+    2. Validates the postcode column in the full_responses DataFrame against the
+       master list.
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
     Parameters:
     config (Dict): A dictionary containing configuration options.
     paths (Dict): A dictionary containing paths to various files.
-    full_responses (pd.DataFrame): The DataFrame containing the data to be validated.
+    full_responses (pd.DataFrame): The DataFrame containing the data to be
+    validated.
     run_id (str): The run ID for this execution.
     check_file_exists (Callable): A function that checks if a file exists.
     read_csv (Callable): A function that reads a CSV file into a DataFrame.
     write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame and the master list of postcodes.
+    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+    and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
@@ -454,7 +473,9 @@ def stage_validate_harmonise_postcodes(
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
-    invalid_df = val.validate_post_col(full_responses, postcode_masterlist, config)
+    invalid_df = val.validate_post_col(
+        full_responses, postcode_masterlist, config
+    )
 
     # Log the saving of invalid postcodes to a file
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
