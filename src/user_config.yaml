@@ -1,6 +1,6 @@
 config_validation:
   validate: True
-  path: None
+  path: src/user_config_schema.yaml
 global:
   # Staging and validation settings
   postcode_csv_check: False

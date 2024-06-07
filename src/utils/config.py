@@ -167,25 +167,43 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
         "float": float,
         "str": str,
         "bool": bool,
-        "path": str # passed as string in config
+        "path": str, # passed as string in config
+        "list": list
     }
     # recursive check on schema item
-    while not _check_has_schema(value=item):
+    if not _check_has_schema(value=item):
         for sub_item in item.keys():
-            _check_items(item=item[sub_item], config=config_item[sub_item])
+            _check_items(
+                item=item[sub_item],
+                config_item=config_item[sub_item],
+                item_name=sub_item
+            )
+        return
     # check that both levels aren't the same
     if item["top_level"] == item["bottom_level"]:
         raise ValueError(
             "Conflicting config. top_level == botom_level"
         )
     # do validation
-    dtype = DTYPES[item["dtype"]]
-    if item["accept_nonetype"]:
-        dtype = (dtype, type(None))
     if item["bottom_level"]:
         config_item = {item_name: config_item}
+    dtype = DTYPES[item["dtype"]] if "list" not in item["dtype"] else list
+    if item["accept_nonetype"]:
+        dtype = (dtype, type(None))
     for level in config_item.keys():
         param = f"{item_name}:{level}"
+        # parse list datatype
+        if "list" in item["dtype"]:
+            dtype = item["dtype"]
+            _type_defence(config_item[level], param, list)
+            subtype = dtype.replace("list[", "").replace("]", "")
+            for list_item in config_item[level]:
+                _type_defence(
+                    list_item, 
+                    f"{param}:list item:{list_item}", 
+                    DTYPES[subtype]
+                )
+            return
         # convert nulltype strings
         if isinstance(config_item[level], str):
             config_item[level] = _nulltype_conversion(config_item[level])

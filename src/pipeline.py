@@ -7,7 +7,7 @@ from copy import deepcopy
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.config import safeload_yaml, validate_unique_keys, merge_configs
+from src.utils.config import safeload_yaml, validate_config, merge_configs
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
@@ -34,7 +34,11 @@ def run_pipeline(start, user_config_path, dev_config_path):
     user_config = safeload_yaml(user_config_path)
     dev_config = safeload_yaml(dev_config_path)
     # validate config
-
+    validate_config(user_config)
+    validate_config(dev_config)
+    # drop validation keys
+    user_config.pop("config_validation", None)
+    dev_config.pop("config_validation", None)
     # combine configs
     config = merge_configs(user_config, dev_config)
     del user_config

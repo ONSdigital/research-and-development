@@ -74,8 +74,8 @@ def _validate_file_extension(
         ext = f".{ext}"
     # check extension
     found_ext = os.path.splitext(path)
-    if found_ext != ext:
-        msg = f"Expected file extension {ext} for {path}. Got {found_ext}"
+    if found_ext[1] != ext:
+        msg = f"Expected file extension {ext} for {path}. Got {found_ext[1]}"
         if warn:
             warnings.warn(msg, UserWarning)
         else:

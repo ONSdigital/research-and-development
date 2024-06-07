@@ -1,6 +1,6 @@
 # top_level: bool: is this top level where dt is the same?
 # bottom_level: bool: is this bottom level e.g., singular dtype for one item
-# dtype: [str, int, float, bool, path]
+# dtype: [str, int, float, bool, path, list[<type> or any]]
 # accept_nonetype: bool: whether or not to accept None
 # max: [int, float]: applies only to int/float dtype, optional (inclusive)
 # min: [int, float]: applies only to int/float dtype, optional (inclusive)

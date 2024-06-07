@@ -1,6 +1,6 @@
 config_validation:
   validate: True
-  path: None
+  path: src/dev_config_schema.yaml
 global:
   # Logging settings
   log_to_file: True # Write logs to .log file
@@ -11,7 +11,7 @@ global:
   network_or_hdfs: "network" #whether to load from hdfs or network (local Python)
   # Construction Settings
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: True
+  load_from_feather: True 
   # Apportionment to sites settings
   apportion_sites: True
 runlog_writer:
@@ -28,7 +28,6 @@ network_paths:
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
-  feather_path: ""
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   # Imputation and outliers input paths
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
