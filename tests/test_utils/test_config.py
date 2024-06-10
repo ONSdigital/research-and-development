@@ -143,6 +143,50 @@ class TestValidatePath(object):
     
     def test__validate_path_raises(self, path_config):
         """Test _validate_path raises."""
-        msg = rf"Expected file extension .txt for test/path.test. Got .test"
+        msg = r"Expected file extension .txt for test/path.test. Got .test"
         with pytest.raises(TypeError, match=msg):
             _validate_path("test/path.test", "test", path_config)
+
+
+class TestMergeConfigs(object):
+    """Tests for merge_configs."""
+
+    def test_merge_configs(self):
+        """General tests for merge_configs."""
+        conf1 = {
+            "test": 1,
+            "test2": {"sub1": 1}
+        }
+        conf2 = {
+            "tester": 1,
+            "test2": {"sub2": 2}
+        }
+        expected = {
+            "test": 1,
+            "test2": {
+                "sub1": 1,
+                "sub2": 2
+                },
+            "tester": 1
+        }
+        resultant = merge_configs(conf1, conf2)
+        assert expected == resultant, (
+            "Merged configs not as expected."
+        )
+
+    def test_merge_configs_raises_top_level(self):
+        """Test that merge_configs raises overlapping keys."""
+        test1 = {"test": 1}
+        test2 = {"test": 2}
+        msg = r"Overlapping keys in configs: test"
+        with pytest.raises(ValueError, match=msg):
+            merge_configs(test1, test2)
+    
+    def test_merge_configs_raises_second_level(self):
+        """Test that merge_configs raises overlapping keys."""
+        test1 = {"test": {"test_again": 1}}
+        test2 = {"test": {"test_again": 2}}
+        msg = r"Overlapping keys in configs: test:test_again"
+        with pytest.raises(ValueError, match=msg):
+            merge_configs(test1, test2)
+    
