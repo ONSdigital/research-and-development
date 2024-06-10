@@ -132,12 +132,12 @@ def _validate_numeric(value: Union[float, int], param_nm: str, config: dict):
     if max:
         if value > max:
             raise ValueError(
-                f"Config value ({value}) {param_nm} greater than max ({max})."
+                f"Config value for {param_nm} ({value}) greater than max ({max})."
             )
     if min:
         if value < min:
             raise ValueError(
-                f"Config value ({value}) {param_nm} less than min ({min})."
+                f"Config value for {param_nm} ({value}) less than min ({min})."
             )
 
 
