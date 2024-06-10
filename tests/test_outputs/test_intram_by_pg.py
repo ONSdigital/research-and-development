@@ -10,12 +10,16 @@ import pandas as pd
 
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.utils.helpers import Config_settings
+from src.utils.config import safeload_yaml, merge_configs
 
 # read config file
-config_path = os.path.join("src", "developer_config.yaml")
-conf_obj = Config_settings(config_path)
-config = conf_obj.config_dict
+user_path = os.path.join("src", "user_config.yaml")
+dev_path = os.path.join("src", "dev_config.yaml")
+user_config = safeload_yaml(user_path)
+dev_config = safeload_yaml(dev_path)
+user_config.pop("config_validation", None)
+dev_config.pop("config_validation", None)
+config = merge_configs(user_config, dev_config)
 
 # Assign config values to paths
 LOCATION = config["global"]["network_or_hdfs"]
