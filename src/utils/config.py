@@ -71,11 +71,11 @@ def merge_configs(config1: dict, config2: dict) -> dict:
     return deepcopy(config2)
 
 
-def _check_has_schema(value: dict) -> bool:
+def _check_has_schema(_dict: dict) -> bool:
     """Check if an item has a schema.
 
     Args:
-        value (dict): The item.
+        _dict (dict): The config item.
 
     Returns:
         bool: Whether or not the item has a schema.
@@ -86,7 +86,7 @@ def _check_has_schema(value: dict) -> bool:
         "dtype", 
         "accept_nonetype",
     ]
-    if sorted(expected_keys) == sorted(list(value.keys())[:4]):
+    if sorted(expected_keys) == sorted(list(_dict.keys())[:4]):
         return True
     return False
 
@@ -157,8 +157,17 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
 def _check_items(item: dict, config_item: dict, item_name: str) -> None:
     """Check items of a config to validate them.
 
+    This function recursively checks items in the config and validates them. It
+     traverses the tree of the config (levels) until the config validation ymal
+    reaches a validation schema. If a valdiation schema is detected, the 
+    function will stop recursively going deeper into the tree, and will 
+    validate the current level with the parameters passed.
+
     Args:
-        item (dict): The item(s) to check.
+        item (dict): The item(s) to check (config validation).
+        config_item (dict): The matching config item (actual config). 
+        item_name (str): The name of the item (matching in both validation
+                         and config)
     """
     DTYPES = {
         "int": int,
@@ -169,7 +178,7 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
         "list": list
     }
     # recursive check on schema item
-    if not _check_has_schema(value=item):
+    if not _check_has_schema(_dict=item):
         for sub_item in item.keys():
             _check_items(
                 item=item[sub_item],
