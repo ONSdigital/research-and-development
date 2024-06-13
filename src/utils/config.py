@@ -86,7 +86,7 @@ def _check_has_schema(_dict: dict) -> bool:
         "dtype", 
         "accept_nonetype",
     ]
-    if sorted(expected_keys) == sorted(list(_dict.keys())[:4]):
+    if set(expected_keys).issubset(set(list(_dict.keys()))):
         return True
     return False
 

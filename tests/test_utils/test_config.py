@@ -194,6 +194,59 @@ class TestMergeConfigs(object):
 class TestValidateConfig(object):
     """Tests for validate_config."""
     
-    def test_validate_config(self):
+    @pytest.fixture(scope="function")
+    def dummy_validation(self):
+        """A dummy config validation for use in tests."""
+        validation = {
+            "tester": {
+                "top_level": False,
+                "bottom_level": True,
+                "dtype": "int",
+                "accept_nonetype": False,
+                "max": 15
+            }
+        }
+        return validation
+
+    def test_validate_config(self, dummy_validation, tmp_path):
         """General testss for validate_config."""
-        pass
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        write_dict_to_yaml(dummy_validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                "validate": True,
+                "path": validation_path
+            },
+            "tester": 14
+        }
+        validate_config(dummy_config)
+
+    def test_validate_config_no_validate(self, dummy_validation, tmp_path):
+        """Test that None is returned when validate=False."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        write_dict_to_yaml(dummy_validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                "validate": False,
+                "path": validation_path
+            },
+            "tester": 14
+        }
+        assert isinstance(validate_config(dummy_config), type(None)), (
+            "validate_config expected to return None."
+        )
+
+    def test_validate_config_over_max(self, dummy_validation, tmp_path):
+        """Test that an error is raised when the max is breached."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        write_dict_to_yaml(dummy_validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                "validate": True,
+                "path": validation_path
+            },
+            "tester": 16
+        }
+        msg = r"Config value for tester:tester .*16.* greater than max .*15.*"
+        with pytest.raises(ValueError, match=msg):
+            validate_config(dummy_config)
