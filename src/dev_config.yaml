@@ -20,10 +20,13 @@ runlog_writer:
   write_sql: False # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
   log_path: "/ons/rdbe_dev/"
+hdfs_paths:
+  root: "/ons/rdbe_dev/"
+  logs_foldername: "/ons/rdbe_dev/logs/run_logs"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/" # dev config
   logs_foldername: "logs/run_logs" # dev config
-  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"

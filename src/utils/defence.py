@@ -18,7 +18,7 @@ def _type_defence(
         types (Union[object, tuple]): Specified type(s) to match.
         warn (bool, optional): Whether or not to warn in the case that the 
                                passed object does not match the given type.
-                               Raises when False. Defaults to False.
+                               Raises an error when False. Defaults to False.
 
     Raises:
         TypeError: Raised if the passed object is not of the specified type.
@@ -35,26 +35,6 @@ def _type_defence(
                 msg
             )
     return None
-
-
-def _validate_str_is_path(path: str, param_nm: str, warn: bool=False):
-    """Validate the a path passed in string form is valid.
-
-    Args:
-        path (str): The path.
-        param_nm (str): The parameter name (for error raising).
-        warn (bool, optional): Whether or not to warn. Defaults to False.
-    """
-    unix = path.replace("\\", "/")
-    realpath = os.path.realpath(unix)
-    # ensure it can be converted to a path
-    try:
-        pathlib.Path(realpath)
-    except Exception as e:
-        raise TypeError(
-            "Path passed is not valid: {path}. Full error:\n{e}"
-        )
-
 
 
 def _validate_file_extension(

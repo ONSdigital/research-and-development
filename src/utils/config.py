@@ -8,7 +8,6 @@ import yaml
 
 from src.utils.defence import (
     _type_defence, 
-    _validate_str_is_path, 
     _validate_file_extension
 )
 
@@ -100,7 +99,6 @@ def _validate_path(path: str, param_nm: str, config: dict):
         param_nm (str): The param name (for error raises).
         item_conf (dict): The config file (for file ext).
     """
-    _validate_str_is_path(path, param_nm)
     try:
         file_ext = config["filetype"]
     except KeyError:
@@ -235,7 +233,6 @@ def validate_config(config: dict) -> None:
         return None
     validation_path = config["config_validation"]["path"]
     _type_defence(validation_path, "config_validation:path", str)
-    _validate_str_is_path(validation_path, "config_validation:path")
     # read in config schema
     validation_config = safeload_yaml(validation_path)
     for item in validation_config.keys():

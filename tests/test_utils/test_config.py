@@ -189,4 +189,11 @@ class TestMergeConfigs(object):
         msg = r"Overlapping keys in configs: test:test_again"
         with pytest.raises(ValueError, match=msg):
             merge_configs(test1, test2)
+
+
+class TestValidateConfig(object):
+    """Tests for validate_config."""
     
+    def test_validate_config(self):
+        """General testss for validate_config."""
+        pass
