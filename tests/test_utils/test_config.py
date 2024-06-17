@@ -192,7 +192,10 @@ class TestMergeConfigs(object):
 
 
 class TestValidateConfig(object):
-    """Tests for validate_config."""
+    """Tests for validate_config.
+    
+    This will also act as a space to test _check_items. 
+    """
     
     @pytest.fixture(scope="function")
     def dummy_validation(self):
@@ -203,7 +206,8 @@ class TestValidateConfig(object):
                 "bottom_level": True,
                 "dtype": "int",
                 "accept_nonetype": False,
-                "max": 15
+                "max": 15,
+                "min": 5
             }
         }
         return validation
@@ -236,8 +240,43 @@ class TestValidateConfig(object):
             "validate_config expected to return None."
         )
 
-    def test_validate_config_over_max(self, dummy_validation, tmp_path):
-        """Test that an error is raised when the max is breached."""
+    @pytest.mark.parametrize(
+            "val, error_type, msg",
+            (
+                [
+                    16,
+                    ValueError, 
+                    (
+                        r"Config value for tester:tester .*16.* greater than " 
+                        r"max .*15.*"
+                    )
+                ],
+                [
+                    4,
+                    ValueError, 
+                    (
+                        r"Config value for tester:tester .*4.* less than min "
+                        r".*5.*."
+                    )
+                ],
+                [
+                    "tester",
+                    TypeError, 
+                    (
+                        r".*tester:tester.* expected .*int.* Got .*str.*"
+                    )
+                ]
+            )
+    )
+    def test_validate_config_ints(
+            self, 
+            dummy_validation, 
+            tmp_path, 
+            val,
+            error_type, 
+            msg
+        ):
+        """Tests for validating an integer."""
         validation_path = os.path.join(tmp_path, "conf_val.yaml")
         write_dict_to_yaml(dummy_validation, validation_path)
         dummy_config = {
@@ -245,8 +284,79 @@ class TestValidateConfig(object):
                 "validate": True,
                 "path": validation_path
             },
-            "tester": 16
+            "tester": val
         }
-        msg = r"Config value for tester:tester .*16.* greater than max .*15.*"
+        with pytest.raises(error_type, match=msg):
+            validate_config(dummy_config)
+
+    @pytest.mark.parametrize(
+            "value",
+            (
+                None,
+                "None",
+                ""
+            )
+    )
+    def test_validate_config_accept_nonetypes(
+            self, 
+            dummy_validation, 
+            tmp_path,
+            value
+        ):
+        """Test that nonetypes are accepted."""
+        dummy_validation["tester"]["accept_nonetype"] = True
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        write_dict_to_yaml(dummy_validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                "validate": True,
+                "path": validation_path
+            },
+            "tester": value
+        }
+        validate_config(dummy_config)
+        
+
+
+    def test_validate_config_multiple_layers(self, dummy_validation, tmp_path):
+        """Test that a config with multiple layers is parsed."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        validation = {"layer1": dummy_validation}
+        write_dict_to_yaml(validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                    "validate": True,
+                    "path": validation_path
+                },
+            "layer1": {
+                "tester": 4
+            }
+        }
+        msg = r"Config value for tester:tester .*4.* less than min .*5.*."
         with pytest.raises(ValueError, match=msg):
             validate_config(dummy_config)
+    
+    def test_validate_config_both_levels(self, tmp_path):
+        """Test that an error is raied when both levels are passed."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        validation = {
+            "test": {
+                "top_level": True,
+                "bottom_level": True,
+                "dtype": "int",
+                "accept_nonetype": False
+            }
+        }
+        config = {
+            "config_validation": {
+                    "validate": True,
+                    "path": validation_path
+                },
+            "test": 100
+        }
+        write_dict_to_yaml(validation, validation_path)
+        msg = r"Conflicting config.* top_level == botom_level"
+        with pytest.raises(ValueError, match=msg):
+            validate_config(config)
+        
+
