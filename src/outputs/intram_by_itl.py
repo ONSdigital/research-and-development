@@ -52,17 +52,20 @@ def save_detailed_csv(
     write_csv(save_path, df)
 
 
-def rename_itl(df: pd.DataFrame, itl: int) -> pd.DataFrame:
-    """Rename ITL columns in a dataframe.
+def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
+    """Renames ITL columns in a dataframe. Puts current year in total column name. 
+
 
     Args:
         df (pd.DataFrame): The dataframe containing the ITL columns.
         itl (int): The ITL level.
-
-    Returns:
+        year (int): The current year from config.
+ 
+ 
+    Returns: 
         pd.DataFrame: A df with the renamed ITL columns.
     """
-    renamer = {"211": "Year Total q211"}
+    renamer = {"211": f"Year {year} Total q211"}
     for col in df.columns:
         cd = re.search(rf"^ITL{itl}[0-9]*CD$", col)
         if cd:
@@ -99,6 +102,7 @@ def output_intram_by_itl(
     # Declare Config Values
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    CURRENT_YEAR = config["years"]["current_year"]
 
     # Subset GB Data
     df = df_gb[["postcodes_harmonised", "formtype", "211"]]
@@ -108,7 +112,7 @@ def output_intram_by_itl(
         df_ni["postcodes_harmonised"] = pd.NA
         df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
         df = df.append(df_ni, ignore_index=True).copy()
-S
+
     # Join Aggregation Cols
     df = map_o.join_itl_regions(df, postcode_mapper)
     df = df.merge(itl_mapper, how="left", left_on="itl", right_on="LAU121CD")
@@ -123,8 +127,8 @@ S
 
     # Clean data rady for export
     itl2 = itl2.drop(GEO_COLS[2:], axis=1)
-    itl1 = rename_itl(itl1, 1)
-    itl2 = rename_itl(itl2, 2)
+    itl1 = rename_itl(itl1, 1, CURRENT_YEAR)
+    itl2 = rename_itl(itl2, 2, CURRENT_YEAR)
 
     # Export UK outputs
     area = "gb" if df_ni is None else "uk"

@@ -6,7 +6,7 @@ from typing import Callable, Dict, Any
 import pandas as pd
 from datetime import datetime
 
-from src.outputs.outputs_helpers import aggregate_output, create_output_df
+from src.outputs.outputs_helpers import create_output_df
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 
@@ -101,12 +101,7 @@ def output_frozen_group(
 
     # Deduplicate by aggregation
     if deduplicate:
-        df_agg = aggregate_output(
-            df,
-            category_columns,
-            value_columns,
-            "sum"
-        )
+        df_agg = df.groupby(category_columns).agg("sum").reset_index()
     else:
         df_agg = df
 

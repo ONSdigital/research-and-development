@@ -908,6 +908,8 @@ docs/_linkcheck/
 /logs/*
 !logs/.gitkeep
 !logs/logs.md
+!logs/run_logs
+!logs/run_logs/.gitkeep
 
 # Utility bat file for ssh key
 add_ssh_key.bat
