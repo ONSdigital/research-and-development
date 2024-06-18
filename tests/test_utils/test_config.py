@@ -393,6 +393,58 @@ class TestValidateConfig(object):
         }
         with pytest.raises(error, match=msg):
             validate_config(config)
+    
+    @pytest.mark.parametrize(
+            "val, error_type, msg",
+            (
+                [
+                    16.5,
+                    ValueError, 
+                    (
+                        r"Config value for tester:tester .*16.*5.* greater than " 
+                        r"max .*15.*"
+                    )
+                ],
+                [
+                    4.7,
+                    ValueError, 
+                    (
+                        r"Config value for tester:tester .*4.*7.* less than min "
+                        r".*5.*."
+                    )
+                ],
+                [
+                    "tester",
+                    TypeError, 
+                    (
+                        r".*tester:tester.* expected .*float.* Got .*str.*"
+                    )
+                ]
+            )
+    )
+    def test_validate_config_ints(
+            self, 
+            dummy_validation, 
+            tmp_path, 
+            val,
+            error_type, 
+            msg
+        ):
+        """Tests for validating an integer."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        dummy_validation["tester"]["dtype"] = "float"
+        write_dict_to_yaml(dummy_validation, validation_path)
+        dummy_config = {
+            "config_validation": {
+                "validate": True,
+                "path": validation_path
+            },
+            "tester": val
+        }
+        with pytest.raises(error_type, match=msg):
+            validate_config(dummy_config)
+
+        
 
         
 
