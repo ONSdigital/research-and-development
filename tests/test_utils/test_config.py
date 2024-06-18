@@ -316,8 +316,6 @@ class TestValidateConfig(object):
         }
         validate_config(dummy_config)
         
-
-
     def test_validate_config_multiple_layers(self, dummy_validation, tmp_path):
         """Test that a config with multiple layers is parsed."""
         validation_path = os.path.join(tmp_path, "conf_val.yaml")
@@ -358,5 +356,43 @@ class TestValidateConfig(object):
         msg = r"Conflicting config.* top_level == botom_level"
         with pytest.raises(ValueError, match=msg):
             validate_config(config)
+
+    @pytest.mark.parametrize(
+            "path, ext, error, msg",
+            (
+                ["tester/test.txt", ".yaml", TypeError, (
+                    r"Expected file extension .*yaml.*Got.*txt.*"
+                    )
+                ],
+                # test with no '.' in extension
+                ["tester/test.bat", "toml", TypeError, (
+                    r"Expected file extension .*toml.*Got.*bat.*"
+                    )
+                ]
+            )
+    )
+    def test_validate_config_path(self, tmp_path, path, ext, error, msg):
+        """Tests for validating a path."""
+        validation_path = os.path.join(tmp_path, "conf_val.yaml")
+        validation = {
+            "test_path": {
+                "top_level": False,
+                "bottom_level": True,
+                "dtype": "path",
+                "accept_nonetype": False,
+                "filetype": ext
+            }
+        }
+        write_dict_to_yaml(validation, validation_path)
+        config = {
+            "config_validation": {
+                    "validate": True,
+                    "path": validation_path
+                },
+            "test_path": path
+        }
+        with pytest.raises(error, match=msg):
+            validate_config(config)
+
         
 
