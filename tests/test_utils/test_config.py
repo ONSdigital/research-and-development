@@ -422,7 +422,7 @@ class TestValidateConfig(object):
                 ]
             )
     )
-    def test_validate_config_ints(
+    def test_validate_config_floats(
             self, 
             dummy_validation, 
             tmp_path, 
