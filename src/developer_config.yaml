@@ -1,4 +1,5 @@
 global:
+  survey_year: 2023
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
@@ -15,7 +16,7 @@ global:
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: True  # whether to load previous year data for MoR
+  load_backdata: False  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Apportionment to sites settings

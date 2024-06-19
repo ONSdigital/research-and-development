@@ -1,44 +1,49 @@
 """Read in the large postcode lookup and save smaller csv with two required columns."""
 
 import pandas as pd
+import os
+import sys
 
-# configuration settings
-survey_year = 2020
-# Input folder and file names
-root_fol = "R:/BERD Results System Development 2023/DAP_emulation/"
-in_fol = root_fol + "ONS_Postcode_Reference/"
-in_file = "postcodes_pcd2_itl.csv"
+sys.path.append("D:/coding_projects/github_repos/research-and-development")  # noqa
 
-# Output folder and file names
-out_fol = root_fol + f"{survey_year}_surveys/mappers/"
-out_file = "postcodes_mapper_reduced.csv"
+from src.utils.helpers import Config_settings  # noqa
+from src.utils.local_file_mods import check_file_exists  # noqa
 
-key_cols = ["pcd2", "itl"]
+# load config
+config_path = os.path.join("src", "developer_config.yaml")
+conf_obj = Config_settings(config_path)
+config = conf_obj.config_dict
 
-# validate the inputs
+survey_year = config["global"]["survey_year"]
 # test the survey year is a valid year as an integer
 if not ((survey_year > 2020) and (survey_year < 2035)):
     msg = f"""The survey_year value {survey_year} is not valid.
            Enter an integer between 2021 and 2034"""
     raise Exception(msg)
 
-# check the input and output paths are valid
+# Input folder and file names
+in_file = config["network_paths"]["postcode_masterlist"]
+
+# Output folder and file names
+root_fol = "R:/BERD Results System Development 2023/DAP_emulation/"
+out_fol = root_fol + f"{survey_year}_surveys/mappers/"
+out_path = out_fol + "postcodes_mapper_reduced.csv"
+
+# check the input paths are valid
+check_file_exists(in_file)
 
 # Read in files
-
-in_path = in_fol + in_file
-with open(in_path, "r") as file:
+key_cols = ["pcd2", "itl"]
+with open(in_file, "r") as file:
     # Import csv file and convert to Dataframe
     try:
         df = pd.read_csv(file, usecols=key_cols, low_memory=False)
     except Exception:
-        print(f"Could not find specified columns in {in_path}")
+        print(f"Could not find specified columns in {in_file}")
         print("Columns specified: " + str(key_cols))
         raise ValueError
 
-print(df.head())
-# save output
-out_path = out_fol + out_file
+# write the reduced file to the new destination
 with open(out_path, "w", newline="\n", encoding="utf-8") as file:
     # Write dataframe to the file
     df.to_csv(file, index=False)
