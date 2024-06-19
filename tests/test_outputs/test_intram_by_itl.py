@@ -273,12 +273,12 @@ class TestOutputIntramByItl(object):
         return df
 
 
-    def create_dummy_config(self, path: pathlib.Path):
+    def create_dummy_config(self, path: pathlib.Path, year: int):
         """Create dummy config to provide output paths"""
         config = {
             "global": {"network_or_hdfs": "network"}, # no impact for test
             "network_paths": {"output_path": path},
-            "years": {"current_year": 2022}
+            "years": {"current_year": year}
         }
         return config
 
@@ -321,7 +321,7 @@ class TestOutputIntramByItl(object):
             gb_itl2_output
         ):
         """General tests for output_intram_by_itl with no NI data."""
-        config = self.create_dummy_config(tmp_path)
+        config = self.create_dummy_config(tmp_path, 2022)
         output_paths = self.setup_output_dir(tmp_path, "gb")
         # save outputs
         output_intram_by_itl(
@@ -355,7 +355,7 @@ class TestOutputIntramByItl(object):
         uk_itl2_output
     ):
         """General tests for output_intram_by_itl with NI data."""
-        config = self.create_dummy_config(tmp_path)
+        config = self.create_dummy_config(tmp_path, 2022)
         output_paths = self.setup_output_dir(tmp_path, "uk")
         # save outputs
         output_intram_by_itl(
