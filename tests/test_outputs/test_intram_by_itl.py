@@ -109,7 +109,7 @@ class TestRenameItl(object):
         # assert column name changes
         data_1 = rename_itl(data_1, 1, 2022)
         data_2 = rename_itl(data_2, 2, 2022)
-        data_1_missing = rename_itl(data_1.copy(), 2) # no changes
+        data_1_missing = rename_itl(data_1.copy(), 2, 2022) # no changes
         assert (
             np.array_equal(
                 data_1.columns,
@@ -216,7 +216,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def gb_itl1_output(self) -> pd.DataFrame:
         """Expected output for GB - ITL1."""
-        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year Total q211"]
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year 2022 Total q211"]
         data = [
             ['TLE', 'Yorkshire and The Humber', 337266.6667],
             ['TLI', 'London', 0.0],
@@ -231,7 +231,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def gb_itl2_output(self) -> pd.DataFrame:
         """Expected output for GB - ITL2."""
-        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year Total q211"]
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year 2022 Total q211"]
         data = [
             ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
             ['TLI7', 'Outer London - West and North West', 0.0],
@@ -246,7 +246,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def uk_itl1_output(self) -> pd.DataFrame:
         """Expected output for UK - ITL1."""
-        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year Total q211"]
+        columns = ["Area Code (ITL1)", "Region (ITL1)", "Year 2022 Total q211"]
         data = [
             ['TLE', 'Yorkshire and The Humber', 337266.6667],
             ['TLI', 'London', 0.0],
@@ -261,7 +261,7 @@ class TestOutputIntramByItl(object):
     @pytest.fixture(scope="function")
     def uk_itl2_output(self) -> pd.DataFrame:
         """Expected output for UK - ITL2."""
-        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year Total q211"]
+        columns = ["Area Code (ITL2)", "Region (ITL2)", "Year 2022 Total q211"]
         data = [
             ['TLE1', 'East Yorkshire and Northern Lincolnshire', 337266.6667],
             ['TLI7', 'Outer London - West and North West', 0.0],
@@ -277,7 +277,8 @@ class TestOutputIntramByItl(object):
         """Create dummy config to provide output paths"""
         config = {
             "global": {"network_or_hdfs": "network"}, # no impact for test
-            "network_paths": {"output_path": path}
+            "network_paths": {"output_path": path},
+            "years": {"current_year": 2022}
         }
         return config
 
