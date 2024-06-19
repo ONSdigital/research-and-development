@@ -107,8 +107,8 @@ class TestRenameItl(object):
         data_1 = self.get_test_data(itl=1)
         data_2 = self.get_test_data(itl=2)
         # assert column name changes
-        data_1 = rename_itl(data_1, 1)
-        data_2 = rename_itl(data_2, 2)
+        data_1 = rename_itl(data_1, 1, 2022)
+        data_2 = rename_itl(data_2, 2, 2022)
         data_1_missing = rename_itl(data_1.copy(), 2) # no changes
         assert (
             np.array_equal(
