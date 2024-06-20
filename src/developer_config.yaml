@@ -7,7 +7,7 @@ global:
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
-  postcode_csv_check: False
+  postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: True
   load_historic_data: False
@@ -17,7 +17,7 @@ global:
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: True
+  load_from_feather: False
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
@@ -116,6 +116,9 @@ network_paths:
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
+  contributors_schema: "config/contributors_schema.toml"
+  long_response_schema: "config/long_response.toml"
+  wide_responses_schema: "config/wide_responses.toml"
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
