@@ -975,7 +975,8 @@ class TestLogOutlierNumbers:
             auto.log_outlier_info(input_df, "value_col")
 
         assert (
-            "1 outliers were detected out of a total of 2 valid entries in column value_col"
+            "1 outliers were detected out of a total of 2 valid entries in column"
+            " value_col"
             in caplog.text
         )
 

@@ -321,7 +321,8 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
     The weights are calculated using the formula:
         weight = site_percent / site_percent_total
 
-    The weights are then used to apportion expenditure of each reference across their sites.
+    The weights are then used to apportion expenditure of each reference across
+     their sites.
 
     Parameters:
         df (pd.DataFrame): The input DataFrame.

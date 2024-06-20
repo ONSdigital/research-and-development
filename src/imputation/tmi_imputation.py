@@ -490,7 +490,8 @@ def run_tmi(
         full_df (pd.DataFrame): the full responses spp dataframe
         config (Dict): the configuration settings
     Returns:
-        final_df(pd.DataFrame): dataframe with the imputed valued added and counts columns
+        final_df(pd.DataFrame): dataframe with the imputed valued added and counts
+            columns
         qa_df: qa dataframe
     """
     # changing type of Civil or Defence column 200 helps with imputation classes

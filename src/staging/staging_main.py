@@ -14,7 +14,7 @@ import src.staging.staging_helpers as helpers
 StagingMainLogger = logging.getLogger(__name__)
 
 
-def run_staging(
+def run_staging(  # noqa: C901
     config: dict,
     check_file_exists: Callable,
     load_json: Callable,

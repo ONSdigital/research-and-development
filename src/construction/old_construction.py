@@ -110,7 +110,8 @@ def get_amendments(main_snapshot, secondary_snapshot):
 
         # ? I think this is the way to do it:
         # ?     Take a slice of the df which is just the cols ending with _diff_nonzero
-        # ?     Do a column-wise any() on this slice, which returns a series where the value is True if any of the *_diff_nonzero cols in that row were True
+        # ?     Do a column-wise any() on this slice, which returns a series where the
+        #       value is True if any of the *_diff_nonzero cols in that row were True
         # ?     Add that series as a column to the original df
         # ?     Remove any rows from the df where is_any_diff_nonzero is False
         # ! Can't test this without a real secondary snapshot file

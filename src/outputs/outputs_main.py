@@ -20,7 +20,7 @@ from src.outputs.total_fte import qa_output_total_fte
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def run_outputs(
+def run_outputs(  # noqa: C901
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,

@@ -9,7 +9,7 @@ from src.outputs.outputs_helpers import create_period_year
 construction_logger = logging.getLogger(__name__)
 
 
-def run_construction(
+def run_construction(  # noqa: C901
     snapshot_df: pd.DataFrame,
     config: dict,
     check_file_exists: Callable,
@@ -181,7 +181,7 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     # Check which references are going to be converted to long forms
     # and how many instances they have
     ref_count = construction_df.loc[
-        construction_df["short_to_long"] == True, "reference"
+        construction_df["short_to_long"] == True, "reference"  # noqa: E712
     ].value_counts()
 
     # Create conversion df
