@@ -153,7 +153,7 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
         return None
     return value
 
-
+# noqa: C901
 def _check_items(item: dict, config_item: dict, item_name: str) -> None:
     """Check items of a config to validate them.
 
