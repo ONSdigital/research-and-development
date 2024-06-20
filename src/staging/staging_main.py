@@ -137,20 +137,31 @@ def run_staging(
             secondary_full_responses = helpers.load_validate_secondary_snapshot(
                 load_json,
                 secondary_snapshot_path,
+                config,
+                network_or_hdfs,
             )
         else:
             secondary_full_responses = None
 
         # Write both snapshots to feather file at given path
         if is_network:
-            helpers.write_snapshot_to_feather(
+            feather_fname = f"{snapshot_name}_corrected.feather"
+            s_feather_fname = f"{secondary_snapshot_name}.feather"
+            helpers.df_to_feather(
                 feather_path,
-                snapshot_name,
+                feather_fname,
                 full_responses,
-                write_feather,
-                secondary_snapshot_name,
-                secondary_full_responses,
+                write_feather
+
             )
+            if secondary_full_responses is not None:
+                helpers.df_to_feather(
+                    feather_path,
+                    s_feather_fname,
+                    secondary_full_responses,
+                    write_feather
+
+                )
 
     # Flag invalid records
     val.flag_no_rand_spenders(full_responses, "raise")

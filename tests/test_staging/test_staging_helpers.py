@@ -1,8 +1,8 @@
 """Tests for 'staging_helpers.py'."""
 # Standard Library Imports
+import os
 import pytest
 import pathlib
-import os
 from typing import Tuple
 from datetime import date
 
@@ -13,12 +13,9 @@ import pyarrow.feather as feather
 
 # Local Imports
 from src.staging.staging_helpers import (
-    # postcode_topup,
     fix_anon_data,
     update_ref_list,
     getmappername,
-    load_validate_mapper,
-    load_historic_data,
     check_snapshot_feather_exists,
     load_snapshot_feather,
     load_val_snapshot_json,
@@ -121,6 +118,7 @@ class TestUpdateRefList(object):
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
 
+
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
@@ -149,6 +147,7 @@ class TestUpdateRefList(object):
         error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
+
 
 
 class TestGetMapperName(object):
@@ -190,6 +189,7 @@ class TestCheckSnapshotFeatherExists(object):
         if second:
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
+
 
     @pytest.mark.parametrize(
         "first, second, check_both, result",
@@ -284,10 +284,10 @@ class TestWriteSnapshotToFeather(object):
         # write 'feathers'
         write_snapshot_to_feather(
             tmp_path,
-            "snap_1",
+            "test3.test",
             f1,
             write_feather,
-            "snap_2",
+            False,
         )
         # assert feathers has been written
         files = os.listdir(tmp_path)
@@ -381,6 +381,7 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
+
 
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""
