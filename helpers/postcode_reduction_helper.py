@@ -16,9 +16,9 @@ config = conf_obj.config_dict
 
 survey_year = config["global"]["survey_year"]
 # test the survey year is a valid year as an integer
-if not ((survey_year > 2020) and (survey_year < 2035)):
+if not ((survey_year > 2021) and (survey_year < 2041)):
     msg = f"""The survey_year value {survey_year} is not valid.
-           Enter an integer between 2021 and 2034"""
+           Enter an integer between 2022 and 2040"""
     raise Exception(msg)
 
 # Input folder and file names
