@@ -158,10 +158,12 @@ def run_imputation(
         schema_dict = load_schema(schema_path)
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
-        write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
-        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
-        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
-        write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
+        if links_filename is None:
+     #   if backdata is not None: Both this and the one above work, will keep both in case there are issues further down the line
+          write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
+          write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
+          write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
+          write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe
