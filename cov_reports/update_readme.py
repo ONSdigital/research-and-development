@@ -1,5 +1,6 @@
-import subprocess
+import os
 
-
-subprocess.run(["python", "-m", "coverage", "run", "-m", "pytest"])
-subprocess.run(["python", "-m", "readme-cov"])
+os.system("cd ..")
+os.system("pip3 install coverage readme-coverage-badger")
+os.system("python -m coverage run -m pytest")
+os.system("readme-cov")
