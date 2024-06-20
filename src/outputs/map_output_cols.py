@@ -74,7 +74,6 @@ def join_fgn_ownership(
             combined_df = combined_df.rename(columns={"ultfoc_y": "ultfoc"})
             combined_df = combined_df[old_cols]
 
-
         main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
 
         # If foreign ownership is empty, we fill it with "GB" for long, short
@@ -143,8 +142,32 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
-    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
+    status_before = [
+        "100",
+        "101",
+        "102",
+        "200",
+        "201",
+        "210",
+        "211",
+        "302",
+        "303",
+        "304",
+        "309",
+    ]
+    status_after = [
+        "200",
+        "100",
+        "1000",
+        "400",
+        "500",
+        "600",
+        "800",
+        "1200",
+        "1300",
+        "900",
+        "1400",
+    ]
 
     cora_dict = dict(zip(status_before, status_after))
 
@@ -234,8 +257,8 @@ def map_to_numeric(df: pd.DataFrame):
 
 
 def map_FG_cols_to_numeric(
-    df: pd.DataFrame,
-    col_list: list = ["251", "307", "308","309"]):
+    df: pd.DataFrame, col_list: list = ["251", "307", "308", "309"]
+):
     """Map specified cols in dataframe from letters to numeric format
     Yes is mapped to 1
     No is mapped to 2

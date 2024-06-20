@@ -13,7 +13,7 @@ def output_intram_by_pg(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ni_df: pd.DataFrame = None
+    ni_df: pd.DataFrame = None,
 ):
     """Run the outputs module.
 
@@ -40,15 +40,12 @@ def output_intram_by_pg(
     if ni_df is not None:
         # defence
         if not isinstance(ni_df, pd.DataFrame):
-            raise TypeError(
-                f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
-                )
+            raise TypeError(f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}")
         # work out cols to select
         cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
         gb_df = gb_df[cols_to_keep]
         ni_df = ni_df[cols_to_keep]
         gb_df = gb_df.append(ni_df)
-
 
     # Group by PG and aggregate intram
     df_agg = gb_df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
@@ -78,4 +75,7 @@ def output_intram_by_pg(
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
     filename = f"output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}", df_merge)
+    write_csv(
+        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}",
+        df_merge,
+    )

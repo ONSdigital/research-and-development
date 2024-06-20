@@ -8,7 +8,8 @@ Compares if the old and new values are the same within tolerance
 Saves the ouotputs
 """
 import sys
-sys.path.append('D:/programming_projects/research-and-development')
+
+sys.path.append("D:/programming_projects/research-and-development")
 #%%
 import pandas as pd
 from src.utils.local_file_mods import read_local_csv as read_csv
@@ -27,9 +28,16 @@ out_fol = "D:/coding_projects/randd_regression/"
 out_file = "apportion_merged.csv"
 
 # Columns to select
-key_cols = ["reference", "200",  "201", "formtype", "pg_numeric", "601"]
+key_cols = ["reference", "200", "201", "formtype", "pg_numeric", "601"]
 value_col = "211"
-other_cols = ["instance", "status", "imp_marker",  "602", "referencepostcode", "postcodes_harmonised"]
+other_cols = [
+    "instance",
+    "status",
+    "imp_marker",
+    "602",
+    "referencepostcode",
+    "postcodes_harmonised",
+]
 tolerance = 0.001
 #%% Read files
 cols_read = key_cols + [value_col] + other_cols
@@ -47,16 +55,12 @@ print(f"New size: {df_new_good.shape}")
 
 #%% Join
 df_merge = df_old_good.merge(
-    df_new_good,
-    on=key_cols,
-    how="outer",
-    suffixes=("_old", "_new"),
-    indicator=True
+    df_new_good, on=key_cols, how="outer", suffixes=("_old", "_new"), indicator=True
 )
 #%% Compare the values
 df_merge["value_different"] = (
-    (df_merge[value_col + "_old"] - df_merge[value_col + "_new"])**2 > tolerance**2
-)
+    df_merge[value_col + "_old"] - df_merge[value_col + "_new"]
+) ** 2 > tolerance**2
 
 # %% Save output
 write_csv(out_fol + out_file, df_merge)

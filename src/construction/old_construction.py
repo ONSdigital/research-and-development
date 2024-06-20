@@ -252,8 +252,19 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 def apply_amendments(main_df, amendments_df):
     """Apply amendments to the main snapshot."""
     key_cols = ["reference", "year", "instance"]
-    numeric_cols = ["219", "220", "242", "243", "244", "245",
-                    "246", "247", "248", "249", "250"]
+    numeric_cols = [
+        "219",
+        "220",
+        "242",
+        "243",
+        "244",
+        "245",
+        "246",
+        "247",
+        "248",
+        "249",
+        "250",
+    ]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
     accepted_amendments_df = amendments_df.drop(

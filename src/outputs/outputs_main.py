@@ -153,17 +153,12 @@ def run_outputs(
             run_id,
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
-    
+
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
         OutputMainLogger.info("Starting Intram by PG (UK) output...")
         output_intram_by_pg(
-            outputs_df,
-            pg_detailed,
-            config,
-            write_csv,
-            run_id,
-            ni_full_responses
+            outputs_df, pg_detailed, config, write_csv, run_id, ni_full_responses
         )
         OutputMainLogger.info("Finished Intram by PG (UK) output.")
 

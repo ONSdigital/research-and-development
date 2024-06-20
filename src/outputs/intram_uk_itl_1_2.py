@@ -20,7 +20,7 @@ def output_intram_uk_itl_1_2(
 ):
     """Creates and saves total intram value by ITL 1 and 2 levels for the
     entire UK. Combines BERD and NI data, maps regional codes to postcodes,
-    then maps regional codes to local authority unit codes. 
+    then maps regional codes to local authority unit codes.
     In a for loop, iterating through level 1 and 2, aggregates the intram and
     saves two output CSV files.
 
@@ -63,23 +63,21 @@ def output_intram_uk_itl_1_2(
     # Dictionary of codes and textual descriptions at itl levels 1 and 2
     itl_levels_dict = {
         1: {"itl_code": "ITL121CD", "itl_text": "ITL121NM"},
-        2: {"itl_code": "ITL221CD", "itl_text": "ITL221NM"}
+        2: {"itl_code": "ITL221CD", "itl_text": "ITL221NM"},
     }
 
     # Merge the mapper of ITL codes and texts at all levels
     df = df.merge(itl_mapper, how="left", left_on="itl", right_on=reg_code)
-    
+
     # Create aggregates at all levels
     for level in [1, 2]:
-        
+
         # Retrieve the code and text at approppriate level
         itl_code = itl_levels_dict[level]["itl_code"]
         itl_text = itl_levels_dict[level]["itl_text"]
-    
+
         # Group by ITL and aggregate the values by summation
-        df_agg = df.groupby(
-            [itl_code, itl_text]
-        ).agg({value_col: "sum"}).reset_index()
+        df_agg = df.groupby([itl_code, itl_text]).agg({value_col: "sum"}).reset_index()
 
         # Sort by ITL code
         df_agg = df_agg.sort_values(itl_code, axis=0, ascending=True)
@@ -89,11 +87,7 @@ def output_intram_uk_itl_1_2(
         detail = f"Region (ITL{level})"
         value_title = "2022 Total q211"
         df_agg = df_agg[[itl_code, itl_text, value_col]].rename(
-            columns={
-                itl_code: code,
-                itl_text: detail,
-                value_col: value_title
-            }
+            columns={itl_code: code, itl_text: detail, value_col: value_title}
         )
 
         # Outputting the CSV file with timestamp and run_id

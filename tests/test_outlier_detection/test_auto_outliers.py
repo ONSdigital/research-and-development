@@ -14,6 +14,7 @@ import src.outlier_detection.auto_outliers as auto
 # Test for error (where a clip is over 1)
 # Test for error (where flag_value_cols is not a list)
 
+
 class TestValidateConfigZero:
     """Unit tests for validate_config function."""
 
@@ -123,7 +124,9 @@ class TestFilterValid:
         value_col = "701"
         result_df = auto.filter_valid(input_df, value_col)
 
-        assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+        assert_frame_equal(
+            result_df.reset_index(drop=True), expected_df.reset_index(drop=True)
+        )
 
 
 class TestFilterValidEmpty:
@@ -141,8 +144,7 @@ class TestFilterValidEmpty:
             "701",
         ]
 
-        data = [
-        ]
+        data = []
 
         input_df = pandasDF(data=data, columns=input_cols)
         return input_df
@@ -270,6 +272,7 @@ class TestOutlierFlagging:
 
 class TestNoOutliers:
     """Unit tests for flag_outliers function."""
+
     """No outliers to calculate"""
 
     def create_input_df(self):
@@ -314,7 +317,6 @@ class TestNoOutliers:
             [3, 0, "P", "210", 2020, 10, 1.1, False],
             [4, 0, "P", "210", 2020, 10, 1.1, False],
             [5, 0, "P", "210", 2020, 10, 1.1, False],
-
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
@@ -335,6 +337,7 @@ class TestNoOutliers:
 
 class TestRoundingOutliers1:
     """Unit tests for flag_outliers function."""
+
     """Checking correct rounding 1/5"""
 
     def create_input_df(self):
@@ -469,6 +472,7 @@ class TestRoundingOutliers1:
 
 class TestRoundingOutliers2:
     """Unit tests for flag_outliers function."""
+
     """Checking correct rounding 2/5"""
 
     def create_input_df(self):
@@ -563,6 +567,7 @@ class TestRoundingOutliers2:
 
 class TestRoundingOutliers3:
     """Unit tests for flag_outliers function."""
+
     """Checking correct rounding 3/5"""
 
     def create_input_df(self):
@@ -655,6 +660,7 @@ class TestRoundingOutliers3:
 
 class TestRoundingOutliers4:
     """Unit tests for flag_outliers function."""
+
     """Checking correct rounding 4/5"""
 
     def create_input_df(self):
@@ -727,6 +733,7 @@ class TestRoundingOutliers4:
 
 class TestRoundingOutliers5:
     """Unit tests for flag_outliers function."""
+
     """Checking correct rounding 5/5"""
 
     def create_input_df(self):
@@ -943,7 +950,7 @@ class TestLogOutlierNumbers:
             "statusencoded",
             "value_col",
             "instance",
-            "value_col_outlier_flag"
+            "value_col_outlier_flag",
         ]
 
         data = [
@@ -967,7 +974,10 @@ class TestLogOutlierNumbers:
         with caplog.at_level(logging.INFO):
             auto.log_outlier_info(input_df, "value_col")
 
-        assert "1 outliers were detected out of a total of 2 valid entries in column value_col" in caplog.text
+        assert (
+            "1 outliers were detected out of a total of 2 valid entries in column value_col"
+            in caplog.text
+        )
 
 
 # One test for `run_auto_flagging()`:
@@ -977,6 +987,7 @@ class TestLogOutlierNumbers:
 
 class TestOneValueOutlier:
     """Unit test for one value causes the whole RU ref to be an outlier"""
+
     """Using run_auto_flagging function to allow for multiple outlier cols"""
 
     def create_input_df(self):
@@ -992,7 +1003,7 @@ class TestOneValueOutlier:
             "701",
             "702",
             "703",
-            "704"
+            "704",
         ]
 
         data = [
@@ -1005,7 +1016,7 @@ class TestOneValueOutlier:
             [7, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 5.1, 1.1],
             [8, 0, "P", "0001", "210", 2020, 10, 0.1, 1.1, 1.1, 1.1],
             [9, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 1.1, 1.1],
-            [10, 0, "P", "0001", "210", 2020, 10, 5.1, 1.1, 1.1, 1.1]
+            [10, 0, "P", "0001", "210", 2020, 10, 5.1, 1.1, 1.1, 1.1],
         ]
 
         input_df = pandasDF(data=data, columns=input_cols)
@@ -1029,21 +1040,201 @@ class TestOneValueOutlier:
             "702_outlier_flag",
             "703_outlier_flag",
             "704_outlier_flag",
-            'auto_outlier',
-            'manual_outlier',
+            "auto_outlier",
+            "manual_outlier",
         ]
 
         data = [
-            [1, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 1.1, 0.1, False, False, False, True, True, np.nan],
-            [2, 0, "P", "0001", "210", 2020, 10, 1.1, 5.1, 1.1, 1.1, False, True, False, False, True, np.nan],
-            [3, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 1.1, 5.1, False, False, False, True, True, np.nan],
-            [4, 0, "P", "0001", "210", 2020, 10, 1.1, 0.1, 1.1, 1.1, False, True, False, False, True, np.nan],
-            [5, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 1.1, 1.1, False, False, False, False, False, np.nan],
-            [6, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 0.1, 1.1, False, False, True, False, True, np.nan],
-            [7, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 5.1, 1.1, False, False, True, False, True, np.nan],
-            [8, 0, "P", "0001", "210", 2020, 10, 0.1, 1.1, 1.1, 1.1, True, False, False, False, True, np.nan],
-            [9, 0, "P", "0001", "210", 2020, 10, 1.1, 1.1, 1.1, 1.1, False, False, False, False, False, np.nan],
-            [10, 0, "P", "0001", "210", 2020, 10, 5.1, 1.1, 1.1, 1.1, True, False, False, False, True, np.nan]
+            [
+                1,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                1.1,
+                0.1,
+                False,
+                False,
+                False,
+                True,
+                True,
+                np.nan,
+            ],
+            [
+                2,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                5.1,
+                1.1,
+                1.1,
+                False,
+                True,
+                False,
+                False,
+                True,
+                np.nan,
+            ],
+            [
+                3,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                1.1,
+                5.1,
+                False,
+                False,
+                False,
+                True,
+                True,
+                np.nan,
+            ],
+            [
+                4,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                0.1,
+                1.1,
+                1.1,
+                False,
+                True,
+                False,
+                False,
+                True,
+                np.nan,
+            ],
+            [
+                5,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                1.1,
+                1.1,
+                False,
+                False,
+                False,
+                False,
+                False,
+                np.nan,
+            ],
+            [
+                6,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                0.1,
+                1.1,
+                False,
+                False,
+                True,
+                False,
+                True,
+                np.nan,
+            ],
+            [
+                7,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                5.1,
+                1.1,
+                False,
+                False,
+                True,
+                False,
+                True,
+                np.nan,
+            ],
+            [
+                8,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                0.1,
+                1.1,
+                1.1,
+                1.1,
+                True,
+                False,
+                False,
+                False,
+                True,
+                np.nan,
+            ],
+            [
+                9,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                1.1,
+                1.1,
+                1.1,
+                1.1,
+                False,
+                False,
+                False,
+                False,
+                False,
+                np.nan,
+            ],
+            [
+                10,
+                0,
+                "P",
+                "0001",
+                "210",
+                2020,
+                10,
+                5.1,
+                1.1,
+                1.1,
+                1.1,
+                True,
+                False,
+                False,
+                False,
+                True,
+                np.nan,
+            ],
         ]
 
         expected_df = pandasDF(data=data, columns=exp_cols)
@@ -1053,7 +1244,6 @@ class TestOneValueOutlier:
         """Test for flag_outliers function."""
         input_df = self.create_input_df()
         expected_df = self.create_expected_df()
-
 
         upper_clip = 0.05
         lower_clip = 0.05
@@ -1117,7 +1307,9 @@ class TestShortFormFilter:
 
         result_df = auto.apply_short_form_filters(input_df, form_type_no, sel_type)
 
-        assert_frame_equal(result_df.reset_index(drop=True), expected_df.reset_index(drop=True))
+        assert_frame_equal(
+            result_df.reset_index(drop=True), expected_df.reset_index(drop=True)
+        )
 
 
 # One test for `normal_round()`:
@@ -1143,13 +1335,10 @@ class TestNormalRound:
         ]
         input_df = pandasDF(data=data, columns=input_columns)
         return input_df
+
     def create_expected_df(self):
         """Create an input dataframe for the test."""
-        input_columns = [
-            "Reference",
-            "to_round",
-            "rounded"
-        ]
+        input_columns = ["Reference", "to_round", "rounded"]
         data = [
             [1, 2.4, 2],
             [2, 2.5, 3],

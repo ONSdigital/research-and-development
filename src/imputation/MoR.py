@@ -145,7 +145,7 @@ def carry_forwards(df, backdata, impute_vars):
 
     # Update the postcodes_harmonised column from the updated column 601
     df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
-    
+
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
@@ -244,12 +244,14 @@ def calculate_links(gr_df, target_vars, config):
 def get_threshold_value(config: dict) -> int:
     """Read, validate and return threshold value from the config."""
     threshold_num = config["imputation"]["mor_threshold"]
-    if (type(threshold_num) == int) & (threshold_num >=0):
+    if (type(threshold_num) == int) & (threshold_num >= 0):
         return threshold_num
     else:
-        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
-                        "of the config must be zero or a positive integer.")
-        
+        raise Exception(
+            "The variable 'mor_threshold' in the 'imputation' section "
+            "of the config must be zero or a positive integer."
+        )
+
 
 def group_calc_link(group, target_vars, config):
     """Apply the MoR method to each group
@@ -284,7 +286,7 @@ def group_calc_link(group, target_vars, config):
                 valid_group_size = False
 
         # If the group is a valid size, and there are non-null, non-zero values for this
-        # 'var', then calculate the mean        
+        # 'var', then calculate the mean
         if valid_group_size & (sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0):
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
