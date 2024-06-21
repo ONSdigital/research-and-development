@@ -60,8 +60,7 @@ class TestCheckHasSchema(object):
     def test__check_has_schema_true(self):
         """Positive tests for _check_has_schema"""
         test_dict = {
-            "top_level": True,
-            "bottom_level": False,
+            "singular": False,
             "dtype": "str",
             "accept_nonetype": False
         }
@@ -145,7 +144,7 @@ class TestValidatePath(object):
         """Test _validate_path raises."""
         msg = r"Expected file extension .txt for test/path.test. Got .test"
         with pytest.raises(TypeError, match=msg):
-            _validate_path("test/path.test", "test", path_config)
+            _validate_path("test/path.test", path_config)
 
 
 class TestMergeConfigs(object):
@@ -202,8 +201,7 @@ class TestValidateConfig(object):
         """A dummy config validation for use in tests."""
         validation = {
             "tester": {
-                "top_level": False,
-                "bottom_level": True,
+                "singular": True,
                 "dtype": "int",
                 "accept_nonetype": False,
                 "max": 15,
@@ -333,29 +331,7 @@ class TestValidateConfig(object):
         msg = r"Config value for tester:tester .*4.* less than min .*5.*."
         with pytest.raises(ValueError, match=msg):
             validate_config(dummy_config)
-    
-    def test_validate_config_both_levels(self, tmp_path):
-        """Test that an error is raied when both levels are passed."""
-        validation_path = os.path.join(tmp_path, "conf_val.yaml")
-        validation = {
-            "test": {
-                "top_level": True,
-                "bottom_level": True,
-                "dtype": "int",
-                "accept_nonetype": False
-            }
-        }
-        config = {
-            "config_validation": {
-                    "validate": True,
-                    "path": validation_path
-                },
-            "test": 100
-        }
-        write_dict_to_yaml(validation, validation_path)
-        msg = r"Conflicting config.* top_level == botom_level"
-        with pytest.raises(ValueError, match=msg):
-            validate_config(config)
+
 
     @pytest.mark.parametrize(
             "path, ext, error, msg",
@@ -376,8 +352,7 @@ class TestValidateConfig(object):
         validation_path = os.path.join(tmp_path, "conf_val.yaml")
         validation = {
             "test_path": {
-                "top_level": False,
-                "bottom_level": True,
+                "singular": True,
                 "dtype": "path",
                 "accept_nonetype": False,
                 "filetype": ext

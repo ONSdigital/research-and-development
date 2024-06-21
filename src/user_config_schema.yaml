@@ -6,8 +6,7 @@
 # min: [int, float]: applies only to int/float dtype, optional (inclusive)
 # filetype: str: applies to only path dtype, optional (using '.' optional)
 global:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "bool"
   accept_nonetype: False
   max: null
@@ -15,39 +14,33 @@ global:
   filetype: null
 years:
   current_year:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "int"
     accept_nonetype: False
     max: null
     min: 2022
   previous_years_to_load:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "int"
     accept_nonetype: False
     max: null
     min: 0
 hdfs_paths:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "path"
   accept_nonetype: True
 network_paths:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "path"
   accept_nonetype: True
 # Export config for users
 outliers:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "float"
   accept_nonetype: False
   min: 0
 imputation:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "int"
   accept_nonetype: False
   min: 0

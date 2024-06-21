@@ -81,8 +81,7 @@ def _check_has_schema(_dict: dict) -> bool:
         bool: Whether or not the item has a schema.
     """
     expected_keys = [
-        "top_level", 
-        "bottom_level", 
+        "singular",
         "dtype", 
         "accept_nonetype",
     ]
@@ -91,7 +90,7 @@ def _check_has_schema(_dict: dict) -> bool:
     return False
 
 
-def _validate_path(path: str, param_nm: str, config: dict):
+def _validate_path(path: str, config: dict):
     """Validate a passed path (str format) is valid.
 
     Args:
@@ -187,12 +186,8 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
             )
         return
     # check that both levels aren't the same
-    if item["top_level"] == item["bottom_level"]:
-        raise ValueError(
-            "Conflicting config. top_level == botom_level"
-        )
     # do validation
-    if item["bottom_level"]:
+    if item["singular"]:
         config_item = {item_name: config_item}
     dtype = DTYPES[item["dtype"]] if "list" not in item["dtype"] else list
     if item["accept_nonetype"]:
@@ -220,7 +215,7 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
             continue
         # validation for each type
         if item["dtype"] == "path":
-            _validate_path(config_item[level], param, item)
+            _validate_path(config_item[level], item)
         if item["dtype"] in ["int", "float"]:
             _validate_numeric(config_item[level], param, item)
 

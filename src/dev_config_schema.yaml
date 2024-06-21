@@ -1,144 +1,118 @@
 global:
   # Logging settings
   log_to_file: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   logging_level:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "str"
     accept_nonetype: False
   table_config: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "str"
     accept_nonetype: False
   # Environment settings
   dev_test : 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   network_or_hdfs: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "str"
     accept_nonetype: False
   # Construction Settings
   load_reference_list: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   load_from_feather:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   # Apportionment to sites settings
   apportion_sites:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
 runlog_writer:
   write_csv:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   write_hdf5: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   write_sql:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   display:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "bool"
     accept_nonetype: False
   log_path:    
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "path"
     accept_nonetype: False
 network_paths:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "path"
   accept_nonetype: True
 schema_paths:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "path"
   accept_nonetype: False
   filetype: ".toml"
 # Export config for users
 outliers:
   flag_cols:   
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
 devtest:
   seltype_list: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[int]"
     accept_nonetype: False
 csv_filenames:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "path"
   accept_nonetype: False
   filetype: ".csv"
 run_log_sql:
-  top_level: True
-  bottom_level: False
+  singular: False
   dtype: "str"
   accept_nonetype: False
 estimation:
   numeric_cols: 
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
 imputation: 
   lf_target_vars:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
   sum_cols:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
 breakdowns:
   "211":
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
   "305":
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
   emp_total:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
   headcount_total:
-    top_level: False
-    bottom_level: True
+    singular: True
     dtype: "list[str]"
     accept_nonetype: False
