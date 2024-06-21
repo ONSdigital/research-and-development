@@ -78,7 +78,7 @@ def _check_has_schema(_dict: dict) -> bool:
         _dict (dict): The config item.
 
     Returns:
-        bool: Whether or not the item has a schema.
+        bool: Whether config item has required keys.
     """
     expected_keys = [
         "singular",
@@ -152,7 +152,6 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
         return None
     return value
 
-# noqa: C901
 def _check_items(item: dict, config_item: dict, item_name: str) -> None:
     """Check items of a config to validate them.
 
