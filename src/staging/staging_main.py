@@ -137,20 +137,31 @@ def run_staging(
             secondary_full_responses = helpers.load_validate_secondary_snapshot(
                 load_json,
                 secondary_snapshot_path,
+                config,
+                network_or_hdfs,
             )
         else:
             secondary_full_responses = None
 
         # Write both snapshots to feather file at given path
         if is_network:
-            helpers.write_snapshot_to_feather(
+            feather_fname = f"{snapshot_name}_corrected.feather"
+            s_feather_fname = f"{secondary_snapshot_name}.feather"
+            helpers.df_to_feather(
                 feather_path,
-                snapshot_name,
+                feather_fname,
                 full_responses,
-                write_feather,
-                secondary_snapshot_name,
-                secondary_full_responses,
+                write_feather
+
             )
+            if secondary_full_responses is not None:
+                helpers.df_to_feather(
+                    feather_path,
+                    s_feather_fname,
+                    secondary_full_responses,
+                    write_feather
+
+                )
 
     # Flag invalid records
     val.flag_no_rand_spenders(full_responses, "raise")
@@ -162,6 +173,12 @@ def run_staging(
         check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
+        manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
+            False
+        )
+        manual_outliers = manual_outliers.drop_duplicates(
+            subset=["reference"], keep="first"
+        )
         val.validate_data_with_schema(
             manual_outliers, "./config/manual_outliers_schema.toml"
         )
@@ -178,10 +195,13 @@ def run_staging(
         wanted_cols = ["reference", "instance", "manual_trim"]
         manual_trim_df = read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+        manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
+        manual_trim_df = manual_trim_df.drop_duplicates(
+            subset=["reference", "instance"], keep="first"
+        )
         val.validate_data_with_schema(
             manual_trim_df, "./config/manual_trim_schema.toml"
         )
-        # Fill empty values with False
     else:
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")

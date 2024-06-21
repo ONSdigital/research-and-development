@@ -82,15 +82,13 @@ def calculate_weighting_factor(
 
     # Create small QA dataframe
 
-    qa_df = pd.DataFrame(
-        {
+    qa_frame = {
             "cellnumber": [],
             "N": [],
             "n": [],
             "outliers": [],
             "a_weight": [],
         }
-    )
 
     # Group by cell number
     grouped_by_cell = filtered_df.groupby("cellnumber")
@@ -118,9 +116,17 @@ def calculate_weighting_factor(
         ] = a_weight
 
         # Save the relevant estimation info for QA seperately.
-        qa_list = [cell_number, N, n, outlier_count, a_weight]
-        qa_df = qa_df.append(pd.Series(qa_list, index=qa_df.columns), ignore_index=True)
+        qa_list = [
+            float(cell_number),
+            float(N), 
+            float(n),
+            float(outlier_count), 
+            a_weight
+        ]
+        for col, val in zip(list(qa_frame.keys()), qa_list):
+            qa_frame[col].append(val)
 
+    qa_df = pd.DataFrame(qa_frame)
     return df, qa_df
 
 

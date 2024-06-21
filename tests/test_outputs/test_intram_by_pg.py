@@ -28,13 +28,6 @@ PATHS = config[f"{LOCATION}_paths"]
 # create logger (required pass to function)
 TestLogger = logging.getLogger(__name__)
 
-# import the correct write_csv (assumption config is correct)
-if LOCATION.lower() == "network":
-    from src.utils.local_file_mods import write_local_csv as write_csv
-else:
-    from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-
-
 class TestOutputIntramByPG(object):
     """Tests for output_intram_by_pg."""
     
@@ -158,7 +151,8 @@ class TestOutputIntramByPG(object):
             self,
             tmp_path,
             input_data_gb,
-            pg_detailed_df
+            pg_detailed_df,
+            write_csv_func
         ):
         """Defensive tests for output_intram_by_pg."""
         self.setup_tmp_dir(pathlib.Path(tmp_path))
@@ -169,7 +163,7 @@ class TestOutputIntramByPG(object):
                 gb_df=input_data_gb,
                 pg_detailed=pg_detailed_df,
                 config=config,
-                write_csv=write_csv,
+                write_csv=write_csv_func,
                 run_id=1,
                 ni_df=1
                 )
@@ -189,7 +183,8 @@ class TestOutputIntramByPG(object):
         tmp_path,
         input_data_gb,
         input_data_ni,
-        pg_detailed_df
+        pg_detailed_df,
+        write_csv_func
     ):
         """Tests for output_intram_by_pg."""
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
@@ -199,7 +194,7 @@ class TestOutputIntramByPG(object):
                 gb_df=input_data_gb,
                 pg_detailed=pg_detailed_df,
                 config=config,
-                write_csv=write_csv,
+                write_csv=write_csv_func,
                 run_id=1,
                 ni_df=input_data_ni
                 )

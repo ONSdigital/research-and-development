@@ -16,6 +16,9 @@ from src.utils.hdfs_mods import (
     check_file_exists,
 )
 
+# mark tests in file
+pytestmark = pytest.mark.runhdfs
+
 sys.modules["mock_f"] = mock.Mock()
 
 
