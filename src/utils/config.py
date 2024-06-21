@@ -7,8 +7,8 @@ from typing import Union
 import yaml
 
 from src.utils.defence import (
-    _type_defence, 
-    _validate_file_extension
+    type_defence, 
+    validate_file_extension
 )
 
 def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
@@ -104,7 +104,7 @@ def _validate_path(path: str, param_nm: str, config: dict):
     except KeyError:
         file_ext = None
     if file_ext:
-        _validate_file_extension(path, file_ext)
+        validate_file_extension(path, file_ext)
 
 
 def _validate_numeric(value: Union[float, int], param_nm: str, config: dict):
@@ -148,7 +148,7 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
     Returns:
         Union[str, None]: The altered value.
     """
-    _type_defence(value, "value", str)
+    type_defence(value, "value", str)
     if value.lower() in ["", "null", "none"]:
         return None
     return value
@@ -202,10 +202,10 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
         # parse list datatype
         if "list" in item["dtype"]:
             dtype = item["dtype"]
-            _type_defence(config_item[level], param, list)
+            type_defence(config_item[level], param, list)
             subtype = dtype.replace("list[", "").replace("]", "")
             for list_item in config_item[level]:
-                _type_defence(
+                type_defence(
                     list_item, 
                     f"{param}:list item:{list_item}", 
                     DTYPES[subtype]
@@ -214,7 +214,7 @@ def _check_items(item: dict, config_item: dict, item_name: str) -> None:
         # convert nulltype strings
         if isinstance(config_item[level], str):
             config_item[level] = _nulltype_conversion(config_item[level])
-        _type_defence(config_item[level], param, dtype)
+        type_defence(config_item[level], param, dtype)
         # skip validation if Nonetype
         if isinstance(config_item[level], type(None)):
             continue
@@ -233,7 +233,7 @@ def validate_config(config: dict) -> None:
     """
     # validate config validation paths
     validate = config["config_validation"]["validate"]
-    _type_defence(
+    type_defence(
         validate,
         "config_validation:validate",
         bool
@@ -241,7 +241,7 @@ def validate_config(config: dict) -> None:
     if not validate:
         return None
     validation_path = config["config_validation"]["path"]
-    _type_defence(validation_path, "config_validation:path", str)
+    type_defence(validation_path, "config_validation:path", str)
     # read in config schema
     validation_config = safeload_yaml(validation_path)
     for item in validation_config.keys():

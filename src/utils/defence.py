@@ -4,7 +4,7 @@ import warnings
 import os
 from typing import Union
 
-def _type_defence(
+def type_defence(
         obj: object, 
         param_nm: str,
         types: Union[object, tuple], 
@@ -37,7 +37,7 @@ def _type_defence(
     return None
 
 
-def _validate_file_extension(
+def validate_file_extension(
         path: Union[pathlib.Path, str],
         ext: str, 
         warn: bool=False
