@@ -31,28 +31,6 @@ def write_dict_to_yaml(_dict: dict, path: Union[str, pathlib.Path]) -> None:
         yaml.dump(_dict, f, default_flow_style=False)
 
 
-class TestSafeloadYaml(object):
-    """Tests for safeload_yaml."""
-
-    def test_safeload_yaml(self, tmp_path):
-       """General tests for safeload_yaml."""
-       # save yaml first
-       test_data = {"a": [1, 2, 3],
-                    "b": "string",
-                    "c": 6,
-                    "d": True,
-                    "e": {
-                        "bool": False,
-                        "float": 4.5
-                    }
-                    }
-       test_path = os.path.join(tmp_path, "test_yaml.yaml")
-       write_dict_to_yaml(_dict=test_data, path=test_path)
-       # read in the data
-       assert os.path.exists(test_path), f".yaml file not found at {test_path}"
-       data = safeload_yaml(test_path)
-       assert test_data == data, "Data read from yaml is incorrect."
-
 
 class TestCheckHasSchema(object):
     """Tests for _check_has_schema."""

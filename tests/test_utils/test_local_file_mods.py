@@ -1,9 +1,12 @@
 import pytest
-import pandas as pd
 import os
 import json
 import io
-from pathlib import Path
+import pathlib
+from typing import Union
+
+import pandas as pd
+import yaml
 
 from src.utils.local_file_mods import (
     read_local_csv,
@@ -15,6 +18,7 @@ from src.utils.local_file_mods import (
     local_mkdir,
     local_open,
     local_write_feather,
+    safeload_yaml
 )
 
 
@@ -64,7 +68,7 @@ def test_write_local_csv(tmp_path, input_data):
 
     # Use os and pathlib to check that the written file exists
     assert os.path.exists(filepath)
-    assert Path.exists(filepath)
+    assert pathlib.Path.exists(filepath)
 
     # Read the written CSV file and compare the content
     df = pd.read_csv(filepath)
@@ -106,7 +110,7 @@ def test_local_file_size(tmp_path):
 
     # Check the file size is correct using both os and pathlib
     assert local_file_size(str(filepath)) == os.path.getsize(filepath)
-    assert local_file_size(str(filepath)) == Path(filepath).stat().st_size
+    assert local_file_size(str(filepath)) == pathlib.Path(filepath).stat().st_size
 
 
 def test_check_file_exists(tmp_path):
@@ -151,3 +155,40 @@ def test_local_file_write_feather(tmp_path, input_data, expout_data):
     # Read the written feather file and compare the content
     df = pd.read_feather(filepath)
     pd.testing.assert_frame_equal(df, expout_data)
+
+
+def write_dict_to_yaml(_dict: dict, path: Union[str, pathlib.Path]) -> None:
+    """Write a dictionary as a yaml file
+
+    Args:
+        _dict (dict): The data to save to the yaml file.
+        path (Union[str, pathlib.Path]): The save path (including file ext).
+
+    Returns:
+        None
+    """
+    with open(path, 'w') as f:
+        yaml.dump(_dict, f, default_flow_style=False)
+
+
+class TestSafeloadYaml(object):
+    """Tests for safeload_yaml."""
+
+    def test_safeload_yaml(self, tmp_path):
+       """General tests for safeload_yaml."""
+       # save yaml first
+       test_data = {"a": [1, 2, 3],
+                    "b": "string",
+                    "c": 6,
+                    "d": True,
+                    "e": {
+                        "bool": False,
+                        "float": 4.5
+                    }
+                    }
+       test_path = os.path.join(tmp_path, "test_yaml.yaml")
+       write_dict_to_yaml(_dict=test_data, path=test_path)
+       # read in the data
+       assert os.path.exists(test_path), f".yaml file not found at {test_path}"
+       data = safeload_yaml(test_path)
+       assert test_data == data, "Data read from yaml is incorrect."
