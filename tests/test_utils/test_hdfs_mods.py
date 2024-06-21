@@ -174,3 +174,5 @@ class TestCheckFileExists:
         with pytest.raises(FileNotFoundError):
             mock_hdfs_is_file.return_value = False
             check_file_exists("file/truepath/filename.csv")
+
+# TODO: test safeload_yaml
