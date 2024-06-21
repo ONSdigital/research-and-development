@@ -1,42 +1,12 @@
 """Simple utils to assist the config."""
-import pathlib
-import os
 from copy import deepcopy
-from typing import Union
-
-import yaml
+from typing import Union, Callable
 
 from src.utils.defence import (
     type_defence, 
     validate_file_extension
 )
-
-def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
-    """Load a .yaml file from a path.
-
-    Args:
-        path (Union[str, pathlib.Path]): The path to load the .yaml file from.
-
-    Raises:
-        FileNotFoundError: Raised if there is no file at the given path.
-        TypeError: Raised if the file does not have the .yaml extension.
-
-    Returns:
-        dict: The loaded yaml file as as dictionary.
-    """
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            f"Attempted to load yaml at: {path}. File "
-            "does not exist."
-        )
-    ext = os.path.splitext(path)[1]
-    if ext != ".yaml":
-        raise TypeError(
-            f"Expected a .yaml file. Got {ext}"
-        )
-    with open(path, "r") as f:
-        yaml_dict = yaml.safe_load(f)
-    return yaml_dict
+from src.utils.local_file_mods import safeload_yaml
 
 
 def merge_configs(config1: dict, config2: dict) -> dict:

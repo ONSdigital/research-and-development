@@ -7,8 +7,9 @@ from copy import deepcopy
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.config import safeload_yaml, validate_config, merge_configs
+from src.utils.config import validate_config, merge_configs
 from src.utils.wrappers import logger_creator
+from src.utils.local_file_mods import safeload_yaml
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
