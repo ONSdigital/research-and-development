@@ -346,10 +346,117 @@ class TestLoadValidateMapper(object):
 #         )
 
 
-# # load_val_snapshot_json [CANT TEST: TOO MANY HARD CODED PATHS]
+class TestLoadValSnapshotJson:
+
+    @pytest.fixture
+    def load_json(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def config(self):
+        return {
+            "global": {
+                "dev_test": False
+            },
+            "schema_paths": {
+                "contributors_schema": "path/to/contributors_schema.toml",
+                "long_response_schema": "path/to/long_response_schema.toml",
+                "wide_responses_schema": "path/to/wide_responses_schema.toml"
+            }
+        }
+
+    @pytest.fixture
+    def network_or_hdfs(self):
+        return "network"
+
+    @pytest.fixture
+    def contributors_schema(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def long_response_schema(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def wide_responses_schema(self):
+        return MagicMock()
+
+    @patch('src.staging.validation.validate_data_with_schema')
+    @patch('src.staging.spp_snapshot_processing.full_responses')
+    @patch('src.staging.validation.combine_schemas_validate_full_df')
+    def test_load_val_snapshot_json(self, mock_toml_load, mock_file_open, snapshot_path, load_json, config, network_or_hdfs):
+
+        expected_res_rate = "0.50"
+
+        load_json.return_value = {
+            "contributors": [
+                {"reference": 1},
+                {"reference": 2},
+                {"reference": 3},
+                {"reference": 4}
+            ],
+            "responses": [
+                {"reference": 1},
+                {"reference": 2}
+            ]
+        }
+
+
+        full_responses, res_rate = load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs)
+
+        assert res_rate == expected_res_rate
+        load_json.assert_called_once_with(snapshot_path)
+        mock_file_open.assert_called()
+        mock_toml_load.assert_called()
 
 
 # # load_validate_secondary_snapshot [CANT TEST: TOO MANY HARD CODED PATHS]
+
+class TestLoadValSecondarySnapshotJson:
+
+    @pytest.fixture
+    def load_json(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def secondary_snapshot_path(self):
+        return "path/to/secondary_snapshot.json"
+
+    @pytest.fixture
+    def contributors_schema(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def long_response_schema(self):
+        return MagicMock()
+
+    @pytest.fixture
+    def wide_responses_schema(self):
+        return MagicMock()
+
+    @patch('src.staging.validation.validate_data_with_schema')
+    @patch('src.staging.spp_snapshot_processing.full_responses')
+    @patch('src.staging.validation.combine_schemas_validate_full_df')
+    def test_load_validate_secondary_snapshot(self, load_json, secondary_snapshot_path):
+
+        load_json.return_value = {
+            "contributors": [
+                {"reference": 1},
+                {"reference": 2},
+                {"reference": 3},
+                {"reference": 4}
+            ],
+            "responses": [
+                {"reference": 1},
+                {"reference": 2}
+            ]
+        }
+
+
+        full_responses, res_rate = load_validate_secondary_snapshot(load_json, secondary_snapshot_path)
+
+        load_json.assert_called_once_with(secondary_snapshot_path)
+
 
 # class TestWriteSnapshotToFeather(object):
 #     """Tests for write_snapshot_to_feather."""
@@ -510,129 +617,38 @@ class TestLoadValidateMapper(object):
 #         return today_str
 
 
-#     def test_stage_validate_harmonise_postcodes(
-#             self,
-#             full_responses,
-#             config,
-#             pc_mapper_output,
-#             full_responses_output,
-#             tmp_path
-#         ):
-#         """General tests for stage_validate_harmonise_postcodes."""
-#         pc_path = self.postcode_masterlist(tmp_path)
-#         paths = self.create_paths(tmp_path, pc_path)
-#         fr, pm = stage_validate_harmonise_postcodes(
-#             config=config,
-#             paths=paths,
-#             full_responses=full_responses,
-#             run_id=1,
-#             check_file_exists=check_file_exists,
-#             read_csv=read_csv,
-#             write_csv=write_csv
-#         )
-#         # test direct function outputs
-#         assert fr.equals(full_responses_output), (
-#             "full_responses output from stage_validate_harmonise_postcodes not"
-#             " as expected."
-#         )
-#         assert pm.equals(pc_mapper_output), (
-#             "postcode_mapper output from stage_validate_harmonise_postcodes not"
-#             " as expected."
-#         )
-#         # assert that invalid postcodes have been saved out
-#         files = os.listdir(tmp_path)
-#         filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
-#         assert (filename in files), (
-#             "stage_validate_harmonise_postcodes failed to save out invalid PCs"
-#         )
-
-
-class TestLoadValSnapshotJson:
-
-    @pytest.fixture
-    def load_json(self):
-        return MagicMock()
-
-    @pytest.fixture
-    def config(self):
-        return {
-            "global": {
-                "dev_test": False
-            },
-            "schema_paths": {
-                "contributors_schema": "path/to/contributors_schema.toml",
-                "long_response_schema": "path/to/long_response_schema.toml",
-                "wide_responses_schema": "path/to/wide_responses_schema.toml"
-            }
-        }
-
-    @pytest.fixture
-    def network_or_hdfs(self):
-        return "network"
-
-    # @pytest.fixture
-    # def contributors_schema(self):
-    #     return MagicMock()
-
-    # @pytest.fixture
-    # def long_response_schema(self):
-    #     return MagicMock()
-
-    # @pytest.fixture
-    # def wide_responses_schema(self):
-    #     return MagicMock()
-
-    # @pytest.fixture
-    # def snapshot_path(self):
-    #     return "path/to/snapshot.json"
-
-    # @pytest.fixture
-    # def mock_toml_load(self):
-    #     with patch('toml.load', return_value=MagicMock()) as mock_load:
-    #         yield mock_load
-
-    # @pytest.fixture
-    # def mock_file_open(self):
-    #     with patch('builtins.open', mock_open(read_data='schema data')) as m:
-    #         yield m
-
-    # @patch('builtins.open', new_callable=mock_open, read_data='schema data')
-    # @patch('toml.load', return_value=MagicMock())
-    @patch('src.staging.validation.validate_data_with_schema')
-    @patch('src.staging.spp_snapshot_processing.full_responses')
-    @patch('src.staging.validation.combine_schemas_validate_full_df')
-    def test_load_val_snapshot_json(self, mock_toml_load, mock_file_open, snapshot_path, load_json, config, network_or_hdfs):
-
-        # Arrange
-        expected_contributors_df = MagicMock()
-        expected_responses_df = MagicMock()
-        expected_full_responses = MagicMock()
-        expected_res_rate = "0.50"
-
-        load_json.return_value = {
-            "contributors": [
-                {"reference": 1},
-                {"reference": 2},
-                {"reference": 3},
-                {"reference": 4}
-            ],
-            "responses": [
-                {"reference": 1},
-                {"reference": 2}
-            ]
-        }
-
-        # Mock the data in the schema files
-        contributors_schema.return_value = MagicMock()
-        long_response_schema.return_value = MagicMock()
-        wide_responses_schema.return_value = MagicMock()
-
-        # Act
-        full_responses, res_rate = load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs)
-
-        # Assert
-        #assert full_responses == expected_full_responses
-        assert res_rate == expected_res_rate
-        load_json.assert_called_once_with(snapshot_path)
-        mock_file_open.assert_called()
-        mock_toml_load.assert_called()
+    # def test_stage_validate_harmonise_postcodes(
+    #         self,
+    #         full_responses,
+    #         config,
+    #         pc_mapper_output,
+    #         full_responses_output,
+    #         tmp_path
+    #     ):
+    #     """General tests for stage_validate_harmonise_postcodes."""
+    #     pc_path = self.postcode_masterlist(tmp_path)
+    #     paths = self.create_paths(tmp_path, pc_path)
+    #     fr, pm = stage_validate_harmonise_postcodes(
+    #         config=config,
+    #         paths=paths,
+    #         full_responses=full_responses,
+    #         run_id=1,
+    #         check_file_exists=check_file_exists,
+    #         read_csv=read_csv,
+    #         write_csv=write_csv
+    #     )
+    #     # test direct function outputs
+    #     assert fr.equals(full_responses_output), (
+    #         "full_responses output from stage_validate_harmonise_postcodes not"
+    #         " as expected."
+    #     )
+    #     assert pm.equals(pc_mapper_output), (
+    #         "postcode_mapper output from stage_validate_harmonise_postcodes not"
+    #         " as expected."
+    #     )
+    #     # assert that invalid postcodes have been saved out
+    #     files = os.listdir(tmp_path)
+    #     filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+    #     assert (filename in files), (
+    #         "stage_validate_harmonise_postcodes failed to save out invalid PCs"
+    #     )
