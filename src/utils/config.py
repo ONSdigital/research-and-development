@@ -1,6 +1,6 @@
 """Simple utils to assist the config."""
 from copy import deepcopy
-from typing import Union, Callable
+from typing import Union
 
 from src.utils.defence import (
     type_defence, 
