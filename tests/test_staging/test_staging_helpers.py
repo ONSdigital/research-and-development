@@ -371,7 +371,6 @@ class TestLoadValSnapshotJson:
         mock_full_responses,
         mock_combine_schemas_validate_full_df,
         config,
-        mocker,
     ):
         """Ensure load_val_snapshot_json behaves correctly."""
         snapshot_path = "path/to/snapshot.json"
@@ -405,7 +404,6 @@ class TestLoadValSecondarySnapshotJson:
 
     def test_load_validate_secondary_snapshot(
         self,
-        mocker,
         mock_load_json,
         mock_validate_data_with_schema,
         mock_full_responses,
