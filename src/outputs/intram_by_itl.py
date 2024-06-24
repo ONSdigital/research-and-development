@@ -18,12 +18,12 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def save_detailed_csv(
-        df: pd.DataFrame,
-        dir: Union[pathlib.Path, str],
-        title: str,
-        run_id: int,
-        write_csv: Callable,
-        overwrite: bool = True
+    df: pd.DataFrame,
+    dir: Union[pathlib.Path, str],
+    title: str,
+    run_id: int,
+    write_csv: Callable,
+    overwrite: bool = True,
 ):
     """Save a df as a csv with a detailed filename.
 
@@ -53,16 +53,16 @@ def save_detailed_csv(
 
 
 def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
-    """Renames ITL columns in a dataframe. Puts current year in total column name. 
+    """Renames ITL columns in a dataframe. Puts current year in total column name.
 
 
     Args:
         df (pd.DataFrame): The dataframe containing the ITL columns.
         itl (int): The ITL level.
         year (int): The current year from config.
- 
- 
-    Returns: 
+
+
+    Returns:
         pd.DataFrame: A df with the renamed ITL columns.
     """
     renamer = {"211": f"Year {year} Total q211"}
@@ -79,13 +79,13 @@ def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
 
 
 def output_intram_by_itl(
-        df_gb: pd.DataFrame,
-        config: Dict[str, Any],
-        write_csv: Callable,
-        run_id: int,
-        postcode_mapper: pd.DataFrame,
-        itl_mapper: pd.DataFrame,
-        df_ni: pd.DataFrame = None,
+    df_gb: pd.DataFrame,
+    config: Dict[str, Any],
+    write_csv: Callable,
+    run_id: int,
+    postcode_mapper: pd.DataFrame,
+    itl_mapper: pd.DataFrame,
+    df_ni: pd.DataFrame = None,
 ):
     """Generate outputs aggregated to ITL levels 1 and 2.
 
@@ -141,5 +141,5 @@ def output_intram_by_itl(
             title=f"output_intram_{area}_itl{i}",
             run_id=run_id,
             write_csv=write_csv,
-            overwrite=True
+            overwrite=True,
         )

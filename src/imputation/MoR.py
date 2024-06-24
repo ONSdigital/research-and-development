@@ -146,7 +146,6 @@ def carry_forwards(df, backdata, impute_vars):
     # Update the postcodes_harmonised column from the updated column 601
     df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
 
-
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]

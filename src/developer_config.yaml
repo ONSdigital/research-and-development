@@ -42,7 +42,7 @@ global:
   output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: False
-years: 
+years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
 runlog_writer:

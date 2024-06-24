@@ -28,19 +28,12 @@ def pytest_collection_modifyitems(config, items):  # noqa:C901
     """Handle switching based on cli args."""
 
     # do full test suite when all flags are given
-    if (config.getoption("--runhdfs")):
+    if config.getoption("--runhdfs"):
         return
 
     # do not add runhdfs marks when the --runhdfs flag is passed
     if not config.getoption("--runhdfs"):
-        skip_hdfs = pytest.mark.skip(
-            reason="Need --runhdfs option to run."
-        )
+        skip_hdfs = pytest.mark.skip(reason="Need --runhdfs option to run.")
         for item in items:
             if "runhdfs" in item.keywords:
                 item.add_marker(skip_hdfs)
-
-    
-
-
-

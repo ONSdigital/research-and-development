@@ -159,7 +159,9 @@ def run_construction(  # noqa: C901
         # Top up all new postcodes so they're all eight characters exactly
         postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
         for col in postcode_cols:
-            updated_snapshot_df[col] = updated_snapshot_df[col].apply(pcval.format_postcodes)
+            updated_snapshot_df[col] = updated_snapshot_df[col].apply(
+                pcval.format_postcodes
+            )
 
         # Reset shortforms with status 'Form sent out' to instance=None
         form_sent_condition = (updated_snapshot_df.formtype == "0006") & (

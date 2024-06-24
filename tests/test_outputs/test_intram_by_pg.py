@@ -22,6 +22,7 @@ PATHS = config[f"{LOCATION}_paths"]
 # create logger (required pass to function)
 TestLogger = logging.getLogger(__name__)
 
+
 class TestOutputIntramByPG(object):
     """Tests for output_intram_by_pg."""
 
@@ -176,14 +177,9 @@ class TestOutputIntramByPG(object):
         ]
         return pd.DataFrame(data=data, columns=columns)
 
-
     def test_output_intram_by_pg_raises(
-            self,
-            tmp_path,
-            input_data_gb,
-            pg_detailed_df,
-            write_csv_func
-        ):
+        self, tmp_path, input_data_gb, pg_detailed_df, write_csv_func
+    ):
         """Defensive tests for output_intram_by_pg."""
         self.setup_tmp_dir(pathlib.Path(tmp_path))
         # checks NI dataset is a dataframe
@@ -202,27 +198,27 @@ class TestOutputIntramByPG(object):
         "ni, exp_out", ([False, exp_out_gb()], [True, exp_out_uk()])
     )
     def test_output_intram_by_pg(
-        self, 
+        self,
         ni,
         exp_out,
         tmp_path,
         input_data_gb,
         input_data_ni,
         pg_detailed_df,
-        write_csv_func
+        write_csv_func,
     ):
         """Tests for output_intram_by_pg."""
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
         if not ni:
             input_data_ni = None
         output_intram_by_pg(
-                gb_df=input_data_gb,
-                pg_detailed=pg_detailed_df,
-                config=config,
-                write_csv=write_csv_func,
-                run_id=1,
-                ni_df=input_data_ni
-                )
+            gb_df=input_data_gb,
+            pg_detailed=pg_detailed_df,
+            config=config,
+            write_csv=write_csv_func,
+            run_id=1,
+            ni_df=input_data_ni,
+        )
         # assert output saved
         found_paths = os.listdir(pth)
         assert len(found_paths) > 0, "Outputs not saved."

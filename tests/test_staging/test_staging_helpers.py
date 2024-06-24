@@ -118,7 +118,6 @@ class TestUpdateRefList(object):
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
 
-
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
@@ -147,7 +146,6 @@ class TestUpdateRefList(object):
         error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
-
 
 
 class TestGetMapperName(object):
@@ -189,7 +187,6 @@ class TestCheckSnapshotFeatherExists(object):
         if second:
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
-
 
     @pytest.mark.parametrize(
         "first, second, check_both, result",
@@ -330,7 +327,6 @@ class TestDfToFeather(object):
         ), ".feather. extension not applied when another extension exists."
 
 
-
 class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
 
@@ -415,7 +411,6 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-
 
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""

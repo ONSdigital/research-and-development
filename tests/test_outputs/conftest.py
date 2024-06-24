@@ -7,6 +7,7 @@ from typing import Callable
 # Local Imports
 from src.utils.helpers import ConfigSettings
 
+
 def read_config() -> dict:
     """Read config for tests."""
     # read config file (relative path is consistent for tests)
@@ -15,8 +16,10 @@ def read_config() -> dict:
     config = conf_obj.config_dict
     return config
 
+
 CONFIG = read_config()
 LOCATION = CONFIG["global"]["network_or_hdfs"]
+
 
 @pytest.fixture(scope="module")
 def write_csv_func() -> Callable:
