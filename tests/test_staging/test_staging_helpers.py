@@ -241,7 +241,7 @@ class TestLoadValidateMapper(object):
         assert output.equals(mapper_df)
 
 
-# # load_historic_data: deprecated function
+# load_historic_data: deprecated function
 
 
 class TestCheckSnapshotFeatherExists(object):
