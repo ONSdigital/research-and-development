@@ -1,8 +1,8 @@
 """Tests for 'staging_helpers.py'."""
 # Standard Library Imports
+import os
 import pytest
 import pathlib
-import os
 from typing import Tuple
 from datetime import date
 import logging
@@ -20,25 +20,22 @@ import toml
 
 # Local Imports
 from src.staging.staging_helpers import (
-    # postcode_topup,
     fix_anon_data,
     update_ref_list,
     getmappername,
-    load_validate_mapper,
-    load_historic_data,
     check_snapshot_feather_exists,
     load_snapshot_feather,
     load_val_snapshot_json,
     load_validate_secondary_snapshot,
-    write_snapshot_to_feather,
-    stage_validate_harmonise_postcodes
+    df_to_feather,
+    stage_validate_harmonise_postcodes,
 )
 from src.utils.local_file_mods import (
     local_file_exists as check_file_exists,
     local_read_feather as read_feather,
     local_write_feather as write_feather,
     read_local_csv as read_csv,
-    write_local_csv as write_csv
+    write_local_csv as write_csv,
 )
 
 # def match_col_type(
