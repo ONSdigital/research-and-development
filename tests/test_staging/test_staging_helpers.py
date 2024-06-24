@@ -171,29 +171,16 @@ class TestGetMapperName(object):
 class TestLoadValidateMapper(object):
     """Tests for load_validate_mapper."""
 
-    @pytest.fixture
-    def mock_file_exists_func(self, mocker):
-        return mocker.patch("src.utils.local_file_mods.check_file_exists")
-
-    @pytest.fixture
-    def mock_read_csv_func(self, mocker):
-        return mocker.patch("src.utils.local_file_mods.read_local_csv")
-
-    @pytest.fixture
-    def mock_val_with_schema_func(self, mocker):
-        return mocker.patch("src.staging.validation.validate_data_with_schema")
-
-    @pytest.fixture
-    def mock_one_to_many_val_func(self, mocker):
-        return mocker.patch("src.staging.validation.validate_many_to_one")
-
+    @patch("src.utils.local_file_mods.check_file_exists")
+    @patch("src.utils.local_file_mods.read_local_csv")
+    @patch("src.staging.validation.validate_data_with_schema")
+    @patch("src.staging.validation.validate_many_to_one")
     def test_load_validate_mapper(
         self,
-        caplog,
-        mock_file_exists_func,
-        mock_read_csv_func,
-        mock_val_with_schema_func,
         mock_one_to_many_val_func,
+        mock_val_with_schema_func,
+        mock_read_csv_func,
+        mock_file_exists_func,
     ):
 
         # Create a logger for this test
@@ -210,7 +197,7 @@ class TestLoadValidateMapper(object):
         col_many = "col_many"
         col_one = "col_one"
 
-        # Mock function calls
+        # Set mock return values
         mock_file_exists_func.return_value = True
         mock_read_csv_func.return_value = mapper_df
 
@@ -228,14 +215,11 @@ class TestLoadValidateMapper(object):
         )
 
         # Assertions
-        mock_file_exists_func.assert_called_once_with(
-            "/path/to/mapper.csv", raise_error=True
-        )
+        mock_file_exists_func.assert_called_once_with("/path/to/mapper.csv", raise_error=True)
         mock_read_csv_func.assert_called_once_with("/path/to/mapper.csv")
         mock_val_with_schema_func.assert_called_once_with(mapper_df, schema_path)
         mock_one_to_many_val_func.assert_called_once_with(mapper_df, col_many, col_one)
-        assert output.equals(mapper_df)
-
+        assert output.equals(mapper_df), "load_validate_mapper not behaving as expected."
 
 # load_historic_data: deprecated function
 
