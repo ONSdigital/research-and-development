@@ -226,7 +226,7 @@ class TestLoadValidateMapper(object):
 
         # Create a logger for this test
         test_logger = logging.getLogger("test_load_validate_mapper")
-        test_logger.setLevel(logging.DEBUG)  # Ensure it captures all levels of logs
+        test_logger.setLevel(logging.DEBUG)
 
         # Mock data
         mapper_path_key = "test_mapper_path"
@@ -260,7 +260,6 @@ class TestLoadValidateMapper(object):
         mock_val_with_schema_func.assert_called_once_with(mapper_df, schema_path)
         mock_one_to_many_val_func.assert_called_once_with(mapper_df, col_many, col_one)
         assert output.equals(mapper_df)
-
 
 
 # # load_historic_data: deprecated function
@@ -344,128 +343,90 @@ class TestLoadSnapshotFeather(object):
         )
 
 
-class TestLoadValSnapshotJson:
+# Fixtures for load_val_snapshot_json and load_validate_secondary_snapshot tests
+@pytest.fixture
+def mock_load_json(mocker):
+    return mocker.patch('src.utils.local_file_mods.load_local_json')
 
-    @pytest.fixture
-    def load_json(self):
-        return MagicMock()
+@pytest.fixture
+def mock_validate_data_with_schema(mocker):
+    return mocker.patch('src.staging.validation.validate_data_with_schema')
 
-    @pytest.fixture
-    def config(self):
-        return {
-            "global": {
-                "dev_test": False
-            },
-            "schema_paths": {
-                "contributors_schema": "path/to/contributors_schema.toml",
-                "long_response_schema": "path/to/long_response_schema.toml",
-                "wide_responses_schema": "path/to/wide_responses_schema.toml"
-            }
+@pytest.fixture
+def mock_full_responses(mocker):
+    return mocker.patch('src.staging.spp_snapshot_processing.full_responses')
+
+@pytest.fixture
+def mock_combine_schemas_validate_full_df(mocker):
+    return mocker.patch('src.staging.validation.combine_schemas_validate_full_df')
+
+@pytest.fixture
+def config():
+    return {
+        "global": {"dev_test": False},
+        "schema_paths": {
+            "contributors_schema": "path/to/contributors_schema.toml",
+            "long_response_schema": "path/to/long_response_schema.toml",
+            "wide_responses_schema": "path/to/wide_responses_schema.toml"
         }
+    }
 
-    @pytest.fixture
-    def network_or_hdfs(self):
-        return "network"
+@pytest.fixture
+def contributors_schema(self):
+    return MagicMock()
 
-    @pytest.fixture
-    def contributors_schema(self):
-        return MagicMock()
+@pytest.fixture
+def long_response_schema(self):
+    return MagicMock()
 
-    @pytest.fixture
-    def long_response_schema(self):
-        return MagicMock()
+@pytest.fixture
+def wide_responses_schema(self):
+    return MagicMock()
 
-    @pytest.fixture
-    def wide_responses_schema(self):
-        return MagicMock()
 
-    @patch('src.staging.validation.validate_data_with_schema')
-    @patch('src.staging.spp_snapshot_processing.full_responses')
-    @patch('src.staging.validation.combine_schemas_validate_full_df')
-    def test_load_val_snapshot_json(self, mock_toml_load, mock_file_open, snapshot_path, load_json, config, network_or_hdfs):
+class TestLoadValSnapshotJson:
+    """Tests for the load_val_snapshot_json function."""
 
+    def test_load_val_snapshot_json_correct_response_rate(self, mock_load_json, mock_validate_data_with_schema, mock_full_responses, mock_combine_schemas_validate_full_df, config, mocker):
+        """Ensure load_val_snapshot_json calculates the response rate correctly."""
+        snapshot_path = "path/to/snapshot.json"
+        network_or_hdfs = "network"
         expected_res_rate = "0.50"
 
-        load_json.return_value = {
-            "contributors": [
-                {"reference": 1},
-                {"reference": 2},
-                {"reference": 3},
-                {"reference": 4}
-            ],
-            "responses": [
-                {"reference": 1},
-                {"reference": 2}
-            ]
+        # Setup mock return value
+        mock_load_json.return_value = {
+            "contributors": [{"reference": i} for i in range(1, 5)],
+            "responses": [{"reference": i} for i in range(1, 3)]
         }
 
-        full_responses, res_rate = load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs)
+        # Execute the function under test
+        full_responses, res_rate = load_val_snapshot_json(snapshot_path, mock_load_json, config, network_or_hdfs)
 
-        assert res_rate == expected_res_rate
-        load_json.assert_called_once_with(snapshot_path)
-        mock_file_open.assert_called()
-        mock_toml_load.assert_called()
+        # Assertions
+        assert res_rate == expected_res_rate, "The response rate calculated by load_val_snapshot_json does not match the expected value."
+        mock_load_json.assert_called_once_with(snapshot_path), "load_json was not called with the expected snapshot path."
+        mock_validate_data_with_schema.assert_called(), "validate_data_with_schema was not called as expected."
+        mock_combine_schemas_validate_full_df.assert_called(), "combine_schemas_validate_full_df was not called as expected."
 
 
 class TestLoadValSecondarySnapshotJson:
+    """Tests for the load_validate_secondary_snapshot function."""
 
-    @pytest.fixture
-    def load_json(self):
-        return MagicMock()
+    def test_load_validate_secondary_snapshot(self, mocker, mock_load_json, mock_validate_data_with_schema, mock_full_responses, mock_combine_schemas_validate_full_df, config):
+        """Ensure load_validate_secondary_snapshot processes data correctly."""
+        secondary_snapshot_path = "path/to/secondary_snapshot.json"
+        network_or_hdfs = "network"
 
-    @pytest.fixture
-    def config(self):
-        return {
-            "global": {
-                "dev_test": False
-            },
-            "schema_paths": {
-                "contributors_schema": "path/to/contributors_schema.toml",
-                "long_response_schema": "path/to/long_response_schema.toml",
-                "wide_responses_schema": "path/to/wide_responses_schema.toml"
-            }
+        mock_load_json.return_value = {
+            "contributors": [{"reference": i} for i in range(1, 5)],
+            "responses": [{"reference": i} for i in range(1, 3)]
         }
 
-    @pytest.fixture
-    def network_or_hdfs(self):
-        return "network"
+        load_validate_secondary_snapshot(mock_load_json, secondary_snapshot_path, config, network_or_hdfs)
 
-    @pytest.fixture
-    def contributors_schema(self):
-        return MagicMock()
-
-    @pytest.fixture
-    def long_response_schema(self):
-        return MagicMock()
-
-    @pytest.fixture
-    def wide_responses_schema(self):
-        return MagicMock()
-
-    @patch('src.staging.validation.validate_data_with_schema')
-    @patch('src.staging.spp_snapshot_processing.full_responses')
-    @patch('src.staging.validation.combine_schemas_validate_full_df')
-    def test_load_val_snapshot_json(self, mock_toml_load, mock_file_open, secondary_snapshot_path, load_json, config, network_or_hdfs):
-
-        load_json.return_value = {
-            "contributors": [
-                {"reference": 1},
-                {"reference": 2},
-                {"reference": 3},
-                {"reference": 4}
-            ],
-            "responses": [
-                {"reference": 1},
-                {"reference": 2}
-            ]
-        }
-
-
-        load_validate_secondary_snapshot(load_json, secondary_snapshot_path, config, network_or_hdfs)
-
-        load_json.assert_called_once_with(secondary_snapshot_path)
-        mock_file_open.assert_called()
-        mock_toml_load.assert_called()
+        mock_load_json.assert_called_once_with(secondary_snapshot_path), "load_json was not called with the expected snapshot path."
+        mock_validate_data_with_schema.assert_called(), "validate_data_with_schema was not called as expected."
+        mock_combine_schemas_validate_full_df.assert_called(), "combine_schemas_validate_full_df was not called as expected."
 
 
 class TestDfToFeather(object):
