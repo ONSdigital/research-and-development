@@ -7,7 +7,7 @@ import yaml
 user_config_path = "config/userconfig.toml"
 
 
-class Config_settings:
+class ConfigSettings:
     """Get the config settings from the config file."""
 
     def __init__(self, config_path):

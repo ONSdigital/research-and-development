@@ -18,6 +18,8 @@ from src.staging.staging_helpers import (
     getmappername,
     check_snapshot_feather_exists,
     load_snapshot_feather,
+    load_val_snapshot_json,
+    load_validate_secondary_snapshot,
     df_to_feather,
     stage_validate_harmonise_postcodes,
 )
@@ -116,6 +118,7 @@ class TestUpdateRefList(object):
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
 
+
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
@@ -146,6 +149,7 @@ class TestUpdateRefList(object):
             update_ref_list(full_input_df, ref_list_input)
 
 
+
 class TestGetMapperName(object):
     """Tests for getmappername."""
 
@@ -160,6 +164,12 @@ class TestGetMapperName(object):
         assert (
             getmappername(test_str, False) == "cellno_2022"
         ), "getmappername not behaving as expected when split=False"
+
+
+# load_validate_mapper [CANT TEST: TOO MANY HARD CODED PATHS]
+
+
+# load_historic_data
 
 
 class TestCheckSnapshotFeatherExists(object):
@@ -179,6 +189,7 @@ class TestCheckSnapshotFeatherExists(object):
         if second:
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
+
 
     @pytest.mark.parametrize(
         "first, second, check_both, result",
@@ -319,6 +330,7 @@ class TestDfToFeather(object):
         ), ".feather. extension not applied when another extension exists."
 
 
+
 class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
 
@@ -338,17 +350,17 @@ class TestStageValidateHarmonisePostcodes(object):
         """Test data for stag_validate_harmonise_postcodes."""
         columns = ["reference", "instance", "formtype", "601", "referencepostcode"]
         data = [
-            [39900000404, 0.0, 6, np.nan, "NP442NZ"],  # add white space
+            [39900000404, 0.0, 6, None, "NP442NZ"],  # add white space
             [39900000404, 1.0, 6, "NP442NZ", "NP442NZ"],
-            [39900000960, 0.0, 1, np.nan, "CE1 4OY"],  # add white space
+            [39900000960, 0.0, 1, None, "CE1 4OY"],  # add white space
             [39900000960, 1.0, 1, "CE1 4OY", "CE1 4OY"],
             [39900001530, 0.0, 6, "CE2", "CE2"],  # invalid
-            [39900001601, 0.0, 1, np.nan, "RH12 1XL"],  # normal
+            [39900001601, 0.0, 1, None, "RH12 1XL"],  # normal
             [39900001601, 1.0, 1, "RH12 1XL", "RH12 1XL"],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU"],
+            [39900003110, 0.0, 6, None, "CE11 8IU"],
             [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
             [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
-            [38880003110, 0.0, 6, np.nan, "NP22 8UI"],  # not in postcode list
+            [38880003110, 0.0, 6, None, "NP22 8UI"],  # not in postcode list
             [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
@@ -375,18 +387,18 @@ class TestStageValidateHarmonisePostcodes(object):
             "postcodes_harmonised",
         ]
         data = [
-            [39900000404, 0.0, 6, np.nan, "NP442NZ", "NP44 2NZ"],
+            [39900000404, 0.0, 6, None, "NP442NZ", "NP44 2NZ"],
             [39900000404, 1.0, 6, "NP44 2NZ", "NP442NZ", "NP44 2NZ"],
-            [39900000960, 0.0, 1, np.nan, "CE1 4OY", "CE1  4OY"],
+            [39900000960, 0.0, 1, None, "CE1 4OY", "CE1  4OY"],
             [39900000960, 1.0, 1, "CE1  4OY", "CE1 4OY", "CE1  4OY"],
-            [39900001530, 0.0, 6, "     CE2", "CE2", np.nan],
-            [39900001601, 0.0, 1, np.nan, "RH12 1XL", "RH12 1XL"],
+            [39900001530, 0.0, 6, "CE2     ", "CE2", None],
+            [39900001601, 0.0, 1, None, "RH12 1XL", "RH12 1XL"],
             [39900001601, 1.0, 1, "RH12 1XL", "RH12 1XL", "RH12 1XL"],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU", "CE11 8IU"],
+            [39900003110, 0.0, 6, None, "CE11 8IU", "CE11 8IU"],
             [39900003110, 1.0, 6, "CE11 8IU", "CE11 8IU", "CE11 8IU"],
             [39900003110, 2.0, 6, "CE11 8IU", "CE11 8IU", "CE11 8IU"],
-            [38880003110, 0.0, 6, np.nan, "NP22 8UI", np.nan],
-            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI", np.nan],
+            [38880003110, 0.0, 6, None, "NP22 8UI", None],
+            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI", None],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -403,6 +415,7 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
+
 
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""

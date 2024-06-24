@@ -3,7 +3,8 @@ import logging
 import pandas as pd
 from typing import Callable
 
-from src.staging.validation import validate_data_with_schema, postcode_topup
+from src.staging.validation import validate_data_with_schema
+from src.staging import postcode_validation as pcval
 from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
@@ -158,7 +159,7 @@ def run_construction(  # noqa: C901
         # Top up all new postcodes so they're all eight characters exactly
         postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
         for col in postcode_cols:
-            updated_snapshot_df[col] = updated_snapshot_df[col].apply(postcode_topup)
+            updated_snapshot_df[col] = updated_snapshot_df[col].apply(pcval.format_postcodes)
 
         # Reset shortforms with status 'Form sent out' to instance=None
         form_sent_condition = (updated_snapshot_df.formtype == "0006") & (

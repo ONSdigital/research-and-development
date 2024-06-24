@@ -6,7 +6,7 @@ import logging
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.helpers import Config_settings
+from src.utils.helpers import ConfigSettings
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
@@ -30,7 +30,7 @@ def run_pipeline(start, config_path):
         used.
     """
     # load config
-    conf_obj = Config_settings(config_path)
+    conf_obj = ConfigSettings(config_path)
     config = conf_obj.config_dict
 
     # import yaml

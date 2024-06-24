@@ -10,7 +10,7 @@ from typing import List
 from pathlib import Path
 import getpass
 
-from src.utils.helpers import Config_settings
+from src.utils.helpers import ConfigSettings
 from src.outputs.manifest_output import Manifest
 
 
@@ -214,7 +214,7 @@ def run_export(config_path: str):
     """Main function to run the data export pipeline."""
 
     # Load config
-    conf_obj = Config_settings(config_path)
+    conf_obj = ConfigSettings(config_path)
     config = conf_obj.config_dict
 
     # Get and set logging level
