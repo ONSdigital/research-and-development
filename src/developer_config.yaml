@@ -7,7 +7,7 @@ global:
   dev_test : False
   network_or_hdfs: network #whether to load from hdfs or network (local Python)
   # Staging and validation settings
-  postcode_csv_check: True
+  postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: True
   load_historic_data: False
@@ -17,7 +17,7 @@ global:
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: False
+  load_from_feather: True
   # Apportionment to sites settings
   apportion_sites: True
   # Output settings
@@ -35,14 +35,14 @@ global:
   output_tau: False
   output_intram_by_pg_gb: False
   output_intram_by_pg_uk: False
-  output_intram_uk_itl: True
-  output_intram_gb_itl: True
+  output_intram_uk_itl: False
+  output_intram_gb_itl: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: False
-years: 
+years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
 runlog_writer:
@@ -116,9 +116,6 @@ network_paths:
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
   sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
 schema_paths:
-  contributors_schema: "config/contributors_schema.toml"
-  long_response_schema: "config/long_response.toml"
-  wide_responses_schema: "config/wide_responses.toml"
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
