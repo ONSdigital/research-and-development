@@ -6,7 +6,6 @@ https://docs.pytest.org/en/latest/example/simple.html.
 """
 
 import pytest
-import os
 
 
 def pytest_addoption(parser):
