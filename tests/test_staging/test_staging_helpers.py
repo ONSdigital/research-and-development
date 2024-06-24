@@ -8,6 +8,7 @@ from datetime import date
 import logging
 
 # Third Party Imports
+import pytest
 import pandas as pd
 import numpy as np
 import pyarrow.feather as feather
@@ -371,6 +372,7 @@ class TestLoadValSnapshotJson:
         mock_full_responses,
         mock_combine_schemas_validate_full_df,
         config,
+        mocker
     ):
         """Ensure load_val_snapshot_json behaves correctly."""
         snapshot_path = "path/to/snapshot.json"
@@ -409,6 +411,7 @@ class TestLoadValSecondarySnapshotJson:
         mock_full_responses,
         mock_combine_schemas_validate_full_df,
         config,
+        mocker
     ):
         """Ensure load_validate_secondary_snapshot behaves correctly."""
         secondary_snapshot_path = "path/to/secondary_snapshot.json"
