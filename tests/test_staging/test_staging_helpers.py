@@ -298,70 +298,32 @@ class TestLoadSnapshotFeather(object):
         ), "Snapshot df has more columnss than expected."
 
 
-# Fixtures for load_val_snapshot_json and load_validate_secondary_snapshot tests
-@pytest.fixture
-def mock_load_json(mocker):
-    return mocker.patch("src.utils.local_file_mods.load_local_json")
-
-
-@pytest.fixture
-def mock_validate_data_with_schema(mocker):
-    return mocker.patch("src.staging.validation.validate_data_with_schema")
-
-
-@pytest.fixture
-def mock_full_responses(mocker):
-    return mocker.patch("src.staging.spp_snapshot_processing.full_responses")
-
-
-@pytest.fixture
-def mock_combine_schemas_validate_full_df(mocker):
-    return mocker.patch("src.staging.validation.combine_schemas_validate_full_df")
-
-
-@pytest.fixture
-def config():
-    return {
-        "global": {"dev_test": False},
-        "schema_paths": {
-            "contributors_schema": "path/to/contributors_schema.toml",
-            "long_response_schema": "path/to/long_response_schema.toml",
-            "wide_responses_schema": "path/to/wide_responses_schema.toml",
-        },
-    }
-
-
-@pytest.fixture
-def contributors_schema(self):
-    return MagicMock()
-
-
-@pytest.fixture
-def long_response_schema(self):
-    return MagicMock()
-
-
-@pytest.fixture
-def wide_responses_schema(self):
-    return MagicMock()
-
-
-class TestLoadValSnapshotJson:
+class TestLoadValSnapshotJson(object):
     """Tests for the load_val_snapshot_json function."""
 
+    @patch("src.utils.local_file_mods.load_local_json")
+    @patch("src.staging.validation.validate_data_with_schema")
+    @patch("src.staging.spp_snapshot_processing.full_responses")
+    @patch("src.staging.validation.combine_schemas_validate_full_df")
     def test_load_val_snapshot_json_correct_response_rate(
         self,
-        mock_load_json,
-        mock_validate_data_with_schema,
-        mock_full_responses,
         mock_combine_schemas_validate_full_df,
-        config,
-        mocker
+        mock_full_responses,
+        mock_validate_data_with_schema,
+        mock_load_json
     ):
         """Ensure load_val_snapshot_json behaves correctly."""
         snapshot_path = "path/to/snapshot.json"
         network_or_hdfs = "network"
         expected_res_rate = "0.50"
+        config = {
+            "global": {"dev_test": False},
+            "schema_paths": {
+                "contributors_schema": "path/to/contributors_schema.toml",
+                "long_response_schema": "path/to/long_response_schema.toml",
+                "wide_responses_schema": "path/to/wide_responses_schema.toml",
+            },
+        }
 
         # Setup mock return value
         mock_load_json.return_value = {
@@ -378,28 +340,36 @@ class TestLoadValSnapshotJson:
         assert (
             res_rate == expected_res_rate
         ), "The response rate calculated by load_val_snapshot_json does not match the expected value."
-        mock_load_json.assert_called_once_with(
-            snapshot_path
-        ), "load_json was not called with the expected snapshot path."
-        mock_validate_data_with_schema.assert_called(), "validate_data_with_schema was not called as expected."
-        mock_combine_schemas_validate_full_df.assert_called(), "combine_schemas_validate_full_df was not called as expected."
+        mock_load_json.assert_called_once_with(snapshot_path)
+        mock_validate_data_with_schema.assert_called()
+        mock_combine_schemas_validate_full_df.assert_called()
 
 
-class TestLoadValSecondarySnapshotJson:
+class TestLoadValSecondarySnapshotJson(object):
     """Tests for the load_validate_secondary_snapshot function."""
 
+    @patch("src.utils.local_file_mods.load_local_json")
+    @patch("src.staging.validation.validate_data_with_schema")
+    @patch("src.staging.spp_snapshot_processing.full_responses")
+    @patch("src.staging.validation.combine_schemas_validate_full_df")
     def test_load_validate_secondary_snapshot(
         self,
-        mock_load_json,
-        mock_validate_data_with_schema,
-        mock_full_responses,
         mock_combine_schemas_validate_full_df,
-        config,
-        mocker
+        mock_full_responses,
+        mock_validate_data_with_schema,
+        mock_load_json
     ):
         """Ensure load_validate_secondary_snapshot behaves correctly."""
         secondary_snapshot_path = "path/to/secondary_snapshot.json"
         network_or_hdfs = "network"
+        config = {
+            "global": {"dev_test": False},
+            "schema_paths": {
+                "contributors_schema": "path/to/contributors_schema.toml",
+                "long_response_schema": "path/to/long_response_schema.toml",
+                "wide_responses_schema": "path/to/wide_responses_schema.toml",
+            },
+        }
 
         mock_load_json.return_value = {
             "contributors": [{"reference": i} for i in range(1, 5)],
@@ -410,11 +380,9 @@ class TestLoadValSecondarySnapshotJson:
             mock_load_json, secondary_snapshot_path, config, network_or_hdfs
         )
 
-        mock_load_json.assert_called_once_with(
-            secondary_snapshot_path
-        ), "load_json was not called with the expected snapshot path."
-        mock_validate_data_with_schema.assert_called(), "validate_data_with_schema was not called as expected."
-        mock_combine_schemas_validate_full_df.assert_called(), "combine_schemas_validate_full_df was not called as expected."
+        mock_load_json.assert_called_once_with(secondary_snapshot_path)
+        mock_validate_data_with_schema.assert_called()
+        mock_combine_schemas_validate_full_df.assert_called()
 
 
 class TestDfToFeather(object):
