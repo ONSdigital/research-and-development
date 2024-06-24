@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.6'
+
 # 4) Install dependencies from requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
