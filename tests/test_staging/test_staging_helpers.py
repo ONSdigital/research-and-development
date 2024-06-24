@@ -378,7 +378,7 @@ class TestLoadValSnapshotJson:
         config,
         mocker,
     ):
-        """Ensure load_val_snapshot_json calculates the response rate correctly."""
+        """Ensure load_val_snapshot_json behaves correctly."""
         snapshot_path = "path/to/snapshot.json"
         network_or_hdfs = "network"
         expected_res_rate = "0.50"
@@ -417,7 +417,7 @@ class TestLoadValSecondarySnapshotJson:
         mock_combine_schemas_validate_full_df,
         config,
     ):
-        """Ensure load_validate_secondary_snapshot processes data correctly."""
+        """Ensure load_validate_secondary_snapshot behaves correctly."""
         secondary_snapshot_path = "path/to/secondary_snapshot.json"
         network_or_hdfs = "network"
 
