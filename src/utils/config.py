@@ -65,7 +65,6 @@ def _validate_path(path: str, config: dict):
 
     Args:
         path (str): The path to validate.
-        param_nm (str): The param name (for error raises).
         item_conf (dict): The config file (for file ext).
     """
     try:
