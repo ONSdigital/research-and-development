@@ -1,16 +1,16 @@
 """Simple utils to assist the config."""
 from copy import deepcopy
-from typing import Union
+from typing import Union, Dict
 
-from src.utils.defence import (
-    type_defence, 
-    validate_file_extension
-)
+from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
 
 
-def merge_configs(config1: dict, config2: dict) -> dict:
+def merge_configs(config1: Dict, config2: Dict) -> Dict:
     """Merge two config files.
+
+    Takes two config files and merges them into a single config file.
+    If there are overlapping keys in the configs, a ValueError is raised.
 
     Args:
         config1 (dict): The first config file.
@@ -24,11 +24,11 @@ def merge_configs(config1: dict, config2: dict) -> dict:
     """
     for key in config1:
         if key in config2:
-            if (
-                isinstance(config2[key], dict) and 
-                isinstance(config1[key], dict)
-            ):
+            # check if the value is a dict and if so, merge the subkeys
+            # if it is not a dict, there is overlap so raise an error
+            if isinstance(config2[key], dict) and isinstance(config1[key], dict):
                 for subkey in config1[key]:
+                    # if the subkey is also in the second config, then there is overlap
                     if subkey not in config2[key].keys():
                         config2[key][subkey] = config1[key][subkey]
                     else:
@@ -41,35 +41,42 @@ def merge_configs(config1: dict, config2: dict) -> dict:
     return deepcopy(config2)
 
 
-def _check_has_schema(_dict: dict) -> bool:
-    """Check if an item has a schema.
+def _check_has_schema(config_item: dict) -> bool:
+    """Check if a validation config item is a schema.
+
+    This is done by seeing whether the item has the required keys.
 
     Args:
-        _dict (dict): The config item.
+        config_item (dict): An item from the validation schema.
 
     Returns:
         bool: Whether config item has required keys.
     """
     expected_keys = [
         "singular",
-        "dtype", 
+        "dtype",
         "accept_nonetype",
     ]
-    if set(expected_keys).issubset(set(list(_dict.keys()))):
+    if set(expected_keys).issubset(set(list(config_item.keys()))):
         return True
     return False
 
 
-def _validate_path(path: str, config: dict):
-    """Validate a passed path (str format) is valid.
+def _validate_path(path: str, schema_config: dict):
+    """Check a path has the extension specified in the config schema.
 
     Args:
         path (str): The path to validate.
-        param_nm (str): The param name (for error raises).
-        item_conf (dict): The config file (for file ext).
+        schema_config (dict): The config schema containing the file extension.
+
+    Raises:
+        KeyError: If the validation schema config does not contain the 'filetype' key.
+
+    Returns:
+        None
     """
     try:
-        file_ext = config["filetype"]
+        file_ext = schema_config["filetype"]
     except KeyError:
         file_ext = None
     if file_ext:
@@ -77,34 +84,34 @@ def _validate_path(path: str, config: dict):
 
 
 def _validate_numeric(value: Union[float, int], param_nm: str, config: dict):
-    """Valdiate a numerical value fits between a range.
+    """Validate a numerical value to ensure it falls within a specified range.
 
     Args:
-        value (Union[float, int]): The numerical value.
-        param_nm (str): The parameter name (used for error raises).
-        config (dict): The config.
+        value (Union[float, int]): The numerical value to be validated.
+        param_nm (str): The name of the parameter being validated (for error messages).
+        config (dict): The configuration schema containing the min and max values.
 
     Raises:
-        ValueError: Raised if a number is lesser than the minimum.
-        ValueError: Raised if a number is greater than the maximum.
+        ValueError: If the value is greater than the maximum specified in the config.
+        ValueError: If the value is less than the minimum specified in the config.
     """
     try:
-        max = config["max"]
+        max_value = config["max"]
     except KeyError:
-        max = None
+        max_value = None
     try:
-        min = config["min"]
+        min_value = config["min"]
     except KeyError:
-        min = None
-    if max:
-        if value > max:
+        min_value = None
+    if max_value:
+        if value > max_value:
             raise ValueError(
-                f"Config value for {param_nm} ({value}) greater than max ({max})."
+                f"Config value for {param_nm} ({value}) greater than max ({max_value})."
             )
-    if min:
-        if value < min:
+    if min_value:
+        if value < min_value:
             raise ValueError(
-                f"Config value for {param_nm} ({value}) less than min ({min})."
+                f"Config value for {param_nm} ({value}) less than min ({min_value})."
             )
 
 
@@ -122,95 +129,110 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
         return None
     return value
 
-def _check_items(item: dict, config_item: dict, item_name: str) -> None:
-    """Check items of a config to validate them.
+
+def _validate_config_items(  # noqa C901
+    config_item: dict, validation_item: dict, item_name: str
+) -> None:
+    """Recursively validate items in a config.
 
     This function recursively checks items in the config and validates them. It
-     traverses the tree of the config (levels) until the config validation ymal
-    reaches a validation schema. If a valdiation schema is detected, the 
-    function will stop recursively going deeper into the tree, and will 
-    validate the current level with the parameters passed.
+    traverses the tree of the config (levels) until it reaches a validation schema.
+    If a validation schema is detected, the function will stop recursively going
+    deeper into the tree and validate the current level with the parameters passed.
 
     Args:
-        item (dict): The item(s) to check (config validation).
-        config_item (dict): The matching config item (actual config). 
-        item_name (str): The name of the item (matching in both validation
-                         and config)
+        config_item (dict): The config item to be validated.
+        validation_item (dict): The dict to use for validation.
+        item_name (str): The name of the item (matching in config and validation items)
     """
     DTYPES = {
         "int": int,
         "float": float,
         "str": str,
         "bool": bool,
-        "path": str, # passed as string in config
-        "list": list
+        "path": str,  # passed as string in config
+        "list": list,
     }
-    # recursive check on schema item
-    if not _check_has_schema(_dict=item):
-        for sub_item in item.keys():
-            _check_items(
-                item=item[sub_item],
+    # check whether we have reached a schema or need to traverse deeper
+    if not _check_has_schema(config_item=validation_item):
+        # traverse deeper by calling the function recursively
+        for sub_item in validation_item.keys():
+            _validate_config_items(
                 config_item=config_item[sub_item],
-                item_name=sub_item
+                validation_item=validation_item[sub_item],
+                item_name=sub_item,
             )
         return
-    # check that both levels aren't the same
-    # do validation
-    if item["singular"]:
+
+    # if we have reached a schema, validate the item
+    if validation_item["singular"]:
+        # putting a "singular" item in the form of a dictionary so it can be processed
+        # in the same way as items that are not singular.
         config_item = {item_name: config_item}
-    dtype = DTYPES[item["dtype"]] if "list" not in item["dtype"] else list
-    if item["accept_nonetype"]:
+    if "list" not in validation_item["dtype"]:
+        dtype = DTYPES[validation_item["dtype"]]
+    else:
+        dtype = list
+    if validation_item["accept_nonetype"]:
         dtype = (dtype, type(None))
-    for level in config_item.keys():
-        param = f"{item_name}:{level}"
-        # parse list datatype
-        if "list" in item["dtype"]:
-            dtype = item["dtype"]
-            type_defence(config_item[level], param, list)
+    for config_value in config_item.keys():
+        # create the parameter name for the error message
+        param = f"{item_name}:{config_value}"
+        # check if the item is a list and validate each item in the list
+        if "list" in validation_item["dtype"]:
+            dtype = validation_item["dtype"]
+            type_defence(config_item[config_value], param, list)
             subtype = dtype.replace("list[", "").replace("]", "")
-            for list_item in config_item[level]:
+            for list_item in config_item[config_value]:
                 type_defence(
-                    list_item, 
-                    f"{param}:list item:{list_item}", 
-                    DTYPES[subtype]
+                    list_item, f"{param}:list item:{list_item}", DTYPES[subtype]
                 )
             return
         # convert nulltype strings
-        if isinstance(config_item[level], str):
-            config_item[level] = _nulltype_conversion(config_item[level])
-        type_defence(config_item[level], param, dtype)
+        if isinstance(config_item[config_value], str):
+            config_item[config_value] = _nulltype_conversion(config_item[config_value])
+        type_defence(config_item[config_value], param, dtype)
         # skip validation if Nonetype
-        if isinstance(config_item[level], type(None)):
+        if isinstance(config_item[config_value], type(None)):
             continue
         # validation for each type
-        if item["dtype"] == "path":
-            _validate_path(config_item[level], item)
-        if item["dtype"] in ["int", "float"]:
-            _validate_numeric(config_item[level], param, item)
+        if validation_item["dtype"] == "path":
+            _validate_path(config_item[config_value], validation_item)
+        if validation_item["dtype"] in ["int", "float"]:
+            _validate_numeric(config_item[config_value], param, validation_item)
 
 
 def validate_config(config: dict) -> None:
-    """Validate the information passed to the config file.
+    """
+    Validate a configuration dictionary based on a validation schema.
+
+    If the 'validate' flag is set to False, no validation is performed.
 
     Args:
-        config (dict): The config to validate.
+        config (dict): The configuration dictionary to validate.
+
+    Returns:
+        None: This function does not return anything.
+
+    Raises:
+        TypeError: If the 'validate' flag is not a boolean or the 'path' value is not
+            a string.
     """
-    # validate config validation paths
+    # check if validation is required
     validate = config["config_validation"]["validate"]
-    type_defence(
-        validate,
-        "config_validation:validate",
-        bool
-    )
+    # check that the variable is a boolean
+    type_defence(validate, "config_validation:validate", bool)
     if not validate:
         return None
+    # get the path to the config validation schema and check it is a string
     validation_path = config["config_validation"]["path"]
     type_defence(validation_path, "config_validation:path", str)
-    # read in config schema
+    # load the validation schema
     validation_config = safeload_yaml(validation_path)
-    for item in validation_config.keys():
-        _check_items(
-            item=validation_config[item], 
-            config_item=config[item],
-            item_name=item
+    # for each item in the validation schema, validate the correponding config item.
+    for validation_item in validation_config.keys():
+        _validate_config_items(
+            config_item=config[validation_item],
+            validation_item=validation_config[validation_item],
+            item_name=validation_item,
         )
