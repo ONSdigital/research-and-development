@@ -7,6 +7,7 @@ from typing import Callable
 # Local Imports
 from src.utils.config import safeload_yaml, merge_configs
 
+
 def read_config() -> dict:
     """Read config for tests."""
     # read config file (relative path is consistent for tests)

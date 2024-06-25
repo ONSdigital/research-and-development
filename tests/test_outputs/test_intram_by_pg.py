@@ -11,17 +11,11 @@ import pandas as pd
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
 from src.utils.config import safeload_yaml, merge_configs
+from tests.test_outputs.conftest import read_config
 
-# read config file
-user_path = os.path.join("src", "user_config.yaml")
-dev_path = os.path.join("src", "dev_config.yaml")
-user_config = safeload_yaml(user_path)
-dev_config = safeload_yaml(dev_path)
-user_config.pop("config_validation", None)
-dev_config.pop("config_validation", None)
-config = merge_configs(user_config, dev_config)
 
 # Assign config values to paths
+config = read_config()
 LOCATION = config["global"]["network_or_hdfs"]
 PATHS = config[f"{LOCATION}_paths"]
 
