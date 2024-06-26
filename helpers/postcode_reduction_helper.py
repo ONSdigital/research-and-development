@@ -6,12 +6,12 @@ import sys
 
 sys.path.append("D:/coding_projects/github_repos/research-and-development")  # noqa
 
-from src.utils.helpers import Config_settings  # noqa
+from src.utils.helpers import ConfigSettings  # noqa
 from src.utils.local_file_mods import check_file_exists  # noqa
 
 # load config
 config_path = os.path.join("src", "developer_config.yaml")
-conf_obj = Config_settings(config_path)
+conf_obj = ConfigSettings(config_path)
 config = conf_obj.config_dict
 
 survey_year = config["global"]["survey_year"]
@@ -23,14 +23,13 @@ if not ((survey_year > 2021) and (survey_year < 2041)):
 
 # Input folder and file names
 in_file = config["network_paths"]["postcode_masterlist"]
+# check the input paths are valid
+check_file_exists(in_file)
 
 # Output folder and file names
 root_fol = "R:/BERD Results System Development 2023/DAP_emulation/"
 out_fol = root_fol + f"{survey_year}_surveys/mappers/"
-out_path = out_fol + "postcodes_mapper_reduced.csv"
-
-# check the input paths are valid
-check_file_exists(in_file)
+out_path = out_fol + f"postcodes_{survey_year}.csv"
 
 # Read in files
 key_cols = ["pcd2", "itl"]

@@ -1,5 +1,5 @@
 global:
-  survey_year: 2000
+  survey_year: 2023
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
@@ -43,7 +43,7 @@ global:
   output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: False
-years: 
+years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
 runlog_writer:
@@ -83,6 +83,7 @@ network_paths:
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
+  postcode_mapper: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/mappers/v1/postcodes_2023.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
