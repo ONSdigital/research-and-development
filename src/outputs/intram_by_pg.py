@@ -35,19 +35,19 @@ def output_intram_by_pg(
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
-
     # evaluate if NI data is included and clean
     if ni_df is not None:
-        # defence
-        if not isinstance(ni_df, pd.DataFrame):
-            raise TypeError(
-                f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
-                )
-        # work out cols to select
-        cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
-        gb_df = gb_df[cols_to_keep]
-        ni_df = ni_df[cols_to_keep]
-        gb_df = gb_df.append(ni_df)
+        if not ni_df.empty:
+            # defence
+            if not isinstance(ni_df, pd.DataFrame):
+                raise TypeError(
+                    f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
+                    )
+            # work out cols to select
+            cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
+            gb_df = gb_df[cols_to_keep]
+            ni_df = ni_df[cols_to_keep]
+            gb_df = gb_df.append(ni_df)
 
 
     # Group by PG and aggregate intram
