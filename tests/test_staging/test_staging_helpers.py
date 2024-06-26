@@ -6,13 +6,12 @@ import pathlib
 from typing import Tuple
 from datetime import date
 import logging
+from unittest.mock import patch
 
 # Third Party Imports
-import pytest
 import pandas as pd
 import numpy as np
 import pyarrow.feather as feather
-from unittest.mock import MagicMock, patch
 
 # Local Imports
 from src.staging.staging_helpers import (
@@ -345,7 +344,7 @@ class TestLoadValSnapshotJson(object):
         mock_combine_schemas_validate_full_df.assert_called()
 
 
-class TestLoadValSecondarySnapshotJson(object):
+class TestLoadValSecondarySnapshot(object):
     """Tests for the load_validate_secondary_snapshot function."""
 
     @patch("src.utils.local_file_mods.load_local_json")
