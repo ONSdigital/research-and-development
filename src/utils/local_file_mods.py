@@ -1,4 +1,10 @@
-"""Functions to read and write files on a local network drive"""
+"""Functions to read and write files on a local network drive
+
+NOTE: these functions used to be name-spaced with the prefix 'local_',
+but these have now been updated to 'rd_' representing "R and D".
+This is so that the corresponding functions in the hdfs_file_mods.py file, which
+are used when running code on hdfs, can be imported with the same name.
+"""
 
 import json
 import os
