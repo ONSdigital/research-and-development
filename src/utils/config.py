@@ -130,7 +130,7 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
     return value
 
 
-def _validate_config_items(  # noqa C901
+def _validate_config_items( # noqa C901
     config_item: dict, validation_item: dict, item_name: str
 ) -> None:
     """Recursively validate items in a config.
@@ -163,18 +163,17 @@ def _validate_config_items(  # noqa C901
                 item_name=sub_item,
             )
         return
-
-    # if we have reached a schema, validate the item
-    if validation_item["singular"]:
-        # putting a "singular" item in the form of a dictionary so it can be processed
-        # in the same way as items that are not singular.
-        config_item = {item_name: config_item}
-    if "list" not in validation_item["dtype"]:
-        dtype = DTYPES[validation_item["dtype"]]
-    else:
-        dtype = list
-    if validation_item["accept_nonetype"]:
-        dtype = (dtype, type(None))
+    # convert a "singular" item to a dictionary so it can be processed
+    # in the same way as non-singular items.
+    config_item = (
+        {item_name: config_item} if validation_item["singular"] else config_item
+    )
+    dtype = (
+        DTYPES[validation_item["dtype"]]
+        if "list" not in validation_item["dtype"]
+        else list
+    )
+    dtype = (dtype, type(None)) if validation_item["accept_nonetype"] else dtype
     for config_value in config_item.keys():
         # create the parameter name for the error message
         param = f"{item_name}:{config_value}"
