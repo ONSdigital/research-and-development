@@ -8,11 +8,11 @@ import pytest
 import sys
 
 from src.utils.hdfs_mods import (
-    read_hdfs_csv,
-    write_hdfs_csv,
-    hdfs_load_json,
-    hdfs_file_exists,
-    hdfs_file_size,
+    read_rd_csv,
+    write_rd_csv,
+    rd_load_json,
+    rd_file_exists,
+    rd_file_size,
     check_file_exists,
 )
 
@@ -23,7 +23,7 @@ sys.modules["mock_f"] = mock.Mock()
 
 
 class TestReadCsv:
-    """Tests for hdfs_append function."""
+    """Tests for rd_append function."""
 
     def input_data(self):
 
@@ -49,8 +49,8 @@ class TestReadCsv:
 
     @mock.patch("src.utils.hdfs_mods.pd")
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_read_hdfs_csv(self, mock_hdfs, mock_pd_csv):
-        """Test the expected functionality of read_hdfs_csv.
+    def test_read_rd_csv(self, mock_hdfs, mock_pd_csv):
+        """Test the expected functionality of read_rd_csv.
 
         Note:
             we pass the two patches defined above the function.
@@ -61,7 +61,7 @@ class TestReadCsv:
 
         mock_pd_csv.read_csv.return_value = self.input_data()
 
-        df_result = read_hdfs_csv("file/path/filename.csv")
+        df_result = read_rd_csv("file/path/filename.csv")
 
         # make sure function was called with mocked parameter in 'with open'
         mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
@@ -72,15 +72,15 @@ class TestReadCsv:
 
 class TestWriteCsv:
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_write_hdfs_csv(self, mock_hdfs):
-        """Test the expected functionality of write_hdfs_csv."""
+    def test_write_rd_csv(self, mock_hdfs):
+        """Test the expected functionality of write_rd_csv."""
 
         mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
 
         test_df = pd.DataFrame({"col": ["data"]})
 
         with mock.patch.object(test_df, "to_csv") as to_csv_mock:
-            write_hdfs_csv("file/path/filename.csv", test_df)
+            write_rd_csv("file/path/filename.csv", test_df)
             # make sure mocked data object was used inside 'with open'
             to_csv_mock.assert_called_with(sys.modules["mock_f"], index=False)
 
@@ -112,14 +112,14 @@ class TestLoadJson:
 
     @mock.patch("src.utils.hdfs_mods.json")
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_hdfs_load_json(self, mock_hdfs, mock_json):
-        """Test the expected functionality of hdfs_load_json."""
+    def test_rd_load_json(self, mock_hdfs, mock_json):
+        """Test the expected functionality of rd_load_json."""
 
         mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
 
         mock_json.load.return_value = self.input_data()
 
-        json_result = hdfs_load_json("file/path/filename.json")
+        json_result = rd_load_json("file/path/filename.json")
 
         mock_json.load.assert_called_with(sys.modules["mock_f"])
 
@@ -132,16 +132,16 @@ class TestHdfsFileExists:
     """Tests for function to check a file exists in HDFS."""
 
     @mock.patch("src.utils.hdfs_mods.hdfs.path.exists")
-    def test_hdfs_file_exists(self, mock_hdfs_is_file):
-        """Mock tests for hdfs_file_exists function in True and False cases."""
+    def test_rd_file_exists(self, mock_rd_is_file):
+        """Mock tests for rd_file_exists function in True and False cases."""
         # check True is returned if file exists
-        mock_hdfs_is_file.return_value = True
-        result1 = hdfs_file_exists("file/truepath/filename.csv")
+        mock_rd_is_file.return_value = True
+        result1 = rd_file_exists("file/truepath/filename.csv")
         assert result1
 
         # check False is returned if file does not exist
-        mock_hdfs_is_file.return_value = False
-        result2 = hdfs_file_exists("file/falsepath/filename.csv")
+        mock_rd_is_file.return_value = False
+        result2 = rd_file_exists("file/falsepath/filename.csv")
         assert not result2
 
 
@@ -149,10 +149,10 @@ class TestHdfsFileSize:
     """Tests for function to return size of file in HDFS."""
 
     @mock.patch("src.utils.hdfs_mods.hdfs.path.getsize")
-    def test_hdfs_file_size(self, mock_hdfs_getsize):
-        """Mock test for hdfs_file_size to return size of file in hdfs."""
-        mock_hdfs_getsize.return_value = 300
-        result = hdfs_file_size("filepath/filename.csv")
+    def test_rd_file_size(self, mock_rd_getsize):
+        """Mock test for rd_file_size to return size of file in hdfs."""
+        mock_rd_getsize.return_value = 300
+        result = rd_file_size("filepath/filename.csv")
         assert result == 300
 
 
@@ -161,10 +161,10 @@ class TestCheckFileExists:
 
     @mock.patch("src.utils.hdfs_mods.hdfs.path.getsize")
     @mock.patch("src.utils.hdfs_mods.hdfs.path.exists")
-    def test_check_hdfs_file_exists(self, mock_hdfs_is_file, mock_get_filesize):
-        """Mock tests for check_hdfs_file_exists function in True and False cases."""
+    def test_check_rd_file_exists(self, mock_rd_is_file, mock_get_filesize):
+        """Mock tests for check_rd_file_exists function in True and False cases."""
         # check True is returned if file exists and is non-empty
-        mock_hdfs_is_file.return_value = True
+        mock_rd_is_file.return_value = True
         mock_get_filesize.return_value = 300
         result1 = check_file_exists("file/truepath/filename.csv")
         assert result1
@@ -175,5 +175,5 @@ class TestCheckFileExists:
 
         # check error raised if file doesn't exist
         with pytest.raises(FileNotFoundError):
-            mock_hdfs_is_file.return_value = False
+            mock_rd_is_file.return_value = False
             check_file_exists("file/truepath/filename.csv")
