@@ -27,22 +27,20 @@ def output_intram_by_pg(
         ni_df (pd.DataFrame): The NI datasets without weights applied.
 
     """
-
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
-
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
     # evaluate if NI data is included and clean
-    if ni_df is not None:
-        if not ni_df.empty:
-            # defence
-            if not isinstance(ni_df, pd.DataFrame):
+    if not isinstance(ni_df, (pd.DataFrame, type(None))):
                 raise TypeError(
                     f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
                     )
+    if ni_df is not None:
+        if not ni_df.empty:
+            # defence
             # work out cols to select
             cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
             gb_df = gb_df[cols_to_keep]
