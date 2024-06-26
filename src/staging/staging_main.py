@@ -10,7 +10,6 @@ import os
 from src.staging import validation as val
 import src.staging.staging_helpers as helpers
 
-
 StagingMainLogger = logging.getLogger(__name__)
 
 
@@ -258,6 +257,16 @@ def run_staging(
         None,
     )
 
+    pg_detailed_mapper = helpers.load_validate_mapper(
+        "pg_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
+
     # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
@@ -282,7 +291,7 @@ def run_staging(
         #sic_pg_alpha_mapper,
         #sic_pg_utf_mapper,
         backdata,
-        #pg_detailed_mapper,
+        pg_detailed_mapper,
         itl1_detailed_mapper,
         #ref_list_817_mapper,
         civil_defence_detailed_mapper,

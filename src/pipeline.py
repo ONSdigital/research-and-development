@@ -94,17 +94,17 @@ def run_pipeline(start, config_path):
         full_responses,
         secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
-        ultfoc_mapper,
-        itl_mapper,
-        cellno_df,
+        #ultfoc_mapper,
+        #itl_mapper,
+        #cellno_df,
         postcode_mapper,
-        pg_num_alpha,
-        sic_pg_alpha,
-        sic_pg_num,
+        #pg_num_alpha,
+        #sic_pg_alpha,
+        #sic_pg_num,
         backdata,
         pg_detailed,
         itl1_detailed,
-        reference_list,
+        #reference_list,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
@@ -145,7 +145,6 @@ def run_pipeline(start, config_path):
         read_feather,
         write_feather,
         isfile,
-        run_id,
     )
     MainLogger.info("Finished Mapping...")
 
