@@ -344,7 +344,7 @@ class TestLoadValSnapshotJson(object):
         mock_combine_schemas_validate_full_df.assert_called()
 
 
-class TestLoadValSecondarySnapshot(object):
+class TestLoadValidateSecondarySnapshot(object):
     """Tests for the load_validate_secondary_snapshot function."""
 
     @patch("src.utils.local_file_mods.load_local_json")
