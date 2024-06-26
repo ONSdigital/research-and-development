@@ -11,6 +11,7 @@ from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
+from src.mapping.mapping_main import run_mapping
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
@@ -132,10 +133,26 @@ def run_pipeline(start, config_path):
     )
     MainLogger.info("Finished Construction...")
 
+    # Mapping module
+    MainLogger.info("Starting Mapping...")
+    mapped_df = run_mapping(
+        full_responses,
+        config,
+        check_file_exists,
+        load_json,
+        read_csv,
+        write_csv,
+        read_feather,
+        write_feather,
+        isfile,
+        run_id,
+    )
+    MainLogger.info("Finished Mapping...")
+
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(
-        full_responses,
+        mapped_df,
         manual_trimming_df,
         pg_num_alpha,
         sic_pg_num,
