@@ -20,7 +20,7 @@ from src.utils.wrappers import time_logger_wrap
 try:
     import pydoop.hdfs as hdfs
 
-    # from src.utils.rd_mods import read_rd_csv, write_rd_csv
+    # from src.utils.rd_mods import rd_read_csv, rd_write_csv
     HDFS_AVAILABLE = True
 except ImportError:
     HDFS_AVAILABLE = False
@@ -29,7 +29,7 @@ except ImportError:
 rd_logger = logging.getLogger(__name__)
 
 
-def read_rd_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from DAP into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
@@ -52,7 +52,7 @@ def read_rd_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     return df_from_hdfs
 
 
-def write_rd_csv(filepath: str, data: pd.DataFrame):
+def rd_write_csv(filepath: str, data: pd.DataFrame):
     """Writes a Pandas Dataframe to csv in DAP
 
     Args:

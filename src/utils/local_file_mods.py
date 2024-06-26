@@ -16,7 +16,7 @@ from src.utils.wrappers import time_logger_wrap
 lfmod_logger = logging.getLogger(__name__)
 
 
-def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
     Args:
         filepath (str): Filepath
@@ -28,10 +28,10 @@ def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df = pd.read_csv(file, thousands=',')
+            df = pd.read_csv(file, thousands=",")
         else:
             try:
-                df = pd.read_csv(file, usecols=cols, thousands=',')
+                df = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
                 lfmod_logger.error(f"Could not find specified columns in {filepath}")
                 lfmod_logger.info("Columns specified: " + str(cols))
@@ -39,7 +39,7 @@ def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     return df
 
 
-def write_local_csv(filepath: str, data: pd.DataFrame):
+def rd_write_csv(filepath: str, data: pd.DataFrame):
     """Writes a Pandas Dataframe to csv on a local network drive
 
     Args:
@@ -52,7 +52,7 @@ def write_local_csv(filepath: str, data: pd.DataFrame):
         data.to_csv(file, date_format="%Y-%m-%d %H:%M:%S.%f+00", index=False)
 
 
-def load_local_json(filepath: str) -> dict:
+def rd_load_json(filepath: str) -> dict:
     """Function to load JSON data from a file on a local network drive
     Args:
         filepath (string): The filepath
@@ -68,7 +68,7 @@ def load_local_json(filepath: str) -> dict:
     return data
 
 
-def local_file_exists(filepath: str, raise_error=False) -> bool:
+def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check if a file exists on a local network drive
 
     Args:
@@ -85,7 +85,7 @@ def local_file_exists(filepath: str, raise_error=False) -> bool:
     return file_exists
 
 
-def local_file_size(filepath: str) -> int:
+def rd_file_size(filepath: str) -> int:
     """Function to check the size of a file on a local network drive
 
     Args:
@@ -99,7 +99,7 @@ def local_file_size(filepath: str) -> int:
     return file_size
 
 
-def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
+def check_file_exists(filename: str, filepath: str) -> bool:
     """Checks if file exists on a local network drive and is non-empty.
     Raises a FileNotFoundError if the file doesn't exist.
 
@@ -114,30 +114,30 @@ def check_file_exists(filename: str, filepath: str = "./data/raw/") -> bool:
 
     file_loc = os.path.join(filepath, filename)
 
-    local_file = local_file_exists(file_loc)
+    rd_file = rd_file_exists(file_loc)
 
     # If the file exists locally, check the size of it.
-    if local_file:
-        file_size = local_file_size(file_loc)
+    if rd_file:
+        file_size = rd_file_size(file_loc)
 
     # If file does not exist locally
-    if not local_file:
+    if not rd_file:
         raise FileNotFoundError(f"File {filename} does not exist or is empty")
 
     # If file exists locally and is non-empty
-    if local_file and file_size > 0:
+    if rd_file and file_size > 0:
         output = True
         lfmod_logger.info(f"File {filename} exists and is non-empty")
 
     # If file exists locally but is empty
-    elif local_file and file_size == 0:
+    elif rd_file and file_size == 0:
         output = False
         lfmod_logger.warning(f"File {filename} exists but is empty")
 
     return output
 
 
-def local_mkdir(path):
+def rd_mkdir(path):
     """Creates a directory on a local network drive
 
     Args:
@@ -147,7 +147,7 @@ def local_mkdir(path):
     return None
 
 
-def local_open(filepath, mode):
+def rd_open(filepath, mode):
     """Opens a file on a local network drive
 
     Args:
@@ -159,7 +159,7 @@ def local_open(filepath, mode):
 
 
 @time_logger_wrap
-def local_write_feather(filepath, df):
+def rd_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
     Args:
@@ -171,7 +171,7 @@ def local_write_feather(filepath, df):
 
 
 @time_logger_wrap
-def local_read_feather(filepath):
+def rd_read_feather(filepath):
     """Reads a feather file from a local network drive into a Pandas DataFrame
 
     Args:
@@ -184,7 +184,7 @@ def local_read_feather(filepath):
     return df
 
 
-def local_delete_file(path: str):
+def rd_delete_file(path: str):
     """
     Delete a file on the local file system.
 
@@ -199,7 +199,7 @@ def local_delete_file(path: str):
         return False
 
 
-def local_md5sum(path: str):
+def rd_md5sum(path: str):
     """
     Get md5sum of a specific file on the local file system.
 
@@ -211,7 +211,7 @@ def local_md5sum(path: str):
         return hashlib.md5(f.read()).hexdigest()
 
 
-def local_stat_size(path: str):
+def rd_stat_size(path: str):
     """
     Get the size of a file or directory in bytes on the local file system.
 
@@ -222,7 +222,7 @@ def local_stat_size(path: str):
     return os.stat(path).st_size
 
 
-def local_isdir(path: str) -> bool:
+def rd_isdir(path: str) -> bool:
     """
     Test if directory exists on the local file system.
 
@@ -233,7 +233,7 @@ def local_isdir(path: str) -> bool:
     return os.path.isdir(path)
 
 
-def local_isfile(path: str) -> bool:
+def rd_isfile(path: str) -> bool:
     """
     Test if file exists on the local file system.
 
@@ -247,7 +247,7 @@ def local_isfile(path: str) -> bool:
     return os.path.isfile(path)
 
 
-def local_read_header(path: str):
+def rd_read_header(path: str):
     """
     Reads the first line of a file on the local file system.
 
@@ -259,7 +259,7 @@ def local_read_header(path: str):
         return f.readline()
 
 
-def local_write_string_to_file(content: bytes, path: str):
+def rd_write_string_to_file(content: bytes, path: str):
     """
     Writes a string into the specified file path on the local file system.
 
@@ -271,7 +271,7 @@ def local_write_string_to_file(content: bytes, path: str):
         f.write(content)
 
 
-def local_copy_file(src_path: str, dst_path: str):
+def rd_copy_file(src_path: str, dst_path: str):
     """
     Copies a file from src_path to dst_path on the local file system.
 
@@ -280,7 +280,7 @@ def local_copy_file(src_path: str, dst_path: str):
     shutil.copy(src_path, dst_path)
 
 
-def local_move_file(src_path: str, dst_path: str):
+def rd_move_file(src_path: str, dst_path: str):
     """Moves a file from src_path to dst_path on the local file system.
 
     Returns: None
@@ -288,7 +288,7 @@ def local_move_file(src_path: str, dst_path: str):
     shutil.move(src_path, dst_path)
 
 
-def local_list_files(path: str, ext: str = None, order: str = None):
+def rd_list_files(path: str, ext: str = None, order: str = None):
     """
     Lists all files in a directory on the local file system.
 
@@ -315,7 +315,7 @@ def local_list_files(path: str, ext: str = None, order: str = None):
     return files_in_dir
 
 
-def local_search_file(dir_path, ending):
+def rd_search_file(dir_path, ending):
     """Search for a file with a particular suffix in a directory on the local
         file system.
 

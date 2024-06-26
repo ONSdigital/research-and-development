@@ -8,8 +8,8 @@ import pytest
 import sys
 
 from src.utils.hdfs_mods import (
-    read_rd_csv,
-    write_rd_csv,
+    rd_read_csv,
+    rd_write_csv,
     rd_load_json,
     rd_file_exists,
     rd_file_size,
@@ -49,8 +49,8 @@ class TestReadCsv:
 
     @mock.patch("src.utils.hdfs_mods.pd")
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_read_rd_csv(self, mock_hdfs, mock_pd_csv):
-        """Test the expected functionality of read_rd_csv.
+    def test_rd_read_csv(self, mock_hdfs, mock_pd_csv):
+        """Test the expected functionality of rd_read_csv.
 
         Note:
             we pass the two patches defined above the function.
@@ -61,7 +61,7 @@ class TestReadCsv:
 
         mock_pd_csv.read_csv.return_value = self.input_data()
 
-        df_result = read_rd_csv("file/path/filename.csv")
+        df_result = rd_read_csv("file/path/filename.csv")
 
         # make sure function was called with mocked parameter in 'with open'
         mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
@@ -72,15 +72,15 @@ class TestReadCsv:
 
 class TestWriteCsv:
     @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_write_rd_csv(self, mock_hdfs):
-        """Test the expected functionality of write_rd_csv."""
+    def test_rd_write_csv(self, mock_hdfs):
+        """Test the expected functionality of rd_write_csv."""
 
         mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
 
         test_df = pd.DataFrame({"col": ["data"]})
 
         with mock.patch.object(test_df, "to_csv") as to_csv_mock:
-            write_rd_csv("file/path/filename.csv", test_df)
+            rd_write_csv("file/path/filename.csv", test_df)
             # make sure mocked data object was used inside 'with open'
             to_csv_mock.assert_called_with(sys.modules["mock_f"], index=False)
 

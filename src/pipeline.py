@@ -41,31 +41,11 @@ def run_pipeline(start, config_path):
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
     if network_or_hdfs == "network":
+        from src.utils import local_file_mods as mods
 
-        from src.utils.local_file_mods import load_local_json as load_json
-        from src.utils.local_file_mods import local_file_exists as check_file_exists
-        from src.utils.local_file_mods import local_mkdir as mkdir
-        from src.utils.local_file_mods import local_open as open_file
-        from src.utils.local_file_mods import read_local_csv as read_csv
-        from src.utils.local_file_mods import write_local_csv as write_csv
-        from src.utils.local_file_mods import local_isfile as isfile
-
-        # from src.utils.local_file_mods import local_file_exists as file_exists
-        from src.utils.local_file_mods import local_write_feather as write_feather
-        from src.utils.local_file_mods import local_read_feather as read_feather
     elif network_or_hdfs == "hdfs":
+        from src.utils import hdfs_mods as mods
 
-        from src.utils.hdfs_mods import hdfs_load_json as load_json
-        from src.utils.hdfs_mods import hdfs_file_exists as check_file_exists
-        from src.utils.hdfs_mods import hdfs_mkdir as mkdir
-        from src.utils.hdfs_mods import hdfs_open as open_file
-        from src.utils.hdfs_mods import read_hdfs_csv as read_csv
-        from src.utils.hdfs_mods import write_hdfs_csv as write_csv
-        from src.utils.hdfs_mods import hdfs_isfile as isfile
-
-        # from src.utils.hdfs_mods import hdfs_file_exists as file_exists
-        from src.utils.hdfs_mods import hdfs_write_feather as write_feather
-        from src.utils.hdfs_mods import hdfs_read_feather as read_feather
     else:
         MainLogger.error("The network_or_hdfs configuration is wrong")
         raise ImportError
@@ -73,7 +53,13 @@ def run_pipeline(start, config_path):
     # Set up the run logger
     global_config = config["global"]
     runlog_obj = runlog.RunLog(
-        config, version, open_file, check_file_exists, mkdir, read_csv, write_csv
+        config,
+        version,
+        mods.rd_open,
+        mods.rd_file_exists,
+        mods.rd_mkdir,
+        mods.rd_read_csv,
+        mods.rd_write_csv,
     )
 
     logger = logger_creator(global_config)
@@ -109,26 +95,28 @@ def run_pipeline(start, config_path):
         manual_trimming_df,
     ) = run_staging(
         config,
-        check_file_exists,
-        load_json,
-        read_csv,
-        write_csv,
-        read_feather,
-        write_feather,
-        isfile,
+        mods.rd_file_exists,
+        mods.rd_load_json,
+        mods.rd_read_csv,
+        mods.rd_write_csv,
+        mods.rd_read_feather,
+        mods.rd_write_feather,
+        mods.rd_isfile,
         run_id,
     )
     MainLogger.info("Finished Data Ingest.")
 
     # Northern Ireland staging and construction
     MainLogger.info("Starting NI module...")
-    ni_df = run_ni(config, check_file_exists, read_csv, write_csv, run_id)
+    ni_df = run_ni(
+        config, mods.rd_file_exists, mods.rd_read_csv, mods.rd_write_csv, run_id
+    )
     MainLogger.info("Finished NI Data Ingest.")
 
     # Construction module
     MainLogger.info("Starting Construction...")
     full_responses = run_construction(
-        full_responses, config, check_file_exists, read_csv
+        full_responses, config, mods.rd_file_exists, mods.rd_read_csv
     )
     MainLogger.info("Finished Construction...")
 
@@ -141,7 +129,7 @@ def run_pipeline(start, config_path):
         sic_pg_num,
         backdata,
         config,
-        write_csv,
+        mods.rd_write_csv,
         run_id,
     )
     MainLogger.info("Finished  Imputation...")
@@ -149,23 +137,33 @@ def run_pipeline(start, config_path):
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
     outliered_responses_df = run_outliers(
-        imputed_df, manual_outliers, config, write_csv, run_id
+        imputed_df, manual_outliers, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Outlier module.")
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
     estimated_responses_df, weighted_responses_df = run_estimation(
-        outliered_responses_df, cellno_df, config, write_csv, run_id
+        outliered_responses_df, cellno_df, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Apportionment to sites
     estimated_responses_df = run_site_apportionment(
-        estimated_responses_df, config, write_csv, run_id, "estimated", output_file=True
+        estimated_responses_df,
+        config,
+        mods.rd_write_csv,
+        run_id,
+        "estimated",
+        output_file=True,
     )
     weighted_responses_df = run_site_apportionment(
-        weighted_responses_df, config, write_csv, run_id, "weighted", output_file=True
+        weighted_responses_df,
+        config,
+        mods.rd_write_csv,
+        run_id,
+        "weighted",
+        output_file=True,
     )
     MainLogger.info("Finished Site Apportionment module.")
 
@@ -185,7 +183,7 @@ def run_pipeline(start, config_path):
         weighted_responses_df,
         ni_df,
         config,
-        write_csv,
+        mods.rd_write_csv,
         run_id,
         ultfoc_mapper,
         postcode_mapper,
