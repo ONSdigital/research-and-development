@@ -22,34 +22,6 @@ pytestmark = pytest.mark.runhdfs
 sys.modules["mock_f"] = mock.Mock()
 
 
-class TestReadCsv2:
-    """Tests for rd_read_csv function."""
-
-    @mock.patch("src.utils.hdfs_mods.hdfs.open")
-    @mock.patch("src.utils.hdfs_mods.pd.read_csv")
-    def test_rd_read_csv2(self, mock_read_csv, mock_open):
-        """Test the expected functionality of rd_read_csv."""
-        # Mock the hdfs.open function
-        mock_file = mock_open.return_value.__enter__.return_value
-
-        # Mock the pd.read_csv function
-        mock_df = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
-        mock_read_csv.return_value = mock_df
-
-        # Call the rd_read_csv function
-        filepath = "file/path/filename.csv"
-        df_result = rd_read_csv(filepath)
-
-        # Assert that hdfs.open was called with the correct filepath and mode
-        mock_open.assert_called_once_with(filepath, "r")
-
-        # Assert that pd.read_csv was called with the correct file object
-        mock_read_csv.assert_called_once_with(mock_file, thousands=",")
-
-        # Assert that the returned DataFrame is equal to the mocked DataFrame
-        pd.testing.assert_frame_equal(df_result, mock_df)
-
-
 class TestReadCsv:
     """Tests for rd_append function."""
 
