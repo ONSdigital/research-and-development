@@ -2,8 +2,7 @@
 import logging
 import pandas as pd
 from typing import Callable
-# import src.staging.staging_helpers as helpers
-# import src.mapping.mapping_helpers as val
+
 from src.mapping import mapping_helpers as hlp
 
 MappingMainLogger = logging.getLogger(__name__)
@@ -120,6 +119,6 @@ def run_mapping(
         ref_list_817_mapper = pd.DataFrame()
 
 
-    ## placeholder for running mapping
+    # placeholder for running mapping
 
-    return mapped_df
+    # return mapped_df
