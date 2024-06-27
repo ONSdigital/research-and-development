@@ -23,51 +23,79 @@ sys.modules["mock_f"] = mock.Mock()
 
 
 class TestReadCsv:
-    """Tests for rd_append function."""
+    """Tests for rd_read_csv function."""
 
-    def input_data(self):
+    @mock.patch("src.utils.hdfs_mods.hdfs.open")
+    @mock.patch("src.utils.hdfs_mods.pd.read_csv")
+    def test_rd_read_csv(self, mock_read_csv, mock_open):
+        """Test the expected functionality of rd_read_csv."""
+        # Mock the hdfs.open function
+        mock_file = mock_open.return_value.__enter__.return_value
 
-        data = {
-            "run_id": [1, 2],
-            "timestamp": ["Time:1", "Time:2"],
-            "version": ["0.0.0", "0.0.1"],
-            "duration": [5.0, 6.0],
-        }
+        # Mock the pd.read_csv function
+        mock_df = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
+        mock_read_csv.return_value = mock_df
 
-        return pd.DataFrame(data)
+        # Call the rd_read_csv function
+        filepath = "file/path/filename.csv"
+        df_result = rd_read_csv(filepath)
 
-    def expout_data(self):
+        # Assert that hdfs.open was called with the correct filepath and mode
+        mock_open.assert_called_once_with(filepath, "r")
 
-        data = {
-            "run_id": [1, 2],
-            "timestamp": ["Time:1", "Time:2"],
-            "version": ["0.0.0", "0.0.1"],
-            "duration": [5.0, 6.0],
-        }
+        # Assert that pd.read_csv was called with the correct file object
+        mock_read_csv.assert_called_once_with(mock_file, thousands=",")
 
-        return pd.DataFrame(data)
+        # Assert that the returned DataFrame is equal to the mocked DataFrame
+        pd.testing.assert_frame_equal(df_result, mock_df)
 
-    @mock.patch("src.utils.hdfs_mods.pd")
-    @mock.patch("src.utils.hdfs_mods.hdfs")
-    def test_rd_read_csv(self, mock_hdfs, mock_pd_csv):
-        """Test the expected functionality of rd_read_csv.
 
-        Note:
-            we pass the two patches defined above the function.
-            firstly, mock_hdfs which refers to the bottom decorator
-            secondly mock_pd_csv refers to the decorater above it.
-        """
-        mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
+# class TestReadCsv:
+#     """Tests for rd_append function."""
 
-        mock_pd_csv.read_csv.return_value = self.input_data()
+#     def input_data(self):
 
-        df_result = rd_read_csv("file/path/filename.csv")
+#         data = {
+#             "run_id": [1, 2],
+#             "timestamp": ["Time:1", "Time:2"],
+#             "version": ["0.0.0", "0.0.1"],
+#             "duration": [5.0, 6.0],
+#         }
 
-        # make sure function was called with mocked parameter in 'with open'
-        mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
+#         return pd.DataFrame(data)
 
-        df_expout = self.expout_data()
-        pd.testing.assert_frame_equal(df_result, df_expout)
+#     def expout_data(self):
+
+#         data = {
+#             "run_id": [1, 2],
+#             "timestamp": ["Time:1", "Time:2"],
+#             "version": ["0.0.0", "0.0.1"],
+#             "duration": [5.0, 6.0],
+#         }
+
+#         return pd.DataFrame(data)
+
+#     @mock.patch("src.utils.hdfs_mods.pd")
+#     @mock.patch("src.utils.hdfs_mods.hdfs")
+#     def test_rd_read_csv(self, mock_hdfs, mock_pd_csv):
+#         """Test the expected functionality of rd_read_csv.
+
+#         Note:
+#             we pass the two patches defined above the function.
+#             firstly, mock_hdfs which refers to the bottom decorator
+#             secondly mock_pd_csv refers to the decorater above it.
+#         """
+#         mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
+
+#         mock_pd_csv.read_csv.return_value = self.input_data()
+
+#         df_result = rd_read_csv("file/path/filename.csv")
+
+#         # make sure function was called with mocked parameter in 'with open'
+#         mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
+
+#         df_expout = self.expout_data()
+#         pd.testing.assert_frame_equal(df_result, df_expout)
 
 
 class TestWriteCsv:
