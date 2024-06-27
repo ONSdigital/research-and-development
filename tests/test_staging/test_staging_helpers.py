@@ -27,8 +27,8 @@ from src.utils.local_file_mods import (
     rd_file_exists as check_file_exists,
     rd_read_feather as read_feather,
     rd_write_feather as write_feather,
-    read_rd_csv as read_csv,
-    write_rd_csv as write_csv,
+    rd_read_csv as read_csv,
+    rd_write_csv as write_csv,
 )
 
 
