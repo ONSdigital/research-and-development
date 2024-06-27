@@ -22,12 +22,12 @@ pytestmark = pytest.mark.runhdfs
 sys.modules["mock_f"] = mock.Mock()
 
 
-class TestReadCsv:
+class TestReadCsv2:
     """Tests for rd_read_csv function."""
 
     @mock.patch("src.utils.hdfs_mods.hdfs.open")
     @mock.patch("src.utils.hdfs_mods.pd.read_csv")
-    def test_rd_read_csv(self, mock_read_csv, mock_open):
+    def test_rd_read_csv2(self, mock_read_csv, mock_open):
         """Test the expected functionality of rd_read_csv."""
         # Mock the hdfs.open function
         mock_file = mock_open.return_value.__enter__.return_value
@@ -50,52 +50,43 @@ class TestReadCsv:
         pd.testing.assert_frame_equal(df_result, mock_df)
 
 
-# class TestReadCsv:
-#     """Tests for rd_append function."""
+class TestReadCsv:
+    """Tests for rd_append function."""
 
-#     def input_data(self):
+    def mock_data(self):
 
-#         data = {
-#             "run_id": [1, 2],
-#             "timestamp": ["Time:1", "Time:2"],
-#             "version": ["0.0.0", "0.0.1"],
-#             "duration": [5.0, 6.0],
-#         }
+        data = {
+            "run_id": [1, 2],
+            "timestamp": ["Time:1", "Time:2"],
+            "version": ["0.0.0", "0.0.1"],
+            "duration": [5.0, 6.0],
+        }
 
-#         return pd.DataFrame(data)
+        return pd.DataFrame(data)
 
-#     def expout_data(self):
+    @mock.patch("src.utils.hdfs_mods.pd.read_csv")
+    @mock.patch("src.utils.hdfs_mods.hdfs.open")
+    def test_rd_read_csv(self, mock_open, mock_read_csv):
+        """Test the expected functionality of rd_read_csv.
 
-#         data = {
-#             "run_id": [1, 2],
-#             "timestamp": ["Time:1", "Time:2"],
-#             "version": ["0.0.0", "0.0.1"],
-#             "duration": [5.0, 6.0],
-#         }
+        Note:
+            we pass the two patches defined above the function.
+            firstly, mock_hdfs which refers to the bottom decorator
+            secondly mock_pd_csv refers to the decorater above it.
+        """
+        mock_file = mock_open.return_value.__enter__.return_value
+        mock_read_csv.return_value = self.mock_data()
 
-#         return pd.DataFrame(data)
+        # Call the rd_read_csv function
+        filepath = "file/path/filename.csv"
+        df_result = rd_read_csv(filepath)
 
-#     @mock.patch("src.utils.hdfs_mods.pd")
-#     @mock.patch("src.utils.hdfs_mods.hdfs")
-#     def test_rd_read_csv(self, mock_hdfs, mock_pd_csv):
-#         """Test the expected functionality of rd_read_csv.
+        # Assert that hdfs.open was called with the correct filepath and mode
+        mock_open.assert_called_once_with(filepath, "r")
 
-#         Note:
-#             we pass the two patches defined above the function.
-#             firstly, mock_hdfs which refers to the bottom decorator
-#             secondly mock_pd_csv refers to the decorater above it.
-#         """
-#         mock_hdfs.open.return_value.__enter__.return_value = sys.modules["mock_f"]
-
-#         mock_pd_csv.read_csv.return_value = self.input_data()
-
-#         df_result = rd_read_csv("file/path/filename.csv")
-
-#         # make sure function was called with mocked parameter in 'with open'
-#         mock_pd_csv.read_csv.assert_called_with(sys.modules["mock_f"])
-
-#         df_expout = self.expout_data()
-#         pd.testing.assert_frame_equal(df_result, df_expout)
+        # Assert that pd.read_csv was called with the correct file object
+        mock_read_csv.assert_called_once_with(mock_file, thousands=",")
+        pd.testing.assert_frame_equal(df_result, mock_read_csv)
 
 
 class TestWriteCsv:
@@ -110,7 +101,11 @@ class TestWriteCsv:
         with mock.patch.object(test_df, "to_csv") as to_csv_mock:
             rd_write_csv("file/path/filename.csv", test_df)
             # make sure mocked data object was used inside 'with open'
-            to_csv_mock.assert_called_with(sys.modules["mock_f"], index=False)
+            to_csv_mock.assert_called_with(
+                sys.modules["mock_f"],
+                date_format="%Y-%m-%d %H:%M:%S.%f+00",
+                index=False,
+            )
 
 
 class TestLoadJson:
