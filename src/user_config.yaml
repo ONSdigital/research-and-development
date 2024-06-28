@@ -3,13 +3,11 @@ config_validation:
   path: src/user_config_schema.yaml
 years:
   current_year: 2022
-  previous_years_to_load: 1
 global:
   # Staging and validation settings
   postcode_csv_check: False
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: True
-  load_historic_data: False
   # Construction Settings
   run_construction: False
   run_ni_construction: False
@@ -41,11 +39,10 @@ global:
   output_frozen_group: False
 hdfs_paths:
   # staging input paths
+  root: "/ons/rdbe_dev/"
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: ""
-  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
-  postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   feather_path: "/ons/rdbe_dev/staging/feather"
   history_path: "/ons/rdbe_dev/BERD_V7_Anonymised"
   # Imputation and outliers input paths
@@ -56,7 +53,11 @@ hdfs_paths:
   # Construction paths
   construction_file_path: ""
   construction_file_path_ni: ""
+  # postcode paths
+  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
+  postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   # mapper paths
+  mappers_version: "v1"
   ultfoc_mapper_path: "/ons/rdbe_dev/mappers/2023/BERD_2022_ultfoc_anon.csv"
   cellno_2022_path: "/ons/rdbe_dev/mappers/2023/berd_2022_cellno_coverage.csv"
   itl_mapper_path: "/ons/rdbe_dev/mappers/2023/itl.csv"
@@ -77,18 +78,6 @@ hdfs_paths:
   estimation_path:  "/ons/rdbe_dev/estimation"
   output_path:  "/ons/rdbe_dev/outputs"
   export_path: /ons/rdbe_dev/outgoing_export
-network_paths:
-  # output folder paths
-  staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
-  feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
-  staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
-  ni_staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/ni_staging_qa"
-  imputation_path:  "R:/BERD Results System Development 2023/DAP_emulation/imputation"
-  estimation_path:  "R:/BERD Results System Development 2023/DAP_emulation/estimation"
-  construction_path: "R:/BERD Results System Development 2023/DAP_emulation/construction"
-  apportionment_path:  "R:/BERD Results System Development 2023/DAP_emulation/apportionment"
-  output_path:  "R:/BERD Results System Development 2023/DAP_emulation/outputs"
-  export_path: "R:/BERD Results System Development 2023/DAP_emulation/outgoing_export"
 # Export config for users
 outliers:
   upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05

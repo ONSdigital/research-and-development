@@ -13,8 +13,8 @@ from typing import Callable, Tuple, Dict, Union
 from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import postcode_validation as pcval
-from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
+from src.staging import spp_snapshot_parser as spp_parser
 
 
 # Create logger for this module
@@ -199,47 +199,6 @@ def load_validate_mapper(
 
     # Return the loaded and validated DataFrame
     return mapper_df
-
-
-def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
-    """Load historic data into the pipeline.
-
-    Args:
-        config (dict): The pipeline configuration
-        paths (dict): The paths to the data files
-        read_csv (Callable): Function to read a csv file.
-            This will be the hdfs or network version depending on settings.
-
-    Returns:
-        dict: A dictionary of history data loaded into the pipeline.
-    """
-    curent_year = config["years"]["current_year"]
-    years_to_load = config["years"]["previous_years_to_load"]
-    years_gen = history_loader.history_years(curent_year, years_to_load)
-
-    if years_gen is None:
-        StagingHelperLogger.info("No historic data to load for this run.")
-        return {}
-    else:
-        StagingHelperLogger.info("Loading historic data...")
-        history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(
-            years_gen, history_path, read_csv
-        )
-        # Check if it has loaded and is not empty
-        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-            StagingHelperLogger.info(
-                "Dictionary of history data: %s loaded into pipeline",
-                ", ".join(dict_of_hist_dfs),
-            )
-            StagingHelperLogger.info("Historic data loaded.")
-        else:
-            StagingHelperLogger.warning(
-                "Problem loading historic data. Dict may be empty or not present"
-            )
-            raise Exception("The historic data did not load")
-
-    return dict_of_hist_dfs if dict_of_hist_dfs else {}
 
 
 def check_snapshot_feather_exists(

@@ -60,14 +60,22 @@ def run_staging(  # noqa: C901
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
+    # get the survey year variable
+    year = config["global"]["survey_year"]
 
-    # Conditionally load paths
+    # dictionaries from the config
     paths = config[f"{network_or_hdfs}_paths"]
-    snapshot_path = paths["snapshot_path"]
+    qa_folders = config["qa_folders"]
+
+    root_path = f"{paths['root']}/survey_{year}/BERD"
+    mapper_path = f"{root_path}/mappers/{paths['mappers_version']}"
+    staging_folder = f"{root_path}/{config['modules']['staging']}"
+
+    snapshot_path = f"{root_path}/{paths['snapshot_path']}"
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-    feather_path = paths["feather_path"]
+    feather_path = f"{staging_folder}/{qa_folders['feather']}"
     feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
     secondary_feather_file = os.path.join(
         feather_path, f"{secondary_snapshot_name}.feather"
@@ -77,11 +85,6 @@ def run_staging(  # noqa: C901
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
-
-    # Load historic data
-    if config["global"]["load_historic_data"]:
-        dict_of_hist_dfs = helpers.load_historic_data(config, paths, read_csv)
-        print(dict_of_hist_dfs)
 
     # Check if the if the snapshot feather and optionally the secondary
     # snapshot feather exist
