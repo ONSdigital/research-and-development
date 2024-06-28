@@ -53,12 +53,12 @@ def test_sic_mapper(sic_dummy_data, sic_expected_output, sic_mapper):
     expected_output_data = sic_expected_output
 
     df_result = sic_to_pg_mapper(
-        sic_dummy_data, 
+        sic_dummy_data,
         sic_mapper,
         pg_column="201",
         from_col="sic",
         to_col="pg",
-        )
+    )
 
     pd.testing.assert_frame_equal(df_result, expected_output_data)
 
@@ -86,11 +86,7 @@ def mapper():
 def test_pg_to_pg_mapper_with_many_to_one(mapper):
 
     columns = ["formtype", "201", "other_col"]
-    row_data = [
-        ["0001", 45, "2020"], 
-        ["0001", 49, "2020"], 
-        ["0002", 50, "2020"]
-    ]
+    row_data = [["0001", 45, "2020"], ["0001", 49, "2020"], ["0002", 50, "2020"]]
 
     test_df = pd.DataFrame(row_data, columns=columns)
 
@@ -99,7 +95,7 @@ def test_pg_to_pg_mapper_with_many_to_one(mapper):
     expected_data = [
         ["0001", "AC", "2020", 45],
         ["0001", "AD", "2020", 49],
-        ["0002", "AD", "2020", 50]
+        ["0002", "AD", "2020", 50],
     ]
 
     type_dict = {"201": "category", "pg_numeric": "category"}
@@ -114,7 +110,7 @@ def test_pg_to_pg_mapper_with_many_to_one(mapper):
 
 
 def test_pg_to_pg_mapper_success(mapper):
-    columns = ["formtype", "201", "other_col"] 
+    columns = ["formtype", "201", "other_col"]
     row_data = [
         ["0001", 36, "2020"],
         ["0001", 45, "2020"],
@@ -132,8 +128,7 @@ def test_pg_to_pg_mapper_success(mapper):
         ["0001", "AD", "2020", 49],
     ]
 
-    expected_result_df = pd.DataFrame(
-        expected_data, columns=expected_columns)
+    expected_result_df = pd.DataFrame(expected_data, columns=expected_columns)
 
     type_dict = {"201": "category", "pg_numeric": "category"}
     expected_result_df = expected_result_df.astype(type_dict)

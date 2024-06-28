@@ -21,7 +21,7 @@ def run_mapping(
     read_feather: Callable,
     write_feather: Callable,
     isfile: Callable,
-    ):
+):
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -108,6 +108,5 @@ def run_mapping(
     full_responses = join_cellno_mapper(full_responses, cellno_df)
 
     # placeholder for running mapping
-    
 
     # return mapped_df
