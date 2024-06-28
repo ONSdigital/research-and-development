@@ -4,13 +4,14 @@ import json
 import os
 import pandas as pd
 import logging
-from typing import List
+import pathlib
 import hashlib
 import shutil
+from typing import List, Union
 
+import yaml
 
 from src.utils.wrappers import time_logger_wrap
-
 
 # Set up logger
 lfmod_logger = logging.getLogger(__name__)
@@ -334,3 +335,28 @@ def local_search_file(dir_path, ending):
                 target_file = str(file)
 
     return target_file
+
+
+def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
+    """Load a .yaml file from a path.
+
+    Args:
+        path (Union[str, pathlib.Path]): The path to load the .yaml file from.
+
+    Raises:
+        FileNotFoundError: Raised if there is no file at the given path.
+        TypeError: Raised if the file does not have the .yaml extension.
+
+    Returns:
+        dict: The loaded yaml file as as dictionary.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Attempted to load yaml at: {path}. File does not exist."
+        )
+    ext = os.path.splitext(path)[1]
+    if ext != ".yaml":
+        raise TypeError(f"Expected a .yaml file. Got {ext}")
+    with open(path, "r") as f:
+        yaml_dict = yaml.safe_load(f)
+    return yaml_dict

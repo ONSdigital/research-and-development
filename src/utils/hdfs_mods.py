@@ -5,9 +5,12 @@
 import pandas as pd
 import json
 import logging
-from typing import List
 import subprocess
 import os
+import pathlib
+from typing import List, Union
+
+import yaml
 
 from src.utils.wrappers import time_logger_wrap
 
@@ -369,3 +372,25 @@ def hdfs_search_file(dir_path, ending):
     target_file = target_file.split()[-1]
 
     return target_file
+
+
+def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
+    """Load a .yaml file from a path.
+
+    Args:
+        path (Union[str, pathlib.Path]): The path to load the .yaml file from.
+
+    Raises:
+        FileNotFoundError: Raised if there is no file at the given path.
+        TypeError: Raised if the file does not have the .yaml extension.
+
+    Returns:
+        dict: The loaded yaml file as as dictionary.
+    """
+    check_file_exists(path)
+    ext = os.path.splitext(path)[1]
+    if ext != ".yaml":
+        raise TypeError(f"Expected a .yaml file. Got {ext}")
+    with hdfs.open(path, "r") as f:
+        yaml_dict = yaml.safe_load(f)
+    return yaml_dict

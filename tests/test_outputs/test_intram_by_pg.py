@@ -10,12 +10,12 @@ import pandas as pd
 
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
+from src.utils.config import safeload_yaml, merge_configs
 from tests.test_outputs.conftest import read_config
 
-# read config file
-config = read_config()
 
 # Assign config values to paths
+config = read_config()
 LOCATION = config["global"]["network_or_hdfs"]
 PATHS = config[f"{LOCATION}_paths"]
 

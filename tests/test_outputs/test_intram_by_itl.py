@@ -1,4 +1,4 @@
-"""Tests fpr intram_by_itl.py."""
+"""Tests for intram_by_itl.py."""
 # Standard Library Imports
 import pytest
 import os
