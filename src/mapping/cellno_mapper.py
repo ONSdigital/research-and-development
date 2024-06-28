@@ -2,6 +2,7 @@
 import pandas as pd
 
 
+# TODO: this dict function won't be needed, it's the old method for reference.
 def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
     """To creted dictioanry from The berd_2022_cellno_coverage.xlsx
     going to be use for mapping
@@ -23,3 +24,19 @@ def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
     cell_unit_dict = cellno_df.set_index("cell_no").to_dict()["UNI_Count"]
 
     return cell_unit_dict
+
+
+def join_cellno_mapper(df: pd.DataFrame, cellno_df: pd.DataFrame) -> pd.DataFrame:
+    """Add a column for universe count to shortfrom responses, joining on cellnumber."""
+    mapper = cellno_df.copy()[["cell_no", "UNI_Count"]]
+    mapper = mapper.rename(columns={"UNI_Count", "uni_count"})
+
+    # condition for shorot form responses
+    sf_cond = df[df.formtype == "0006"]
+
+    # merge the mapper to the dataframe
+    df.loc[sf_cond] = df.loc[sf_cond].merge(
+        cellno_df, left_on="cellnumber", right_on="cell_no"
+    )
+
+    return df

@@ -1,6 +1,6 @@
 """Test for cellno mapper function"""
 import pandas as pd
-from src.estimation.cellno_mapper import cellno_unit_dict
+from src.mapping.cellno_mapper import cellno_unit_dict
 
 
 # testing cellno_unit_dict

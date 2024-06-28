@@ -31,7 +31,7 @@ def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
 
 
 def calculate_weighting_factor(
-    df: pd.DataFrame, cellno_dict: dict, exp_col: str = "709"
+    df: pd.DataFrame, exp_col: str = "709"
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Calculate the weighting factor 'a' for each cell in the survery data
 
@@ -83,12 +83,12 @@ def calculate_weighting_factor(
     # Create small QA dataframe
 
     qa_frame = {
-            "cellnumber": [],
-            "N": [],
-            "n": [],
-            "outliers": [],
-            "a_weight": [],
-        }
+        "cellnumber": [],
+        "N": [],
+        "n": [],
+        "outliers": [],
+        "a_weight": [],
+    }
 
     # Group by cell number
     grouped_by_cell = filtered_df.groupby("cellnumber")
@@ -97,7 +97,8 @@ def calculate_weighting_factor(
     for cell_number, cell_group in grouped_by_cell:
 
         # Get N from cellno_dict
-        N = cellno_dict[cell_number]
+        # N = cellno_dict[cell_number]
+        N = cell_group["uni_count"].first()
 
         # Get lower n
         n = calc_lower_n(cell_group)
@@ -118,10 +119,10 @@ def calculate_weighting_factor(
         # Save the relevant estimation info for QA seperately.
         qa_list = [
             float(cell_number),
-            float(N), 
+            float(N),
             float(n),
-            float(outlier_count), 
-            a_weight
+            float(outlier_count),
+            a_weight,
         ]
         for col, val in zip(list(qa_frame.keys()), qa_list):
             qa_frame[col].append(val)
