@@ -130,7 +130,6 @@ class TestCheckSnapshotFeatherExists(object):
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
 
-
     @pytest.mark.parametrize(
         "first, second, check_both, result",
         (
@@ -199,9 +198,7 @@ class TestDfToFeather(object):
     @pytest.fixture(scope="function")
     def f1(self):
         """Snapshot 1 test data."""
-        f1 = pd.DataFrame(
-            {"f1": [1]}
-        )
+        f1 = pd.DataFrame({"f1": [1]})
         return f1
 
     def test_df_to_feather_defences(self, tmp_path, f1):
@@ -210,19 +207,9 @@ class TestDfToFeather(object):
         fake_path = "test_test/test/this_is_a_test"
         match = rf"The passed directory.*{fake_path}.*"
         with pytest.raises(FileNotFoundError, match=match):
-            df_to_feather(
-                fake_path,
-                "test",
-                f1,
-                write_feather
-            )
+            df_to_feather(fake_path, "test", f1, write_feather)
         # test raise for file already exists
-        df_to_feather(
-            tmp_path,
-            "test",
-            f1,
-            write_feather
-        )
+        df_to_feather(tmp_path, "test", f1, write_feather)
         match = r"File already saved at .*"
         with pytest.raises(FileExistsError, match=match):
             df_to_feather(
@@ -243,9 +230,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test.feather")), (
-            "Feather not saved out correctly."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test.feather")
+        ), "Feather not saved out correctly."
         # save without .feather extension passed
         df_to_feather(
             tmp_path,
@@ -254,9 +241,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test2.feather")), (
-            ".feather. extension not applied to path."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test2.feather")
+        ), ".feather. extension not applied to path."
         # test with overwrite=True
         # using try/except since nullcontext not supported in python=3.6
         try:
@@ -277,10 +264,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test3.test.feather")), (
-            ".feather. extension not applied when another extension exists."
-        )
-
+        assert os.path.exists(
+            os.path.join(tmp_path, "test3.test.feather")
+        ), ".feather. extension not applied when another extension exists."
 
 
 class TestStageValidateHarmonisePostcodes(object):
@@ -367,7 +353,6 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-
 
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""

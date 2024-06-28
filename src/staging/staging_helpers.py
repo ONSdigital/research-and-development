@@ -52,7 +52,6 @@ def fix_anon_data(responses_df, config):
     return responses_df
 
 
-
 def getmappername(mapper_path_key, split):
     """
     Extracts the mapper name from a given path key.
@@ -295,7 +294,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
 
 def load_validate_secondary_snapshot(
-        load_json, secondary_snapshot_path, config, network_or_hdfs
+    load_json, secondary_snapshot_path, config, network_or_hdfs
 ):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
@@ -352,11 +351,11 @@ def load_validate_secondary_snapshot(
 
 
 def df_to_feather(
-        dir: Union[pathlib.Path, str],
-        save_name: str,
-        df: pd.DataFrame,
-        write_feather: Callable,
-        overwrite: bool = True
+    dir: Union[pathlib.Path, str],
+    save_name: str,
+    df: pd.DataFrame,
+    write_feather: Callable,
+    overwrite: bool = True,
 ) -> None:
     """_summary_
 

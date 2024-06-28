@@ -147,19 +147,14 @@ def run_staging(
             feather_fname = f"{snapshot_name}_corrected.feather"
             s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
-                feather_path,
-                feather_fname,
-                full_responses,
-                write_feather
-
+                feather_path, feather_fname, full_responses, write_feather
             )
             if secondary_full_responses is not None:
                 helpers.df_to_feather(
                     feather_path,
                     s_feather_fname,
                     secondary_full_responses,
-                    write_feather
-
+                    write_feather,
                 )
 
     # Flag invalid records
@@ -205,7 +200,6 @@ def run_staging(
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
-
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
@@ -222,7 +216,6 @@ def run_staging(
     else:
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
-
 
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(

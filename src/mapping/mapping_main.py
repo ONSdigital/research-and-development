@@ -1,4 +1,4 @@
-"""The main file for the staging and validation module."""
+"""The main file for the mapping module."""
 import logging
 import pandas as pd
 from typing import Callable
@@ -20,7 +20,7 @@ def run_mapping(
     read_feather: Callable,
     write_feather: Callable,
     isfile: Callable,
-    ):
+):
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -119,7 +119,6 @@ def run_mapping(
     else:
         MappingMainLogger.info("Skipping loding the reference list mapper File.")
         ref_list_817_mapper = pd.DataFrame()
-
 
     # placeholder for running mapping
 

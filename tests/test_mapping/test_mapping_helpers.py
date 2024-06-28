@@ -5,6 +5,7 @@ import numpy as np
 # Local Imports
 from src.mapping.mapping_helpers import update_ref_list
 
+
 class TestUpdateRefList(object):
     """Tests for update_ref_list."""
 
@@ -31,7 +32,6 @@ class TestUpdateRefList(object):
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
-
 
     @pytest.fixture(scope="function")
     def expected_output(self):
@@ -61,4 +61,3 @@ class TestUpdateRefList(object):
         error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
-
