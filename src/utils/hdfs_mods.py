@@ -1,5 +1,11 @@
 """All general functions for the hdfs file system which uses PyDoop.
     These functions will need to be tested separately, using mocking.
+
+    NOTE: these functions used to be name-spaced with the prefix 'hdfs_',
+    but these have now been updated to 'rd_' representing "R and D".
+    This is so that the corresponding functions in the local_file_mods.py file, which
+    are used when running code locally (or on the network), can be imported with the
+    same name.
 """
 
 import pandas as pd
@@ -17,16 +23,16 @@ from src.utils.wrappers import time_logger_wrap
 try:
     import pydoop.hdfs as hdfs
 
-    # from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
+    # from src.utils.rd_mods import rd_read_csv, rd_write_csv
     HDFS_AVAILABLE = True
 except ImportError:
     HDFS_AVAILABLE = False
 
 # set up logging
-hdfs_logger = logging.getLogger(__name__)
+rd_logger = logging.getLogger(__name__)
 
 
-def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from DAP into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
@@ -43,13 +49,13 @@ def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
             try:
                 df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
-                hdfs_logger.error(f"Could not find specified columns in {filepath}")
-                hdfs_logger.info("Columns specified: " + str(cols))
+                rd_logger.error(f"Could not find specified columns in {filepath}")
+                rd_logger.info("Columns specified: " + str(cols))
                 raise ValueError
     return df_from_hdfs
 
 
-def write_hdfs_csv(filepath: str, data: pd.DataFrame):
+def rd_write_csv(filepath: str, data: pd.DataFrame):
     """Writes a Pandas Dataframe to csv in DAP
 
     Args:
@@ -63,7 +69,7 @@ def write_hdfs_csv(filepath: str, data: pd.DataFrame):
     return None
 
 
-def hdfs_load_json(filepath: str) -> dict:
+def rd_load_json(filepath: str) -> dict:
     """Function to load JSON data from DAP
     Args:
         filepath (string): The filepath in Hue
@@ -77,7 +83,7 @@ def hdfs_load_json(filepath: str) -> dict:
     return datadict
 
 
-def hdfs_file_exists(filepath: str, raise_error=False) -> bool:
+def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check file exists in hdfs.
 
         Args:
@@ -96,7 +102,7 @@ def hdfs_file_exists(filepath: str, raise_error=False) -> bool:
     return file_exists
 
 
-def hdfs_file_size(filepath: str) -> int:
+def rd_file_size(filepath: str) -> int:
     """Function to check the size of a file on hdfs.
 
     Args:
@@ -126,27 +132,27 @@ def check_file_exists(filepath) -> bool:
     """
     output = False
 
-    file_exists = hdfs_file_exists(filepath)
+    file_exists = rd_file_exists(filepath)
 
     # If the file exists on hdfs, check the size of it.
     if file_exists:
-        file_size = hdfs_file_size(filepath)
+        file_size = rd_file_size(filepath)
 
     if not file_exists:
         raise FileNotFoundError(f"File {filepath} does not exist.")
 
     if file_exists and file_size > 0:
         output = True
-        hdfs_logger.info(f"File {filepath} exists and is non-empty")
+        rd_logger.info(f"File {filepath} exists and is non-empty")
 
     elif file_exists and file_size == 0:
         output = False
-        hdfs_logger.warning(f"File {filepath} exists on HDFS but is empty")
+        rd_logger.warning(f"File {filepath} exists on HDFS but is empty")
 
     return output
 
 
-def hdfs_mkdir(path):
+def rd_mkdir(path):
     """Function to create a directory in HDFS
 
     Args:
@@ -156,7 +162,7 @@ def hdfs_mkdir(path):
     return None
 
 
-def hdfs_open(filepath, mode):
+def rd_open(filepath, mode):
     """Function to open a file in HDFS
 
     Args:
@@ -168,23 +174,23 @@ def hdfs_open(filepath, mode):
 
 
 @time_logger_wrap
-def hdfs_write_feather(filepath, df):
+def rd_write_feather(filepath, df):
     """Function to write dataframe as feather file in HDFS"""
     with hdfs.open(filepath, "wb") as file:
         df.to_feather(file)
     # Check log written to feather
-    hdfs_logger.info(f"Dataframe written to {filepath} as feather file")
+    rd_logger.info(f"Dataframe written to {filepath} as feather file")
 
     return True
 
 
 @time_logger_wrap
-def hdfs_read_feather(filepath):
+def rd_read_feather(filepath):
     """Function to read feather file from HDFS"""
     with hdfs.open(filepath, "rb") as file:
         df = pd.read_feather(file)
     # Check log written to feather
-    hdfs_logger.info(f"Dataframe read from {filepath} as feather file")
+    rd_logger.info(f"Dataframe read from {filepath} as feather file")
 
     return df
 
@@ -224,7 +230,7 @@ def _perform(
     return process.returncode == 0
 
 
-def hdfs_delete_file(path: str):
+def rd_delete_file(path: str):
     """
     Delete a file. Uses 'hadoop fs -rm'.
 
@@ -236,7 +242,7 @@ def hdfs_delete_file(path: str):
     return _perform(command)
 
 
-def hdfs_md5sum(path: str):
+def rd_md5sum(path: str):
     """
     Get md5sum of a specific file on HDFS.
     """
@@ -248,7 +254,7 @@ def hdfs_md5sum(path: str):
     ).split(" ")[0]
 
 
-def hdfs_stat_size(path: str):
+def rd_stat_size(path: str):
     """
     Runs stat command on a file or directory to get the size in bytes.
     """
@@ -256,7 +262,7 @@ def hdfs_stat_size(path: str):
     return _perform(command, str_output=True).split(" ")[0]
 
 
-def hdfs_isdir(path: str) -> bool:
+def rd_isdir(path: str) -> bool:
     """
     Test if directory exists. Uses 'hadoop fs -test -d'.
 
@@ -268,7 +274,7 @@ def hdfs_isdir(path: str) -> bool:
     return _perform(command)
 
 
-def hdfs_isfile(path: str) -> bool:
+def rd_isfile(path: str) -> bool:
     """
     Test if file exists. Uses 'hadoop fs -test -f.
 
@@ -288,7 +294,7 @@ def hdfs_isfile(path: str) -> bool:
     return _perform(command)
 
 
-def hdfs_read_header(path: str):
+def rd_read_header(path: str):
     """
     Reads the first line of a file on HDFS
     """
@@ -300,7 +306,7 @@ def hdfs_read_header(path: str):
     )
 
 
-def hdfs_write_string_to_file(content: bytes, path: str):
+def rd_write_string_to_file(content: bytes, path: str):
     """
     Writes a string into the specified file path
     """
@@ -310,7 +316,7 @@ def hdfs_write_string_to_file(content: bytes, path: str):
     return _write_string_to_file.communicate(content)
 
 
-def hdfs_copy_file(src_path: str, dst_path: str):
+def rd_copy_file(src_path: str, dst_path: str):
     """
     Copy a file from one location to another. Uses 'hadoop fs -cp'.
     """
@@ -318,7 +324,7 @@ def hdfs_copy_file(src_path: str, dst_path: str):
     return _perform(command)
 
 
-def hdfs_move_file(src_path: str, dst_path: str):
+def rd_move_file(src_path: str, dst_path: str):
     """
     Move a file from one location to another. Uses 'hadoop fs -mv'.
     """
@@ -326,7 +332,7 @@ def hdfs_move_file(src_path: str, dst_path: str):
     return _perform(command)
 
 
-def hdfs_list_files(path: str, ext: str = None, order=None):
+def rd_list_files(path: str, ext: str = None, order=None):
     """
     List files in a directory. Uses 'hadoop fs -ls'.
     """
@@ -348,7 +354,7 @@ def hdfs_list_files(path: str, ext: str = None, order=None):
     return file_paths
 
 
-def hdfs_search_file(dir_path, ending):
+def rd_search_file(dir_path, ending):
     """Find a file in a directory with a specific ending using grep and hadoop fs -ls.
 
     Args:
