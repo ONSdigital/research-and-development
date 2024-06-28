@@ -28,10 +28,10 @@ def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df = pd.read_csv(file, thousands=',')
+            df = pd.read_csv(file, thousands=",")
         else:
             try:
-                df = pd.read_csv(file, usecols=cols, thousands=',')
+                df = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
                 lfmod_logger.error(f"Could not find specified columns in {filepath}")
                 lfmod_logger.info("Columns specified: " + str(cols))

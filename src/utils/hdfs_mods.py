@@ -35,10 +35,10 @@ def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df_from_hdfs = pd.read_csv(file, thousands=',')
+            df_from_hdfs = pd.read_csv(file, thousands=",")
         else:
             try:
-                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=',')
+                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
                 hdfs_logger.error(f"Could not find specified columns in {filepath}")
                 hdfs_logger.info("Columns specified: " + str(cols))

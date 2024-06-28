@@ -51,10 +51,12 @@ def check_data_shape(
 
     Keyword Arguments:
         data_df(pd.DataFrame): Pandas dataframe containing data to be checked.
-        contributor_schema(str): Path to the schema toml (should be in config folder)
-        wide_respon_schema(str): Path to the schema toml (should be in config folder)
+        contributor_schema(str): Path to the schema toml
+            (should be in config folder)
+        wide_respon_schema(str): Path to the schema toml
+            (should be in config folder)
     Returns:
-        A bool: boolean, True if number of columns is as expected, otherwise False
+        bool: True if number of columns is as expected, otherwise False
     """
     if not isinstance(data_df, pd.DataFrame):
         raise ValueError(
@@ -81,10 +83,10 @@ def check_data_shape(
     # Compare length of data dictionary to the data schema
     if len(df_cols_set) == len(schema_full_col_set):
         cols_match = True
-        ValidationLogger.info(f"Data columns match schema.")
+        ValidationLogger.info("Data columns match schema.")
     else:
         cols_match = False
-        ValidationLogger.warning(f"Data columns do not match schema.")
+        ValidationLogger.warning("Data columns do not match schema.")
         missing_file_cols = (
             f"Missing from dataframe: {schema_full_col_set - df_cols_set}"
         )
@@ -92,18 +94,19 @@ def check_data_shape(
         ValidationLogger.warning(missing_file_cols)
         ValidationLogger.warning(missing_df_cols)
         if raise_error:
-            raise ColumnMismatch(
-                "Error: The number of columns do not match. Halted"
+            raise ColumnMismatch(  # noqa: F821
+                "Error: The the number of columns do not match. Halted"
             )
 
     ValidationLogger.info(
-        f"Length of data: {len(df_cols_set)}. Length of schema: {len(schema_full_col_set)}"
+        f"Length of data: {len(df_cols_set)}. Length of schema: "
+        f"{len(schema_full_col_set)}"
     )
 
     return cols_match
 
 
-@time_logger_wrap
+@time_logger_wrap  # noqa: C901
 def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
     """Takes the schema from the toml file and validates the survey data df.
 
@@ -151,7 +154,8 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                     )
                 except TypeError:
                     raise TypeError(
-                        f"Failed to convert column '{column}' to datetime. Please check the data."
+                        f"Failed to convert column '{column}' to datetime. Please check"
+                        " the data."
                     )
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
@@ -267,21 +271,26 @@ def validate_many_to_one(*args) -> pd.DataFrame:
     Validates a many-to-one mapper DataFrame.
 
     This function performs the following checks:
-    1. Checks if the mapper has two specified columns, referred to as 'col_many' and 'col_one'.
+    1. Checks if the mapper has two specified columns, referred to as 'col_many' and
+        'col_one'.
     2. Selects and deduplicates 'col_many' and 'col_one'.
-    3. Checks that for each entry in 'col_many' there is exactly one corresponding entry in 'col_one'.
+    3. Checks that for each entry in 'col_many' there is exactly one corresponding
+        entry in 'col_one'.
 
     Args:
-        *args: Variable length argument list. It should contain the following items in order:
+        *args: Variable length argument list. It should contain the following items
+            in order:
             - df (pd.DataFrame): The input mapper DataFrame.
             - col_many (str): The name of the column with many entries.
             - col_one (str): The name of the column with one entry.
 
     Returns:
-        pd.DataFrame: The validated mapper DataFrame with deduplicated 'col_many' and 'col_one' columns.
+        pd.DataFrame: The validated mapper DataFrame with deduplicated 'col_many' and
+            'col_one' columns.
 
     Raises:
-        ValueError: If the mapper does not have the 'col_many' and 'col_one' columns, or if there are multiple entries in 'col_one' for any entry in 'col_many'.
+        ValueError: If the mapper does not have the 'col_many' and 'col_one' columns,
+            or if there are multiple entries in 'col_one' for any entry in 'col_many'.
     """
 
     mapper = args[0]
@@ -359,7 +368,8 @@ def validate_cora_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def flag_no_rand_spenders(df, raise_or_warn):
     """
-    Flags any records that answer "No" to "604" and also report their expenditure in "211" as more than 0.
+    Flags any records that answer "No" to "604" and also report their expenditure in
+    "211" as more than 0.
 
     Parameters:
     df (pandas.DataFrame): The input DataFrame.

@@ -24,7 +24,7 @@ from src.outputs.total_fte import qa_output_total_fte
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def run_outputs(
+def run_outputs(  # noqa: C901
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
@@ -138,9 +138,7 @@ def run_outputs(
     # Running NI SAS output
     if config["global"]["output_ni_sas"]:
         if not config["global"]["load_ni_data"]:
-            OutputMainLogger.info(
-                "Skipping NI SAS output as NI data is NOT loaded..."
-            )
+            OutputMainLogger.info("Skipping NI SAS output as NI data is NOT loaded...")
         else:
             OutputMainLogger.info("Starting NI SAS output...")
             output_ni_sas(
@@ -167,12 +165,7 @@ def run_outputs(
     if config["global"]["output_intram_by_pg_uk"]:
         OutputMainLogger.info("Starting Intram by PG (UK) output...")
         output_intram_by_pg(
-            outputs_df,
-            pg_detailed,
-            config,
-            write_csv,
-            run_id,
-            ni_full_responses
+            outputs_df, pg_detailed, config, write_csv, run_id, ni_full_responses
         )
         OutputMainLogger.info("Finished Intram by PG (UK) output.")
 

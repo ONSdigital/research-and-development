@@ -244,11 +244,13 @@ def calculate_links(gr_df, target_vars, config):
 def get_threshold_value(config: dict) -> int:
     """Read, validate and return threshold value from the config."""
     threshold_num = config["imputation"]["mor_threshold"]
-    if (type(threshold_num) == int) & (threshold_num >=0):
+    if (type(threshold_num) == int) & (threshold_num >= 0):
         return threshold_num
     else:
-        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
-                        "of the config must be zero or a positive integer.")
+        raise Exception(
+            "The variable 'mor_threshold' in the 'imputation' section "
+            "of the config must be zero or a positive integer."
+        )
 
 
 def group_calc_link(group, target_vars, config):
