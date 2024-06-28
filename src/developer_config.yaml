@@ -15,7 +15,7 @@ global:
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: True  # whether to load previous year data for MoR
+  load_backdata: False  # whether to load previous year data for MoR
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Apportionment to sites settings
@@ -30,19 +30,19 @@ global:
   output_apportionment_qa: False
   output_long_form: False
   output_short_form: False
-  output_gb_sas: True
-  output_ni_sas: True
-  output_tau: True
-  output_intram_by_pg_gb: True
-  output_intram_by_pg_uk: True
-  output_intram_uk_itl: True
-  output_intram_gb_itl: True
-  output_intram_by_civil_defence: True
-  output_intram_by_sic: True
-  output_fte_total_qa: True
-  output_status_filtered: True
-  output_frozen_group: True
-years: 
+  output_gb_sas: False
+  output_ni_sas: False
+  output_tau: False
+  output_intram_by_pg_gb: False
+  output_intram_by_pg_uk: False
+  output_intram_uk_itl: False
+  output_intram_gb_itl: False
+  output_intram_by_civil_defence: False
+  output_intram_by_sic: False
+  output_fte_total_qa: False
+  output_status_filtered: False
+  output_frozen_group: False
+years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
 runlog_writer:

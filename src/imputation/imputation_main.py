@@ -52,9 +52,7 @@ def run_imputation(
         pd.DataFrame: dataframe with the imputed columns updated
     """
     # Carry out product group conversion
-    df = run_pg_conversion(
-        df, pg_num_alpha, sic_pg_num, pg_column="201"
-    )
+    df = run_pg_conversion(df, pg_num_alpha, sic_pg_num, pg_column="201")
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
@@ -108,7 +106,7 @@ def run_imputation(
                 backdata,
                 pg_num_alpha,
                 pg_column="q201",
-                from_col= "pg_numeric",
+                from_col="pg_numeric",
                 to_col="pg_alpha",
             )
             backdata = backdata.drop("pg_numeric", axis=1)
@@ -158,10 +156,11 @@ def run_imputation(
         schema_dict = load_schema(schema_path)
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
-        write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
         write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
+        if config["global"]["load_backdata"]:
+            write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe
@@ -171,7 +170,7 @@ def run_imputation(
         ImputationMainLogger,
         to_impute_cols,
         write_csv,
-        run_id, 
+        run_id,
     )
-    
+
     return imputed_df
