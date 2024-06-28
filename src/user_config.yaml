@@ -15,7 +15,7 @@ global:
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: True  # whether to load previous year data for MoR
+  load_backdata: False  # whether to load previous year data for MoR
   # QA output settings
   output_full_responses: False
   output_ni_full_responses: False
