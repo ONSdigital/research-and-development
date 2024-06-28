@@ -165,7 +165,7 @@ def get_username():
 
     Returns:
         str: The username of the currently logged-in user, or "unknown" if the username
-        cannot be determined.
+            cannot be determined.
     """
     # Get the user's username
     username = getpass.getuser()

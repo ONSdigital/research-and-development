@@ -31,7 +31,6 @@ def output_ni_sas(
         postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
 
     """
-
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]

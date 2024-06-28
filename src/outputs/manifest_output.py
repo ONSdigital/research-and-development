@@ -103,20 +103,16 @@ class Manifest:
         """
         if "outputs" not in str(relative_file_path):
             raise ManifestError(
-                (
-                    f"""File must be in a subdirectory of the outgoing directory:
+                f"""File must be in a subdirectory of the outgoing directory:
                     {relative_file_path}"""
-                )
             )
 
         absolute_file_path = os.path.join(self.outgoing_directory, relative_file_path)
 
         if not self.isfile(absolute_file_path):
             raise ManifestError(
-                (
-                    f"""Cannot add file to manifest, file does not exist:
+                f"""Cannot add file to manifest, file does not exist:
                     {absolute_file_path}"""
-                )
             )
         # Get the col headers from the file
         file_header_string = self.read_header(absolute_file_path)
@@ -162,21 +158,17 @@ class Manifest:
 
             if len(col_above_max_len) > 0:
                 self.invalid_headers.append(
-                    (
-                        f"File:{absolute_file_path}\n"
-                        f"These column names are exceeding the maximum char length "
-                        "of 32: {col_above_max_len}\n"
-                    )
+                    f"File:{absolute_file_path}\n"
+                    "These column names are exceeding the maximum char length "
+                    "of 32: {col_above_max_len}\n"
                 )
         # Check that files are not more than 2.5Gb as nifi can't cope
         file_size_bytes = int(self.stat_size(absolute_file_path))
         file_size_gb = file_size_bytes / 1024**3
         if file_size_gb > 2.5:
             raise ManifestError(
-                (
-                    f"""Error with {absolute_file_path}
+                f"""Error with {absolute_file_path}
                     File size is too big"""
-                )
             )
 
         file_manifest = {
