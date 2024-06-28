@@ -1,8 +1,10 @@
 """Map the missing columns that are required for the outputs"""
+import logging
 
 import pandas as pd
 import numpy as np
 
+OutputMainLogger = logging.getLogger(__name__)
 
 def join_pg_numeric(
     main_df: pd.DataFrame, mapper_df: pd.DataFrame, cols_pg: list = ["201"]
@@ -91,7 +93,7 @@ def join_fgn_ownership(
 
 def map_sizebands(
     df: pd.DataFrame,
-):
+) -> pd.DataFrame:
     """Generate sizebands from the frozen (IDBR) employent column
 
     Args:

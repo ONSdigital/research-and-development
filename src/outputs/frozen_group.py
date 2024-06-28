@@ -49,7 +49,9 @@ def output_frozen_group(
     output_path = paths["output_path"]
 
     df_gb = map_o.map_FG_cols_to_numeric(df_gb)
-    df_ni = map_o.map_FG_cols_to_numeric(df_ni)
+    if df_ni is not None:
+        if not df_ni.empty:
+            df_ni = map_o.map_FG_cols_to_numeric(df_ni)
 
     # Categorical columns that we have in BERD and NI data
     category_columns = [
@@ -94,7 +96,13 @@ def output_frozen_group(
     # Select the columns we need
     need_columns = category_columns + value_columns
     df_gb_need = df_gb[need_columns]
-    df_ni_need = df_ni[need_columns]
+    if df_ni is not None:
+        if not df_ni.empty:
+            df_ni_need = df_ni[need_columns]
+        else:
+            df_ni_need = df_ni
+    else:
+        df_ni_need = df_ni
 
     # Concatinate GB and NI
     df = pd.concat([df_gb_need, df_ni_need], ignore_index=True, axis=0)

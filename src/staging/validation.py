@@ -93,7 +93,7 @@ def check_data_shape(
         ValidationLogger.warning(missing_df_cols)
         if raise_error:
             raise ColumnMismatch(
-                "Error: The the number of columns do not match. Halted"
+                "Error: The number of columns do not match. Halted"
             )
 
     ValidationLogger.info(
