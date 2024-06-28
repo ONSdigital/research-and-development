@@ -43,7 +43,7 @@ network_paths:
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
   # mapper paths
-  mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
+  mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/mappers/v1/"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
   cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'

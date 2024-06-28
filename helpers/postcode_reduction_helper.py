@@ -6,13 +6,13 @@ import sys
 
 sys.path.append("D:/coding_projects/github_repos/research-and-development")  # noqa
 
-from src.utils.helpers import ConfigSettings  # noqa
-from src.utils.local_file_mods import check_file_exists  # noqa
+from src.utils.config import config_setup  # noqa
+from src.utils.local_file_mods import rd_file_exists  # noqa
 
 # load config
-config_path = os.path.join("src", "developer_config.yaml")
-conf_obj = ConfigSettings(config_path)
-config = conf_obj.config_dict
+dev_config_path = os.path.join("src", "dev_config.yaml")
+user_config_path = os.path.join("src", "user_config.yaml")
+config = config_setup(user_config_path, dev_config_path)
 
 survey_year = config["global"]["survey_year"]
 # test the survey year is a valid year as an integer
@@ -21,14 +21,13 @@ if not ((survey_year > 2021) and (survey_year < 2041)):
            Enter an integer between 2022 and 2040"""
     raise Exception(msg)
 
-# Input folder and file names
+# Input and output folder and file names
 in_file = config["network_paths"]["postcode_masterlist"]
+out_fol = config["network_paths"]["mapper_path"]
 # check the input paths are valid
-check_file_exists(in_file)
+rd_file_exists(in_file)
 
 # Output folder and file names
-root_fol = "R:/BERD Results System Development 2023/DAP_emulation/"
-out_fol = root_fol + f"{survey_year}_surveys/mappers/"
 out_path = out_fol + f"postcodes_{survey_year}.csv"
 
 # Read in files
