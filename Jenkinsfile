@@ -27,7 +27,7 @@ pipeline {
         BUILD_BRANCH            = 'main'  // Any commits to this branch will create a build in artifactory
         BUILD_TAG               = '*-release'  // Any commits tagged with this pattern will create a build in artifactory
         MIN_COVERAGE_PC         = '0'
-        GITLAB_CREDS            = 'epds_gitlab_token'  // Credentials used for notifying GitLab of build status
+        GITLAB_CREDS            = 'rdsa_token'  // Credentials used for notifying GitLab of build status
     }
 
     options {

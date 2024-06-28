@@ -16,6 +16,7 @@ from src.utils.wrappers import time_logger_wrap
 # Set up logger
 lfmod_logger = logging.getLogger(__name__)
 
+
 def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from a local network drive into a Pandas DataFrame
     Args:
@@ -28,10 +29,10 @@ def read_local_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df = pd.read_csv(file, thousands=',')
+            df = pd.read_csv(file, thousands=",")
         else:
             try:
-                df = pd.read_csv(file, usecols=cols, thousands=',')
+                df = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
                 lfmod_logger.error(f"Could not find specified columns in {filepath}")
                 lfmod_logger.info("Columns specified: " + str(cols))
@@ -351,14 +352,11 @@ def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
     """
     if not os.path.exists(path):
         raise FileNotFoundError(
-            f"Attempted to load yaml at: {path}. File "
-            "does not exist."
+            f"Attempted to load yaml at: {path}. File does not exist."
         )
     ext = os.path.splitext(path)[1]
     if ext != ".yaml":
-        raise TypeError(
-            f"Expected a .yaml file. Got {ext}"
-        )
+        raise TypeError(f"Expected a .yaml file. Got {ext}")
     with open(path, "r") as f:
         yaml_dict = yaml.safe_load(f)
     return yaml_dict

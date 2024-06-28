@@ -38,10 +38,10 @@ def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     with hdfs.open(filepath, "r") as file:
         # Import csv file and convert to Dataframe
         if not cols:
-            df_from_hdfs = pd.read_csv(file, thousands=',')
+            df_from_hdfs = pd.read_csv(file, thousands=",")
         else:
             try:
-                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=',')
+                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=",")
             except Exception:
                 hdfs_logger.error(f"Could not find specified columns in {filepath}")
                 hdfs_logger.info("Columns specified: " + str(cols))
@@ -390,9 +390,7 @@ def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
     check_file_exists(path)
     ext = os.path.splitext(path)[1]
     if ext != ".yaml":
-        raise TypeError(
-            f"Expected a .yaml file. Got {ext}"
-        )
+        raise TypeError(f"Expected a .yaml file. Got {ext}")
     with hdfs.open(path, "r") as f:
         yaml_dict = yaml.safe_load(f)
     return yaml_dict

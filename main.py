@@ -13,4 +13,4 @@ run_time = src.run_pipeline(start, user_path, dev_path)
 
 min_secs = divmod(round(run_time), 60)
 
-print(f"Time taken for pipeline: {min_secs[0]}mins and {min_secs[1]}seconds")
+print(f"Time taken for pipeline: {min_secs[0]} mins and {min_secs[1]} seconds")

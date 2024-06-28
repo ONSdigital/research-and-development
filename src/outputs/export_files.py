@@ -159,11 +159,13 @@ def get_username():
     """
     Retrieves the username of the currently logged-in user.
 
-    This function uses the `getpass` module to get the username of the currently logged-in user.
+    This function uses the `getpass` module to get the username of the
+    currently logged-in user.
     If the username cannot be determined, it defaults to "unknown".
 
     Returns:
-        str: The username of the currently logged-in user, or "unknown" if the username cannot be determined.
+        str: The username of the currently logged-in user, or "unknown" if the username
+            cannot be determined.
     """
     # Get the user's username
     username = getpass.getuser()
@@ -180,13 +182,15 @@ def log_exports(
     """
     Logs the details of the exported files.
 
-    This function logs the date and time of the pipeline run, the username of the user who ran the pipeline,
-    and the list of files that were exported. The date and time are formatted as "YYYY-MM-DD HH:MM:SS".
+    This function logs the date and time of the pipeline run, the username of the
+    user who ran the pipeline, and the list of files that were exported. The date
+    and time are formatted as "YYYY-MM-DD HH:MM:SS".
 
     Args:
-        list_file_exported (List[str]): A list of the names of the files that were exported.
-        pipeline_run_datetime (datetime): The date and time when the pipeline was run.
-        logger (logging.Logger): The logger to use for logging the export details.
+        list_file_exported (List[str]): A list of the names of the files that were
+        exported. pipeline_run_datetime (datetime): The date and time when the pipeline
+        was run. logger (logging.Logger): The logger to use for logging the export
+        details.
 
     Returns:
         None

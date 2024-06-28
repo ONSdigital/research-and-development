@@ -20,8 +20,10 @@ def read_config() -> dict:
     config = merge_configs(user_config, dev_config)
     return config
 
+
 CONFIG = read_config()
 LOCATION = CONFIG["global"]["network_or_hdfs"]
+
 
 @pytest.fixture(scope="module")
 def write_csv_func() -> Callable:
