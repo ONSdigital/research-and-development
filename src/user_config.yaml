@@ -32,8 +32,8 @@ global:
   output_tau: False
   output_intram_by_pg_gb: False
   output_intram_by_pg_uk: False
-  output_intram_by_itl1: False
-  output_intram_uk_itl2: False
+  output_intram_gb_itl: False
+  output_intram_uk_itl: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False
@@ -43,7 +43,7 @@ hdfs_paths:
   # staging input paths
   snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
-  ni_full_responses_path: "" 
+  ni_full_responses_path: ""
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "/ons/rdbe_dev/staging/staging_qa/postcode_validation"
   feather_path: "/ons/rdbe_dev/staging/feather"
@@ -53,7 +53,7 @@ hdfs_paths:
   manual_imp_trim_path: ""
   manual_outliers_path: "/ons/rdbe_dev/outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
   outliers_path: ""
-  # Construction paths  
+  # Construction paths
   construction_file_path: ""
   construction_file_path_ni: ""
   # mapper paths
@@ -78,7 +78,7 @@ hdfs_paths:
   output_path:  "/ons/rdbe_dev/outputs"
   export_path: /ons/rdbe_dev/outgoing_export
 network_paths:
-  # output folder paths 
+  # output folder paths
   staging_test_foldername: "R:/BERD Results System Development 2023/Staged_Test_Output"
   feather_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/feather"
   staging_output_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/full_responses_qa"
@@ -99,4 +99,3 @@ imputation:
   trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
   sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
   mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
-  
