@@ -4,6 +4,8 @@ import pandas as pd
 from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
+from src.staging import staging_helpers as stage_hlp
+from src.staging import validation as val
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -26,72 +28,72 @@ def run_mapping(
     # Conditionally load paths
     paths = config[f"{network_or_hdfs}_paths"]
 
-    pg_num_alpha = hlp.load_validate_mapper(
+    pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
         "pg_numeric",
         "pg_alpha",
     )
 
     # Load ultfoc (Foreign Ownership) mapper
-    ultfoc_mapper = hlp.load_validate_mapper(
+    ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
+        val.validate_data_with_schema,
         hlp.validate_ultfoc_df,
     )
 
     # Load ITL mapper
-    itl_mapper = hlp.load_validate_mapper(
+    itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
+        val.validate_data_with_schema,
         None,
     )
 
     # Loading cell number coverage
-    cellno_df = hlp.load_validate_mapper(
+    cellno_df = stage_hlp.load_validate_mapper(
         "cellno_2022_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
+        val.validate_data_with_schema,
         None,
     )
 
     # Loading SIC to PG to alpha mapper
-    sic_pg_alpha_mapper = hlp.load_validate_mapper(
+    sic_pg_alpha_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_alpha_mapper_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
         "sic",
         "pg_alpha",
     )
 
-    sic_pg_utf_mapper = hlp.load_validate_mapper(
+    sic_pg_utf_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_utf_mapper_path",
         paths,
         check_file_exists,
         read_csv,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
+        val.validate_data_with_schema,
+        val.validate_many_to_one,
         "SIC 2007_CODE",
         "2016 > Form PG",
     )
@@ -103,13 +105,13 @@ def run_mapping(
     # Loading ru_817_list mapper
     load_ref_list_mapper = config["global"]["load_reference_list"]
     if load_ref_list_mapper:
-        ref_list_817_mapper = hlp.load_validate_mapper(
+        ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
             check_file_exists,
             read_csv,
             MappingMainLogger,
-            hlp.validate_data_with_schema,
+            val.validate_data_with_schema,
             None,
         )
         # update longform references that should be on the reference list
