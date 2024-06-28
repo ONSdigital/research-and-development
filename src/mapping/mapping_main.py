@@ -4,12 +4,15 @@ import pandas as pd
 from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
+from src.mapping.pg_conversion import run_pg_conversion
+from src.mapping.cellno_mapper import join_cellno_mapper
 
 MappingMainLogger = logging.getLogger(__name__)
 
 
 def run_mapping(
     full_responses,
+    ni_full_responses,
     config: dict,
     check_file_exists: Callable,
     load_json: Callable,
@@ -71,21 +74,8 @@ def run_mapping(
         None,
     )
 
-    # Loading SIC to PG to alpha mapper
-    sic_pg_alpha_mapper = hlp.load_validate_mapper(
-        "sic_pg_alpha_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
-        "sic",
-        "pg_alpha",
-    )
-
-    sic_pg_utf_mapper = hlp.load_validate_mapper(
-        "sic_pg_utf_mapper_path",
+    sic_pg_num = hlp.load_validate_mapper(
+        "sic_pg_num_mapper_path",
         paths,
         check_file_exists,
         read_csv,
@@ -95,14 +85,9 @@ def run_mapping(
         "SIC 2007_CODE",
         "2016 > Form PG",
     )
-    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
-    sic_pg_utf_mapper = sic_pg_utf_mapper[cols_needed]
-    mapper_path = paths["mapper_path"]
-    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
 
     # Loading ru_817_list mapper
-    load_ref_list_mapper = config["global"]["load_reference_list"]
-    if load_ref_list_mapper:
+    if config["global"]["survey_year"] == 2022:
         ref_list_817_mapper = hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
@@ -114,11 +99,15 @@ def run_mapping(
         )
         # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
-    else:
-        MappingMainLogger.info("Skipping loding the reference list mapper File.")
-        ref_list_817_mapper = pd.DataFrame()
+    # Carry out product group conversion
+    # Impute missing product group responses in q201 from SIC, then copy this to a new
+    # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
+    full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
+    ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
 
+    full_responses = join_cellno_mapper(full_responses, cellno_df)
 
     # placeholder for running mapping
+    
 
     # return mapped_df

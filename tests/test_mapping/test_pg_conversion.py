@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import numpy as np
 
-from src.imputation.pg_conversion import pg_to_pg_mapper, sic_to_pg_mapper
+from src.mapping.pg_conversion import pg_to_pg_mapper, sic_to_pg_mapper
 
 
 @pytest.fixture

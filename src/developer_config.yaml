@@ -1,4 +1,5 @@
 global:
+  survey_year: 2022
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
@@ -16,7 +17,6 @@ global:
   load_manual_outliers: False
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
-  load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
   # Apportionment to sites settings
   apportion_sites: True
@@ -42,7 +42,7 @@ global:
   output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: False
-years: 
+years:
   current_year: 2022 # TODO: put this in the userconfig
   previous_years_to_load: 1 # TODO: put this in the userconfig
 runlog_writer:
@@ -109,8 +109,9 @@ network_paths:
   cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" #input for mapping status to cora "form_stauts"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
-  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
   pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
+  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
+  sic_pg_num_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_num.csv'
   itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
   ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
   civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"

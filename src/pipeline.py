@@ -94,17 +94,17 @@ def run_pipeline(start, config_path):
         full_responses,
         secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
-        #ultfoc_mapper,
-        #itl_mapper,
-        #cellno_df,
+        # ultfoc_mapper,
+        # itl_mapper,
+        # cellno_df,
         postcode_mapper,
-        #pg_num_alpha,
-        #sic_pg_alpha,
-        #sic_pg_num,
+        # pg_num_alpha,
+        # sic_pg_alpha,
+        # sic_pg_num,
         backdata,
         pg_detailed,
         itl1_detailed,
-        #reference_list,
+        # reference_list,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
@@ -137,6 +137,7 @@ def run_pipeline(start, config_path):
     MainLogger.info("Starting Mapping...")
     mapped_df = run_mapping(
         full_responses,
+        ni_df,
         config,
         check_file_exists,
         load_json,
@@ -153,8 +154,6 @@ def run_pipeline(start, config_path):
     imputed_df = run_imputation(
         mapped_df,
         manual_trimming_df,
-        pg_num_alpha,
-        sic_pg_num,
         backdata,
         config,
         write_csv,
@@ -206,13 +205,10 @@ def run_pipeline(start, config_path):
         ultfoc_mapper,
         postcode_mapper,
         itl_mapper,
-        sic_pg_num,
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
-        pg_num_alpha,
-        sic_pg_num,
     )
 
     MainLogger.info("Finished All Output modules.")
