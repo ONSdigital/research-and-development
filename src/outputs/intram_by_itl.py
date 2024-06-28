@@ -108,10 +108,11 @@ def output_intram_by_itl(
     df = df_gb[["postcodes_harmonised", "formtype", "211"]]
 
     if df_ni is not None:
-        # Clean NI data and join
-        df_ni["postcodes_harmonised"] = pd.NA
-        df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
-        df = df.append(df_ni, ignore_index=True).copy()
+        if not df_ni.empty:
+            # Clean NI data and join
+            df_ni["postcodes_harmonised"] = pd.NA
+            df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
+            df = df.append(df_ni, ignore_index=True).copy()
 
     # Join Aggregation Cols
     df = map_o.join_itl_regions(df, postcode_mapper)
