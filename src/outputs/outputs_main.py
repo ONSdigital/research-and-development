@@ -138,9 +138,7 @@ def run_outputs(  # noqa: C901
     # Running NI SAS output
     if config["global"]["output_ni_sas"]:
         if not config["global"]["load_ni_data"]:
-            OutputMainLogger.info(
-                "Skipping NI SAS output as NI data is NOT loaded..."
-            )
+            OutputMainLogger.info("Skipping NI SAS output as NI data is NOT loaded...")
         else:
             OutputMainLogger.info("Starting NI SAS output...")
             output_ni_sas(

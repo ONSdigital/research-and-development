@@ -6,6 +6,7 @@ import numpy as np
 
 OutputMainLogger = logging.getLogger(__name__)
 
+
 def join_pg_numeric(
     main_df: pd.DataFrame, mapper_df: pd.DataFrame, cols_pg: list = ["201"]
 ) -> pd.DataFrame:
