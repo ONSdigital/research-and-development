@@ -75,10 +75,10 @@ def create_imp_class_col(
 def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     """Applies the fill zeros function to filtered dataframes.
 
-    A mask is created to identify clear responders, excluding instance zero rows, 
+    A mask is created to identify clear responders, excluding instance zero rows,
     but exclude "postcode only" rows.
 
-    Zeros are then filled for the target values based on this mask, and the equivalent 
+    Zeros are then filled for the target values based on this mask, and the equivalent
     "_imputed" columns.
 
     Args:
@@ -92,15 +92,16 @@ def apply_fill_zeros(df: pd.DataFrame, target_variables: list):
     excl_postcode_only_mask = ~(df["211"].isnull() & hlp.create_notnull_mask(df, "601"))
 
     zerofill_mask = (
-        (df["instance"] != 0) &
-        (df["status"].isin(["Clear", "Clear - overridden"])) &
-        excl_postcode_only_mask
+        (df["instance"] != 0)
+        & (df["status"].isin(["Clear", "Clear - overridden"]))
+        & excl_postcode_only_mask
     )
 
     for var in target_variables:
         df.loc[zerofill_mask, var] = df.loc[zerofill_mask, var].fillna(0)
         df.loc[zerofill_mask, f"{var}_imputed"] = df.loc[
-            zerofill_mask, f"{var}_imputed"].fillna(0)
+            zerofill_mask, f"{var}_imputed"
+        ].fillna(0)
 
     return df
 
@@ -489,7 +490,8 @@ def run_tmi(
         full_df (pd.DataFrame): the full responses spp dataframe
         config (Dict): the configuration settings
     Returns:
-        final_df(pd.DataFrame): dataframe with the imputed valued added and counts columns
+        final_df(pd.DataFrame): dataframe with the imputed valued added and counts
+            columns
         qa_df: qa dataframe
     """
     # changing type of Civil or Defence column 200 helps with imputation classes

@@ -14,7 +14,7 @@ import src.staging.staging_helpers as helpers
 StagingMainLogger = logging.getLogger(__name__)
 
 
-def run_staging(
+def run_staging(  # noqa: C901
     config: dict,
     check_file_exists: Callable,
     load_json: Callable,
@@ -148,19 +148,14 @@ def run_staging(
             feather_fname = f"{snapshot_name}_corrected.feather"
             s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
-                feather_path,
-                feather_fname,
-                full_responses,
-                write_feather
-
+                feather_path, feather_fname, full_responses, write_feather
             )
             if secondary_full_responses is not None:
                 helpers.df_to_feather(
                     feather_path,
                     s_feather_fname,
                     secondary_full_responses,
-                    write_feather
-
+                    write_feather,
                 )
 
     # Flag invalid records

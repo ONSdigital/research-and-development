@@ -1,0 +1,47 @@
+# singular: bool: Whether to validate a single config item, or validate multiple
+# (multiple = there are multiple items below the current config value)
+# dtype: [str, int, float, bool, path, list[<type> or any]]
+# accept_nonetype: bool: whether or not to accept None
+# max: [int, float]: applies only to int/float dtype, optional (inclusive)
+# min: [int, float]: applies only to int/float dtype, optional (inclusive)
+# filetype: str: applies to only path dtype, optional (using '.' optional)
+global:
+  singular: False
+  dtype: "bool"
+  accept_nonetype: False
+  max: null
+  min: null
+  filetype: null
+years:
+  current_year:
+    singular: True
+    dtype: "int"
+    accept_nonetype: False
+    max: null
+    min: 2022
+  previous_years_to_load:
+    singular: True
+    dtype: "int"
+    accept_nonetype: False
+    max: null
+    min: 0
+hdfs_paths:
+  singular: False
+  dtype: "path"
+  accept_nonetype: True
+network_paths:
+  singular: False
+  dtype: "path"
+  accept_nonetype: True
+# Export config for users
+outliers:
+  singular: False
+  dtype: "float"
+  accept_nonetype: False
+  min: 0
+imputation:
+  singular: False
+  dtype: "int"
+  accept_nonetype: False
+  min: 0
+  

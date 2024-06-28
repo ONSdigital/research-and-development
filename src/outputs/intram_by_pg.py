@@ -13,7 +13,7 @@ def output_intram_by_pg(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ni_df: pd.DataFrame = None
+    ni_df: pd.DataFrame = None,
 ):
     """Run the outputs module.
 
@@ -27,28 +27,23 @@ def output_intram_by_pg(
         ni_df (pd.DataFrame): The NI datasets without weights applied.
 
     """
-
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
-
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
-
     # evaluate if NI data is included and clean
+    if not isinstance(ni_df, (pd.DataFrame, type(None))):
+        raise TypeError(f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}")
     if ni_df is not None:
-        # defence
-        if not isinstance(ni_df, pd.DataFrame):
-            raise TypeError(
-                f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}"
-                )
-        # work out cols to select
-        cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
-        gb_df = gb_df[cols_to_keep]
-        ni_df = ni_df[cols_to_keep]
-        gb_df = gb_df.append(ni_df)
-
+        if not ni_df.empty:
+            # defence
+            # work out cols to select
+            cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
+            gb_df = gb_df[cols_to_keep]
+            ni_df = ni_df[cols_to_keep]
+            gb_df = gb_df.append(ni_df)
 
     # Group by PG and aggregate intram
     df_agg = gb_df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
@@ -77,5 +72,10 @@ def output_intram_by_pg(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}", df_merge)
+    filename = (
+        f"output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}_{tdate}_v{run_id}.csv"
+    )
+    write_csv(
+        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}",
+        df_merge,
+    )
