@@ -12,6 +12,7 @@ from typing import Callable, Tuple, Dict, Union
 # Our own modules
 from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
+from src.staging import postcode_validation as pcval
 from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
 
@@ -337,7 +338,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
 
 def load_validate_secondary_snapshot(
-        load_json, secondary_snapshot_path, config, network_or_hdfs
+    load_json, secondary_snapshot_path, config, network_or_hdfs
 ):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
@@ -394,11 +395,11 @@ def load_validate_secondary_snapshot(
 
 
 def df_to_feather(
-        dir: Union[pathlib.Path, str],
-        save_name: str,
-        df: pd.DataFrame,
-        write_feather: Callable,
-        overwrite: bool = True
+    dir: Union[pathlib.Path, str],
+    save_name: str,
+    df: pd.DataFrame,
+    write_feather: Callable,
+    overwrite: bool = True,
 ) -> None:
     """_summary_
 
@@ -446,6 +447,8 @@ def stage_validate_harmonise_postcodes(
     1. Loads a master list of postcodes from a CSV file.
     2. Validates the postcode column in the full_responses DataFrame against the
        master list.
+    2. Validates the postcode column in the full_responses DataFrame against
+        the master list.
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
@@ -462,6 +465,8 @@ def stage_validate_harmonise_postcodes(
     Returns:
     Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
     and the master list of postcodes.
+    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+    and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
@@ -473,7 +478,7 @@ def stage_validate_harmonise_postcodes(
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
-    invalid_df = val.validate_post_col(
+    full_responses, invalid_df = pcval.run_full_postcode_process(
         full_responses, postcode_masterlist, config
     )
 

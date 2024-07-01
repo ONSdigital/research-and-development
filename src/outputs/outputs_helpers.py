@@ -54,6 +54,7 @@ def regions() -> dict:
     regions["UK"] = regions["GB"] + regions["NI"]
     return regions
 
+
 def create_period_year(df: pd.DataFrame) -> pd.DataFrame:
     """Created year column for short form output
 

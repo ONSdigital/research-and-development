@@ -18,24 +18,21 @@ from src.staging.staging_helpers import (
     getmappername,
     check_snapshot_feather_exists,
     load_snapshot_feather,
+    load_val_snapshot_json,
+    load_validate_secondary_snapshot,
     df_to_feather,
-    stage_validate_harmonise_postcodes
+    stage_validate_harmonise_postcodes,
 )
 from src.utils.local_file_mods import (
-    local_file_exists as check_file_exists,
-    local_read_feather as read_feather,
-    local_write_feather as write_feather,
-    read_local_csv as read_csv,
-    write_local_csv as write_csv
+    rd_file_exists as check_file_exists,
+    rd_read_feather as read_feather,
+    rd_write_feather as write_feather,
+    rd_read_csv as read_csv,
+    rd_write_csv as write_csv,
 )
 
 
-def match_col_type(
-        df1: pd.DataFrame,
-        df2: pd.DataFrame,
-        col_name: str,
-        _type: str
-):
+def match_col_type(df1: pd.DataFrame, df2: pd.DataFrame, col_name: str, _type: str):
     """Convert DataFrame columns of the same name to matching types."""
     df1[col_name] = df1[col_name].astype(_type)
     df2[col_name] = df2[col_name].astype(_type)
@@ -48,11 +45,7 @@ class TestFixAnonData(object):
     @pytest.fixture(scope="function")
     def dummy_config(self) -> dict:
         """Config used for test data."""
-        config = {
-            "devtest": {
-                "seltype_list": [1, 2, 3, 5, 6, 7, 9, 10]
-            }
-        }
+        config = {"devtest": {"seltype_list": [1, 2, 3, 5, 6, 7, 9, 10]}}
         return config
 
     @pytest.fixture(scope="function")
@@ -93,14 +86,9 @@ class TestFixAnonData(object):
         """General tests for fix_anon_data."""
         output = fix_anon_data(input_data, dummy_config)
         output, expected_output = match_col_type(
-            output,
-            expected_output,
-            "cellnumber",
-            "int32"
+            output, expected_output, "cellnumber", "int32"
         )
-        assert (output.equals(expected_output)), (
-            "fix_anon_data not behaving as expected."
-        )
+        assert output.equals(expected_output), "fix_anon_data not behaving as expected."
 
 
 class TestUpdateRefList(object):
@@ -109,13 +97,13 @@ class TestUpdateRefList(object):
     @pytest.fixture(scope="function")
     def full_input_df(self):
         """Main input data for update_ref_list tests."""
-        columns = ['reference', 'instance', 'formtype', 'cellnumber']
+        columns = ["reference", "instance", "formtype", "cellnumber"]
         data = [
             [49900001031, 0.0, 6, 674],
             [49900001530, 0.0, 6, 805],
             [49900001601, 0.0, 1, 117],
             [49900001601, 1.0, 1, 117],
-            [49900003099, 0.0, 6, 41]
+            [49900003099, 0.0, 6, 41],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
@@ -124,10 +112,8 @@ class TestUpdateRefList(object):
     @pytest.fixture(scope="function")
     def ref_list_input(self):
         """Reference list df input for update_ref_list tests."""
-        columns = ['reference', 'cellnumber', 'selectiontype', 'formtype']
-        data = [
-            [49900001601, 117, 'C', '1']
-        ]
+        columns = ["reference", "cellnumber", "selectiontype", "formtype"]
+        data = [[49900001601, 117, "C", "1"]]
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
@@ -135,13 +121,13 @@ class TestUpdateRefList(object):
     @pytest.fixture(scope="function")
     def expected_output(self):
         """Expected output for update_ref_list tests."""
-        columns = ['reference', 'instance', 'formtype', 'cellnumber', 'selectiontype']
+        columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
             [49900001031, 0.0, "6", 674, np.nan],
             [49900001530, 0.0, "6", 805, np.nan],
             [49900001601, 0.0, "1", 817, "L"],
             [49900001601, 1.0, "1", 817, "L"],
-            [49900003099, 0.0, "6", 41, np.nan]
+            [49900003099, 0.0, "6", 41, np.nan],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -149,17 +135,15 @@ class TestUpdateRefList(object):
     def test_update_ref_list(self, full_input_df, ref_list_input, expected_output):
         """General tests for update_ref_list."""
         output = update_ref_list(full_input_df, ref_list_input)
-        assert (output.equals(expected_output)), (
-            "update_ref_list not behaving as expected"
-        )
+        assert output.equals(
+            expected_output
+        ), "update_ref_list not behaving as expected"
 
     def test_update_ref_list_raises(self, full_input_df, ref_list_input):
         """Test the raises in update_ref_list."""
         # add a non valid reference
         ref_list_input.loc[1] = [34567123123, 117, "C", "1"]
-        error_msg = (
-            r"The following references in the reference list mapper are.*"
-        )
+        error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
 
@@ -171,23 +155,26 @@ class TestGetMapperName(object):
         """General tests for getmappername."""
         test_str = "cellno_2022_path"
         # with split
-        assert getmappername(test_str, True) == "cellno 2022", (
-            "getmappername not behaving as expected when split=True"
-        )
+        assert (
+            getmappername(test_str, True) == "cellno 2022"
+        ), "getmappername not behaving as expected when split=True"
         # without split
-        assert getmappername(test_str, False) == "cellno_2022", (
-            "getmappername not behaving as expected when split=False"
-        )
+        assert (
+            getmappername(test_str, False) == "cellno_2022"
+        ), "getmappername not behaving as expected when split=False"
+
+
+# load_validate_mapper [CANT TEST: TOO MANY HARD CODED PATHS]
+
+
+# load_historic_data
 
 
 class TestCheckSnapshotFeatherExists(object):
     """Tests for check_snapshot_feather_exists."""
 
     def create_feather_files(
-            self,
-            dir: pathlib.Path,
-            first: bool,
-            second: bool
+        self, dir: pathlib.Path, first: bool, second: bool
     ) -> Tuple[pathlib.Path, pathlib.Path]:
         """Create feather files in a given path for testing."""
         empty_df = pd.DataFrame()
@@ -209,16 +196,16 @@ class TestCheckSnapshotFeatherExists(object):
             [False, True, False, False],  # create second, check first
             [False, True, True, False],  # create second, check both
             [True, True, True, True],  # create both, check both
-            [True, True, False, True]  # create both, check first
-        )
+            [True, True, False, True],  # create both, check first
+        ),
     )
     def test_check_snapshot_feather_exists(
-            self,
-            tmp_path,
-            first: bool,
-            second: bool,
-            check_both: bool,
-            result: bool,
+        self,
+        tmp_path,
+        first: bool,
+        second: bool,
+        check_both: bool,
+        result: bool,
     ):
         """General tests for check_snapshot_feather_exists."""
         # create feather files
@@ -230,12 +217,12 @@ class TestCheckSnapshotFeatherExists(object):
             config=config,
             check_file_exists=check_file_exists,
             feather_file_to_check=a,
-            secondary_feather_file=b
+            secondary_feather_file=b,
         )
         # assert result
-        assert output == result, (
-            "check_snapshot_feather_exists not behaving as expected."
-        )
+        assert (
+            output == result
+        ), "check_snapshot_feather_exists not behaving as expected."
 
 
 class TestLoadSnapshotFeather(object):
@@ -249,12 +236,12 @@ class TestLoadSnapshotFeather(object):
         feather.write_feather(empty_df, path)
         # test loading 'snapshot'
         snapshot = load_snapshot_feather(path, read_feather)
-        assert np.array_equal(snapshot.test, [1, 2, 3]), (
-            "load_snapshot_feather not behaving as expected"
-        )
-        assert len(snapshot.columns) == 1, (
-            "Snapshot df has more columnss than expected."
-        )
+        assert np.array_equal(
+            snapshot.test, [1, 2, 3]
+        ), "load_snapshot_feather not behaving as expected"
+        assert (
+            len(snapshot.columns) == 1
+        ), "Snapshot df has more columnss than expected."
 
 
 # load_val_snapshot_json [CANT TEST: TOO MANY HARD CODED PATHS]
@@ -262,15 +249,14 @@ class TestLoadSnapshotFeather(object):
 
 # load_validate_secondary_snapshot [CANT TEST: TOO MANY HARD CODED PATHS]
 
+
 class TestDfToFeather(object):
     """Tests for df_to_Feather."""
 
     @pytest.fixture(scope="function")
     def f1(self):
         """Snapshot 1 test data."""
-        f1 = pd.DataFrame(
-            {"f1": [1]}
-        )
+        f1 = pd.DataFrame({"f1": [1]})
         return f1
 
     def test_df_to_feather_defences(self, tmp_path, f1):
@@ -279,19 +265,9 @@ class TestDfToFeather(object):
         fake_path = "test_test/test/this_is_a_test"
         match = rf"The passed directory.*{fake_path}.*"
         with pytest.raises(FileNotFoundError, match=match):
-            df_to_feather(
-                fake_path,
-                "test",
-                f1,
-                write_feather
-            )
+            df_to_feather(fake_path, "test", f1, write_feather)
         # test raise for file already exists
-        df_to_feather(
-            tmp_path,
-            "test",
-            f1,
-            write_feather
-        )
+        df_to_feather(tmp_path, "test", f1, write_feather)
         match = r"File already saved at .*"
         with pytest.raises(FileExistsError, match=match):
             df_to_feather(
@@ -312,9 +288,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test.feather")), (
-            "Feather not saved out correctly."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test.feather")
+        ), "Feather not saved out correctly."
         # save without .feather extension passed
         df_to_feather(
             tmp_path,
@@ -323,9 +299,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test2.feather")), (
-            ".feather. extension not applied to path."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test2.feather")
+        ), ".feather. extension not applied to path."
         # test with overwrite=True
         # using try/except since nullcontext not supported in python=3.6
         try:
@@ -346,9 +322,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test3.test.feather")), (
-            ".feather. extension not applied when another extension exists."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test3.test.feather")
+        ), ".feather. extension not applied when another extension exists."
 
 
 class TestStageValidateHarmonisePostcodes(object):
@@ -362,10 +338,7 @@ class TestStageValidateHarmonisePostcodes(object):
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
         """Test paths."""
-        paths = {
-            "postcode_path": pc_path,
-            "postcode_masterlist": pc_ml
-        }
+        paths = {"postcode_path": pc_path, "postcode_masterlist": pc_ml}
         return paths
 
     @pytest.fixture(scope="function")
@@ -373,18 +346,18 @@ class TestStageValidateHarmonisePostcodes(object):
         """Test data for stag_validate_harmonise_postcodes."""
         columns = ["reference", "instance", "formtype", "601", "referencepostcode"]
         data = [
-            [39900000404, 0.0, 6, np.nan, "NP442NZ"],  # add white space
+            [39900000404, 0.0, 6, None, "NP442NZ"],  # add white space
             [39900000404, 1.0, 6, "NP442NZ", "NP442NZ"],
-            [39900000960, 0.0, 1, np.nan, "CE1 4OY"],  # add white space
+            [39900000960, 0.0, 1, None, "CE1 4OY"],  # add white space
             [39900000960, 1.0, 1, "CE1 4OY", "CE1 4OY"],
             [39900001530, 0.0, 6, "CE2", "CE2"],  # invalid
-            [39900001601, 0.0, 1, np.nan, 'RH12 1XL'],  # normal
-            [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, "CE11 8IU"],
+            [39900001601, 0.0, 1, None, "RH12 1XL"],  # normal
+            [39900001601, 1.0, 1, "RH12 1XL", "RH12 1XL"],
+            [39900003110, 0.0, 6, None, "CE11 8IU"],
             [39900003110, 1.0, 6, "CE11 8iu", "CE11 8IU"],
             [39900003110, 2.0, 6, "Ce11 8iU", "CE11 8IU"],
-            [38880003110, 0.0, 6, np.nan, "NP22 8UI"],  # not in postcode list
-            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"]
+            [38880003110, 0.0, 6, None, "NP22 8UI"],  # not in postcode list
+            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -402,26 +375,26 @@ class TestStageValidateHarmonisePostcodes(object):
     def full_responses_output(self) -> pd.DataFrame:
         """Expected output for full_responses."""
         columns = [
-            'reference',
-            'instance',
-            'formtype',
-            '601',
-            'referencepostcode',
-            'postcodes_harmonised',
+            "reference",
+            "instance",
+            "formtype",
+            "601",
+            "referencepostcode",
+            "postcodes_harmonised",
         ]
         data = [
-            [39900000404, 0.0, 6, np.nan, 'NP442NZ', 'NP44 2NZ'],
-            [39900000404, 1.0, 6, 'NP44 2NZ', 'NP442NZ', 'NP44 2NZ'],
-            [39900000960, 0.0, 1, np.nan, 'CE1 4OY', 'CE1  4OY'],
-            [39900000960, 1.0, 1, 'CE1  4OY', 'CE1 4OY', 'CE1  4OY'],
-            [39900001530, 0.0, 6, '     CE2', 'CE2', np.nan],
-            [39900001601, 0.0, 1, np.nan, 'RH12 1XL', 'RH12 1XL'],
-            [39900001601, 1.0, 1, 'RH12 1XL', 'RH12 1XL', 'RH12 1XL'],
-            [39900003110, 0.0, 6, np.nan, 'CE11 8IU', 'CE11 8IU'],
-            [39900003110, 1.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
-            [39900003110, 2.0, 6, 'CE11 8IU', 'CE11 8IU', 'CE11 8IU'],
-            [38880003110, 0.0, 6, np.nan, 'NP22 8UI', np.nan],
-            [38880003110, 1.0, 6, 'NP22 8UI', 'NP22 8UI', np.nan]
+            [39900000404, 0.0, 6, None, "NP442NZ", "NP44 2NZ"],
+            [39900000404, 1.0, 6, "NP44 2NZ", "NP442NZ", "NP44 2NZ"],
+            [39900000960, 0.0, 1, None, "CE1 4OY", "CE1  4OY"],
+            [39900000960, 1.0, 1, "CE1  4OY", "CE1 4OY", "CE1  4OY"],
+            [39900001530, 0.0, 6, "CE2     ", "CE2", None],
+            [39900001601, 0.0, 1, None, "RH12 1XL", "RH12 1XL"],
+            [39900001601, 1.0, 1, "RH12 1XL", "RH12 1XL", "RH12 1XL"],
+            [39900003110, 0.0, 6, None, "CE11 8IU", "CE11 8IU"],
+            [39900003110, 1.0, 6, "CE11 8IU", "CE11 8IU", "CE11 8IU"],
+            [39900003110, 2.0, 6, "CE11 8IU", "CE11 8IU", "CE11 8IU"],
+            [38880003110, 0.0, 6, None, "NP22 8UI", None],
+            [38880003110, 1.0, 6, "NP22 8UI", "NP22 8UI", None],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -446,12 +419,7 @@ class TestStageValidateHarmonisePostcodes(object):
         return today_str
 
     def test_stage_validate_harmonise_postcodes(
-            self,
-            full_responses,
-            config,
-            pc_mapper_output,
-            full_responses_output,
-            tmp_path
+        self, full_responses, config, pc_mapper_output, full_responses_output, tmp_path
     ):
         """General tests for stage_validate_harmonise_postcodes."""
         pc_path = self.postcode_masterlist(tmp_path)
@@ -463,7 +431,7 @@ class TestStageValidateHarmonisePostcodes(object):
             run_id=1,
             check_file_exists=check_file_exists,
             read_csv=read_csv,
-            write_csv=write_csv
+            write_csv=write_csv,
         )
         # test direct function outputs
         assert fr.equals(full_responses_output), (
@@ -477,6 +445,6 @@ class TestStageValidateHarmonisePostcodes(object):
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
         filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
-        assert (filename in files), (
-            "stage_validate_harmonise_postcodes failed to save out invalid PCs"
-        )
+        assert (
+            filename in files
+        ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"

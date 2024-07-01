@@ -10,7 +10,7 @@ from typing import List
 from pathlib import Path
 import getpass
 
-from src.utils.helpers import Config_settings
+from src.utils.helpers import ConfigSettings
 from src.outputs.manifest_output import Manifest
 
 
@@ -159,11 +159,13 @@ def get_username():
     """
     Retrieves the username of the currently logged-in user.
 
-    This function uses the `getpass` module to get the username of the currently logged-in user.
+    This function uses the `getpass` module to get the username of the currently
+    logged-in user.
     If the username cannot be determined, it defaults to "unknown".
 
     Returns:
-        str: The username of the currently logged-in user, or "unknown" if the username cannot be determined.
+        str: The username of the currently logged-in user, or "unknown" if the username
+            cannot be determined.
     """
     # Get the user's username
     username = getpass.getuser()
@@ -180,11 +182,13 @@ def log_exports(
     """
     Logs the details of the exported files.
 
-    This function logs the date and time of the pipeline run, the username of the user who ran the pipeline,
-    and the list of files that were exported. The date and time are formatted as "YYYY-MM-DD HH:MM:SS".
+    This function logs the date and time of the pipeline run, the username of the
+    user who ran the pipeline, and the list of files that were exported. The date and
+    time are formatted as "YYYY-MM-DD HH:MM:SS".
 
     Args:
-        list_file_exported (List[str]): A list of the names of the files that were exported.
+        list_file_exported (List[str]): A list of the names of the files that were
+            exported.
         pipeline_run_datetime (datetime): The date and time when the pipeline was run.
         logger (logging.Logger): The logger to use for logging the export details.
 
@@ -210,7 +214,7 @@ def run_export(config_path: str):
     """Main function to run the data export pipeline."""
 
     # Load config
-    conf_obj = Config_settings(config_path)
+    conf_obj = ConfigSettings(config_path)
     config = conf_obj.config_dict
 
     # Get and set logging level
@@ -222,34 +226,10 @@ def run_export(config_path: str):
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
     if network_or_hdfs == "network":
-
-        from src.utils.local_file_mods import local_move_file as move_files
-        from src.utils.local_file_mods import local_copy_file as copy_files
-        from src.utils.local_file_mods import local_search_file as search_files
-        from src.utils.local_file_mods import local_isfile as isfile
-        from src.utils.local_file_mods import local_delete_file as delete_file
-        from src.utils.local_file_mods import local_md5sum as hdfs_md5sum
-        from src.utils.local_file_mods import local_stat_size as hdfs_stat_size
-        from src.utils.local_file_mods import local_isdir as isdir
-        from src.utils.local_file_mods import local_read_header as read_header
-        from src.utils.local_file_mods import (
-            local_write_string_to_file as write_string_to_file,
-        )
+        from src.utils import local_file_mods as mods
 
     elif network_or_hdfs == "hdfs":
-
-        from src.utils.hdfs_mods import hdfs_move_file as move_files
-        from src.utils.hdfs_mods import hdfs_copy_file as copy_files
-        from src.utils.hdfs_mods import hdfs_search_file as search_files
-        from src.utils.hdfs_mods import hdfs_isfile as isfile
-        from src.utils.hdfs_mods import hdfs_delete_file as delete_file
-        from src.utils.hdfs_mods import hdfs_md5sum as hdfs_md5sum
-        from src.utils.hdfs_mods import hdfs_stat_size as hdfs_stat_size
-        from src.utils.hdfs_mods import hdfs_isdir as isdir
-        from src.utils.hdfs_mods import hdfs_read_header as read_header
-        from src.utils.hdfs_mods import (
-            hdfs_write_string_to_file as write_string_to_file,
-        )
+        from src.utils import hdfs_mods as mods
 
     else:
         OutgoingLogger.error("The network_or_hdfs configuration is wrong")
@@ -266,7 +246,7 @@ def run_export(config_path: str):
     file_select_dict = get_file_choice(paths, config)
 
     # Check that files exist
-    check_files_exist(list(file_select_dict.values()), network_or_hdfs, isfile)
+    check_files_exist(list(file_select_dict.values()), network_or_hdfs, mods.rd_isfile)
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(
@@ -274,13 +254,13 @@ def run_export(config_path: str):
         export_directory=export_folder,
         pipeline_run_datetime=pipeline_run_datetime,
         dry_run=False,
-        delete_file_func=delete_file,
-        md5sum_func=hdfs_md5sum,
-        stat_size_func=hdfs_stat_size,
-        isdir_func=isdir,
-        isfile_func=isfile,
-        read_header_func=read_header,
-        string_to_file_func=write_string_to_file,
+        delete_file_func=mods.rd_delete_file,
+        md5sum_func=mods.rd_md5sum,
+        stat_size_func=mods.rd_stat_size,
+        isdir_func=mods.rd_isdir,
+        isfile_func=mods.rd_isfile,
+        read_header_func=mods.rd_read_header,
+        string_to_file_func=mods.rd_write_string_to_file,
     )
 
     schemas_header_dict = get_schema_headers(config)
@@ -298,7 +278,7 @@ def run_export(config_path: str):
     manifest.write_manifest()
 
     # Move the manifest file to the outgoing folder
-    manifest_file = search_files(manifest.outgoing_directory, "_manifest.json")
+    manifest_file = mods.rd_search_files(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
 
@@ -307,8 +287,8 @@ def run_export(config_path: str):
         manifest.export_directory,
         "move",
         OutgoingLogger,
-        copy_files,
-        move_files,
+        mods.rd_copy_files,
+        mods.rd_move_files,
     )
 
     # Copy or Move files to outgoing folder
@@ -321,8 +301,8 @@ def run_export(config_path: str):
             manifest.export_directory,
             file_transfer_method,
             OutgoingLogger,
-            copy_files,
-            move_files,
+            mods.rd_copy_files,
+            mods.rd_move_files,
         )
 
     log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)

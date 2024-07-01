@@ -1,8 +1,13 @@
 """The main file for the Outputs module."""
+# Standard Library Imports
 import logging
-import pandas as pd
 from typing import Callable, Dict, Any
+from datetime import datetime
 
+# Third Party Imports
+import pandas as pd
+
+# Local Imports
 from src.outputs.form_output_prep import form_output_prep
 from src.outputs.frozen_group import output_frozen_group
 from src.outputs.short_form import output_short_form
@@ -11,8 +16,7 @@ from src.outputs.tau import output_tau
 from src.outputs.gb_sas import output_gb_sas
 from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.outputs.intram_by_itl1 import output_intram_by_itl1
-from src.outputs.intram_uk_itl_1_2 import output_intram_uk_itl_1_2
+from src.outputs.intram_by_itl import output_intram_by_itl
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
@@ -20,7 +24,7 @@ from src.outputs.total_fte import qa_output_total_fte
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def run_outputs(
+def run_outputs(  # noqa: C901
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
@@ -133,14 +137,17 @@ def run_outputs(
 
     # Running NI SAS output
     if config["global"]["output_ni_sas"]:
-        OutputMainLogger.info("Starting NI SAS output...")
-        output_ni_sas(
-            ni_full_responses,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished NI SAS output.")
+        if not config["global"]["load_ni_data"]:
+            OutputMainLogger.info("Skipping NI SAS output as NI data is NOT loaded...")
+        else:
+            OutputMainLogger.info("Starting NI SAS output...")
+            output_ni_sas(
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+            )
+            OutputMainLogger.info("Finished NI SAS output.")
 
     # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
@@ -153,47 +160,45 @@ def run_outputs(
             run_id,
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
-    
+
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
         OutputMainLogger.info("Starting Intram by PG (UK) output...")
         output_intram_by_pg(
-            outputs_df,
-            pg_detailed,
-            config,
-            write_csv,
-            run_id,
-            ni_full_responses
+            outputs_df, pg_detailed, config, write_csv, run_id, ni_full_responses
         )
         OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
-    # Running Intram by ITL1
-    if config["global"]["output_intram_by_itl1"]:
-        OutputMainLogger.info("Starting  Intram by ITL1 output...")
-        output_intram_by_itl1(
+    # Running Intram by ITL (GB)
+    if config["global"]["output_intram_gb_itl"]:
+        OutputMainLogger.info("Starting Intram by ITL (GB) output...")
+        start = datetime.now()
+        output_intram_by_itl(
             outputs_df,
             config,
             write_csv,
             run_id,
             postcode_mapper,
             itl_mapper,
-            itl1_detailed,
         )
-        OutputMainLogger.info("Finished  Intram by ITL1 output.")
+        OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
+        OutputMainLogger.info("Finished Intram by ITL (GB) output.")
 
-    # Running Intram UK by ITL 1 and 2
-    if config["global"]["output_intram_uk_itl2"]:
-        OutputMainLogger.info("Starting  Intram UK by ITL 1 and 2 output...")
-        output_intram_uk_itl_1_2(
+    # Running Intram by ITL (UK)
+    if config["global"]["output_intram_uk_itl"]:
+        OutputMainLogger.info("Starting Intram by ITL (UK) output...")
+        start = datetime.now()
+        output_intram_by_itl(
             outputs_df,
-            ni_full_responses,
             config,
             write_csv,
             run_id,
             postcode_mapper,
             itl_mapper,
+            ni_full_responses,
         )
-        OutputMainLogger.info("Finished  Intram UK by ITL 1 and 2 output.")
+        OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
+        OutputMainLogger.info("Finished Intram by ITL (UK) output.")
 
     # Running frozen group
     if config["global"]["output_frozen_group"]:
