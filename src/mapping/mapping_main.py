@@ -13,17 +13,16 @@ MappingMainLogger = logging.getLogger(__name__)
 def run_mapping(
     full_responses,
     config: dict,
-    check_file_exists: Callable,
-    load_json: Callable,
-    read_csv: Callable,
-    write_csv: Callable,
-    read_feather: Callable,
-    write_feather: Callable,
-    isfile: Callable,
 ):
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
+
+    if network_or_hdfs == "network":
+        from src.utils import local_file_mods as mods
+
+    elif network_or_hdfs == "hdfs":
+        from src.utils import hdfs_mods as mods
 
     # Conditionally load paths
     paths = config[f"{network_or_hdfs}_paths"]
@@ -31,8 +30,8 @@ def run_mapping(
     pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         val.validate_many_to_one,
@@ -44,8 +43,8 @@ def run_mapping(
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         hlp.validate_ultfoc_df,
@@ -55,8 +54,8 @@ def run_mapping(
     itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         None,
@@ -66,8 +65,8 @@ def run_mapping(
     cellno_df = stage_hlp.load_validate_mapper(
         "cellno_2022_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         None,
@@ -77,8 +76,8 @@ def run_mapping(
     sic_pg_alpha_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_alpha_mapper_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         val.validate_many_to_one,
@@ -89,8 +88,8 @@ def run_mapping(
     sic_pg_utf_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_utf_mapper_path",
         paths,
-        check_file_exists,
-        read_csv,
+        mods.rd_file_exists,
+        mods.rd_read_csv,
         MappingMainLogger,
         val.validate_data_with_schema,
         val.validate_many_to_one,
@@ -100,7 +99,7 @@ def run_mapping(
     cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
     sic_pg_utf_mapper = sic_pg_utf_mapper[cols_needed]
     mapper_path = paths["mapper_path"]
-    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
+    mods.rd_write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
 
     # Loading ru_817_list mapper
     load_ref_list_mapper = config["global"]["load_reference_list"]
@@ -108,8 +107,8 @@ def run_mapping(
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
-            check_file_exists,
-            read_csv,
+            mods.rd_file_exists,
+            mods.rd_read_csv,
             MappingMainLogger,
             val.validate_data_with_schema,
             None,

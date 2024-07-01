@@ -127,13 +127,6 @@ def run_pipeline(start, user_config_path, dev_config_path):
     mapped_df = run_mapping(
         full_responses,
         config,
-        mods.rd_file_exists,
-        mods.rd_load_json,
-        mods.rd_read_csv,
-        mods.rd_write_csv,
-        mods.rd_read_feather,
-        mods.rd_write_feather,
-        mods.rd_isfile,
     )
     MainLogger.info("Finished Mapping...")
 

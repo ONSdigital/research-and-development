@@ -14,11 +14,11 @@ class TestUpdateRefList(object):
         """Main input data for update_ref_list tests."""
         columns = ["reference", "instance", "formtype", "cellnumber"]
         data = [
-            [49900001031, 0.0, 6, 674],
-            [49900001530, 0.0, 6, 805],
-            [49900001601, 0.0, 1, 117],
-            [49900001601, 1.0, 1, 117],
-            [49900003099, 0.0, 6, 41],
+            [49900001031, 0, 6, 674],
+            [49900001530, 0, 6, 805],
+            [49900001601, 0, 1, 117],
+            [49900001601, 1, 1, 117],
+            [49900003099, 0, 6, 41],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
@@ -38,11 +38,11 @@ class TestUpdateRefList(object):
         """Expected output for update_ref_list tests."""
         columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
-            [49900001031, 0.0, "6", 674, np.nan],
-            [49900001530, 0.0, "6", 805, np.nan],
-            [49900001601, 0.0, "1", 817, "L"],
-            [49900001601, 1.0, "1", 817, "L"],
-            [49900003099, 0.0, "6", 41, np.nan],
+            [49900001031, 0, "6", 674, np.nan],
+            [49900001530, 0, "6", 805, np.nan],
+            [49900001601, 0, "1", 817, "L"],
+            [49900001601, 1, "1", 817, "L"],
+            [49900003099, 0, "6", 41, np.nan],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df

@@ -7,8 +7,6 @@ from src.utils.wrappers import time_logger_wrap, exception_wrap
 MappingLogger = logging.getLogger(__name__)
 
 
-@time_logger_wrap
-@exception_wrap
 def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Validates ultfoc df:
