@@ -6,11 +6,16 @@ from datetime import datetime
 import pandas as pd
 import os
 
-# Our own modules
-from src.staging import validation as val
 import src.staging.staging_helpers as helpers
+from src.staging import validation as val
+from src.utils.path_helpers import (
+    get_paths,
+    get_root_paths,
+    create_staging_paths_dict,
+    create_mapping_paths_dict,
+)
 
-
+# Set up the logger
 StagingMainLogger = logging.getLogger(__name__)
 
 
@@ -60,32 +65,27 @@ def run_staging(  # noqa: C901
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
-    # get the survey year variable
-    year = config["years"]["survey_year"]
-
-    # dictionaries from the config
-    paths = config[f"{network_or_hdfs}_paths"]
-    qa_paths = config["qa_paths"]
-
-    root_path = f"{paths['root']}"
-    berd_path = f"{paths['root']}survey_{year}/BERD"
-    mapper_path = f"{root_path}mappers/{paths['mappers_version']}"
-    staging_folder = f"{berd_path}/{config['modules']['staging']}"
-
-    snapshot_path = f"{root_path}/{paths['snapshot_path']}"
-    snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
-    secondary_snapshot_path = paths["secondary_snapshot_path"]
-    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-    feather_path = f"{staging_folder}/{qa_paths['feather_output']}"
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-    secondary_feather_file = os.path.join(
-        feather_path, f"{secondary_snapshot_name}.feather"
-    )
-
-    # Config settings for staging
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
+
+    paths = get_paths(config)
+
+    # set up a dictionary with all the paths needed for the staging module
+    staging_dict = create_staging_paths_dict(config)
+    # set up a dictionary with all the paths needed for the mapping module
+    mapping_dict = create_mapping_paths_dict(config)
+
+    snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
+    secondary_snapshot_name = os.path.basename(
+        staging_dict["secondary_snapshot_path"]
+    ).split(".", 1)[0]
+
+    feather_path = staging_dict["feather_output"]
+    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    secondary_feather_file = os.path.join(
+        feather_path, f"{secondary_snapshot_name}.feather"
+    )
 
     # Check if the if the snapshot feather and optionally the secondary
     # snapshot feather exist
@@ -114,6 +114,7 @@ def run_staging(  # noqa: C901
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
+        snapshot_path = staging_dict["snapshot_path"]
         check_file_exists(snapshot_path, raise_error=True)
         full_responses, response_rate = helpers.load_val_snapshot_json(
             snapshot_path, load_json, config, network_or_hdfs
@@ -258,7 +259,7 @@ def run_staging(  # noqa: C901
 
     # Loading cell number coverage
     cellno_df = helpers.load_validate_mapper(
-        "cellno_2022_path",
+        "cellno_path",
         paths,
         check_file_exists,
         read_csv,

@@ -22,27 +22,32 @@ runlog_writer:
   log_path: "/ons/rdbe_dev/"
 hdfs_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
-modules:
-  staging: "01_staging"
-  freezing: "02_freezing"
-  northern_ireland: "03_northern_ireland"
-  construction: "04_construction"
-  mapping: "05_mapping"
-  imputation: "06_imputation"
-  outliers: "07_outliers"
-  estimation: "08_estimation"
-  apportionment: "09_apportionment"
-  outputs: "10_outputs"
-qa_paths:
-  feather_output: "01_staging/feather"
-  staging_output_path: "01_staging/staging_qa/full_responses_qa"
-  postcode_path: "01_staging/staging_qa/postcode_validation"
-  ni_staging_output_path: "02_northern_ireland/ni_staging_qa"
-  imputation_path:  "imputation"
-  estimation_path:  "estimation"
-  apportionment_path:  "apportionment"
-  output_path:  "outputs"
-  export_path: "outgoing_export"
+staging_paths:
+  folder: "01_staging"
+  feather_output: "feather"
+  staging_output_path: "staging_qa/full_responses_qa"
+  postcode_path: "staging_qa/postcode_validation"
+freezing_paths:
+  folder: "02_freezing"
+ni_paths:
+  folder: "03_northern_ireland"
+  ni_staging_output_path: "03_northern_ireland/ni_staging_qa"
+construction_paths:
+  folder: "04_construction"
+mapping_paths:
+  folder: "05_mapping"
+imputation_paths:
+  folder: "06_imputation"
+outlier_paths:
+  folder: "07_outliers"
+estimation_paths:
+  folder: "08_estimation"
+apportionment_paths:
+  folder: "09_apportionment"
+output_paths:
+  folder: "10_outputs"
+export_paths:
+  export_folder: "outgoing_export"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs" # dev config
@@ -52,29 +57,14 @@ network_paths:
   history_path: "BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   # Imputation and outliers input paths
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
-  manual_imp_trim_path: "imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
-  manual_outliers_path: "outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-  outliers_path: "outliers"
+  manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   # Construction paths
-  construction_file_path: "construction/manual_construction/test_construction_file.csv"
-  construction_file_path_ni: "construction/manual_construction/test_construction_ni_file.csv"
+  construction_file_path: "04_construction/manual_construction/test_construction_file.csv"
+  construction_file_path_ni: "04_construction/manual_construction/test_construction_ni_file.csv"
   # postcode paths
   postcode_masterlist: "ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
-  # mapper paths
-  mappers_version: "v1"
-  ultfoc_mapper_path: "mappers/2023/BERD_2022_ultfoc.csv"
-  itl_mapper_path: 'mappers/2023/itl_6162_ni.csv'
-  cellno_2022_path: 'mappers/2023/berd_2022_cellno_coverage.csv'
-  sic_pg_alpha_mapper_path: 'mappers/sic_pg_alpha.csv'
-  sic_pg_utf_mapper_path: 'mappers/SIC_to_PG_UTF-8.csv'
-  pg_detailed_mapper_path: "mappers/pg_detailed.csv"
-  pg_num_alpha_mapper_path: 'mappers/pg_num_alpha.csv'
-  # cora_mapper_path: "mappers/2023/cora_mapper.csv" ### DELETE
-  itl1_detailed_mapper_path: "mappers/itl1_detailed.csv"
-  ref_list_817_mapper_path: "mappers/2023/BERD_2022_ref_list.csv"
-  civil_defence_detailed_mapper_path: "mappers/civil_defence_detailed.csv"
-  sic_division_detailed_mapper_path: "mappers/sic_div_detailed.csv"
-
+# schema paths
 schema_paths:
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"

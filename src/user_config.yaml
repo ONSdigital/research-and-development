@@ -56,25 +56,33 @@ hdfs_paths:
   postcode_masterlist: "mappers/2023/ONSPD_NOV_2022_UK.csv"
   postcode_path: "staging/staging_qa/postcode_validation"
   # mapper paths
+2022_mappers:
   mappers_version: "v1"
-  ultfoc_mapper_path: "2023/BERD_2022_ultfoc_anon.csv"
-  cellno_2022_path: "2023/berd_2022_cellno_coverage.csv"
-  itl_mapper_path: "2023/itl.csv"
-  cellno_2022_path: '2023/berd_2022_cellno_coverage.csv'
-  sic_pg_alpha_mapper_path: 'sic_pg_alpha.csv'
+  postcodes_mapper: "postcodes_2022.csv"
+  itl_mapper_path: "itl_2022.csv"
+  ultfoc_mapper_path: "BERD_2022_ultfoc_anon.csv"
+  ref_list_817_mapper_path: "BERD_2022_ref_list.csv"
+  cellno_path: 'berd_2022_cellno_coverage.csv'
+  pg_num_alpha_mapper_path: 'pg_num_alpha_2022.csv'
+  sic_pg_alpha_mapper_path: 'sic_pg_alpha_2022.csv'
   sic_pg_utf_mapper_path: 'SIC_to_PG_UTF-8.csv'
-  pg_detailed_mapper_path: "pg_detailed.csv"
-  pg_num_alpha_mapper_path: 'pg_num_alpha.csv'
-  itl1_detailed_mapper_path: "itl1_detailed.csv"
-  ref_list_817_mapper_path: "2023/BERD_2022_ref_list.csv"
-  civil_defence_detailed_mapper_path: "civil_defence_detailed.csv"
-  sic_division_detailed_mapper_path: "sic_div_detailed.csv"
-  # output folder paths
-  manual_imp_trim_path: "imputation/manual_trimming"
-  outliers_path: "outliers"
-  estimation_path:  "estimation"
-  output_path:  "outputs"
-  export_path: outgoing_export
+  pg_detailed_mapper_path: "pg_detailed_2022.csv"
+  itl1_detailed_mapper_path: "itl1_detailed_2022.csv"
+  civil_defence_detailed_mapper_path: "civil_defence_detailed_2022.csv"
+  sic_division_detailed_mapper_path: "sic_div_detailed_2022.csv"
+2023_mappers:
+  mappers_version: "v1"
+  postcodes_mapper: "postcodes_2023.csv"
+  itl_mapper_path: "itl_2023.csv"
+  ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
+  cellno_2023_path: 'berd_2023_cellno_coverage.csv'
+  pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
+  sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
+  sic_pg_utf_mapper_path: 'SIC_to_PG_UTF-8.csv'
+  pg_detailed_mapper_path: "pg_detailed_2023.csv"
+  itl1_detailed_mapper_path: "itl1_detailed_2023.csv"
+  civil_defence_detailed_mapper_path: "civil_defence_detailed_2023.csv"
+  sic_division_detailed_mapper_path: "sic_div_detailed_2023.csv"
 # Export config for users
 outliers:
   upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05

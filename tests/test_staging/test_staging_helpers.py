@@ -153,7 +153,7 @@ class TestGetMapperName(object):
 
     def test_getmappername(self):
         """General tests for getmappername."""
-        test_str = "cellno_2022_path"
+        test_str = "cellno_path"
         # with split
         assert (
             getmappername(test_str, True) == "cellno 2022"
