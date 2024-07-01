@@ -14,14 +14,13 @@ class TestUpdateRefList(object):
         """Main input data for update_ref_list tests."""
         columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
-            [49900001031, 0, 6, 674, "A"],
-            [49900001530, 0, 6, 805, "B"],
-            [49900001601, 0, 1, 117, "C"],
-            [49900001601, 1, 1, 117, "D"],
-            [49900003099, 0, 6, 41, "E"],
+            [49900001031, 0, "0006", 674, "A"],
+            [49900001530, 0, "0006", 805, "B"],
+            [49900001601, 0, "0001", 117, "C"],
+            [49900001601, 1, "0001", 117, "D"],
+            [49900003099, 0, "0006", 41, "E"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
 
     @pytest.fixture(scope="function")
@@ -30,7 +29,6 @@ class TestUpdateRefList(object):
         columns = ["reference", "cellnumber", "selectiontype", "formtype"]
         data = [[49900001601, 117, "C", "1"]]
         df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
         return df
 
     @pytest.fixture(scope="function")
@@ -38,11 +36,11 @@ class TestUpdateRefList(object):
         """Expected output for update_ref_list tests."""
         columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
-            [49900001031, 0, "6", 674, "A"],
-            [49900001530, 0, "6", 805, "B"],
-            [49900001601, 0, "1", 817, "L"],
-            [49900001601, 1, "1", 817, "L"],
-            [49900003099, 0, "6", 41, "E"],
+            [49900001031, 0, "0006", 674, "A"],
+            [49900001530, 0, "0006", 805, "B"],
+            [49900001601, 0, "0001", 817, "L"],
+            [49900001601, 1, "0001", 817, "L"],
+            [49900003099, 0, "0006", 41, "E"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
