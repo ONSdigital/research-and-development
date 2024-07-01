@@ -32,7 +32,7 @@ def output_intram_by_civil_defence(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    period = config["years"]["current_year"]
+    period = config["years"]["survey_year"]
     period_str = str(period)
 
     # Group by civil/defence (200) and aggregate intram (211)

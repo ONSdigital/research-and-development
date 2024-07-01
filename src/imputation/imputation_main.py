@@ -90,7 +90,7 @@ def run_imputation(
 
     # Create imp_path variable for QA output and manual imputation file
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+    imp_path = f"{config['modules']['imputation']}"
 
     # Load manual imputation file
     df = mimp.merge_manual_imputation(df, manual_trimming_df)

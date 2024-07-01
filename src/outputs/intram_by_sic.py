@@ -30,7 +30,7 @@ def output_intram_by_sic(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    period = config["years"]["current_year"]
+    period = config["years"]["survey_year"]
 
     # Create sic_division column from rusic
     df["rusic_string"] = df["rusic"].astype(str).str.zfill(5)

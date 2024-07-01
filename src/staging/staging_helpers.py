@@ -14,7 +14,7 @@ from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import postcode_validation as pcval
 from src.staging import spp_snapshot_processing as processing
-from src.staging import spp_snapshot_parser as spp_parser
+from src.staging import spp_parser
 
 
 # Create logger for this module
@@ -431,7 +431,7 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Starting PostCode Validation")
 
     # Load the master list of postcodes
-    postcode_masterlist = paths["postcode_masterlist"]
+    postcode_masterlist = f"{paths['root']}{paths['postcode_masterlist']}"
     check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_mapper["pcd2"]
@@ -445,7 +445,11 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
 
     # Save the invalid postcodes to a CSV file
-    pcodes_folder = paths["postcode_path"]
+    pcodes_folder = (
+        f"{paths['root']}{config['years']['survey_year']}_surveys/"
+        f"{config['qa_paths']['postcode_path']}"
+    )
+
     tdate = datetime.now().strftime("%Y-%m-%d")
     invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)

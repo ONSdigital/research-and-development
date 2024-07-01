@@ -184,7 +184,7 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     tdate = datetime.now().strftime("%Y-%m-%d")
-    construction_folder = paths["construction_path"]
+    construction_folder = paths["modules"]["construction"]
     amendments_filename = os.path.join(
         construction_folder,
         "auto_construction",

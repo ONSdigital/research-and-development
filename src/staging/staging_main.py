@@ -61,21 +61,22 @@ def run_staging(  # noqa: C901
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
     # get the survey year variable
-    year = config["global"]["survey_year"]
+    year = config["years"]["survey_year"]
 
     # dictionaries from the config
     paths = config[f"{network_or_hdfs}_paths"]
-    qa_folders = config["qa_folders"]
+    qa_paths = config["qa_paths"]
 
-    root_path = f"{paths['root']}/survey_{year}/BERD"
-    mapper_path = f"{root_path}/mappers/{paths['mappers_version']}"
-    staging_folder = f"{root_path}/{config['modules']['staging']}"
+    root_path = f"{paths['root']}"
+    berd_path = f"{paths['root']}survey_{year}/BERD"
+    mapper_path = f"{root_path}mappers/{paths['mappers_version']}"
+    staging_folder = f"{berd_path}/{config['modules']['staging']}"
 
     snapshot_path = f"{root_path}/{paths['snapshot_path']}"
     snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
     secondary_snapshot_path = paths["secondary_snapshot_path"]
     secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-    feather_path = f"{staging_folder}/{qa_folders['feather']}"
+    feather_path = f"{staging_folder}/{qa_paths['feather_output']}"
     feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
     secondary_feather_file = os.path.join(
         feather_path, f"{secondary_snapshot_name}.feather"
@@ -106,7 +107,7 @@ def run_staging(  # noqa: C901
             secondary_full_responses = None
 
         # Read in postcode mapper (needed later in the pipeline)
-        postcode_masterlist = paths["postcode_masterlist"]
+        postcode_masterlist = f"{paths['root']}{paths['postcode_masterlist']}"
         check_file_exists(postcode_masterlist, raise_error=True)
         postcode_mapper = read_csv(postcode_masterlist)
 
