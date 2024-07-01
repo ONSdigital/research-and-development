@@ -7,7 +7,7 @@ from src.imputation.imputation_helpers import (
     copy_first_to_group,
     fix_604_error,
     create_r_and_d_instance,
-    check_604_fix
+    check_604_fix,
 )
 
 
@@ -112,7 +112,7 @@ class TestFix604Error:
             [4004, 0, None, None, "0001"],
         ]
 
-        qa_data =  [
+        qa_data = [
             [1001, 0, None, "No", "0001"],
             [1001, 1, "C", "No", "0001"],
             [1001, 2, "C", "No", "0001"],
@@ -120,7 +120,7 @@ class TestFix604Error:
         ]
         expected_filtered_df = pandasDF(data=filtered_data, columns=input_cols)
         expected_qa_df = pandasDF(data=qa_data, columns=input_cols)
-        
+
         return expected_filtered_df, expected_qa_df
 
     def test_fix_604_error(self):
@@ -132,7 +132,6 @@ class TestFix604Error:
         assert_frame_equal(result_df.reset_index(drop=True), expected_filtered_df)
         assert_frame_equal(qa_df.reset_index(drop=True), expected_qa_df)
 
-
     def test_check_604_fix(self):
         """Test for function check 604 fix"""
         # Create an input dataframe for the test
@@ -142,7 +141,7 @@ class TestFix604Error:
             "200",
             "604",
             "formtype",
-        ]    
+        ]
         input_data = [
             [1001, 0, None, "No", "0001"],
             [2002, 0, None, "Yes", "0001"],
@@ -151,7 +150,7 @@ class TestFix604Error:
             [3003, 1, "C", "No", "0001"],
             [4004, 0, None, None, "0001"],
         ]
-   
+
         exp_data = [
             [1001, 0, None, "No", "0001"],
             [2002, 0, None, "Yes", "0001"],
@@ -160,11 +159,7 @@ class TestFix604Error:
             [4004, 0, None, None, "0001"],
         ]
 
-        expected_check_cols = [
-            "reference",
-            "instance",
-            "ref_count"
-        ]   
+        expected_check_cols = ["reference", "instance", "ref_count"]
         expected_check_data = [
             [3003, 1, 2],
             [3003, 1, 2],

@@ -167,7 +167,7 @@ def apply_expansion(
 
 def prepare_short_form_constructed(df: pd.DataFrame, master_cols: List) -> pd.DataFrame:
     """Prepare the constructed short form responses for sf expansion.
-    
+
     The constructed records were removed from imputation, so it is necessary to copy
     the master columns to the empty "imputed" master columns.
     It is also necessary to create imputation classes for these records.
@@ -184,7 +184,7 @@ def prepare_short_form_constructed(df: pd.DataFrame, master_cols: List) -> pd.Da
     # Copy the values of the master columns to the corresponding "_imputed" column
     for col in master_cols:
         df.loc[sf_constructed_mask, f"{col}_imputed"] = df.loc[sf_constructed_mask, col]
-    
+
     return df
 
 

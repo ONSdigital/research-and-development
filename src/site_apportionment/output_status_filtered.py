@@ -9,9 +9,8 @@ StatusFilteredLogger = logging.getLogger(__name__)
 
 
 def save_removed_markers(
-        df: pd.DataFrame, 
-        imp_markers_to_keep: List[str]
-    ) -> pd.DataFrame:
+    df: pd.DataFrame, imp_markers_to_keep: List[str]
+) -> pd.DataFrame:
     """Filter rows neither clear nor imputed for output QA, based on imp_marker."""
     to_remove = ~df["imp_marker"].isin(imp_markers_to_keep)
     return df.copy().loc[to_remove]
@@ -56,4 +55,3 @@ def keep_good_markers(
     """Keep only rows that are clear or imputed, based on the imp_marker column."""
     series_to_keep = df["imp_marker"].isin(imp_markers_to_keep)
     return df.copy().loc[series_to_keep]
-
