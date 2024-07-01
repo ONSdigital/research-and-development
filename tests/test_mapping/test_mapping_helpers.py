@@ -12,13 +12,13 @@ class TestUpdateRefList(object):
     @pytest.fixture(scope="function")
     def full_input_df(self):
         """Main input data for update_ref_list tests."""
-        columns = ["reference", "instance", "formtype", "cellnumber"]
+        columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
-            [49900001031, 0, 6, 674],
-            [49900001530, 0, 6, 805],
-            [49900001601, 0, 1, 117],
-            [49900001601, 1, 1, 117],
-            [49900003099, 0, 6, 41],
+            [49900001031, 0, 6, 674, "A"],
+            [49900001530, 0, 6, 805, "B"],
+            [49900001601, 0, 1, 117, "C"],
+            [49900001601, 1, 1, 117, "D"],
+            [49900003099, 0, 6, 41, "E"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         df["formtype"] = df["formtype"].apply(lambda x: str(x))
@@ -38,11 +38,11 @@ class TestUpdateRefList(object):
         """Expected output for update_ref_list tests."""
         columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
         data = [
-            [49900001031, 0, "6", 674, np.nan],
-            [49900001530, 0, "6", 805, np.nan],
+            [49900001031, 0, "6", 674, "A"],
+            [49900001530, 0, "6", 805, "B"],
             [49900001601, 0, "1", 817, "L"],
             [49900001601, 1, "1", 817, "L"],
-            [49900003099, 0, "6", 41, np.nan],
+            [49900003099, 0, "6", 41, "E"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
