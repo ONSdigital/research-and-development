@@ -77,14 +77,19 @@ def getmappername(mapper_path_key, split):
     return mapper_name
 
 
+
+
+
 def load_validate_mapper(
     mapper_path_key,
     paths,
-    file_exists_func,
-    read_csv_func,
+    #file_exists_func,
+    #read_csv_func,
     logger,
-    val_with_schema_func: Callable,
-    one_to_many_val_func: Callable,
+    #val_with_schema_func: Callable,
+    additional_validation,
+    #one_to_many_val_func: Callable,
+    network_or_hdfs,
     *args,
 ):
     """
@@ -124,6 +129,12 @@ def load_validate_mapper(
     # Get the path of the mapper from the paths dictionary
     mapper_path = paths[mapper_path_key]
 
+    if network_or_hdfs == "network":
+        from src.utils import local_file_mods as mods
+
+    elif network_or_hdfs == "hdfs":
+        from src.utils import hdfs_mods as mods
+
     # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
 
@@ -131,24 +142,24 @@ def load_validate_mapper(
     logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
-    file_exists_func(mapper_path, raise_error=True)
+    mods.rd_file_exists(mapper_path, raise_error=True)
 
     # Read the file at the mapper path into a DataFrame
-    mapper_df = read_csv_func(mapper_path)
+    mapper_df = mods.rd_read_csv(mapper_path)
 
     # Construct the path of the schema from the mapper name
     schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
     schema_path = f"./config/{schema_prefix}_schema.toml"
 
     # Validate the DataFrame against the schema
-    val_with_schema_func(mapper_df, schema_path)
+    val.validate_data_with_schema(mapper_df, schema_path)
 
     # If a one-to-many validation function is provided, validate the DataFrame
-    if one_to_many_val_func:
+    if additional_validation:
         # Prepend the DataFrame to the arguments
         args = (mapper_df,) + args
         # Call the validation function with the DataFrame and the other arguments
-        one_to_many_val_func(*args)  # args include "col_many" and "col_one"
+        val.validate_many_to_one(*args)  # args include "col_many" and "col_one"
 
     # Log the successful loading of the mapper
     logger.info(f"{mapper_name} loaded successfully")

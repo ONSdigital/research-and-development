@@ -30,57 +30,49 @@ def run_mapping(
     pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
+        True,
+        network_or_hdfs,
         "pg_numeric",
         "pg_alpha",
+
     )
 
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        hlp.validate_ultfoc_df,
+        False,
+        network_or_hdfs,
     )
+    hlp.validate_ultfoc_df(ultfoc_mapper)
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        False,
+        network_or_hdfs,
     )
 
     # Loading cell number coverage
     cellno_df = stage_hlp.load_validate_mapper(
         "cellno_2022_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        False,
+        network_or_hdfs,
     )
 
     # Loading SIC to PG to alpha mapper
     sic_pg_alpha_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_alpha_mapper_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
+        True,
+        network_or_hdfs,
         "sic",
         "pg_alpha",
     )
@@ -88,11 +80,9 @@ def run_mapping(
     sic_pg_utf_mapper = stage_hlp.load_validate_mapper(
         "sic_pg_utf_mapper_path",
         paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
+        True,
+        network_or_hdfs,
         "SIC 2007_CODE",
         "2016 > Form PG",
     )
@@ -107,11 +97,9 @@ def run_mapping(
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
-            mods.rd_file_exists,
-            mods.rd_read_csv,
             MappingMainLogger,
-            val.validate_data_with_schema,
-            None,
+            False,
+            network_or_hdfs,
         )
         # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
