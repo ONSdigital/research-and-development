@@ -183,17 +183,18 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     # Prepare output paths
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["current_year"]
     construction_folder = paths["construction_path"]
     amendments_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_amendments_{tdate}_v{run_id}.csv",
+        f"{survey_year}_construction_amendments_{tdate}_v{run_id}.csv",
     )
     additions_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_additions_{tdate}_v{run_id}.csv",
+        f"{survey_year}_construction_additions_{tdate}_v{run_id}.csv",
     )
 
     # Check if the dataframes are empty before writing
@@ -242,9 +243,10 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
             )
 
     # Save the constructed dataframe as a CSV
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["current_year"]
     construction_output_filepath = os.path.join(
-        paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv"
+        paths["root"], "construction", f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv"
     )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df

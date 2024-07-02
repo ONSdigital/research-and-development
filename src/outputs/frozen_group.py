@@ -209,8 +209,9 @@ def output_frozen_group(
     output = create_output_df(df_agg, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_frozen_group_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["current_year"]
+    filename = f"{survey_year}_output_frozen_group_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_frozen_group/{filename}", output)
 
     return None
