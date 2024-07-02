@@ -39,6 +39,7 @@ def create_staging_paths_dict(config: dict) -> dict:
     staging_dict["snapshot_path"] = f"{root_path}/{paths['snapshot_path']}"
     ss_path = f"{root_path}/{paths['secondary_snapshot_path']}"
     staging_dict["secondary_snapshot_path"] = f"{root_path}/{ss_path}"
+    staging_dict["postcode_masterlist"] = f"{root_path}/{paths['postcode_masterlist']}"
 
     return staging_dict
 
@@ -53,7 +54,6 @@ def create_mapping_paths_dict(config: dict) -> dict:
         dict: A dictionary with all the paths needed for the mapping module.
     """
     roots = get_root_paths(config)
-    paths = get_paths(config)
     root_path = roots["root_path"]
 
     year = config["years"]["survey_year"]

@@ -10,7 +10,6 @@ from datetime import datetime
 from typing import Callable, Tuple, Dict, Union
 
 # Our own modules
-from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import postcode_validation as pcval
 from src.staging import spp_snapshot_processing as processing
@@ -228,7 +227,6 @@ def check_snapshot_feather_exists(
         return check_file_exists(feather_file_to_check)
 
 
-@time_logger_wrap
 def load_snapshot_feather(feather_file, read_feather):
     snapdata = read_feather(feather_file)
     StagingHelperLogger.info(f"{feather_file} loaded")
@@ -390,6 +388,7 @@ def df_to_feather(
 
 
 def stage_validate_harmonise_postcodes(
+    staging_dict: Dict,
     config: Dict,
     paths: Dict,
     full_responses: pd.DataFrame,
@@ -412,6 +411,7 @@ def stage_validate_harmonise_postcodes(
     4. Returns the original DataFrame and the master list of postcodes.
 
     Parameters:
+    staging_dict (Dict): A dictionary containing staging paths.
     config (Dict): A dictionary containing configuration options.
     paths (Dict): A dictionary containing paths to various files.
     full_responses (pd.DataFrame): The DataFrame containing the data to be
@@ -431,7 +431,7 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Starting PostCode Validation")
 
     # Load the master list of postcodes
-    postcode_masterlist = f"{paths['root']}{paths['postcode_masterlist']}"
+    postcode_masterlist = staging_dict["postcode_masterlist"]
     check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_mapper["pcd2"]

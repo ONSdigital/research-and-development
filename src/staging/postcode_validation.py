@@ -145,7 +145,6 @@ def format_postcodes(postcode: str):
             return formatted_postcode + " " * spaces_needed
 
 
-@exception_wrap
 def get_masterlist(postcode_masterlist) -> pd.Series:
     """This function converts the masterlist dataframe to a Pandas series
 
