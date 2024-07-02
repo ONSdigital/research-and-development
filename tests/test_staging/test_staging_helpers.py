@@ -415,7 +415,7 @@ class TestStageValidateHarmonisePostcodes(object):
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""
         today = date.today()
-        today_str = today.strftime(r"%Y-%m-%d")
+        today_str = today.strftime(r"%y-%m-%d")
         return today_str
 
     def test_stage_validate_harmonise_postcodes(
@@ -444,7 +444,7 @@ class TestStageValidateHarmonisePostcodes(object):
         )
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
-        filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        filename = f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
         assert (
             filename in files
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"
