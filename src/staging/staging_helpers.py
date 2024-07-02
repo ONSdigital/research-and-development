@@ -445,10 +445,7 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
 
     # Save the invalid postcodes to a CSV file
-    pcodes_folder = (
-        f"{paths['root']}{config['years']['survey_year']}_surveys/"
-        f"{config['qa_paths']['postcode_path']}"
-    )
+    pcodes_folder = staging_dict["postcode_path"]
 
     tdate = datetime.now().strftime("%Y-%m-%d")
     invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
