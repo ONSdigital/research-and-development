@@ -387,4 +387,4 @@ def flag_no_rand_spenders(df, raise_or_warn):
             ValidationLogger.error(invalid_records)
 
     else:
-        ValidationLogger("All records have valid R&D spend.")
+        ValidationLogger.info("All records have valid R&D spend.")

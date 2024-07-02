@@ -13,7 +13,7 @@ def get_root_paths(config: dict) -> Tuple[dict, dict]:
     paths = get_paths(config)
     root_dict = {
         "root_path": paths["root"],
-        "berd_path": f"{paths['root']}{year}_survey/BERD/",
+        "berd_path": f"{paths['root']}{year}_surveys/BERD/",
     }
     return root_dict
 

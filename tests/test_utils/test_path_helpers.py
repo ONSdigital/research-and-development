@@ -50,7 +50,7 @@ def test_get_root_paths(config):
     """Test get_root_paths function."""
     expected_root_dict = {
         "root_path": "R:/DAP_emulation/",
-        "berd_path": "R:/DAP_emulation/2022_survey/BERD/",
+        "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
     }
     root_dict = get_root_paths(config)
 
@@ -61,7 +61,7 @@ def test_create_staging_paths_dict(config):
     """Test create_staging_paths_dict function."""
 
     expected_staging_dict = {
-        "feather_output": "R:/DAP_emulation/2022_survey/BERD/01_staging/feather",
+        "feather_output": "R:/DAP_emulation/2022_surveys/BERD/01_staging/feather",
         "snapshot_path": "R:/DAP_emulation/snapshot_path/snap.csv",
         "secondary_snapshot_path": "R:/DAP_emulation/secondary_snapshot_path/snap2.csv",
         "postcode_masterlist": "R:/DAP_emulation/postcode_masterlist_path/postcode.csv",
