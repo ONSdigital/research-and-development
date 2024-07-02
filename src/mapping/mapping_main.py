@@ -3,7 +3,7 @@ import logging
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
-from src.mapping.cellno_mapper import join_cellno_mapper
+
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
 
@@ -73,7 +73,7 @@ def run_mapping(
         None,
     )
 
-    sic_pg_num = hlp.load_validate_mapper(
+    sic_pg_num = stage_hlp.load_validate_mapper(
         "sic_pg_num_mapper_path",
         paths,
         mods.rd_file_exists,
@@ -87,7 +87,7 @@ def run_mapping(
 
     # Loading ru_817_list mapper
     if config["global"]["survey_year"] == 2022:
-        ref_list_817_mapper = hlp.load_validate_mapper(
+        ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,
             mods.rd_file_exists,
@@ -104,7 +104,7 @@ def run_mapping(
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
     ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
 
-    full_responses = join_cellno_mapper(full_responses, cellno_df)
+    # full_responses = join_cellno_mapper(full_responses, cellno_df)
 
     # placeholder for running mapping
 
