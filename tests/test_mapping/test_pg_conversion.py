@@ -229,7 +229,7 @@ class TestRunPgConversion(object):
             [39900008968, 1, 2021, "GB ", 1.44, "AA", 46420, 40.0],
             [39900009016, 1, 2021, "GB ", 4.0, "AD", 71129, 50.0],
             [39900009078, 1, 2021, "GB ", 0.72, "J", 23610, 15.0],
-        ]  # noqa: E501
+        ] 
 
         ni_expected = pd.DataFrame(data=data, columns=columns)
         ni_expected["201"] = ni_expected["201"].astype("category")
