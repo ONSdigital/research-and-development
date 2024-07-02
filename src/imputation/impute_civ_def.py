@@ -48,7 +48,7 @@ def create_civdef_dict(df: pd.DataFrame) -> Tuple[Dict[str, float], pd.DataFrame
     # Filter out imputation classes that are missing either "201" or "rusic"
     # and exclude empty pg_sic classes
     cond1 = ~(df["pg_sic_class"].str.contains("nan")) & (
-        df["empty_pgsic_group"] == False
+        df["empty_pgsic_group"] == False  # noqa: E712
     )
     filtered_df = df[cond1]
 
@@ -63,8 +63,11 @@ def create_civdef_dict(df: pd.DataFrame) -> Tuple[Dict[str, float], pd.DataFrame
     # for the "empty_pgsic_group" cases
     pg_dict = {}
 
-    # filter out invalid pg classes and empty pg groups from the original dataframe
-    cond2 = ~(df["pg_class"].str.contains("nan")) & (df["empty_pg_group"] == False)
+    # filter out invalid pg classes and empty pg groups from the original
+    # dataframe
+    cond2 = ~(df["pg_class"].str.contains("nan")) & (
+        df["empty_pg_group"] == False  # noqa: E712
+    )
     filtered_df2 = df[cond2]
 
     # evaluate which pg classes are needed for empty pg_sic groups
@@ -180,7 +183,7 @@ def apply_civdev_imputation(
     # PASS 2: refine based on product group imputation class
 
     # filter out empty and invalid imputation classes
-    cond1 = to_impute_df["empty_pg_group"] == False
+    cond1 = to_impute_df["empty_pg_group"] == False  # noqa: E712
     cond2 = ~to_impute_df["pg_class"].str.contains("nan")
 
     filtered_df = to_impute_df.loc[cond1 & cond2].copy()
@@ -200,7 +203,7 @@ def apply_civdev_imputation(
     # PASS 3: refine again based on product group and SIC imputation class
 
     # filter out empty and invalid imputation classes
-    cond3 = to_impute_df["empty_pgsic_group"] == False
+    cond3 = to_impute_df["empty_pgsic_group"] == False  # noqa: E712
     cond4 = ~to_impute_df["pg_sic_class"].str.contains("nan")
 
     filtered_df2 = to_impute_df.loc[cond3 & cond4].copy()

@@ -110,7 +110,8 @@ def get_amendments(main_snapshot, secondary_snapshot):
 
         # ? I think this is the way to do it:
         # ?     Take a slice of the df which is just the cols ending with _diff_nonzero
-        # ?     Do a column-wise any() on this slice, which returns a series where the value is True if any of the *_diff_nonzero cols in that row were True
+        # ?     Do a column-wise any() on this slice, which returns a series where the
+        #       value is True if any of the *_diff_nonzero cols in that row were True
         # ?     Add that series as a column to the original df
         # ?     Remove any rows from the df where is_any_diff_nonzero is False
         # ! Can't test this without a real secondary snapshot file
@@ -252,8 +253,19 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 def apply_amendments(main_df, amendments_df):
     """Apply amendments to the main snapshot."""
     key_cols = ["reference", "year", "instance"]
-    numeric_cols = ["219", "220", "242", "243", "244", "245",
-                    "246", "247", "248", "249", "250"]
+    numeric_cols = [
+        "219",
+        "220",
+        "242",
+        "243",
+        "244",
+        "245",
+        "246",
+        "247",
+        "248",
+        "249",
+        "250",
+    ]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
     accepted_amendments_df = amendments_df.drop(

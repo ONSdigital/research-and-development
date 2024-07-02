@@ -13,7 +13,7 @@ import src.staging.staging_helpers as helpers
 StagingMainLogger = logging.getLogger(__name__)
 
 
-def run_staging(
+def run_staging(  # noqa: C901
     config: dict,
     check_file_exists: Callable,
     load_json: Callable,
@@ -147,19 +147,14 @@ def run_staging(
             feather_fname = f"{snapshot_name}_corrected.feather"
             s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
-                feather_path,
-                feather_fname,
-                full_responses,
-                write_feather
-
+                feather_path, feather_fname, full_responses, write_feather
             )
             if secondary_full_responses is not None:
                 helpers.df_to_feather(
                     feather_path,
                     s_feather_fname,
                     secondary_full_responses,
-                    write_feather
-
+                    write_feather,
                 )
 
     # Flag invalid records
@@ -205,7 +200,6 @@ def run_staging(
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
-
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
@@ -222,7 +216,6 @@ def run_staging(
     else:
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
-
 
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(
@@ -283,17 +276,10 @@ def run_staging(
         full_responses,
         secondary_full_responses,
         manual_outliers,
-        #ultfoc_mapper,
-        #itl_mapper,
-        #cellno_df,
         postcode_mapper,
-        #pg_num_alpha,
-        #sic_pg_alpha_mapper,
-        #sic_pg_utf_mapper,
         backdata,
         pg_detailed_mapper,
         itl1_detailed_mapper,
-        #ref_list_817_mapper,
         civil_defence_detailed_mapper,
         sic_division_detailed_mapper,
         manual_trim_df,

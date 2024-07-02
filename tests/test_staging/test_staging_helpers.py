@@ -14,7 +14,6 @@ import pyarrow.feather as feather
 # Local Imports
 from src.staging.staging_helpers import (
     fix_anon_data,
-    update_ref_list,
     getmappername,
     check_snapshot_feather_exists,
     load_snapshot_feather,
@@ -24,11 +23,11 @@ from src.staging.staging_helpers import (
     stage_validate_harmonise_postcodes,
 )
 from src.utils.local_file_mods import (
-    local_file_exists as check_file_exists,
-    local_read_feather as read_feather,
-    local_write_feather as write_feather,
-    read_local_csv as read_csv,
-    write_local_csv as write_csv,
+    rd_file_exists as check_file_exists,
+    rd_read_feather as read_feather,
+    rd_write_feather as write_feather,
+    rd_read_csv as read_csv,
+    rd_write_csv as write_csv,
 )
 
 
@@ -91,65 +90,6 @@ class TestFixAnonData(object):
         assert output.equals(expected_output), "fix_anon_data not behaving as expected."
 
 
-class TestUpdateRefList(object):
-    """Tests for update_ref_list."""
-
-    @pytest.fixture(scope="function")
-    def full_input_df(self):
-        """Main input data for update_ref_list tests."""
-        columns = ["reference", "instance", "formtype", "cellnumber"]
-        data = [
-            [49900001031, 0.0, 6, 674],
-            [49900001530, 0.0, 6, 805],
-            [49900001601, 0.0, 1, 117],
-            [49900001601, 1.0, 1, 117],
-            [49900003099, 0.0, 6, 41],
-        ]
-        df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
-        return df
-
-    @pytest.fixture(scope="function")
-    def ref_list_input(self):
-        """Reference list df input for update_ref_list tests."""
-        columns = ["reference", "cellnumber", "selectiontype", "formtype"]
-        data = [[49900001601, 117, "C", "1"]]
-        df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
-        return df
-
-
-    @pytest.fixture(scope="function")
-    def expected_output(self):
-        """Expected output for update_ref_list tests."""
-        columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
-        data = [
-            [49900001031, 0.0, "6", 674, np.nan],
-            [49900001530, 0.0, "6", 805, np.nan],
-            [49900001601, 0.0, "1", 817, "L"],
-            [49900001601, 1.0, "1", 817, "L"],
-            [49900003099, 0.0, "6", 41, np.nan],
-        ]
-        df = pd.DataFrame(columns=columns, data=data)
-        return df
-
-    def test_update_ref_list(self, full_input_df, ref_list_input, expected_output):
-        """General tests for update_ref_list."""
-        output = update_ref_list(full_input_df, ref_list_input)
-        assert output.equals(
-            expected_output
-        ), "update_ref_list not behaving as expected"
-
-    def test_update_ref_list_raises(self, full_input_df, ref_list_input):
-        """Test the raises in update_ref_list."""
-        # add a non valid reference
-        ref_list_input.loc[1] = [34567123123, 117, "C", "1"]
-        error_msg = r"The following references in the reference list mapper are.*"
-        with pytest.raises(ValueError, match=error_msg):
-            update_ref_list(full_input_df, ref_list_input)
-
-
-
 class TestGetMapperName(object):
     """Tests for getmappername."""
 
@@ -189,7 +129,6 @@ class TestCheckSnapshotFeatherExists(object):
         if second:
             feather.write_feather(empty_df.copy(), s_path)
         return (pathlib.Path(f_path), pathlib.Path(s_path))
-
 
     @pytest.mark.parametrize(
         "first, second, check_both, result",
@@ -259,9 +198,7 @@ class TestDfToFeather(object):
     @pytest.fixture(scope="function")
     def f1(self):
         """Snapshot 1 test data."""
-        f1 = pd.DataFrame(
-            {"f1": [1]}
-        )
+        f1 = pd.DataFrame({"f1": [1]})
         return f1
 
     def test_df_to_feather_defences(self, tmp_path, f1):
@@ -270,19 +207,9 @@ class TestDfToFeather(object):
         fake_path = "test_test/test/this_is_a_test"
         match = rf"The passed directory.*{fake_path}.*"
         with pytest.raises(FileNotFoundError, match=match):
-            df_to_feather(
-                fake_path,
-                "test",
-                f1,
-                write_feather
-            )
+            df_to_feather(fake_path, "test", f1, write_feather)
         # test raise for file already exists
-        df_to_feather(
-            tmp_path,
-            "test",
-            f1,
-            write_feather
-        )
+        df_to_feather(tmp_path, "test", f1, write_feather)
         match = r"File already saved at .*"
         with pytest.raises(FileExistsError, match=match):
             df_to_feather(
@@ -303,9 +230,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test.feather")), (
-            "Feather not saved out correctly."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test.feather")
+        ), "Feather not saved out correctly."
         # save without .feather extension passed
         df_to_feather(
             tmp_path,
@@ -314,9 +241,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test2.feather")), (
-            ".feather. extension not applied to path."
-        )
+        assert os.path.exists(
+            os.path.join(tmp_path, "test2.feather")
+        ), ".feather. extension not applied to path."
         # test with overwrite=True
         # using try/except since nullcontext not supported in python=3.6
         try:
@@ -337,10 +264,9 @@ class TestDfToFeather(object):
             write_feather,
             False,
         )
-        assert os.path.exists(os.path.join(tmp_path, "test3.test.feather")), (
-            ".feather. extension not applied when another extension exists."
-        )
-
+        assert os.path.exists(
+            os.path.join(tmp_path, "test3.test.feather")
+        ), ".feather. extension not applied when another extension exists."
 
 
 class TestStageValidateHarmonisePostcodes(object):
@@ -427,7 +353,6 @@ class TestStageValidateHarmonisePostcodes(object):
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
-
 
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""

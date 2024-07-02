@@ -25,8 +25,7 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
 
     if (upper_clip == 0) and (lower_clip == 0):
         AutoOutlierLogger.warning(
-            "upper_clip and lower_clip both zero: "
-            "All auto_outlier flags will be False"
+            "upper_clip and lower_clip both zero: All auto_outlier flags will be False"
         )
     elif (upper_clip < 0) | (lower_clip < 0):
         AutoOutlierLogger.error("upper_clip and lower_clip cannot be negative")
@@ -238,7 +237,7 @@ def run_auto_flagging(
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
-    msg = "Outlier flags have been created" f"for {num_flagged} records in total."
+    msg = f"Outlier flags have been createdfor {num_flagged} records in total."
     AutoOutlierLogger.info(msg)
 
     AutoOutlierLogger.info("Finishing automatic outlier detection.")
