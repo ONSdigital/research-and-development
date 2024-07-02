@@ -333,7 +333,7 @@ class TestStageValidateHarmonisePostcodes(object):
     @pytest.fixture(scope="function")
     def config(self) -> pd.DataFrame:
         """Test config."""
-        config = {"global": {"postcode_csv_check": True}}
+        config = {"global": {"postcode_csv_check": True}, "years": {"current_year": 2022}}
         return config
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
