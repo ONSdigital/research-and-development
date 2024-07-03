@@ -42,7 +42,7 @@ def output_status_filtered(
     output_path = paths["output_path"]
 
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     filename = f"{survey_year}_status_filtered_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_status_filtered_qa/{filename}", filtered_df)
 

@@ -129,7 +129,7 @@ def run_imputation(
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation files.")
         tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["current_year"]
+        survey_year = config["years"]["survey_year"]
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
         # links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"

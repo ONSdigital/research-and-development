@@ -69,6 +69,6 @@ def output_tau(
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     filename = f"{survey_year}_output_tau_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_tau/{filename}", tau_output)

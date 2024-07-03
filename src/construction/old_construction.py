@@ -184,7 +184,7 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     construction_folder = paths["construction_path"]
     amendments_filename = os.path.join(
         construction_folder,
@@ -244,7 +244,7 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 
     # Save the constructed dataframe as a CSV
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     construction_output_filepath = os.path.join(
         paths["root"], "construction", f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv"
     )

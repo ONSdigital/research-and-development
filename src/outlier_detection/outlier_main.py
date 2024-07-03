@@ -58,7 +58,7 @@ def run_outliers(
 
     # Output the file with auto outliers for manual checking
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     if config["global"]["output_auto_outliers"]:
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
         file_path = auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"

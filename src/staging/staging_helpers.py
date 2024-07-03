@@ -169,7 +169,7 @@ def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
     Returns:
         dict: A dictionary of history data loaded into the pipeline.
     """
-    curent_year = config["years"]["current_year"]
+    curent_year = config["years"]["survey_year"]
     years_to_load = config["years"]["previous_years_to_load"]
     years_gen = history_loader.history_years(curent_year, years_to_load)
 
@@ -444,7 +444,7 @@ def stage_validate_harmonise_postcodes(
     # Save the invalid postcodes to a CSV file
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["current_year"]
+    survey_year = config["years"]["survey_year"]
     invalid_filename = f"{survey_year}_invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
 

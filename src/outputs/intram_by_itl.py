@@ -104,7 +104,7 @@ def output_intram_by_itl(
     # Declare Config Values
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
-    CURRENT_YEAR = config["years"]["current_year"]
+    CURRENT_YEAR = config["years"]["survey_year"]
 
     # Subset GB Data
     df = df_gb[["postcodes_harmonised", "formtype", "211"]]
@@ -141,7 +141,7 @@ def output_intram_by_itl(
         save_detailed_csv(
             df=itl_df,
             dir=output_dir,
-            survey_year=config["years"]["current_year"],
+            survey_year=config["years"]["survey_year"],
             title=f"output_intram_{area}_itl{i}",
             run_id=run_id,
             write_csv=write_csv,
