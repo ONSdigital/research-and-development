@@ -1,5 +1,4 @@
 import pandas as pd
-from src.imputation.pg_conversion import run_pg_conversion
 from src.staging.validation import flag_no_rand_spenders
 from src.outputs.outputs_helpers import create_period_year
 
@@ -8,8 +7,6 @@ def form_output_prep(
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
-    pg_num_alpha: pd.DataFrame,
-    sic_pg_num: pd.DataFrame,
 ):
 
     """Prepares the data for the outputs.
@@ -19,8 +16,6 @@ def form_output_prep(
         short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         ni_full_responses(pd.DataFrame): Dataset with all NI data
-        pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_alpha (pd.DataFrame): Mapper for product group conversions (SIC to alpha)
 
     Returns:
         ni_full_responses (pd.DataFrame): If available, prepared NI data
@@ -49,11 +44,6 @@ def form_output_prep(
         ni_full_responses["form_status"] = 600
         ni_full_responses["602"] = 100.0
         ni_full_responses["formtype"] = "0003"
-
-        # Update column 201 (currently PG numeric) to alpha-numeric, mapping from SIC.
-        ni_full_responses = run_pg_conversion(
-            ni_full_responses, pg_num_alpha, sic_pg_num
-        )
 
         # outputs_df = pd.concat([outputs_df, ni_full_responses])
         tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])

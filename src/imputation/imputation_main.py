@@ -7,10 +7,10 @@ from datetime import datetime
 from src.imputation import imputation_helpers as hlp
 from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
-from src.imputation.pg_conversion import run_pg_conversion, pg_to_pg_mapper
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
-from src.imputation.MoR import run_mor
+
+# from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.outputs.outputs_helpers import create_output_df
@@ -22,8 +22,6 @@ ImputationMainLogger = logging.getLogger(__name__)
 def run_imputation(
     df: pd.DataFrame,
     manual_trimming_df: pd.DataFrame,
-    pg_num_alpha: pd.DataFrame,
-    sic_pg_num: pd.DataFrame,
     backdata: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
@@ -32,15 +30,14 @@ def run_imputation(
     """Run all the processes for the imputation module.
 
     These processes are, in order:
-    1) PG conversion: convert PG column (201) from numeric to alpha-numeric
-    2) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
-    3) Short to long form conversion: create new instances with short form questions
+    1) Apportionment: apportion 4xx and 5xx cols to create FTE and headcount cols
+    2) Short to long form conversion: create new instances with short form questions
         mapped and apportioned to longform question equivalents
-    4) Mean of Ratios imputation: (forwards imputation) where back data is available,
+    3) Mean of Ratios imputation: (forwards imputation) where back data is available,
         with "carry forward" as fall back data exists for prev but not current period.
-    5) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
+    4) Trimmed Mean imputation (TMI): carried out where no backdata was avaialbe to
         allow mean of ratios or carried forward method
-    6) Short form expansion imputation: imputing for questions not asked in short forms
+    5) Short form expansion imputation: imputing for questions not asked in short forms
 
     Args:
         df (pd.DataFrame): the full responses spp data
@@ -51,8 +48,6 @@ def run_imputation(
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
     """
-    # Carry out product group conversion
-    df = run_pg_conversion(df, pg_num_alpha, sic_pg_num, pg_column="201")
 
     # Apportion cols 4xx and 5xx to create FTE and headcount values
     df = run_apportionment(df)
@@ -97,22 +92,10 @@ def run_imputation(
     trimmed_df, df = hlp.split_df_on_trim(df, "manual_trim")
 
     # Run MoR
-    if backdata is not None:
-        # Fix for different column names on network vs hdfs
-        if NETWORK_OR_HDFS == "network":
-            # Map PG numeric to alpha in column q201
-            # This isn't done on HDFS as the column is already mapped
-            backdata = pg_to_pg_mapper(
-                backdata,
-                pg_num_alpha,
-                pg_column="q201",
-                from_col="pg_numeric",
-                to_col="pg_alpha",
-            )
-            backdata = backdata.drop("pg_numeric", axis=1)
-
-        lf_target_vars = config["imputation"]["lf_target_vars"]
-        df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
+    # if backdata is not None:
+    # MoR will be re-written with new backdata
+    # lf_target_vars = config["imputation"]["lf_target_vars"]
+    # df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)
@@ -148,7 +131,7 @@ def run_imputation(
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["current_year"]
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
-        links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
+        # links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
         wrong_604_filename = f"{survey_year}_wrong_604_error_qa_{tdate}_v{run_id}.csv"
 
@@ -157,11 +140,13 @@ def run_imputation(
         schema_dict = load_schema(schema_path)
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
+        # if backdata is not None:
+        #  write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
         write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
         write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
         write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
-        if config["global"]["load_backdata"]:
-            write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
+        # if config["global"]["load_backdata"]:
+        #     write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe

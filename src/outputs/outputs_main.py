@@ -34,13 +34,10 @@ def run_outputs(  # noqa: C901
     ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
-    sic_pg_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
-    pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -57,24 +54,17 @@ def run_outputs(  # noqa: C901
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): Links postcode to region code
         itl_mapper (pd.DataFrame): Links region to ITL codes
-        sic_pg_num (pd.DataFrame): Maps SIC to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
-        pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_num (pd.DataFrame): Mapper for product group conversions
     """
 
     # Remove instance 0 from weighted df, so that it does not go to Tau outputs
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
-        estimated_df,
-        weighted_df,
-        ni_full_responses,
-        pg_num_alpha,
-        sic_pg_num,
+        estimated_df, weighted_df, ni_full_responses
     )
 
     # Running short form output
