@@ -3,7 +3,6 @@ import pytest
 
 from src.utils.path_helpers import (
     get_paths,
-    get_root_paths,
     create_staging_paths_dict,
     create_mapping_paths_dict,
 )
@@ -40,21 +39,12 @@ def test_get_paths(config):
         "snapshot_path": "snapshot_path/snap.csv",
         "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
+        "year": 2022,
+        "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
     }
     network_paths = get_paths(config)
 
     assert network_paths == expected_network_paths
-
-
-def test_get_root_paths(config):
-    """Test get_root_paths function."""
-    expected_root_dict = {
-        "root_path": "R:/DAP_emulation/",
-        "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
-    }
-    root_dict = get_root_paths(config)
-
-    assert root_dict == expected_root_dict
 
 
 def test_create_staging_paths_dict(config):

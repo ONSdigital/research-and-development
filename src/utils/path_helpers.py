@@ -1,21 +1,13 @@
-from typing import Tuple
+"""This module contains helper functions for creating paths."""
 
 
 def get_paths(config: dict) -> dict:
-    """ "Return either network_paths or hdfs_paths despending on the environment."""
+    """Return either network_paths or hdfs_paths despending on the environment."""
     network_or_hdfs = config["global"]["network_or_hdfs"]
-    return config[f"{network_or_hdfs}_paths"]
-
-
-def get_root_paths(config: dict) -> Tuple[dict, dict]:
-    """Create a dictionary for the root paths."""
-    year = config["years"]["survey_year"]
-    paths = get_paths(config)
-    root_dict = {
-        "root_path": paths["root"],
-        "berd_path": f"{paths['root']}{year}_surveys/BERD/",
-    }
-    return root_dict
+    paths = config[f"{network_or_hdfs}_paths"]
+    paths["year"] = config["years"]["survey_year"]
+    paths["berd_path"] = f"{paths['root']}{paths['year']}_surveys/BERD/"
+    return paths
 
 
 def create_staging_paths_dict(config: dict) -> dict:
@@ -27,12 +19,11 @@ def create_staging_paths_dict(config: dict) -> dict:
     Returns:
         dict: A dictionary with all the paths needed for the staging module.
     """
-    roots = get_root_paths(config)
     paths = get_paths(config)
-    root_path = roots["root_path"]
+    root_path = paths["root"]
     staging_config = config["staging_paths"]
     wanted_keys = list(staging_config.keys())[1:]
-    folder_path = f"{roots['berd_path']}{config['staging_paths']['folder']}"
+    folder_path = f"{paths['berd_path']}{config['staging_paths']['folder']}"
 
     # set up the staging paths dictionary
     staging_dict = {key: f"{folder_path}/{staging_config[key]}" for key in wanted_keys}
@@ -53,10 +44,10 @@ def create_mapping_paths_dict(config: dict) -> dict:
     Returns:
         dict: A dictionary with all the paths needed for the mapping module.
     """
-    roots = get_root_paths(config)
-    root_path = roots["root_path"]
+    paths = get_paths(config)
+    root_path = paths["root"]
 
-    year = config["years"]["survey_year"]
+    year = paths["year"]
     year_mapper_dict = config[f"{year}_mappers"]
 
     mapper_folder = f"{root_path}mappers/{year_mapper_dict['mappers_version']}/"
@@ -65,3 +56,14 @@ def create_mapping_paths_dict(config: dict) -> dict:
     mapping_dict = {k: f"{mapper_folder}{year_mapper_dict[k]}" for k in wanted_keys}
 
     return mapping_dict
+
+
+def create_imputation_paths_dict(config: dict) -> dict:
+    """Create a dictionary with all the paths needed for the imputation module.
+
+    Args:
+        config (dict): The pipeline configuration.
+
+    Returns:
+        dict: A dictionary with all the paths needed for the imputation module.
+    """
