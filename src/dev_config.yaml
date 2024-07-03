@@ -2,7 +2,7 @@ config_validation:
   validate: True
   path: src/dev_config_schema.yaml
 global:
-  survey_year: 2022
+  survey_year: 2023
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
@@ -31,6 +31,7 @@ network_paths:
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
+  postcode_mapper: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/mappers/v1/postcodes_2023.csv"
   postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
   history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
   # Imputation and outliers input paths
@@ -42,7 +43,7 @@ network_paths:
   construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
   construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
   # mapper paths
-  mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
+  mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/mappers/v1/"
   ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
   itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
   cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
