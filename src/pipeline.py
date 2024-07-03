@@ -124,8 +124,9 @@ def run_pipeline(start, user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    mapped_df = run_mapping(
+    (mapped_df, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df,) = run_mapping(
         full_responses,
+        ni_df,
         config,
     )
     MainLogger.info("Finished Mapping...")
@@ -135,8 +136,6 @@ def run_pipeline(start, user_config_path, dev_config_path):
     imputed_df = run_imputation(
         mapped_df,
         manual_trimming_df,
-        pg_num_alpha,
-        sic_pg_num,
         backdata,
         config,
         mods.rd_write_csv,
@@ -198,13 +197,10 @@ def run_pipeline(start, user_config_path, dev_config_path):
         ultfoc_mapper,
         postcode_mapper,
         itl_mapper,
-        sic_pg_num,
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
-        pg_num_alpha,
-        sic_pg_num,
     )
 
     MainLogger.info("Finished All Output modules.")
