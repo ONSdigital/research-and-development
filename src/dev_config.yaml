@@ -2,6 +2,7 @@ config_validation:
   validate: True
   path: src/dev_config_schema.yaml
 global:
+  survey_year: 2022
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"

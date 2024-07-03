@@ -12,6 +12,7 @@ from src.utils.local_file_mods import safeload_yaml
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
+from src.mapping.mapping_main import run_mapping
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
@@ -87,17 +88,10 @@ def run_pipeline(start, user_config_path, dev_config_path):
         full_responses,
         secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
-        ultfoc_mapper,
-        itl_mapper,
-        cellno_df,
         postcode_mapper,
-        pg_num_alpha,
-        sic_pg_alpha,
-        sic_pg_num,
         backdata,
         pg_detailed,
         itl1_detailed,
-        reference_list,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
@@ -128,13 +122,20 @@ def run_pipeline(start, user_config_path, dev_config_path):
     )
     MainLogger.info("Finished Construction...")
 
+    # Mapping module
+    MainLogger.info("Starting Mapping...")
+    (mapped_df, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df,) = run_mapping(
+        full_responses,
+        ni_df,
+        config,
+    )
+    MainLogger.info("Finished Mapping...")
+
     # Imputation module
     MainLogger.info("Starting Imputation...")
     imputed_df = run_imputation(
-        full_responses,
+        mapped_df,
         manual_trimming_df,
-        pg_num_alpha,
-        sic_pg_num,
         backdata,
         config,
         mods.rd_write_csv,
@@ -196,13 +197,10 @@ def run_pipeline(start, user_config_path, dev_config_path):
         ultfoc_mapper,
         postcode_mapper,
         itl_mapper,
-        sic_pg_num,
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
-        pg_num_alpha,
-        sic_pg_num,
     )
 
     MainLogger.info("Finished All Output modules.")

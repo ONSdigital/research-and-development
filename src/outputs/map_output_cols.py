@@ -7,36 +7,6 @@ import numpy as np
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def join_pg_numeric(
-    main_df: pd.DataFrame, mapper_df: pd.DataFrame, cols_pg: list = ["201"]
-) -> pd.DataFrame:
-    """
-    Add a new column with numeric PD using a mapper.
-
-    Args:
-        main_df (pd.DataFrame): The main DataFrame.
-        mapper_df (pd.DataFrame): The mapper DataFrame.
-        cols_pg (list): PG clumns to be converted from alpha to numeric
-
-    Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
-    """
-    for mycol in cols_pg:
-        try:
-            # Perform left join
-            combined_df = main_df.merge(
-                mapper_df, how="left", left_on=mycol, right_on="pg_alpha"
-            )
-            combined_df.rename(columns={"pg_numeric": mycol + "_numeric"}, inplace=True)
-            combined_df = combined_df.drop(columns=["pg_alpha"])
-
-        except Exception as e:
-            raise ValueError(
-                "An error occurred while combining main_df and mapper_df: " + str(e)
-            )
-    return combined_df
-
-
 def join_fgn_ownership(
     main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
 ) -> pd.DataFrame:

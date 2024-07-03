@@ -3,7 +3,6 @@
 import logging
 from typing import Callable, Tuple
 from datetime import datetime
-import pandas as pd
 import os
 
 import src.staging.staging_helpers as helpers
@@ -15,7 +14,6 @@ from src.utils.path_helpers import (
     # create_mapping_paths_dict,
 )
 
-# Set up the logger
 StagingMainLogger = logging.getLogger(__name__)
 
 
@@ -208,18 +206,6 @@ def run_staging(  # noqa: C901
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
-    pg_num_alpha = helpers.load_validate_mapper(
-        "pg_num_alpha_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
-        "pg_numeric",
-        "pg_alpha",
-    )
-
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
@@ -237,78 +223,6 @@ def run_staging(  # noqa: C901
         backdata = None
         StagingMainLogger.info("Loading of Backdata File skipped")
 
-    # Load ultfoc (Foreign Ownership) mapper
-    ultfoc_mapper = helpers.load_validate_mapper(
-        "ultfoc_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_ultfoc_df,
-    )
-
-    # Load ITL mapper
-    itl_mapper = helpers.load_validate_mapper(
-        "itl_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
-    )
-
-    # Loading cell number coverage
-    cellno_df = helpers.load_validate_mapper(
-        "cellno_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
-    )
-
-    # Loading SIC to PG to alpha mapper
-    sic_pg_alpha_mapper = helpers.load_validate_mapper(
-        "sic_pg_alpha_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
-        "sic",
-        "pg_alpha",
-    )
-
-    sic_pg_utf_mapper = helpers.load_validate_mapper(
-        "sic_pg_utf_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
-        "SIC 2007_CODE",
-        "2016 > Form PG",
-    )
-    cols_needed = ["SIC 2007_CODE", "2016 > Form PG"]
-    sic_pg_utf_mapper = sic_pg_utf_mapper[cols_needed]
-    mapper_path = paths["mapper_path"]
-    write_csv(f"{mapper_path}/sic_pg_num.csv", sic_pg_utf_mapper)
-
-    pg_detailed_mapper = helpers.load_validate_mapper(
-        "pg_detailed_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
-        StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
-    )
-
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
@@ -319,24 +233,6 @@ def run_staging(  # noqa: C901
         val.validate_data_with_schema,
         None,
     )
-
-    # Loading ru_817_list mapper
-    load_ref_list_mapper = config["global"]["load_reference_list"]
-    if load_ref_list_mapper:
-        ref_list_817_mapper = helpers.load_validate_mapper(
-            "ref_list_817_mapper_path",
-            paths,
-            check_file_exists,
-            read_csv,
-            StagingMainLogger,
-            val.validate_data_with_schema,
-            None,
-        )
-        # update longform references that should be on the reference list
-        full_responses = helpers.update_ref_list(full_responses, ref_list_817_mapper)
-    else:
-        StagingMainLogger.info("Skipping loding the reference list mapper File.")
-        ref_list_817_mapper = pd.DataFrame()
 
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
@@ -352,6 +248,16 @@ def run_staging(  # noqa: C901
     # Loading SIC division detailed mapper
     sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
+        paths,
+        check_file_exists,
+        read_csv,
+        StagingMainLogger,
+        val.validate_data_with_schema,
+        None,
+    )
+
+    pg_detailed_mapper = helpers.load_validate_mapper(
+        "pg_detailed_mapper_path",
         paths,
         check_file_exists,
         read_csv,
@@ -376,17 +282,10 @@ def run_staging(  # noqa: C901
         full_responses,
         secondary_full_responses,
         manual_outliers,
-        ultfoc_mapper,
-        itl_mapper,
-        cellno_df,
         postcode_mapper,
-        pg_num_alpha,
-        sic_pg_alpha_mapper,
-        sic_pg_utf_mapper,
         backdata,
         pg_detailed_mapper,
         itl1_detailed_mapper,
-        ref_list_817_mapper,
         civil_defence_detailed_mapper,
         sic_division_detailed_mapper,
         manual_trim_df,
