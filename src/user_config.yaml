@@ -2,7 +2,7 @@ config_validation:
   validate: True
   path: src/user_config_schema.yaml
 years:
-  current_year: 2022
+  survey_year: 2022
   previous_years_to_load: 1
 global:
   # Staging and validation settings
