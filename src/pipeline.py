@@ -8,6 +8,7 @@ from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
+from src.utils.path_helpers import update_config_with_paths
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
@@ -32,6 +33,8 @@ def run_pipeline(start, user_config_path, dev_config_path):
     """
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
+    # Update the config with the full paths depending on the environment.
+    update_config_with_paths(config)
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]

@@ -44,13 +44,12 @@ outliers_paths:
   folder: "07_outliers"
   qa_path: "outlier_qa"
   auto_outliers_path: "auto_outliers"
-  manual_outliers_path: "manual_outliers"
 estimation_paths:
   folder: "08_estimation"
   qa_path: "estimation_qa"
 apportionment_paths:
   folder: "09_apportionment"
-output_paths:
+outputs_paths:
   folder: "10_outputs"
 export_paths:
   export_folder: "outgoing_export"
