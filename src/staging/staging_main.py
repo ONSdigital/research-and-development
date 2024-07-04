@@ -9,8 +9,8 @@ import src.staging.staging_helpers as helpers
 from src.staging import validation as val
 from src.utils.path_helpers import (
     get_paths,
-    create_staging_paths_dict,
-    create_mapping_paths_dict,
+    create_staging_config,
+    create_mapping_config,
 )
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -69,9 +69,11 @@ def run_staging(  # noqa: C901
     paths = get_paths(config)
 
     # set up a dictionary with all the paths needed for the staging module
-    staging_dict = create_staging_paths_dict(config)
+    staging_dict = create_staging_config(config)
+    config["staging_paths"] = staging_dict
     # set up a dictionary with all the paths needed for mapping
-    mapping_dict = create_mapping_paths_dict(config)
+    mapping_dict = create_mapping_config(config)
+    config["mapping_paths"] = mapping_dict
 
     snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
     secondary_snapshot_name = os.path.basename(
@@ -127,9 +129,7 @@ def run_staging(  # noqa: C901
 
         # Validate the postcodes in data loaded from JSON
         full_responses, postcode_mapper = helpers.stage_validate_harmonise_postcodes(
-            staging_dict,
             config,
-            paths,
             full_responses,
             run_id,
             check_file_exists,

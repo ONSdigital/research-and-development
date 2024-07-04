@@ -31,17 +31,23 @@ freezing_paths:
   folder: "02_freezing"
 ni_paths:
   folder: "03_northern_ireland"
-  ni_staging_output_path: "03_northern_ireland/ni_staging_qa"
+  ni_staging_output_path: "ni_staging_qa"
 construction_paths:
   folder: "04_construction"
 mapping_paths:
   folder: "05_mapping"
 imputation_paths:
   folder: "06_imputation"
-outlier_paths:
+  qa_path: "imputation_qa"
+  manual_trimming_path: "manual_trimming"
+outliers_paths:
   folder: "07_outliers"
+  qa_path: "outlier_qa"
+  auto_outliers_path: "auto_outliers"
+  manual_outliers_path: "manual_outliers"
 estimation_paths:
   folder: "08_estimation"
+  qa_path: "estimation_qa"
 apportionment_paths:
   folder: "09_apportionment"
 output_paths:

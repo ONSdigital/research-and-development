@@ -344,9 +344,7 @@ def df_to_feather(
 
 
 def stage_validate_harmonise_postcodes(
-    staging_dict: Dict,
     config: Dict,
-    paths: Dict,
     full_responses: pd.DataFrame,
     run_id: str,
     check_file_exists: Callable,
@@ -367,9 +365,7 @@ def stage_validate_harmonise_postcodes(
     4. Returns the original DataFrame and the master list of postcodes.
 
     Parameters:
-    staging_dict (Dict): A dictionary containing staging paths.
     config (Dict): A dictionary containing configuration options.
-    paths (Dict): A dictionary containing paths to various files.
     full_responses (pd.DataFrame): The DataFrame containing the data to be
     validated.
     run_id (str): The run ID for this execution.
@@ -385,6 +381,8 @@ def stage_validate_harmonise_postcodes(
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
+
+    staging_dict = config["staging_paths"]
 
     # Load the master list of postcodes
     postcode_masterlist = staging_dict["postcode_masterlist"]
