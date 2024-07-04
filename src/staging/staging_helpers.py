@@ -81,9 +81,7 @@ def load_validate_mapper(
     mapper_path_key,
     paths,
     logger,
-    #additional_validation,
     network_or_hdfs,
-    #*args,
 ):
     """
     Loads a specified mapper, validates it using a schema and an optional
