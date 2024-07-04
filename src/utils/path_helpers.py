@@ -23,7 +23,8 @@ def create_staging_paths_dict(config: dict) -> dict:
     root_path = paths["root"]
     staging_config = config["staging_paths"]
     wanted_keys = list(staging_config.keys())[1:]
-    folder_path = f"{paths['berd_path']}{config['staging_paths']['folder']}"
+    berd_path = paths["berd_path"]
+    folder_path = f"{berd_path}{config['staging_paths']['folder']}"
 
     # set up the staging paths dictionary
     staging_dict = {key: f"{folder_path}/{staging_config[key]}" for key in wanted_keys}
@@ -31,6 +32,8 @@ def create_staging_paths_dict(config: dict) -> dict:
     ss_path = f"{root_path}{paths['secondary_snapshot_path']}"
     staging_dict["secondary_snapshot_path"] = ss_path
     staging_dict["postcode_masterlist"] = f"{root_path}{paths['postcode_masterlist']}"
+    staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
+    staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
 
     return staging_dict
 
@@ -50,10 +53,13 @@ def create_mapping_paths_dict(config: dict) -> dict:
     year = paths["year"]
     year_mapper_dict = config[f"{year}_mappers"]
 
-    mapper_folder = f"{root_path}mappers/{year_mapper_dict['mappers_version']}/"
+    paths["mappers"] = f"{paths['root']}{paths['year']}_surveys/mappers/"
+
+    version = year_mapper_dict["mappers_version"]
+    map_folder = f"{root_path}{year}_surveys/mappers/{version}/"
 
     wanted_keys = list(year_mapper_dict.keys())[1:]
-    mapping_dict = {k: f"{mapper_folder}{year_mapper_dict[k]}" for k in wanted_keys}
+    mapping_dict = {k: f"{map_folder}{year_mapper_dict[k]}" for k in wanted_keys}
 
     return mapping_dict
 

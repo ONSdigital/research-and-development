@@ -19,7 +19,7 @@ def read_ni_files(
     """Read in CSV file and schema for NI data."""
     # read in csv file as pandas dataframes
     paths = config[f"{config['global']['network_or_hdfs']}_paths"]
-    ni_full_response_file = paths["ni_full_responses_path"]
+    ni_full_response_file = f"{paths['berd_path']}{paths['ni_full_responses_path']}"
 
     # raise error if the required files do not exist
     check_file_exists(ni_full_response_file, raise_error=True)
@@ -103,7 +103,9 @@ def run_ni_staging(
         staging_folder = paths["ni_staging_output_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        staged_filename = f"{survey_year}_staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        staged_filename = (
+            f"{survey_year}_staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        )
         write_csv(f"{staging_folder}/{staged_filename}", ni_responses_df)
         NIStagingLogger.info("Finished output of staged NI data.")
     else:

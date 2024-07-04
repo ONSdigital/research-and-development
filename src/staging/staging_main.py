@@ -9,9 +9,8 @@ import src.staging.staging_helpers as helpers
 from src.staging import validation as val
 from src.utils.path_helpers import (
     get_paths,
-    # get_root_paths,
     create_staging_paths_dict,
-    # create_mapping_paths_dict,
+    create_mapping_paths_dict,
 )
 
 StagingMainLogger = logging.getLogger(__name__)
@@ -71,8 +70,8 @@ def run_staging(  # noqa: C901
 
     # set up a dictionary with all the paths needed for the staging module
     staging_dict = create_staging_paths_dict(config)
-    # set up a dictionary with all the paths needed for the mapping module
-    # mapping_dict = create_mapping_paths_dict(config)
+    # set up a dictionary with all the paths needed for mapping
+    mapping_dict = create_mapping_paths_dict(config)
 
     snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
     secondary_snapshot_name = os.path.basename(
@@ -105,7 +104,7 @@ def run_staging(  # noqa: C901
             secondary_full_responses = None
 
         # Read in postcode mapper (needed later in the pipeline)
-        postcode_masterlist = f"{paths['root']}{paths['postcode_masterlist']}"
+        postcode_masterlist = staging_dict["postcode_masterlist"]
         check_file_exists(postcode_masterlist, raise_error=True)
         postcode_mapper = read_csv(postcode_masterlist)
 
@@ -137,7 +136,7 @@ def run_staging(  # noqa: C901
             read_csv,
             write_csv,
         )
-
+        # TODO : this code hasn't been updated to use the new paths (in staging)
         if load_updated_snapshot:
             secondary_full_responses = helpers.load_validate_secondary_snapshot(
                 load_json,
@@ -150,7 +149,7 @@ def run_staging(  # noqa: C901
 
         # Write both snapshots to feather file at given path
         if is_network:
-            feather_fname = f"{snapshot_name}_corrected.feather"
+            feather_fname = f"{snapshot_name}.feather"
             s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
                 feather_path, feather_fname, full_responses, write_feather
@@ -188,7 +187,7 @@ def run_staging(  # noqa: C901
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Get the latest manual trim file
-    manual_trim_path = paths["manual_imp_trim_path"]
+    manual_trim_path = staging_dict["manual_imp_trim_path"]
 
     if config["global"]["load_manual_imputation"] and isfile(manual_trim_path):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
@@ -209,7 +208,7 @@ def run_staging(  # noqa: C901
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
-        backdata_path = paths["backdata_path"]
+        backdata_path = staging_dict["backdata_path"]
         check_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
         # To be added once schema is defined
@@ -226,7 +225,7 @@ def run_staging(  # noqa: C901
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -237,7 +236,7 @@ def run_staging(  # noqa: C901
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -248,7 +247,7 @@ def run_staging(  # noqa: C901
     # Loading SIC division detailed mapper
     sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -258,7 +257,7 @@ def run_staging(  # noqa: C901
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,

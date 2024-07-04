@@ -283,7 +283,7 @@ class TestStageValidateHarmonisePostcodes(object):
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
         """Test paths."""
-        paths = {"postcode_path": pc_path, "postcode_masterlist": pc_ml}
+        paths = {"pcode_val_path": pc_path, "postcode_masterlist": pc_ml}
         return paths
 
     @pytest.fixture(scope="function")

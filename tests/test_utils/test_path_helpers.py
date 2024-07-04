@@ -17,6 +17,8 @@ def config():
             "snapshot_path": "snapshot_path/snap.csv",
             "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
             "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
+            "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
+            "manual_outliers_path": "07_outliers/man_out/man_out.csv",
         },
         "years": {"survey_year": 2022},
         "staging_paths": {
@@ -39,6 +41,8 @@ def test_get_paths(config):
         "snapshot_path": "snapshot_path/snap.csv",
         "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
+        "manual_outliers_path": "07_outliers/man_out/man_out.csv",
+        "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
         "year": 2022,
         "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
     }
@@ -55,6 +59,12 @@ def test_create_staging_paths_dict(config):
         "snapshot_path": "R:/DAP_emulation/snapshot_path/snap.csv",
         "secondary_snapshot_path": "R:/DAP_emulation/secondary_snapshot_path/snap2.csv",
         "postcode_masterlist": "R:/DAP_emulation/postcode_masterlist_path/postcode.csv",
+        "manual_outliers_path": (  # noqa E501
+            "R:/DAP_emulation/2022_surveys/BERD/07_outliers/man_out/man_out.csv"
+        ),
+        "manual_imp_trim_path": (  # noqa E501
+            "R:/DAP_emulation/2022_surveys/BERD/06_imputation/man_trim/trim_qa.csv"
+        ),
     }
     staging_dict = create_staging_paths_dict(config)
 
@@ -65,8 +75,10 @@ def test_create_mapping_paths_dict(config):
     """Test create_mapping_paths_dict function."""
 
     expected_mapping_dict = {
-        "postcodes_mapper": "R:/DAP_emulation/mappers/v1/postcodes_2022.csv",
-        "itl_mapper_path": "R:/DAP_emulation/mappers/v1/itl_2022.csv",
+        "postcodes_mapper": (  # noqa E501
+            "R:/DAP_emulation/2022_surveys/mappers/v1/postcodes_2022.csv"
+        ),
+        "itl_mapper_path": "R:/DAP_emulation/2022_surveys/mappers/v1/itl_2022.csv",
     }
     mapping_dict = create_mapping_paths_dict(config)
 
