@@ -221,7 +221,6 @@ def run_staging(  # noqa: C901
         "itl1_detailed_mapper_path",
         paths,
         StagingMainLogger,
-        False,
         network_or_hdfs,
     )
 
@@ -230,7 +229,6 @@ def run_staging(  # noqa: C901
         "civil_defence_detailed_mapper_path",
         paths,
         StagingMainLogger,
-        False,
         network_or_hdfs,
     )
 
@@ -239,7 +237,6 @@ def run_staging(  # noqa: C901
         "sic_division_detailed_mapper_path",
         paths,
         StagingMainLogger,
-        False,
         network_or_hdfs,
     )
 
@@ -247,7 +244,6 @@ def run_staging(  # noqa: C901
         "pg_detailed_mapper_path",
         paths,
         StagingMainLogger,
-        False,
         network_or_hdfs,
     )
 

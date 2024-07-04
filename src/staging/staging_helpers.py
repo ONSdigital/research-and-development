@@ -81,9 +81,9 @@ def load_validate_mapper(
     mapper_path_key,
     paths,
     logger,
-    additional_validation,
+    #additional_validation,
     network_or_hdfs,
-    *args,
+    #*args,
 ):
     """
     Loads a specified mapper, validates it using a schema and an optional
@@ -146,13 +146,6 @@ def load_validate_mapper(
 
     # Validate the DataFrame against the schema
     val.validate_data_with_schema(mapper_df, schema_path)
-
-    # If a one-to-many validation function is provided, validate the DataFrame
-    if additional_validation:
-        # Prepend the DataFrame to the arguments
-        args = (mapper_df,) + args
-        # Call the validation function with the DataFrame and the other arguments
-        val.validate_many_to_one(*args)  # args include "col_many" and "col_one"
 
     # Log the successful loading of the mapper
     logger.info(f"{mapper_name} loaded successfully")

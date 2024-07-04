@@ -4,6 +4,7 @@ import logging
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
 from src.staging import staging_helpers as stage_hlp
+from src.staging import validation as val
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -24,18 +25,15 @@ def run_mapping(
         "pg_num_alpha_mapper_path",
         paths,
         MappingMainLogger,
-        True,
         network_or_hdfs,
-        "pg_numeric",
-        "pg_alpha",
     )
+    val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
 
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
         paths,
         MappingMainLogger,
-        False,
         network_or_hdfs,
     )
     hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
@@ -46,7 +44,6 @@ def run_mapping(
         "itl_mapper_path",
         paths,
         MappingMainLogger,
-        False,
         network_or_hdfs,
     )
 
@@ -55,7 +52,6 @@ def run_mapping(
         "cellno_2022_path",
         paths,
         MappingMainLogger,
-        False,
         network_or_hdfs,
     )
 
@@ -63,11 +59,9 @@ def run_mapping(
         "sic_pg_num_mapper_path",
         paths,
         MappingMainLogger,
-        True,
         network_or_hdfs,
-        "SIC 2007_CODE",
-        "2016 > Form PG",
     )
+    val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
     # Loading ru_817_list mapper
     if config["global"]["survey_year"] == 2022:
@@ -75,7 +69,6 @@ def run_mapping(
             "ref_list_817_mapper_path",
             paths,
             MappingMainLogger,
-            False,
             network_or_hdfs,
         )
         # update longform references that should be on the reference list
