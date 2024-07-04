@@ -3,7 +3,76 @@ import pandas as pd
 import numpy as np
 
 # Local Imports
-from src.mapping.mapping_helpers import update_ref_list, join_fgn_ownership
+from src.mapping.mapping_helpers import (
+    col_validation_checks,
+    check_mapping_unique,
+    update_ref_list,
+    join_fgn_ownership,
+    )
+
+
+class TestColValidationChecks(object):
+    """Tests for col_validation_checks."""
+
+    @pytest.fixture(scope="function")
+    def test_mapper_df(self):
+        """Sample mapper for testing."""
+        columns = ["ruref", "ultfoc"]
+        data = [
+            ["abc", "AB"],
+            ["def", "EF"],
+            ["ghi", "IJ"],
+            ["jkl", "MN"],
+            ["mno", "QR"],
+        ]
+        return pd.DataFrame(data=data, columns=columns)
+
+    def test_col_validation_checks_type(self, test_mapper_df):
+        """Test col_validation_checks for type validation."""
+        with pytest.raises(ValueError):
+            col_validation_checks(test_mapper_df, "test_mapper", "ruref", int, None)
+
+    def test_col_validation_checks_length(self, test_mapper_df):
+        """Test col_validation_checks for length validation."""
+        with pytest.raises(ValueError):
+            col_validation_checks(test_mapper_df, "test_mapper", "ultfoc", None, 3)
+
+    def test_col_validation_checks_capitalisation(self, test_mapper_df):
+        """Test col_validation_checks for capitalisation validation."""
+        with pytest.raises(ValueError):
+            col_validation_checks(test_mapper_df, "test_mapper", "ruref", None, None, True)
+
+    def test_col_validation_checks_pass(self, test_mapper_df):
+        """Test col_validation_checks for passing all checks."""
+        col_validation_checks(test_mapper_df, "test_mapper", "ruref", str, None)
+        col_validation_checks(test_mapper_df, "test_mapper", "ultfoc", str, 2)
+        col_validation_checks(test_mapper_df, "test_mapper", "ultfoc", str, None, True)
+
+
+class TestCheckMappingUnique(object):
+    """Tests for check_mapping_unique."""
+
+    @pytest.fixture(scope="function")
+    def test_mapper_df(self):
+        """Sample mapper for testing."""
+        columns = ["ruref", "ultfoc"]
+        data = [
+            ["abc", "AB"],
+            ["def", "EF"],
+            ["ghi", "AB"],
+            ["jkl", "MN"],
+            ["mno", "AB"],
+        ]
+        return pd.DataFrame(data=data, columns=columns)
+
+    def test_check_mapping_unique_unique(self, test_mapper_df):
+        """Test check_mapping_unique for a column with unique values."""
+        check_mapping_unique(test_mapper_df, "ruref")
+
+    def test_check_mapping_unique_not_unique(self, test_mapper_df):
+        """Test check_mapping_unique for a column without unique values."""
+        with pytest.raises(ValueError):
+            check_mapping_unique(test_mapper_df, "ultfoc")
 
 
 class TestJoinFgnOwnership(object):
@@ -18,7 +87,8 @@ class TestJoinFgnOwnership(object):
             [2, "0001", 22],
             [3, "0001", 23],
             [4, np.nan, 24],
-            [5, "0002", 25],
+            [5, "0001", 25],
+            [6, "0001", 26],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -27,7 +97,14 @@ class TestJoinFgnOwnership(object):
     def mapper_input(self):
         """mapper_df input data."""
         columns = ["ruref", "ultfoc"]
-        data = [[21, "uf1"], [22, "uf2"], [23, "uf3"]]
+        data = [
+            [21, "uf1"],
+            [22, "uf2"],
+            [23, "uf3"],
+            [24, None],
+            [25, ""],
+            [26, np.nan]
+        ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
 
@@ -40,7 +117,8 @@ class TestJoinFgnOwnership(object):
             [2, "0001", 22, "uf2"],
             [3, "0001", 23, "uf3"],
             [4, np.nan, 24, "GB"],
-            [5, "0002", 25, "GB"],
+            [5, "0001", 25, "GB"],
+            [6, "0001", 26, "GB"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df

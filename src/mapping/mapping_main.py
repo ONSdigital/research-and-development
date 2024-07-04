@@ -3,7 +3,6 @@ import logging
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
-
 from src.staging import staging_helpers as stage_hlp
 
 MappingMainLogger = logging.getLogger(__name__)
@@ -39,7 +38,8 @@ def run_mapping(
         False,
         network_or_hdfs,
     )
-    hlp.validate_ultfoc_df(ultfoc_mapper)
+    hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
+    hlp.check_mapping_unique(ultfoc_mapper, "ruref")
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
@@ -90,12 +90,12 @@ def run_mapping(
 
     full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper)
 
-    ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
-    ni_full_responses = hlp.join_fgn_ownership(
-        full_responses,
-        ultfoc_mapper,
-        is_northern_ireland=True,
-    )
+    # ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+    # ni_full_responses = hlp.join_fgn_ownership(
+    #     full_responses,
+    #     ultfoc_mapper,
+    #     is_northern_ireland=True,
+    # )
 
     # return mapped_df
     return (full_responses, ni_full_responses, itl_mapper, cellno_df)

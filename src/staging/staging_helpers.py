@@ -80,12 +80,8 @@ def getmappername(mapper_path_key, split):
 def load_validate_mapper(
     mapper_path_key,
     paths,
-    # file_exists_func,
-    # read_csv_func,
     logger,
-    # val_with_schema_func: Callable,
     additional_validation,
-    # one_to_many_val_func: Callable,
     network_or_hdfs,
     *args,
 ):
