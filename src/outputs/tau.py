@@ -15,7 +15,6 @@ def output_tau(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -35,9 +34,6 @@ def output_tau(
     output_path = paths["output_path"]
 
     # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"])
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)

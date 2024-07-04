@@ -45,7 +45,7 @@ class TestFormOutputPrep(object):
             [39900000960, 1, 202212, "AA", np.nan, 0.0, np.nan, "No", 1.0, "0001", 40],  # noqa
             [39900001029, 1, 202212, "I", 119376.5, 244543.0, 100.0, np.nan, 1.0, "0001", 14],  # noqa
         ]  # noqa
-        
+
         estimated_df = pd.DataFrame(data=data, columns=columns)
         return estimated_df
 
@@ -155,7 +155,7 @@ class TestFormOutputPrep(object):
             "reference",
             "instance",
             "period_year",
-            "foc",
+            "ultfoc",
             "407",
             "201",  # pg
             "rusic",  # sic
@@ -172,7 +172,7 @@ class TestFormOutputPrep(object):
             [39900008968, 1, 2021, "GB ", 1.44, "AA", 46420, 40.0],
             [39900009016, 1, 2021, "GB ", 4.0, "AD", 71129, 50.0],
             [39900009078, 1, 2021, "GB ", 0.72, "J", 23610, 15.0],
-        ] 
+        ]
         ni_full_responses = pd.DataFrame(data=data, columns=columns)
         return ni_full_responses
 

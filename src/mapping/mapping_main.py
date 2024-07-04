@@ -19,12 +19,6 @@ def run_mapping(
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
-    # if network_or_hdfs == "network":
-    #     from src.utils import local_file_mods as mods
-
-    # elif network_or_hdfs == "hdfs":
-    #     from src.utils import hdfs_mods as mods
-
     # Conditionally load paths
     paths = config[f"{network_or_hdfs}_paths"]
 
@@ -88,15 +82,18 @@ def run_mapping(
         )
         # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
+
     # Carry out product group conversion
     # Impute missing product group responses in q201 from SIC, then copy this to a new
     # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
 
     # full_responses = join_cellno_mapper(full_responses, cellno_df)
 
-    # placeholder for running mapping
+    full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper)
+
+    # ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+    # ni_full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper, is_northern_ireland=True,)
 
     # return mapped_df
-    return (full_responses, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df)
+    return (full_responses, ni_full_responses, itl_mapper, cellno_df)

@@ -2,7 +2,7 @@
 import pandas as pd
 import logging
 
-from src.utils.wrappers import time_logger_wrap, exception_wrap
+import src.staging.validation as stval
 
 MappingLogger = logging.getLogger(__name__)
 
@@ -43,6 +43,34 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
     except ValueError as ve:
         raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
+
+
+def join_fgn_ownership(
+    df: pd.DataFrame, mapper_df: pd.DataFrame, is_northern_ireland: bool = False,
+) -> pd.DataFrame:
+    """
+    Combine two DataFrames using a left join based on specified columns.
+
+    Args:
+        df (pd.DataFrame): The main DataFrame.
+        mapper_df (pd.DataFrame): The mapper DataFrame.
+
+    Returns:
+        pd.DataFrame: The combined DataFrame resulting from the left join.
+    """
+
+    if is_northern_ireland:
+        df = df.rename(columns={"foc": "ultfoc"})
+        df["ultfoc"] = df["ultfoc"].fillna("GB")
+        return df
+
+    else:
+        mapped_df = df.merge(
+            mapper_df, how="left", left_on="reference", right_on="ruref",
+        )
+        mapped_df.drop(columns = ["ruref"], inplace = True)
+        mapped_df["ultfoc"] = mapped_df["ultfoc"].fillna("GB")
+        return mapped_df
 
 
 def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.DataFrame:

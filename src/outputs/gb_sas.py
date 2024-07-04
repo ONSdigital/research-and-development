@@ -16,7 +16,6 @@ def output_gb_sas(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -39,9 +38,6 @@ def output_gb_sas(
     df1 = df.copy().loc[df["region"].isin(regions()["GB"])]
 
     # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    df1 = map_o.join_fgn_ownership(df1, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
     df1 = map_o.create_cora_status_col(df1)
