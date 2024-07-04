@@ -204,7 +204,15 @@ class TestCreateAdditionalNiCols(object):
         df = pd.DataFrame(data=data, columns=columns)
 
         # Expected output DataFrame
-        expected_columns = ["reference", "value", "a_weight", "604", "form_status", "602", "formtype"]
+        expected_columns = [
+            "reference",
+            "value",
+            "a_weight",
+            "604",
+            "form_status",
+            "602",
+            "formtype",
+        ]
         expected_data = [
             [1, 10, 1, "Yes", 600, 100.0, "0003"],
             [2, 20, 1, "Yes", 600, 100.0, "0003"],
@@ -216,4 +224,6 @@ class TestCreateAdditionalNiCols(object):
         output_df = create_additional_ni_cols(df)
 
         # Check if the output matches the expected DataFrame
-        assert output_df.equals(expected_df), "Output from create_additional_ni_cols not as expected."
+        assert output_df.equals(
+            expected_df
+        ), "Output from create_additional_ni_cols not as expected."

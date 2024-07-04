@@ -85,7 +85,9 @@ def run_mapping(
 
     if ni_full_responses is not None:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
-        ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+        ni_full_responses = run_pg_conversion(
+            ni_full_responses, pg_num_alpha, sic_pg_num
+        )
         ni_full_responses = hlp.join_fgn_ownership(
             ni_full_responses,
             ultfoc_mapper,
