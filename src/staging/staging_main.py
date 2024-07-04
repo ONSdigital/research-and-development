@@ -3,7 +3,6 @@
 import logging
 from typing import Callable, Tuple
 from datetime import datetime
-import pandas as pd
 import os
 
 # Our own modules

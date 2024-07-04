@@ -130,7 +130,7 @@ def _nulltype_conversion(value: str) -> Union[str, None]:
     return value
 
 
-def _validate_config_items( # noqa C901
+def _validate_config_items(  # noqa C901
     config_item: dict, validation_item: dict, item_name: str
 ) -> None:
     """Recursively validate items in a config.

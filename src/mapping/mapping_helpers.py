@@ -2,8 +2,6 @@
 import pandas as pd
 import logging
 
-import src.staging.validation as stval
-
 MappingLogger = logging.getLogger(__name__)
 
 
@@ -46,7 +44,9 @@ def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def join_fgn_ownership(
-    df: pd.DataFrame, mapper_df: pd.DataFrame, is_northern_ireland: bool = False,
+    df: pd.DataFrame,
+    mapper_df: pd.DataFrame,
+    is_northern_ireland: bool = False,
 ) -> pd.DataFrame:
     """
     Combine two DataFrames using a left join based on specified columns.
@@ -66,9 +66,12 @@ def join_fgn_ownership(
 
     else:
         mapped_df = df.merge(
-            mapper_df, how="left", left_on="reference", right_on="ruref",
+            mapper_df,
+            how="left",
+            left_on="reference",
+            right_on="ruref",
         )
-        mapped_df.drop(columns = ["ruref"], inplace = True)
+        mapped_df.drop(columns=["ruref"], inplace=True)
         mapped_df["ultfoc"] = mapped_df["ultfoc"].fillna("GB")
         return mapped_df
 
