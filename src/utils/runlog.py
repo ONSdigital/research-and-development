@@ -189,7 +189,7 @@ class RunLog:
         if they don't already exist.
         """
 
-        main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
+        main_columns = ["run_id", "user", "status", "timestamp", "version", "time_taken"]
         file_name = self.csv_filenames["main"]
         file_path = str(os.path.join(self.main_path, file_name))
         self.log_csv_creator(file_path, main_columns)

@@ -4,7 +4,7 @@ import time
 import logging
 
 # Our local modules
-from src.utils import runlog
+from src.utils import runlog_refactor as runlog
 from src._version import __version__ as version
 from src.utils.config import validate_config, merge_configs
 from src.utils.wrappers import logger_creator
@@ -69,7 +69,9 @@ def run_pipeline(start, user_config_path, dev_config_path):
         mods.rd_read_csv,
         mods.rd_write_csv,
     )
-
+    runlog_obj.create_runlog_files()
+    runlog_obj.write_config_log()
+    runlog_obj.write_mainlog()
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
     MainLogger.info(f"Reading user config from {user_config_path}.")
@@ -206,16 +208,8 @@ def run_pipeline(start, user_config_path, dev_config_path):
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
+    
+    runlog_obj.write_runlog()
+    runlog_obj.mark_mainlog_passed()
 
-    runlog_obj.retrieve_pipeline_logs()
-
-    run_time = round(time.time() - start, 5)
-    runlog_obj._record_time_taken(run_time)
-
-    runlog_obj.retrieve_configs()
-    runlog_obj._create_runlog_dicts()
-    runlog_obj._create_runlog_dfs()
-    runlog_obj.create_runlog_files()
-    runlog_obj._write_runlog()
-
-    return run_time
+    return runlog_obj.time_taken
