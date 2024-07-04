@@ -5,19 +5,15 @@ import os
 from typing import Callable
 
 # Local Imports
-from src.utils.config import safeload_yaml, merge_configs
+from src.utils.config import config_setup
 
 
 def read_config() -> dict:
     """Read config for tests."""
     # read config file (relative path is consistent for tests)
-    user_path = os.path.join("src", "user_config.yaml")
-    dev_path = os.path.join("src", "dev_config.yaml")
-    user_config = safeload_yaml(user_path)
-    dev_config = safeload_yaml(dev_path)
-    user_config.pop("config_validation", None)
-    dev_config.pop("config_validation", None)
-    config = merge_configs(user_config, dev_config)
+    dev_config_path = os.path.join("src", "dev_config.yaml")
+    user_config_path = os.path.join("src", "user_config.yaml")
+    config = config_setup(user_config_path, dev_config_path)
     return config
 
 

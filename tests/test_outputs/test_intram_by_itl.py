@@ -32,6 +32,7 @@ class TestSaveDetailedCSV(object):
         save_detailed_csv(
             df=test_frame,
             dir=tmp_path,
+            survey_year="2022",
             title="test_df",
             run_id=1,
             write_csv=write_csv_func,
@@ -43,6 +44,7 @@ class TestSaveDetailedCSV(object):
             save_detailed_csv(
                 df=test_frame,
                 dir=tmp_path,
+                survey_year="2022",
                 title="test_df",
                 run_id=1,
                 write_csv=write_csv_func,
@@ -54,14 +56,15 @@ class TestSaveDetailedCSV(object):
         save_detailed_csv(
             df=test_frame,
             dir=tmp_path,
+            survey_year="2022",
             title="test_df",
             run_id=40,
             write_csv=write_csv_func,
             overwrite=False,
         )
         # create expected filename
-        date = datetime.now().strftime("%Y-%m-%d")
-        save_name = f"test_df_{date}_v40.csv"
+        date = datetime.now().strftime("%y-%m-%d")
+        save_name = f"2022_test_df_{date}_v40.csv"
         fpath = os.path.join(tmp_path, save_name)
         # assert file exists
         assert os.path.exists(fpath), "save_detailed_csv not saving out dataframe."

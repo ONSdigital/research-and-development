@@ -6,9 +6,8 @@ import logging
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.config import validate_config, merge_configs
+from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
-from src.utils.local_file_mods import safeload_yaml
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
@@ -31,19 +30,8 @@ def run_pipeline(start, user_config_path, dev_config_path):
         config_path (string): The path to the config file to be
         used.
     """
-    # load config
-    user_config = safeload_yaml(user_config_path)
-    dev_config = safeload_yaml(dev_config_path)
-    # validate config
-    validate_config(user_config)
-    validate_config(dev_config)
-    # drop validation keys
-    user_config.pop("config_validation", None)
-    dev_config.pop("config_validation", None)
-    # combine configs
-    config = merge_configs(user_config, dev_config)
-    del user_config
-    del dev_config
+    # Load, validate and merge the user and developer configs
+    config = config_setup(user_config_path, dev_config_path)
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]

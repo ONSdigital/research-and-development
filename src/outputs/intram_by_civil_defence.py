@@ -58,6 +58,7 @@ def output_intram_by_civil_defence(
     df_for_output = df_merge.iloc[1:]
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_by_civil_defence{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_intram_by_civil_defence{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_intram_by_civil_defence/{filename}", df_for_output)
