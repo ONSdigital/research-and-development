@@ -83,12 +83,14 @@ def run_mapping(
 
     full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper)
 
-    # ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
-    # ni_full_responses = hlp.join_fgn_ownership(
-    #     full_responses,
-    #     ultfoc_mapper,
-    #     is_northern_ireland=True,
-    # )
+    if ni_full_responses is not None:
+        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
+        ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+        ni_full_responses = hlp.join_fgn_ownership(
+            ni_full_responses,
+            ultfoc_mapper,
+            is_northern_ireland=True,
+        )
 
     # return mapped_df
     return (full_responses, ni_full_responses, itl_mapper, cellno_df)

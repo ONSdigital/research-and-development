@@ -8,6 +8,7 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     join_fgn_ownership,
+    create_additional_ni_cols,
 )
 
 
@@ -186,3 +187,33 @@ class TestUpdateRefList(object):
         error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
+
+
+class TestCreateAdditionalNiCols(object):
+    """Tests for create_additional_ni_cols function."""
+
+    def test_create_additional_ni_cols(self):
+        """Test create_additional_ni_cols function."""
+        # Create sample input DataFrame
+        columns = ["reference", "value"]
+        data = [
+            [1, 10],
+            [2, 20],
+            [3, 30],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+
+        # Expected output DataFrame
+        expected_columns = ["reference", "value", "a_weight", "604", "form_status", "602", "formtype"]
+        expected_data = [
+            [1, 10, 1, "Yes", 600, 100.0, "0003"],
+            [2, 20, 1, "Yes", 600, 100.0, "0003"],
+            [3, 30, 1, "Yes", 600, 100.0, "0003"],
+        ]
+        expected_df = pd.DataFrame(data=expected_data, columns=expected_columns)
+
+        # Call the function
+        output_df = create_additional_ni_cols(df)
+
+        # Check if the output matches the expected DataFrame
+        assert output_df.equals(expected_df), "Output from create_additional_ni_cols not as expected."
