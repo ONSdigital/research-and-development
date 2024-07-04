@@ -20,6 +20,7 @@ OutputMainLogger = logging.getLogger(__name__)
 def save_detailed_csv(
     df: pd.DataFrame,
     dir: Union[pathlib.Path, str],
+    survey_year: str,
     title: str,
     run_id: int,
     write_csv: Callable,
@@ -30,6 +31,7 @@ def save_detailed_csv(
     Args:
         df (pd.DataFrame): The dataframe to save
         dir (Union[pathlib.Path, str]): The directory to save the dataframe to.
+        survey_year (str): The year that the data is from (from config).
         title (str): The filename to save the df as (excluding date, run id).
         run_id (int): The current run ID.
         write_csv (Callable): A function to write to a csv file.
@@ -41,8 +43,8 @@ def save_detailed_csv(
             already exists.
 
     """
-    date = datetime.now().strftime("%Y-%m-%d")
-    save_name = f"{title}_{date}_v{run_id}.csv"
+    date = datetime.now().strftime("%y-%m-%d")
+    save_name = f"{survey_year}_{title}_{date}_v{run_id}.csv"
     save_path = os.path.join(dir, save_name)
     if not overwrite and os.path.exists(save_path):
         raise FileExistsError(
@@ -102,7 +104,7 @@ def output_intram_by_itl(
     # Declare Config Values
     NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
     OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
-    CURRENT_YEAR = config["years"]["current_year"]
+    CURRENT_YEAR = config["years"]["survey_year"]
 
     # Subset GB Data
     df = df_gb[["postcodes_harmonised", "formtype", "211"]]
@@ -139,6 +141,7 @@ def output_intram_by_itl(
         save_detailed_csv(
             df=itl_df,
             dir=output_dir,
+            survey_year=config["years"]["survey_year"],
             title=f"output_intram_{area}_itl{i}",
             run_id=run_id,
             write_csv=write_csv,

@@ -101,8 +101,9 @@ def run_ni_staging(
         paths = config[f"{network_or_hdfs}_paths"]
         NIStagingLogger.info("Starting output of staged NI data...")
         staging_folder = paths["ni_staging_output_path"]
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        staged_filename = f"{survey_year}_staged_NI_full_responses_{tdate}_v{run_id}.csv"
         write_csv(f"{staging_folder}/{staged_filename}", ni_responses_df)
         NIStagingLogger.info("Finished output of staged NI data.")
     else:

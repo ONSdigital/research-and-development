@@ -41,8 +41,9 @@ def output_status_filtered(
     paths = config[f"{NETWORK_OR_HDFS}_paths"]
     output_path = paths["output_path"]
 
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"status_filtered_qa_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_status_filtered_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_status_filtered_qa/{filename}", filtered_df)
 
     StatusFilteredLogger.info("Finished status filtered output.")
