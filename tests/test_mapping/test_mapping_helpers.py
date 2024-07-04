@@ -8,7 +8,7 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     join_fgn_ownership,
-    )
+)
 
 
 class TestColValidationChecks(object):
@@ -40,7 +40,9 @@ class TestColValidationChecks(object):
     def test_col_validation_checks_capitalisation(self, test_mapper_df):
         """Test col_validation_checks for capitalisation validation."""
         with pytest.raises(ValueError):
-            col_validation_checks(test_mapper_df, "test_mapper", "ruref", None, None, True)
+            col_validation_checks(
+                test_mapper_df, "test_mapper", "ruref", None, None, True
+            )
 
     def test_col_validation_checks_pass(self, test_mapper_df):
         """Test col_validation_checks for passing all checks."""
@@ -103,7 +105,7 @@ class TestJoinFgnOwnership(object):
             [23, "uf3"],
             [24, None],
             [25, ""],
-            [26, np.nan]
+            [26, np.nan],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df

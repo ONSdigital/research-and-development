@@ -11,11 +11,13 @@ def col_validation_checks(
     col: str,
     expected_value_type: type,
     expected_value_length: int,
-    check_capitalisation: bool = False) -> None:
+    check_capitalisation: bool = False,
+) -> None:
     """
     Perform validation checks on a column in a DataFrame.
 
-    This function checks the type, length, and capitalisation of a column in a DataFrame.
+    This function checks the type, length, and capitalisation
+    of a column in a DataFrame.
     It raises a ValueError if any of the checks fail.
 
     Args:
@@ -24,7 +26,8 @@ def col_validation_checks(
         col (str): The name of the column to check.
         expected_value_type (type): The expected type of the column values.
         expected_value_length (int): The expected length of the column values.
-        check_capitalisation (bool, optional): Whether to check if the column values are in uppercase. Defaults to False.
+        check_capitalisation (bool, optional): Whether to check if the column
+        values are in uppercase. Defaults to False.
 
     Raises:
         ValueError: If any of the validation checks fail.
@@ -32,13 +35,24 @@ def col_validation_checks(
     """
     try:
         if expected_value_type is not None:
-            # Filter out nulls before checking the type
+            # Check datatype correct
             if not df[col][df[col].notnull()].apply(type).eq(expected_value_type).all():
-                raise ValueError(f"Column {col} is not of the expected type {expected_value_type}.")
+                raise ValueError(
+                    f"Column {col} is not of the expected type {expected_value_type}."
+                )
         if expected_value_length is not None:
-            # Convert all non-null values to strings, then check if value lengths are correct
-            if not df[col][df[col].notnull()].astype(str).str.len().eq(expected_value_length).all():
-                raise ValueError(f"Column {col} does not have the expected length of {expected_value_length}.")
+            # Convert to strings, and check if value lengths are correct
+            if (
+                not df[col][df[col].notnull()]
+                .astype(str)
+                .str.len()
+                .eq(expected_value_length)
+                .all()
+            ):
+                raise ValueError(
+                    f"Column {col} does not have the expected length of"
+                    f" {expected_value_length}."
+                )
         if check_capitalisation:
             # Check if all non-null values in the column are in uppercase
             if not df[col][df[col].notnull()].str.isupper().all():
@@ -82,10 +96,10 @@ def join_fgn_ownership(
     """
 
     if is_northern_ireland:
-        df = df.rename(columns={"foc": "ultfoc"})
-        df["ultfoc"] = df["ultfoc"].fillna("GB")
-        mapped_df["ultfoc"] = mapped_df["ultfoc"].replace("", "GB")
-        return df
+        mapped_ni_df = df.rename(columns={"foc": "ultfoc"})
+        mapped_ni_df["ultfoc"] = mapped_ni_df["ultfoc"].fillna("GB")
+        mapped_ni_df["ultfoc"] = mapped_ni_df["ultfoc"].replace("", "GB")
+        return mapped_ni_df
 
     else:
         mapped_df = df.merge(
