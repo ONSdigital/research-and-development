@@ -65,6 +65,7 @@ def output_gb_sas(
     output = create_output_df(df1, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_gb_sas_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_gb_sas_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_gb_sas/{filename}", output)

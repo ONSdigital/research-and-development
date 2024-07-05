@@ -65,7 +65,7 @@ def run_mapping(
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
     # Loading ru_817_list mapper
-    if config["global"]["survey_year"] == 2022:
+    if config["years"]["survey_year"] == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             paths,

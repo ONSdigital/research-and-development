@@ -57,10 +57,11 @@ def run_outliers(
     filtered_df = auto.apply_short_form_filters(df_auto_flagged)
 
     # Output the file with auto outliers for manual checking
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
     if config["global"]["output_auto_outliers"]:
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
-        file_path = auto_outlier_path + f"/manual_outlier_{tdate}_v{run_id}.csv"
+        file_path = auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"
         write_csv(file_path, filtered_df)
         OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
     else:
@@ -85,7 +86,7 @@ def run_outliers(
     # Output the outlier flags for QA
     if config["global"]["output_outlier_qa"]:
         OutlierMainLogger.info("Starting output of Outlier QA data...")
-        filename = f"outliers_qa_{tdate}_v{run_id}.csv"
+        filename = f"{survey_year}_outliers_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
     else:

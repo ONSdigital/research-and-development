@@ -13,7 +13,7 @@ global:
   min: null
   filetype: null
 years:
-  current_year:
+  survey_year:
     singular: True
     dtype: "int"
     accept_nonetype: False
