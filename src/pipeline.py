@@ -21,7 +21,7 @@ from src.outputs.outputs_main import run_outputs
 MainLogger = logging.getLogger(__name__)
 
 
-def run_pipeline(start, user_config_path, dev_config_path):
+def run_pipeline(user_config_path, dev_config_path):
     """The main pipeline.
 
     Args:
