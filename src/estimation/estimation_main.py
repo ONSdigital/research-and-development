@@ -52,9 +52,10 @@ def run_estimation(
 
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        cell_qa_filename = f"estimation_weights_qa_{tdate}_v{run_id}.csv"
-        full_qa_filename = f"full_estimation_qa_{tdate}_v{run_id}.csv"
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        cell_qa_filename = f"{survey_year}_estimation_weights_qa_{tdate}_v{run_id}.csv"
+        full_qa_filename = f"{survey_year}_full_estimation_qa_{tdate}_v{run_id}.csv"
         write_csv(f"{est_path}/estimation_qa/{cell_qa_filename}", qa_df)
         write_csv(f"{est_path}/estimation_qa/{full_qa_filename}", estimated_df)
     EstMainLogger.info("Finished estimation weights calculation.")
