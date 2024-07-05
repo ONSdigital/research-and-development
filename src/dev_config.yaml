@@ -52,6 +52,7 @@ apportionment_paths:
   qa_path: "apportionment_qa"
 outputs_paths:
   folder: "10_outputs"
+  #TODO: add all the output subpaths
   outputs_master: ""
 export_paths:
   export_folder: "outgoing_export"
