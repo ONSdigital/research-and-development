@@ -445,10 +445,41 @@ def stage_validate_harmonise_postcodes(
     pcodes_folder = paths["postcode_path"]
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
-    invalid_filename = f"{survey_year}_invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    invalid_filename = (
+        f"{survey_year}_invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    )
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
 
     # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
+
+
+def filter_PNP_data(full_responses):
+    """
+    After the full_responses dataframe is created, filter out all PNP data
+    by simply excluding all records with legalstatus of 7.
+
+    This function removes all rows of the full_responses dataframe
+        where 'legalstatus' == '7'.
+
+    This is part of the requirement to:
+    AC1 BERD data is isolated from the full dataset
+    AC3 BERD separated data set is in a format that can be used during
+        the BERD pipeline run (a pandas dataframe and a CSV QA file)
+
+    Args:
+        full_responses (pandas.DataFrame):
+            The DataFrame containing the full resonses data.
+
+    Returns:
+        pandas.DataFrame: The filtered DataFrame
+        without rows where 'legalstatus' == '7'
+
+    """
+
+    # filter out PNP data legalstatus=7
+    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
+
+    return full_responses
