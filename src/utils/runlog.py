@@ -191,7 +191,14 @@ class RunLog:
         self,
         logfile_name: str,
     ) -> pd.DataFrame:
-        """Read a log file into memory as a dataframe."""
+        """Read logs from a .csv file.
+
+        Args:
+            logfile_name (str): The name of the file to read.
+
+        Returns:
+            pd.DataFrame: A dataframe containing logs.
+        """
         write_csv, write_hdf5, write_sql = self._get_runlog_settings()
         if write_csv:
             # write the runlog to a csv file
@@ -209,7 +216,14 @@ class RunLog:
     def _write_log(
         self, logfile_name: str, logs_df: pd.DataFrame, update: bool = False
     ) -> None:
-        """Write logs to file."""
+        """Write logs (in df format) to a file.
+
+        Args:
+            logfile_name (str): The name of the file to write to,
+            logs_df (pd.DataFrame): The dataframe to append to the logs file.
+            update (bool, optional): Whether or not to write the dataframe as the logs,
+                or to append to current logs. Defaults to False.
+        """
         # Get the runlog settings from the config file
         write_csv, write_hdf5, write_sql = self._get_runlog_settings()
         if write_csv:
