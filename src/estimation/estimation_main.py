@@ -34,7 +34,7 @@ def run_estimation(
     """
     EstMainLogger.info("Starting estimation weights calculation...")
 
-    est_qa_path = config["estimation_paths"]["estimation_qa"]
+    est_qa_path = config["estimation_paths"]["qa_path"]
 
     # clean and create a dictionary from the cellno mapper
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)

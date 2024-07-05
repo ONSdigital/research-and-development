@@ -130,7 +130,7 @@ def create_module_config(config: dict, module_name: str) -> dict:
     }
 
     return module_dict
-    
+
 
 def update_config_with_paths(config: dict) -> dict:
     """Update the config with all the paths needed for the pipeline.
@@ -145,7 +145,14 @@ def update_config_with_paths(config: dict) -> dict:
     config["ni_paths"] = create_ni_staging_config(config)
     config["mapping_paths"] = create_mapping_config(config)
 
-    for module_name in ["construction", "imputation", "outliers", "estimation", "apportionment", "outputs"]:
+    for module_name in [
+        "construction",
+        "imputation",
+        "outliers",
+        "estimation",
+        "apportionment",
+        "outputs",
+    ]:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
 
     return config

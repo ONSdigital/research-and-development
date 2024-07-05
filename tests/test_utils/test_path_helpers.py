@@ -49,7 +49,7 @@ def config():
         },
         "outliers_paths": {
             "folder": "07_outliers",
-            "qa_path": "outlier_qa",
+            "qa_path": "outliers_qa",
             "auto_outliers_path": "auto_outliers",
         },
         "estimation_paths": {
@@ -172,7 +172,9 @@ def test_create_module_config_outliers_case(config, expected_outliers_dict):
     assert outliers_dict == expected_outliers_dict
 
 
-def test_update_config_with_paths(config, expected_staging_dict, expected_outliers_dict):
+def test_update_config_with_paths(
+    config, expected_staging_dict, expected_outliers_dict
+):
     """Test update_config_with_paths function."""
     updated_config = update_config_with_paths(config)
 
@@ -180,7 +182,14 @@ def test_update_config_with_paths(config, expected_staging_dict, expected_outlie
     assert "ni_paths" in updated_config
     assert "mapping_paths" in updated_config
 
-    for module_name in ["construction", "imputation", "outliers", "estimation", "apportionment", "outputs"]:
+    for module_name in [
+        "construction",
+        "imputation",
+        "outliers",
+        "estimation",
+        "apportionment",
+        "outputs",
+    ]:
         assert f"{module_name}_paths" in updated_config
 
     assert updated_config["staging_paths"] == expected_staging_dict

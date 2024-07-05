@@ -42,15 +42,17 @@ imputation_paths:
   manual_trimming_path: "manual_trimming"
 outliers_paths:
   folder: "07_outliers"
-  qa_path: "outlier_qa"
+  qa_path: "outliers_qa"
   auto_outliers_path: "auto_outliers"
 estimation_paths:
   folder: "08_estimation"
   qa_path: "estimation_qa"
 apportionment_paths:
   folder: "09_apportionment"
+  qa_path: "apportionment_qa"
 outputs_paths:
   folder: "10_outputs"
+  outputs_master: ""
 export_paths:
   export_folder: "outgoing_export"
 network_paths:

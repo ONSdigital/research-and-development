@@ -7,11 +7,6 @@ import os
 
 import src.staging.staging_helpers as helpers
 from src.staging import validation as val
-from src.utils.path_helpers import (
-    get_paths,
-    create_staging_config,
-    create_mapping_config,
-)
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -66,14 +61,9 @@ def run_staging(  # noqa: C901
     load_from_feather = config["global"]["load_from_feather"]
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
 
-    paths = get_paths(config)
-
-    # set up a dictionary with all the paths needed for the staging module
-    staging_dict = create_staging_config(config)
-    config["staging_paths"] = staging_dict
-    # set up a dictionary with all the paths needed for mapping
-    mapping_dict = create_mapping_config(config)
-    config["mapping_paths"] = mapping_dict
+    # set up dictionaries with all the paths needed for the staging module
+    staging_dict = config["staging_paths"]
+    mapping_dict = config["mapping_paths"]
 
     snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
     secondary_snapshot_name = os.path.basename(
@@ -168,7 +158,7 @@ def run_staging(  # noqa: C901
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
-        manual_path = paths["manual_outliers_path"]
+        manual_path = staging_dict["manual_outliers_path"]
         check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
@@ -268,7 +258,7 @@ def run_staging(  # noqa: C901
     # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
-        staging_folder = paths["staging_output_path"]
+        staging_folder = staging_dict["staging_output_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         staged_filename = (

@@ -47,8 +47,8 @@ def run_outliers(
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
 
-    outlier_qa_path = config["outlier_paths"]["outliers_qa"]
-    auto_outlier_path = config["outlier_paths"]["auto_outliers"]
+    outlier_qa_path = config["outliers_paths"]["qa_path"]
+    auto_outlier_path = config["outliers_paths"]["auto_outliers_path"]
 
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
@@ -61,7 +61,9 @@ def run_outliers(
     survey_year = config["years"]["survey_year"]
     if config["global"]["output_auto_outliers"]:
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
-        file_path = auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"  # noqa
+        file_path = (
+            auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"
+        )  # noqa
         write_csv(file_path, filtered_df)
         OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
     else:
@@ -87,7 +89,7 @@ def run_outliers(
     if config["global"]["output_outlier_qa"]:
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         filename = f"{survey_year}_outliers_qa_{tdate}_v{run_id}.csv"
-        write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
+        write_csv(f"{outlier_qa_path}/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
     else:
         OutlierMainLogger.info("Skipping output of Outlier QA data...")
