@@ -6,11 +6,11 @@ MappingLogger = logging.getLogger(__name__)
 
 
 def col_validation_checks(
-    df: pd.DataFrame,
+    mapper_df: pd.DataFrame,
     mapper_name: str,
     col: str,
-    expected_value_type: type,
-    expected_value_length: int,
+    expected_value_type: type = None,
+    expected_value_length: int = None,
     check_capitalisation: bool = False,
 ) -> None:
     """
@@ -21,7 +21,7 @@ def col_validation_checks(
     It raises a ValueError if any of the checks fail.
 
     Args:
-        df (pd.DataFrame): The DataFrame to check.
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
         mapper_name (str): The name of the mapper being validated.
         col (str): The name of the column to check.
         expected_value_type (type): The expected type of the column values.
@@ -36,14 +36,14 @@ def col_validation_checks(
     try:
         if expected_value_type is not None:
             # Check datatype correct
-            if not df[col][df[col].notnull()].apply(type).eq(expected_value_type).all():
+            if not mapper_df[col][mapper_df[col].notnull()].apply(type).eq(expected_value_type).all():
                 raise ValueError(
                     f"Column {col} is not of the expected type {expected_value_type}."
                 )
         if expected_value_length is not None:
             # Convert to strings, and check if value lengths are correct
             if (
-                not df[col][df[col].notnull()]
+                not mapper_df[col][mapper_df[col].notnull()]
                 .astype(str)
                 .str.len()
                 .eq(expected_value_length)
@@ -55,27 +55,27 @@ def col_validation_checks(
                 )
         if check_capitalisation:
             # Check if all non-null values in the column are in uppercase
-            if not df[col][df[col].notnull()].str.isupper().all():
+            if not mapper_df[col][mapper_df[col].notnull()].str.isupper().all():
                 raise ValueError(f"Column {col} is not in uppercase.")
     except ValueError as ve:
         raise ValueError(f"{mapper_name} mapper validation failed: " + str(ve))
 
 
 def check_mapping_unique(
-    df: pd.DataFrame,
+    mapper_df: pd.DataFrame,
     col_to_check: str,
 ) -> None:
     """
     Checks if a column contains unique values.
 
     Parameters:
-    df (pd.DataFrame): The DataFrame to check.
+    mapper_df (pd.DataFrame): The mapper DataFrame to check.
     col_to_check (str): The name of the column to check.
 
     Raises:
     ValueError: If the column does not contain unique values.
     """
-    if not df[col_to_check].is_unique:
+    if not mapper_df[col_to_check].is_unique:
         raise ValueError(f"Column {col_to_check} is not unique.")
 
 

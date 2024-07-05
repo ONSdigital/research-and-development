@@ -27,7 +27,7 @@ global:
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: True
+  output_gb_sas: False
   output_ni_sas: False
   output_tau: False
   output_intram_by_pg_gb: False
