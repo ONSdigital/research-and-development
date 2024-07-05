@@ -29,7 +29,7 @@ def config():
             "folder": "01_staging",
             "feather_output": "feather",
         },
-        "ni_staging_paths": {
+        "ni_paths": {
             "folder": "03_northern_ireland",
             "ni_staging_output_path": "ni_staging_qa",
         },
@@ -156,7 +156,7 @@ def test_create_module_config_imputation_case(config):
 @pytest.fixture(scope="module")
 def expected_outliers_dict():
     expected_outliers_dict = {
-        "qa_path": "R:/DAP_emulation/2022_surveys/BERD/07_outliers/outlier_qa",
+        "qa_path": "R:/DAP_emulation/2022_surveys/BERD/07_outliers/outliers_qa",
         "auto_outliers_path": (
             "R:/DAP_emulation/2022_surveys/BERD/07_outliers/auto_outliers"
         ),
