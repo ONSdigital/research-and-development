@@ -3,6 +3,7 @@ import logging
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
+from src.mapping.ultfoc_mapping import join_fgn_ownership
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
 
@@ -81,10 +82,10 @@ def run_mapping(
 
     # full_responses = join_cellno_mapper(full_responses, cellno_df)
 
-    full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper)
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     # ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
-    # ni_full_responses = hlp.join_fgn_ownership(
+    # ni_full_responses = join_fgn_ownership(
     #     full_responses,
     #     ultfoc_mapper,
     #     is_northern_ireland=True,
