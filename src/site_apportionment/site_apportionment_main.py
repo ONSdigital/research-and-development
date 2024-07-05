@@ -54,7 +54,9 @@ def run_site_apportionment(
             SitesMainLogger.info("Outputting Apportionment files.")
             tdate = datetime.now().strftime("%y-%m-%d")
             survey_year = config["years"]["survey_year"]
-            filename = f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
+            filename = (
+                f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
+            )
             write_csv(f"{imp_path}/apportionment_qa/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")

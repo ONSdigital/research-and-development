@@ -275,7 +275,10 @@ class TestStageValidateHarmonisePostcodes(object):
     @pytest.fixture(scope="function")
     def config(self) -> pd.DataFrame:
         """Test config."""
-        config = {"global": {"postcode_csv_check": True}, "years": {"survey_year": 2022}}
+        config = {
+            "global": {"postcode_csv_check": True},
+            "years": {"survey_year": 2022},
+        }
         return config
 
     def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
@@ -386,7 +389,9 @@ class TestStageValidateHarmonisePostcodes(object):
         )
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
-        filename = f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        filename = (
+            f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        )
         assert (
             filename in files
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"

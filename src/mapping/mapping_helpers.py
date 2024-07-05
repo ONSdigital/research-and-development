@@ -36,7 +36,12 @@ def col_validation_checks(
     try:
         if expected_value_type is not None:
             # Check datatype correct
-            if not mapper_df[col][mapper_df[col].notnull()].apply(type).eq(expected_value_type).all():
+            if (
+                not mapper_df[col][mapper_df[col].notnull()]
+                .apply(type)
+                .eq(expected_value_type)
+                .all()
+            ):
                 raise ValueError(
                     f"Column {col} is not of the expected type {expected_value_type}."
                 )

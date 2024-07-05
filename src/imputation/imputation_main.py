@@ -132,7 +132,9 @@ def run_imputation(
         survey_year = config["years"]["survey_year"]
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
         # links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
-        full_imp_filename = f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
+        full_imp_filename = (
+            f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
+        )
         wrong_604_filename = f"{survey_year}_wrong_604_error_qa_{tdate}_v{run_id}.csv"
 
         # create trimming qa dataframe with required columns from schema

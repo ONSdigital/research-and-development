@@ -253,7 +253,9 @@ def run_staging(  # noqa: C901
         staging_folder = paths["staging_output_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        staged_filename = f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+        staged_filename = (
+            f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+        )
         write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
