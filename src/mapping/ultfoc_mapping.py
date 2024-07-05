@@ -2,6 +2,7 @@
 
 import pandas as pd
 
+
 def join_fgn_ownership(
     df: pd.DataFrame,
     mapper_df: pd.DataFrame,
