@@ -3,7 +3,6 @@
 import logging
 from typing import Callable, Tuple
 from datetime import datetime
-import pandas as pd
 import os
 
 # Our own modules
@@ -94,6 +93,8 @@ def run_staging(  # noqa: C901
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
+        # filter out PNP data legalstatus=7
+        full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
         if load_updated_snapshot:
             secondary_full_responses = helpers.load_snapshot_feather(
                 secondary_feather_file, read_feather
@@ -266,7 +267,9 @@ def run_staging(  # noqa: C901
         staging_folder = paths["staging_output_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        staged_filename = f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+        staged_filename = (
+            f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+        )
         write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
