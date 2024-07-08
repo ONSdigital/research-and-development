@@ -252,6 +252,7 @@ class TestOutputIntramByItl(object):
             "global": {"network_or_hdfs": "network"},  # no impact for test
             "network_paths": {"output_path": path},
             "years": {"survey_year": year},
+            "outputs_paths": {"outputs_master": path},
         }
         return config
 

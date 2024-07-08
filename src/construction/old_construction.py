@@ -246,7 +246,9 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     construction_output_filepath = os.path.join(
-        paths["root"], "construction", f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv"
+        paths["root"],
+        "construction",
+        f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv",
     )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df

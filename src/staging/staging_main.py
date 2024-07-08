@@ -5,9 +5,8 @@ from typing import Callable, Tuple
 from datetime import datetime
 import os
 
-# Our own modules
-from src.staging import validation as val
 import src.staging.staging_helpers as helpers
+from src.staging import validation as val
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -58,28 +57,24 @@ def run_staging(  # noqa: C901
     """
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
-
-    # Conditionally load paths
-    paths = config[f"{network_or_hdfs}_paths"]
-    snapshot_path = paths["snapshot_path"]
-    snapshot_name = os.path.basename(snapshot_path).split(".", 1)[0]
-    secondary_snapshot_path = paths["secondary_snapshot_path"]
-    secondary_snapshot_name = os.path.basename(secondary_snapshot_path).split(".", 1)[0]
-    feather_path = paths["feather_path"]
-    feather_file = os.path.join(feather_path, f"{snapshot_name}_corrected.feather")
-    secondary_feather_file = os.path.join(
-        feather_path, f"{secondary_snapshot_name}.feather"
-    )
-
-    # Config settings for staging
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
 
-    # Load historic data
-    if config["global"]["load_historic_data"]:
-        dict_of_hist_dfs = helpers.load_historic_data(config, paths, read_csv)
-        print(dict_of_hist_dfs)
+    # set up dictionaries with all the paths needed for the staging module
+    staging_dict = config["staging_paths"]
+    mapping_dict = config["mapping_paths"]
+
+    snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
+    secondary_snapshot_name = os.path.basename(
+        staging_dict["secondary_snapshot_path"]
+    ).split(".", 1)[0]
+
+    feather_path = staging_dict["feather_output"]
+    feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+    secondary_feather_file = os.path.join(
+        feather_path, f"{secondary_snapshot_name}.feather"
+    )
 
     # Check if the if the snapshot feather and optionally the secondary
     # snapshot feather exist
@@ -103,13 +98,15 @@ def run_staging(  # noqa: C901
             secondary_full_responses = None
 
         # Read in postcode mapper (needed later in the pipeline)
-        postcode_masterlist = paths["postcode_masterlist"]
+        postcode_masterlist = staging_dict["postcode_masterlist"]
         check_file_exists(postcode_masterlist, raise_error=True)
         postcode_mapper = read_csv(postcode_masterlist)
 
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
+        snapshot_path = staging_dict["snapshot_path"]
+        secondary_snapshot_path = staging_dict["secondary_snapshot_path"]
         check_file_exists(snapshot_path, raise_error=True)
         full_responses, response_rate = helpers.load_val_snapshot_json(
             snapshot_path, load_json, config, network_or_hdfs
@@ -125,14 +122,13 @@ def run_staging(  # noqa: C901
         # Validate the postcodes in data loaded from JSON
         full_responses, postcode_mapper = helpers.stage_validate_harmonise_postcodes(
             config,
-            paths,
             full_responses,
             run_id,
             check_file_exists,
             read_csv,
             write_csv,
         )
-
+        # TODO : this code hasn't been updated to use the new paths (in staging)
         if load_updated_snapshot:
             secondary_full_responses = helpers.load_validate_secondary_snapshot(
                 load_json,
@@ -145,7 +141,7 @@ def run_staging(  # noqa: C901
 
         # Write both snapshots to feather file at given path
         if is_network:
-            feather_fname = f"{snapshot_name}_corrected.feather"
+            feather_fname = f"{snapshot_name}.feather"
             s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
                 feather_path, feather_fname, full_responses, write_feather
@@ -164,7 +160,7 @@ def run_staging(  # noqa: C901
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
-        manual_path = paths["manual_outliers_path"]
+        manual_path = staging_dict["manual_outliers_path"]
         check_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
@@ -183,7 +179,7 @@ def run_staging(  # noqa: C901
         StagingMainLogger.info("Loading of Manual Outlier File skipped")
 
     # Get the latest manual trim file
-    manual_trim_path = paths["manual_imp_trim_path"]
+    manual_trim_path = staging_dict["manual_imp_trim_path"]
 
     if config["global"]["load_manual_imputation"] and isfile(manual_trim_path):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
@@ -204,7 +200,7 @@ def run_staging(  # noqa: C901
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
-        backdata_path = paths["backdata_path"]
+        backdata_path = staging_dict["backdata_path"]
         check_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
         # To be added once schema is defined
@@ -221,7 +217,7 @@ def run_staging(  # noqa: C901
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -232,7 +228,7 @@ def run_staging(  # noqa: C901
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -243,7 +239,7 @@ def run_staging(  # noqa: C901
     # Loading SIC division detailed mapper
     sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -253,7 +249,7 @@ def run_staging(  # noqa: C901
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
-        paths,
+        mapping_dict,
         check_file_exists,
         read_csv,
         StagingMainLogger,
@@ -264,7 +260,7 @@ def run_staging(  # noqa: C901
     # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
-        staging_folder = paths["staging_output_path"]
+        staging_folder = staging_dict["staging_output_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         staged_filename = (
