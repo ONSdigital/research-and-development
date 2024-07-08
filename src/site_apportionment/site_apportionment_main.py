@@ -56,7 +56,7 @@ def run_site_apportionment(
             filename = (
                 f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
             )
-            write_csv(f"{qa_path}/apportionment_qa/{filename}", df_out)
+            write_csv(f"{qa_path}/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")
         return df_out

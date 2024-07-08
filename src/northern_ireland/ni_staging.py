@@ -18,7 +18,7 @@ def read_ni_files(
 ) -> Tuple:
     """Read in CSV file and schema for NI data."""
     # read in csv file as pandas dataframes
-    ni_full_response_file = config["ni_paths"]["ni_full_responses_path"]
+    ni_full_response_file = config["ni_paths"]["ni_full_responses"]
 
     # raise error if the required files do not exist
     check_file_exists(ni_full_response_file, raise_error=True)
