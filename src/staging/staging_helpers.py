@@ -76,17 +76,12 @@ def getmappername(mapper_path_key, split):
     return mapper_name
 
 
-def load_validate_mapper(
-    mapper_path_key,
-    paths,
-    logger,
-    network_or_hdfs,
-):
+def load_validate_mapper(mapper_path_key, config, logger) -> pd.DataFrame:
     """
     Loads a specified mapper, validates it using a schema and an optional
     validation function.
 
-    This function first retrieves the path of the mapper from the provided paths
+    This function first retrieves the path of the mapper from the provided config
     dictionary using the mapper_path_key. It then checks if the file exists at
     the mapper path. If the file exists, it is read into a DataFrame. The
     DataFrame is then validated against a schema, which is located at a path
@@ -95,18 +90,14 @@ def load_validate_mapper(
 
     Args:
         mapper_path_key (str): The key to retrieve the mapper path from the
-        paths dictionary.
+        config dictionary.
 
-        paths (dict): A dictionary containing paths.
+        config (dict): A dictionary containing configuration options.
         file_exists_func (Callable): A function to check if a file exists at a
         given path.
         read_csv_func (Callable): A function to read a CSV file into a
         DataFrame.
         logger (logging.Logger): A logger to log information and errors.
-        val_with_schema_func (Callable): A function to validate a DataFrame
-        against a schema.
-        validation_func (Callable, optional): An optional function to perform
-        additional validation on the DataFrame.
         *args: Additional arguments to pass to the validation function.
 
     Returns:
@@ -116,8 +107,9 @@ def load_validate_mapper(
         FileNotFoundError: If no file exists at the mapper path.
         ValidationError: If the DataFrame fails schema validation or the validation func
     """
-    # Get the path of the mapper from the paths dictionary
-    mapper_path = paths[mapper_path_key]
+    # Get the path of the mapper from the config dictionary
+    mapper_path = config["mapping_paths"][mapper_path_key]
+    network_or_hdfs = config["global"]["network_or_hdfs"]
 
     if network_or_hdfs == "network":
         from src.utils import local_file_mods as mods

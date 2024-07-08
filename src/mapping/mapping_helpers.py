@@ -71,7 +71,7 @@ def col_validation_checks(
             # Convert to strings, and check if value lengths are correct
             if (
                 not mapper_df[col]
-                .loc[mapper_df[col].notnull()]  # & (mapper_df[col] != None)]
+                .loc[mapper_df[col].notnull()]
                 .astype(str)
                 .str.len()
                 .eq(expected_value_length)

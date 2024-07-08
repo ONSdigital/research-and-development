@@ -6,7 +6,6 @@ from src.mapping.pg_conversion import run_pg_conversion
 from src.mapping.ultfoc_mapping import join_fgn_ownership
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
-from src.utils import path_helpers as paths_hlp
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ def run_mapping(
 ):
 
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
+    # network_or_hdfs = config["global"]["network_or_hdfs"]
 
     # if network_or_hdfs == "network":
     #     from src.utils import local_file_mods as mods
@@ -26,80 +25,62 @@ def run_mapping(
     # elif network_or_hdfs == "hdfs":
     #     from src.utils import hdfs_mods as mods
 
-    # create a config dictionary of mapper paths
-    mapping_dict = paths_hlp.create_mapping_config(config)
-
-    pg_num_alpha = stage_hlp.load_validate_mapper(
-        "pg_num_alpha_mapper_path",
-        mapping_dict,
-        MappingMainLogger,
-        network_or_hdfs,
-    )
-    val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
-
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
-        mapping_dict,
+        config,
         MappingMainLogger,
-        network_or_hdfs,
     )
-    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
-        mapping_dict,
+        config,
         MappingMainLogger,
-        network_or_hdfs,
     )
 
     # Loading cell number coverage
     cellno_df = stage_hlp.load_validate_mapper(
         "cellno_path",
-        mapping_dict,
+        config,
         MappingMainLogger,
-        network_or_hdfs,
     )
 
+    # Load and validate the PG mappers
+    pg_num_alpha = stage_hlp.load_validate_mapper(
+        "pg_num_alpha_mapper_path",
+        config,
+        MappingMainLogger,
+    )
+    val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
+
+    # Load and validate the SIC to PG mappers, to be used to impute missing PG
     sic_pg_num = stage_hlp.load_validate_mapper(
         "sic_pg_num_mapper_path",
-        mapping_dict,
+        config,
         MappingMainLogger,
-        network_or_hdfs,
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
-    # Loading ru_817_list mapper
+    # For survey year 2022 only, it's necessary to update the reference list
     if config["years"]["survey_year"] == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
-            mapping_dict,
+            config,
             MappingMainLogger,
-            network_or_hdfs,
         )
-        # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
 
-    # Carry out product group conversion
-    # Impute missing product group responses in q201 from SIC, then copy this to a new
-    # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
+    # Join the mappers to the full responses dataframe, with validation.
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    # if ni_full_responses is not None:
-    #     ni_full_responses = run_pg_conversion(
-    #         ni_full_responses, pg_num_alpha, sic_pg_num
-    #     )
-
-    # full_responses = join_cellno_mapper(full_responses, cellno_df)
-
-    full_responses = hlp.join_fgn_ownership(full_responses, ultfoc_mapper)
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     if ni_full_responses is not None:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
         ni_full_responses = run_pg_conversion(
             ni_full_responses, pg_num_alpha, sic_pg_num
         )
-        ni_full_responses = hlp.join_fgn_ownership(
+        ni_full_responses = join_fgn_ownership(
             ni_full_responses,
             ultfoc_mapper,
             is_northern_ireland=True,
