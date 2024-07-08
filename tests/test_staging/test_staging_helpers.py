@@ -9,6 +9,7 @@ from datetime import date
 # Third Party Imports
 import pandas as pd
 import numpy as np
+from pandas import DataFrame as pandasDF
 import pyarrow.feather as feather
 
 # Local Imports
