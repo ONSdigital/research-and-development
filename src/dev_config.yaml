@@ -2,7 +2,6 @@ config_validation:
   validate: True
   path: src/dev_config_schema.yaml
 global:
-  survey_year: 2022
   # Logging settings
   log_to_file: True # Write logs to .log file
   logging_level: "DEBUG"
@@ -22,40 +21,58 @@ runlog_writer:
   display: False # Display the runlog in the terminal
   log_path: "/ons/rdbe_dev/"
 hdfs_paths:
-  root: "/ons/rdbe_dev/"
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
+staging_paths:
+  folder: "01_staging"
+  feather_output: "feather"
+  staging_output_path: "staging_qa/full_responses_qa"
+  pcode_val_path: "staging_qa/postcode_validation"
+freezing_paths:
+  folder: "02_freezing"
+ni_paths:
+  folder: "03_northern_ireland"
+  ni_staging_output_path: "ni_staging_qa"
+construction_paths:
+  folder: "04_construction"
+mapping_paths:
+  folder: "05_mapping"
+imputation_paths:
+  folder: "06_imputation"
+  qa_path: "imputation_qa"
+  manual_trimming_path: "manual_trimming"
+outliers_paths:
+  folder: "07_outliers"
+  qa_path: "outliers_qa"
+  auto_outliers_path: "auto_outliers"
+estimation_paths:
+  folder: "08_estimation"
+  qa_path: "estimation_qa"
+apportionment_paths:
+  folder: "09_apportionment"
+  qa_path: "apportionment_qa"
+outputs_paths:
+  folder: "10_outputs"
+  #TODO: add all the output subpaths
+  outputs_master: ""
+export_paths:
+  export_folder: "outgoing_export"
 network_paths:
-  root: "R:/BERD Results System Development 2023/DAP_emulation/" # dev config
+  root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs" # dev config
-  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
-  secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
-  ni_full_responses_path: "R:/BERD Results System Development 2023/DAP_emulation/northern_ireland/2021/TEST_ni.csv" # TESTER FILE
-  postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
-  postcode_path: "R:/BERD Results System Development 2023/DAP_emulation/staging/staging_qa/postcode_validation"
-  history_path: "R:/BERD Results System Development 2023/DAP_emulation/BERD_V7_Anonymised" #"R:\BERD Results System Development 2023\DAP_emulation\backseries\v1"
+  snapshot_path: "survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  secondary_snapshot_path: "berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
+  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Imputation and outliers input paths
   backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
-  manual_imp_trim_path: "R:/BERD Results System Development 2023/DAP_emulation/imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
-  manual_outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
-  outliers_path: "R:/BERD Results System Development 2023/DAP_emulation/outliers"
+  manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   # Construction paths
-  construction_file_path: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_file.csv"
-  construction_file_path_ni: "R:/BERD Results System Development 2023/DAP_emulation/construction/manual_construction/test_construction_ni_file.csv"
-  # mapper paths
-  mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers'
-  ultfoc_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ultfoc.csv"
-  itl_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/itl_6162_ni.csv'
-  cellno_2022_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/berd_2022_cellno_coverage.csv'
-  sic_pg_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_alpha.csv'
-  sic_pg_utf_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/SIC_to_PG_UTF-8.csv'
-  sic_pg_num_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_pg_num.csv'
-  pg_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_detailed.csv"
-  pg_num_alpha_mapper_path: 'R:/BERD Results System Development 2023/DAP_emulation/mappers/pg_num_alpha.csv'
-  # cora_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/cora_mapper.csv" ### DELETE
-  itl1_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/itl1_detailed.csv"
-  ref_list_817_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/2023/BERD_2022_ref_list.csv"
-  civil_defence_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/civil_defence_detailed.csv"
-  sic_division_detailed_mapper_path: "R:/BERD Results System Development 2023/DAP_emulation/mappers/sic_div_detailed.csv"
+  construction_file_path: "04_construction/manual_construction/test_construction_file.csv"
+  construction_file_path_ni: "04_construction/manual_construction/test_construction_ni_file.csv"
+  # postcode paths
+  postcode_masterlist: "ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
+  pcode_val_path: "01_staging/staging_qa/postcode_validation"
+# schema paths
 schema_paths:
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
@@ -77,7 +94,7 @@ outliers:
   flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
 devtest:
   seltype_list: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19, 21, 22, 23, 25, 26, 27, 29, 30, 31, 33, 34, 35, 37, 38, 39]
-csv_filenames:
+log_filenames:
   main: "main_runlog.csv"
   configs: "configs_runlog.csv"
   logs: "logs_runlog.csv"

@@ -4,6 +4,58 @@ from typing import Union, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
+from src.utils.path_helpers import update_config_with_paths
+
+
+def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
+    """Set up the config for the pipeline.
+
+    Args:
+        user_config_path (str): The path to the user config file.
+        dev_config_path (str): The path to the developer config file.
+
+    Returns:
+        Dict: The merged user and developer configs.
+    """
+    user_config, dev_config = load_validate_configs(user_config_path, dev_config_path)
+    combined_config = merge_configs(user_config, dev_config)
+    del user_config, dev_config
+
+    # update the config with the full paths
+    modules = [
+        "construction",
+        "imputation",
+        "outliers",
+        "estimation",
+        "apportionment",
+        "outputs",
+    ]
+    combined_config = update_config_with_paths(combined_config, modules)
+
+    return combined_config
+
+
+def load_validate_configs(user_config_path: str, dev_config_path: str):
+    """Load and validate the user and developer configs.
+
+    Args:
+        user_config_path (str): The path to the user config file.
+        dev_config_path (str): The path to the developer config file.
+
+    Returns:
+        Tuple[Dict, Dict]: The user and developer configs.
+    """
+    user_config = safeload_yaml(user_config_path)
+    dev_config = safeload_yaml(dev_config_path)
+    if user_config["config_validation"]["validate"]:
+        validate_config(user_config)
+    if dev_config["config_validation"]["validate"]:
+        validate_config(dev_config)
+
+    # drop validation keys
+    user_config.pop("config_validation", None)
+    dev_config.pop("config_validation", None)
+    return user_config, dev_config
 
 
 def merge_configs(config1: Dict, config2: Dict) -> Dict:

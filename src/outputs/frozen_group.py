@@ -42,10 +42,7 @@ def output_frozen_group(
         None
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     df_gb = map_o.map_FG_cols_to_numeric(df_gb)
     if df_ni is not None:
@@ -205,8 +202,9 @@ def output_frozen_group(
     output = create_output_df(df_agg, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_frozen_group_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_frozen_group_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_frozen_group/{filename}", output)
 
     return None

@@ -1,14 +1,12 @@
 """The main pipeline"""
 # Core Python modules
-import time
 import logging
 
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
-from src.utils.config import validate_config, merge_configs
+from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
-from src.utils.local_file_mods import safeload_yaml
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction import run_construction
@@ -22,7 +20,7 @@ from src.outputs.outputs_main import run_outputs
 MainLogger = logging.getLogger(__name__)
 
 
-def run_pipeline(start, user_config_path, dev_config_path):
+def run_pipeline(user_config_path, dev_config_path):
     """The main pipeline.
 
     Args:
@@ -31,19 +29,8 @@ def run_pipeline(start, user_config_path, dev_config_path):
         config_path (string): The path to the config file to be
         used.
     """
-    # load config
-    user_config = safeload_yaml(user_config_path)
-    dev_config = safeload_yaml(dev_config_path)
-    # validate config
-    validate_config(user_config)
-    validate_config(dev_config)
-    # drop validation keys
-    user_config.pop("config_validation", None)
-    dev_config.pop("config_validation", None)
-    # combine configs
-    config = merge_configs(user_config, dev_config)
-    del user_config
-    del dev_config
+    # Load, validate and merge the user and developer configs
+    config = config_setup(user_config_path, dev_config_path)
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
@@ -69,7 +56,9 @@ def run_pipeline(start, user_config_path, dev_config_path):
         mods.rd_read_csv,
         mods.rd_write_csv,
     )
-
+    runlog_obj.create_runlog_files()
+    runlog_obj.write_config_log()
+    runlog_obj.write_mainlog()
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
     MainLogger.info(f"Reading user config from {user_config_path}.")
@@ -205,16 +194,8 @@ def run_pipeline(start, user_config_path, dev_config_path):
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
+    
+    runlog_obj.write_runlog()
+    runlog_obj.mark_mainlog_passed()
 
-    runlog_obj.retrieve_pipeline_logs()
-
-    run_time = round(time.time() - start, 5)
-    runlog_obj._record_time_taken(run_time)
-
-    runlog_obj.retrieve_configs()
-    runlog_obj._create_runlog_dicts()
-    runlog_obj._create_runlog_dfs()
-    runlog_obj.create_runlog_files()
-    runlog_obj._write_runlog()
-
-    return run_time
+    return runlog_obj.time_taken

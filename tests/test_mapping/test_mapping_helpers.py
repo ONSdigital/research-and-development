@@ -4,29 +4,31 @@ import numpy as np
 
 # Local Imports
 from src.mapping.mapping_helpers import (
+    mapper_null_checks,
     col_validation_checks,
     check_mapping_unique,
     update_ref_list,
-    join_fgn_ownership,
     create_additional_ni_cols,
 )
 
 
+@pytest.fixture(scope="module")
+def test_mapper_df():
+    """Sample mapper for testing."""
+    columns = ["ruref", "ultfoc"]
+    data = [
+        ["abc", "AB"],
+        ["def", "EF"],
+        ["ghi", "IJ"],
+        ["jkl", "MN"],
+        ["mno", "QR"],
+        ["pqr", None],
+    ]
+    return pd.DataFrame(data=data, columns=columns)
+
+
 class TestColValidationChecks(object):
     """Tests for col_validation_checks."""
-
-    @pytest.fixture(scope="function")
-    def test_mapper_df(self):
-        """Sample mapper for testing."""
-        columns = ["ruref", "ultfoc"]
-        data = [
-            ["abc", "AB"],
-            ["def", "EF"],
-            ["ghi", "IJ"],
-            ["jkl", "MN"],
-            ["mno", "QR"],
-        ]
-        return pd.DataFrame(data=data, columns=columns)
 
     def test_col_validation_checks_type(self, test_mapper_df):
         """Test col_validation_checks for type validation."""
@@ -56,7 +58,7 @@ class TestCheckMappingUnique(object):
     """Tests for check_mapping_unique."""
 
     @pytest.fixture(scope="function")
-    def test_mapper_df(self):
+    def test_mapper_nonunique_df(self):
         """Sample mapper for testing."""
         columns = ["ruref", "ultfoc"]
         data = [
@@ -65,73 +67,18 @@ class TestCheckMappingUnique(object):
             ["ghi", "AB"],
             ["jkl", "MN"],
             ["mno", "AB"],
+            ["pqr", None],
         ]
         return pd.DataFrame(data=data, columns=columns)
 
-    def test_check_mapping_unique_unique(self, test_mapper_df):
+    def test_check_mapping_unique_unique(self, test_mapper_nonunique_df):
         """Test check_mapping_unique for a column with unique values."""
-        check_mapping_unique(test_mapper_df, "ruref")
+        check_mapping_unique(test_mapper_nonunique_df, "ruref")
 
-    def test_check_mapping_unique_not_unique(self, test_mapper_df):
+    def test_check_mapping_unique_not_unique(self, test_mapper_nonunique_df):
         """Test check_mapping_unique for a column without unique values."""
         with pytest.raises(ValueError):
-            check_mapping_unique(test_mapper_df, "ultfoc")
-
-
-class TestJoinFgnOwnership(object):
-    """Tests for join_fgn_ownership."""
-
-    @pytest.fixture(scope="function")
-    def main_input(self):
-        """main_df input data."""
-        columns = ["test_col", "formtype", "reference"]
-        data = [
-            [1, "0006", 21],
-            [2, "0001", 22],
-            [3, "0001", 23],
-            [4, np.nan, 24],
-            [5, "0001", 25],
-            [6, "0001", 26],
-        ]
-        df = pd.DataFrame(data=data, columns=columns)
-        return df
-
-    @pytest.fixture(scope="function")
-    def mapper_input(self):
-        """mapper_df input data."""
-        columns = ["ruref", "ultfoc"]
-        data = [
-            [21, "uf1"],
-            [22, "uf2"],
-            [23, "uf3"],
-            [24, None],
-            [25, ""],
-            [26, np.nan],
-        ]
-        df = pd.DataFrame(data=data, columns=columns)
-        return df
-
-    @pytest.fixture(scope="function")
-    def exp_output(self):
-        """expected output data."""
-        columns = ["test_col", "formtype", "reference", "ultfoc"]
-        data = [
-            [1, "0006", 21, "uf1"],
-            [2, "0001", 22, "uf2"],
-            [3, "0001", 23, "uf3"],
-            [4, np.nan, 24, "GB"],
-            [5, "0001", 25, "GB"],
-            [6, "0001", 26, "GB"],
-        ]
-        df = pd.DataFrame(data=data, columns=columns)
-        return df
-
-    def test_join_fgn_ownership(self, main_input, mapper_input, exp_output):
-        """General tests for join_pg_numeric"""
-        output = join_fgn_ownership(main_input, mapper_input)
-        assert output.equals(
-            exp_output
-        ), "Output from join_fgn_ownership not as expected."
+            check_mapping_unique(test_mapper_nonunique_df, "ultfoc")
 
 
 class TestUpdateRefList(object):

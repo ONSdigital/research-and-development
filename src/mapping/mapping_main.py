@@ -3,8 +3,10 @@ import logging
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
+from src.mapping.ultfoc_mapping import join_fgn_ownership
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
+from src.utils import path_helpers as paths_hlp
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -18,12 +20,18 @@ def run_mapping(
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
-    # Conditionally load paths
-    paths = config[f"{network_or_hdfs}_paths"]
+    # if network_or_hdfs == "network":
+    #     from src.utils import local_file_mods as mods
+
+    # elif network_or_hdfs == "hdfs":
+    #     from src.utils import hdfs_mods as mods
+
+    # create a config dictionary of mapper paths
+    mapping_dict = paths_hlp.create_mapping_config(config)
 
     pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
-        paths,
+        mapping_dict,
         MappingMainLogger,
         network_or_hdfs,
     )
@@ -32,42 +40,41 @@ def run_mapping(
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
-        paths,
+        mapping_dict,
         MappingMainLogger,
         network_or_hdfs,
     )
-    hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
-    hlp.check_mapping_unique(ultfoc_mapper, "ruref")
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
-        paths,
+        mapping_dict,
         MappingMainLogger,
         network_or_hdfs,
     )
 
     # Loading cell number coverage
     cellno_df = stage_hlp.load_validate_mapper(
-        "cellno_2022_path",
-        paths,
+        "cellno_path",
+        mapping_dict,
         MappingMainLogger,
         network_or_hdfs,
     )
 
     sic_pg_num = stage_hlp.load_validate_mapper(
         "sic_pg_num_mapper_path",
-        paths,
+        mapping_dict,
         MappingMainLogger,
         network_or_hdfs,
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
     # Loading ru_817_list mapper
-    if config["global"]["survey_year"] == 2022:
+    if config["years"]["survey_year"] == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
-            paths,
+            mapping_dict,
             MappingMainLogger,
             network_or_hdfs,
         )
@@ -78,6 +85,10 @@ def run_mapping(
     # Impute missing product group responses in q201 from SIC, then copy this to a new
     # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
+    # if ni_full_responses is not None:
+    #     ni_full_responses = run_pg_conversion(
+    #         ni_full_responses, pg_num_alpha, sic_pg_num
+    #     )
 
     # full_responses = join_cellno_mapper(full_responses, cellno_df)
 

@@ -24,16 +24,14 @@ def output_ni_sas(
         ni_full_responses (pd.DataFrame): NI dataset
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
-         This will be the hdfs or network version depending on settings.
+            This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         postcode_mapper (pd.DataFrame): maps the postcode to region code
         pg_alpha_num (pd.DataFrame): mapper of numeric PG to alpha PG
         postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
 
     """
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
@@ -57,6 +55,7 @@ def output_ni_sas(
     output = create_output_df(df, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_ni_sas_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_ni_sas_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_ni_sas/{filename}", output)
