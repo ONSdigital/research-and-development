@@ -71,7 +71,7 @@ def test_get_paths(config):
     }
     network_paths = get_paths(config)
 
-    assert network_paths == expected_network_paths
+    assert network_paths == expected_network_paths, "Network paths are not as expected"
 
 
 @pytest.fixture(scope="module")
@@ -96,7 +96,7 @@ def test_create_staging_config(config, expected_staging_dict):
 
     staging_dict = create_staging_config(config)
 
-    assert staging_dict == expected_staging_dict
+    assert staging_dict == expected_staging_dict, "Staging config is not as expected"
 
 
 def test_create_ni_staging_config(config):
@@ -112,7 +112,7 @@ def test_create_ni_staging_config(config):
     }
     ni_staging_dict = create_ni_staging_config(config)
 
-    assert ni_staging_dict == expected_ni_staging_dict
+    assert ni_staging_dict == expected_ni_staging_dict, "NI config is not as expected"
 
 
 def test_create_mapping_config(config):
@@ -124,7 +124,7 @@ def test_create_mapping_config(config):
     }
     mapping_dict = create_mapping_config(config)
 
-    assert mapping_dict == expected_mapping_dict
+    assert mapping_dict == expected_mapping_dict, "Mapping config is not as expected"
 
 
 def test_create_module_config_imputation_case(config):
@@ -138,7 +138,7 @@ def test_create_module_config_imputation_case(config):
     }
     imputation_dict = create_module_config(config, "imputation")
 
-    assert imputation_dict == expected_imputation_dict
+    assert imputation_dict == expected_imputation_dict, "Imp config is not as expected"
 
 
 @pytest.fixture(scope="module")
@@ -157,7 +157,7 @@ def test_create_module_config_outliers_case(config, expected_outliers_dict):
 
     outliers_dict = create_module_config(config, "outliers")
 
-    assert outliers_dict == expected_outliers_dict
+    assert outliers_dict == expected_outliers_dict, "Outliers config is not as expected"
 
 
 def test_update_config_with_paths(
@@ -167,13 +167,18 @@ def test_update_config_with_paths(
     module_list = ["construction", "imputation", "outliers"]
     updated_config = update_config_with_paths(config, module_list)
 
-    assert "staging_paths" in updated_config
-    assert "ni_paths" in updated_config
-    assert "mapping_paths" in updated_config
+    special_paths = ["staging_paths", "ni_paths", "mapping_paths"]
+    for module_name in module_list + special_paths:
+        assert (
+            f"{module_name}_paths" in updated_config,
+            f"{module_name}_paths are not present in updated_config",
+        )
 
-    for module_name in module_list:
-
-        assert f"{module_name}_paths" in updated_config
-
-    assert updated_config["staging_paths"] == expected_staging_dict
-    assert updated_config["outliers_paths"] == expected_outliers_dict
+    assert (
+        updated_config["staging_paths"] == expected_staging_dict,
+        "Staging paths are not as expected",
+    )
+    assert (
+        updated_config["outliers_paths"] == expected_outliers_dict,
+        "Outliers paths are not as expected",
+    )
