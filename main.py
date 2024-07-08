@@ -1,6 +1,10 @@
 from importlib import reload
 import time
 import os
+print(os.getcwd())
+
+os.chdir("/home/cdsw/research-and-development")
+
 import src.pipeline as src
 
 # reload the pipeline module to implement any changes

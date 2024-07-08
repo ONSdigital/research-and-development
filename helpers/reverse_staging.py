@@ -1,4 +1,4 @@
-'''This script produces a synthetic small sample of SPP snapshot.
+'''This script produces a synthetic small sample of the anonymised SPP snapshot.
 It also creates a postcodes mapper that only has the postcodes we need.'''
 
 import pandas as pd
@@ -15,6 +15,14 @@ config  = {
         "schemas_dir": r"./config/synthetic_schemas",
         "input_snapshot": r"staged_BERD_full_responses_2024-06-03_v16.csv",
     },
+    ,
+    "hdfs_paths": {
+        "input_dir": "ons/rdbe_dev/synthetic/inputs",
+        "output_dir": "ons/rdbe_dev/synthetic/outputs",
+        "schemas_dir": "./config/synthetic_schemas",
+        "input_snapshot": r"staged_BERD_full_responses_2024-06-03_v16.csv",
+    },
+}
 }
 
 # Create schema of staged df
