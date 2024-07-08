@@ -480,6 +480,8 @@ def filter_PNP_data(full_responses):
     """
 
     # filter out PNP data legalstatus=7
-    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
+    full_responses = full_responses.loc[
+        (full_responses["legalstatus"] != "7")
+    ].reset_index(drop=True)
 
     return full_responses
