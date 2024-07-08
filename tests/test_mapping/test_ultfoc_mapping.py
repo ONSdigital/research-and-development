@@ -64,6 +64,7 @@ class TestJoinFgnOwnership(object):
 
 class TestValidateUltfocMapper(object):
     """Tests for validate_ultfoc_mapper."""
+
     @pytest.fixture(scope="function")
     def ultfoc_mapper_input_fail(self):
         """ultfoc_mapper input data."""
@@ -96,13 +97,8 @@ class TestValidateUltfocMapper(object):
         """General tests for validate_ultfoc_mapper."""
         with pytest.raises(ValueError):
             validate_ultfoc_mapper(ultfoc_mapper_input_fail)
-        
 
     def test_validate_ultfoc_mapper_pass(self, ultfoc_mapper_input_pass):
         """General tests for validate_ultfoc_mapper."""
         result = validate_ultfoc_mapper(ultfoc_mapper_input_pass)
         assert result is None
-
-    
-
-
