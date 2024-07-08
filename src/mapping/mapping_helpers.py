@@ -5,6 +5,28 @@ import logging
 MappingLogger = logging.getLogger(__name__)
 
 
+def mapper_null_checks(
+    mapper_df: pd.DataFrame, mapper_name: str, col1: str, col2: str
+) -> None:
+    """
+    Perform null checks on two columns of a mapper DataFrame.
+
+    Args:
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
+        mapper_name (str): The name of the mapper being validated.
+        col1 (str): The name of the first column to check for nulls.
+        col2 (str): The name of the second column to check for nulls.
+
+    Raises:
+        ValueError: If any null values are found in the mapper DataFrame.
+
+    """
+    if mapper_df[col1].isnull().any():
+        raise ValueError(f"{mapper_name} mapper contains null values in {col1}.")
+    if mapper_df[col2].isnull().any():
+        raise ValueError(f"{mapper_name} mapper contains null values in {col2}.")
+
+
 def col_validation_checks(
     mapper_df: pd.DataFrame,
     mapper_name: str,
@@ -24,10 +46,10 @@ def col_validation_checks(
         mapper_df (pd.DataFrame): The mapper DataFrame to check.
         mapper_name (str): The name of the mapper being validated.
         col (str): The name of the column to check.
-        expected_value_type (type): The expected type of the column values.
-        expected_value_length (int): The expected length of the column values.
+        expected_value_type (type, optional): The expected type of the column values.
+        expected_value_length (int, optional): The expected length of the column values.
         check_capitalisation (bool, optional): Whether to check if the column
-        values are in uppercase. Defaults to False.
+            values are in uppercase. Defaults to False.
 
     Raises:
         ValueError: If any of the validation checks fail.

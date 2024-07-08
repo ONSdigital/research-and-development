@@ -4,27 +4,30 @@ import numpy as np
 
 # Local Imports
 from src.mapping.mapping_helpers import (
+    mapper_null_checks,
     col_validation_checks,
     check_mapping_unique,
     update_ref_list,
 )
 
 
+@pytest.fixture(scope="module")
+def test_mapper_df():
+    """Sample mapper for testing."""
+    columns = ["ruref", "ultfoc"]
+    data = [
+        ["abc", "AB"],
+        ["def", "EF"],
+        ["ghi", "IJ"],
+        ["jkl", "MN"],
+        ["mno", "QR"],
+        ["pqr", None],
+    ]
+    return pd.DataFrame(data=data, columns=columns)
+
+
 class TestColValidationChecks(object):
     """Tests for col_validation_checks."""
-
-    @pytest.fixture(scope="function")
-    def test_mapper_df(self):
-        """Sample mapper for testing."""
-        columns = ["ruref", "ultfoc"]
-        data = [
-            ["abc", "AB"],
-            ["def", "EF"],
-            ["ghi", "IJ"],
-            ["jkl", "MN"],
-            ["mno", "QR"],
-        ]
-        return pd.DataFrame(data=data, columns=columns)
 
     def test_col_validation_checks_type(self, test_mapper_df):
         """Test col_validation_checks for type validation."""
@@ -54,7 +57,7 @@ class TestCheckMappingUnique(object):
     """Tests for check_mapping_unique."""
 
     @pytest.fixture(scope="function")
-    def test_mapper_df(self):
+    def test_mapper_nonunique_df(self):
         """Sample mapper for testing."""
         columns = ["ruref", "ultfoc"]
         data = [
@@ -63,17 +66,18 @@ class TestCheckMappingUnique(object):
             ["ghi", "AB"],
             ["jkl", "MN"],
             ["mno", "AB"],
+            ["pqr", None],
         ]
         return pd.DataFrame(data=data, columns=columns)
 
-    def test_check_mapping_unique_unique(self, test_mapper_df):
+    def test_check_mapping_unique_unique(self, test_mapper_nonunique_df):
         """Test check_mapping_unique for a column with unique values."""
-        check_mapping_unique(test_mapper_df, "ruref")
+        check_mapping_unique(test_mapper_nonunique_df, "ruref")
 
-    def test_check_mapping_unique_not_unique(self, test_mapper_df):
+    def test_check_mapping_unique_not_unique(self, test_mapper_nonunique_df):
         """Test check_mapping_unique for a column without unique values."""
         with pytest.raises(ValueError):
-            check_mapping_unique(test_mapper_df, "ultfoc")
+            check_mapping_unique(test_mapper_nonunique_df, "ultfoc")
 
 
 class TestUpdateRefList(object):
@@ -129,3 +133,31 @@ class TestUpdateRefList(object):
         error_msg = r"The following references in the reference list mapper are.*"
         with pytest.raises(ValueError, match=error_msg):
             update_ref_list(full_input_df, ref_list_input)
+
+
+# Test the mapper_null_checks function
+class TestMapperNullChecks(object):
+    """Tests for mapper_null_checks."""
+
+    def test_mapper_no_nulls_df(self):
+        """Sample mapper for testing."""
+        columns = ["ruref", "ultfoc"]
+        data = [
+            ["abc", "AB"],
+            ["def", "EF"],
+            ["ghi", "AB"],
+        ]
+        return pd.DataFrame(data=data, columns=columns)
+
+    def test_mapper_null_checks_pass(self):
+        """Test mapper_null_checks for passing all checks."""
+        mapper_df = self.test_mapper_no_nulls_df()
+        result = mapper_null_checks(mapper_df, "test_mapper", "ruref", "ultfoc")
+
+        assert result is None
+
+    def test_mapper_null_checks_raises(self, test_mapper_df):
+        """Test mapper_null_checks for raising an error."""
+        error_msg = f"test_mapper mapper contains null values in ultfoc."
+        with pytest.raises(ValueError, match=error_msg):
+            mapper_null_checks(test_mapper_df, "test_mapper", "ruref", "ultfoc")

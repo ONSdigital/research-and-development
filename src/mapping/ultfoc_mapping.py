@@ -2,6 +2,23 @@
 
 import pandas as pd
 
+from src.mapping import mapping_helpers as hlp
+
+
+def validate_ultfoc_mapper(ultfoc_mapper: pd.DataFrame) -> None:
+    """
+    Validate the foreign ownership (ultfoc) mapper.
+
+    Args:
+        ultfoc_mapper (pd.DataFrame): The foreign ownership mapper DataFrame.
+
+    Returns:
+        pd.DataFrame: The validated foreign ownership mapper DataFrame.
+    """
+    hlp.mapper_null_checks(ultfoc_mapper, "ultfoc", "ruref", "ultfoc")
+    hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
+    hlp.check_mapping_unique(ultfoc_mapper, "ruref")
+
 
 def join_fgn_ownership(
     df: pd.DataFrame,
@@ -9,7 +26,7 @@ def join_fgn_ownership(
     is_northern_ireland: bool = False,
 ) -> pd.DataFrame:
     """
-    Combine two DataFrames using a left join based on specified columns.
+    Validate and join the foreign ownership (ultfoc) mapper to the responses dataframes.
 
     Args:
         df (pd.DataFrame): The main DataFrame.
@@ -18,6 +35,7 @@ def join_fgn_ownership(
     Returns:
         pd.DataFrame: The combined DataFrame resulting from the left join.
     """
+    mapper_df = validate_ultfoc_mapper(mapper_df)
 
     if is_northern_ireland:
         mapped_ni_df = df.rename(columns={"foc": "ultfoc"})

@@ -37,8 +37,7 @@ def run_mapping(
         MappingMainLogger,
         network_or_hdfs,
     )
-    hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
-    hlp.check_mapping_unique(ultfoc_mapper, "ruref")
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
@@ -80,9 +79,7 @@ def run_mapping(
     # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
 
-    # full_responses = join_cellno_mapper(full_responses, cellno_df)
-
-    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
+    # full_responses = join_cellno_mapper(full_responses, cellno_df
 
     # ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
     # ni_full_responses = join_fgn_ownership(
