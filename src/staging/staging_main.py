@@ -261,6 +261,13 @@ def run_staging(  # noqa: C901
         None,
     )
 
+    # For synthetic file only
+    # mypath = r"D:\repos\research-and-development\config\synthetic_schemas\full_responses_schema.toml"
+    # from helpers.synthetic import save_schema
+    # save_schema(full_responses, mypath)
+    # End of synthetic
+    
+
     # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
