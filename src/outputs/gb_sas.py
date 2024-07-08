@@ -16,7 +16,6 @@ def output_gb_sas(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -30,18 +29,12 @@ def output_gb_sas(
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): maps the postcode to region code
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     # Filter regions for GB only
     df1 = df.copy().loc[df["region"].isin(regions()["GB"])]
 
     # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    df1 = map_o.join_fgn_ownership(df1, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
     df1 = map_o.create_cora_status_col(df1)
@@ -69,6 +62,7 @@ def output_gb_sas(
     output = create_output_df(df1, schema_dict)
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_gb_sas_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_gb_sas_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_gb_sas/{filename}", output)

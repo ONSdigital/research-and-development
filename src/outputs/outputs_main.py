@@ -31,7 +31,6 @@ def run_outputs(  # noqa: C901
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
@@ -75,7 +74,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
@@ -91,7 +89,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -107,7 +104,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished TAU output.")
@@ -120,7 +116,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished GB SAS output.")
@@ -196,7 +191,6 @@ def run_outputs(  # noqa: C901
         output_frozen_group(
             outputs_df,
             ni_full_responses,
-            ultfoc_mapper,
             config,
             write_csv,
             run_id,

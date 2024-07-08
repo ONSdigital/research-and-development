@@ -27,9 +27,7 @@ def output_intram_by_pg(
         ni_df (pd.DataFrame): The NI datasets without weights applied.
 
     """
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
@@ -71,11 +69,14 @@ def output_intram_by_pg(
     )
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
     filename = (
-        f"output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}_{tdate}_v{run_id}.csv"
+        f"{survey_year}_output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
+        f"_{tdate}_v{run_id}.csv"
     )
     write_csv(
-        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}/{filename}",
+        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
+        f"/{filename}",
         df_merge,
     )

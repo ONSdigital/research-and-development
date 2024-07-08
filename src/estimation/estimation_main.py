@@ -2,8 +2,8 @@
 import logging
 from datetime import datetime
 from typing import Any, Callable, Dict
-
 import pandas as pd
+
 from src.estimation import apply_weights as appweights
 from src.estimation import calculate_weights as weights
 from src.estimation import cellno_mapper as cmap
@@ -34,8 +34,7 @@ def run_estimation(
     """
     EstMainLogger.info("Starting estimation weights calculation...")
 
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    est_path = config[f"{NETWORK_OR_HDFS}_paths"]["estimation_path"]
+    est_qa_path = config["estimation_paths"]["qa_path"]
 
     # clean and create a dictionary from the cellno mapper
     cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
@@ -52,11 +51,12 @@ def run_estimation(
 
     if config["global"]["output_estimation_qa"]:
         EstMainLogger.info("Outputting estimation QA file.")
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        cell_qa_filename = f"estimation_weights_qa_{tdate}_v{run_id}.csv"
-        full_qa_filename = f"full_estimation_qa_{tdate}_v{run_id}.csv"
-        write_csv(f"{est_path}/estimation_qa/{cell_qa_filename}", qa_df)
-        write_csv(f"{est_path}/estimation_qa/{full_qa_filename}", estimated_df)
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        cell_qa_filename = f"{survey_year}_estimation_weights_qa_{tdate}_v{run_id}.csv"
+        full_qa_filename = f"{survey_year}_full_estimation_qa_{tdate}_v{run_id}.csv"
+        write_csv(f"{est_qa_path}/{cell_qa_filename}", qa_df)
+        write_csv(f"{est_qa_path}/{full_qa_filename}", estimated_df)
     EstMainLogger.info("Finished estimation weights calculation.")
 
     # update the numeric columns to the estimated values, and drop the qa cols

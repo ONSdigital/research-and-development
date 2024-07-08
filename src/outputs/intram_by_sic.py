@@ -25,12 +25,8 @@ def output_intram_by_sic(
         sic_div_detailed (pd.DataFrame): Format of the SIC output as mapper
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
-
-    period = config["years"]["current_year"]
+    output_path = config["outputs_paths"]["outputs_master"]
+    period = config["years"]["survey_year"]
 
     # Create sic_division column from rusic
     df["rusic_string"] = df["rusic"].astype(str).str.zfill(5)
@@ -91,6 +87,7 @@ def output_intram_by_sic(
     df_selected = df_merge[selected_columns]
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"output_intram_by_sic_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_output_intram_by_sic_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_intram_by_sic/{filename}", df_selected)

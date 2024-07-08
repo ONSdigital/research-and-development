@@ -37,12 +37,11 @@ def output_status_filtered(
     # filter the dataframe
     filtered_df = save_removed_markers(df, imp_markers_to_keep)
 
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"status_filtered_qa_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_status_filtered_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_status_filtered_qa/{filename}", filtered_df)
 
     StatusFilteredLogger.info("Finished status filtered output.")

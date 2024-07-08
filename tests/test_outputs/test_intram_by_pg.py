@@ -10,14 +10,12 @@ import pandas as pd
 
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.utils.config import safeload_yaml, merge_configs
 from tests.test_outputs.conftest import read_config
 
 
 # Assign config values to paths
 config = read_config()
 LOCATION = config["global"]["network_or_hdfs"]
-PATHS = config[f"{LOCATION}_paths"]
 
 # create logger (required pass to function)
 TestLogger = logging.getLogger(__name__)
@@ -29,13 +27,11 @@ class TestOutputIntramByPG(object):
     def setup_tmp_dir(self, path: pathlib.Path, ni: bool = True) -> pathlib.Path:
         """Set up the output directory given a temp path."""
         # create output dirs
-        output_parent = os.path.join(path, "outputs")
+        output_parent = os.path.join(path, "10_outputs")
         output_child = os.path.join(
             output_parent, f"output_intram_by_pg_{'gb' if not ni else 'uk'}"
         )
         os.makedirs(output_child)
-        # update config
-        PATHS["output_path"] = output_parent
         return pathlib.Path(output_child)
 
     @pytest.fixture(scope="function")
@@ -209,6 +205,8 @@ class TestOutputIntramByPG(object):
     ):
         """Tests for output_intram_by_pg."""
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
+        # alter path so that tests pass
+        config["outputs_paths"]["outputs_master"] = os.path.dirname(pth)
         if not ni:
             input_data_ni = None
         output_intram_by_pg(
