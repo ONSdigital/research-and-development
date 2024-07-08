@@ -20,11 +20,11 @@ def run_mapping(
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
-    if network_or_hdfs == "network":
-        from src.utils import local_file_mods as mods
+    # if network_or_hdfs == "network":
+    #     from src.utils import local_file_mods as mods
 
-    elif network_or_hdfs == "hdfs":
-        from src.utils import hdfs_mods as mods
+    # elif network_or_hdfs == "hdfs":
+    #     from src.utils import hdfs_mods as mods
 
     # create a config dictionary of mapper paths
     mapping_dict = paths_hlp.create_mapping_config(config)
@@ -32,8 +32,6 @@ def run_mapping(
     pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
         mapping_dict,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
         MappingMainLogger,
         network_or_hdfs,
     )
@@ -87,10 +85,10 @@ def run_mapping(
     # Impute missing product group responses in q201 from SIC, then copy this to a new
     # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    if ni_full_responses is not None:
-        ni_full_responses = run_pg_conversion(
-            ni_full_responses, pg_num_alpha, sic_pg_num
-        )
+    # if ni_full_responses is not None:
+    #     ni_full_responses = run_pg_conversion(
+    #         ni_full_responses, pg_num_alpha, sic_pg_num
+    #     )
 
     # full_responses = join_cellno_mapper(full_responses, cellno_df
 
