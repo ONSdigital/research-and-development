@@ -83,9 +83,8 @@ def run_imputation(
     for col in to_impute_cols:
         df[f"{col}_imputed"] = df[col]
 
-    # Create imp_path variable for QA output and manual imputation file
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["imputation_path"]
+    # Create qa_path variable for QA output and manual imputation file
+    qa_path = config["imputation_paths"]["qa_path"]
 
     # Load manual imputation file
     df = mimp.merge_manual_imputation(df, manual_trimming_df)
@@ -131,7 +130,8 @@ def run_imputation(
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
-        # links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
+        # if config["global"]["load_backdata"]:
+        #   links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = (
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
         )
@@ -142,13 +142,11 @@ def run_imputation(
         schema_dict = load_schema(schema_path)
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
-        # if backdata is not None:
-        #  write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
-        write_csv(f"{imp_path}/imputation_qa/{trim_qa_filename}", trimming_qa_output)
-        write_csv(f"{imp_path}/imputation_qa/{full_imp_filename}", imputed_df)
-        write_csv(f"{imp_path}/imputation_qa/{wrong_604_filename}", wrong_604_qa_df)
+        write_csv(f"{qa_path}/{trim_qa_filename}", trimming_qa_output)
+        write_csv(f"{qa_path}/{full_imp_filename}", imputed_df)
+        write_csv(f"{qa_path}/{wrong_604_filename}", wrong_604_qa_df)
         # if config["global"]["load_backdata"]:
-        #     write_csv(f"{imp_path}/imputation_qa/{links_filename}", links_df)
+        #     write_csv(f"{qa_path}{links_filename}", links_df)
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe

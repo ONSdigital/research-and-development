@@ -42,10 +42,7 @@ def output_frozen_group(
         None
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     df_gb = map_o.map_FG_cols_to_numeric(df_gb)
     if df_ni is not None:

@@ -43,12 +43,12 @@ def run_outliers(
     """
     OutlierMainLogger.info("Starting Auto Outlier Detection...")
 
-    network_or_hdfs = config["global"]["network_or_hdfs"]
     upper_clip = config["outliers"]["upper_clip"]
     lower_clip = config["outliers"]["lower_clip"]
     flag_cols = config["outliers"]["flag_cols"]
-    outlier_path = config[f"{network_or_hdfs}_paths"]["outliers_path"]
-    auto_outlier_path = outlier_path + "/auto_outliers"
+
+    outlier_qa_path = config["outliers_paths"]["qa_path"]
+    auto_outlier_path = config["outliers_paths"]["auto_outliers_path"]
 
     # Calculate automatic outliers
     df_auto_flagged = auto.run_auto_flagging(df, upper_clip, lower_clip, flag_cols)
@@ -89,7 +89,7 @@ def run_outliers(
     if config["global"]["output_outlier_qa"]:
         OutlierMainLogger.info("Starting output of Outlier QA data...")
         filename = f"{survey_year}_outliers_qa_{tdate}_v{run_id}.csv"
-        write_csv(f"{outlier_path}/outliers_qa/{filename}", flagged_outlier_df)
+        write_csv(f"{outlier_qa_path}/{filename}", flagged_outlier_df)
         OutlierMainLogger.info("Finished QA output of outliers data.")
     else:
         OutlierMainLogger.info("Skipping output of Outlier QA data...")

@@ -105,10 +105,7 @@ def output_short_form(
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)

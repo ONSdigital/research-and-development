@@ -10,11 +10,10 @@ from datetime import datetime
 from typing import Callable, Tuple, Dict, Union
 
 # Our own modules
-from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import postcode_validation as pcval
-from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
+from src.staging import spp_parser
 
 
 # Create logger for this module
@@ -152,47 +151,6 @@ def load_validate_mapper(
     return mapper_df
 
 
-def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
-    """Load historic data into the pipeline.
-
-    Args:
-        config (dict): The pipeline configuration
-        paths (dict): The paths to the data files
-        read_csv (Callable): Function to read a csv file.
-            This will be the hdfs or network version depending on settings.
-
-    Returns:
-        dict: A dictionary of history data loaded into the pipeline.
-    """
-    curent_year = config["years"]["survey_year"]
-    years_to_load = config["years"]["previous_years_to_load"]
-    years_gen = history_loader.history_years(curent_year, years_to_load)
-
-    if years_gen is None:
-        StagingHelperLogger.info("No historic data to load for this run.")
-        return {}
-    else:
-        StagingHelperLogger.info("Loading historic data...")
-        history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(
-            years_gen, history_path, read_csv
-        )
-        # Check if it has loaded and is not empty
-        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-            StagingHelperLogger.info(
-                "Dictionary of history data: %s loaded into pipeline",
-                ", ".join(dict_of_hist_dfs),
-            )
-            StagingHelperLogger.info("Historic data loaded.")
-        else:
-            StagingHelperLogger.warning(
-                "Problem loading historic data. Dict may be empty or not present"
-            )
-            raise Exception("The historic data did not load")
-
-    return dict_of_hist_dfs if dict_of_hist_dfs else {}
-
-
 def check_snapshot_feather_exists(
     config: dict,
     check_file_exists: Callable,
@@ -220,7 +178,6 @@ def check_snapshot_feather_exists(
         return check_file_exists(feather_file_to_check)
 
 
-@time_logger_wrap
 def load_snapshot_feather(feather_file, read_feather):
     snapdata = read_feather(feather_file)
     StagingHelperLogger.info(f"{feather_file} loaded")
@@ -383,7 +340,6 @@ def df_to_feather(
 
 def stage_validate_harmonise_postcodes(
     config: Dict,
-    paths: Dict,
     full_responses: pd.DataFrame,
     run_id: str,
     check_file_exists: Callable,
@@ -405,7 +361,6 @@ def stage_validate_harmonise_postcodes(
 
     Parameters:
     config (Dict): A dictionary containing configuration options.
-    paths (Dict): A dictionary containing paths to various files.
     full_responses (pd.DataFrame): The DataFrame containing the data to be
     validated.
     run_id (str): The run ID for this execution.
@@ -422,8 +377,10 @@ def stage_validate_harmonise_postcodes(
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
 
+    staging_dict = config["staging_paths"]
+
     # Load the master list of postcodes
-    postcode_masterlist = paths["postcode_masterlist"]
+    postcode_masterlist = staging_dict["postcode_masterlist"]
     check_file_exists(postcode_masterlist, raise_error=True)
     postcode_mapper = read_csv(postcode_masterlist)
     postcode_masterlist = postcode_mapper["pcd2"]
@@ -437,7 +394,7 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
 
     # Save the invalid postcodes to a CSV file
-    pcodes_folder = paths["postcode_path"]
+    pcodes_folder = staging_dict["pcode_val_path"]
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     invalid_filename = (
