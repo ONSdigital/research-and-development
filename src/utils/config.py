@@ -22,7 +22,15 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
     del user_config, dev_config
 
     # update the config with the full paths
-    combined_config = update_config_with_paths(combined_config)
+    modules = [
+        "construction",
+        "imputation",
+        "outliers",
+        "estimation",
+        "apportionment",
+        "outputs",
+    ]
+    combined_config = update_config_with_paths(combined_config, modules)
 
     return combined_config
 
