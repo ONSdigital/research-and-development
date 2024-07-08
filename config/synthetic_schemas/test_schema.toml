@@ -1,0 +1,7 @@
+[A]
+old_name = "A"
+Deduced_Data_Type = "object"
+
+[B]
+old_name = "B"
+Deduced_Data_Type = "int64"
