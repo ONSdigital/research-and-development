@@ -348,12 +348,12 @@ class TestStageValidateHarmonisePostcodes(object):
     @pytest.fixture(scope="function")
     def pc_mapper_output(self) -> pd.DataFrame:
         """Expected output for postcode_mapper"""
-        columns = ["Unnamed: 0", "pcd2"]
+        columns = ["pcd2"]
         data = [
-            [0, "NP44 2NZ"],
-            [1, "CE1  4OY"],
-            [2, "RH12 1XL"],
-            [3, "CE11 8IU"],
+            ["NP44 2NZ"],
+            ["CE1  4OY"],
+            ["RH12 1XL"],
+            ["CE11 8IU"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -381,10 +381,10 @@ class TestStageValidateHarmonisePostcodes(object):
             "full_responses output from stage_validate_harmonise_postcodes not"
             " as expected."
         )
-        # assert pm.equals(pc_mapper_output), (
-        #     "postcode_mapper output from stage_validate_harmonise_postcodes not"
-        #     " as expected."
-        # )
+        assert pm.equals(pc_mapper_output), (
+            "postcode_mapper output from stage_validate_harmonise_postcodes not"
+            " as expected."
+        )
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
         filename = (

@@ -17,7 +17,6 @@ from tests.test_outputs.conftest import read_config
 # Assign config values to paths
 config = read_config()
 LOCATION = config["global"]["network_or_hdfs"]
-PATHS = config[f"{LOCATION}_paths"]
 
 # create logger (required pass to function)
 TestLogger = logging.getLogger(__name__)
@@ -34,8 +33,7 @@ class TestOutputIntramByPG(object):
             output_parent, f"output_intram_by_pg_{'gb' if not ni else 'uk'}"
         )
         os.makedirs(output_child)
-        # update config
-        PATHS["output_path"] = output_parent
+        print(path)
         return pathlib.Path(output_child)
 
     @pytest.fixture(scope="function")
@@ -194,36 +192,36 @@ class TestOutputIntramByPG(object):
                 ni_df=1,
             )
 
-    # @pytest.mark.parametrize(
-    #     "ni, exp_out", ([False, exp_out_gb()], [True, exp_out_uk()])
-    # )
-    # def test_output_intram_by_pg(
-    #     self,
-    #     ni,
-    #     exp_out,
-    #     tmp_path,
-    #     input_data_gb,
-    #     input_data_ni,
-    #     pg_detailed_df,
-    #     write_csv_func,
-    # ):
-    #     """Tests for output_intram_by_pg."""
-    #     pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
-    #     if not ni:
-    #         input_data_ni = None
-    #     output_intram_by_pg(
-    #         gb_df=input_data_gb,
-    #         pg_detailed=pg_detailed_df,
-    #         config=config,
-    #         write_csv=write_csv_func,
-    #         run_id=1,
-    #         ni_df=input_data_ni,
-    #     )
-    #     # assert output saved
-    #     found_paths = os.listdir(pth)
-    #     assert len(found_paths) > 0, "Outputs not saved."
-    #     output = pd.read_csv(os.path.join(pth, found_paths[0]))
-    #     # refine df
-    #     output = output[output["2023 (Current period)"] > 0].reset_index(drop=True)
-    #     # assert output is correct
-    #     assert output.equals(exp_out), "Output not as expected."
+    @pytest.mark.parametrize(
+        "ni, exp_out", ([False, exp_out_gb()], [True, exp_out_uk()])
+    )
+    def test_output_intram_by_pg(
+        self,
+        ni,
+        exp_out,
+        tmp_path,
+        input_data_gb,
+        input_data_ni,
+        pg_detailed_df,
+        write_csv_func,
+    ):
+        """Tests for output_intram_by_pg."""
+        pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
+        if not ni:
+            input_data_ni = None
+        output_intram_by_pg(
+            gb_df=input_data_gb,
+            pg_detailed=pg_detailed_df,
+            config=config,
+            write_csv=write_csv_func,
+            run_id=1,
+            ni_df=input_data_ni,
+        )
+        # assert output saved
+        found_paths = os.listdir(pth)
+        assert len(found_paths) > 0, "Outputs not saved."
+        output = pd.read_csv(os.path.join(pth, found_paths[0]))
+        # refine df
+        output = output[output["2023 (Current period)"] > 0].reset_index(drop=True)
+        # assert output is correct
+        assert output.equals(exp_out), "Output not as expected."
