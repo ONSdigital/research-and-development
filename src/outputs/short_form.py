@@ -92,7 +92,6 @@ def output_short_form(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -107,9 +106,6 @@ def output_short_form(
 
     """
     output_path = config["outputs_paths"]["outputs_master"]
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)

@@ -16,7 +16,6 @@ def output_long_form(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
 ):
     """Run the outputs module on long forms.
 
@@ -36,9 +35,6 @@ def output_long_form(
 
     # Filter for long-forms/NI (status mapping has already been done)
     df = df.loc[((df["formtype"] == "0001") | (df["formtype"] == "0003"))]
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Create long form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["long_form_schema"]

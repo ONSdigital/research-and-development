@@ -218,43 +218,31 @@ def run_staging(  # noqa: C901
     itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
         mapping_dict,
-        check_file_exists,
-        read_csv,
         StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
         mapping_dict,
-        check_file_exists,
-        read_csv,
         StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
     # Loading SIC division detailed mapper
     sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
         mapping_dict,
-        check_file_exists,
-        read_csv,
         StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
         mapping_dict,
-        check_file_exists,
-        read_csv,
         StagingMainLogger,
-        val.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
     # Output the staged BERD data.

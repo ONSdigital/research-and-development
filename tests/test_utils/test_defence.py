@@ -2,21 +2,19 @@
 
 import pytest
 
-from src.utils.defence import (
-    type_defence,
-    validate_file_extension
-)
+from src.utils.defence import type_defence, validate_file_extension
+
 
 class TestTypeDefence(object):
     """Tests for type_defence."""
 
     def test_type_defence(self):
         """General passing tests for type_defence."""
-        type_defence(None, 'test', (str, type(None)))
-        type_defence(5, 'test', int)
-        type_defence(True, 'test', (bool, int))
-        type_defence('tester', 'test', str)
-    
+        type_defence(None, "test", (str, type(None)))
+        type_defence(5, "test", int)
+        type_defence(True, "test", (bool, int))
+        type_defence("tester", "test", str)
+
     def test_type_defence_raises(self):
         """Tests for type_defence error raises."""
         msg = ".*test_param.* expected .*str.*Got .*int.*"
@@ -32,7 +30,7 @@ class TestTypeDefence(object):
 
 class TestValidateFileExtension(object):
     """Tests for validate_file_extension."""
-    
+
     def test_validate_file_extension(self):
         """General tests for validate_file_extension."""
         validate_file_extension("test/test.txt", ".txt")

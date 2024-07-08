@@ -63,7 +63,7 @@ def run_outliers(
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
         file_path = (
             auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"
-        )  # noqa
+        )
         write_csv(file_path, filtered_df)
         OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
     else:

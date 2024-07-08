@@ -16,7 +16,6 @@ OutputMainLogger = logging.getLogger(__name__)
 def output_frozen_group(
     df_gb: pd.DataFrame,
     df_ni: pd.DataFrame,
-    ultfoc_mapper: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -157,9 +156,6 @@ def output_frozen_group(
         "q257",
         "q258",
     ]
-
-    # Join foriegn ownership column using ultfoc mapper for GB
-    df_gb = map_o.join_fgn_ownership(df_gb, ultfoc_mapper, formtype=["0001", "0006"])
 
     # Map to the CORA statuses from the statusencoded column
     df_gb = map_o.create_cora_status_col(df_gb)
