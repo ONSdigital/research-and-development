@@ -17,9 +17,10 @@ class TestJoinFgnOwnership(object):
             [1, "0006", 21],
             [2, "0001", 22],
             [3, "0001", 23],
-            [4, np.nan, 24],
-            [5, "0001", 25],
-            [6, "0001", 26],
+            [4, "0001", 23],
+            [5, np.nan, 24],
+            [6, "0001", 25],
+            [7, "0001", 26],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -29,12 +30,12 @@ class TestJoinFgnOwnership(object):
         """mapper_df input data."""
         columns = ["ruref", "ultfoc"]
         data = [
-            [21, "uf1"],
-            [22, "uf2"],
-            [23, "uf3"],
+            [21, "UZ"],
+            [22, "NL"],
+            [23, "BG"],
             [24, None],
-            [25, ""],
-            [26, np.nan],
+            [25, None],
+            [26, None],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -44,12 +45,13 @@ class TestJoinFgnOwnership(object):
         """expected output data."""
         columns = ["test_col", "formtype", "reference", "ultfoc"]
         data = [
-            [1, "0006", 21, "uf1"],
-            [2, "0001", 22, "uf2"],
-            [3, "0001", 23, "uf3"],
-            [4, np.nan, 24, "GB"],
-            [5, "0001", 25, "GB"],
-            [6, "0001", 26, "GB"],
+            [1, "0006", 21, "UZ"],
+            [2, "0001", 22, "NL"],
+            [3, "0001", 23, "BG"],
+            [4, "0001", 23, "BG"],
+            [5, np.nan, 24, "GB"],
+            [6, "0001", 25, "GB"],
+            [7, "0001", 26, "GB"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -85,9 +87,9 @@ class TestValidateUltfocMapper(object):
         """ultfoc_mapper input data."""
         columns = ["ruref", "ultfoc"]
         data = [
-            [21, "uf1"],
-            [22, "uf2"],
-            [23, "uf3"],
+            [21, "u1"],
+            [22, "u2"],
+            [23, "u3"],
             [24, "GB"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
@@ -100,5 +102,14 @@ class TestValidateUltfocMapper(object):
 
     def test_validate_ultfoc_mapper_pass(self, ultfoc_mapper_input_pass):
         """General tests for validate_ultfoc_mapper."""
+        columns = ["ruref", "ultfoc"]
+        data = [
+            [21, "UZ"],
+            [22, "NL"],
+            [23, "UK"],
+            [24, "GB"],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
         result = validate_ultfoc_mapper(ultfoc_mapper_input_pass)
         assert result is None

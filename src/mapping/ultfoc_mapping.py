@@ -9,13 +9,14 @@ def validate_ultfoc_mapper(ultfoc_mapper: pd.DataFrame) -> None:
     """
     Validate the foreign ownership (ultfoc) mapper.
 
+    NOTE: we can allow this mapper to contain null values in the ultfoc
+
     Args:
         ultfoc_mapper (pd.DataFrame): The foreign ownership mapper DataFrame.
 
     Returns:
         pd.DataFrame: The validated foreign ownership mapper DataFrame.
     """
-    hlp.mapper_null_checks(ultfoc_mapper, "ultfoc", "ruref", "ultfoc")
     hlp.col_validation_checks(ultfoc_mapper, "ultfoc", "ultfoc", str, 2, True)
     hlp.check_mapping_unique(ultfoc_mapper, "ruref")
 
@@ -35,7 +36,8 @@ def join_fgn_ownership(
     Returns:
         pd.DataFrame: The combined DataFrame resulting from the left join.
     """
-    mapper_df = validate_ultfoc_mapper(mapper_df)
+    # perform validation on the foreign ownership (ultfoc) mapper
+    validate_ultfoc_mapper(mapper_df)
 
     if is_northern_ireland:
         mapped_ni_df = df.rename(columns={"foc": "ultfoc"})
