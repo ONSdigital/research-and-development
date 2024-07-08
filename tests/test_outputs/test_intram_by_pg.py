@@ -10,7 +10,6 @@ import pandas as pd
 
 # Local Imports
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.utils.config import safeload_yaml, merge_configs
 from tests.test_outputs.conftest import read_config
 
 
@@ -33,7 +32,6 @@ class TestOutputIntramByPG(object):
             output_parent, f"output_intram_by_pg_{'gb' if not ni else 'uk'}"
         )
         os.makedirs(output_child)
-        print(path)
         return pathlib.Path(output_child)
 
     @pytest.fixture(scope="function")
@@ -207,6 +205,8 @@ class TestOutputIntramByPG(object):
     ):
         """Tests for output_intram_by_pg."""
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
+        # alter path so that tests pass
+        config["outputs_paths"]["outputs_master"] = os.path.dirname(pth)
         if not ni:
             input_data_ni = None
         output_intram_by_pg(
