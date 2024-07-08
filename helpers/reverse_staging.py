@@ -15,15 +15,14 @@ config  = {
         "schemas_dir": r"./config/synthetic_schemas",
         "input_snapshot": r"staged_BERD_full_responses_2024-06-03_v16.csv",
     },
-    ,
     "hdfs_paths": {
         "input_dir": "ons/rdbe_dev/synthetic/inputs",
         "output_dir": "ons/rdbe_dev/synthetic/outputs",
-        "schemas_dir": "./config/synthetic_schemas",
+        "schemas_dir": "/home/cdsw/research-and-development/config/synthetic_schemas",
         "input_snapshot": r"staged_BERD_full_responses_2024-06-03_v16.csv",
     },
 }
-}
+
 
 # Create schema of staged df
 def save_schema(df: pd.DataFrame, shema_path: str) -> None: 
@@ -101,7 +100,7 @@ if __name__ == "__main__":
         "B": [1, 2, 3],
     })
 
-    mydir = config["network_paths"]["schemas_dir"]
+    mydir = config["hdfs_paths"]["schemas_dir"]
     myfile = "test_schema.toml"
     mypath = join(mydir, myfile)
     save_schema(df, mypath)
