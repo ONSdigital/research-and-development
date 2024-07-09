@@ -5,6 +5,7 @@ from src.utils.path_helpers import (
     get_paths,
     create_staging_config,
     create_ni_staging_config,
+    create_construction_config,
     create_mapping_config,
     create_module_config,
     update_config_with_paths,
@@ -23,6 +24,8 @@ def config():
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
             "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
             "manual_outliers_path": "07_outliers/man_out/man_out.csv",
+            "construction_file_path": "04_construction/man_con/construction_file.csv",
+            "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         },
         "years": {"survey_year": 2022},
         "staging_paths": {
@@ -34,13 +37,17 @@ def config():
             "ni_staging_output_path": "ni_staging_qa",
         },
         "construction_paths": {
-            "folder": "02_construction",
+            "folder": "04_construction",
             "qa_path": "construction_qa",
         },
         "2022_mappers": {
             "mappers_version": "v1",
             "postcodes_mapper": "pcodes_2022.csv",
             "itl_mapper_path": "itl_2022.csv",
+        },
+        "mapping_paths": {
+            "folder": "05_mapping",
+            "qa_path": "mapping_qa",
         },
         "imputation_paths": {
             "folder": "06_imputation",
@@ -66,6 +73,8 @@ def test_get_paths(config):
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
         "manual_outliers_path": "07_outliers/man_out/man_out.csv",
         "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
+        "construction_file_path": "04_construction/man_con/construction_file.csv",
+        "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         "year": 2022,
         "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
     }
@@ -121,10 +130,27 @@ def test_create_mapping_config(config):
     expected_mapping_dict = {
         "postcodes_mapper": "R:/DAP_emulation/2022_surveys/mappers/v1/pcodes_2022.csv",
         "itl_mapper_path": "R:/DAP_emulation/2022_surveys/mappers/v1/itl_2022.csv",
+        "qa_path": "R:/DAP_emulation/2022_surveys/BERD/05_mapping/mapping_qa",
     }
     mapping_dict = create_mapping_config(config)
 
     assert mapping_dict == expected_mapping_dict, "Mapping config is not as expected"
+
+
+def test_create_construction_config(config):
+    """Test create_construction_config function."""
+    expected_construction_dict = {
+        "qa_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/construction_qa",
+        "construction_file_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/construction_file.csv",
+        "construction_file_path_ni": (
+            "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/con_file_ni.csv"
+        ),
+    }
+    construction_dict = create_construction_config(config)
+
+    assert (
+        construction_dict == expected_construction_dict
+    ), "Construction config is not as expected"
 
 
 def test_create_module_config_imputation_case(config):
@@ -164,7 +190,7 @@ def test_update_config_with_paths(
     config, expected_staging_dict, expected_outliers_dict
 ):
     """Test update_config_with_paths function."""
-    module_list = ["construction", "imputation", "outliers"]
+    module_list = ["imputation", "outliers"]
     updated_config = update_config_with_paths(config, module_list)
 
     special_paths = ["staging_paths", "ni_paths", "mapping_paths"]

@@ -6,7 +6,6 @@ from src.mapping.pg_conversion import run_pg_conversion
 from src.mapping.ultfoc_mapping import join_fgn_ownership
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
-from src.utils import path_helpers as paths_hlp
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ def run_mapping(
     #     from src.utils import hdfs_mods as mods
 
     # create a config dictionary of mapper paths
-    mapping_dict = paths_hlp.create_mapping_config(config)
+    mapping_dict = config["mapping_paths"]
 
     pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",

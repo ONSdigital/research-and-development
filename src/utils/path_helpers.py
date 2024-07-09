@@ -10,6 +10,32 @@ def get_paths(config: dict) -> dict:
     return paths
 
 
+def create_module_config(config: dict, module_name: str) -> dict:
+    """Create a dictionary with all the paths needed for a named module.
+
+    This dict will update the module section of the config with full paths.
+    Examples of module names are "imputation", "outliers", "estimation".
+
+    Args:
+        config (dict): The pipeline configuration.
+
+    Returns:
+        dict: A dictionary with all the paths needed for the specified module.
+    """
+    paths = get_paths(config)
+    berd_path = paths["berd_path"]
+
+    module_conf = config[f"{module_name}_paths"]
+    folder_path = f"{berd_path}{module_conf['folder']}"
+
+    # we next prefix the folder path to the imputation paths.
+    module_dict = {
+        k: f"{folder_path}/{v}" for k, v in module_conf.items() if k != "folder"
+    }
+
+    return module_dict
+
+
 def create_staging_config(config: dict) -> dict:
     """Create a configuration dict with all full paths needed for staging.
 
@@ -26,14 +52,7 @@ def create_staging_config(config: dict) -> dict:
     root_path = paths["root"]
     berd_path = paths["berd_path"]
 
-    staging_conf = config["staging_paths"]
-
-    folder_path = f"{berd_path}{staging_conf['folder']}"
-
-    # we next prefix the folder path to the staging paths.
-    staging_dict = {
-        k: f"{folder_path}/{v}" for k, v in staging_conf.items() if k != "folder"
-    }
+    staging_dict = create_module_config(config, "staging")
 
     # add new paths to the staging section of the config
     staging_dict["snapshot_path"] = f"{root_path}{paths['snapshot_path']}"
@@ -61,13 +80,7 @@ def create_ni_staging_config(config: dict) -> dict:
     paths = get_paths(config)
     berd_path = paths["berd_path"]
 
-    ni_staging_conf = config["ni_paths"]
-    folder_path = f"{berd_path}{ni_staging_conf['folder']}"
-
-    # we next prefix the folder path to the staging paths.
-    ni_staging_dict = {
-        k: f"{folder_path}/{v}" for k, v in ni_staging_conf.items() if k != "folder"
-    }
+    ni_staging_dict = create_module_config(config, "ni")
 
     # add in the path to the ni_full_responses
     ni_staging_dict[
@@ -103,33 +116,34 @@ def create_mapping_config(config: dict) -> dict:
         k: f"{map_folder}{v}" for k, v in year_dict.items() if k != "mappers_version"
     }
 
+    # add in the other mapping paths, such as the qa path
+    module_dict = create_module_config(config, "mapping")
+    mapping_dict.update(module_dict)
+
     return mapping_dict
 
 
-def create_module_config(config: dict, module_name: str) -> dict:
-    """Create a dictionary with all the paths needed for a named module.
-
-    This dict will update the module section of the config with full paths.
-    Examples of module names are "imputation", "outliers", "estimation".
+def create_construction_config(config: dict) -> dict:
+    """Create a configuration dictionary with all paths needed for construction module.
 
     Args:
         config (dict): The pipeline configuration.
 
     Returns:
-        dict: A dictionary with all the paths needed for the specified module.
+        dict: A dictionary with all the paths needed for the construction module.
     """
+    construction_dict = create_module_config(config, "construction")
+
+    # now update add construction paths
     paths = get_paths(config)
     berd_path = paths["berd_path"]
-
-    module_conf = config[f"{module_name}_paths"]
-    folder_path = f"{berd_path}{module_conf['folder']}"
-
-    # we next prefix the folder path to the imputation paths.
-    module_dict = {
-        k: f"{folder_path}/{v}" for k, v in module_conf.items() if k != "folder"
-    }
-
-    return module_dict
+    construction_dict[
+        "construction_file_path"
+    ] = f"{berd_path}{paths['construction_file_path']}"
+    construction_dict[
+        "construction_file_path_ni"
+    ] = f"{berd_path}{paths['construction_file_path_ni']}"
+    return construction_dict
 
 
 def update_config_with_paths(config: dict, modules: list) -> dict:
@@ -145,6 +159,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
     config["staging_paths"] = create_staging_config(config)
     config["ni_paths"] = create_ni_staging_config(config)
     config["mapping_paths"] = create_mapping_config(config)
+    config["construction_paths"] = create_construction_config(config)
 
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
