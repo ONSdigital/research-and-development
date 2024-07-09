@@ -55,9 +55,11 @@ def run_construction(  # noqa: C901
         return snapshot_df
 
     # Obtain construction paths
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    paths = config[f"{network_or_hdfs}_paths"]
-    construction_file_path = paths[path_type]
+    paths = config[f"construction_paths"]
+    if is_northern_ireland:
+        construction_file_path = paths["construction_file_path_ni"]
+    else:
+        construction_file_path = paths["construction_file_path"]
 
     # Check the construction file exists and has records, then read it
     construction_df = read_construction_file(
