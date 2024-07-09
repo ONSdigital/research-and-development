@@ -71,7 +71,7 @@ def col_validation_checks(
             # Convert to strings, and check if value lengths are correct
             if (
                 not mapper_df[col]
-                .loc[mapper_df[col].notnull()]  # & (mapper_df[col] != None)]
+                .loc[mapper_df[col].notnull()]
                 .astype(str)
                 .str.len()
                 .eq(expected_value_length)
@@ -149,3 +149,23 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
     df = df.drop(["_merge", "cellnumber_new"], axis=1)
 
     return df
+
+
+def create_additional_ni_cols(ni_full_responses: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create additional columns for Northern Ireland data.
+
+    Args:
+        df (pd.DataFrame): The main DataFrame.
+
+    Returns:
+        pd.DataFrame: The DataFrame with additional columns.
+    """
+    # Add required columns to NI data
+    ni_full_responses["a_weight"] = 1
+    ni_full_responses["604"] = "Yes"
+    ni_full_responses["form_status"] = 600
+    ni_full_responses["602"] = 100.0
+    ni_full_responses["formtype"] = "0003"
+
+    return ni_full_responses

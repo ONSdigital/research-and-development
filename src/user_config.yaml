@@ -7,7 +7,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   # Construction Settings
   run_construction: True
   run_ni_construction: False
@@ -25,11 +25,11 @@ global:
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
-  output_ni_sas: False
-  output_tau: False
-  output_intram_by_pg_gb: False
-  output_intram_by_pg_uk: False
+  output_gb_sas: True
+  output_ni_sas: True
+  output_tau: True
+  output_intram_by_pg_gb: True
+  output_intram_by_pg_uk: True
   output_intram_gb_itl: False
   output_intram_uk_itl: False
   output_intram_by_civil_defence: False
