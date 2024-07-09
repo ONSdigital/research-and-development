@@ -350,6 +350,13 @@ def run_staging(  # noqa
     )
 
     # Output the staged BERD data.
+    # For synthetic data - begin
+    mypath = r"/home/cdsw/research-and-development/config/synthetic_schemas/full_responses_schema.toml"
+    from helpers.reverse_staging import save_schema
+    save_schema(full_responses, mypath)    
+    # For synthetic data - end
+    
+    
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = paths["staging_output_path"]
