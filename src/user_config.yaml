@@ -18,6 +18,7 @@ global:
   output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
+  output_mapping_qa: True
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
