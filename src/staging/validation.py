@@ -137,7 +137,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
             dtypes_dict[column] = "float64"
 
         try:
-            ValidationLogger.debug(f"{column} before: {survey_df[column].dtype}")
             if dtypes_dict[column] == "Int64":
                 # Convert non-integer string to NaN
                 survey_df[column] = survey_df[column].apply(
@@ -159,7 +158,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
                     )
             else:
                 survey_df[column] = survey_df[column].astype(dtypes_dict[column])
-            ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
         except Exception as e:
             ValidationLogger.error(e)
     ValidationLogger.info("Validation successful")
@@ -205,7 +203,6 @@ def combine_schemas_validate_full_df(
 
             # Try to cast each column to the required data type
 
-        ValidationLogger.debug(f"{column} before: {survey_df[column].dtype}")
         if dtypes[column] == "Int64":
             # Convert non-integer string to NaN
             survey_df[column] = survey_df[column].apply(pd.to_numeric, errors="coerce")
@@ -220,7 +217,6 @@ def combine_schemas_validate_full_df(
             survey_df[column] = survey_df[column].astype("string")
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
-        ValidationLogger.debug(f"{column} after: {survey_df[column].dtype}")
     ValidationLogger.info("Finished data type casting process")
 
 
@@ -351,4 +347,4 @@ def flag_no_rand_spenders(df, raise_or_warn):
             ValidationLogger.error(invalid_records)
 
     else:
-        ValidationLogger.debug("All records have valid R&D spend.")
+        ValidationLogger.info("All records have valid R&D spend.")

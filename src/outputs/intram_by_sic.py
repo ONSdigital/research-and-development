@@ -25,11 +25,7 @@ def output_intram_by_sic(
         sic_div_detailed (pd.DataFrame): Format of the SIC output as mapper
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
-
+    output_path = config["outputs_paths"]["outputs_master"]
     period = config["years"]["survey_year"]
 
     # Create sic_division column from rusic

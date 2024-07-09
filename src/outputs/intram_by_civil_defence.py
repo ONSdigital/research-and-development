@@ -27,10 +27,7 @@ def output_intram_by_civil_defence(
 
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     period = config["years"]["survey_year"]
     period_str = str(period)

@@ -1,7 +1,9 @@
-from datetime import datetime
-import pandas as pd
 import os
 import csv
+from datetime import datetime
+from typing import Tuple
+
+import pandas as pd
 
 
 class RunLog:
@@ -17,40 +19,36 @@ class RunLog:
         read_func,
         write_csv_func,
     ):
+        # config based attrs
         self.config = config
+        self.environment = config["global"]["network_or_hdfs"]
+        self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
+        self.log_filenames = config["log_filenames"]
+        # user information
         self.user = self._generate_username()
+        # attrs containing callables
         self.file_open_func = file_open_func
         self.file_exists_func = file_exists_func
         self.mkdir_func = mkdir_func
         self.read_func = read_func
         self.write_func = write_csv_func
         self.write_csv_func = write_csv_func
-        self.environment = config["global"]["network_or_hdfs"]
-        self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
-        self.csv_filenames = config["csv_filenames"]
-        self.main_path = self._make_main_path()
+        # pipeline information
         self.run_id = self._create_run_id()
         self.version = version
-
+        # logs
         self.logs = []
-        self.timestamp = self._generate_time()
-
-    def _make_main_path(self):
-        """Returns the log folder from the config"""
-        logs_folder = self.logs_folder
-        return logs_folder
+        self.timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 
     def _create_folder(self):
         """Create the folder for the runlog if it doesn't exist."""
-        if not self.file_exists_func(self.main_path):
-            self.mkdir(self.main_path)
+        if not self.file_exists_func(self.logs_folder):
+            self.mkdir_func(self.logs_folder)
 
     def _generate_username(self):
-        """Record the username of the user running the pipeline
-        using os package"""
+        """Record the username of the user running the pipeline using os package"""
         # Use the Hadoop Username to record user
         self.context = os.getenv("HADOOP_USER_NAME")
-
         if self.context is None:  # Running local Python yields None here
             self.context = "local_dev_run"
         return self.context
@@ -58,39 +56,36 @@ class RunLog:
     def _create_run_id(self):
         """Create a unique run_id from the previous iteration"""
         # Import name of main log file
-        runid_path = self.csv_filenames["main"]
-        mainfile = f"{self.main_path}/{runid_path}"
+        main_path = self.log_filenames["main"]
+        mainfile = os.path.join(self.logs_folder, main_path)
         latest_id = 0
-
         # Check if file exists using the open function provided
         if self.file_open_func and self.file_exists_func(mainfile):
             with self.file_open_func(mainfile, "r") as file:
                 runfile = pd.read_csv(file)
                 latest_id = max(runfile.run_id)
-
         # increment the latest id by 1
         run_id = latest_id + 1
-
         return run_id
 
-    def _record_time_taken(self, time_taken):
-        """Get the time taken for the pipeline to run.
+    def _record_time_taken(self):
+        """Get the time taken for the pipeline to run (in seconds).
 
         This is for the total pipeline run time, not the time taken for each step.
 
         """
-        self.time_taken = time_taken
-
+        start_time = datetime.strptime(self.timestamp, "%d/%m/%Y-%H:%M:%S")
+        self.time_taken = (datetime.now() - start_time).total_seconds()
         return self.time_taken
 
-    def retrieve_pipeline_logs(self):
+    def _retrieve_pipeline_logs(self):
         """
-        Get all of the logs from the pipeline run
-        and append them to self.saved_logs df.
+        Get all of the logs from the pipeline run and append them to self.saved_logs df.
         """
-        f = open("logs/main.log", "r")
-        # Split logs by line
-        lines = f.read().splitlines()
+        with open("logs/main.log", "r") as f:
+            # Split logs by line
+            lines = f.read().splitlines()
+
         self.runids = {"run_id": self.run_id}
         self.users = {"user": self.user}
         # Add run_id and user to logs
@@ -98,65 +93,30 @@ class RunLog:
             self.logs.append(line.split(" - "))
             self.runids.update({"run_id": self.run_id})
             self.users.update({"user": self.user})
-        self.saved_logs = pd.DataFrame(
+        self.run_logs_df = pd.DataFrame(
             self.logs, columns=["timestamp", "module", "function", "message"]
         )
-        self.saved_logs.insert(0, "run_id", self.runids["run_id"])
-        self.saved_logs.insert(1, "user", self.users["user"])
+        self.run_logs_df.insert(0, "run_id", self.runids["run_id"])
+        self.run_logs_df.insert(1, "user", self.users["user"])
 
-        return self
+        return self.run_logs_df
 
-    def retrieve_configs(self):
-        """Gets the configs settings for each run of the pipeline"""
-        # Convert the YAML data to a Pandas DataFrame
-        dct = {k: [v] for k, v in self.config.items()}
-        self.ndct = {}
-        # Use all the 2nd level yaml keys as headers
-        for i in dct.keys():
-            nrow = {k: [v] for k, v in dct[i][0].items()}
-            self.ndct.update(nrow)
-        self.configdf = pd.DataFrame(self.ndct)
-        # Add run_id and user to configs
-        self.configdf.insert(0, "run_id", self.runids["run_id"])
-        self.configdf.insert(1, "user", self.users["user"])
-
-        return self
-
-    def _generate_time(self):
-        """Generate unqiue timestamp for when each run"""
-        timestamp = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-
-        return timestamp
-
-    def _create_runlog_dicts(self):
-        """Create unique dictionaries for runlogs, configs
-        and loggers with run_id as identifier"""
-
-        self.runlog_main_dict = {
-            "run_id": self.run_id,
-            "user": self.user,
-            "timestamp": self.timestamp,
-            "version": self.version,
-            "time_taken": self.time_taken,
-        }
-
-        return self
-
-    def _create_runlog_dfs(self):
-        """Convert dictionaries to pandas dataframes."""
-        self.runlog_main_df = pd.DataFrame(
-            [self.runlog_main_dict],
-            columns=["run_id", "user", "timestamp", "version", "time_taken"],
+    def _create_mainlog_df(self) -> pd.DataFrame:
+        """Create the new row for the main log."""
+        self.mainlog_df = pd.DataFrame(
+            {
+                "run_id": [self.run_id],
+                "user": [self.user],
+                "status": ["FAILED"],
+                "timestamp": [self.timestamp],
+                "version": [self.version],
+                "time_taken": [0],
+            }
         )
-        # These dfs were created earlier. Renaming for continuity
-        self.runlog_configs_df = self.configdf
 
-        self.runlog_logs_df = self.saved_logs
+        return self.mainlog_df
 
-        return self
-
-    def _get_runlog_settings(self):
-
+    def _get_runlog_settings(self) -> Tuple[bool, bool, bool]:
         """Get the runlog settings from the config file."""
         runlog_settings = self.config["runlog_writer"]
         write_csv_setting = runlog_settings["write_csv"]
@@ -165,7 +125,7 @@ class RunLog:
 
         return write_csv_setting, write_hdf5_setting, write_sql_setting
 
-    def log_csv_creator(self, filepath: str, columns: list):
+    def log_csv_creator(self, filepath: str, columns: list) -> None:
         """Creates a csv file in DAP with user
         defined headers if it doesn't exist.
         Args:
@@ -185,74 +145,145 @@ class RunLog:
         return None
 
     def create_runlog_files(self):
-        """Creates csv files with column names
-        if they don't already exist.
-        """
+        """Creates csv files with column names if they don't already exist."""
 
-        main_columns = ["run_id", "user", "timestamp", "version", "time_taken"]
-        file_name = self.csv_filenames["main"]
-        file_path = str(os.path.join(self.main_path, file_name))
+        main_columns = [
+            "run_id",
+            "user",
+            "status",
+            "timestamp",
+            "version",
+            "time_taken",
+        ]
+        file_name = self.log_filenames["main"]
+        file_path = str(os.path.join(self.logs_folder, file_name))
         self.log_csv_creator(file_path, main_columns)
 
-        config_columns = list(self.configdf.columns.values)
-        file_name = self.csv_filenames["configs"]
-        file_path = str(os.path.join(self.main_path, file_name))
+        config_columns = list(self._retrieve_config_log().columns)
+        file_name = self.log_filenames["configs"]
+        file_path = str(os.path.join(self.logs_folder, file_name))
         self.log_csv_creator(file_path, config_columns)
 
         log_columns = ["run_id", "user", "timestamp", "module", "function", "message"]
-        file_name = self.csv_filenames["logs"]
-        file_path = str(os.path.join(self.main_path, file_name))
+        file_name = self.log_filenames["logs"]
+        file_path = str(os.path.join(self.logs_folder, file_name))
         self.log_csv_creator(file_path, log_columns)
 
         return None
 
-    def _write_runlog(self):
-        """Write the runlog to a file specified in the config."""
+    def _retrieve_config_log(self) -> pd.DataFrame:
+        """Gets the configs settings for each run of the pipeline"""
+        # Convert the YAML data to a Pandas DataFrame
+        dct = {k: [v] for k, v in self.config.items()}
+        self.ndct = {}
+        # Use all the 2nd level yaml keys as headers
+        for i in dct.keys():
+            nrow = {k: [v] for k, v in dct[i][0].items()}
+            self.ndct.update(nrow)
+        config_log_df = pd.DataFrame(self.ndct)
+        # Add run_id and user to configs
+        config_log_df.insert(0, "run_id", self.run_id)
+        config_log_df.insert(1, "user", self.user)
+        self.config_log_df = config_log_df
+        return self.config_log_df
 
-        # Get the runlog settings from the config file
+    def _read_log(
+        self,
+        logfile_name: str,
+    ) -> pd.DataFrame:
+        """Read logs from a .csv file.
+
+        Args:
+            logfile_name (str): The name of the file to read.
+
+        Returns:
+            pd.DataFrame: A dataframe containing logs.
+        """
         write_csv, write_hdf5, write_sql = self._get_runlog_settings()
-
         if write_csv:
             # write the runlog to a csv file
-            file_name = self.csv_filenames["main"]
-            file_path = str(os.path.join(self.main_path, file_name))
-            df = self.read_func(file_path)
-            newdf = df.append(self.runlog_main_df)
-            self.write_func(file_path, newdf)
+            file_path = str(os.path.join(self.logs_folder, logfile_name))
+            return pd.read_csv(file_path)
+        elif write_hdf5:
+            # write the runlog to a hdf5 file
+            logfile_name = f"{os.path.splitext(logfile_name)[0]}.hdf"
+            return pd.read_hdf(logfile_name)
+        elif write_sql:
+            # write the runlog to a sql database
+            logfile_name = f"{os.path.splitext(logfile_name)[0]}.sql"
+            return pd.read_sql(logfile_name)
 
-            file_name = self.csv_filenames["configs"]
-            file_path = str(os.path.join(self.main_path, file_name))
-            df = self.read_func(file_path)
-            newdf = df.append(self.runlog_configs_df)
-            self.write_func(file_path, newdf)
+    def _write_log(
+        self, logfile_name: str, logs_df: pd.DataFrame, update: bool = False
+    ) -> None:
+        """Write logs (in df format) to a file.
 
-            file_name = self.csv_filenames["logs"]
-            file_path = str(os.path.join(self.main_path, file_name))
-            df = self.read_func(file_path)
-            newdf = df.append(self.runlog_logs_df)
-            self.write_func(file_path, newdf)
-
+        Args:
+            logfile_name (str): The name of the file to write to,
+            logs_df (pd.DataFrame): The dataframe to append to the logs file.
+            update (bool, optional): Whether or not to write the dataframe as the logs,
+                or to append to current logs. Defaults to False.
+        """
+        # Get the runlog settings from the config file
+        write_csv, write_hdf5, write_sql = self._get_runlog_settings()
+        if write_csv:
+            # write the runlog to a csv file
+            file_path = str(os.path.join(self.logs_folder, logfile_name))
+            if update:
+                self.write_func(file_path, logs_df)
+            else:
+                df = self.read_func(file_path)
+                df = df.append(logs_df)
+                self.write_func(file_path, df)
         if write_hdf5:
             # write the runlog to a hdf5 file
-            self.runlog_main_df.to_hdf(
-                "main_runlog.hdf", mode="a", index=False, header=False
-            )
-            self.runlog_configs_df.to_hdf(
-                "configs_runlog.hdf", mode="a", index=False, header=False
-            )
-            self.runlog_logs_df.to_hdf(
-                "logs_runlog.hdf", mode="a", index=False, header=False
-            )
+            logfile_name = f"{os.path.splitext(logfile_name)[0]}.hdf"
+            if update:
+                logs_df.to_hdf(logfile_name, mode="a", index=False, header=False)
+            else:
+                df = pd.read_hdf(logfile_name)
+                df = df.append(self.logs_df)
+                df.to_hdf(logfile_name, mode="a", index=False, header=False)
         if write_sql:
             # write the runlog to a sql database
-            self.runlog_main_df.to_sql(
-                "main_runlog.sql", mode="a", index=False, header=False
-            )
-            self.runlog_configs_df.to_sql(
-                "configs_runlog.sql", mode="a", index=False, header=False
-            )
-            self.runlog_logs_df.to_sql(
-                "logs_runlog.sql", mode="a", index=False, header=False
-            )
+            logfile_name = f"{os.path.splitext(logfile_name)[0]}.sql"
+            if update:
+                logs_df.to_sql(logfile_name, mode="a", index=False, header=False)
+            else:
+                df = pd.read_sql(logfile_name)
+                df = df.append(logs_df)
+                df.to_sql(logfile_name, mode="a", index=False, header=False)
 
+    def write_runlog(self) -> None:
+        """Write the logs from the pipeline run to file."""
+        logs = self._retrieve_pipeline_logs()
+        self._write_log(self.log_filenames["logs"], logs)
         return None
+
+    def write_config_log(self) -> None:
+        """Write the config log to file."""
+        logs = self._retrieve_config_log()
+        self._write_log(self.log_filenames["configs"], logs)
+        return None
+
+    def write_mainlog(self) -> None:
+        """Write the mainlog to file."""
+        self._create_mainlog_df()
+        self._write_log(self.log_filenames["main"], self.mainlog_df)
+        return None
+
+    def mark_mainlog_passed(self):
+        """Mark the most recent run as passed in the main log."""
+        self._record_time_taken()
+        mainlog_df = self._read_log(self.log_filenames["main"])
+        (
+            mainlog_df.loc[
+                mainlog_df[mainlog_df.run_id == self.run_id].index[0], "status"
+            ]
+        ) = "PASSED"
+        (
+            mainlog_df.loc[
+                mainlog_df[mainlog_df.run_id == self.run_id].index[0], "time_taken"
+            ]
+        ) = self.time_taken
+        self._write_log(self.log_filenames["main"], mainlog_df, update=True)

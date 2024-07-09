@@ -16,7 +16,6 @@ def output_long_form(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
 ):
     """Run the outputs module on long forms.
 
@@ -29,19 +28,13 @@ def output_long_form(
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
 
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)
 
     # Filter for long-forms/NI (status mapping has already been done)
     df = df.loc[((df["formtype"] == "0001") | (df["formtype"] == "0003"))]
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper)
 
     # Create long form output dataframe with required columns from schema
     schema_path = config["schema_paths"]["long_form_schema"]

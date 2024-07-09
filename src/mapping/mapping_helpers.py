@@ -2,47 +2,109 @@
 import pandas as pd
 import logging
 
-from src.utils.wrappers import time_logger_wrap, exception_wrap
-
 MappingLogger = logging.getLogger(__name__)
 
 
-def validate_ultfoc_df(df: pd.DataFrame) -> pd.DataFrame:
+def mapper_null_checks(
+    mapper_df: pd.DataFrame, mapper_name: str, col1: str, col2: str
+) -> None:
     """
-    Validates ultfoc df:
-    1. Checks if the DataFrame has exactly two columns.
-    2. Checks if the column headers are 'ruref' and 'ultfoc'.
-    3. Checks the validity of values in the 'ultfoc' column.
+    Perform null checks on two columns of a mapper DataFrame.
+
     Args:
-        df (pd.DataFrame): The input DataFrame containing 'ruref'
-        and 'ultfoc' columns.
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
+        mapper_name (str): The name of the mapper being validated.
+        col1 (str): The name of the first column to check for nulls.
+        col2 (str): The name of the second column to check for nulls.
+
+    Raises:
+        ValueError: If any null values are found in the mapper DataFrame.
+
+    """
+    if mapper_df[col1].isnull().any():
+        raise ValueError(f"{mapper_name} mapper contains null values in {col1}.")
+    if mapper_df[col2].isnull().any():
+        raise ValueError(f"{mapper_name} mapper contains null values in {col2}.")
+
+
+def col_validation_checks(
+    mapper_df: pd.DataFrame,
+    mapper_name: str,
+    col: str,
+    expected_value_type: type = None,
+    expected_value_length: int = None,
+    check_capitalisation: bool = False,
+) -> None:
+    """
+    Perform validation checks on a column in a DataFrame.
+
+    This function checks the type, length, and capitalisation
+    of a column in a DataFrame.
+    It raises a ValueError if any of the checks fail.
+
+    Args:
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
+        mapper_name (str): The name of the mapper being validated.
+        col (str): The name of the column to check.
+        expected_value_type (type, optional): The expected type of the column values.
+        expected_value_length (int, optional): The expected length of the column values.
+        check_capitalisation (bool, optional): Whether to check if the column
+            values are in uppercase. Defaults to False.
+
+    Raises:
+        ValueError: If any of the validation checks fail.
+
     """
     try:
-        # Check DataFrame shape
-        if df.shape[1] != 2:
-            raise ValueError("Dataframe file must have exactly two columns")
-
-        # Check column headers
-        if list(df.columns) != ["ruref", "ultfoc"]:
-            raise ValueError("Column headers should be 'ruref' and 'ultfoc'")
-
-        # Check 'ultfoc' values are either 2 characters or 'nan'
-        def check_ultfoc(value):
-            if pd.isna(value):
-                return True
-            else:
-                return isinstance(value, str) and (len(value) == 2)
-
-        df["contents_check"] = df.apply(lambda row: check_ultfoc(row["ultfoc"]), axis=1)
-
-        # check any unexpected contents
-        if not df["contents_check"].all():
-            raise ValueError("Unexpected format within 'ultfoc' column contents")
-
-        df.drop(columns=["contents_check"], inplace=True)
-
+        if expected_value_type is not None:
+            # Check datatype correct
+            if (
+                not mapper_df[col][mapper_df[col].notnull()]
+                .apply(type)
+                .eq(expected_value_type)
+                .all()
+            ):
+                raise ValueError(
+                    f"Column {col} is not of the expected type {expected_value_type}."
+                )
+        if expected_value_length is not None:
+            # Convert to strings, and check if value lengths are correct
+            if (
+                not mapper_df[col]
+                .loc[mapper_df[col].notnull()]  # & (mapper_df[col] != None)]
+                .astype(str)
+                .str.len()
+                .eq(expected_value_length)
+                .all()
+            ):
+                raise ValueError(
+                    f"Column {col} does not have the expected length of"
+                    f" {expected_value_length}."
+                )
+        if check_capitalisation:
+            # Check if all non-null values in the column are in uppercase
+            if not mapper_df[col][mapper_df[col].notnull()].str.isupper().all():
+                raise ValueError(f"Column {col} is not in uppercase.")
     except ValueError as ve:
-        raise ValueError("Foreign ownership mapper validation failed: " + str(ve))
+        raise ValueError(f"{mapper_name} mapper validation failed: " + str(ve))
+
+
+def check_mapping_unique(
+    mapper_df: pd.DataFrame,
+    col_to_check: str,
+) -> None:
+    """
+    Checks if a column contains unique values.
+
+    Parameters:
+    mapper_df (pd.DataFrame): The mapper DataFrame to check.
+    col_to_check (str): The name of the column to check.
+
+    Raises:
+    ValueError: If the column does not contain unique values.
+    """
+    if not mapper_df[col_to_check].is_unique:
+        raise ValueError(f"Column {col_to_check} is not unique.")
 
 
 def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.DataFrame:

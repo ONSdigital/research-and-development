@@ -15,7 +15,6 @@ def output_tau(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
@@ -29,15 +28,8 @@ def output_tau(
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_itl_mapper (pd.DataFrame): maps the postcode to region code
     """
-
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    paths = config[f"{NETWORK_OR_HDFS}_paths"]
-    output_path = paths["output_path"]
-
+    output_path = config["outputs_paths"]["outputs_master"]
     # Prepare the columns needed for outputs:
-
-    # Join foriegn ownership column using ultfoc mapper
-    df = map_o.join_fgn_ownership(df, ultfoc_mapper, formtype=["0001", "0006"])
 
     # Map to the CORA statuses from the statusencoded column
     df = map_o.create_cora_status_col(df)

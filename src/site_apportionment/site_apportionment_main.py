@@ -34,9 +34,8 @@ def run_site_apportionment(
         df_out (pd.DataFrame): Percentages filled in for short forms and applied
         to apportion  for long forms
     """
-    # Create apport_path variable for output of QA apportionment file
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    imp_path = config[f"{NETWORK_OR_HDFS}_paths"]["apportionment_path"]
+    # Create variable for output of QA apportionment file
+    qa_path = config["apportionment_paths"]["qa_path"]
 
     imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
 
@@ -54,8 +53,10 @@ def run_site_apportionment(
             SitesMainLogger.info("Outputting Apportionment files.")
             tdate = datetime.now().strftime("%y-%m-%d")
             survey_year = config["years"]["survey_year"]
-            filename = f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
-            write_csv(f"{imp_path}/apportionment_qa/{filename}", df_out)
+            filename = (
+                f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
+            )
+            write_csv(f"{qa_path}/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")
         return df_out
