@@ -23,7 +23,6 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
 
     # update the config with the full paths
     modules = [
-        "construction",
         "imputation",
         "outliers",
         "estimation",

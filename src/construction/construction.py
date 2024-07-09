@@ -3,6 +3,9 @@ import logging
 import pandas as pd
 from typing import Callable
 
+from src.construction.construction_utils import (
+    read_construction_file
+)
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
 from src.outputs.outputs_helpers import create_period_year
@@ -51,24 +54,21 @@ def run_construction(  # noqa: C901
         construction_logger.info("Skipping Construction...")
         return snapshot_df
 
-    # Check the construction file exists and has records, then read it
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    paths = config[f"{network_or_hdfs}_paths"]
-    construction_file_path = paths[path_type]
-    construction_logger.info(f"Reading construction file {construction_file_path}")
-    construction_file_exists = check_file_exists(construction_file_path)
-    if construction_file_exists:
-        try:
-            construction_df = read_csv(construction_file_path)
-        except pd.errors.EmptyDataError:
-            construction_logger.warning(
-                f"Construction file {construction_file_path} is empty, skipping..."
-            )
-            return snapshot_df
+    # Obtain construction paths
+    paths = config[f"construction_paths"]
+    if is_northern_ireland:
+        construction_file_path = paths["construction_file_path_ni"]
     else:
-        construction_logger.info(
-            "Construction file not found, skipping construction..."
-        )
+        construction_file_path = paths["construction_file_path"]
+
+    # Check the construction file exists and has records, then read it
+    construction_df = read_construction_file(
+        path=construction_file_path,
+        logger=construction_logger,
+        read_csv_func=read_csv,
+        file_exists_func=check_file_exists
+    )
+    if isinstance(construction_df, type(None)):
         return snapshot_df
 
     # Make a copy of the snapshot
