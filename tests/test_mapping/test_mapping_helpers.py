@@ -8,6 +8,7 @@ from src.mapping.mapping_helpers import (
     col_validation_checks,
     check_mapping_unique,
     update_ref_list,
+    create_additional_ni_cols,
 )
 
 
@@ -135,29 +136,41 @@ class TestUpdateRefList(object):
             update_ref_list(full_input_df, ref_list_input)
 
 
-# Test the mapper_null_checks function
-class TestMapperNullChecks(object):
-    """Tests for mapper_null_checks."""
+class TestCreateAdditionalNiCols(object):
+    """Tests for create_additional_ni_cols function."""
 
-    def test_mapper_no_nulls_df(self):
-        """Sample mapper for testing."""
-        columns = ["ruref", "ultfoc"]
+    def test_create_additional_ni_cols(self):
+        """Test create_additional_ni_cols function."""
+        # Create sample input DataFrame
+        columns = ["reference", "value"]
         data = [
-            ["abc", "AB"],
-            ["def", "EF"],
-            ["ghi", "AB"],
+            [1, 10],
+            [2, 20],
+            [3, 30],
         ]
-        return pd.DataFrame(data=data, columns=columns)
+        df = pd.DataFrame(data=data, columns=columns)
 
-    def test_mapper_null_checks_pass(self):
-        """Test mapper_null_checks for passing all checks."""
-        mapper_df = self.test_mapper_no_nulls_df()
-        result = mapper_null_checks(mapper_df, "test_mapper", "ruref", "ultfoc")
+        # Expected output DataFrame
+        expected_columns = [
+            "reference",
+            "value",
+            "a_weight",
+            "604",
+            "form_status",
+            "602",
+            "formtype",
+        ]
+        expected_data = [
+            [1, 10, 1, "Yes", 600, 100.0, "0003"],
+            [2, 20, 1, "Yes", 600, 100.0, "0003"],
+            [3, 30, 1, "Yes", 600, 100.0, "0003"],
+        ]
+        expected_df = pd.DataFrame(data=expected_data, columns=expected_columns)
 
-        assert result is None
+        # Call the function
+        output_df = create_additional_ni_cols(df)
 
-    def test_mapper_null_checks_raises(self, test_mapper_df):
-        """Test mapper_null_checks for raising an error."""
-        error_msg = f"test_mapper mapper contains null values in ultfoc."
-        with pytest.raises(ValueError, match=error_msg):
-            mapper_null_checks(test_mapper_df, "test_mapper", "ruref", "ultfoc")
+        # Check if the output matches the expected DataFrame
+        assert output_df.equals(
+            expected_df
+        ), "Output from create_additional_ni_cols not as expected."
