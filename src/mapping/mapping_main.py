@@ -14,6 +14,7 @@ def run_mapping(
     full_responses,
     ni_full_responses,
     config: dict,
+    run_id: int
 ):
 
     # Check the environment switch
@@ -107,6 +108,27 @@ def run_mapping(
     # full_responses = join_cellno_mapper(full_responses, cellno_df)
 
     # placeholder for running mapping
+
+    # output QA files
+    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
+    mapping_path = config[f"{NETWORK_OR_HDFS}_paths"]["mapping_path"] # Changed
+
+    if config["global"]["output_mapping_qa"]:
+        ImputationMainLogger.info("Outputting Imputation files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        full_responses_filename = f"{survey_year}_full_responses_qa_{tdate}_v{run_id}.csv"
+        
+        # create trimming qa dataframe with required columns from schema
+        schema_path = config["schema_paths"]["long_form_schema"] # Changed
+        schema_dict = load_schema(schema_path)
+        mapping_qa_output = create_output_df(full_responses, schema_dict) # Changed
+
+        # if backdata is not None:
+        write_csv(f"{mapping_path}/imputation_qa/{full_responses_filename}", mapping_qa_output) # Changed
+        # if config["global"]["load_backdata"]:
+        #     write_csv(f"{mapping_path}/imputation_qa/{links_filename}", links_df)
+    ImputationMainLogger.info("Finished Imputation calculation.")
 
     # return mapped_df
     return (full_responses, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df)
