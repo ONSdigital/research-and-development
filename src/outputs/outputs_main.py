@@ -24,14 +24,13 @@ from src.outputs.total_fte import qa_output_total_fte
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def run_outputs(
+def run_outputs(  # noqa: C901
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
@@ -75,7 +74,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
@@ -91,7 +89,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -107,7 +104,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished TAU output.")
@@ -120,21 +116,23 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 
     # Running NI SAS output
     if config["global"]["output_ni_sas"]:
-        OutputMainLogger.info("Starting NI SAS output...")
-        output_ni_sas(
-            ni_full_responses,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished NI SAS output.")
+        if not config["global"]["load_ni_data"]:
+            OutputMainLogger.info("Skipping NI SAS output as NI data is NOT loaded...")
+        else:
+            OutputMainLogger.info("Starting NI SAS output...")
+            output_ni_sas(
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+            )
+            OutputMainLogger.info("Finished NI SAS output.")
 
     # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
@@ -193,7 +191,6 @@ def run_outputs(
         output_frozen_group(
             outputs_df,
             ni_full_responses,
-            ultfoc_mapper,
             config,
             write_csv,
             run_id,

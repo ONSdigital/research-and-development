@@ -1,6 +1,5 @@
 import pandas as pd
 import logging
-import numpy as np
 
 PgLogger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ import os
 
 # configuration settings
 csv_path = "D:/coding_projects/randd_test_data/"
-input_file1 = "test.csv"
+input_file = "test.csv"
 
 # whether the unit test data is input or expected output
 in_or_output = "input"
@@ -20,23 +20,23 @@ df1 = pd.read_csv(path1)
 df1 = df1.astype(str)
 
 # add quotes to the strings in the columns that should show as string types
-string_cols = [] # ["period"]
+string_cols = []  # ["period"]
 
 df1[string_cols] = df1[string_cols].applymap('"{}"'.format)
 
 # prepare the output formatting
-tab = " "*4
+tab = " " * 4
 
 col_list = df1.columns
 col_string = ""
 
 # create a new column that joins the contents of the other columns
-df1['output'] = f"{tab}["
+df1["output"] = f"{tab}["
 for col in df1.columns[:-1]:
     df1["output"] += df1[col] + ", "
     col_string += f'{tab}{tab}"{col}",\n'
-    
-df1['output'] += df1[df1.columns[-2]] + "],"
+
+df1["output"] += df1[df1.columns[-2]] + "],"
 
 # concatenate everything in the new column into a single string
 rows_string = df1["output"].str.cat(sep=f"\n{tab}")
@@ -45,8 +45,8 @@ rows_string = df1["output"].str.cat(sep=f"\n{tab}")
 full_text = f'''def create_input_df(self):
     """Create an input dataframe for the test."""
     {in_or_output}_columns = [\n{col_string}{tab}]
-        
-    data = [\n{tab}{rows_string}\n{tab}]   
+
+    data = [\n{tab}{rows_string}\n{tab}]
 
     {in_or_output}_df = pandasDF(data=data, columns={in_or_output}_columns)
     return {in_or_output}_df

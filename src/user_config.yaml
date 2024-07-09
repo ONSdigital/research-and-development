@@ -1,0 +1,95 @@
+config_validation:
+  validate: True
+  path: src/user_config_schema.yaml
+years:
+  survey_year: 2022
+global:
+  # Staging and validation settings
+  postcode_csv_check: True
+  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
+  load_ni_data: False
+  # Construction Settings
+  run_construction: True
+  run_ni_construction: False
+  load_manual_outliers: False
+  load_manual_imputation: False
+  load_backdata: False  # whether to load previous year data for MoR
+  # QA output settings
+  output_full_responses: False
+  output_ni_full_responses: False
+  output_imputation_qa: False
+  output_auto_outliers: False
+  output_outlier_qa : False
+  output_estimation_qa: False
+  output_apportionment_qa: False
+  # Final output settings
+  output_long_form: False
+  output_short_form: False
+  output_gb_sas: False
+  output_ni_sas: False
+  output_tau: False
+  output_intram_by_pg_gb: False
+  output_intram_by_pg_uk: False
+  output_intram_gb_itl: False
+  output_intram_uk_itl: False
+  output_intram_by_civil_defence: False
+  output_intram_by_sic: False
+  output_fte_total_qa: False
+  output_status_filtered: False
+  output_frozen_group: True
+hdfs_paths:
+  root: "/ons/rdbe_dev/"
+  # staging input paths
+  snapshot_path: "berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  secondary_snapshot_path: "berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
+  feather_path: "staging/feather"
+  history_path: "BERD_V7_Anonymised"
+  # Imputation and outliers input paths
+  backdata_path: ""
+  manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023_09_09_sample_amonymised.csv"
+  # Construction paths
+  construction_file_path:  "04_construction/manual_construction/test_construction_file.csv"
+  construction_file_path_ni:  "04_construction/manual_construction/test_construction_file.csv"
+  # postcode paths
+  postcode_masterlist: "mappers/2023/ONSPD_NOV_2022_UK.csv"
+  pcode_val_path: "01_staging/staging_qa/postcode_validation"
+  # mapper paths
+2022_mappers:
+  mappers_version: "v1"
+  postcodes_mapper: "postcodes_2022.csv"
+  itl_mapper_path: "itl_2022.csv"
+  ultfoc_mapper_path: "BERD_2022_ultfoc.csv"
+  ref_list_817_mapper_path: "BERD_2022_ref_list.csv"
+  cellno_path: 'berd_2022_cellno_coverage.csv'
+  pg_num_alpha_mapper_path: 'pg_num_alpha_2022.csv'
+  sic_pg_alpha_mapper_path: 'sic_pg_alpha_2022.csv'
+  sic_pg_num_mapper_path: 'sic_pg_num_2022.csv'
+  pg_detailed_mapper_path: "pg_detailed_2022.csv"
+  itl1_detailed_mapper_path: "itl1_detailed_2022.csv"
+  civil_defence_detailed_mapper_path: "civil_defence_detailed_2022.csv"
+  sic_division_detailed_mapper_path: "sic_div_detailed_2022.csv"
+2023_mappers:
+  mappers_version: "v1"
+  postcodes_mapper: "postcodes_2023.csv"
+  itl_mapper_path: "itl_2023.csv"
+  ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
+  cellno_2023_path: 'berd_2023_cellno_coverage.csv'
+  pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
+  sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
+  sic_pg_num_mapper_path: 'sic_pg_num_2023.csv'
+  pg_detailed_mapper_path: "pg_detailed_2023.csv"
+  itl1_detailed_mapper_path: "itl1_detailed_2023.csv"
+  civil_defence_detailed_mapper_path: "civil_defence_detailed_2023.csv"
+  sic_division_detailed_mapper_path: "sic_div_detailed_2023.csv"
+# Export config for users
+outliers:
+  upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
+  lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
+imputation:
+  lower_trim_perc: 15
+  upper_trim_perc: 15
+  trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
+  sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
+  mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation

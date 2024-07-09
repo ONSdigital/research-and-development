@@ -18,8 +18,7 @@ def read_ni_files(
 ) -> Tuple:
     """Read in CSV file and schema for NI data."""
     # read in csv file as pandas dataframes
-    paths = config[f"{config['global']['network_or_hdfs']}_paths"]
-    ni_full_response_file = paths["ni_full_responses_path"]
+    ni_full_response_file = config["ni_paths"]["ni_full_responses"]
 
     # raise error if the required files do not exist
     check_file_exists(ni_full_response_file, raise_error=True)
@@ -97,12 +96,13 @@ def run_ni_staging(
 
     # Optionally output the staged NI data
     if config["global"]["output_ni_full_responses"]:
-        network_or_hdfs = config["global"]["network_or_hdfs"]
-        paths = config[f"{network_or_hdfs}_paths"]
         NIStagingLogger.info("Starting output of staged NI data...")
-        staging_folder = paths["ni_staging_output_path"]
-        tdate = datetime.now().strftime("%Y-%m-%d")
-        staged_filename = f"staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        staging_folder = config["ni_paths"]["ni_staging_output_path"]
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        staged_filename = (
+            f"{survey_year}_staged_NI_full_responses_{tdate}_v{run_id}.csv"
+        )
         write_csv(f"{staging_folder}/{staged_filename}", ni_responses_df)
         NIStagingLogger.info("Finished output of staged NI data.")
     else:

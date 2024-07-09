@@ -1,11 +1,12 @@
-"""The main file for the staging and validation module."""
+"""The main file for the mapping module."""
 import logging
-import pandas as pd
-from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
-from src.mapping.cellno_mapper import join_cellno_mapper
+from src.mapping.ultfoc_mapping import join_fgn_ownership
+from src.staging import staging_helpers as stage_hlp
+from src.staging import validation as val
+from src.utils import path_helpers as paths_hlp
 
 MappingMainLogger = logging.getLogger(__name__)
 
@@ -14,99 +15,82 @@ def run_mapping(
     full_responses,
     ni_full_responses,
     config: dict,
-    check_file_exists: Callable,
-    load_json: Callable,
-    read_csv: Callable,
-    write_csv: Callable,
-    read_feather: Callable,
-    write_feather: Callable,
-    isfile: Callable,
 ):
 
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
-    # Conditionally load paths
-    paths = config[f"{network_or_hdfs}_paths"]
+    # if network_or_hdfs == "network":
+    #     from src.utils import local_file_mods as mods
 
-    pg_num_alpha = hlp.load_validate_mapper(
+    # elif network_or_hdfs == "hdfs":
+    #     from src.utils import hdfs_mods as mods
+
+    # create a config dictionary of mapper paths
+    mapping_dict = paths_hlp.create_mapping_config(config)
+
+    pg_num_alpha = stage_hlp.load_validate_mapper(
         "pg_num_alpha_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
+        mapping_dict,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
-        "pg_numeric",
-        "pg_alpha",
+        network_or_hdfs,
     )
+    val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
 
     # Load ultfoc (Foreign Ownership) mapper
-    ultfoc_mapper = hlp.load_validate_mapper(
+    ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
+        mapping_dict,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_ultfoc_df,
+        network_or_hdfs,
     )
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
 
     # Load ITL mapper
-    itl_mapper = hlp.load_validate_mapper(
+    itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
+        mapping_dict,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
     # Loading cell number coverage
-    cellno_df = hlp.load_validate_mapper(
-        "cellno_2022_path",
-        paths,
-        check_file_exists,
-        read_csv,
+    cellno_df = stage_hlp.load_validate_mapper(
+        "cellno_path",
+        mapping_dict,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        None,
+        network_or_hdfs,
     )
 
-    sic_pg_num = hlp.load_validate_mapper(
+    sic_pg_num = stage_hlp.load_validate_mapper(
         "sic_pg_num_mapper_path",
-        paths,
-        check_file_exists,
-        read_csv,
+        mapping_dict,
         MappingMainLogger,
-        hlp.validate_data_with_schema,
-        hlp.validate_many_to_one,
-        "SIC 2007_CODE",
-        "2016 > Form PG",
+        network_or_hdfs,
     )
+    val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
     # Loading ru_817_list mapper
-    if config["global"]["survey_year"] == 2022:
-        ref_list_817_mapper = hlp.load_validate_mapper(
+    if config["years"]["survey_year"] == 2022:
+        ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
-            paths,
-            check_file_exists,
-            read_csv,
+            mapping_dict,
             MappingMainLogger,
-            hlp.validate_data_with_schema,
-            None,
+            network_or_hdfs,
         )
         # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
+
     # Carry out product group conversion
     # Impute missing product group responses in q201 from SIC, then copy this to a new
     # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+    # if ni_full_responses is not None:
+    #     ni_full_responses = run_pg_conversion(
+    #         ni_full_responses, pg_num_alpha, sic_pg_num
+    #     )
 
-    full_responses = join_cellno_mapper(full_responses, cellno_df)
-
-    # placeholder for running mapping
+    # full_responses = join_cellno_mapper(full_responses, cellno_df
 
     # return mapped_df
+    return (full_responses, ni_full_responses, itl_mapper, cellno_df)

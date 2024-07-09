@@ -18,13 +18,14 @@ from src.site_apportionment.site_apportionment import (
     create_sites_df,
     count_duplicate_sites,
     weight_values,
-    create_category_df
+    create_category_df,
 )
 
 # Define easier pandas usages
 pandasDF = pd.DataFrame
 assert_frame_equal = pd._testing.assert_frame_equal
 assert_series_equal = pd._testing.assert_series_equal
+
 
 @pytest.fixture
 def create_exp_percent_test_output_df():
@@ -53,16 +54,36 @@ def create_exp_percent_test_output_df():
         [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
         [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ"],
         [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU"],
-        [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ"],
+        [
+            3,
+            2,
+            "0001",
+            np.nan,
+            np.nan,
+            1.0,
+            "Check needed",
+            "No mean found",
+            "NP30 7ZZ",
+        ],
         [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ"],
-        [5, 1, "0001", "SA50 5BE", 100.0, 1.0, "Form sent out", "No mean found", "SA50 5BE"],
+        [
+            5,
+            1,
+            "0001",
+            "SA50 5BE",
+            100.0,
+            1.0,
+            "Form sent out",
+            "No mean found",
+            "SA50 5BE",
+        ],
     ]
 
     exp_output_df = pandasDF(data=data, columns=exp_output_columns)
     return exp_output_df
 
 
-class TestSetPercentages():
+class TestSetPercentages:
     """Tests for the set_percentages function."""
 
     def create_input_df(self):
@@ -88,9 +109,29 @@ class TestSetPercentages():
             [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
             [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ"],
             [3, 1, "0001", "DE72 3AU", np.nan, 1.0, "Check needed", "TMI", "DE72 3AU"],
-            [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ"],
+            [
+                3,
+                2,
+                "0001",
+                np.nan,
+                np.nan,
+                1.0,
+                "Check needed",
+                "No mean found",
+                "NP30 7ZZ",
+            ],
             [4, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "TMI", "CF10 BZZ"],
-            [5, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "No mean found", "SA50 5BE"],
+            [
+                5,
+                1,
+                "0001",
+                np.nan,
+                np.nan,
+                np.nan,
+                "Form sent out",
+                "No mean found",
+                "SA50 5BE",
+            ],
         ]
 
         input_df = pandasDF(data=data, columns=input_columns)
@@ -104,7 +145,7 @@ class TestSetPercentages():
         assert_frame_equal(result_df, expected_output_df)
 
 
-class TestSplitSitesDf():
+class TestSplitSitesDf:
     """Tests for the split_sites_df function."""
 
     def create_exp_to_apportion_output(self):
@@ -125,10 +166,30 @@ class TestSplitSitesDf():
             [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
             [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
             [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU"],
-            [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ"],
+            [
+                3,
+                2,
+                "0001",
+                np.nan,
+                np.nan,
+                1.0,
+                "Check needed",
+                "No mean found",
+                "NP30 7ZZ",
+            ],
             [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ"],
-            [5, 1, "0001", "SA50 5BE", 100.0, 1.0, "Form sent out", "No mean found", "SA50 5BE"],
-    ]
+            [
+                5,
+                1,
+                "0001",
+                "SA50 5BE",
+                100.0,
+                1.0,
+                "Form sent out",
+                "No mean found",
+                "SA50 5BE",
+            ],
+        ]
 
         exp_output_df1 = pandasDF(data=data1, columns=exp_output_cols1)
         return exp_output_df1
@@ -170,16 +231,17 @@ class TestSplitSitesDf():
 
         imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
         result_to_apportion, result_df_out = split_sites_df(
-            input_df,
-            imp_markers_to_keep
+            input_df, imp_markers_to_keep
         )
 
-        assert_frame_equal(result_to_apportion.reset_index(drop=True), exp_to_apportion_df)
+        assert_frame_equal(
+            result_to_apportion.reset_index(drop=True), exp_to_apportion_df
+        )
 
         assert_frame_equal(result_df_out.reset_index(drop=True), exp_df_out)
 
 
-class TestDeduplicateCodeValues():
+class TestDeduplicateCodeValues:
     """Tests for the deduplicate_codes_values function."""
 
     def create_input_df(self):
@@ -236,14 +298,15 @@ class TestDeduplicateCodeValues():
             input_df,
             ["reference", "period", "200", "201", "pg_numeric"],
             ["211"],
-            ["251"]
+            ["251"],
         )
 
         assert_frame_equal(result_df.reset_index(drop=True), exp_df)
 
 
-class TestCalcWeightsForSites():
+class TestCalcWeightsForSites:
     """Tests for the calc_weights_for_sites function."""
+
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_columns = [
@@ -307,8 +370,9 @@ class TestCalcWeightsForSites():
         assert_frame_equal(result_df.reset_index(drop=True), exp_df)
 
 
-class TestCreateCartesianProduct():
+class TestCreateCartesianProduct:
     """Tests for the create_cartesian_product function."""
+
     def create_sites_input_df(self):
         """Create an input dataframe for the test."""
         sites_input_columns = [
@@ -393,7 +457,6 @@ class TestCreateCartesianProduct():
         exp_output_df = pandasDF(data=data, columns=exp_output_columns)
         return exp_output_df
 
-
     def test_create_cartesian_product(self):
         """Test for the create_cartesian_product function."""
         category_input_df = self.create_category_input_df()
@@ -406,8 +469,9 @@ class TestCreateCartesianProduct():
         assert_frame_equal(result_df.reset_index(drop=True), exp_output_df)
 
 
-class TestCreateNotnullMask():
+class TestCreateNotnullMask:
     """Tests for the function create_not_null_mask."""
+
     def create_input_df(self):
         """Create an input dataframe for the test."""
         input_columns = ["reference", "col"]
@@ -424,7 +488,6 @@ class TestCreateNotnullMask():
         input_df = pandasDF(data=data, columns=input_columns)
         return input_df
 
-
     def test_create_notnull_mask(self):
         """Test for create_notnull_mask function."""
         self.input_df = self.create_input_df()
@@ -433,7 +496,6 @@ class TestCreateNotnullMask():
 
         result = create_notnull_mask(self.input_df, "col")
         assert_series_equal(result, exp_output)
-
 
     def create_demo_expected_df(self):
         """Create an input dataframe to show how other nulls work."""
@@ -521,12 +583,12 @@ class TestCreateNotnullMask():
         ]
 
         data = [
-            [0, 1,      np.nan, np.nan, True,   True,   np.nan, np.nan],  #noqa
-            [111, "a",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
-            [222, "",     np.nan, True,   True,   True,   0.0,    np.nan],  #noqa
-            [333, pd.NA,  True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
-            [444, np.nan, True,   np.nan, np.nan, np.nan, np.nan, np.nan],  #noqa
-            [555, " ",    np.nan, np.nan, True,   True,   1.0,    True],  #noqa
+            [0, 1, np.nan, np.nan, True, True, np.nan, np.nan],  # noqa
+            [111, "a", np.nan, np.nan, True, True, 1.0, True],  # noqa
+            [222, "", np.nan, True, True, True, 0.0, np.nan],  # noqa
+            [333, pd.NA, True, np.nan, np.nan, np.nan, np.nan, np.nan],  # noqa
+            [444, np.nan, True, np.nan, np.nan, np.nan, np.nan, np.nan],  # noqa
+            [555, " ", np.nan, np.nan, True, True, 1.0, True],  # noqa
         ]
 
         expected_df = pandasDF(data=data, columns=expected_columns)
@@ -535,8 +597,7 @@ class TestCreateNotnullMask():
         assert_frame_equal(demo_df, expected_df)
 
 
-class TestSortRowsOrderCols():
-
+class TestSortRowsOrderCols:
     def create_input_df(self):
         """Create an input dataframe for the test."""
 
@@ -559,12 +620,10 @@ class TestSortRowsOrderCols():
             [1, "Z", 2, "test", 22],
             [1, "X", 1, "test", 21],
             [3, "Z", 1, "test", 22],
-
         ]
 
         input_df = pandasDF(data=data, columns=input_columns)
         return input_df
-
 
     def create_output_df(self):
         """Create an output dataframe for the test."""
@@ -592,7 +651,6 @@ class TestSortRowsOrderCols():
         expected_df = pandasDF(data=data, columns=output_columns)
         return expected_df
 
-
     def test_sort_rows_order_cols(self, caplog):
         """Unit test for sorting rows and ordering cols."""
 
@@ -606,7 +664,6 @@ class TestSortRowsOrderCols():
 
             assert "Removing {'Remove'} from df_cart" in caplog.text
             assert_frame_equal(result_df, expected_df)
-
 
     def create_input_df_missing_col(self):
         """Create an input dataframe for missing col test."""
@@ -629,12 +686,10 @@ class TestSortRowsOrderCols():
             [1, 2, "test", 22],
             [1, 1, "test", 21],
             [3, 1, "test", 22],
-
         ]
 
         input_missing_col_df = pandasDF(data=data, columns=input_columns)
         return input_missing_col_df
-
 
     def test_sort_rows_missing_cols(self, caplog):
         """Unit test for ordering cols with missing col."""
@@ -651,7 +706,7 @@ class TestSortRowsOrderCols():
 def sites_df_input():
     """
     Input df for create_sites_df tests.
-    
+
     This input data consists of:
     1. Columns that will be dropped
     2. NaN's in used columns (601, 602)
@@ -666,16 +721,46 @@ def sites_df_input():
         "status",
         "imp_marker",
         "postcodes_harmonised",
-        "period"
+        "period",
     ]
     input_data = [
         [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
         [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-        [1, 3, "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101"], # Nan 602 - Ensure conv to 0
-        [1, 4, "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101"], # different postcode
+        [
+            1,
+            3,
+            "RH12 1XL",
+            np.nan,
+            np.nan,
+            "Clear",
+            "R",
+            "RH12 1XL",
+            "202101",
+        ],  # Nan 602 - Ensure conv to 0
+        [
+            1,
+            4,
+            "RH12 1XZ",
+            100.0,
+            np.nan,
+            "Clear",
+            "R",
+            "RH12 1XZ",
+            "202101",
+        ],  # different postcode
         [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [2, 2,  "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [3, 1, np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102"], # NaN 601 - Ensure dropped
+        [2, 2, "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
+        [
+            3,
+            1,
+            np.nan,
+            np.nan,
+            1.0,
+            "Check needed",
+            "TMI",
+            "NP30 7ZZ",
+            "202102",
+        ],  # NaN 601 - Ensure dropped
     ]
     input_df = pandasDF(data=input_data, columns=input_cols)
 
@@ -684,7 +769,7 @@ def sites_df_input():
 
 class TestCreateSitesDf(object):
     """Tests for create_sites_df."""
-    
+
     @pytest.fixture(autouse=True)
     def set_attrs(self):
         """Set class attributes that are passed as parameters."""
@@ -693,30 +778,28 @@ class TestCreateSitesDf(object):
 
     def test_create_sites_df_on_pass(self, sites_df_input):
         """General tests for create_sites_df."""
-        output = create_sites_df(
-            sites_df_input, 
-            self.groupby_cols,
-            self.site_cols)
+        output = create_sites_df(sites_df_input, self.groupby_cols, self.site_cols)
         # assert the resultant dataframe is as expected
-        exp_columns = ["reference",
-                        "period",
-                        "601",
-                        "postcodes_harmonised",
-                        "instance",
-                        "602",]
+        exp_columns = [
+            "reference",
+            "period",
+            "601",
+            "postcodes_harmonised",
+            "instance",
+            "602",
+        ]
         exp_data = [
-            [1, '202101', 'RH12 1XL', 'RH12 1XL', 1, 225.0],
-            [1, '202101', 'RH12 1XZ', 'RH12 1XZ', 4, 100.0],
-            [2, '202102', 'NP44 2NZ', 'NP44 2NZ', 1, 50.0],
-            ]
+            [1, "202101", "RH12 1XL", "RH12 1XL", 1, 225.0],
+            [1, "202101", "RH12 1XZ", "RH12 1XZ", 4, 100.0],
+            [2, "202102", "NP44 2NZ", "NP44 2NZ", 1, 50.0],
+        ]
         expected = pandasDF(data=exp_data, columns=exp_columns)
-        assert output.equals(expected), (
-            "create_sites_df not behaving as expected."
-        )
+        assert output.equals(expected), "create_sites_df not behaving as expected."
 
 
 class TestCountDuplicateSites(object):
     """Tests for count_duplicate_sites."""
+
     def test_count_duplicate_sites_on_pass(self, caplog, sites_df_input):
         """General tests for count_duplicate_sites."""
         # set log level
@@ -725,25 +808,27 @@ class TestCountDuplicateSites(object):
         # parse logs and assert
         log_records = [record.msg for record in caplog.records]
         expected_log_message = "There are 2 duplicate sites."
-        assert log_records[0] == expected_log_message, (
-            "Duplicate sites not added to logger at level INFO."
-        )
+        assert (
+            log_records[0] == expected_log_message
+        ), "Duplicate sites not added to logger at level INFO."
+
+
 class TestWeightValues(object):
     """Tests for weight_values."""
-    
+
     @pytest.fixture(scope="function")
     def weight_values_test_df(self):
         """Test data for weight_values."""
         columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
         data = [
-            [ 0 , 10 ,  3.5,  1.5],
-            [ 1 , 14 ,  4.5,  1.5],
-            [ 2 , 16 , 10 ,  1. ],
-            [ 3 , 18. ,  np.nan,  2. ],
-            [ 4 ,  6 ,  0 ,  3. ]
-            ]
+            [0, 10, 3.5, 1.5],
+            [1, 14, 4.5, 1.5],
+            [2, 16, 10, 1.0],
+            [3, 18.0, np.nan, 2.0],
+            [4, 6, 0, 3.0],
+        ]
         return pandasDF(data=data, columns=columns)
-    
+
     @pytest.fixture(autouse=True)
     def set_attrs(self):
         """Set class attributes to pass to function."""
@@ -752,9 +837,7 @@ class TestWeightValues(object):
 
     def test_weight_values_on_pass(self, weight_values_test_df):
         """General tests for weight_values."""
-        output = weight_values(weight_values_test_df,
-                                self.value_cols, 
-                                self.weight_col)
+        output = weight_values(weight_values_test_df, self.value_cols, self.weight_col)
 
         columns = ["reference", "val_col_1", "val_col_2", "weight_col"]
 
@@ -764,10 +847,10 @@ class TestWeightValues(object):
             [2, 16.0, 10.0, 1.0],
             [3, 36.0, np.nan, 2.0],
             [4, 18.0, 0.0, 3.0],
-               ]
+        ]
         exp_out = pandasDF(data=data, columns=columns)
         assert output.equals(exp_out), "weight_values not acting as expected."
-        
+
 
 class TestCreateCategoryDf(object):
     """Tests for create_category_df."""
@@ -775,22 +858,56 @@ class TestCreateCategoryDf(object):
     @pytest.fixture(scope="function")
     def category_df_input(self):
         """Test data for create_category_df."""
-        columns = ['reference', 'instance', 'period', 'imp_marker', '201', 
-                   '200', 'pg_numeric', '601', '602', '210']
-        
+        columns = [
+            "reference",
+            "instance",
+            "period",
+            "imp_marker",
+            "201",
+            "200",
+            "pg_numeric",
+            "601",
+            "602",
+            "210",
+        ]
+
         # data includes:
 
-        data = [[49900000404, 0, 202212, 'R', 'AA', np.nan, np.nan, np.nan, 100.0, np.nan],
-                [49900000404, 1, 202212, 'R', 'AA', 'C', 29, np.nan, 100.0, 243600.0379],
-                [49900000404, 2, 202212, 'R', 'AA', 'D', 29, np.nan, 100.0, 0.0],
-                [49900000408, 0, 202212, 'R', 'I', np.nan, 32, np.nan, 100.0, np.nan], # group code nan (dropped)
-                [49900000408, 1, 202212, 'R', 'AA', 'C', 33, np.nan, 100.0, 0.0],
-                [49900000407, 2, 202212, 'test', 'AA', 'D', np.nan, np.nan, 100.0, 0.0], # bad imp marker
-                [49900000576, 1, 202212, 'TMI', 'AA', 'C', np.nan, np.nan, np.nan, 0.0],
-                [49900000960, 0, 202212, 'R', 'AA', np.nan, 1, np.nan, np.nan, np.nan],
-                [49900000960, 1, 202212, 'R', 'AA', 'C', 23, np.nan, np.nan, np.nan],
-                [49900001029, 1, 202212, 'TMI', 'I', 'C', 5, np.nan, np.nan, 833.3333]]
-        
+        data = [
+            [49900000404, 0, 202212, "R", "AA", np.nan, np.nan, np.nan, 100.0, np.nan],
+            [49900000404, 1, 202212, "R", "AA", "C", 29, np.nan, 100.0, 243600.0379],
+            [49900000404, 2, 202212, "R", "AA", "D", 29, np.nan, 100.0, 0.0],
+            [
+                49900000408,
+                0,
+                202212,
+                "R",
+                "I",
+                np.nan,
+                32,
+                np.nan,
+                100.0,
+                np.nan,
+            ],  # group code nan (dropped)
+            [49900000408, 1, 202212, "R", "AA", "C", 33, np.nan, 100.0, 0.0],
+            [
+                49900000407,
+                2,
+                202212,
+                "test",
+                "AA",
+                "D",
+                np.nan,
+                np.nan,
+                100.0,
+                0.0,
+            ],  # bad imp marker
+            [49900000576, 1, 202212, "TMI", "AA", "C", np.nan, np.nan, np.nan, 0.0],
+            [49900000960, 0, 202212, "R", "AA", np.nan, 1, np.nan, np.nan, np.nan],
+            [49900000960, 1, 202212, "R", "AA", "C", 23, np.nan, np.nan, np.nan],
+            [49900001029, 1, 202212, "TMI", "I", "C", 5, np.nan, np.nan, 833.3333],
+        ]
+
         return pd.DataFrame(data=data, columns=columns)
 
     @pytest.fixture(autouse=True)
@@ -803,52 +920,62 @@ class TestCreateCategoryDf(object):
         self.site_cols = ["instance", "601", "602"]
         self.value_cols = ["210"]
 
-    
     def test_create_category_df_on_pass(self, category_df_input):
         """General tests for create_category_df."""
-        output = create_category_df(category_df_input,
-                                    self.imp_markers_to_keep,
-                                    category_df_input.columns,
-                                    self.groupby_cols,
-                                    self.code_cols,
-                                    self.site_cols,
-                                    self.value_cols)
-        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
-                        "210", "imp_marker"]
+        output = create_category_df(
+            category_df_input,
+            self.imp_markers_to_keep,
+            category_df_input.columns,
+            self.groupby_cols,
+            self.code_cols,
+            self.site_cols,
+            self.value_cols,
+        )
+        exp_cols = [
+            "reference",
+            "period",
+            "201",
+            "200",
+            "pg_numeric",
+            "210",
+            "imp_marker",
+        ]
         exp_data = [
             [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
             [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
             [49900000408, 202212, "AA", "C", 33.0, 0.0000, "R"],
             [49900000960, 202212, "AA", "C", 23.0, 0.0000, "R"],
-            [49900001029, 202212, "I", "C", 5.0, 833.3333, "TMI"]
-                        ]
+            [49900001029, 202212, "I", "C", 5.0, 833.3333, "TMI"],
+        ]
         expected = pandasDF(data=exp_data, columns=exp_cols)
-        assert output.equals(expected), (
-            "create_category_df not acting as expected"
-            )
-  
-        
+        assert output.equals(expected), "create_category_df not acting as expected"
+
     def test_create_category_df_drops_duplicates(self, category_df_input):
         """Test that create_category_df de-duplicates."""
         # reduce input data to the first four rows
         category_df_input = category_df_input.loc[:3]
         # add duplicate row and pass to create_category_df
-        output = create_category_df(category_df_input.append(category_df_input.iloc[0]),
-                                    self.imp_markers_to_keep,
-                                    category_df_input.columns,
-                                    self.groupby_cols,
-                                    self.code_cols,
-                                    self.site_cols,
-                                    self.value_cols)
-        exp_cols = ["reference", "period", "201", "200", "pg_numeric",
-                        "210", "imp_marker"]
+        output = create_category_df(
+            category_df_input.append(category_df_input.iloc[0]),
+            self.imp_markers_to_keep,
+            category_df_input.columns,
+            self.groupby_cols,
+            self.code_cols,
+            self.site_cols,
+            self.value_cols,
+        )
+        exp_cols = [
+            "reference",
+            "period",
+            "201",
+            "200",
+            "pg_numeric",
+            "210",
+            "imp_marker",
+        ]
         exp_data = [
             [49900000404, 202212, "AA", "C", 29.0, 243600.0379, "R"],
             [49900000404, 202212, "AA", "D", 29.0, 0.0000, "R"],
-                        ]
+        ]
         expected = pandasDF(data=exp_data, columns=exp_cols)
-        assert output.equals(expected), (
-            "Duplicates not dropped by create_category_df."
-        )
-
-        
+        assert output.equals(expected), "Duplicates not dropped by create_category_df."

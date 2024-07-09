@@ -7,7 +7,7 @@ csv_path = "D:/coding_projects/randd_test_data/"
 input_file = "percent_test.csv"
 
 # whether the unit test data is input or expected output (set "input" or "exp_output")
-in_or_output = "input" # "exp_output"
+in_or_output = "input"  # "exp_output"
 
 output_filename = f"{in_or_output}_function"
 
@@ -34,12 +34,14 @@ def add_quotes(x):
     x = '"' + x + '"'
     return x
 
+
 def format_float(x):
     """Add a point and a zero for columns that should show as floats."""
     if "." in x:
         return x
     else:
         return x + ".0"
+
 
 for c in string_cols:
     df1.loc[df1[c] != "nan", c] = df1.loc[df1[c] != "nan", c].apply(add_quotes, 1)
@@ -52,7 +54,7 @@ for c in float_cols:
 df1 = df1.replace("nan", "np.nan")
 
 # prepare the output formatting
-tab = " "*4
+tab = " " * 4
 
 # create the text to represent a list of the columns
 col_list = df1.columns
@@ -61,11 +63,11 @@ for col in df1.columns:
     col_string += f'{tab}{tab}"{col}",\n'
 
 # create a new column that joins the contents of the other columns
-df1['output'] = f"{tab}["
+df1["output"] = f"{tab}["
 for col in df1.columns[:-2]:
     df1["output"] += df1[col] + ", "
 
-df1['output'] += df1[df1.columns[-2]] + "],"
+df1["output"] += df1[df1.columns[-2]] + "],"
 
 # concatenate everything in the new column into a single string
 rows_string = df1["output"].str.cat(sep=f"\n{tab}")
