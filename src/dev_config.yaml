@@ -34,8 +34,10 @@ ni_paths:
   ni_staging_output_path: "ni_staging_qa"
 construction_paths:
   folder: "04_construction"
+  qa_path: "construction_qa"
 mapping_paths:
   folder: "05_mapping"
+  qa_path: "mapping_qa"
 imputation_paths:
   folder: "06_imputation"
   qa_path: "imputation_qa"

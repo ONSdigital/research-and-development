@@ -63,7 +63,6 @@ def run_staging(  # noqa: C901
 
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
-    mapping_dict = config["mapping_paths"]
 
     snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
     secondary_snapshot_name = os.path.basename(
@@ -217,32 +216,28 @@ def run_staging(  # noqa: C901
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(
         "itl1_detailed_mapper_path",
-        mapping_dict,
+        config,
         StagingMainLogger,
-        network_or_hdfs,
     )
 
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
-        mapping_dict,
+        config,
         StagingMainLogger,
-        network_or_hdfs,
     )
 
     # Loading SIC division detailed mapper
     sic_division_detailed_mapper = helpers.load_validate_mapper(
         "sic_division_detailed_mapper_path",
-        mapping_dict,
+        config,
         StagingMainLogger,
-        network_or_hdfs,
     )
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
-        mapping_dict,
+        config,
         StagingMainLogger,
-        network_or_hdfs,
     )
 
     # Output the staged BERD data.

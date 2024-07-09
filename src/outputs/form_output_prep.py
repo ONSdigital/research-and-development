@@ -37,13 +37,6 @@ def form_output_prep(
     tau_outputs_df = create_period_year(tau_outputs_df)
 
     if ni_full_responses is not None:
-        # Add required columns to NI data
-        ni_full_responses["a_weight"] = 1
-        ni_full_responses["604"] = "Yes"
-        ni_full_responses["form_status"] = 600
-        ni_full_responses["602"] = 100.0
-        ni_full_responses["formtype"] = "0003"
-
         # outputs_df = pd.concat([outputs_df, ni_full_responses])
         tau_outputs_df = pd.concat([tau_outputs_df, ni_full_responses])
 
