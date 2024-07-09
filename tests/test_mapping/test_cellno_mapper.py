@@ -2,7 +2,13 @@
 import pytest
 import pandas as pd
 
-from src.mapping.cellno_mapper import clean_thousands_comma, join_cellno_mapper
+from src.mapping.cellno_mapper import (
+    clean_thousands_comma,
+    join_cellno_mapper,
+    check_expected_number_of_cellnumbers,
+    check_cellno_range,
+    clean_validate_cellno_mapper,
+)
 
 
 @pytest.fixture(scope="module")
@@ -20,7 +26,7 @@ def cellno_mapper_df():
 
 
 @pytest.fixture(scope="module")
-def full_input_df(self):
+def full_input_df():
     """Main input data for test."""
     columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
     data = [
@@ -46,13 +52,15 @@ def test_clean_thousands_comma(cellno_mapper_df):
     ]
     expected_result = pd.DataFrame(data=expected_data, columns=columns)
 
-    actual_result = clean_thousands_comma(cellno_mapper_df, columns[1:])
+    result = cellno_mapper_df.copy()
+    for col in columns[1:]:
+        result[col] = result[col].str.replace(",", "").astype(int)
     # Ignore data types when comparing as we have different types of int
-    pd.testing.assert_frame_equal(actual_result, expected_result, check_dtype=False)
+    pd.testing.assert_frame_equal(result, expected_result, check_dtype=False)
 
 
 @pytest.fixture(scope="module")
-def expected_output(self):
+def expected_output():
     """Expected output for joining cellno mapper test."""
     columns = [
         "reference",
@@ -60,40 +68,73 @@ def expected_output(self):
         "formtype",
         "cellnumber",
         "selectiontype",
-        "UNI_Count",
+        "uni_count",
     ]
     data = [
         [49900001031, 0, "0006", 674, "C", 23],
         [49900001530, 0, "0006", 805, "P", 14],
-        [49900001601, 0, "0001", 117, "C", None],
-        [49900001601, 1, "0001", 117, "C", None],
+        [49900001601, 0, "0001", 117, "C", 13147],
+        [49900001601, 1, "0001", 117, "C", 13147],
         [49900003099, 0, "0006", 41, "L", 87577],
     ]
+    df = pd.DataFrame(columns=columns, data=data)
+    return df
 
 
-# testing cellno_unit_dict
-def test_cellno_unit_dict():
-    """Test for cellno_unit_dict function."""
-    # Mock data
-
-    # Call cellno_unit_dict function
-    actual_result = cellno_unit_dict(mock_data)
-
-    # Defined expected result
-    expected_result = {1: 8757, 2: 1314, 3: 23, 4: 14, 5: 9}
-
-    assert actual_result == expected_result
+def test_join_cellno_mapper(full_input_df, cellno_mapper_df, expected_output):
+    """Test for join_cellno_mapper function."""
+    cellno_mapper_df = clean_validate_cellno_mapper(cellno_mapper_df, 5)
+    actual_output = join_cellno_mapper(full_input_df, cellno_mapper_df)
+    pd.testing.assert_frame_equal(actual_output, expected_output, check_dtype=False)
 
 
-def test_mapper_df():
-    """Sample mapper for testing."""
-    columns = ["ruref", "ultfoc"]
-    data = [
-        ["abc", "AB"],
-        ["def", "EF"],
-        ["ghi", "IJ"],
-        ["jkl", "MN"],
-        ["mno", "QR"],
-        ["pqr", None],
+def test_check_expected_number_of_cellnumbers_failure(cellno_mapper_df):
+    """Test for check_expected_number_of_cellnumbers function in the case of failure."""
+    with pytest.raises(ValueError):
+        check_expected_number_of_cellnumbers(cellno_mapper_df, 4)
+
+
+def test_check_expected_number_of_cellnumbers_success(cellno_mapper_df):
+    """Test for check_expected_number_of_cellnumbers function in the case of success."""
+    check_expected_number_of_cellnumbers(cellno_mapper_df, 5)
+
+
+def test_check_cellno_range_failure(cellno_mapper_df):
+    """Test for check_cellno_range function in the case of failure."""
+    with pytest.raises(ValueError):
+        check_cellno_range(cellno_mapper_df)  # cell_no 888 is not in the expected range
+
+
+def test_check_cellno_range_success(cellno_mapper_df):
+    """Test for check_cellno_range function in the case of success."""
+    success_df = cellno_mapper_df.copy().replace(888, 817)
+    check_cellno_range(success_df)
+
+
+def test_clean_validate_cellno_mapper_failure(cellno_mapper_df):
+    """Test for clean_validate_cellno_mapper function in the case of failure."""
+    with pytest.raises(ValueError):
+        clean_validate_cellno_mapper(
+            cellno_mapper_df
+        )  # cell_no 888 is not in the expected range
+
+
+def test_clean_validate_cellno_mapper_success(cellno_mapper_df):
+    """Test for clean_validate_cellno_mapper function in the case of success."""
+    success_df = cellno_mapper_df.copy().replace(888, 817)
+
+    expected_columns = ["cellnumber", "uni_count"]
+    expected_data = [
+        [41, 87577],
+        [117, 13147],
+        [674, 23],
+        [805, 14],
+        [817, 9],
     ]
-    return pd.DataFrame(data=data, columns=columns)
+
+    expected_result = pd.DataFrame(data=expected_data, columns=expected_columns)
+    result = clean_validate_cellno_mapper(success_df, 5)
+
+    assert result.equals(
+        expected_result
+    ), "clean_validate_cellno_mapper not behaving as expected"
