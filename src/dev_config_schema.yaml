@@ -83,7 +83,7 @@ devtest:
     singular: True
     dtype: "list[int]"
     accept_nonetype: False
-csv_filenames:
+log_filenames:
   singular: False
   dtype: "path"
   accept_nonetype: False

@@ -3,6 +3,7 @@
 import os
 import pytest
 import pathlib
+from unittest.mock import Mock
 from typing import Tuple
 from datetime import date
 
@@ -95,14 +96,14 @@ class TestGetMapperName(object):
 
     def test_getmappername(self):
         """General tests for getmappername."""
-        test_str = "cellno_2022_path"
+        test_str = "cellno_path"
         # with split
         assert (
-            getmappername(test_str, True) == "cellno 2022"
+            getmappername(test_str, True) == "cellno"
         ), "getmappername not behaving as expected when split=True"
         # without split
         assert (
-            getmappername(test_str, False) == "cellno_2022"
+            getmappername(test_str, False) == "cellno"
         ), "getmappername not behaving as expected when split=False"
 
 
@@ -273,15 +274,19 @@ class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
 
     @pytest.fixture(scope="function")
-    def config(self) -> pd.DataFrame:
+    def config(self, tmp_path) -> pd.DataFrame:
         """Test config."""
-        config = {"global": {"postcode_csv_check": True}, "years": {"survey_year": 2022}}
+        config = {
+            "global": {"postcode_csv_check": True},
+            "years": {"survey_year": 2022},
+            "staging_paths": {"pcode_val_path": tmp_path, "postcode_masterlist": "ml"},
+        }
         return config
 
-    def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
-        """Test paths."""
-        paths = {"postcode_path": pc_path, "postcode_masterlist": pc_ml}
-        return paths
+    # def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
+    #     """Test paths."""
+    #     paths = {"pcode_val_path": pc_path, "postcode_masterlist": pc_ml}
+    #     return paths
 
     @pytest.fixture(scope="function")
     def full_responses(self) -> pd.DataFrame:
@@ -304,14 +309,13 @@ class TestStageValidateHarmonisePostcodes(object):
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-    def postcode_masterlist(self, dir: pathlib.Path) -> pathlib.Path:
-        """Write the postcode masterlist and return path."""
-        postcode_df = pd.DataFrame(
-            {"pcd2": ["NP44 2NZ", "CE1  4OY", "RH12 1XL", "CE11 8IU"]}
-        )
-        save_path = pathlib.Path(os.path.join(dir, "postcodes_masterlist.csv"))
-        postcode_df.to_csv(save_path)
-        return save_path
+    def mock_read_csv(self, file_path, **kwargs):
+        """Mock function to read a CSV file."""
+        return pd.DataFrame({"pcd2": ["NP44 2NZ", "CE1  4OY", "RH12 1XL", "CE11 8IU"]})
+
+    def mock_check_file_exists(self, file_path, raise_error=True):
+        """Mock function to check if a file exists."""
+        return True
 
     @pytest.fixture(scope="function")
     def full_responses_output(self) -> pd.DataFrame:
@@ -344,12 +348,12 @@ class TestStageValidateHarmonisePostcodes(object):
     @pytest.fixture(scope="function")
     def pc_mapper_output(self) -> pd.DataFrame:
         """Expected output for postcode_mapper"""
-        columns = ["Unnamed: 0", "pcd2"]
+        columns = ["pcd2"]
         data = [
-            [0, "NP44 2NZ"],
-            [1, "CE1  4OY"],
-            [2, "RH12 1XL"],
-            [3, "CE11 8IU"],
+            ["NP44 2NZ"],
+            ["CE1  4OY"],
+            ["RH12 1XL"],
+            ["CE11 8IU"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -364,15 +368,12 @@ class TestStageValidateHarmonisePostcodes(object):
         self, full_responses, config, pc_mapper_output, full_responses_output, tmp_path
     ):
         """General tests for stage_validate_harmonise_postcodes."""
-        pc_path = self.postcode_masterlist(tmp_path)
-        paths = self.create_paths(tmp_path, pc_path)
         fr, pm = stage_validate_harmonise_postcodes(
             config=config,
-            paths=paths,
             full_responses=full_responses,
             run_id=1,
-            check_file_exists=check_file_exists,
-            read_csv=read_csv,
+            check_file_exists=self.mock_check_file_exists,
+            read_csv=self.mock_read_csv,
             write_csv=write_csv,
         )
         # test direct function outputs
@@ -386,7 +387,9 @@ class TestStageValidateHarmonisePostcodes(object):
         )
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
-        filename = f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        filename = (
+            f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        )
         assert (
             filename in files
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"

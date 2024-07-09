@@ -102,8 +102,7 @@ def output_intram_by_itl(
 
     """
     # Declare Config Values
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    OUTPUT_PATH = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    OUTPUT_PATH = config["outputs_paths"]["outputs_master"]
     CURRENT_YEAR = config["years"]["survey_year"]
 
     # Subset GB Data

@@ -97,9 +97,9 @@ class TestNulltypeConversion(object):
     )
     def test__nulltype_conversion(self, value, return_value):
         """General tests for _nulltype_conversion."""
-        assert _nulltype_conversion(value) == return_value, (
-            f"_nulltype_conversion expected to return {return_value}. Got " f"{value}"
-        )
+        assert (
+            _nulltype_conversion(value) == return_value
+        ), f"_nulltype_conversion expected to return {return_value}. Got {value}"
 
 
 class TestValidatePath(object):
@@ -200,7 +200,7 @@ class TestValidateConfig(object):
                 ValueError,
                 (r"Config value for tester:tester .*4.* less than min " r".*5.*."),
             ],
-            ["tester", TypeError, (r".*tester:tester.* expected .*int.* Got .*str.*")],
+            ["tester", TypeError, r".*tester:tester.* expected .*int.* Got .*str.*"],
         ),
     )
     def test_validate_config_ints(
@@ -248,14 +248,14 @@ class TestValidateConfig(object):
                 "tester/test.txt",
                 ".yaml",
                 TypeError,
-                (r"Expected file extension .*yaml.*Got.*txt.*"),
+                r"Expected file extension .*yaml.*Got.*txt.*",
             ],
             # test with no '.' in extension
             [
                 "tester/test.bat",
                 "toml",
                 TypeError,
-                (r"Expected file extension .*toml.*Got.*bat.*"),
+                r"Expected file extension .*toml.*Got.*bat.*",
             ],
         ),
     )
@@ -297,7 +297,7 @@ class TestValidateConfig(object):
             [
                 "tester",
                 TypeError,
-                (r".*tester:tester.* expected .*float.* Got .*str.*"),
+                r".*tester:tester.* expected .*float.* Got .*str.*",
             ],
         ),
     )

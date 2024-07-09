@@ -4,19 +4,17 @@ import warnings
 import os
 from typing import Union
 
+
 def type_defence(
-        obj: object, 
-        param_nm: str,
-        types: Union[object, tuple], 
-        warn: bool=False
-    ) -> None:
+    obj: object, param_nm: str, types: Union[object, tuple], warn: bool = False
+) -> None:
     """Ensure that a passed parameter is of the correct type.
 
     Args:
         obj (object): The passed object.
         param_nm (str): The parameter name.
         types (Union[object, tuple]): Specified type(s) to match.
-        warn (bool, optional): Whether or not to warn in the case that the 
+        warn (bool, optional): Whether or not to warn in the case that the
                                passed object does not match the given type.
                                Raises an error when False. Defaults to False.
 
@@ -31,17 +29,13 @@ def type_defence(
         if warn:
             warnings.warn(msg, UserWarning)
         else:
-            raise TypeError(
-                msg
-            )
+            raise TypeError(msg)
     return None
 
 
 def validate_file_extension(
-        path: Union[pathlib.Path, str],
-        ext: str, 
-        warn: bool=False
-    ):
+    path: Union[pathlib.Path, str], ext: str, warn: bool = False
+):
     """Validate the file extension of a passed path.
 
     Args:
@@ -59,7 +53,4 @@ def validate_file_extension(
         if warn:
             warnings.warn(msg, UserWarning)
         else:
-            raise TypeError(
-                msg
-            )
-    
+            raise TypeError(msg)

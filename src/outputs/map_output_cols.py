@@ -7,60 +7,6 @@ import numpy as np
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def join_fgn_ownership(
-    main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
-) -> pd.DataFrame:
-    """
-    Combine two DataFrames using a left join based on specified columns.
-
-    Args:
-        main_df (pd.DataFrame): The main DataFrame.
-        mapper_csv_path (pd.DataFrame): The mapper DataFrame.
-        formtype (list): List of the formtypes to run through function
-
-    Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
-    """
-
-    try:
-        to_keep = main_df["formtype"].isin(formtype)
-        # filter for long and short forms only
-        filtered_df = main_df.copy().loc[to_keep]
-
-        # the remainder of the dataframe is the NI data
-        ni_df = main_df.copy().loc[~to_keep]
-
-        # Perform left join on filtered dataframe
-        combined_df = filtered_df.merge(
-            mapper_df, how="left", left_on="reference", right_on="ruref"
-        )
-        combined_df.drop(columns=["ruref"], inplace=True)
-
-        # If the filtered_df already had "ultfoc", which is the case for TAU,
-        # then after merging we will have two columns, ultfoc_x - blank, not
-        # needed, and ultfoc_y - with the codes we need. The following  section
-        # renames ultfoc_y to ultfoc, removes ultfoc_x and restores the
-        # original column order.
-        old_cols = list(main_df.columns)
-        new_cols = list(combined_df.columns)
-        if "ultfoc_y" in new_cols:
-            combined_df = combined_df.rename(columns={"ultfoc_y": "ultfoc"})
-            combined_df = combined_df[old_cols]
-
-        main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
-
-        # If foreign ownership is empty, we fill it with "GB" for long, short
-        # and NI
-        main_df["ultfoc"] = main_df["ultfoc"].fillna("GB")
-
-        return main_df
-
-    except Exception as e:
-        raise ValueError(
-            "An error occurred while combining main_df and mapper_df: " + str(e)
-        )
-
-
 def map_sizebands(
     df: pd.DataFrame,
 ) -> pd.DataFrame:
