@@ -20,7 +20,7 @@ from src.staging import spp_parser
 StagingHelperLogger = logging.getLogger(__name__)
 
 
-def fix_anon_data(responses_df, config):
+def fix_anon_data(responses_df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """
     Fixes anonymised snapshot data for use in the DevTest environment.
 
@@ -51,7 +51,7 @@ def fix_anon_data(responses_df, config):
     return responses_df
 
 
-def getmappername(mapper_path_key, split):
+def getmappername(mapper_path_key: str, split: bool) -> str:
     """
     Extracts the mapper name from a given path key.
 
@@ -76,7 +76,9 @@ def getmappername(mapper_path_key, split):
     return mapper_name
 
 
-def load_validate_mapper(mapper_path_key, config, logger) -> pd.DataFrame:
+def load_validate_mapper(
+    mapper_path_key: str, config: dict, logger: logging.Logger
+) -> pd.DataFrame:
     """
     Loads a specified mapper, validates it using a schema and an optional
     validation function.
@@ -89,16 +91,9 @@ def load_validate_mapper(mapper_path_key, config, logger) -> pd.DataFrame:
     is called with the DataFrame and any additional arguments.
 
     Args:
-        mapper_path_key (str): The key to retrieve the mapper path from the
-        config dictionary.
-
+        mapper_path_key (str): The key to retrieve the mapper path from the config.
         config (dict): A dictionary containing configuration options.
-        file_exists_func (Callable): A function to check if a file exists at a
-        given path.
-        read_csv_func (Callable): A function to read a CSV file into a
-        DataFrame.
         logger (logging.Logger): A logger to log information and errors.
-        *args: Additional arguments to pass to the validation function.
 
     Returns:
         pd.DataFrame: The loaded and validated mapper DataFrame.
