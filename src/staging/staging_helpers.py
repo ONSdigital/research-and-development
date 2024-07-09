@@ -456,7 +456,7 @@ def stage_validate_harmonise_postcodes(
     return full_responses, postcode_mapper
 
 
-def filter_PNP_data(full_responses):
+def filter_pnp_data(full_responses):
     """
     After the full_responses dataframe is created, filter out all PNP data
     by simply excluding all records with legalstatus of 7.
@@ -480,8 +480,6 @@ def filter_PNP_data(full_responses):
     """
 
     # filter out PNP data legalstatus=7
-    full_responses = full_responses.loc[
-        (full_responses["legalstatus"] != "7")
-    ].reset_index(drop=True)
+    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
 
     return full_responses

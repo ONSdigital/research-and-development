@@ -22,6 +22,7 @@ from src.staging.staging_helpers import (
     load_validate_secondary_snapshot,
     df_to_feather,
     stage_validate_harmonise_postcodes,
+    filter_pnp_data,
 )
 from src.utils.local_file_mods import (
     rd_file_exists as check_file_exists,
@@ -398,8 +399,8 @@ class TestStageValidateHarmonisePostcodes(object):
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"
 
 
-class Testfilter_PNP_data:
-    """Tests for the filter_PNP_data function."""
+class Testfilter_pnp_data:
+    """Tests for the filter_pnp_data function."""
 
     def create_input_df(self):
         """Create an input dataframe for the test."""
@@ -413,7 +414,7 @@ class Testfilter_PNP_data:
 
         data = [
             [49900000404, 0, "1", "210", "AB15 3GU"],
-            [49900000406, 1, "2", "210", "BA1 5DA"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
             [49900000409, 1, "1", "100", "CB1 3NF"],
             [49900000510, 2, "7", "201", "BA1 5DA"],
             [49912758922, 3, "1", "303", "DE72 3AU"],
@@ -440,7 +441,7 @@ class Testfilter_PNP_data:
 
         data = [
             [49900000404, 0, "1", "210", "AB15 3GU"],
-            [49900000406, 1, "2", "210", "BA1 5DA"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
             [49900000409, 1, "1", "100", "CB1 3NF"],
             [49912758922, 3, "1", "303", "DE72 3AU"],
             [49900187320, 4, "2", "304", "NP30 7ZZ"],
@@ -452,11 +453,13 @@ class Testfilter_PNP_data:
         exp_output_df["statusencoded"].astype("category")
         return exp_output_df
 
-    def test_filter_PNP_data(self):
-        """Test for the filter_PNP_data function."""
+    def test_filter_pnp_data(self):
+        """Test for the filter_pnp_data function."""
         input_df = self.create_input_df()
         exp_df = self.create_exp_output_df()
 
-        result_df = filter_PNP_data(input_df)
+        result_df = filter_pnp_data(input_df)
 
-        assert_frame_equal(result_df, exp_df)
+        pd.testing.assert_frame_equal(
+            result_df.reset_index(drop=True), exp_df.reset_index(drop=True)
+        )
