@@ -2,28 +2,12 @@
 import pandas as pd
 
 
-# TODO: this dict function won't be needed, it's the old method for reference.
-def cellno_unit_dict(cellno_df: pd.DataFrame) -> dict:
-    """To creted dictioanry from The berd_2022_cellno_coverage.xlsx
-    going to be use for mapping
+def clean_thousands_comma(df: pd.DataFrame, columns: list) -> pd.DataFrame:
+    """Remove commas from numbers in columns of a dataframe and convert to integer."""
+    for col in columns:
+        df[col] = df[col].str.replace(",", "").astype(int)
 
-
-    Args:
-        cellno_df (pd.DataFrame):cellno coverage data frame
-
-    Returns:
-        dict: Dictionary contains cell_no as key, UNI_Count as values
-    """
-
-    # Filtering object columns then Convert to object columns as integer
-    object_col = [col for col in cellno_df.columns if cellno_df[col].dtypes == "object"]
-    for col in object_col:
-        cellno_df[col] = cellno_df[col].str.replace(",", "").astype(int)
-
-    # Creating dictionary cell_no and UNI_count
-    cell_unit_dict = cellno_df.set_index("cell_no").to_dict()["UNI_Count"]
-
-    return cell_unit_dict
+    return df
 
 
 def join_cellno_mapper(df: pd.DataFrame, cellno_df: pd.DataFrame) -> pd.DataFrame:
