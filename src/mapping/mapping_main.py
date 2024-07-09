@@ -21,11 +21,11 @@ def run_mapping(
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
-    # if network_or_hdfs == "network":
-    #     from src.utils import local_file_mods as mods
+    if network_or_hdfs == "network":
+        from src.utils import local_file_mods as mods
 
-    # elif network_or_hdfs == "hdfs":
-    #     from src.utils import hdfs_mods as mods
+    elif network_or_hdfs == "hdfs":
+        from src.utils import hdfs_mods as mods
 
     # create a config dictionary of mapper paths
     mapping_dict = paths_hlp.create_mapping_config(config)
@@ -94,25 +94,19 @@ def run_mapping(
     # full_responses = join_cellno_mapper(full_responses, cellno_df
 
     # output QA files
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    mapping_path = config[f"{NETWORK_OR_HDFS}_paths"]["mapping_path"] # Changed
+    qa_path = mapping_dict["qa_path"]
 
     if config["global"]["output_mapping_qa"]:
-        ImputationMainLogger.info("Outputting Imputation files.")
+        MappingMainLogger.info("Outputting QA files.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         full_responses_filename = f"{survey_year}_full_responses_qa_{tdate}_v{run_id}.csv"
-        
-        # create trimming qa dataframe with required columns from schema
-        schema_path = config["schema_paths"]["long_form_schema"] # Changed
-        schema_dict = load_schema(schema_path)
-        mapping_qa_output = create_output_df(full_responses, schema_dict) # Changed
-
+             
         # if backdata is not None:
-        write_csv(f"{mapping_path}/imputation_qa/{full_responses_filename}", mapping_qa_output) # Changed
+        write_csv(f"{qa_path}/{full_responses_filename}", mapping_qa_output) # Changed
         # if config["global"]["load_backdata"]:
         #     write_csv(f"{mapping_path}/imputation_qa/{links_filename}", links_df)
-    ImputationMainLogger.info("Finished Imputation calculation.")
+    MappingMainLogger.info("Finished QA calculation.")
 
     # return mapped_df
     return (full_responses, ni_full_responses, itl_mapper, cellno_df)
