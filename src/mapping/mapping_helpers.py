@@ -169,3 +169,29 @@ def create_additional_ni_cols(ni_full_responses: pd.DataFrame) -> pd.DataFrame:
     ni_full_responses["formtype"] = "0003"
 
     return ni_full_responses
+
+
+def validate_mapper_config(
+    mapper,
+    config: dict,
+    ) -> None:
+    """
+    Validates the config for each mapper. 
+
+    Checks the mapper paths in the config file is not blank and the mapper year matches 
+    the survey year in the config file. 
+
+    Args:
+        mapper:
+        config: 
+
+    Returns:
+        ValueError: If the mapping path in the config file is blank or the mapper year does not match 
+        the survey year ib the config file, an error message is printed and the pipeline stops. 
+
+    """
+    if not config["mapping_paths"]:
+        raise ValueError("The mapping path in the config file is blank, please fix before re-running the pipeline.")
+
+    if mapper["year"] != config["years"]["survey_year"]:
+        raise ValueError("The mapper year does not match the survey year in the config.")
