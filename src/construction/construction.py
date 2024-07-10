@@ -43,11 +43,10 @@ def run_construction(  # noqa: C901
     """
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
-        path_type = "construction_file_path_ni"
         schema_path = "./config/construction_ni_schema.toml"
     else:
-        run_construction = config["global"]["run_construction"]
-        path_type = "construction_file_path"
+        run_construction = config["global"]["run_all_data_construction"]
+        run_postcode_construction = config["global"]["run_postcode_construction"]
         schema_path = "./config/construction_schema.toml"
 
     # Skip this module if not needed
@@ -60,7 +59,8 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         construction_file_path = paths["construction_file_path_ni"]
     else:
-        construction_file_path = paths["construction_file_path"]
+        construction_file_path = paths["all_data_construction_file_path"]
+        postcode_construction_fpath = paths["postcode_construction_file_path"]
 
     # Check the construction file exists and has records, then read it
     construction_df = read_construction_file(
