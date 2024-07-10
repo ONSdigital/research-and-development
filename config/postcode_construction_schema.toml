@@ -54,7 +54,7 @@ Possible_categorical_Values = ["nan"]
 
 [construction_type]
 Description = "nan"
-Deduced_Data_Type = "boolean"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = "str"
 Length = "nan"
