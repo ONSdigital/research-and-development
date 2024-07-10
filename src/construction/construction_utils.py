@@ -38,3 +38,17 @@ def read_construction_file(
         "Construction file not found, skipping construction..."
     )
     return None
+
+
+def convert_formtype(formtype_value):
+    if pd.notnull(formtype_value):
+        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
+            return "0001"
+        elif (
+            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
+        ):
+            return "0006"
+        else:
+            return None
+    else:
+        return None

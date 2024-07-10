@@ -4,7 +4,8 @@ import pandas as pd
 from typing import Callable
 
 from src.construction.construction_utils import (
-    read_construction_file
+    read_construction_file,
+    convert_formtype
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -207,16 +208,3 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
 
     return updated_snapshot_df
 
-
-def convert_formtype(formtype_value):
-    if pd.notnull(formtype_value):
-        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
-            return "0001"
-        elif (
-            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
-        ):
-            return "0006"
-        else:
-            return None
-    else:
-        return None
