@@ -1,6 +1,7 @@
 """The main file for the mapping module."""
 import logging
 from datetime import datetime
+from typing import Callable, Dict, Any
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
@@ -16,7 +17,7 @@ def run_mapping(
     ni_full_responses,
     config: dict,
     write_csv: Callable,
-    run_id: int
+    run_id: int,
 ):
 
     # Check the environment switch
