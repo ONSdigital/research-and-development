@@ -96,7 +96,7 @@ def run_construction(  # noqa: C901
             )
 
         # Prepare the short to long form constructions, if any (N/A to NI)
-        if "short_to_long" in construction_df.columns:
+        if "short_to_long" in construction_df.construction_type.unique():
             updated_snapshot_df = prepare_short_to_long(
                 updated_snapshot_df, construction_df
             )
@@ -186,7 +186,7 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     # Check which references are going to be converted to long forms
     # and how many instances they have
     ref_count = construction_df.loc[
-        construction_df["short_to_long"] == True, "reference"  # noqa: E712
+        construction_df["construction_type"].lower() == "short_to_long", "reference"  # noqa: E712
     ].value_counts()
 
     # Create conversion df
