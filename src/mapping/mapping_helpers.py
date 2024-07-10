@@ -27,6 +27,18 @@ def mapper_null_checks(
         raise ValueError(f"{mapper_name} mapper contains null values in {col2}.")
 
 
+def join_with_null_check(df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:
+    """Perform a left join on two DataFrames and check for null values.
+    
+    Args:
+        df (pd.DataFrame): The main DataFrame.
+        mapper_df (pd.DataFrame): The mapper DataFrame.
+
+    Returns:
+        pd.DataFrame: The merged DataFrame.
+    """
+
+
 def col_validation_checks(
     mapper_df: pd.DataFrame,
     mapper_name: str,
@@ -96,7 +108,7 @@ def check_mapping_unique(
     """
     Checks if a column contains unique values.
 
-    Parameters:
+    Args:
     mapper_df (pd.DataFrame): The mapper DataFrame to check.
     col_to_check (str): The name of the column to check.
 

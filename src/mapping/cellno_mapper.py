@@ -13,7 +13,7 @@ def clean_thousands_comma(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
 def check_expected_number_of_cellnumbers(cellno_df: pd.DataFrame, num: int) -> None:
     """Check we have the expected number of cellnumers.
 
-    Parameters:
+    Args:
     cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
     num (int): The expected number of cellnumbers.
 
@@ -30,7 +30,7 @@ def check_expected_number_of_cellnumbers(cellno_df: pd.DataFrame, num: int) -> N
 def check_cellno_range(cellno_df: pd.DataFrame) -> None:
     """Check the range of the cellnumbers is as expected.
 
-    Parameters:
+    Args:
     cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
 
     Raises:
@@ -43,7 +43,7 @@ def check_cellno_range(cellno_df: pd.DataFrame) -> None:
 def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFrame:
     """Clean and validate the cellno mapper dataframe.
 
-    Parameters:
+    Args:
     cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
     num (int): The expected number of cellnumbers.
 
@@ -72,7 +72,7 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
 def join_cellno_mapper(df: pd.DataFrame, cellno_df: pd.DataFrame) -> pd.DataFrame:
     """Add a column for universe count to shortfrom responses, joining on cellnumber.
 
-    Parameters:
+    Args:
     df (pd.DataFrame): The shortform responses dataframe.
 
     Returns:
@@ -89,7 +89,7 @@ def validate_join_cellno_mapper(
 ) -> pd.DataFrame:
     """Validate the join_cellno_mapper function.
 
-    Parameters:
+    Args:
     df (pd.DataFrame): The shortform responses dataframe.
     cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
 
