@@ -1,9 +1,12 @@
 """Useful utilities for the construction module."""
 import pathlib
 import logging
-from typing import Union, Callable
+from typing import Union, Callable, Tuple
 
 import pandas as pd
+
+from src.construction.construction import prepare_short_to_long
+from src.outputs.outputs_helpers import create_period_year
 
 def read_construction_file(
         path: Union[str, pathlib.Path],
@@ -11,16 +14,16 @@ def read_construction_file(
         read_csv_func: Callable,
         file_exists_func: Callable
     ) -> pd.DataFrame:
-    """_summary_
+    """Read in a construction file, with related logging.
 
     Args:
-        path (Union[str, pathlib.Path]): _description_
-        logger (logging.Logger): _description_
-        read_csv_func (Callable): _description_
-        file_exists_func (Callable): _description_
+        path (Union[str, pathlib.Path]): The path to read the construction file from.
+        logger (logging.Logger): The logger to log to.
+        read_csv_func (Callable): A function to read in a csv.
+        file_exists_func (Callable): A function to check that a file exists.
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: The construction file in df format.
     """
     logger.info(f"Attempting to read construction file from {path}...")
     construction_file_exists = file_exists_func(path)
@@ -40,7 +43,15 @@ def read_construction_file(
     return None
 
 
-def convert_formtype(formtype_value):
+def convert_formtype(formtype_value: str) -> str:
+    """Convert the formtype to a standardised format.
+
+    Args:
+        formtype_value (str): The value to standardise.
+
+    Returns:
+        str: The standardised value for formtype.
+    """
     if pd.notnull(formtype_value):
         if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
             return "0001"
@@ -52,3 +63,42 @@ def convert_formtype(formtype_value):
             return None
     else:
         return None
+    
+
+def prepare_forms_gb(
+        snapshot_df: pd.DataFrame, 
+        construction_df: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Prepare GB forms.
+
+    Args:
+        snapshot_df (pd.DataFrame): The snapshot df (all official data)
+        construction_df (pd.DataFrame): The construction df (artifical data to be added)
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: Both datasets with prepared forms
+    """
+    # Convert formtype to "0001" or "0006"
+    if "formtype" in construction_df.columns:
+        construction_df["formtype"] = construction_df["formtype"].apply(
+            convert_formtype
+        )
+    # Prepare the short to long form constructions, if any (N/A to NI)
+    if "short_to_long" in construction_df.construction_type.unique():
+        snapshot_df = prepare_short_to_long(
+            snapshot_df, construction_df
+        )
+    # Create period_year column (NI already has it)
+    snapshot_df = create_period_year(snapshot_df)
+    construction_df = create_period_year(construction_df)
+    # Set instance=1 so longforms with status 'Form sent out' match correctly
+    form_sent_condition = (snapshot_df.formtype == "0001") & (
+        snapshot_df.status == "Form sent out"
+    )
+    snapshot_df.loc[form_sent_condition, "instance"] = 1
+    # Set instance=0 so shortforms with status 'Form sent out' match correctly
+    form_sent_condition = (snapshot_df.formtype == "0006") & (
+        snapshot_df.status == "Form sent out"
+    )
+    snapshot_df.loc[form_sent_condition, "instance"] = 0
+    return (construction_df, snapshot_df)
