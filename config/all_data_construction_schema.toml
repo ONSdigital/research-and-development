@@ -1564,7 +1564,7 @@ Min_values = "nan"
 Max_values = "nan"
 Possible_categorical_Values = ["nan"]
 
-[short_to_long]
+[construction_type]
 Description = "nan"
 Deduced_Data_Type = "boolean"
 Nullable = true

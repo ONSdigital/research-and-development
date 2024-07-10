@@ -47,7 +47,8 @@ def run_construction(  # noqa: C901
     else:
         run_construction = config["global"]["run_all_data_construction"]
         run_postcode_construction = config["global"]["run_postcode_construction"]
-        schema_path = "./config/construction_schema.toml"
+        schema_path = "./config/all_data_construction_schema.toml"
+        postcode_schema_path = "./config/postcode_construction_schema.toml"
 
     # Skip this module if not needed
     if run_construction is False:
