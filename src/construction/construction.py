@@ -5,7 +5,7 @@ from typing import Callable
 
 from src.construction.construction_utils import (
     read_construction_file,
-    convert_formtype
+    prepare_forms_gb
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -87,33 +87,10 @@ def run_construction(  # noqa: C901
 
     # Run GB specific actions
     if not is_northern_ireland:
-
-        # Convert formtype to "0001" or "0006"
-        # NI doesn't have a formtype until outputs
-        if "formtype" in construction_df.columns:
-            construction_df["formtype"] = construction_df["formtype"].apply(
-                convert_formtype
-            )
-
-        # Prepare the short to long form constructions, if any (N/A to NI)
-        if "short_to_long" in construction_df.construction_type.unique():
-            updated_snapshot_df = prepare_short_to_long(
-                updated_snapshot_df, construction_df
-            )
-        # Create period_year column (NI already has it)
-        updated_snapshot_df = create_period_year(updated_snapshot_df)
-        construction_df = create_period_year(construction_df)
-        # Set instance=1 so longforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0001") & (
-            updated_snapshot_df.status == "Form sent out"
+        updated_snapshot_df, construction_df = (
+            prepare_forms_gb(updated_snapshot_df, construction_df)
         )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
-        # Set instance=0 so shortforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
-            updated_snapshot_df.status == "Form sent out"
-        )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 0
-
+        
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
