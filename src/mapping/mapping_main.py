@@ -20,15 +20,6 @@ def run_mapping(
     run_id: int,
 ):
 
-    # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-
-    if network_or_hdfs == "network":
-        from src.utils import local_file_mods as mods
-
-    elif network_or_hdfs == "hdfs":
-        from src.utils import hdfs_mods as mods
-
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
@@ -97,7 +88,7 @@ def run_mapping(
         MappingMainLogger.info("Outputting Mapping QA files.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        full_responses_filename = f"{survey_year}_full_responses_qa_{tdate}_v{run_id}.csv"
+        full_responses_filename = f"{survey_year}_full_responses_mapped{tdate}_v{run_id}.csv"
              
         write_csv(f"{qa_path}/{full_responses_filename}", full_responses) # Changed
     MappingMainLogger.info("Finished Mapping QA calculation.")
