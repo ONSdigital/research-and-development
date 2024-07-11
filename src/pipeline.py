@@ -117,6 +117,8 @@ def run_pipeline(user_config_path, dev_config_path):
         full_responses,
         ni_df,
         config,
+        mods.rd_write_csv,
+        run_id,
     )
     MainLogger.info("Finished Mapping...")
 

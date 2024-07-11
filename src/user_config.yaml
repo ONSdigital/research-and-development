@@ -18,6 +18,8 @@ global:
   output_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
+  output_mapping_qa: False
+  output_mapping_ni_qa: False 
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
@@ -26,17 +28,17 @@ global:
   output_long_form: False
   output_short_form: False
   output_gb_sas: True
-  output_ni_sas: True
-  output_tau: True
-  output_intram_by_pg_gb: True
-  output_intram_by_pg_uk: True
+  output_ni_sas: False
+  output_tau: False
+  output_intram_by_pg_gb: False
+  output_intram_by_pg_uk: False
   output_intram_gb_itl: False
   output_intram_uk_itl: False
   output_intram_by_civil_defence: False
   output_intram_by_sic: False
   output_fte_total_qa: False
   output_status_filtered: False
-  output_frozen_group: True
+  output_frozen_group: False
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths

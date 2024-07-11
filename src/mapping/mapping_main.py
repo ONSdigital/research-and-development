@@ -1,5 +1,7 @@
 """The main file for the mapping module."""
 import logging
+from datetime import datetime
+from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
@@ -14,16 +16,9 @@ def run_mapping(
     full_responses,
     ni_full_responses,
     config: dict,
+    write_csv: Callable,
+    run_id: int,
 ):
-
-    # Check the environment switch
-    # network_or_hdfs = config["global"]["network_or_hdfs"]
-
-    # if network_or_hdfs == "network":
-    #     from src.utils import local_file_mods as mods
-
-    # elif network_or_hdfs == "hdfs":
-    #     from src.utils import hdfs_mods as mods
 
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
@@ -85,6 +80,27 @@ def run_mapping(
             ultfoc_mapper,
             is_northern_ireland=True,
         )
+
+    # output QA files
+    qa_path = config["mapping_paths"]["qa_path"]
+
+    if config["global"]["output_mapping_qa"]:
+        MappingMainLogger.info("Outputting Mapping QA files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        full_responses_filename = f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
+             
+        write_csv(f"{qa_path}/{full_responses_filename}", full_responses) # Changed
+    MappingMainLogger.info("Finished Mapping QA calculation.")
+
+    if config["global"]["output_mapping_ni_qa"]:
+        MappingMainLogger.info("Outputting Mapping NI QA files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        full_responses_NI_filename = f"{survey_year}_full_responses_ni_mapped_{tdate}_v{run_id}.csv"
+             
+        write_csv(f"{qa_path}/{full_responses_NI_filename}", ni_full_responses) # Changed
+    MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
     return (full_responses, ni_full_responses, itl_mapper, cellno_df)
