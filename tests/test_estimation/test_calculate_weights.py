@@ -302,61 +302,15 @@ class TestCalcWeightWithMissingVals:
             "a_weight",
         ]
 
-        data = [
-            [1, 1, "P", "210", "0006", 0, 1, 10, False, 10.0],
-            [
-                2,
-                np.nan,
-                "P",
-                "210",
-                "0006",
-                0,
-                1,
-                10,
-                False,
-                10.0,
-            ],  # filtered from calc but weight applied
-            [
-                3,
-                1,
-                np.nan,
-                "210",
-                "0006",
-                0,
-                1,
-                10,
-                False,
-                1.0,
-            ],  # filtered out (selectiontype)
-            [
-                4,
-                1,
-                "P",
-                np.nan,
-                "0006",
-                0,
-                1,
-                10,
-                False,
-                1.0,
-            ],  # filtered out (statusencoded)
+        data = [[1, 1, "P", "210", "0006", 0, 1, 10, False, 10.0],
+            [2, np.nan, "P", "210", "0006", 0, 1, 10, False, 10.0],  # filtered from calc but weight applied
+            [3, 1, np.nan, "210", "0006", 0, 1, 10, False, 1.0],  # filtered out (selectiontype)
+            [4, 1, "P", np.nan, "0006", 0, 1, 10, False, 1.0],  # filtered out (statusencoded)
             [5, 1, "P", "210", np.nan, 0, 1, 10, False, 1.0],  # filtered out (formtype)
-            [
-                6,
-                1,
-                "P",
-                "210",
-                "0006",
-                np.nan,
-                2,
-                5,
-                False,
-                2.5,
-            ],  # filtered out (instance) but weight applied
+            [6, 1, "P", "210", "0006", np.nan, 2, 5, False, 2.5],  # filtered out (instance) but weight applied
             [7, 1, "P", "210", "0006", 0, np.nan, 5, False, 1.0],  # No cellno
             [8, 1, "P", "210", "0006", 0, 2, 5, np.nan, 2.5],  # No outlier
-            [9, 1, "P", "210", "0006", 0, 2, 5, False, 2.5],
-        ]
+            [9, 1, "P", "210", "0006", 0, 2, 5, False, 2.5]]
 
         expected_df = pd.DataFrame(data=data, columns=expected_cols)
         return expected_df
