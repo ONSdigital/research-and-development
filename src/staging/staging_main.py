@@ -65,15 +65,18 @@ def run_staging(  # noqa: C901
     staging_dict = config["staging_paths"]
 
     snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
-    secondary_snapshot_name = os.path.basename(
-        staging_dict["secondary_snapshot_path"]
-    ).split(".", 1)[0]
-
     feather_path = staging_dict["feather_output"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
-    secondary_feather_file = os.path.join(
-        feather_path, f"{secondary_snapshot_name}.feather"
-    )
+
+    if load_updated_snapshot:
+        secondary_snapshot_name = os.path.basename(
+            staging_dict["secondary_snapshot_path"]
+        ).split(".", 1)[0]
+        secondary_feather_file = os.path.join(
+            feather_path, f"{secondary_snapshot_name}.feather"
+        )
+    else:
+        secondary_feather_file = None
 
     # Check if the if the snapshot feather and optionally the secondary
     # snapshot feather exist
@@ -141,11 +144,11 @@ def run_staging(  # noqa: C901
         # Write both snapshots to feather file at given path
         if is_network:
             feather_fname = f"{snapshot_name}.feather"
-            s_feather_fname = f"{secondary_snapshot_name}.feather"
             helpers.df_to_feather(
                 feather_path, feather_fname, full_responses, write_feather
             )
             if secondary_full_responses is not None:
+                s_feather_fname = f"{secondary_snapshot_name}.feather"
                 helpers.df_to_feather(
                     feather_path,
                     s_feather_fname,

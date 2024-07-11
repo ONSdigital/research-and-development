@@ -27,9 +27,15 @@ def mapper_null_checks(
         raise ValueError(f"{mapper_name} mapper contains null values in {col2}.")
 
 
-def join_with_null_check(df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFrame:
-    """Perform a left join on two DataFrames and check for null values.
-    
+def join_with_null_check(
+    df: pd.DataFrame,
+    mapper_df: pd.DataFrame,
+    mapper_name: str,
+    on_col: str,
+    check_col: str,
+) -> pd.DataFrame:
+    """Perform a left join on two DataFrames and check for nulls on the join.
+
     Args:
         df (pd.DataFrame): The main DataFrame.
         mapper_df (pd.DataFrame): The mapper DataFrame.
@@ -37,6 +43,22 @@ def join_with_null_check(df: pd.DataFrame, mapper_df: pd.DataFrame) -> pd.DataFr
     Returns:
         pd.DataFrame: The merged DataFrame.
     """
+    df = df.merge(
+        mapper_df,
+        how="left",
+        on=on_col,
+        indicator=True,
+    )
+    # Check for nulls in the join
+    filter_df = df.loc[df[on_col].notnull() & df._merge.eq("left_only")]
+    if not filter_df.empty:
+        raise ValueError(
+            f"Nulls found in the join on {on_col} of {mapper_name} mapper."
+            f"The following {on_col} values are not in the {mapper_name} mapper: "
+            f"{filter_df[on_col].unique()}"
+        )
+    df = df.drop("_merge", axis=1)
+    return df
 
 
 def col_validation_checks(

@@ -91,16 +91,12 @@ def calculate_weighting_factor(
     }
 
     # Group by cell number
-    grouped_by_cell = filtered_df.groupby("cellnumber")
+    grouped_by_cell = filtered_df.groupby("cellnumber").first()
 
     # Create a dict that maps each cell to the weighting factor
     for cell_number, cell_group in grouped_by_cell:
+        N = cell_group["uni_count"]
 
-        # Get N from cellno_dict
-        # N = cellno_dict[cell_number]
-        N = cell_group["uni_count"].first()
-
-        # Get lower n
         n = calc_lower_n(cell_group)
 
         # Count the outliers for this group (will count all the `True` values)

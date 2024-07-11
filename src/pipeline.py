@@ -142,7 +142,7 @@ def run_pipeline(user_config_path, dev_config_path):
     # Estimation module
     MainLogger.info("Starting Estimation...")
     estimated_responses_df, weighted_responses_df = run_estimation(
-        outliered_responses_df, cellno_df, config, mods.rd_write_csv, run_id
+        outliered_responses_df, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
@@ -194,7 +194,7 @@ def run_pipeline(user_config_path, dev_config_path):
     MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
-    
+
     runlog_obj.write_runlog()
     runlog_obj.mark_mainlog_passed()
 

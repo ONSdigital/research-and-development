@@ -1,7 +1,7 @@
 """Return a dictionary for the cell_no mapper"""
 import pandas as pd
 
-from src.mapping.mapping_helpers import check_mapping_unique
+from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
 
 
 def clean_thousands_comma(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
@@ -69,21 +69,6 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
     return cellno_df
 
 
-def join_cellno_mapper(df: pd.DataFrame, cellno_df: pd.DataFrame) -> pd.DataFrame:
-    """Add a column for universe count to shortfrom responses, joining on cellnumber.
-
-    Args:
-    df (pd.DataFrame): The shortform responses dataframe.
-
-    Returns:
-    pd.DataFrame: The shortform responses dataframe with a column for universe count.
-
-    """
-    df = df.merge(cellno_df, on="cellnumber", how="left")
-
-    return df
-
-
 def validate_join_cellno_mapper(
     df: pd.DataFrame, cellno_df: pd.DataFrame
 ) -> pd.DataFrame:
@@ -97,6 +82,6 @@ def validate_join_cellno_mapper(
     pd.DataFrame: The shortform responses dataframe with a column for universe count.
     """
     cellno_df = clean_validate_cellno_mapper(cellno_df, num=613)
-    df = join_cellno_mapper(df, cellno_df)
+    df = join_with_null_check(df, cellno_df, "cellno", "cellnumber", "uni_count")
 
     return df

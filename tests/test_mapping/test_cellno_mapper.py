@@ -4,7 +4,6 @@ import pandas as pd
 
 from src.mapping.cellno_mapper import (
     clean_thousands_comma,
-    join_cellno_mapper,
     check_expected_number_of_cellnumbers,
     check_cellno_range,
     clean_validate_cellno_mapper,
@@ -130,16 +129,7 @@ def expected_clean_mapper(cellno_mapper_df):
 def test_clean_validate_cellno_mapper_success(cellno_mapper_df, expected_clean_mapper):
     """Test for clean_validate_cellno_mapper function in the case of success."""
     success_df = cellno_mapper_df.copy().replace(888, 817)
- 
+
     result = clean_validate_cellno_mapper(success_df, 5)
 
     pd.testing.assert_frame_equal(result, expected_clean_mapper, check_dtype=False)
-
-
-def test_join_cellno_mapper(full_input_df, expected_clean_mapper, expected_output):
-    """Test for join_cellno_mapper function."""
-    actual_output = join_cellno_mapper(full_input_df, expected_clean_mapper)
-    pd.testing.assert_frame_equal(actual_output, expected_output, check_dtype=False)
-
-
-
