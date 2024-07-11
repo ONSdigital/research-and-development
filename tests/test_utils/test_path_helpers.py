@@ -24,7 +24,8 @@ def config():
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
             "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
             "manual_outliers_path": "07_outliers/man_out/man_out.csv",
-            "construction_file_path": "04_construction/man_con/construction_file.csv",
+            "all_data_construction_file_path": "04_construction/man_con/construction_file.csv",
+            "postcode_construction_file_path": "04_construction/man_con/postcode_construction_file.csv",
             "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         },
         "years": {"survey_year": 2022},
@@ -73,7 +74,8 @@ def test_get_paths(config):
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
         "manual_outliers_path": "07_outliers/man_out/man_out.csv",
         "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
-        "construction_file_path": "04_construction/man_con/construction_file.csv",
+        "all_data_construction_file_path": "04_construction/man_con/construction_file.csv",
+        "postcode_construction_file_path": "04_construction/man_con/postcode_construction_file.csv",
         "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         "year": 2022,
         "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
@@ -141,13 +143,13 @@ def test_create_construction_config(config):
     """Test create_construction_config function."""
     expected_construction_dict = {
         "qa_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/construction_qa",
-        "construction_file_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/construction_file.csv",
+        "all_data_construction_file_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/construction_file.csv",
+        "postcode_construction_file_path": "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/postcode_construction_file.csv",
         "construction_file_path_ni": (
             "R:/DAP_emulation/2022_surveys/BERD/04_construction/man_con/con_file_ni.csv"
         ),
     }
     construction_dict = create_construction_config(config)
-
     assert (
         construction_dict == expected_construction_dict
     ), "Construction config is not as expected"
