@@ -203,7 +203,7 @@ class RunLog:
         if write_csv:
             # write the runlog to a csv file
             file_path = str(os.path.join(self.logs_folder, logfile_name))
-            return pd.read_csv(file_path)
+            return self.read_func(file_path)
         elif write_hdf5:
             # write the runlog to a hdf5 file
             logfile_name = f"{os.path.splitext(logfile_name)[0]}.hdf"
