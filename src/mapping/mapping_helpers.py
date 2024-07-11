@@ -171,10 +171,7 @@ def create_additional_ni_cols(ni_full_responses: pd.DataFrame) -> pd.DataFrame:
     return ni_full_responses
 
 
-def validate_mapper_config(
-    mapper,
-    config: dict,
-    ) -> None:
+def validate_mapper_config(config: dict) -> None:
     """
     Validates the config for each mapper. 
 
@@ -182,16 +179,26 @@ def validate_mapper_config(
     the survey year in the config file. 
 
     Args:
-        mapper:
-        config: 
+        config: The config file
 
     Returns:
         ValueError: If the mapping path in the config file is blank or the mapper year does not match 
         the survey year ib the config file, an error message is printed and the pipeline stops. 
 
     """
-    if not config["mapping_paths"]:
-        raise ValueError("The mapping path in the config file is blank, please fix before re-running the pipeline.")
+    if not config["2022_mappers"]:
+        raise ValueError(f"The {config["2022_mappers"]} in the config file is blank, please fix before re-running the pipeline.")
+    else:
 
-    if mapper["year"] != config["years"]["survey_year"]:
-        raise ValueError("The mapper year does not match the survey year in the config.")
+
+    if config["years"]["survey_year"] == 2022:
+        keyword = '2022'
+        for filename in config["2022_mappers"][0:]:
+            if keyword not in filename:
+                raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
+
+    elif config["years"]["survey_year"] == 2023:
+        keyword = '2023'
+        for filename in config["2023_mappers"][0:]:
+            if keyword not in filename:
+                raise ValueError(f"The {filename} year does not match the survey year in the config.")
