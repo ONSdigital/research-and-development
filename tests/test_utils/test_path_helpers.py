@@ -87,9 +87,9 @@ def test_get_paths(config):
 def expected_staging_dict():
     expected_staging_dict = {
         "feather_output": "R:/DAP_emulation/2022_surveys/BERD/01_staging/feather",
-        "snapshot_path": "R:/DAP_emulation/snapshot_path/snap.csv",
-        "secondary_snapshot_path": "R:/DAP_emulation/secondary_snapshot_path/snap2.csv",
-        "postcode_masterlist": "R:/DAP_emulation/postcode_masterlist_path/postcode.csv",
+        "snapshot_path": "snapshot_path/snap.csv",
+        "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
+        "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "manual_outliers_path": (
             "R:/DAP_emulation/2022_surveys/BERD/07_outliers/man_out/man_out.csv"
         ),
