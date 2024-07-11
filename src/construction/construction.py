@@ -3,13 +3,12 @@ import logging
 import pandas as pd
 from typing import Callable
 
-from src.construction.construction_utils import (
+from src.construction.construction_helpers import (
     read_construction_file,
     prepare_forms_gb
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
-from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
 
@@ -155,34 +154,3 @@ def run_construction(  # noqa: C901
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
-
-
-def prepare_short_to_long(updated_snapshot_df, construction_df):
-    """Create addional instances for short to long construction"""
-
-    # Check which references are going to be converted to long forms
-    # and how many instances they have
-    ref_count = construction_df.loc[
-        construction_df["construction_type"].lower() == "short_to_long", "reference"  # noqa: E712
-    ].value_counts()
-
-    # Create conversion df
-    short_to_long_df = updated_snapshot_df[
-        updated_snapshot_df["reference"].isin(ref_count.index)
-    ]
-
-    # For every short_to_long reference,
-    # this copies the instance 0 the relevant number of times,
-    # updating to the corresponding instance number
-    for index, value in ref_count.items():
-        for instance in range(1, value):
-            short_to_long_df_instance = short_to_long_df.loc[
-                short_to_long_df["reference"] == index
-            ].copy()
-            short_to_long_df_instance["instance"] = instance
-            updated_snapshot_df = pd.concat(
-                [updated_snapshot_df, short_to_long_df_instance]
-            )
-
-    return updated_snapshot_df
-

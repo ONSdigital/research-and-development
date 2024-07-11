@@ -5,7 +5,6 @@ from typing import Union, Callable, Tuple
 
 import pandas as pd
 
-from src.construction.construction import prepare_short_to_long
 from src.outputs.outputs_helpers import create_period_year
 
 def read_construction_file(
@@ -102,3 +101,33 @@ def prepare_forms_gb(
     )
     snapshot_df.loc[form_sent_condition, "instance"] = 0
     return (construction_df, snapshot_df)
+
+
+def prepare_short_to_long(updated_snapshot_df, construction_df):
+    """Create addional instances for short to long construction"""
+
+    # Check which references are going to be converted to long forms
+    # and how many instances they have
+    ref_count = construction_df.loc[
+        construction_df["construction_type"].lower() == "short_to_long", "reference"  # noqa: E712
+    ].value_counts()
+
+    # Create conversion df
+    short_to_long_df = updated_snapshot_df[
+        updated_snapshot_df["reference"].isin(ref_count.index)
+    ]
+
+    # For every short_to_long reference,
+    # this copies the instance 0 the relevant number of times,
+    # updating to the corresponding instance number
+    for index, value in ref_count.items():
+        for instance in range(1, value):
+            short_to_long_df_instance = short_to_long_df.loc[
+                short_to_long_df["reference"] == index
+            ].copy()
+            short_to_long_df_instance["instance"] = instance
+            updated_snapshot_df = pd.concat(
+                [updated_snapshot_df, short_to_long_df_instance]
+            )
+
+    return updated_snapshot_df
