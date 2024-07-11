@@ -6,6 +6,16 @@ from typing import Tuple
 CalcWeights_Logger = logging.getLogger(__name__)
 
 
+def create_estimation_filter(df: pd.DataFrame) -> pd.Series:
+    # Create filters for dataframe
+    sample_cond = df["selectiontype"] == "P"
+    status_cond = df.statusencoded.isin(["210", "211"])
+    formtype_cond = df["formtype"] == "0006"
+
+    estimation_filter = formtype_cond & sample_cond & status_cond
+    return estimation_filter
+
+
 def calc_lower_n(df: pd.DataFrame, exp_col: str = "709") -> dict:
     """Calculates 'n' which is a number of
     unique RU references in the filtered dataset.
@@ -60,7 +70,6 @@ def calculate_weighting_factor(
         new column "a_weight".
         2) Returns a QA dataframe of all variables used in the calculation
     """
-
     cols = set(df.columns)
     if not ("outlier" in cols):
         raise ValueError("The column essential 'outlier' is missing.")
@@ -71,60 +80,40 @@ def calculate_weighting_factor(
     # Default a_weight = 1 for all entries
     df["a_weight"] = 1.0
 
-    # Create filters for dataframe
-    sample_cond = df["selectiontype"] == "P"
-    status_cond = df.statusencoded.isin(["210", "211"])
-    formtype_cond = df["formtype"] == "0006"
-    ins_cond = df["instance"] == 0
+    grouped_by_cell = df.groupby("cellnumber").apply(calc_a_weight)
 
-    filtered_df = df[formtype_cond & sample_cond & status_cond & ins_cond]
-    filtered_df = filtered_df.dropna(subset=[exp_col])
+    qa_cols_list = ["cellnumber", "N", "n", "o", "a_weight"]
+    qa_frame = grouped_by_cell[qa_cols_list].groupby("cellnumber").first()
+    qa_frame = qa_frame.reset_index()
 
-    # Create small QA dataframe
+    grouped_by_cell = grouped_by_cell.drop(columns=["N", "n", "o"])
+    return grouped_by_cell, qa_frame
 
-    qa_frame = {
-        "cellnumber": [],
-        "N": [],
-        "n": [],
-        "outliers": [],
-        "a_weight": [],
-    }
 
-    # Group by cell number
-    grouped_by_cell = filtered_df.groupby("cellnumber").first()
+def calc_a_weight(cell_group):
+    N = cell_group["uni_count"]
 
-    # Create a dict that maps each cell to the weighting factor
-    for cell_number, cell_group in grouped_by_cell:
-        N = cell_group["uni_count"]
+    estimation_filter = create_estimation_filter(cell_group)
+    a_weight_filter = cell_group["instance"] == 0  # cell_group["709"].notnull() &
+    filtered_group = cell_group.loc[estimation_filter & a_weight_filter]
 
-        n = calc_lower_n(cell_group)
+    n = calc_lower_n(filtered_group)
 
-        # Count the outliers for this group (will count all the `True` values)
-        outlier_count = cell_group["outlier"].sum()
+    # Count the outliers for this group (will count all the `True` values)
+    outlier_count = filtered_group["outlier"].sum()
 
-        # Calculate 'a' for this group
+    # Calculate 'a' for this group
+    if n > 0:
         a_weight = (N - outlier_count) / (n - outlier_count)
+    else:
+        a_weight = 1.0
 
-        # Put the weight into the column just for this cell number and filters
-        cell_cond = df["cellnumber"] == cell_number
-        df.loc[
-            formtype_cond & sample_cond & status_cond & cell_cond,
-            "a_weight",
-        ] = a_weight
+    cell_group["N"] = N
+    cell_group["n"] = n
+    cell_group["o"] = outlier_count
+    cell_group.loc[estimation_filter, "a_weight"] = a_weight
 
-        # Save the relevant estimation info for QA seperately.
-        qa_list = [
-            float(cell_number),
-            float(N),
-            float(n),
-            float(outlier_count),
-            a_weight,
-        ]
-        for col, val in zip(list(qa_frame.keys()), qa_list):
-            qa_frame[col].append(val)
-
-    qa_df = pd.DataFrame(qa_frame)
-    return df, qa_df
+    return cell_group
 
 
 def outlier_weights(df: pd.DataFrame) -> pd.DataFrame:
