@@ -1,7 +1,7 @@
 """The main file for the mapping module."""
 import logging
 from datetime import datetime
-from typing import Callable, Dict, Any
+from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
@@ -88,7 +88,7 @@ def run_mapping(
         MappingMainLogger.info("Outputting Mapping QA files.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        full_responses_filename = f"{survey_year}_full_responses_mapped{tdate}_v{run_id}.csv"
+        full_responses_filename = f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
              
         write_csv(f"{qa_path}/{full_responses_filename}", full_responses) # Changed
     MappingMainLogger.info("Finished Mapping QA calculation.")
