@@ -3,12 +3,12 @@ import logging
 import pandas as pd
 from typing import Callable
 
-from src.construction.construction_utils import (
-    read_construction_file
+from src.construction.construction_helpers import (
+    read_construction_file,
+    prepare_forms_gb
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
-from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
 
@@ -42,12 +42,12 @@ def run_construction(  # noqa: C901
     """
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
-        path_type = "construction_file_path_ni"
         schema_path = "./config/construction_ni_schema.toml"
     else:
-        run_construction = config["global"]["run_construction"]
-        path_type = "construction_file_path"
-        schema_path = "./config/construction_schema.toml"
+        run_construction = config["global"]["run_all_data_construction"]
+        run_postcode_construction = config["global"]["run_postcode_construction"]
+        schema_path = "./config/all_data_construction_schema.toml"
+        postcode_schema_path = "./config/postcode_construction_schema.toml"
 
     # Skip this module if not needed
     if run_construction is False:
@@ -59,7 +59,8 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         construction_file_path = paths["construction_file_path_ni"]
     else:
-        construction_file_path = paths["construction_file_path"]
+        construction_file_path = paths["all_data_construction_file_path"]
+        postcode_construction_fpath = paths["postcode_construction_file_path"]
 
     # Check the construction file exists and has records, then read it
     construction_df = read_construction_file(
@@ -85,33 +86,10 @@ def run_construction(  # noqa: C901
 
     # Run GB specific actions
     if not is_northern_ireland:
-
-        # Convert formtype to "0001" or "0006"
-        # NI doesn't have a formtype until outputs
-        if "formtype" in construction_df.columns:
-            construction_df["formtype"] = construction_df["formtype"].apply(
-                convert_formtype
-            )
-
-        # Prepare the short to long form constructions, if any (N/A to NI)
-        if "short_to_long" in construction_df.columns:
-            updated_snapshot_df = prepare_short_to_long(
-                updated_snapshot_df, construction_df
-            )
-        # Create period_year column (NI already has it)
-        updated_snapshot_df = create_period_year(updated_snapshot_df)
-        construction_df = create_period_year(construction_df)
-        # Set instance=1 so longforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0001") & (
-            updated_snapshot_df.status == "Form sent out"
+        updated_snapshot_df, construction_df = (
+            prepare_forms_gb(updated_snapshot_df, construction_df)
         )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
-        # Set instance=0 so shortforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
-            updated_snapshot_df.status == "Form sent out"
-        )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 0
-
+        
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
@@ -176,47 +154,3 @@ def run_construction(  # noqa: C901
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
-
-
-def prepare_short_to_long(updated_snapshot_df, construction_df):
-    """Create addional instances for short to long construction"""
-
-    # Check which references are going to be converted to long forms
-    # and how many instances they have
-    ref_count = construction_df.loc[
-        construction_df["short_to_long"] == True, "reference"  # noqa: E712
-    ].value_counts()
-
-    # Create conversion df
-    short_to_long_df = updated_snapshot_df[
-        updated_snapshot_df["reference"].isin(ref_count.index)
-    ]
-
-    # For every short_to_long reference,
-    # this copies the instance 0 the relevant number of times,
-    # updating to the corresponding instance number
-    for index, value in ref_count.items():
-        for instance in range(1, value):
-            short_to_long_df_instance = short_to_long_df.loc[
-                short_to_long_df["reference"] == index
-            ].copy()
-            short_to_long_df_instance["instance"] = instance
-            updated_snapshot_df = pd.concat(
-                [updated_snapshot_df, short_to_long_df_instance]
-            )
-
-    return updated_snapshot_df
-
-
-def convert_formtype(formtype_value):
-    if pd.notnull(formtype_value):
-        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
-            return "0001"
-        elif (
-            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
-        ):
-            return "0006"
-        else:
-            return None
-    else:
-        return None

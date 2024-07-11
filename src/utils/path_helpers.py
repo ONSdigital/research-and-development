@@ -136,11 +136,14 @@ def create_construction_config(config: dict) -> dict:
     paths = get_paths(config)
     berd_path = paths["berd_path"]
     construction_dict[
-        "construction_file_path"
-    ] = f"{berd_path}{paths['construction_file_path']}"
+        "all_data_construction_file_path"
+    ] = f"{berd_path}{paths['all_data_construction_file_path']}"
     construction_dict[
         "construction_file_path_ni"
     ] = f"{berd_path}{paths['construction_file_path_ni']}"
+    construction_dict[
+        "postcode_construction_file_path"
+    ] = f"{berd_path}{paths['postcode_construction_file_path']}"
     return construction_dict
 
 
