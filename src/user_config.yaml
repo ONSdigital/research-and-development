@@ -38,7 +38,7 @@ global:
   output_intram_by_sic: False
   output_fte_total_qa: False
   output_status_filtered: False
-  output_frozen_group: True
+  output_frozen_group: False
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
