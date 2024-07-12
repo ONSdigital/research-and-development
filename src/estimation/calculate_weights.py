@@ -83,16 +83,40 @@ def calculate_weighting_factor(
 
     grouped_by_cell = df.groupby("cellnumber").apply(calc_a_weight)
 
-    qa_cols_list = ["cellnumber", "N", "n", "o", "a_weight"]
-    qa_frame = grouped_by_cell[qa_cols_list].groupby("cellnumber").first()
-    qa_frame = qa_frame.reset_index()
-
+    # Create a QA dataframe
+    qa_frame = create_a_weight_qa_df(grouped_by_cell)
     grouped_by_cell = grouped_by_cell.drop(columns=["N", "n", "o"])
     return grouped_by_cell, qa_frame
 
 
-def calc_a_weight(cell_group):
-    N = cell_group["uni_count"]
+def create_a_weight_qa_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a QA dataframe for the a_weight calculation.
+
+    Args:
+        df (pd.DataFrame): The dataframe containing the a_weight column.
+
+    Returns:
+        pd.DataFrame: The QA dataframe.
+    """
+    est_filter = create_estimation_filter(df)
+
+    qa_cols_list = ["cellnumber", "N", "n", "o", "a_weight"]
+    qa_frame = df[qa_cols_list].loc[est_filter].groupby("cellnumber").first()
+    qa_frame = qa_frame.reset_index()
+
+    return qa_frame
+
+
+def calc_a_weight(cell_group: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the 'a' weighting factor for a cell group.
+
+    Args:
+        cell_group (pd.DataFrame): The dataframe grouped by cellnumber.
+
+    Returns:
+        pd.DataFrame: The dataframe with the 'a' weighting factor calculated.
+    """
+    N = cell_group["uni_count"].iloc[0]
 
     estimation_filter = create_estimation_filter(cell_group)
     a_weight_filter = (cell_group["instance"] == 0) & cell_group["709"].notnull()
@@ -114,8 +138,8 @@ def calc_a_weight(cell_group):
     cell_group["o"] = outlier_count
     cell_group.loc[estimation_filter, "a_weight"] = a_weight
 
-    # Convert a_weight to float, it had become an object after the .loc above.
-    cell_group["a_weight"] = cell_group["a_weight"].astype(float)
+    # # Convert a_weight to float, it had become an object after the .loc above.
+    # cell_group["a_weight"] = cell_group["a_weight"].astype(float)
 
     return cell_group
 
