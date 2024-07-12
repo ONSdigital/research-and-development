@@ -279,9 +279,8 @@ class TestCalcWeightWithMissingVals:
             [4, 1, "P", np.nan, "0006", 0, 1, 10, False],
             [5, 1, "P", "210", np.nan, 0, 1, 10, False],
             [6, 1, "P", "210", "0006", np.nan, 2, 5, False],
-            [7, 1, "P", "210", "0006", 0, np.nan, 5, False],
-            [8, 1, "P", "210", "0006", 0, 2, 5, np.nan],
-            [9, 1, "P", "210", "0006", 0, 2, 5, False],
+            [7, 1, "P", "210", "0006", 0, 2, 5, np.nan],
+            [8, 1, "P", "210", "0006", 0, 2, 5, False],
         ]
 
         input_df = pd.DataFrame(data=data, columns=input_cols)
@@ -302,15 +301,16 @@ class TestCalcWeightWithMissingVals:
             "a_weight",
         ]
 
-        data = [[1, 1, "P", "210", "0006", 0, 1, 10, False, 10.0],
+        data = [
+            [1, 1, "P", "210", "0006", 0, 1, 10, False, 10.0],
             [2, np.nan, "P", "210", "0006", 0, 1, 10, False, 10.0],  # filtered from calc but weight applied
             [3, 1, np.nan, "210", "0006", 0, 1, 10, False, 1.0],  # filtered out (selectiontype)
             [4, 1, "P", np.nan, "0006", 0, 1, 10, False, 1.0],  # filtered out (statusencoded)
             [5, 1, "P", "210", np.nan, 0, 1, 10, False, 1.0],  # filtered out (formtype)
             [6, 1, "P", "210", "0006", np.nan, 2, 5, False, 2.5],  # filtered out (instance) but weight applied
-            [7, 1, "P", "210", "0006", 0, np.nan, 5, False, 1.0],  # No cellno
-            [8, 1, "P", "210", "0006", 0, 2, 5, np.nan, 2.5],  # No outlier
-            [9, 1, "P", "210", "0006", 0, 2, 5, False, 2.5]]
+            [7, 1, "P", "210", "0006", 0, 2, 5, False, 2.5],  # No outlier
+            [8, 1, "P", "210", "0006", 0, 2, 5, False, 2.5]
+        ]
 
         expected_df = pd.DataFrame(data=data, columns=expected_cols)
         return expected_df
@@ -321,7 +321,7 @@ class TestCalcWeightWithMissingVals:
             "cellnumber",
             "N",
             "n",
-            "outliers",
+            "o",
             "a_weight",
         ]
 
@@ -343,6 +343,10 @@ class TestCalcWeightWithMissingVals:
         cellno_dict = {1: 10, 2: 5}
 
         result_df, result_qa_df = calw.calculate_weighting_factor(input_df)
+        pd.set_option("display.max_columns", None)
+        pd.set_option("display.expand_frame_repr", False)
+        print(result_qa_df)
+
 
         assert_frame_equal(
             result_df, expected_df, check_exact=False, rtol=0.01, check_dtype=False

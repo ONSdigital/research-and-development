@@ -2,8 +2,7 @@
 import pytest
 import pandas as pd
 
-from src.mapping.cellno_mapper import (
-    clean_thousands_comma,
+from src.mapping.cellno_mapping import (
     check_expected_number_of_cellnumbers,
     check_cellno_range,
     clean_validate_cellno_mapper,
@@ -14,11 +13,11 @@ from src.mapping.cellno_mapper import (
 def cellno_mapper_df():
     columns = ["cell_no", "UNI_Count", "uni_employment", "uni_turnover"]
     data = [
-        [41, "87,577", "27", "22,867"],
-        [117, "13,147", "11,88", "1,838"],
-        [674, "23", "5,757", "15,284"],
-        [805, "14", "28,154", "8,848"],
-        [888, "9", "18,5", "8,558"],
+        [41, 87577, 27, 22867],
+        [117, 13147, 1188, 1838],
+        [674, 23, 5757, 15284],
+        [805, 14, 28154, 8848],
+        [888, 9, 185, 8558],
     ]
     cellno_mapper = pd.DataFrame(data=data, columns=columns)
     return cellno_mapper
@@ -37,25 +36,6 @@ def full_input_df():
     ]
     df = pd.DataFrame(columns=columns, data=data)
     return df
-
-
-def test_clean_thousands_comma(cellno_mapper_df):
-    """Test for clean_thousands_comma function."""
-    columns = ["cell_no", "UNI_Count", "uni_employment", "uni_turnover"]
-    expected_data = [
-        [41, 87577, 27, 22867],
-        [117, 13147, 1188, 1838],
-        [674, 23, 5757, 15284],
-        [805, 14, 28154, 8848],
-        [888, 9, 185, 8558],
-    ]
-    expected_result = pd.DataFrame(data=expected_data, columns=columns)
-
-    result = cellno_mapper_df.copy()
-    for col in columns[1:]:
-        result[col] = result[col].str.replace(",", "").astype(int)
-    # Ignore data types when comparing as we have different types of int
-    pd.testing.assert_frame_equal(result, expected_result, check_dtype=False)
 
 
 @pytest.fixture(scope="module")

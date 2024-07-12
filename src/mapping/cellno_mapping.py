@@ -4,12 +4,6 @@ import pandas as pd
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
 
 
-def clean_thousands_comma(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
-    """Remove commas from numbers in a column of a dataframe and convert to integer."""
-    df[col_name] = df[col_name].str.replace(",", "").astype(int)
-    return df
-
-
 def check_expected_number_of_cellnumbers(cellno_df: pd.DataFrame, num: int) -> None:
     """Check we have the expected number of cellnumers.
 
@@ -65,7 +59,6 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
     cellno_df = cellno_df.rename(
         columns={"UNI_Count": "uni_count", "cell_no": "cellnumber"}
     )
-    cellno_df = clean_thousands_comma(cellno_df, "uni_count")
     return cellno_df
 
 
@@ -81,7 +74,7 @@ def validate_join_cellno_mapper(
     Returns:
     pd.DataFrame: The shortform responses dataframe with a column for universe count.
     """
-    cellno_df = clean_validate_cellno_mapper(cellno_df, num=613)
+    cellno_df = clean_validate_cellno_mapper(cellno_df, num=588)
     df = join_with_null_check(df, cellno_df, "cellno", "cellnumber", "uni_count")
 
     return df

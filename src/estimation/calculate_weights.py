@@ -73,6 +73,7 @@ def calculate_weighting_factor(
     cols = set(df.columns)
     if not ("outlier" in cols):
         raise ValueError("The column essential 'outlier' is missing.")
+    df["outlier"] = df["outlier"].fillna(False)
 
     # Convert 709 column to numeric
     df["709"] = pd.to_numeric(df["709"], errors="coerce")
@@ -94,7 +95,7 @@ def calc_a_weight(cell_group):
     N = cell_group["uni_count"]
 
     estimation_filter = create_estimation_filter(cell_group)
-    a_weight_filter = cell_group["instance"] == 0  # cell_group["709"].notnull() &
+    a_weight_filter = (cell_group["instance"] == 0) & cell_group["709"].notnull()
     filtered_group = cell_group.loc[estimation_filter & a_weight_filter]
 
     n = calc_lower_n(filtered_group)
@@ -112,6 +113,9 @@ def calc_a_weight(cell_group):
     cell_group["n"] = n
     cell_group["o"] = outlier_count
     cell_group.loc[estimation_filter, "a_weight"] = a_weight
+
+    # Convert a_weight to float, it had become an object after the .loc above.
+    cell_group["a_weight"] = cell_group["a_weight"].astype(float)
 
     return cell_group
 
