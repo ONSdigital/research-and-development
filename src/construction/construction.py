@@ -6,6 +6,7 @@ from typing import Callable
 from src.construction.construction_helpers import (
     read_construction_file,
     prepare_forms_gb,
+    clean_construction_type,
 )
 from src.construction.construction_validation import (
     check_for_duplicates,
@@ -116,6 +117,12 @@ def run_construction(  # noqa: C901
         df2=pc_construction_df,
         validate_dupes=True,
         logger=construction_logger
+    )
+    # clean construction type column
+    construction_df.construction_type = (
+        construction_df.construction_type.apply(
+            lambda x: clean_construction_type(x)
+        )
     )
     # validate that 'construction_type' is valid
     valid_types = ["short_to_long", "new"]

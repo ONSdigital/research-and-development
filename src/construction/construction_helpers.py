@@ -131,3 +131,19 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
             )
 
     return updated_snapshot_df
+
+
+def clean_construction_type(value: str) -> str:
+    """Simple cleaning on construction_type values
+
+    Args:
+        value (str): The value to clean.
+
+    Returns:
+        str: The cleaned value.
+    """
+    # basic formatting
+    cleaned = value.lower().strip()
+    # remove whitespaces
+    cleaned = "_".join(cleaned.split())
+    return value
