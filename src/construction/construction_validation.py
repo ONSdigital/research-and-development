@@ -32,7 +32,10 @@ def check_for_duplicates(
         logger.info("Checking construction dataframe for duplicates...")
     refined_df = df[columns]
     if not refined_df[refined_df.duplicated()].empty:
-        raise ValueError("Duplicates found in construction file. Aborting pipeline.")
+        raise ValueError(
+            f"Duplicates found in construction file.\n{refined_df.duplicated()}"
+            "\nAborting pipeline."
+        )
     if logger:
         logger.info("No duplicates found in construction files. Continuing...")
     return None

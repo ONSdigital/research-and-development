@@ -46,6 +46,7 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
         schema_path = "./config/construction_ni_schema.toml"
+        run_postcode_construction = False
     else:
         run_construction = config["global"]["run_all_data_construction"]
         run_postcode_construction = config["global"]["run_postcode_construction"]
