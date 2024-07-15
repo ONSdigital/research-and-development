@@ -11,6 +11,7 @@ from src.construction.construction_validation import (
     check_for_duplicates,
     concat_construction_dfs,
     validate_columns_not_empty,
+    validate_short_to_long,
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -113,11 +114,21 @@ def run_construction(  # noqa: C901
     construction_df = concat_construction_dfs(
         df1=construction_df, 
         df2=pc_construction_df,
-        validate=True,
+        validate_dupes=True,
         logger=construction_logger
     )
+    # validate that 'construction_type' is valid
+    valid_types = ["short_to_long", "new"]
+    if False in list(
+        construction_df.construction_type.isin(valid_types)
+    ):
+        raise ValueError(
+            "Invalid value for construction_type. Expected one of {valid_types}"
+                    )
+    if not is_northern_ireland:
+        validate_short_to_long(construction_df, construction_logger)
 
-    # Validate construction file and drop columns without constructed values
+    # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Make a copy of the snapshot

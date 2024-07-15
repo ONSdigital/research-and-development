@@ -44,7 +44,7 @@ def check_for_duplicates(
 def concat_construction_dfs(
         df1: pd.DataFrame,
         df2: pd.DataFrame, 
-        validate: bool = False,
+        validate_dupes: bool = False,
         logger: logging.Logger = None
     ) -> pd.DataFrame:
     """Merge the construction and postcode construction dataframes into one.
@@ -61,12 +61,12 @@ def concat_construction_dfs(
     """
     type_defence(df1, "df1", pd.DataFrame)
     type_defence(df2, "df1", pd.DataFrame)
-    type_defence(validate, "validate", bool)
+    type_defence(validate_dupes, "validate_dupes", bool)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     if logger:
         logger.info("Merging dataframes for construction...")
     merged = pd.concat([df1, df2]).reset_index(drop=True)
-    if validate:
+    if validate_dupes:
         if logger:
             logger.info("Merged dataframes are being checked for duplicates...")
         check_for_duplicates(merged, ["reference", "instance"], logger)
@@ -118,4 +118,41 @@ def validate_columns_not_empty(
     # write confirmation to log
     if logger:
         logger.info(f"All rows have a valid value for one of columns {columns}.")
+    return None
+
+
+def validate_short_to_long(
+        df: pd.DataFrame, 
+        logger: logging.Logger = None
+    ) -> None:
+    """Validate the short_to_long construction records.
+
+    Args:
+        df (pd.DataFrame): The dataframe to validate.
+        logger (logging.Logger, optional): The logger to log to.
+
+    Raises:
+        ValueError: Raised when there are no records of instance=0 for a 
+            reference/period.
+    """
+    # defences
+    type_defence(df, "df", (pd.DataFrame))
+    type_defence(logger, "logger", (logging.Logger, type(None)))
+    # validates that all key columns have values
+    validate_columns_not_empty(
+        df=df, 
+        columns=["reference", "instance", "period"], 
+        logger=logger
+    )
+    # refine dataframe to required data
+    df = df[df.construction_type=="short_to_long"]
+    df = df[["reference", "instance", "period"]]
+    # validate that all short_to_long constructions have instance=0
+    min_df = df.groupby(["reference", "period"]).agg("min").reset_index()
+    if len(min_df.instance) > 1 and min_df.instance[0] != 0:
+        raise ValueError(
+            "Short to long construction requires at least record where instance=0 for"
+            "each reference/period."
+        )
+    logger.info("All short_to_long construction rows have valid instances.")
     return None
