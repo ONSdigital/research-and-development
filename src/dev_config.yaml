@@ -69,7 +69,8 @@ network_paths:
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   # Construction paths
-  construction_file_path: "04_construction/manual_construction/test_construction_file.csv"
+  all_data_construction_file_path: "04_construction/manual_construction/test_construction_file.csv"
+  postcode_construction_file_path: "04_construction/manual_construction/test_postcode_construction_file.csv"
   construction_file_path_ni: "04_construction/manual_construction/test_construction_ni_file.csv"
   # postcode paths
   postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"

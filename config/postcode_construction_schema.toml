@@ -1,0 +1,63 @@
+[reference]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = ">=1"
+Min_values = 11001603625
+Max_values = 19891309165
+Possible_Categorical_Values = ["nan"]
+
+[referencepostcode]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = false
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[instance]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = ["nan"]
+q_code = ""
+old_ref = "nan"
+
+[601]
+Description = "nan"
+Deduced_Data_Type = "object"
+Nullable = "nan"
+Current_Data_Type = "object"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [ "nan",]
+q_code = ""
+old_ref = "nan"
+
+[force_imputation]
+Description = "nan"
+Deduced_Data_Type = "boolean"
+Nullable = true
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
+
+[construction_type]
+Description = "nan"
+Deduced_Data_Type = "str"
+Nullable = true
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_categorical_Values = ["nan"]
