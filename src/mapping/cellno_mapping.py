@@ -63,18 +63,20 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
 
 
 def validate_join_cellno_mapper(
-    df: pd.DataFrame, cellno_df: pd.DataFrame
+    df: pd.DataFrame, cellno_df: pd.DataFrame, config: dict
 ) -> pd.DataFrame:
     """Validate the join_cellno_mapper function.
 
     Args:
     df (pd.DataFrame): The shortform responses dataframe.
     cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
+    config (dict): The configuration dictionary.
 
     Returns:
     pd.DataFrame: The shortform responses dataframe with a column for universe count.
     """
-    cellno_df = clean_validate_cellno_mapper(cellno_df, num=588)
+    num = config["estimation"]["num_expected_cellnos"]
+    cellno_df = clean_validate_cellno_mapper(cellno_df, num)
     df = join_with_null_check(df, cellno_df, "cellno", "cellnumber", "uni_count")
 
     return df

@@ -70,7 +70,7 @@ def run_mapping(
     # Join the mappers to the full responses dataframe, with validation.
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
     full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
-    full_responses = validate_join_cellno_mapper(full_responses, cellno_df)
+    full_responses = validate_join_cellno_mapper(full_responses, cellno_df, config)
 
     if ni_full_responses is not None:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
