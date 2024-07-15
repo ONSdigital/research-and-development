@@ -9,7 +9,8 @@ from src.construction.construction_helpers import (
 )
 from src.construction.construction_validation import (
     check_for_duplicates,
-    concat_construction_dfs
+    concat_construction_dfs,
+    validate_columns_not_empty,
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -102,7 +103,12 @@ def run_construction(  # noqa: C901
             columns=["reference", "instance"], 
             logger=construction_logger
         )
-        # check for missing postcodes
+        validate_columns_not_empty(
+            df=pc_construction_df,
+            columns=["601", "postcodereference"],
+            logger=construction_logger,
+            _raise=True,
+        )
     
     construction_df = concat_construction_dfs(
         df1=construction_df, 

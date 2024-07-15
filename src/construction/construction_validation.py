@@ -71,3 +71,51 @@ def concat_construction_dfs(
             logger.info("Merged dataframes are being checked for duplicates...")
         check_for_duplicates(merged, ["reference", "instance"], logger)
     return merged
+
+
+def validate_columns_not_empty(
+        df: pd.DataFrame, 
+        columns: Union[str, list],
+        logger: logging.Logger = None,
+        _raise: bool = True,
+    ) -> None:
+    """Validate that all columns in a set are not empty.
+
+    Args:
+        df (pd.DataFrame): The dataframe to check.
+        columns (Union[str, list]): The columns to check.
+        logger (logging.Logger, optional): A logger. Defaults to None.
+        _raise (bool, optional): Whether to raise an error if all columns are 
+            empty. Defaults to True.
+
+    Raises:
+        IndexError: Raised when a column is passed that isn't present in the df.
+        ValueError: Raised when all columns in the subset are empty for a row.
+
+    Returns:
+        None
+    """
+    # defences
+    type_defence(df, "df", (pd.DataFrame))
+    type_defence(columns, "columns", (str, list))
+    type_defence(logger, "logger", (logging.Logger, type(None)))
+    type_defence(_raise, "_raise", bool)
+    # standardize 'columns'
+    if isinstance(columns, str):
+        columns = [columns]
+    # check passed columns are in the dataframe
+    for column in columns:
+        if column not in df.columns:
+            raise IndexError(f"Column {column} is not in the passed dataframe.")
+    # validate whether there are missing values in all columns of a row
+    if len(df[columns].dropna(axis=0, how="all")) != len(df):
+        if _raise:
+            raise ValueError(
+                f"Columns {columns} are both empty."
+            )
+        else:
+            logger.info(f"Columns {columns} are both empty.")
+    # write confirmation to log
+    if logger:
+        logger.info(f"All rows have a valid value for one of columns {columns}.")
+    return None
