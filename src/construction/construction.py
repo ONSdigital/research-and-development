@@ -5,10 +5,11 @@ from typing import Callable
 
 from src.construction.construction_helpers import (
     read_construction_file,
-    prepare_forms_gb
+    prepare_forms_gb,
 )
 from src.construction.construction_validation import (
-    check_for_duplicates
+    check_for_duplicates,
+    concat_construction_dfs
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -101,6 +102,14 @@ def run_construction(  # noqa: C901
             columns=["reference", "instance"], 
             logger=construction_logger
         )
+        # check for missing postcodes
+    
+    construction_df = concat_construction_dfs(
+        df1=construction_df, 
+        df2=pc_construction_df,
+        validate=True,
+        logger=construction_logger
+    )
 
     # Validate construction file and drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
