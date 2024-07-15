@@ -47,18 +47,6 @@ def calculate_weighting_factor(
 
     Note: A 'cell' is a group of businesses.
 
-    The calculation here is:
-
-    a = (N-o) / (n-o)
-
-    Where:
-        - N is the total number of businesses in the cell
-        - n is the number of businesses in sample for that cell
-        - o is the number of outliers in the cell
-
-    'o' is calculated in this function by summing all the `True` values
-        because `True` == 1
-
     Args:
         df (pd.DataFrame): The input df containing survey data
         cellno_dict (dict): Dictionary of cellnumbers and UNI_counts
@@ -89,26 +77,20 @@ def calculate_weighting_factor(
     return grouped_by_cell, qa_frame
 
 
-def create_a_weight_qa_df(df: pd.DataFrame) -> pd.DataFrame:
-    """Create a QA dataframe for the a_weight calculation.
-
-    Args:
-        df (pd.DataFrame): The dataframe containing the a_weight column.
-
-    Returns:
-        pd.DataFrame: The QA dataframe.
-    """
-    est_filter = create_estimation_filter(df)
-
-    qa_cols_list = ["cellnumber", "N", "n", "o", "a_weight"]
-    qa_frame = df[qa_cols_list].loc[est_filter].groupby("cellnumber").first()
-    qa_frame = qa_frame.reset_index()
-
-    return qa_frame
-
-
 def calc_a_weight(cell_group: pd.DataFrame) -> pd.DataFrame:
     """Calculate the 'a' weighting factor for a cell group.
+
+    The calculation here is:
+
+    a = (N-o) / (n-o)
+
+    Where:
+        - N is the total number of businesses in the cell
+        - n is the number of businesses in sample for that cell
+        - o is the number of outliers in the cell
+
+    'o' is calculated in this function by summing all the `True` values
+        because `True` == 1
 
     Args:
         cell_group (pd.DataFrame): The dataframe grouped by cellnumber.
@@ -138,10 +120,33 @@ def calc_a_weight(cell_group: pd.DataFrame) -> pd.DataFrame:
     cell_group["o"] = outlier_count
     cell_group.loc[estimation_filter, "a_weight"] = a_weight
 
-    # # Convert a_weight to float, it had become an object after the .loc above.
-    # cell_group["a_weight"] = cell_group["a_weight"].astype(float)
-
     return cell_group
+
+
+def create_a_weight_qa_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a QA dataframe for the a_weight calculation.
+
+    Args:
+        df (pd.DataFrame): The dataframe containing the a_weight column.
+
+    Returns:
+        pd.DataFrame: The QA dataframe.
+    """
+    est_filter = create_estimation_filter(df)
+
+    qa_cols_list = ["cellnumber", "N", "n", "o", "a_weight"]
+    qa_frame = df[qa_cols_list].loc[est_filter].groupby("cellnumber").first()
+    qa_frame = qa_frame.reset_index()
+    qa_frame = qa_frame.rename(
+        columns={
+            "cellnumber": "Cell Number",
+            "N": "N - uni_count",
+            "n": "n - num clear records in cell",
+            "o": "o - num outliers in cell",
+        }
+    )
+
+    return qa_frame
 
 
 def outlier_weights(df: pd.DataFrame) -> pd.DataFrame:

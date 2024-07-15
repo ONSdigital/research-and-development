@@ -267,10 +267,10 @@ class TestCalcWeightFilter:
     def create_expected_qa(self):
         """Creates expected qa df for test"""
         expected_qa_cols = [
-            "cellnumber",
-            "N",
-            "n",
-            "o",
+            "Cell Number",
+            "N - uni_count",
+            "n - num clear records in cell",
+            "o - num outliers in cell",
             "a_weight",
         ]
 
@@ -408,10 +408,10 @@ class TestCalcWeightWithMissingVals:
     def create_expected_qa(self):
         """Creates expected qa df for test"""
         expected_qa_cols = [
-            "cellnumber",
-            "N",
-            "n",
-            "o",
+            "Cell Number",
+            "N - uni_count",
+            "n - num clear records in cell",
+            "o - num outliers in cell",
             "a_weight",
         ]
 
@@ -430,7 +430,6 @@ class TestCalcWeightWithMissingVals:
         input_df = self.create_input_df()
         expected_df = self.create_expected_output()
         expected_qa_df = self.create_expected_qa()
-        cellno_dict = {1: 10, 2: 5}
 
         result_df, result_qa_df = calw.calculate_weighting_factor(input_df)
         pd.set_option("display.max_columns", None)

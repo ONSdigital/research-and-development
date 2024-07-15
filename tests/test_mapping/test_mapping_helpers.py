@@ -68,7 +68,7 @@ class TestJoinWithNullCheck(object):
         mapper_df = self.mapper_df()
         expected_output = self.expected_output()
         output = join_with_null_check(
-            main_input_df, mapper_df, "test_mapper", "cellnumber", "uni_count"
+            main_input_df, mapper_df, "test_mapper", "cellnumber"
         )
         assert output.equals(
             expected_output
@@ -85,9 +85,7 @@ class TestJoinWithNullCheck(object):
         )
 
         with pytest.raises(ValueError, match=error_msg):
-            join_with_null_check(
-                main_input_df, mapper_df, "test_mapper", "cellnumber", "uni_count"
-            )
+            join_with_null_check(main_input_df, mapper_df, "test_mapper", "cellnumber")
 
 
 @pytest.fixture(scope="module")

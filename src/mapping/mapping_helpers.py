@@ -31,14 +31,15 @@ def join_with_null_check(
     df: pd.DataFrame,
     mapper_df: pd.DataFrame,
     mapper_name: str,
-    on_col: str,
-    check_col: str,
+    join_col: str,
 ) -> pd.DataFrame:
     """Perform a left join on two DataFrames and check for nulls on the join.
 
     Args:
         df (pd.DataFrame): The main DataFrame.
         mapper_df (pd.DataFrame): The mapper DataFrame.
+        mapper_name (str): The name of the mapper being validated.
+        join_col (str): The column to join on.
 
     Returns:
         pd.DataFrame: The merged DataFrame.
@@ -46,16 +47,16 @@ def join_with_null_check(
     df = df.merge(
         mapper_df,
         how="left",
-        on=on_col,
+        on=join_col,
         indicator=True,
     )
     # Check for nulls in the join
-    filter_df = df.loc[df[on_col].notnull() & df._merge.eq("left_only")]
+    filter_df = df.loc[df[join_col].notnull() & df._merge.eq("left_only")]
     if not filter_df.empty:
         raise ValueError(
-            f"Nulls found in the join on {on_col} of {mapper_name} mapper."
-            f"The following {on_col} values are not in the {mapper_name} mapper: "
-            f"{filter_df[on_col].unique()}"
+            f"Nulls found in the join on {join_col} of {mapper_name} mapper."
+            f"The following {join_col} values are not in the {mapper_name} mapper: "
+            f"{filter_df[join_col].unique()}"
         )
     df = df.drop("_merge", axis=1)
     return df
@@ -131,11 +132,11 @@ def check_mapping_unique(
     Checks if a column contains unique values.
 
     Args:
-    mapper_df (pd.DataFrame): The mapper DataFrame to check.
-    col_to_check (str): The name of the column to check.
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
+        col_to_check (str): The name of the column to check.
 
     Raises:
-    ValueError: If the column does not contain unique values.
+        ValueError: If the column does not contain unique values.
     """
     if not mapper_df[col_to_check].is_unique:
         raise ValueError(f"Column {col_to_check} is not unique.")

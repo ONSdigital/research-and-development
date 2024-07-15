@@ -116,7 +116,7 @@ def load_validate_mapper(
     mapper_name = getmappername(mapper_path_key, split=True)
 
     # Log the loading of the mapper
-    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
+    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
     mods.rd_file_exists(mapper_path, raise_error=True)
@@ -347,19 +347,19 @@ def stage_validate_harmonise_postcodes(
     4. Returns the original DataFrame and the master list of postcodes.
 
     Args:
-    config (Dict): A dictionary containing configuration options.
-    full_responses (pd.DataFrame): The DataFrame containing the data to be
-    validated.
-    run_id (str): The run ID for this execution.
-    check_file_exists (Callable): A function that checks if a file exists.
-    read_csv (Callable): A function that reads a CSV file into a DataFrame.
-    write_csv (Callable): A function that writes a DataFrame to a CSV file.
+        config (Dict): A dictionary containing configuration options.
+        full_responses (pd.DataFrame): The DataFrame containing the data to be
+        validated.
+        run_id (str): The run ID for this execution.
+        check_file_exists (Callable): A function that checks if a file exists.
+        read_csv (Callable): A function that reads a CSV file into a DataFrame.
+        write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")

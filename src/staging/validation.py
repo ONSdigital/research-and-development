@@ -328,7 +328,7 @@ def flag_no_rand_spenders(df, raise_or_warn):
     "211" as more than 0.
 
     Args:
-    df (pandas.DataFrame): The input DataFrame.
+        df (pandas.DataFrame): The input DataFrame.
 
     Returns:
         None
