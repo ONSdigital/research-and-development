@@ -188,8 +188,10 @@ def validate_mapper_config(config: dict) -> None:
     """
     if not config["2022_mappers"]:
         raise ValueError(f"The {config["2022_mappers"]} in the config file is blank, please fix before re-running the pipeline.")
-    else:
-
+    
+    elif not config["2023_mappers"]:
+        raise ValueError(f"The {config["2023_mappers"]} in the config file is blank, please fix before re-running the pipeline.")
+   
 
     if config["years"]["survey_year"] == 2022:
         keyword = '2022'
@@ -202,3 +204,14 @@ def validate_mapper_config(config: dict) -> None:
         for filename in config["2023_mappers"][0:]:
             if keyword not in filename:
                 raise ValueError(f"The {filename} year does not match the survey year in the config.")
+
+
+
+# if the file name doesn't equal the survey year - raise error
+
+
+# check the BERD cell coverage mappers:
+    # must have approximately 600 rows
+    # sum of column b ~ 2.5 million
+
+
