@@ -21,7 +21,7 @@ global:
   output_ni_full_responses: False
   output_imputation_qa: False
   output_mapping_qa: False
-  output_mapping_ni_qa: False 
+  output_mapping_ni_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
@@ -88,7 +88,7 @@ hdfs_paths:
   itl1_detailed_mapper_path: "itl1_detailed_2023.csv"
   civil_defence_detailed_mapper_path: "civil_defence_detailed_2023.csv"
   sic_division_detailed_mapper_path: "sic_div_detailed_2023.csv"
-# Export config for users
+# outliers and imputation settings
 outliers:
   upper_clip: 0.05  # enter percentage as a decimal (float) - default is 0.05
   lower_clip: 0.0  # enter percentage as a decimal (float) - default is 0.0
@@ -98,3 +98,25 @@ imputation:
   trim_threshold: 10 # trimming will only occur on classes strictly larger than this value
   sf_expansion_threshold: 3 # default is 3: the minimum viable imputation class size for short form imputation
   mor_threshold: 3 # default is 3: the minimum viable imputation class size for MoR imputation
+# export settings
+export_choices:
+  copy_or_move_files: "copy"
+  export_short_form: None
+  export_long_form: None
+  export_tau: None
+  export_gb_sas: None
+  export_ni_sas: None
+  export_intram_by_pg_gb: None
+  export_intram_by_pg_uk: None
+  export_intram_gb_itl1: None
+  export_intram_uk_itl1: None
+  export_intram_gb_itl2: None
+  export_intram_uk_itl2: None
+  export_intram_by_sic: None
+  export_fte_total_qa: None
+  export_status_filtered: None
+  export_frozen_group: None
+  export_staged_BERD_full_responses: None
+  export_staged_NI_full_responses: None
+  export_full_responses_imputed: None
+  export_full_estimation_qa: None

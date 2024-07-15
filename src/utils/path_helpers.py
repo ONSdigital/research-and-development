@@ -49,15 +49,14 @@ def create_staging_config(config: dict) -> dict:
         dict: A configuration dictionary will all paths needed for staging.
     """
     paths = get_paths(config)
-    root_path = paths["root"]
     berd_path = paths["berd_path"]
 
     staging_dict = create_module_config(config, "staging")
 
     # add new paths to the staging section of the config
-    staging_dict["snapshot_path"] = paths['snapshot_path']
-    staging_dict["secondary_snapshot_path"] = paths['secondary_snapshot_path']
-    staging_dict["postcode_masterlist"] = paths['postcode_masterlist']
+    staging_dict["snapshot_path"] = paths["snapshot_path"]
+    staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
+    staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
 
@@ -148,6 +147,22 @@ def create_construction_config(config: dict) -> dict:
     return construction_dict
 
 
+def create_exports_config(config: dict) -> dict:
+    """Create a configuration dictionary with all paths needed for exports.
+
+    Args:
+        config (dict): The pipeline configuration.
+    Returns:
+        dict: A dictionary with all the paths needed for the exports module.
+    """
+    paths = get_paths(config)
+    root_path = paths["root"]
+    folder_name = config["export_paths"]["export_folder"]
+
+    config["export_paths"] = {"export_folder": f"{root_path}{folder_name}/"}
+    return config["export_paths"]
+
+
 def update_config_with_paths(config: dict, modules: list) -> dict:
     """Update the config with all the paths needed for the pipeline.
 
@@ -162,6 +177,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
     config["ni_paths"] = create_ni_staging_config(config)
     config["mapping_paths"] = create_mapping_config(config)
     config["construction_paths"] = create_construction_config(config)
+    config["export_paths"] = create_exports_config(config)
 
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
