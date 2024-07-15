@@ -7,6 +7,9 @@ from src.construction.construction_helpers import (
     read_construction_file,
     prepare_forms_gb
 )
+from src.construction.construction_validation import (
+    check_for_duplicates
+)
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
 
@@ -54,7 +57,7 @@ def run_construction(  # noqa: C901
         construction_logger.info("Skipping Construction...")
         return snapshot_df
 
-    # Obtain construction paths
+    # Obtain construction paths 
     paths = config[f"construction_paths"]
     if is_northern_ireland:
         construction_file_path = paths["construction_file_path_ni"]
@@ -71,13 +74,38 @@ def run_construction(  # noqa: C901
     )
     if isinstance(construction_df, type(None)):
         return snapshot_df
+    # read in postcode construction file
+    if run_postcode_construction:
+        pc_construction_df = read_construction_file(
+            path=postcode_construction_fpath,
+            logger=construction_logger,
+            read_csv_func=read_csv,
+            file_exists_func=check_file_exists
+        )
+        if isinstance(pc_construction_df, type(None)):
+            run_postcode_construction = False
+
+    # validate and merge schemas
+    validate_data_with_schema(construction_df, schema_path)
+    check_for_duplicates(
+        df=construction_df, 
+        columns=["reference", "instance"], 
+        logger=construction_logger
+    )
+
+    if run_postcode_construction:
+        validate_data_with_schema(pc_construction_df, postcode_schema_path)
+        check_for_duplicates(
+            df=pc_construction_df, 
+            columns=["reference", "instance"], 
+            logger=construction_logger
+        )
+
+    # Validate construction file and drop columns without constructed values
+    construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Make a copy of the snapshot
     updated_snapshot_df = snapshot_df.copy()
-
-    # Validate construction file and drop columns without constructed values
-    validate_data_with_schema(construction_df, schema_path)
-    construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
