@@ -1,4 +1,4 @@
-"""Return a dictionary for the cell_no mapper"""
+"""Functions to clean and validate the cell no mapper."""
 import pandas as pd
 
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
