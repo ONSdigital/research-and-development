@@ -100,9 +100,9 @@ def run_staging(  # noqa: C901
             secondary_full_responses = None
 
         # Read in postcode mapper (needed later in the pipeline)
-        postcode_masterlist = staging_dict["postcode_masterlist"]
-        check_file_exists(postcode_masterlist, raise_error=True)
-        postcode_mapper = read_csv(postcode_masterlist)
+        postcode_mapper = config["mapping_paths"]["postcode_mapper"]
+        check_file_exists(postcode_mapper, raise_error=True)
+        postcode_mapper = read_csv(postcode_mapper)
 
     else:  # Read from JSON
 

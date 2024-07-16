@@ -63,7 +63,7 @@ hdfs_paths:
   # mapper paths
 2022_mappers:
   mappers_version: "v1"
-  postcodes_mapper: "postcodes_2022.csv"
+  postcode_mapper: "postcodes_2022.csv"
   itl_mapper_path: "itl_2022.csv"
   ultfoc_mapper_path: "BERD_2022_ultfoc.csv"
   ref_list_817_mapper_path: "BERD_2022_ref_list.csv"
@@ -77,7 +77,7 @@ hdfs_paths:
   sic_division_detailed_mapper_path: "sic_div_detailed_2022.csv"
 2023_mappers:
   mappers_version: "v1"
-  postcodes_mapper: "postcodes_2023.csv"
+  postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
   ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
   cellno_2023_path: 'berd_2023_cellno_coverage.csv'
