@@ -40,9 +40,13 @@ def join_with_null_check(
         mapper_df (pd.DataFrame): The mapper DataFrame.
         mapper_name (str): The name of the mapper being validated.
         join_col (str): The column to join on.
-
+    
     Returns:
         pd.DataFrame: The merged DataFrame.
+    
+    Raises:
+        ValueError: Raised if nulls are found in the join.
+        
     """
     df = df.merge(
         mapper_df,
