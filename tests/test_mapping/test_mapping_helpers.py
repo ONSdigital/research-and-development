@@ -9,6 +9,7 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     create_additional_ni_cols,
+    validate_mapper_config
 )
 
 
@@ -174,3 +175,32 @@ class TestCreateAdditionalNiCols(object):
         assert output_df.equals(
             expected_df
         ), "Output from create_additional_ni_cols not as expected."
+
+
+
+class TestValidateMapperConfig(object):
+    @pytest.mark.parametrize(
+        "error_type, match, config", 
+        [
+            [ValueError,
+             ".*2022_mappers.* in the config file is blank, please fix and then re-run the pipeline.*",
+             {"2022_mappers": False}],
+             [ValueError,
+             ".*2023_mappers.* in the config file is blank, please fix and then re-run the pipeline.*",
+             {"2022_mappers": True,
+             "2023_mappers": False}],
+             [ValueError,
+             "The year in the file.* filename does not match the survey year in the config.*",
+             {"2022_mappers": True,
+             "postcodes_mapper": "postcodes_2022.csv",
+             "2023_mappers" : False}],
+
+        ]
+    )
+    def test_validate_mapper_config_raises(self, error_type, match, config):
+        with pytest.raises(error_type, match = match):
+                    validate_mapper_config(config)
+
+
+
+    

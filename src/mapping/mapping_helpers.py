@@ -183,35 +183,25 @@ def validate_mapper_config(config: dict) -> None:
 
     Returns:
         ValueError: If the mapping path in the config file is blank or the mapper year does not match 
-        the survey year ib the config file, an error message is printed and the pipeline stops. 
+        the survey year in the config file, an error message is printed and the pipeline stops. 
 
     """
     if not config["2022_mappers"]:
-        raise ValueError(f"The {config["2022_mappers"]} in the config file is blank, please fix before re-running the pipeline.")
+        raise ValueError("'2022_mappers' in the config file is blank, please fix and then re-run the pipeline.")
     
-    elif not config["2023_mappers"]:
-        raise ValueError(f"The {config["2023_mappers"]} in the config file is blank, please fix before re-running the pipeline.")
+    if not config["2023_mappers"]:
+        raise ValueError("'2023_mappers' in the config file is blank, please fix and then re-run the pipeline.")
    
 
     if config["years"]["survey_year"] == 2022:
         keyword = '2022'
         for filename in config["2022_mappers"][0:]:
             if keyword not in filename:
-                raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
+              #  raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
+                raise ValueError("The year in the file: filename does not match the survey year in the config.")
 
-    elif config["years"]["survey_year"] == 2023:
+    if config["years"]["survey_year"] == 2023:
         keyword = '2023'
         for filename in config["2023_mappers"][0:]:
             if keyword not in filename:
-                raise ValueError(f"The {filename} year does not match the survey year in the config.")
-
-
-
-# if the file name doesn't equal the survey year - raise error
-
-
-# check the BERD cell coverage mappers:
-    # must have approximately 600 rows
-    # sum of column b ~ 2.5 million
-
-
+                raise ValueError(f"The year in the file: {filename} year does not match the survey year in the config.")
