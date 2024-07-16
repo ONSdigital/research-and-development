@@ -277,7 +277,7 @@ def run_export(user_config_path: str, dev_config_path: str):
     manifest.write_manifest()
 
     # Move the manifest file to the outgoing folder
-    manifest_file = mods.rd_search_files(manifest.outgoing_directory, "_manifest.json")
+    manifest_file = mods.rd_search_file(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
 
@@ -286,8 +286,8 @@ def run_export(user_config_path: str, dev_config_path: str):
         manifest.export_directory,
         "move",
         OutgoingLogger,
-        mods.rd_copy_files,
-        mods.rd_move_files,
+        mods.rd_copy_file,
+        mods.rd_move_file,
     )
 
     # Copy or Move files to outgoing folder
@@ -300,8 +300,8 @@ def run_export(user_config_path: str, dev_config_path: str):
             manifest.export_directory,
             file_transfer_method,
             OutgoingLogger,
-            mods.rd_copy_files,
-            mods.rd_move_files,
+            mods.rd_copy_file,
+            mods.rd_move_file,
         )
 
     log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)

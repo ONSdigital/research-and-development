@@ -92,6 +92,10 @@ schema_paths:
   status_filtered_qa_schema: "config/output_schemas/status_filtered_qa_schema.toml"
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
+  full_estimation_qa_schema: "config/output_schemas/full_estimation_qa_schema.toml"
+  full_responses_imputed_schema: "config/output_schemas/full_responses_imputed_schema.toml"
+  staged_BERD_full_responses_schema: "config/output_schemas/staged_BERD_full_responses_schema.toml"
+  invalid_unrecognised_postcodes_schema: "config/output_schemas/invalid_unrecognised_postcodes_schema.toml"
 # Export config for users
 outliers:
   flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
