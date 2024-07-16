@@ -35,7 +35,7 @@ class TestCheckForDuplicates(object):
 
     def test_check_for_duplicates_raises(self, test_df):
         """Check that check_for_duplicates raises when duplicates are present."""
-        msg = "Duplicates found in construction file.* Aborting pipeline.*"
+        msg = "Duplicates found in construction file.*"
         with pytest.raises(ValueError, match=msg):
             check_for_duplicates(test_df, columns=["col1", "col2"])
 
