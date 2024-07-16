@@ -9,7 +9,83 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     create_additional_ni_cols,
+    join_with_null_check,
 )
+
+
+class TestJoinWithNullCheck(object):
+    """Tests for join_with_null_check function."""
+
+    def main_input_df(self):
+        """Main input data for join_with_null_check tests."""
+        columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
+        data = [
+            [49900001031, 0, "0006", 674, "C"],
+            [49900001530, 0, "0006", 805, "P"],
+            [49900001601, 0, "0001", 117, "C"],
+            [49900001601, 1, "0001", 117, "C"],
+            [49900003099, 0, "0006", 41, "L"],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+    def mapper_df(self):
+        """Sample mapper for testing."""
+        columns = ["cellnumber", "uni_count"]
+        data = [
+            [674, 23],
+            [805, 14],
+            [117, 13147],
+            [41, 87577],
+            [817, 9],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+    def expected_output(self):
+        """Expected output for join_with_null_check tests."""
+        columns = [
+            "reference",
+            "instance",
+            "formtype",
+            "cellnumber",
+            "selectiontype",
+            "uni_count",
+        ]
+        data = [
+            [49900001031, 0, "0006", 674, "C", 23],
+            [49900001530, 0, "0006", 805, "P", 14],
+            [49900001601, 0, "0001", 117, "C", 13147],
+            [49900001601, 1, "0001", 117, "C", 13147],
+            [49900003099, 0, "0006", 41, "L", 87577],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+    def test_join_with_null_check_success(self):
+        """General tests for join_with_null_check."""
+        main_input_df = self.main_input_df()
+        mapper_df = self.mapper_df()
+        expected_output = self.expected_output()
+        output = join_with_null_check(
+            main_input_df, mapper_df, "test_mapper", "cellnumber"
+        )
+        assert output.equals(
+            expected_output
+        ), "join_with_null_check not behaving as expected."
+
+    def test_join_with_null_check_failure(self):
+        """Test the raises in join_with_null_check."""
+        main_input_df = self.main_input_df()
+        mapper_df = self.mapper_df()
+        mapper_df = mapper_df.drop(0)
+        error_msg = (
+            "Nulls found in the join on cellnumber of test_mapper mapper."
+            "The following cellnumber values are not in the test_mapper mapper: \[674\]"
+        )
+
+        with pytest.raises(ValueError, match=error_msg):
+            join_with_null_check(main_input_df, mapper_df, "test_mapper", "cellnumber")
 
 
 @pytest.fixture(scope="module")
