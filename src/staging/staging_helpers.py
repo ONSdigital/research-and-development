@@ -458,28 +458,18 @@ def stage_validate_harmonise_postcodes(
 
 def filter_pnp_data(full_responses):
     """
-    After the full_responses dataframe is created, filter out all PNP data
-    by simply excluding all records with legalstatus of 7.
-
-    This function removes all rows of the full_responses dataframe
-        where 'legalstatus' == '7'.
-
-    This is part of the requirement to:
-    AC1 BERD data is isolated from the full dataset
-    AC3 BERD separated data set is in a format that can be used during
-        the BERD pipeline run (a pandas dataframe and a CSV QA file)
+    Filter out all PNP data or equivalently all records with legalstatus of 7
 
     Args:
         full_responses (pandas.DataFrame):
             The DataFrame containing the full resonses data.
 
     Returns:
-        pandas.DataFrame: The filtered DataFrame
-        without rows where 'legalstatus' == '7'
+        pandas.DataFrame: DataFrame without rows where 'legalstatus' == '7'
 
     """
 
-    # filter out PNP data legalstatus=7
+    # filter out PNP data or equivalently records with legalstatus=7
     full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
 
     return full_responses
