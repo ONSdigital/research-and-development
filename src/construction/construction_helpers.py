@@ -147,6 +147,8 @@ def clean_construction_type(value: str) -> str:
     if pd.isna(value):
         return np.NaN
     cleaned = value.lower().strip()
+    if cleaned == "":
+        return np.NaN
     # remove whitespaces
     cleaned = "_".join(cleaned.split())
     return value
