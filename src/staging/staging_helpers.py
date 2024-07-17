@@ -60,7 +60,7 @@ def getmappername(mapper_path_key: str, split: bool) -> str:
     The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
 
-    Parameters:
+    Args:
     mapper_path_key (str): The key from which to extract the mapper name.
     split (bool): Whether to replace underscores in the name with spaces.
 
@@ -116,7 +116,7 @@ def load_validate_mapper(
     mapper_name = getmappername(mapper_path_key, split=True)
 
     # Log the loading of the mapper
-    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
+    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
     mods.rd_file_exists(mapper_path, raise_error=True)
@@ -182,7 +182,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
         dataframes into a full responses dataframe, and validates the full
         responses dataframe against a combined schema.
 
-    Parameters:
+    Args:
         snapshot_path (str): The path to the JSON file containing the snapshot
         data.
         load_json (function): The function to use to load the JSON file.
@@ -244,7 +244,7 @@ def load_validate_secondary_snapshot(
     dataframes into a full responses dataframe, and validates the full responses
     dataframe against a combined schema.
 
-    Parameters:
+    Args:
         load_json (function): The function to use to load the JSON file.
         secondary_snapshot_path (str): The path to the JSON file containing the
         secondary snapshot data.
@@ -346,20 +346,20 @@ def stage_validate_harmonise_postcodes(
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
-    Parameters:
-    config (Dict): A dictionary containing configuration options.
-    full_responses (pd.DataFrame): The DataFrame containing the data to be
-    validated.
-    run_id (str): The run ID for this execution.
-    check_file_exists (Callable): A function that checks if a file exists.
-    read_csv (Callable): A function that reads a CSV file into a DataFrame.
-    write_csv (Callable): A function that writes a DataFrame to a CSV file.
+    Args:
+        config (Dict): A dictionary containing configuration options.
+        full_responses (pd.DataFrame): The DataFrame containing the data to be
+        validated.
+        run_id (str): The run ID for this execution.
+        check_file_exists (Callable): A function that checks if a file exists.
+        read_csv (Callable): A function that reads a CSV file into a DataFrame.
+        write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
