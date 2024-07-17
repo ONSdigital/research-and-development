@@ -1,7 +1,9 @@
 """The main file for the construction module."""
 import logging
-import pandas as pd
 from typing import Callable
+
+import pandas as pd
+import numpy as np
 
 from src.construction.construction_helpers import (
     read_construction_file,
@@ -125,12 +127,12 @@ def run_construction(  # noqa: C901
         )
     )
     # validate that 'construction_type' is valid
-    valid_types = ["short_to_long", "new"]
+    valid_types = ["short_to_long", "new", np.NaN]
     if False in list(
         construction_df.construction_type.isin(valid_types)
     ):
         raise ValueError(
-            "Invalid value for construction_type. Expected one of {valid_types}"
+            f"Invalid value for construction_type. Expected one of {valid_types}"
                     )
     if not is_northern_ireland:
         validate_short_to_long(construction_df, construction_logger)
@@ -145,7 +147,6 @@ def run_construction(  # noqa: C901
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
-
     # Run GB specific actions
     if not is_northern_ireland:
         updated_snapshot_df, construction_df = (

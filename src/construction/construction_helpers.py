@@ -4,6 +4,7 @@ import logging
 from typing import Union, Callable, Tuple
 
 import pandas as pd
+import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
 
@@ -100,7 +101,7 @@ def prepare_forms_gb(
         snapshot_df.status == "Form sent out"
     )
     snapshot_df.loc[form_sent_condition, "instance"] = 0
-    return (construction_df, snapshot_df)
+    return (snapshot_df, construction_df)
 
 
 def prepare_short_to_long(updated_snapshot_df, construction_df):
@@ -109,7 +110,7 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     # Check which references are going to be converted to long forms
     # and how many instances they have
     ref_count = construction_df.loc[
-        construction_df["construction_type"].lower() == "short_to_long", "reference"  # noqa: E712
+        construction_df["construction_type"].str.lower() == "short_to_long", "reference"  # noqa: E712
     ].value_counts()
 
     # Create conversion df
@@ -143,6 +144,8 @@ def clean_construction_type(value: str) -> str:
         str: The cleaned value.
     """
     # basic formatting
+    if pd.isna(value):
+        return np.NaN
     cleaned = value.lower().strip()
     # remove whitespaces
     cleaned = "_".join(cleaned.split())
