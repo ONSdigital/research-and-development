@@ -107,7 +107,7 @@ def run_construction(  # noqa: C901
         )
         validate_columns_not_empty(
             df=pc_construction_df,
-            columns=["601", "postcodereference"],
+            columns=["601", "referencepostcode"],
             logger=construction_logger,
             _raise=True,
         )
