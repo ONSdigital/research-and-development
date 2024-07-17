@@ -1,4 +1,5 @@
 """This module contains helper functions for creating paths."""
+import os
 
 
 def get_paths(config: dict) -> dict:
@@ -6,7 +7,7 @@ def get_paths(config: dict) -> dict:
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     paths["year"] = config["years"]["survey_year"]
-    paths["berd_path"] = f"{paths['root']}{paths['year']}_surveys/BERD/"
+    paths["berd_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/BERD/")
     return paths
 
 
@@ -26,7 +27,8 @@ def create_module_config(config: dict, module_name: str) -> dict:
     berd_path = paths["berd_path"]
 
     module_conf = config[f"{module_name}_paths"]
-    folder_path = f"{berd_path}{module_conf['folder']}"
+    # add the folder to the BERD path
+    folder_path = os.path.join(berd_path, module_conf["folder"])
 
     # we next prefix the folder path to the imputation paths.
     module_dict = {
@@ -81,9 +83,8 @@ def create_ni_staging_config(config: dict) -> dict:
     ni_staging_dict = create_module_config(config, "ni")
 
     # add in the path to the ni_full_responses
-    ni_staging_dict[
-        "ni_full_responses"
-    ] = f"{berd_path}{paths['ni_full_responses_path']}"  # noqa
+    ni_path = paths["ni_full_responses_path"]
+    ni_staging_dict["ni_full_responses"] = os.path.join(berd_path, ni_path)
 
     return ni_staging_dict
 
@@ -105,10 +106,10 @@ def create_mapping_config(config: dict) -> dict:
     year = paths["year"]
     year_dict = config[f"{year}_mappers"]
 
-    paths["mappers"] = f"{paths['root']}{paths['year']}_surveys/mappers/"
+    paths["mappers"] = os.path.join(root_path, f"{paths['year']}_surveys/mappers/")
 
     version = year_dict["mappers_version"]
-    map_folder = f"{root_path}{year}_surveys/mappers/{version}/"
+    map_folder = os.path.join(paths["mappers"], f"{version}/")
 
     mapping_dict = {
         k: f"{map_folder}{v}" for k, v in year_dict.items() if k != "mappers_version"
@@ -135,15 +136,16 @@ def create_construction_config(config: dict) -> dict:
     # now update add construction paths
     paths = get_paths(config)
     berd_path = paths["berd_path"]
-    construction_dict[
-        "all_data_construction_file_path"
-    ] = f"{berd_path}{paths['all_data_construction_file_path']}"
-    construction_dict[
-        "construction_file_path_ni"
-    ] = f"{berd_path}{paths['construction_file_path_ni']}"
-    construction_dict[
-        "postcode_construction_file_path"
-    ] = f"{berd_path}{paths['postcode_construction_file_path']}"
+    construction_dict["all_data_construction_file_path"] = os.path.join(
+        berd_path, paths["all_data_construction_file_path"]
+    )
+    construction_dict["construction_file_path_ni"] = os.path.join(
+        berd_path, paths["construction_file_path_ni"]
+    )
+    construction_dict["postcode_construction_file_path"] = os.path.join(
+        berd_path, paths["postcode_construction_file_path"]
+    )
+
     return construction_dict
 
 
@@ -159,7 +161,8 @@ def create_exports_config(config: dict) -> dict:
     root_path = paths["root"]
     folder_name = config["export_paths"]["export_folder"]
 
-    config["export_paths"] = {"export_folder": f"{root_path}{folder_name}/"}
+    export_folder = os.path.join(root_path, folder_name)
+    config["export_paths"] = {"export_folder": f"{export_folder}/"}
     return config["export_paths"]
 
 
