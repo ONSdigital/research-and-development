@@ -186,19 +186,14 @@ def validate_mapper_config(config: dict) -> None:
         the survey year in the config file, an error message is printed and the pipeline stops. 
 
     """
-    if not config["2022_mappers"]:
-        raise ValueError("'2022_mappers' in the config file is blank, please fix and then re-run the pipeline.")
-    
-    if not config["2023_mappers"]:
-        raise ValueError("'2023_mappers' in the config file is blank, please fix and then re-run the pipeline.")
-   
-
+    if not config["years"]["survey_year"]:
+        raise ValueError("'survey_year' in the config file is blank, please fix and then re-run the pipeline.")
+  
     if config["years"]["survey_year"] == 2022:
         keyword = '2022'
         for filename in config["2022_mappers"][0:]:
             if keyword not in filename:
-              #  raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
-                raise ValueError("The year in the file: filename does not match the survey year in the config.")
+                raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
 
     if config["years"]["survey_year"] == 2023:
         keyword = '2023'

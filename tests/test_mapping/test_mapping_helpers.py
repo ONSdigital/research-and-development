@@ -177,29 +177,43 @@ class TestCreateAdditionalNiCols(object):
         ), "Output from create_additional_ni_cols not as expected."
 
 
+@pytest.fixture(scope="module")
+def test_config():
+    test_config = {
+        "years" : {"survey_year": 2022}, 
+        "2022_mappers" : {"postcodes_mapper": "postcodes_2022.csv"},
+        "2023_mappers" : False
+    }
+    return test_config
 
 class TestValidateMapperConfig(object):
     @pytest.mark.parametrize(
-        "error_type, match, config", 
+       "error_type, match, config", 
         [
             [ValueError,
-             ".*2022_mappers.* in the config file is blank, please fix and then re-run the pipeline.*",
+             ".*survey_year.* in the config file is blank, please fix and then re-run the pipeline.*",
              {"2022_mappers": False}],
-             [ValueError,
-             ".*2023_mappers.* in the config file is blank, please fix and then re-run the pipeline.*",
-             {"2022_mappers": True,
-             "2023_mappers": False}],
-             [ValueError,
-             "The year in the file.* filename does not match the survey year in the config.*",
-             {"2022_mappers": True,
-             "postcodes_mapper": "postcodes_2022.csv",
-             "2023_mappers" : False}],
+
+
+            [
+                ValueError,
+                "The year in the file:* filename does not match the survey year in the config.*",
+                {
+                    "years" : {"survey_year": 2022}, 
+                    "2022_mappers" : {"postcodes_mapper": "postcodes_2022.csv"},
+                    "2023_mappers" : False
+                }
+            ]
 
         ]
-    )
+    ) 
+    # error_type = ValueError
+    # match = ".*2022_mappers.* in the config file is blank, please fix and then re-run the pipeline.*"
     def test_validate_mapper_config_raises(self, error_type, match, config):
+        # print(config)
+        # print(config["years"]["survey_year"])
         with pytest.raises(error_type, match = match):
-                    validate_mapper_config(config)
+            validate_mapper_config(config)
 
 
 
