@@ -69,22 +69,24 @@ def run_mapping(
         )
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
 
+    # create a tuple for the full_responses and ni_full_responses
+    responses = (full_responses, ni_full_responses)
     # Join the mappers to the full responses dataframe, with validation.
-    full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
-    full_responses = validate_join_cellno_mapper(full_responses, cellno_df, config)
-    full_responses = join_itl_regions(full_responses, postcode_mapper)
+    responses = run_pg_conversion(responses, pg_num_alpha, sic_pg_num)
+    responses = join_fgn_ownership(responses, ultfoc_mapper)
+    responses = validate_join_cellno_mapper(responses, cellno_df, config)
+    responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
 
     if ni_full_responses is not None:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
-        ni_full_responses = run_pg_conversion(
-            ni_full_responses, pg_num_alpha, sic_pg_num
-        )
-        ni_full_responses = join_fgn_ownership(
-            ni_full_responses,
-            ultfoc_mapper,
-            is_northern_ireland=True,
-        )
+        # ni_full_responses = run_pg_conversion(
+        #     ni_full_responses, pg_num_alpha, sic_pg_num
+        # )
+        # ni_full_responses = join_fgn_ownership(
+        #     ni_full_responses,
+        #     ultfoc_mapper,
+        #     is_northern_ireland=True,
+        # )
 
     # output QA files
     qa_path = config["mapping_paths"]["qa_path"]

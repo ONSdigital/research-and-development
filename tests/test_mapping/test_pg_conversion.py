@@ -139,8 +139,8 @@ class TestPgToPgMapper(object):
 
 class TestRunPgConversion(object):
     @pytest.fixture(scope="function")
-    def ni_full_responses(self) -> pd.DataFrame:
-        """'ni_full_responses' input as input for the tests.
+    def gb_full_responses(self) -> pd.DataFrame:
+        """'gb_full_responses' input as input for the tests.
 
         NOTE: This is a subset of columns for testing purposes
         """
@@ -164,8 +164,8 @@ class TestRunPgConversion(object):
             [39900009016, 1, 2021, "GB ", 4.0, np.nan, 71129],
             [39900009078, 1, 2021, "GB ", 0.72, np.nan, 23610],
         ]
-        ni_full_responses = pd.DataFrame(data=data, columns=columns)
-        return ni_full_responses
+        gb_full_responses = pd.DataFrame(data=data, columns=columns)
+        return gb_full_responses
 
     @pytest.fixture(scope="function")
     def sic_pg_num(self) -> pd.DataFrame:
@@ -207,7 +207,7 @@ class TestRunPgConversion(object):
         return pg_num_alpha
 
     @pytest.fixture(scope="function")
-    def ni_expected(self) -> pd.DataFrame:
+    def gb_expected(self) -> pd.DataFrame:
         columns = [
             "reference",
             "instance",
@@ -231,22 +231,27 @@ class TestRunPgConversion(object):
             [39900009078, 1, 2021, "GB ", 0.72, "J", 23610, 15.0],
         ]
 
-        ni_expected = pd.DataFrame(data=data, columns=columns)
-        ni_expected["201"] = ni_expected["201"].astype("category")
-        ni_expected["pg_numeric"] = ni_expected["pg_numeric"].astype("category")
-        return ni_expected
+        gb_expected = pd.DataFrame(data=data, columns=columns)
+        gb_expected["201"] = gb_expected["201"].astype("category")
+        gb_expected["pg_numeric"] = gb_expected["pg_numeric"].astype("category")
+        return gb_expected
 
     def test_run_pg_conversion(
-        self, sic_pg_num, pg_num_alpha, ni_full_responses, ni_expected
+        self, sic_pg_num, pg_num_alpha, gb_full_responses, gb_expected
     ):
         """Tests for run_pg_conversion."""
+        ni_df = None
 
-        result = run_pg_conversion(
-            df=ni_full_responses,
+        responses = (gb_full_responses, ni_df)
+
+        gb_result, ni_result = run_pg_conversion(
+            responses,
             pg_num_alpha=pg_num_alpha,
             sic_pg_num=sic_pg_num,
             pg_column="201",
         )
 
-        expected = ni_expected
-        pd.testing.assert_frame_equal(result, expected)
+        expected = gb_expected
+        pd.testing.assert_frame_equal(gb_result, expected)
+
+        assert ni_result is None, "ni_result should be None"

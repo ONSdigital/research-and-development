@@ -1,14 +1,16 @@
 """Code to join the ITL regions onto the full dataframe using the mapper provided."""
 import pandas as pd
+from typing import Tuple
 
 from src.mapping.mapping_helpers import join_with_null_check
 
 
 def join_itl_regions(
-    df: pd.DataFrame,
+    responses: Tuple[pd.DataFrame, pd.DataFrame],
     postcode_mapper: pd.DataFrame,
+    itl_mapper: pd.DataFrame,
     is_ni: bool = False,
-    postcode_col: str = "postcodes_harmonised",
+    pc_col: str = "postcodes_harmonised",
 ):
     """Joins the itl regions onto the full dataframe using the mapper provided
 
@@ -18,13 +20,23 @@ def join_itl_regions(
         formtype (list): List of the formtypes to run through function
 
     Returns:
-        df: Dataframe with column "ua_county" for regions
+        Tuple(gb_df: pd.DataFrame, ni_df: pd.DataFrame): dfs with the ITL regions joined
     """
-    if not is_ni:
-        postcode_mapper = postcode_mapper.rename(columns={"pcd2": postcode_col})
-        df = join_with_null_check(df, postcode_mapper, "postcode mapper", postcode_col)
+    gb_df, ni_df = responses
+    # first create itl column
+    postcode_mapper = postcode_mapper.rename(columns={"pcd2": pc_col})
+    gb_df = join_with_null_check(gb_df, postcode_mapper, "postcode mapper", pc_col)
 
-    else:
-        df["itl"] = "N92000002"
+    if ni_df is not None:
+        ni_df["itl"] = "N92000002"
 
-    return df
+    # next join the itl mapper
+    geo_cols = ["LAU121CD", "ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
+    itl_mapper = itl_mapper[geo_cols].rename(columns={"LAU121CD": "itl"})
+
+    # TODO: remove the "warn" parameter when the ITL mapper is fixed
+    gb_df = join_with_null_check(gb_df, itl_mapper, "itl mapper", "itl", warn=True)
+    if ni_df is not None:
+        ni_df = join_with_null_check(ni_df, itl_mapper, "itl mapper", "itl", warn=True)
+
+    return gb_df, ni_df

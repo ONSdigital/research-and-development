@@ -11,8 +11,6 @@ from typing import Callable, Dict, Any, Union
 # Third Party Imports
 import pandas as pd
 
-# Local Imports
-import src.outputs.map_output_cols as map_o
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -114,10 +112,6 @@ def output_intram_by_itl(
             df_ni["postcodes_harmonised"] = pd.NA
             df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
             df = df.append(df_ni, ignore_index=True).copy()
-
-    # Join Aggregation Cols
-    df = map_o.join_itl_regions(df, postcode_mapper)
-    df = df.merge(itl_mapper, how="left", left_on="itl", right_on="LAU121CD")
 
     # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
     GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]

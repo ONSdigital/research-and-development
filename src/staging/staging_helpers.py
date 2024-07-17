@@ -118,15 +118,17 @@ def load_validate_mapper(
     # Log the loading of the mapper
     logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
+    # Construct the path of the schema from the mapper name
+    schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
+    schema_path = f"./config/{schema_prefix}_schema.toml"
+    schema_dict = val.load_schema(schema_path)
+    wanted_cols = schema_dict.keys()
+
     # Check if the file exists at the mapper path, raise an error if it doesn't
     mods.rd_file_exists(mapper_path, raise_error=True)
 
     # Read the file at the mapper path into a DataFrame
-    mapper_df = mods.rd_read_csv(mapper_path)
-
-    # Construct the path of the schema from the mapper name
-    schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
-    schema_path = f"./config/{schema_prefix}_schema.toml"
+    mapper_df = mods.rd_read_csv(mapper_path, wanted_cols)
 
     # Validate the DataFrame against the schema
     val.validate_data_with_schema(mapper_df, schema_path)
