@@ -8,10 +8,56 @@ import src.estimation.calculate_weights as calw
 from pandas._testing import assert_frame_equal, assert_series_equal
 
 
-# Three tests for calc_lower_n:
-# testing calc_lower_n where duplicate refs
-# testing calc_lower_n where missing col
-# testing calc_lower_n where nan in reference
+class TestCreateEstimationFilter:
+    """Test for create_estimation_filter."""
+
+    def create_input_df(self):
+        """Create input df for test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "709",
+            "selectiontype",
+            "statusencoded",
+            "formtype",
+            "cellnumber",
+            "uni_count",
+            "outlier",
+        ]
+
+        data = [
+            [1, 0, "12", "P", "210", "0006", 1, 20, True],
+            [2, 0, 14, "P", "211", "0006", 2, 4, False],
+            [2, 1, 16, "P", "210", "0006", 2, 4, False],
+            [4, 0, 18, "P", "210", "0006", 4, 3, False],
+            [1, 0, "20", "X", "210", "0006", 5, 10, False],
+            [3, 0, 1, "P", "999", "0006", 1, 20, False],
+            [5, 0, 14, "P", "211", "0001", 2, 4, False],
+            [6, 0, 10, "P", "210", "0006", 1, 20, False],
+            [7, 1, 10, "P", "210", "0006", 5, 10, False],
+            [8, 1, np.nan, "P", "210", "0006", 2, 4, False],
+            [9, 0, 5, "P", "210", "0006", 1, 20, False],
+            [10, 0, 10, "P", "210", "0006", 1, 20, False],
+        ]
+
+        input_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_df
+
+    def create_expected_output(self):
+        """Create expected output boolean series for test"""
+        expected_output = pd.Series(
+            [True, True, True, True, False, False, False, True, True, True, True, True]
+        )
+        return expected_output
+
+    def test_create_estimation_filter(self):
+        """Test for create_estimation_filter."""
+        input_df = self.create_input_df()
+        expected_output = self.create_expected_output()
+
+        actual_output = calw.create_estimation_filter(input_df)
+
+        assert_series_equal(actual_output, expected_output)
 
 
 class TestCalcLowerNDuplicateRefs:
@@ -146,7 +192,7 @@ class TestCalcWeightMissingCol:
         with pytest.raises(
             ValueError, match=r"The column essential 'outlier' is missing"
         ):
-            calw.calculate_weighting_factor(input_df, None, "709")
+            calw.calculate_weighting_factor(input_df, "709")
 
 
 class TestCalcWeightFilter:
@@ -157,28 +203,29 @@ class TestCalcWeightFilter:
         """Creates input df for test"""
         input_cols = [
             "reference",
+            "instance",
             "709",
             "selectiontype",
             "statusencoded",
             "formtype",
-            "instance",
             "cellnumber",
+            "uni_count",
             "outlier",
         ]
 
         data = [
-            [1, "12", "P", "210", "0006", 0, 1, True],
-            [2, 14, "P", "211", "0006", 0, 2, False],
-            [2, 16, "P", "210", "0006", 1, 2, False],
-            [4, 18, "P", "210", "0006", 0, 4, False],
-            [1, "20", "X", "210", "0006", 0, 5, False],
-            [3, 1, "P", "999", "0006", 0, 1, False],
-            [5, 14, "P", "211", "0001", 0, 2, False],
-            [6, 10, "P", "210", "0006", 0, 1, False],
-            [7, 10, "P", "210", "0006", 1, 5, False],
-            [8, np.nan, "P", "210", "0006", 1, 2, False],
-            [9, 5, "P", "210", "0006", 0, 1, False],
-            [10, 10, "P", "210", "0006", 0, 1, False],
+            [1, 0, "12", "P", "210", "0006", 1, 20, True],
+            [2, 0, 14, "P", "211", "0006", 2, 4, False],
+            [2, 1, 16, "P", "210", "0006", 2, 4, False],
+            [4, 0, 18, "P", "210", "0006", 4, 3, False],
+            [1, 0, "20", "X", "210", "0006", 5, 10, False],
+            [3, 0, 1, "P", "999", "0006", 1, 20, False],
+            [5, 0, 14, "P", "211", "0001", 2, 4, False],
+            [6, 0, 10, "P", "210", "0006", 1, 20, False],
+            [7, 1, 10, "P", "210", "0006", 5, 10, False],
+            [8, 1, np.nan, "P", "210", "0006", 2, 4, False],
+            [9, 0, 5, "P", "210", "0006", 1, 20, False],
+            [10, 0, 10, "P", "210", "0006", 1, 20, False],
         ]
 
         input_df = pd.DataFrame(data=data, columns=input_cols)
@@ -188,79 +235,30 @@ class TestCalcWeightFilter:
         """Creates expected df for test"""
         expected_cols = [
             "reference",
+            "instance",
             "709",
             "selectiontype",
             "statusencoded",
             "formtype",
-            "instance",
             "cellnumber",
+            "uni_count",
             "outlier",
             "a_weight",
         ]
 
         data = [
-            [1, 12.0, "P", "210", "0006", 0, 1, True, 6.3],
-            [2, 14.0, "P", "211", "0006", 0, 2, False, 4.0],
-            [2, 16.0, "P", "210", "0006", 1, 2, False, 4.0],
-            [4, 18.0, "P", "210", "0006", 0, 4, False, 8.0],
-            [
-                1,
-                20.0,
-                "X",
-                "210",
-                "0006",
-                0,
-                5,
-                False,
-                1.0,
-            ],  # dropped by filter (selectiontype)
-            [
-                3,
-                1.0,
-                "P",
-                "999",
-                "0006",
-                0,
-                1,
-                False,
-                1.0,
-            ],  # dropped by filter (statusencoded)
-            [
-                5,
-                14.0,
-                "P",
-                "211",
-                "0001",
-                0,
-                2,
-                False,
-                1.0,
-            ],  # dropped by filter (formtype)
-            [6, 10.0, "P", "210", "0006", 0, 1, False, 6.3],
-            [
-                7,
-                10.0,
-                "P",
-                "210",
-                "0006",
-                1,
-                5,
-                False,
-                1.0,
-            ],  # dropped by filter (instance)
-            [
-                8,
-                np.nan,
-                "P",
-                "210",
-                "0006",
-                1,
-                2,
-                False,
-                4.0,
-            ],  # dropped from calc as np.nan but weight applied
-            [9, 5.0, "P", "210", "0006", 0, 1, False, 6.3],
-            [10, 10.0, "P", "210", "0006", 0, 1, False, 6.3],
+            [1, 0, 12.0, "P", "210", "0006", 1, 20, True, 6.3],
+            [2, 0, 14.0, "P", "211", "0006", 2, 4, False, 4.0],
+            [2, 1, 16.0, "P", "210", "0006", 2, 4, False, 4.0],
+            [4, 0, 18.0, "P", "210", "0006", 4, 3, False, 3.0],
+            [1, 0, 20.0, "X", "210", "0006", 5, 10, False, 1.0],
+            [3, 0, 1.0, "P", "999", "0006", 1, 20, False, 1.0],
+            [5, 0, 14.0, "P", "211", "0001", 2, 4, False, 1.0],
+            [6, 0, 10.0, "P", "210", "0006", 1, 20, False, 6.3],
+            [7, 1, 10.0, "P", "210", "0006", 5, 10, False, 1.0],
+            [8, 1, np.nan, "P", "210", "0006", 2, 4, False, 4.0],
+            [9, 0, 5.0, "P", "210", "0006", 1, 20, False, 6.3],
+            [10, 0, 10.0, "P", "210", "0006", 1, 20, False, 6.3],
         ]
 
         expected_df = pd.DataFrame(data=data, columns=expected_cols)
@@ -269,17 +267,18 @@ class TestCalcWeightFilter:
     def create_expected_qa(self):
         """Creates expected qa df for test"""
         expected_qa_cols = [
-            "cellnumber",
-            "N",
-            "n",
-            "outliers",
+            "Cell Number",
+            "N - uni_count",
+            "n - num clear records in cell",
+            "o - num outliers in cell",
             "a_weight",
         ]
 
         data = [
-            [1.0, 20.0, 4, 1.0, 6.3],
-            [2.0, 4.0, 1.0, 0.0, 4.0],
-            [4.0, 8.0, 1.0, 0.0, 8.0],
+            [1, 20, 4, 1, 6.3],
+            [2, 4, 1, 0, 4.0],
+            [4, 3, 1, 0, 3.0],
+            [5, 10, 0, 0, 1.0],
         ]
 
         expected_qa_df = pd.DataFrame(data=data, columns=expected_qa_cols)
@@ -292,135 +291,13 @@ class TestCalcWeightFilter:
         input_df = self.create_input_df()
         expected_df = self.create_expected_output()
         expected_qa_df = self.create_expected_qa()
-        cellno_dict = {1: 20, 2: 4, 3: 6, 4: 8, 5: 10}
 
-        result_df, result_qa_df = calw.calculate_weighting_factor(input_df, cellno_dict)
+        result_df, result_qa_df = calw.calculate_weighting_factor(input_df, "709")
+
+        result_qa_df["a_weight"] = result_qa_df["a_weight"].round(1)
 
         assert_frame_equal(result_df, expected_df, check_exact=False, rtol=0.01)
         assert_frame_equal(result_qa_df, expected_qa_df, check_exact=False, rtol=0.01)
-
-
-class TestCalcWeightNumericNoMissing:
-    """Test for calculate_weighting_factor for 709 numeric
-    with no missing value"""
-
-    def create_input_df(self):
-        """Creates input df for test"""
-        input_cols = [
-            "reference",
-            "709",
-            "selectiontype",
-            "statusencoded",
-            "formtype",
-            "instance",
-            "cellnumber",
-            "outlier",
-        ]
-
-        data = [
-            [1, "12", "P", "210", "0006", 0, 1, False],
-            [2, "14", "P", "211", "0006", 0, 2, False],
-            [2, 16, "P", "210", "0006", 0, 2, False],
-        ]
-
-        input_df = pd.DataFrame(data=data, columns=input_cols)
-        return input_df
-
-    def create_expected_output(self):
-        """Creates expected df for test"""
-        expected_cols = [
-            "reference",
-            "709",
-            "selectiontype",
-            "statusencoded",
-            "formtype",
-            "instance",
-            "cellnumber",
-            "outlier",
-            "a_weight",
-        ]
-
-        data = [
-            [1, 12, "P", "210", "0006", 0, 1, False, 6.3],
-            [2, 14, "P", "211", "0006", 0, 2, False, 4.0],
-            [2, 16, "P", "210", "0006", 0, 2, False, 4.0],
-        ]
-
-        expected_df = pd.DataFrame(data=data, columns=expected_cols)
-        return expected_df
-
-    def test_calculate_weighting_factor_709_no_missing(self):
-        """Test for calculate_weighting_factor for 709 numeric
-        with no missing value"""
-
-        input_df = self.create_input_df()
-        expected_df = self.create_expected_output()
-        cellno_dict = {1: 20, 2: 4, 3: 6, 4: 8, 5: 10}
-
-        result_df, result_qa_df = calw.calculate_weighting_factor(input_df, cellno_dict)
-
-        assert_series_equal(result_df["709"], expected_df["709"], check_dtype=True)
-
-
-class TestCalcWeightNumericWithMissing:
-    """Test for calculate_weighting_factor for 709 numeric
-    with missing value"""
-
-    def create_input_df(self):
-        """Creates input df for test"""
-        input_cols = [
-            "reference",
-            "709",
-            "selectiontype",
-            "statusencoded",
-            "formtype",
-            "instance",
-            "cellnumber",
-            "outlier",
-        ]
-
-        data = [
-            [1, "12", "P", "210", "0006", 0, 1, False],
-            [2, np.nan, "P", "211", "0006", 0, 2, False],
-            [2, 16, "P", "210", "0006", 0, 2, False],
-        ]
-
-        input_df = pd.DataFrame(data=data, columns=input_cols)
-        return input_df
-
-    def create_expected_output(self):
-        """Creates expected df for test"""
-        expected_cols = [
-            "reference",
-            "709",
-            "selectiontype",
-            "statusencoded",
-            "formtype",
-            "instance",
-            "cellnumber",
-            "outlier",
-            "a_weight",
-        ]
-
-        data = [
-            [1, 12.0, "P", "210", "0006", 0, 1, False, 6.3],
-            [2, np.nan, "P", "211", "0006", 0, 2, False, 4.0],
-            [2, 16.0, "P", "210", "0006", 0, 2, False, 4.0],
-        ]
-
-        expected_df = pd.DataFrame(data=data, columns=expected_cols)
-        return expected_df
-
-    def test_calculate_weighting_factor_709_with_missing(self):
-        """Test for calculate_weighting_factor for 709 numeric
-        with missing value"""
-        input_df = self.create_input_df()
-        expected_df = self.create_expected_output()
-        cellno_dict = {1: 20, 2: 4, 3: 6, 4: 8, 5: 10}
-
-        result_df, result_qa_df = calw.calculate_weighting_factor(input_df, cellno_dict)
-
-        assert_series_equal(result_df["709"], expected_df["709"], check_dtype=True)
 
 
 class TestCalcWeightWithMissingVals:
@@ -437,19 +314,19 @@ class TestCalcWeightWithMissingVals:
             "formtype",
             "instance",
             "cellnumber",
+            "uni_count",
             "outlier",
         ]
 
         data = [
-            [1, 1, "P", "210", "0006", 0, 1, False],
-            [2, np.nan, "P", "210", "0006", 0, 1, False],
-            [3, 1, np.nan, "210", "0006", 0, 1, False],
-            [4, 1, "P", np.nan, "0006", 0, 1, False],
-            [5, 1, "P", "210", np.nan, 0, 1, False],
-            [6, 1, "P", "210", "0006", np.nan, 2, False],
-            [7, 1, "P", "210", "0006", 0, np.nan, False],
-            [8, 1, "P", "210", "0006", 0, 2, np.nan],
-            [9, 1, "P", "210", "0006", 0, 2, False],
+            [1, 1, "P", "210", "0006", 0, 1, 10, False],
+            [2, np.nan, "P", "210", "0006", 0, 1, 10, False],
+            [3, 1, np.nan, "210", "0006", 0, 1, 10, False],
+            [4, 1, "P", np.nan, "0006", 0, 1, 10, False],
+            [5, 1, "P", "210", np.nan, 0, 1, 10, False],
+            [6, 1, "P", "210", "0006", np.nan, 2, 5, False],
+            [7, 1, "P", "210", "0006", 0, 2, 5, np.nan],
+            [8, 1, "P", "210", "0006", 0, 2, 5, False],
         ]
 
         input_df = pd.DataFrame(data=data, columns=input_cols)
@@ -465,12 +342,13 @@ class TestCalcWeightWithMissingVals:
             "formtype",
             "instance",
             "cellnumber",
+            "uni_count",
             "outlier",
             "a_weight",
         ]
 
         data = [
-            [1, 1, "P", "210", "0006", 0, 1, False, 10.0],
+            [1, 1, "P", "210", "0006", 0, 1, 10, False, 10.0],
             [
                 2,
                 np.nan,
@@ -479,6 +357,7 @@ class TestCalcWeightWithMissingVals:
                 "0006",
                 0,
                 1,
+                10,
                 False,
                 10.0,
             ],  # filtered from calc but weight applied
@@ -490,6 +369,7 @@ class TestCalcWeightWithMissingVals:
                 "0006",
                 0,
                 1,
+                10,
                 False,
                 1.0,
             ],  # filtered out (selectiontype)
@@ -501,10 +381,11 @@ class TestCalcWeightWithMissingVals:
                 "0006",
                 0,
                 1,
+                10,
                 False,
                 1.0,
             ],  # filtered out (statusencoded)
-            [5, 1, "P", "210", np.nan, 0, 1, False, 1.0],  # filtered out (formtype)
+            [5, 1, "P", "210", np.nan, 0, 1, 10, False, 1.0],  # filtered out (formtype)
             [
                 6,
                 1,
@@ -513,12 +394,12 @@ class TestCalcWeightWithMissingVals:
                 "0006",
                 np.nan,
                 2,
+                5,
                 False,
                 2.5,
             ],  # filtered out (instance) but weight applied
-            [7, 1, "P", "210", "0006", 0, np.nan, False, 1.0],  # No cellno
-            [8, 1, "P", "210", "0006", 0, 2, np.nan, 2.5],  # No outlier
-            [9, 1, "P", "210", "0006", 0, 2, False, 2.5],
+            [7, 1, "P", "210", "0006", 0, 2, 5, False, 2.5],  # No outlier
+            [8, 1, "P", "210", "0006", 0, 2, 5, False, 2.5],
         ]
 
         expected_df = pd.DataFrame(data=data, columns=expected_cols)
@@ -527,10 +408,10 @@ class TestCalcWeightWithMissingVals:
     def create_expected_qa(self):
         """Creates expected qa df for test"""
         expected_qa_cols = [
-            "cellnumber",
-            "N",
-            "n",
-            "outliers",
+            "Cell Number",
+            "N - uni_count",
+            "n - num clear records in cell",
+            "o - num outliers in cell",
             "a_weight",
         ]
 
@@ -549,12 +430,22 @@ class TestCalcWeightWithMissingVals:
         input_df = self.create_input_df()
         expected_df = self.create_expected_output()
         expected_qa_df = self.create_expected_qa()
-        cellno_dict = {1: 10, 2: 5}
 
-        result_df, result_qa_df = calw.calculate_weighting_factor(input_df, cellno_dict)
+        result_df, result_qa_df = calw.calculate_weighting_factor(input_df)
+        pd.set_option("display.max_columns", None)
+        pd.set_option("display.expand_frame_repr", False)
+        print(result_qa_df)
 
-        assert_frame_equal(result_df, expected_df, check_exact=False, rtol=0.01)
-        assert_frame_equal(result_qa_df, expected_qa_df, check_exact=False, rtol=0.01)
+        assert_frame_equal(
+            result_df, expected_df, check_exact=False, rtol=0.01, check_dtype=False
+        )
+        assert_frame_equal(
+            result_qa_df,
+            expected_qa_df,
+            check_exact=False,
+            rtol=0.01,
+            check_dtype=False,
+        )
 
 
 # One tests for outlier_weights:

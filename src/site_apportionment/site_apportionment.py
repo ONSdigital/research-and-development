@@ -324,7 +324,7 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
     The weights are then used to apportion expenditure of each reference across
      their sites.
 
-    Parameters:
+    Args:
         df (pd.DataFrame): The input DataFrame.
         groupby_cols (List[str]): List of columns to group by.
 

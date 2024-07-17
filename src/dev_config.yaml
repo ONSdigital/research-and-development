@@ -109,6 +109,7 @@ run_log_sql:
   log_db: "test_runlog"
   log_mode: "append"
 estimation:
+  num_expected_cellnos: 588  # the number of cell_no items expected in the coverage mapper
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 imputation:
   lf_target_vars:

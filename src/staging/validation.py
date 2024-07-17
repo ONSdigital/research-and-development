@@ -327,8 +327,8 @@ def flag_no_rand_spenders(df, raise_or_warn):
     Flags any records that answer "No" to "604" and also report their expenditure in
     "211" as more than 0.
 
-    Parameters:
-    df (pandas.DataFrame): The input DataFrame.
+    Args:
+        df (pandas.DataFrame): The input DataFrame.
 
     Returns:
         None
