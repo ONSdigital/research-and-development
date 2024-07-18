@@ -1,0 +1,23 @@
+[reference]
+old_name = "reference"
+Deduced_Data_Type = "int64"
+
+[instance]
+old_name = "instance"
+Deduced_Data_Type = "float64"
+
+[formtype]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
+
+[postcode_issue]
+old_name = "postcode_issue"
+Deduced_Data_Type = "object"
+
+[incorrect_postcode]
+old_name = "incorrect_postcode"
+Deduced_Data_Type = "object"
+
+[postcode_source]
+old_name = "postcode_source"
+Deduced_Data_Type = "object"

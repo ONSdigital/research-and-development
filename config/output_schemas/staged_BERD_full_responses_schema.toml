@@ -28,7 +28,7 @@ Deduced_Data_Type = "object"
 
 [201]
 old_name = "201"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "float64"
 
 [202]
 old_name = "202"
@@ -164,7 +164,7 @@ Deduced_Data_Type = "float64"
 
 [251]
 old_name = "251"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [300]
 old_name = "300"
@@ -268,7 +268,7 @@ Deduced_Data_Type = "float64"
 
 [601]
 old_name = "601"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [602]
 old_name = "602"
@@ -336,11 +336,11 @@ Deduced_Data_Type = "float64"
 
 [713]
 old_name = "713"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [714]
 old_name = "714"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [9000]
 old_name = "9000"
@@ -408,7 +408,7 @@ Deduced_Data_Type = "int64"
 
 [formid]
 old_name = "formid"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "int64"
 
 [status]
 old_name = "status"
@@ -508,7 +508,7 @@ Deduced_Data_Type = "float64"
 
 [companyregistrationnumber]
 old_name = "companyregistrationnumber"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "float64"
 
 [numberlivelocalunits]
 old_name = "numberlivelocalunits"
@@ -569,83 +569,3 @@ Deduced_Data_Type = "int64"
 [postcodes_harmonised]
 old_name = "postcodes_harmonised"
 Deduced_Data_Type = "object"
-
-[pg_numeric]
-old_name = "pg_numeric"
-Deduced_Data_Type = "int64"
-
-[emp_researcher]
-old_name = "emp_researcher"
-Deduced_Data_Type = "float64"
-
-[emp_technician]
-old_name = "emp_technician"
-Deduced_Data_Type = "float64"
-
-[emp_other]
-old_name = "emp_other"
-Deduced_Data_Type = "float64"
-
-[emp_total]
-old_name = "emp_total"
-Deduced_Data_Type = "float64"
-
-[headcount_res_m]
-old_name = "headcount_res_m"
-Deduced_Data_Type = "float64"
-
-[headcount_res_f]
-old_name = "headcount_res_f"
-Deduced_Data_Type = "float64"
-
-[headcount_tec_m]
-old_name = "headcount_tec_m"
-Deduced_Data_Type = "float64"
-
-[headcount_tec_f]
-old_name = "headcount_tec_f"
-Deduced_Data_Type = "float64"
-
-[headcount_oth_m]
-old_name = "headcount_oth_m"
-Deduced_Data_Type = "float64"
-
-[headcount_oth_f]
-old_name = "headcount_oth_f"
-Deduced_Data_Type = "float64"
-
-[headcount_tot_m]
-old_name = "headcount_tot_m"
-Deduced_Data_Type = "float64"
-
-[headcount_tot_f]
-old_name = "headcount_tot_f"
-Deduced_Data_Type = "float64"
-
-[headcount_total]
-old_name = "headcount_total"
-Deduced_Data_Type = "float64"
-
-[imp_marker]
-old_name = "imp_marker"
-Deduced_Data_Type = "object"
-
-[imp_class]
-old_name = "imp_class"
-Deduced_Data_Type = "object"
-
-[auto_outlier]
-old_name = "auto_outlier"
-Deduced_Data_Type = "bool"
-
-[manual_outlier]
-old_name = "manual_outlier"
-Deduced_Data_Type = "object"
-
-[outlier]
-old_name = "outlier"
-Deduced_Data_Type = "bool"
-
-[a_weight]
-old_name = "a_weight"
-Deduced_Data_Type = "float64"
