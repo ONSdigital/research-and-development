@@ -175,7 +175,7 @@ def _references_in_snapshot(
             a list of all references missing from the snapshot.
     """
     type_defence(df, "df", pd.DataFrame)
-    type_defence(snapshot_refs, "snapshot_df", pd.DataFrame)
+    type_defence(snapshot_refs, "snapshot_refs", list)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     # add a new column to the dataframe indicating if the ref is present
     valid_df = (
@@ -184,15 +184,16 @@ def _references_in_snapshot(
     # obtain a df of invalid references (not in snpashot)
     invalid_refs = valid_df[valid_df.reference_valid==False]
     if len(invalid_refs) > 0:
+        inv = invalid_refs["reference"].unique()
         if logger:
             logger.info(
-                "Reference(s) in construction file not in snapshot: "
-                f"{invalid_refs["reference"]}"
+                f"Reference(s) in construction file not in snapshot: {inv}",
             )
-        return (False, list(invalid_refs["reference"]))
-    logger.info(
-        "All passed references from construction file in snapshot"
-    )
+        return (False, list(inv))
+    if logger:
+        logger.info(
+            "All passed references from construction file in snapshot"
+        )
     return (True, [])
 
 
