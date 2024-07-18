@@ -6,14 +6,12 @@ import pandas as pd
 
 from src.estimation import apply_weights as appweights
 from src.estimation import calculate_weights as weights
-from src.estimation import cellno_mapper as cmap
 
 EstMainLogger = logging.getLogger(__name__)
 
 
 def run_estimation(
     df: pd.DataFrame,
-    cellno_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
@@ -23,7 +21,6 @@ def run_estimation(
 
     Args:
         df (pd.DataFrame): The main dataset were estimation will be applied.
-        cellno_df (pd.DataFrame): The cellno mapper
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
@@ -36,11 +33,11 @@ def run_estimation(
 
     est_qa_path = config["estimation_paths"]["qa_path"]
 
-    # clean and create a dictionary from the cellno mapper
-    cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
+    # # clean and create a dictionary from the cellno mapper
+    # cell_unit_dict = cmap.cellno_unit_dict(cellno_df)
 
     # calculate the weights
-    df, qa_df = weights.calculate_weighting_factor(df, cell_unit_dict)
+    df, qa_df = weights.calculate_weighting_factor(df)
 
     # calculate the weights for outliers
     weighted_df = weights.outlier_weights(df)
