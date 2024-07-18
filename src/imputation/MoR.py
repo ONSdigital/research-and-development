@@ -55,6 +55,24 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     return imputed_df, links_df
 
 
+# def prep_2021_backdata(backdata: pd:DataFrame) -> pd.DataFrame:
+#     """Prepare the backdata for MoR imputation.
+
+#     Args:
+#         backdata (pd.DataFrame): Backdata for the current year.
+
+#     Returns:
+#         pd.DataFrame: Prepped backdata.
+#     """
+#     # Convert backdata column names from qXXX to XXX
+#     # Note that this is only applicable when using the backdata on the network
+#     if config["network_or_hdfs"] == "network":
+#         p = re.compile(r"q\d{3}")
+#         cols = [col for col in list(backdata.columns) if p.match(col)]
+#         to_rename = {col: col[1:] for col in cols}
+#         backdata = backdata.rename(columns=to_rename)
+
+
 def mor_preprocessing(df, backdata):
     """Apply pre-processing ready for MoR
 
@@ -62,13 +80,6 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-    # Convert backdata column names from qXXX to XXX
-    # Note that this is only applicable when using the backdata on the network
-    p = re.compile(r"q\d{3}")
-    cols = [col for col in list(backdata.columns) if p.match(col)]
-    to_rename = {col: col[1:] for col in cols}
-    backdata = backdata.rename(columns=to_rename)
-
     # Add a QA column for the group size
     df["cf_group_size"] = np.nan
 

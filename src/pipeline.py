@@ -113,7 +113,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses, itl_mapper, cellno_df,) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
         full_responses,
         ni_df,
         config,
@@ -143,43 +143,23 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    estimated_responses_df, weighted_responses_df = run_estimation(
+    weighted_responses_df = run_estimation(
         outliered_responses_df, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Apportionment to sites
-    estimated_responses_df = run_site_apportionment(
-        estimated_responses_df,
-        config,
-        mods.rd_write_csv,
-        run_id,
-        "estimated",
-        output_file=True,
-    )
     weighted_responses_df = run_site_apportionment(
         weighted_responses_df,
         config,
         mods.rd_write_csv,
         run_id,
-        "weighted",
-        output_file=True,
     )
     MainLogger.info("Finished Site Apportionment module.")
 
-    # Data processing: Regional Apportionment
-
-    # Data processing: Aggregation
-
-    # Data display: Visualisations
-
-    # Data output: Disclosure Control
-
-    # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
     run_outputs(
-        estimated_responses_df,
         weighted_responses_df,
         ni_full_responses,
         config,

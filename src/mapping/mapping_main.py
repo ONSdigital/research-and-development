@@ -111,4 +111,4 @@ def run_mapping(
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
-    return (full_responses, ni_full_responses, itl_mapper, cellno_df)
+    return (full_responses, ni_full_responses, itl_mapper)

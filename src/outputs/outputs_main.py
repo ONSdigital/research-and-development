@@ -25,7 +25,6 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def run_outputs(  # noqa: C901
-    estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
@@ -63,7 +62,7 @@ def run_outputs(  # noqa: C901
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
-        estimated_df, weighted_df, ni_full_responses
+        weighted_df, ni_full_responses
     )
 
     # Running short form output

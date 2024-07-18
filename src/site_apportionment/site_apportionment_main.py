@@ -15,8 +15,6 @@ def run_site_apportionment(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    file_suffix,
-    output_file=False,
 ) -> pd.DataFrame:
     """Run the apportionment to sites module.
 
@@ -25,14 +23,12 @@ def run_site_apportionment(
     instance 0 to all other instances.
     Same percentages are used for each product group.
 
-    When running on the local network,
-
     Args:
         config (dict): The pipeline configuration
         df (pd.DataFrame): Main dataset before the outputs
     Returns:
         df_out (pd.DataFrame): Percentages filled in for short forms and applied
-        to apportion  for long forms
+            to apportion  for long forms
     """
     # Create variable for output of QA apportionment file
     qa_path = config["apportionment_paths"]["qa_path"]
@@ -49,13 +45,11 @@ def run_site_apportionment(
         df_out = sap.run_apportion_sites(df, imp_markers_to_keep, config)
 
         # Output QA files
-        if config["global"]["output_apportionment_qa"] & output_file:
+        if config["global"]["output_apportionment_qa"]:
             SitesMainLogger.info("Outputting Apportionment files.")
             tdate = datetime.now().strftime("%y-%m-%d")
             survey_year = config["years"]["survey_year"]
-            filename = (
-                f"{survey_year}_{file_suffix}_df_apportioned_{tdate}_v{run_id}.csv"
-            )
+            filename = f"{survey_year}_weighted_df_apportioned_{tdate}_v{run_id}.csv"
             write_csv(f"{qa_path}/{filename}", df_out)
 
         SitesMainLogger.info("Finished apportionment to sites.")
