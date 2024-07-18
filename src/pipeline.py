@@ -1,6 +1,5 @@
 """The main pipeline"""
 # Core Python modules
-import time
 import logging
 
 # Our local modules
@@ -10,7 +9,7 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
-from src.construction.construction import run_construction
+from src.construction.construction_main import run_construction
 from src.mapping.mapping_main import run_mapping
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
@@ -21,7 +20,7 @@ from src.outputs.outputs_main import run_outputs
 MainLogger = logging.getLogger(__name__)
 
 
-def run_pipeline(start, user_config_path, dev_config_path):
+def run_pipeline(user_config_path, dev_config_path):
     """The main pipeline.
 
     Args:
@@ -57,7 +56,9 @@ def run_pipeline(start, user_config_path, dev_config_path):
         mods.rd_read_csv,
         mods.rd_write_csv,
     )
-
+    runlog_obj.create_runlog_files()
+    runlog_obj.write_config_log()
+    runlog_obj.write_mainlog()
     logger = logger_creator(global_config)
     run_id = runlog_obj.run_id
     MainLogger.info(f"Reading user config from {user_config_path}.")
@@ -112,10 +113,12 @@ def run_pipeline(start, user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df,) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper, cellno_df,) = run_mapping(
         full_responses,
         ni_df,
         config,
+        mods.rd_write_csv,
+        run_id,
     )
     MainLogger.info("Finished Mapping...")
 
@@ -141,7 +144,7 @@ def run_pipeline(start, user_config_path, dev_config_path):
     # Estimation module
     MainLogger.info("Starting Estimation...")
     estimated_responses_df, weighted_responses_df = run_estimation(
-        outliered_responses_df, cellno_df, config, mods.rd_write_csv, run_id
+        outliered_responses_df, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
@@ -178,11 +181,10 @@ def run_pipeline(start, user_config_path, dev_config_path):
     run_outputs(
         estimated_responses_df,
         weighted_responses_df,
-        ni_df,
+        ni_full_responses,
         config,
         mods.rd_write_csv,
         run_id,
-        ultfoc_mapper,
         postcode_mapper,
         itl_mapper,
         pg_detailed,
@@ -195,15 +197,7 @@ def run_pipeline(start, user_config_path, dev_config_path):
 
     MainLogger.info("Finishing Pipeline .......................")
 
-    runlog_obj.retrieve_pipeline_logs()
+    runlog_obj.write_runlog()
+    runlog_obj.mark_mainlog_passed()
 
-    run_time = round(time.time() - start, 5)
-    runlog_obj._record_time_taken(run_time)
-
-    runlog_obj.retrieve_configs()
-    runlog_obj._create_runlog_dicts()
-    runlog_obj._create_runlog_dfs()
-    runlog_obj.create_runlog_files()
-    runlog_obj._write_runlog()
-
-    return run_time
+    return runlog_obj.time_taken

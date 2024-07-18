@@ -21,8 +21,7 @@ def qa_output_total_fte(
         run_id (int): The current run id
 
     """
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     totals_names = ["emp_total", "emp_researcher", "emp_technician", "emp_other"]
     totals_values = [

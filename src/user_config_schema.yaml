@@ -5,13 +5,6 @@
 # max: [int, float]: applies only to int/float dtype, optional (inclusive)
 # min: [int, float]: applies only to int/float dtype, optional (inclusive)
 # filetype: str: applies to only path dtype, optional (using '.' optional)
-global:
-  singular: False
-  dtype: "bool"
-  accept_nonetype: False
-  max: null
-  min: null
-  filetype: null
 years:
   survey_year:
     singular: True
@@ -19,17 +12,22 @@ years:
     accept_nonetype: False
     max: null
     min: 2022
-  previous_years_to_load:
-    singular: True
-    dtype: "int"
-    accept_nonetype: False
-    max: null
-    min: 0
+global:
+  singular: False
+  dtype: "bool"
+  accept_nonetype: False
+  max: null
+  min: null
+  filetype: null
 hdfs_paths:
   singular: False
   dtype: "path"
   accept_nonetype: True
-network_paths:
+2022_mappers:
+  singular: False
+  dtype: "path"
+  accept_nonetype: True
+2023_mappers:
   singular: False
   dtype: "path"
   accept_nonetype: True
@@ -44,4 +42,3 @@ imputation:
   dtype: "int"
   accept_nonetype: False
   min: 0
-  

@@ -1,11 +1,23 @@
 """The main file for the construction module."""
 import logging
-import pandas as pd
 from typing import Callable
 
+import pandas as pd
+import numpy as np
+
+from src.construction.construction_helpers import (
+    read_construction_file,
+    prepare_forms_gb,
+    clean_construction_type,
+)
+from src.construction.construction_validation import (
+    check_for_duplicates,
+    concat_construction_dfs,
+    validate_columns_not_empty,
+    validate_short_to_long,
+)
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
-from src.outputs.outputs_helpers import create_period_year
 
 construction_logger = logging.getLogger(__name__)
 
@@ -39,79 +51,108 @@ def run_construction(  # noqa: C901
     """
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
-        path_type = "construction_file_path_ni"
         schema_path = "./config/construction_ni_schema.toml"
+        run_postcode_construction = False
     else:
-        run_construction = config["global"]["run_construction"]
-        path_type = "construction_file_path"
-        schema_path = "./config/construction_schema.toml"
+        run_construction = config["global"]["run_all_data_construction"]
+        run_postcode_construction = config["global"]["run_postcode_construction"]
+        schema_path = "./config/all_data_construction_schema.toml"
+        postcode_schema_path = "./config/postcode_construction_schema.toml"
 
     # Skip this module if not needed
     if run_construction is False:
         construction_logger.info("Skipping Construction...")
         return snapshot_df
 
-    # Check the construction file exists and has records, then read it
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    paths = config[f"{network_or_hdfs}_paths"]
-    construction_file_path = paths[path_type]
-    construction_logger.info(f"Reading construction file {construction_file_path}")
-    construction_file_exists = check_file_exists(construction_file_path)
-    if construction_file_exists:
-        try:
-            construction_df = read_csv(construction_file_path)
-        except pd.errors.EmptyDataError:
-            construction_logger.warning(
-                f"Construction file {construction_file_path} is empty, skipping..."
-            )
-            return snapshot_df
+    # Obtain construction paths 
+    paths = config[f"construction_paths"]
+    if is_northern_ireland:
+        construction_file_path = paths["construction_file_path_ni"]
     else:
-        construction_logger.info(
-            "Construction file not found, skipping construction..."
-        )
+        construction_file_path = paths["all_data_construction_file_path"]
+        postcode_construction_fpath = paths["postcode_construction_file_path"]
+
+    # Check the construction file exists and has records, then read it
+    construction_df = read_construction_file(
+        path=construction_file_path,
+        logger=construction_logger,
+        read_csv_func=read_csv,
+        file_exists_func=check_file_exists
+    )
+    if isinstance(construction_df, type(None)):
         return snapshot_df
+    # read in postcode construction file
+    if run_postcode_construction:
+        pc_construction_df = read_construction_file(
+            path=postcode_construction_fpath,
+            logger=construction_logger,
+            read_csv_func=read_csv,
+            file_exists_func=check_file_exists
+        )
+        if isinstance(pc_construction_df, type(None)):
+            run_postcode_construction = False
+
+    # validate and merge schemas
+    validate_data_with_schema(construction_df, schema_path)
+    check_for_duplicates(
+        df=construction_df, 
+        columns=["reference", "instance"], 
+        logger=construction_logger
+    )
+
+    if run_postcode_construction:
+        validate_data_with_schema(pc_construction_df, postcode_schema_path)
+        check_for_duplicates(
+            df=pc_construction_df, 
+            columns=["reference", "instance"], 
+            logger=construction_logger
+        )
+        validate_columns_not_empty(
+            df=pc_construction_df,
+            columns=["601", "referencepostcode"],
+            logger=construction_logger,
+            _raise=True,
+        )
+    
+    construction_df = concat_construction_dfs(
+        df1=construction_df, 
+        df2=pc_construction_df,
+        validate_dupes=True,
+        logger=construction_logger
+    )
+    # clean construction type column
+    construction_df.construction_type = (
+        construction_df.construction_type.apply(
+            lambda x: clean_construction_type(x)
+        )
+    )
+    # validate that 'construction_type' is valid
+    valid_types = ["short_to_long", "new", np.NaN]
+    if False in list(
+        construction_df.construction_type.isin(valid_types)
+    ):
+        raise ValueError(
+            f"Invalid value for construction_type. Expected one of {valid_types}"
+                    )
+    if not is_northern_ireland:
+        validate_short_to_long(construction_df, construction_logger)
+
+    # Drop columns without constructed values
+    construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Make a copy of the snapshot
     updated_snapshot_df = snapshot_df.copy()
-
-    # Validate construction file and drop columns without constructed values
-    validate_data_with_schema(construction_df, schema_path)
-    construction_df = construction_df.dropna(axis="columns", how="all")
 
     # Add flags to indicate whether a row was constructed or should be imputed
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
-
     # Run GB specific actions
     if not is_northern_ireland:
-
-        # Convert formtype to "0001" or "0006"
-        # NI doesn't have a formtype until outputs
-        if "formtype" in construction_df.columns:
-            construction_df["formtype"] = construction_df["formtype"].apply(
-                convert_formtype
-            )
-
-        # Prepare the short to long form constructions, if any (N/A to NI)
-        if "short_to_long" in construction_df.columns:
-            updated_snapshot_df = prepare_short_to_long(
-                updated_snapshot_df, construction_df
-            )
-        # Create period_year column (NI already has it)
-        updated_snapshot_df = create_period_year(updated_snapshot_df)
-        construction_df = create_period_year(construction_df)
-        # Set instance=1 so longforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0001") & (
-            updated_snapshot_df.status == "Form sent out"
+        updated_snapshot_df, construction_df = (
+            prepare_forms_gb(updated_snapshot_df, construction_df)
         )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 1
-        # Set instance=0 so shortforms with status 'Form sent out' match correctly
-        form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
-            updated_snapshot_df.status == "Form sent out"
-        )
-        updated_snapshot_df.loc[form_sent_condition, "instance"] = 0
-
+        
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
@@ -176,47 +217,3 @@ def run_construction(  # noqa: C901
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
-
-
-def prepare_short_to_long(updated_snapshot_df, construction_df):
-    """Create addional instances for short to long construction"""
-
-    # Check which references are going to be converted to long forms
-    # and how many instances they have
-    ref_count = construction_df.loc[
-        construction_df["short_to_long"] == True, "reference"  # noqa: E712
-    ].value_counts()
-
-    # Create conversion df
-    short_to_long_df = updated_snapshot_df[
-        updated_snapshot_df["reference"].isin(ref_count.index)
-    ]
-
-    # For every short_to_long reference,
-    # this copies the instance 0 the relevant number of times,
-    # updating to the corresponding instance number
-    for index, value in ref_count.items():
-        for instance in range(1, value):
-            short_to_long_df_instance = short_to_long_df.loc[
-                short_to_long_df["reference"] == index
-            ].copy()
-            short_to_long_df_instance["instance"] = instance
-            updated_snapshot_df = pd.concat(
-                [updated_snapshot_df, short_to_long_df_instance]
-            )
-
-    return updated_snapshot_df
-
-
-def convert_formtype(formtype_value):
-    if pd.notnull(formtype_value):
-        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
-            return "0001"
-        elif (
-            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
-        ):
-            return "0006"
-        else:
-            return None
-    else:
-        return None

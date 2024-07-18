@@ -1,9 +1,12 @@
 """The main file for the mapping module."""
 import logging
+from datetime import datetime
+from typing import Callable
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
-
+from src.mapping.ultfoc_mapping import join_fgn_ownership
+from src.mapping.cellno_mapping import validate_join_cellno_mapper
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
 
@@ -14,99 +17,98 @@ def run_mapping(
     full_responses,
     ni_full_responses,
     config: dict,
+    write_csv: Callable,
+    run_id: int,
 ):
-
-    # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-
-    if network_or_hdfs == "network":
-        from src.utils import local_file_mods as mods
-
-    elif network_or_hdfs == "hdfs":
-        from src.utils import hdfs_mods as mods
-
-    # Conditionally load paths
-    paths = config[f"{network_or_hdfs}_paths"]
-
-    pg_num_alpha = stage_hlp.load_validate_mapper(
-        "pg_num_alpha_mapper_path",
-        paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
-        MappingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
-        "pg_numeric",
-        "pg_alpha",
-    )
 
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path",
-        paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
+        config,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        hlp.validate_ultfoc_df,
     )
 
     # Load ITL mapper
     itl_mapper = stage_hlp.load_validate_mapper(
         "itl_mapper_path",
-        paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
+        config,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        None,
     )
 
     # Loading cell number coverage
     cellno_df = stage_hlp.load_validate_mapper(
-        "cellno_2022_path",
-        paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
+        "cellno_path",
+        config,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        None,
     )
 
+    # Load and validate the PG mappers
+    pg_num_alpha = stage_hlp.load_validate_mapper(
+        "pg_num_alpha_mapper_path",
+        config,
+        MappingMainLogger,
+    )
+    val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
+
+    # Load and validate the SIC to PG mappers, to be used to impute missing PG
     sic_pg_num = stage_hlp.load_validate_mapper(
         "sic_pg_num_mapper_path",
-        paths,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
+        config,
         MappingMainLogger,
-        val.validate_data_with_schema,
-        val.validate_many_to_one,
-        "SIC 2007_CODE",
-        "2016 > Form PG",
     )
+    val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
-    # Loading ru_817_list mapper
+    # For survey year 2022 only, it's necessary to update the reference list
     if config["years"]["survey_year"] == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
-            paths,
-            mods.rd_file_exists,
-            mods.rd_read_csv,
+            config,
             MappingMainLogger,
-            val.validate_data_with_schema,
-            None,
         )
-        # update longform references that should be on the reference list
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
-    # Carry out product group conversion
-    # Impute missing product group responses in q201 from SIC, then copy this to a new
-    # column, pg_numeric. Finally, convert column 201 to alpha-numeric PG
+
+    # Join the mappers to the full responses dataframe, with validation.
     full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    ni_full_responses = run_pg_conversion(ni_full_responses, pg_num_alpha, sic_pg_num)
+    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
+    full_responses = validate_join_cellno_mapper(full_responses, cellno_df, config)
 
-    # full_responses = join_cellno_mapper(full_responses, cellno_df)
+    if ni_full_responses is not None:
+        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
+        ni_full_responses = run_pg_conversion(
+            ni_full_responses, pg_num_alpha, sic_pg_num
+        )
+        ni_full_responses = join_fgn_ownership(
+            ni_full_responses,
+            ultfoc_mapper,
+            is_northern_ireland=True,
+        )
 
-    # placeholder for running mapping
+    # output QA files
+    qa_path = config["mapping_paths"]["qa_path"]
+
+    if config["global"]["output_mapping_qa"]:
+        MappingMainLogger.info("Outputting Mapping QA files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        full_responses_filename = (
+            f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
+        )
+
+        write_csv(f"{qa_path}/{full_responses_filename}", full_responses)  # Changed
+    MappingMainLogger.info("Finished Mapping QA calculation.")
+
+    if config["global"]["output_mapping_ni_qa"]:
+        MappingMainLogger.info("Outputting Mapping NI QA files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        full_responses_NI_filename = (
+            f"{survey_year}_full_responses_ni_mapped_{tdate}_v{run_id}.csv"
+        )
+
+        write_csv(
+            f"{qa_path}/{full_responses_NI_filename}", ni_full_responses
+        )  # Changed
+    MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
-    return (full_responses, ni_full_responses, ultfoc_mapper, itl_mapper, cellno_df)
+    return (full_responses, ni_full_responses, itl_mapper, cellno_df)

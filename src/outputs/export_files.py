@@ -10,7 +10,7 @@ from typing import List
 from pathlib import Path
 import getpass
 
-from src.utils.helpers import ConfigSettings
+from src.utils.config import config_setup
 from src.outputs.manifest_output import Manifest
 
 
@@ -101,7 +101,7 @@ def get_file_choice(paths, config: dict):
         if "export" in output_name
     }
 
-    root_output = paths["output_path"]
+    root_output = config["outputs_paths"]["outputs_master"]
 
     # Use dictionary comprehension to create the selection list dict
     selection_dict = {
@@ -210,12 +210,11 @@ def log_exports(
     )
 
 
-def run_export(config_path: str):
+def run_export(user_config_path: str, dev_config_path: str):
     """Main function to run the data export pipeline."""
 
     # Load config
-    conf_obj = ConfigSettings(config_path)
-    config = conf_obj.config_dict
+    config = config_setup(user_config_path, dev_config_path)
 
     # Get and set logging level
     logging_level = config["global"]["logging_level"]
@@ -239,8 +238,8 @@ def run_export(config_path: str):
 
     # Define paths
     paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
-    output_path = paths["output_path"]
-    export_folder = paths["export_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
+    export_folder = config["export_paths"]["export_folder"]
 
     # Get list of files to transfer from user
     file_select_dict = get_file_choice(paths, config)
@@ -278,7 +277,7 @@ def run_export(config_path: str):
     manifest.write_manifest()
 
     # Move the manifest file to the outgoing folder
-    manifest_file = mods.rd_search_files(manifest.outgoing_directory, "_manifest.json")
+    manifest_file = mods.rd_search_file(manifest.outgoing_directory, "_manifest.json")
 
     manifest_path = os.path.join(manifest.outgoing_directory, manifest_file)
 
@@ -287,8 +286,8 @@ def run_export(config_path: str):
         manifest.export_directory,
         "move",
         OutgoingLogger,
-        mods.rd_copy_files,
-        mods.rd_move_files,
+        mods.rd_copy_file,
+        mods.rd_move_file,
     )
 
     # Copy or Move files to outgoing folder
@@ -301,8 +300,8 @@ def run_export(config_path: str):
             manifest.export_directory,
             file_transfer_method,
             OutgoingLogger,
-            mods.rd_copy_files,
-            mods.rd_move_files,
+            mods.rd_copy_file,
+            mods.rd_move_file,
         )
 
     log_exports(list(file_select_dict.values()), pipeline_run_datetime, OutgoingLogger)
