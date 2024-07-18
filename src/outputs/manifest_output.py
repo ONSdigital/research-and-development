@@ -53,7 +53,7 @@ class Manifest:
             )
         if not isdir_func(export_directory):
             raise ManifestError(
-                f"Outgoing directory does not exist: {self.outgoing_directory}"
+                f"Export directory does not exist: {self.export_directory}"
             )
 
         if not isinstance(pipeline_run_datetime, datetime):
