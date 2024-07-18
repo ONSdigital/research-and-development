@@ -1,6 +1,7 @@
 """Specific functions applied in mapping_main.py"""
 import pandas as pd
 import logging
+from src.utils.defence import validate_file_extension
 
 MappingLogger = logging.getLogger(__name__)
 
@@ -227,20 +228,22 @@ def validate_mapper_config(config: dict) -> None:
     """
     if not config["years"]["survey_year"]:
         raise ValueError("'survey_year' in the config file is blank, please fix and then re-run the pipeline.")
-  
-    def get_paths(config: dict) -> dict:
-        """Return either network_paths or hdfs_paths despending on the environment."""
-        network_or_hdfs = config["global"]["network_or_hdfs"]
-        paths = config[f"{network_or_hdfs}_paths"]
-        paths["year"] = config["years"]["survey_year"]
-        paths["berd_path"] = f"{paths['root']}{paths['year']}_surveys/BERD/"
-        return paths
-      
+
+    if not config["mapping_paths"]:
+        raise ValueError(f"There are {sum(1 for item in config["mapping_paths"] if item is None)} null  in the config file is blank, please fix and then re-run the pipeline.")
+
+    if validate_file_extension(config["mapping_paths"]) is True:
+        return 
+
     paths = get_paths(config)
     year = paths["year"]
     year_dict = config[f"{year}_mappers"]
        
-    
+    config["mapping_paths"] - # access the mapping paths
+   # to get postcode mapper -> config["mapping_paths"]["postcodes_mapper"]
+
+
+
     if config["years"]["survey_year"] == year:
         keyword = year
         for filename in year_dict[0:]:
@@ -251,4 +254,6 @@ def validate_mapper_config(config: dict) -> None:
         keyword = '2023'
         for filename in config["2023_mappers"][0:]:
             if keyword not in filename:
-                raise ValueError(f"The year in the file: {filename} year does not match the survey year in the config.")
+                raise ValueError(f"The year in the file: {filename} does not match the survey year in the config.")
+
+# check mapper paths are correct file types.

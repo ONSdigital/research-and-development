@@ -271,7 +271,7 @@ class TestValidateMapperConfig(object):
         [
             [ValueError,
              ".*survey_year.* in the config file is blank, please fix and then re-run the pipeline.*",
-             {"2022_mappers": False}],
+             {"years": {"survey_year" : False}}],
 
 
             [
