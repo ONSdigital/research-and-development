@@ -1,6 +1,6 @@
 """Utilities to validate the construction process."""
 import logging
-from typing import Union
+from typing import Union, Tuple
 
 import pandas as pd
 
@@ -155,4 +155,100 @@ def validate_short_to_long(
             "each reference/period."
         )
     logger.info("All short_to_long construction rows have valid instances.")
+    return None
+
+
+def _references_in_snapshot(
+        df: pd.DataFrame, 
+        snapshot_refs: list, 
+        logger: logging.Logger = None
+    ) -> Tuple[bool, list]:
+    """Determine if the references in a df are in a snapshot.
+
+    Args:
+        df (pd.DataFrame): The construction df (With references).
+        snapshot_refs (list): A list of the references in the snapshot df.
+        logger (logging.Logger): The logger to log to.
+
+    Returns:
+        Tuple[bool, list]: Whether or not all references are in the snapshot, 
+            a list of all references missing from the snapshot.
+    """
+    type_defence(df, "df", pd.DataFrame)
+    type_defence(snapshot_refs, "snapshot_df", pd.DataFrame)
+    type_defence(logger, "logger", (logging.Logger, type(None)))
+    # add a new column to the dataframe indicating if the ref is present
+    valid_df = (
+        df.join(df[["reference"]].isin(snapshot_refs), how="left", rsuffix="_valid")
+    )
+    # obtain a df of invalid references (not in snpashot)
+    invalid_refs = valid_df[valid_df.reference_valid==False]
+    if len(invalid_refs) > 0:
+        if logger:
+            logger.info(
+                "Reference(s) in construction file not in snapshot: "
+                f"{invalid_refs["reference"]}"
+            )
+        return (False, list(invalid_refs["reference"]))
+    logger.info(
+        "All passed references from construction file in snapshot"
+    )
+    return (True, [])
+
+
+def validate_construction_references(
+        df: pd.DataFrame, 
+        snapshot_df: pd.DataFrame, 
+        logger: logging.Logger = None
+    ) -> None:
+    """Validate the construction references for both new and non-new constructors.
+
+    Args:
+        df (pd.DataFrame): The construction dataframe.
+        snapshot_df (pd.DataFrame): The snapshot dataframe.
+        logger (logging.Logger, optional): The logger. Defaults to None.
+
+    Raises:
+        ValueError: Raised if non new construction refs aren't present.
+        ValueError: Raised if new construction refs are already present.
+
+    Returns:
+        None
+    """
+    type_defence(df, "df", pd.DataFrame)
+    type_defence(snapshot_df, "snapshot_df", pd.DataFrame)
+    type_defence(logger, "logger", (logging.Logger, type(None)))
+    snapshot_refs = list(snapshot_df.reference.unique())
+    new_constructions = df[df.construction_type=="new"]
+    reg_constructions = df[df.construction_type!="new"]
+    # non new constructors
+    refs_valid, refs = _references_in_snapshot(
+        df=reg_constructions,
+        snapshot_refs=snapshot_refs,
+        logger=logger
+    )
+    if not refs_valid:
+        raise ValueError(
+            "References in construction file are not included in the original "
+            f"data: {refs}"
+        )
+    if logger:
+        logger.info(
+            "References not marked as new constructors are all in the original dataset"
+            )
+    # new constructors
+    if new_constructions.empty:
+        return None
+    refs_valid, refs = _references_in_snapshot(
+        df=new_constructions,
+        snapshot_refs=snapshot_refs,
+        logger=logger
+    )
+    if refs_valid:
+        raise ValueError(
+            "References in the construction file labelled 'new' are already in"
+            " the dataset."
+        )
+    if logger:
+        logger.info("All references marked as 'new' are validated as new.")
     return None
