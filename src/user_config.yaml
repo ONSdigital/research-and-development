@@ -7,7 +7,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   # Construction Settings
   run_construction: False
   run_all_data_construction: False
@@ -17,7 +17,7 @@ global:
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   # Backdata output settings
-  output_backdata: True
+  output_backdata: False
   # QA output settings
   output_full_responses: False
   output_ni_full_responses: False

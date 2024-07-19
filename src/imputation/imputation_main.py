@@ -1,5 +1,6 @@
 """The main file for the Imputation module."""
 import logging
+import os
 import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
@@ -125,11 +126,11 @@ def run_imputation(
     ).reset_index(drop=True)
 
     # Output QA files
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
 
     if config["global"]["output_imputation_qa"]:
-        ImputationMainLogger.info("Outputting Imputation files.")
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
+        ImputationMainLogger.info("Outputting Imputation QA files.")
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = (
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
@@ -147,6 +148,7 @@ def run_imputation(
         if config["global"]["load_backdata"]:
             links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
             write_csv(f"{qa_path}{links_filename}", links_df)
+
     ImputationMainLogger.info("Finished Imputation calculation.")
 
     # remove rows and columns no longer needed from the imputed dataframe
@@ -158,5 +160,13 @@ def run_imputation(
         write_csv,
         run_id,
     )
+
+    # optionally output backdata for imputation
+    if config["global"]["output_backdata"]:
+        ImputationMainLogger.info("Outputting backdata for imputation.")
+        backdata_path = config["imputation_paths"]["backdata_out_path"]
+        backdata_filename = f"{survey_year}_backdata_{tdate}_v{run_id}.csv"
+        new_backdata = hlp.create_new_backdata(imputed_df, config)
+        write_csv(os.path.join(backdata_path, backdata_filename), new_backdata)
 
     return imputed_df

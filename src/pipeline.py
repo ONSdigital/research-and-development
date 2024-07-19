@@ -17,6 +17,7 @@ from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
+
 MainLogger = logging.getLogger(__name__)
 
 
@@ -143,23 +144,32 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Estimation module
     MainLogger.info("Starting Estimation...")
-    weighted_responses_df = run_estimation(
+    estimated_responses_df, weighted_responses_df = run_estimation(
         outliered_responses_df, config, mods.rd_write_csv, run_id
     )
     MainLogger.info("Finished Estimation module.")
 
     # Data processing: Apportionment to sites
+    estimated_responses_df = run_site_apportionment(
+        estimated_responses_df,
+        config,
+        mods.rd_write_csv,
+        run_id,
+        "estimated",
+    )
     weighted_responses_df = run_site_apportionment(
         weighted_responses_df,
         config,
         mods.rd_write_csv,
         run_id,
+        "weighted",
     )
     MainLogger.info("Finished Site Apportionment module.")
 
     MainLogger.info("Starting Outputs...")
 
     run_outputs(
+        estimated_responses_df,
         weighted_responses_df,
         ni_full_responses,
         config,

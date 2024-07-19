@@ -1,17 +1,14 @@
 """Functions for the Mean of Ratios (MoR) methods."""
 import itertools
+import re
 import pandas as pd
 import numpy as np
-import re
 
-from src.staging import postcode_validation as pcval
-from src.imputation.apportionment import run_apportionment
 from src.imputation.tmi_imputation import (
     create_imp_class_col,
     trim_bounds,
     calculate_totals,
 )
-
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
@@ -55,24 +52,6 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     return imputed_df, links_df
 
 
-# def prep_2021_backdata(backdata: pd:DataFrame) -> pd.DataFrame:
-#     """Prepare the backdata for MoR imputation.
-
-#     Args:
-#         backdata (pd.DataFrame): Backdata for the current year.
-
-#     Returns:
-#         pd.DataFrame: Prepped backdata.
-#     """
-#     # Convert backdata column names from qXXX to XXX
-#     # Note that this is only applicable when using the backdata on the network
-#     if config["network_or_hdfs"] == "network":
-#         p = re.compile(r"q\d{3}")
-#         cols = [col for col in list(backdata.columns) if p.match(col)]
-#         to_rename = {col: col[1:] for col in cols}
-#         backdata = backdata.rename(columns=to_rename)
-
-
 def mor_preprocessing(df, backdata):
     """Apply pre-processing ready for MoR
 
@@ -86,13 +65,10 @@ def mor_preprocessing(df, backdata):
     # TODO move this to imputation main
     # Select only values to be imputed
     df = create_imp_class_col(df, "200", "201")
-    backdata = create_imp_class_col(backdata, "200", "201")
 
     imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
-
-    backdata = run_apportionment(backdata)
 
     clear_status_cond = backdata["status"].isin(good_statuses)
 
@@ -143,11 +119,6 @@ def carry_forwards(df, backdata, impute_vars):
 
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
-
-    # Apply the postcode formatting to clean the postcodes in col 601 of the back data
-    df.loc[match_cond, "601_prev"] = df.loc[match_cond, "601_prev"].apply(
-        pcval.format_postcodes
-    )
 
     # Replace the values of certain columns with the values from the back data
     replace_vars = ["instance", "200", "201", "601", "602", "604"]

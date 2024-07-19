@@ -15,6 +15,7 @@ def run_site_apportionment(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    output_type: str,
 ) -> pd.DataFrame:
     """Run the apportionment to sites module.
 
@@ -39,24 +40,16 @@ def run_site_apportionment(
     if config["global"]["output_status_filtered"]:
         osf.output_status_filtered(df, imp_markers_to_keep, config, write_csv, run_id)
 
-    # Check if this module needs to be applied
-    if config["global"]["apportion_sites"]:
-        SitesMainLogger.info("Starting apportionment to sites...")
-        df_out = sap.run_apportion_sites(df, imp_markers_to_keep, config)
+    SitesMainLogger.info("Starting apportionment to sites...")
+    df_out = sap.run_apportion_sites(df, imp_markers_to_keep, config)
 
-        # Output QA files
-        if config["global"]["output_apportionment_qa"]:
-            SitesMainLogger.info("Outputting Apportionment files.")
-            tdate = datetime.now().strftime("%y-%m-%d")
-            survey_year = config["years"]["survey_year"]
-            filename = f"{survey_year}_weighted_df_apportioned_{tdate}_v{run_id}.csv"
-            write_csv(f"{qa_path}/{filename}", df_out)
+    # Output QA files
+    if config["global"]["output_apportionment_qa"]:
+        SitesMainLogger.info("Outputting Apportionment files.")
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        filename = f"{survey_year}_{output_type}_apportioned_{tdate}_v{run_id}.csv"
+        write_csv(f"{qa_path}/{filename}", df_out)
 
-        SitesMainLogger.info("Finished apportionment to sites.")
-        return df_out
-
-    else:
-        SitesMainLogger.info("Apportionment to sites disabled, skipped")
-        # Remove records that are neither clear nor imputed, based on imputation marker.
-        filtered_df = sap.keep_good_markers(df)
-        return filtered_df
+    SitesMainLogger.info("Finished apportionment to sites.")
+    return df_out
