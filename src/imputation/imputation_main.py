@@ -142,12 +142,12 @@ def run_imputation(
         schema_dict = load_schema(schema_path)
         trimming_qa_output = create_output_df(qa_df, schema_dict)
 
-        write_csv(f"{qa_path}/{trim_qa_filename}", trimming_qa_output)
-        write_csv(f"{qa_path}/{full_imp_filename}", imputed_df)
-        write_csv(f"{qa_path}/{wrong_604_filename}", wrong_604_qa_df)
+        write_csv(os.path.join(qa_path, trim_qa_filename), trimming_qa_output)
+        write_csv(os.path.join(qa_path, full_imp_filename), imputed_df)
+        write_csv(os.path.join(qa_path, wrong_604_filename), wrong_604_qa_df)
         if config["global"]["load_backdata"]:
             links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
-            write_csv(f"{qa_path}{links_filename}", links_df)
+            write_csv(os.path.join(qa_path, links_filename), links_df)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 
