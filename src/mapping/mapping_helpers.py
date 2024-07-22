@@ -226,14 +226,16 @@ def validate_mapper_config(config: dict) -> None:
         the survey year in the config file, an error message is printed and the pipeline stops. 
 
     """
-   
+    
     list_from_dict = list(config["2022_mappers"].values())
     x = any(list_from_dict)
-    if x is True:
-        raise ValueError("There is 1 or more empty values in the config file mapping paths, please fix and then re-run the pipeline.")
+    if x is False:
+        raise ValueError("There is 1 or more empty values in the config file 2022 mapping paths, please fix and then re-run the pipeline.")
 
-
-
+    list_from_dict = list(config["2022_mappers"].values())
+    x = any(list_from_dict)
+    if x is False:
+        raise ValueError("There is 1 or more empty values in the config file 2022 mapping paths, please fix and then re-run the pipeline.")
 
     # if validate_file_extension(config["mapping_paths"]) is False:
     #     raise ValueError("There are mapping paths with incorrect file types, please rectify these before re-running the pipeline.")

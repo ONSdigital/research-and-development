@@ -49,6 +49,7 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
+        validate_mapper_config(config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -278,7 +279,6 @@ def validate_config(config: dict) -> None:
     # get the path to the config validation schema and check it is a string
     validation_path = config["config_validation"]["path"]
     type_defence(validation_path, "config_validation:path", str)
-    validate_mapper_config(config)
     # load the validation schema
     validation_config = safeload_yaml(validation_path)
     # for each item in the validation schema, validate the correponding config item.
