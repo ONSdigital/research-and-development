@@ -5,6 +5,7 @@ from typing import Union, Dict
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
 from src.utils.path_helpers import update_config_with_paths
+from src.mapping.mapping_helpers import validate_mapper_config
 
 
 def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
@@ -277,6 +278,7 @@ def validate_config(config: dict) -> None:
     # get the path to the config validation schema and check it is a string
     validation_path = config["config_validation"]["path"]
     type_defence(validation_path, "config_validation:path", str)
+    validate_mapper_config(config)
     # load the validation schema
     validation_config = safeload_yaml(validation_path)
     # for each item in the validation schema, validate the correponding config item.
