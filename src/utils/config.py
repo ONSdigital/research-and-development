@@ -4,8 +4,7 @@ from typing import Union, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
-from src.utils.path_helpers import update_config_with_paths
-from src.mapping.mapping_helpers import validate_mapper_config
+from src.utils.path_helpers import update_config_with_paths, validate_mapping_filenames
 
 
 def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
@@ -31,8 +30,9 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
         "outputs",
     ]
     combined_config = update_config_with_paths(combined_config, modules)
+    test = validate_mapping_filenames(combined_config)
 
-    return combined_config
+    return test
 
 
 def load_validate_configs(user_config_path: str, dev_config_path: str):
@@ -49,7 +49,6 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
-        validate_mapper_config(config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 

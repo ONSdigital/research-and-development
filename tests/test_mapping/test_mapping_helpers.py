@@ -294,6 +294,33 @@ class TestValidateMapperConfig(object):
         with pytest.raises(error_type, match = match):
             validate_mapper_config(config)
 
+    config = {
+    '2022_mappers': {'itl_mapper_path': "itl_2022.csv",
+                     'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+                     'ultfoc_mapper_path': None,}
+} 
+print(config)
+
+def not_blank(config: dict, section: str, mapper_name: str) -> bool:
+    my_file = config[section][mapper_name]
+    not_blank = (my_file != '') and (not (my_file is None))
+
+    return not_blank
+
+
+print(not_blank(config, '2023_mappers', 'ultfoc_mapper_path'))
+#print(f"The filename {my_file} is not blank: {not_blank}")
+
+['itl_mapper_path', 'ultfoc_mapper_path']
+my_mappers = list(config['2022_mappers'].keys())
+
+section = '2023_mappers'
+not_blank_list = [not_blank(config, section, x) for x in my_mappers]
+
+all(not_blank_list)
+
+
 
 
     

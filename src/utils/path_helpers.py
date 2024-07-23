@@ -1,6 +1,8 @@
 """This module contains helper functions for creating paths."""
 import os
+import logging
 
+PathHelpLogger = logging.getLogger(__name__)
 
 def get_paths(config: dict) -> dict:
     """Return either network_paths or hdfs_paths despending on the environment."""
@@ -186,3 +188,54 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
 
     return config
+
+
+def validate_mapping_filenames(config: dict) -> dict: 
+    """
+    Validates the config for each mapper. 
+
+    Checks the mapper paths in the config file is not blank.
+    
+    Checks the mapper year matches the survey year in the config file. 
+
+    Ensures the mappers files are .csv
+
+    Args:
+        year_mapper_dict: The config file
+
+    Returns:
+        ValueError: If the mapping path in the config file is blank or the mapper year does not match 
+        the survey year in the config file, an error message is printed and the pipeline stops. 
+
+    """
+    year = str(config["years"]["survey_year"])
+    print("-------------------------------------------------------------", year)
+    print(type(year))
+    year_mapper_dict = config[f"{year}_mappers"]
+    print("-------------------------------------------------------------", year_mapper_dict)
+
+    bool_dict = {}
+    msg = ""
+
+    for key, value in year_mapper_dict.items():
+        print("--------------", key)
+        print("--------------", value)
+        bool_dict[key] = True
+        # check string is not empty
+        if (not value) or (value == ""):
+            msg += f"Empty filename for {key}" 
+            bool_dict[key] = False   
+            raise ValueError(f"Empty filename for {key}")
+
+       # check filename is correct
+
+       # check year is correct
+        if not value.str.contains(year):
+            msg += f"Incorrect year for {key}"
+            bool_dict[key] = False
+          #  raise ValueError(f"Invalid filename for {key} in {year}.")
+
+    #    add in unit test with good and bad dictionary 
+
+    if bool_dict.values().all():
+        PathHelpLogger.info("All mapping filenames are valid.")
