@@ -161,7 +161,7 @@ def run_pg_conversion(
     gb_df = sic_to_pg_mapper(gb_df, sic_pg_num, pg_column)
     gb_df = pg_to_pg_mapper(gb_df, pg_num_alpha, pg_column)
 
-    if ni_df is not None:
+    if not ni_df.empty:
         ni_df = sic_to_pg_mapper(ni_df, sic_pg_num, pg_column)
         ni_df = pg_to_pg_mapper(ni_df, pg_num_alpha, pg_column)
 

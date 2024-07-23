@@ -1,5 +1,6 @@
 """The main file for the mapping module."""
 import logging
+import os
 from datetime import datetime
 from typing import Callable
 
@@ -77,42 +78,28 @@ def run_mapping(
     responses = validate_join_cellno_mapper(responses, cellno_df, config)
     responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
 
-    if ni_full_responses is not None:
+    if not ni_full_responses.empty:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
-        # ni_full_responses = run_pg_conversion(
-        #     ni_full_responses, pg_num_alpha, sic_pg_num
-        # )
-        # ni_full_responses = join_fgn_ownership(
-        #     ni_full_responses,
-        #     ultfoc_mapper,
-        #     is_northern_ireland=True,
-        # )
 
     # output QA files
     qa_path = config["mapping_paths"]["qa_path"]
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
 
     if config["global"]["output_mapping_qa"]:
         MappingMainLogger.info("Outputting Mapping QA files.")
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
         full_responses_filename = (
             f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
         )
-
-        write_csv(f"{qa_path}/{full_responses_filename}", full_responses)  # Changed
+        write_csv(os.path.join(qa_path, full_responses_filename), full_responses)
     MappingMainLogger.info("Finished Mapping QA calculation.")
 
-    if config["global"]["output_mapping_ni_qa"]:
+    if config["global"]["output_mapping_ni_qa"] and not ni_full_responses.empty:
         MappingMainLogger.info("Outputting Mapping NI QA files.")
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
         full_responses_NI_filename = (
             f"{survey_year}_full_responses_ni_mapped_{tdate}_v{run_id}.csv"
         )
-
-        write_csv(
-            f"{qa_path}/{full_responses_NI_filename}", ni_full_responses
-        )  # Changed
+        write_csv(os.path.join(qa_path, full_responses_NI_filename), ni_full_responses)
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df

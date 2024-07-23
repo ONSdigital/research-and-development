@@ -1,6 +1,8 @@
 """Functions to clean and validate the cell no mapper."""
 import pandas as pd
 
+from typing import Tuple
+
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
 
 
@@ -37,7 +39,7 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
 
 
 def validate_join_cellno_mapper(
-    df: pd.DataFrame, cellno_df: pd.DataFrame, config: dict
+    responses: Tuple[pd.DataFrame, pd.DataFrame], cellno_df: pd.DataFrame, config: dict
 ) -> pd.DataFrame:
     """Validate the join_cellno_mapper function.
 
@@ -49,8 +51,9 @@ def validate_join_cellno_mapper(
     Returns:
         pd.DataFrame: The shortform responses dataframe with a column for universe count
     """
+    gb_df, ni_df = responses
     num = config["estimation"]["num_expected_cellnos"]
     cellno_df = clean_validate_cellno_mapper(cellno_df, num)
-    df = join_with_null_check(df, cellno_df, "cellno", "cellnumber")
+    gb_df = join_with_null_check(gb_df, cellno_df, "cellno", "cellnumber")
 
-    return df
+    return gb_df, ni_df

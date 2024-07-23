@@ -1,6 +1,7 @@
 """The main pipeline"""
 # Core Python modules
 import logging
+import pandas as pd
 
 # Our local modules
 from src.utils import runlog
@@ -98,11 +99,17 @@ def run_pipeline(user_config_path, dev_config_path):
     MainLogger.info("Finished Data Ingest.")
 
     # Northern Ireland staging and construction
-    MainLogger.info("Starting NI module...")
-    ni_df = run_ni(
-        config, mods.rd_file_exists, mods.rd_read_csv, mods.rd_write_csv, run_id
-    )
-    MainLogger.info("Finished NI Data Ingest.")
+    load_ni_data = config["global"]["load_ni_data"]
+    if load_ni_data:
+        MainLogger.info("Starting NI module...")
+        ni_df = run_ni(
+            config, mods.rd_file_exists, mods.rd_read_csv, mods.rd_write_csv, run_id
+        )
+        MainLogger.info("Finished NI Data Ingest.")
+    else:
+        # If NI data is not loaded, set ni_df to an empty dataframe
+        MainLogger.info("NI data not loaded.")
+        ni_df = pd.DataFrame()
 
     # Construction module
     MainLogger.info("Starting Construction...")

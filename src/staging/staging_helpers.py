@@ -122,7 +122,7 @@ def load_validate_mapper(
     schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
     schema_path = f"./config/{schema_prefix}_schema.toml"
     schema_dict = val.load_schema(schema_path)
-    wanted_cols = schema_dict.keys()
+    wanted_cols = list(schema_dict.keys())
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
     mods.rd_file_exists(mapper_path, raise_error=True)
