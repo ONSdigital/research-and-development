@@ -264,9 +264,9 @@ def run_staging(  # noqa: C901
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         staged_filename = (
-            f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+            f"{survey_year}_staged_PNP_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{staging_folder}/{staged_filename}", full_responses)
+        write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
         StagingMainLogger.info("Finished output of staged PNP data.")
     else:
         StagingMainLogger.info("Skipping output of staged PNP data...")
