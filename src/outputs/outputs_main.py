@@ -25,7 +25,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def run_outputs(  # noqa: C901
-    estimated_df,
+    estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],

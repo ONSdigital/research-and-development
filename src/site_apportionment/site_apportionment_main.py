@@ -27,6 +27,11 @@ def run_site_apportionment(
     Args:
         config (dict): The pipeline configuration
         df (pd.DataFrame): Main dataset before the outputs
+        write_csv (Callable): Function to write to a csv file.
+            This will be the hdfs or network version depending on settings.
+        run_id (int): The current run id
+        output_type (str): The type of output being processed, either "estimated_df"
+            or "weighted_df". Needed for the QA file naming.
     Returns:
         df_out (pd.DataFrame): Percentages filled in for short forms and applied
             to apportion  for long forms
