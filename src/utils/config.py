@@ -30,9 +30,8 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
         "outputs",
     ]
     combined_config = update_config_with_paths(combined_config, modules)
-    test = validate_mapping_filenames(combined_config)
 
-    return test
+    return combined_config
 
 
 def load_validate_configs(user_config_path: str, dev_config_path: str):

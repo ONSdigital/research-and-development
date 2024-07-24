@@ -1,6 +1,7 @@
 """This module contains helper functions for creating paths."""
 import os
 import logging
+from src.utils.defence import validate_file_extension
 
 PathHelpLogger = logging.getLogger(__name__)
 
@@ -191,51 +192,31 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
 
 
 def validate_mapping_filenames(config: dict) -> dict: 
-    """
-    Validates the config for each mapper. 
-
-    Checks the mapper paths in the config file is not blank.
-    
-    Checks the mapper year matches the survey year in the config file. 
-
-    Ensures the mappers files are .csv
-
-    Args:
-        year_mapper_dict: The config file
-
-    Returns:
-        ValueError: If the mapping path in the config file is blank or the mapper year does not match 
-        the survey year in the config file, an error message is printed and the pipeline stops. 
-
-    """
     year = str(config["years"]["survey_year"])
-    print("-------------------------------------------------------------", year)
-    print(type(year))
     year_mapper_dict = config[f"{year}_mappers"]
-    print("-------------------------------------------------------------", year_mapper_dict)
-
     bool_dict = {}
-    msg = ""
 
     for key, value in year_mapper_dict.items():
-        print("--------------", key)
-        print("--------------", value)
         bool_dict[key] = True
         # check string is not empty
         if (not value) or (value == ""):
-            msg += f"Empty filename for {key}" 
             bool_dict[key] = False   
-            raise ValueError(f"Empty filename for {key}")
+            raise ValueError(f"{value} is empty.")
 
        # check filename is correct
+        if value != 'v1':
+            validate_file_extension(value, '.csv')
+            bool_dict[key] = False   
 
        # check year is correct
-        if not value.str.contains(year):
-            msg += f"Incorrect year for {key}"
-            bool_dict[key] = False
-          #  raise ValueError(f"Invalid filename for {key} in {year}.")
+        if value != 'v1':
+            if year not in value:
+                bool_dict[key] = False
+                raise ValueError(f"{year} is not included in {key}.")
+    
+    if all(bool_dict.values()):
+        PathHelpLogger.info("All mapping filenames are valid.")  
+    else:
+        PathHelpLogger.info("There are errors with the mapping filenames.")     
 
-    #    add in unit test with good and bad dictionary 
-
-    if bool_dict.values().all():
-        PathHelpLogger.info("All mapping filenames are valid.")
+    return config

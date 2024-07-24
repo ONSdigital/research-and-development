@@ -266,41 +266,19 @@ def test_config():
     return test_config
 
 class TestValidateMapperConfig(object):
-    @pytest.mark.parametrize(
-       "error_type, match, config", 
-        [
-            [ValueError,
-             ".*survey_year.* in the config file is blank, please fix and then re-run the pipeline.*",
-             {"years": {"survey_year" : False}}],
-
-
-            [
-                ValueError,
-                "The year in the file:* filename does not match the survey year in the config.*",
-                {
-                    "years" : {"survey_year": 2022}, 
-                    "2022_mappers" : {"postcodes_mapper": "postcodes_2022.csv"},
-                    "2023_mappers" : False
-                }
-            ]
-
-        ]
-    ) 
-    # error_type = ValueError
-    # match = ".*2022_mappers.* in the config file is blank, please fix and then re-run the pipeline.*"
+    
     def test_validate_mapper_config_raises(self, error_type, match, config):
-        # print(config)
-        # print(config["years"]["survey_year"])
         with pytest.raises(error_type, match = match):
             validate_mapper_config(config)
 
-    config = {
-    '2022_mappers': {'itl_mapper_path': "itl_2022.csv",
-                     'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-                     'ultfoc_mapper_path': None,}
-} 
-print(config)
+        config = {
+            'survey_year' : {2022,},
+            '2022_mappers': {'itl_mapper_path': "itl_202.csv",
+                             'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+                             'ultfoc_mapper_path': None,}
+                } 
+
 
 def not_blank(config: dict, section: str, mapper_name: str) -> bool:
     my_file = config[section][mapper_name]

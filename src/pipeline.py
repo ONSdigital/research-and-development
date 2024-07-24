@@ -16,6 +16,7 @@ from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
+from src.utils.path_helpers import validate_mapping_filenames
 
 MainLogger = logging.getLogger(__name__)
 
@@ -31,7 +32,6 @@ def run_pipeline(user_config_path, dev_config_path):
     """
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
-
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
@@ -66,7 +66,8 @@ def run_pipeline(user_config_path, dev_config_path):
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-
+    
+    config = validate_mapping_filenames(config) # 
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
