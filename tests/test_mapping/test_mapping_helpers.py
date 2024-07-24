@@ -16,6 +16,7 @@ from src.mapping.mapping_helpers import (
 >>>>>>> origin/develop
 )
 
+from src.utils.path_helpers import validate_mapping_filenames
 
 class TestJoinWithNullCheck(object):
     """Tests for join_with_null_check function."""
@@ -255,30 +256,50 @@ class TestCreateAdditionalNiCols(object):
             expected_df
         ), "Output from create_additional_ni_cols not as expected."
 
+class TestValidateMappingFilenames(object):
+    @pytest.fixture(scope="module")
+    def test_validate_mapper_config_raises_file_incorrect(self, config):
+            with pytest.raises(error_type, match = match):
+                config = {
+                    'survey_year' : {2022,},
+                    '2022_mappers': {'itl_mapper_path': "itl_2022.cs",
+                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+                    'ultfoc_mapper_path': None,}
+            } 
 
-@pytest.fixture(scope="module")
-def test_config():
-    test_config = {
-        "years" : {"survey_year": 2022}, 
-        "2022_mappers" : {"postcodes_mapper": "postcodes_2022.csv"},
-        "2023_mappers" : False
-    }
-    return test_config
+        validate_mapping_filenames(config)
+    return config
 
-class TestValidateMapperConfig(object):
-    
-    def test_validate_mapper_config_raises(self, error_type, match, config):
-        with pytest.raises(error_type, match = match):
-            validate_mapper_config(config)
+    def test_validate_mapper_config_raises_year_incorrect(self, config):
+            with pytest.raises(error_type, match = match):
+                config = {
+                    'survey_year' : {2022,},
+                    '2022_mappers': {'itl_mapper_path': "itl_202.csv",
+                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+                    'ultfoc_mapper_path': None,}
+            } 
 
-        config = {
-            'survey_year' : {2022,},
-            '2022_mappers': {'itl_mapper_path': "itl_202.csv",
-                             'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-                             'ultfoc_mapper_path': None,}
-                } 
+        validate_mapping_filenames(config)
+    return config
 
+    def test_validate_mapper_config_raises_missing_file(self, config):
+            with pytest.raises(error_type, match = match):
+                config = {
+                    'survey_year' : {2022,},
+                    '2022_mappers': {'itl_mapper_path': ,
+                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+                    'ultfoc_mapper_path': None,}
+            } 
+
+        validate_mapping_filenames(config)
+    return config
+
+    test = TestValidateMappingFilenames()
+
+------------------------------------------------------------------------------------------------------------
 
 def not_blank(config: dict, section: str, mapper_name: str) -> bool:
     my_file = config[section][mapper_name]
