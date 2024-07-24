@@ -10,7 +10,7 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
-from src.construction.construction import run_construction
+from src.construction.construction_main import run_construction
 from src.mapping.mapping_main import run_mapping
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers

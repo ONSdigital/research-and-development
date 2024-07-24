@@ -8,6 +8,7 @@ from src.utils.path_helpers import (
     create_construction_config,
     create_mapping_config,
     create_module_config,
+    create_exports_config,
     update_config_with_paths,
 )
 
@@ -64,6 +65,7 @@ def config():
             "qa_path": "outliers_qa",
             "auto_outliers_path": "auto_outliers",
         },
+        "export_paths": {"export_folder": "outgoing_export"},
     }
     return config
 
@@ -163,6 +165,14 @@ def test_create_construction_config(config):
     ), "Construction config is not as expected"
 
 
+def test_create_exports_config(config):
+    """Test create_exports_config function."""
+    expected_exports_dict = {"export_folder": "R:/DAP_emulation/outgoing_export/"}
+    exports_dict = create_exports_config(config)
+
+    assert exports_dict == expected_exports_dict, "Exports config is not as expected"
+
+
 def test_create_module_config_imputation_case(config):
     """Test create_module_config function for the imputation module."""
 
@@ -217,4 +227,9 @@ def test_update_config_with_paths(
     assert (
         updated_config["outliers_paths"] == expected_outliers_dict,
         "Outliers paths are not as expected",
+    )
+
+    assert (
+        updated_config["export_paths"]
+        == {"export_folder": "R:/DAP_emulation/outgoing_export/"},
     )

@@ -393,3 +393,22 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
+
+
+def filter_pnp_data(full_responses):
+    """
+    Filter out all PNP data or equivalently all records with legalstatus of 7
+
+    Args:
+        full_responses (pandas.DataFrame):
+            The DataFrame containing the full resonses data.
+
+    Returns:
+        pandas.DataFrame: DataFrame without rows where 'legalstatus' == '7'
+
+    """
+
+    # filter out PNP data or equivalently records with legalstatus=7
+    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
+
+    return full_responses

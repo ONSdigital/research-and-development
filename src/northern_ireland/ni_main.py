@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 from typing import Callable
 from src.northern_ireland.ni_staging import run_ni_staging
-from src.construction.construction import run_construction
+from src.construction.construction_main import run_construction
 from src.northern_ireland.ni_headcount_fte import run_ni_headcount_fte
 
 NIModuleLogger = logging.getLogger(__name__)
