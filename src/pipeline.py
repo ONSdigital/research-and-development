@@ -120,7 +120,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
+    (mapped_df, ni_full_responses) = run_mapping(
         full_responses,
         ni_df,
         postcode_mapper,
@@ -194,7 +194,6 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         postcode_mapper,
-        itl_mapper,
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,

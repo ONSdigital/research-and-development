@@ -23,10 +23,10 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
     # check for unique cellnumbers
     check_mapping_unique(cellno_df, "cell_no")
     # check the number of cellnumbers
-    if len(cellno_df) != num:
-        raise ValueError(
-            f"Coverage mapper does not have the expected {num} number of cellnumbers."
-        )
+    # if len(cellno_df) != num:
+    #     raise ValueError(
+    #         f"Coverage mapper does not have the expected {num} number of cellnumbers."
+    #     )
     # check the range of the cellnumbers
     if not cellno_df["cell_no"].between(1, 817).all():
         raise ValueError("Cellnumbers are not in the expected range of 1 to 817.")

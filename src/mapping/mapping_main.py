@@ -78,6 +78,9 @@ def run_mapping(
     responses = validate_join_cellno_mapper(responses, cellno_df, config)
     responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
 
+    # unpack the responses
+    full_responses, ni_full_responses = responses
+
     if not ni_full_responses.empty:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
 
@@ -103,4 +106,4 @@ def run_mapping(
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
-    return (full_responses, ni_full_responses, itl_mapper)
+    return (full_responses, ni_full_responses)

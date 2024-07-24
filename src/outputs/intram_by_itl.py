@@ -84,7 +84,6 @@ def output_intram_by_itl(
     write_csv: Callable,
     run_id: int,
     postcode_mapper: pd.DataFrame,
-    itl_mapper: pd.DataFrame,
     df_ni: pd.DataFrame = None,
 ):
     """Generate outputs aggregated to ITL levels 1 and 2.
@@ -95,7 +94,6 @@ def output_intram_by_itl(
         write_csv (Callable): A function to write to a csv file.
         run_id (int): The current run ID.
         postcode_mapper (pd.DataFrame): Postcode to regional code mapping df.
-        itl_mapper (pd.DataFrame): Regional code to ITL levels mapping df.
         df_ni (pd.DataFrame): NI microdate (weights are 1), defaults to None.
 
     """
@@ -106,12 +104,11 @@ def output_intram_by_itl(
     # Subset GB Data
     df = df_gb[["postcodes_harmonised", "formtype", "211"]]
 
-    if df_ni is not None:
-        if not df_ni.empty:
-            # Clean NI data and join
-            df_ni["postcodes_harmonised"] = pd.NA
-            df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
-            df = df.append(df_ni, ignore_index=True).copy()
+    if not df_ni.empty:
+        # Clean NI data and join
+        df_ni["postcodes_harmonised"] = pd.NA
+        df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
+        df = df.append(df_ni, ignore_index=True).copy()
 
     # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
     GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]

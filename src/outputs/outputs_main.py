@@ -32,7 +32,6 @@ def run_outputs(  # noqa: C901
     write_csv: Callable,
     run_id: int,
     postcode_mapper: pd.DataFrame,
-    itl_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
@@ -164,7 +163,6 @@ def run_outputs(  # noqa: C901
             write_csv,
             run_id,
             postcode_mapper,
-            itl_mapper,
         )
         OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
         OutputMainLogger.info("Finished Intram by ITL (GB) output.")
@@ -179,7 +177,6 @@ def run_outputs(  # noqa: C901
             write_csv,
             run_id,
             postcode_mapper,
-            itl_mapper,
             ni_full_responses,
         )
         OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
