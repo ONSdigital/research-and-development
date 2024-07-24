@@ -18,6 +18,7 @@ from src.site_apportionment.site_apportionment_main import run_site_apportionmen
 from src.outputs.outputs_main import run_outputs
 from src.utils.path_helpers import validate_mapping_filenames
 
+
 MainLogger = logging.getLogger(__name__)
 
 
@@ -114,7 +115,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses, itl_mapper, cellno_df,) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
         full_responses,
         ni_df,
         config,
@@ -156,7 +157,6 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         "estimated",
-        output_file=True,
     )
     weighted_responses_df = run_site_apportionment(
         weighted_responses_df,
@@ -164,19 +164,9 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         "weighted",
-        output_file=True,
     )
     MainLogger.info("Finished Site Apportionment module.")
 
-    # Data processing: Regional Apportionment
-
-    # Data processing: Aggregation
-
-    # Data display: Visualisations
-
-    # Data output: Disclosure Control
-
-    # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
     run_outputs(

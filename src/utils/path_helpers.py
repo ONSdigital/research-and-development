@@ -62,6 +62,7 @@ def create_staging_config(config: dict) -> dict:
     staging_dict["snapshot_path"] = paths["snapshot_path"]
     staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
     staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
+    staging_dict["backdata_path"] = paths["backdata_path"]
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
 
