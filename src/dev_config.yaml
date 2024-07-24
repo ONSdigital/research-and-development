@@ -56,6 +56,8 @@ outputs_paths:
   folder: "10_outputs"
   #TODO: add all the output subpaths
   outputs_master: ""
+pnp_paths:
+  staging_qa_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/PNP/01_staging"
 export_paths:
   export_folder: "outgoing_export"
 network_paths:
