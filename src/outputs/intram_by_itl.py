@@ -79,39 +79,40 @@ def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
 
 
 def output_intram_by_itl(
-    df_gb: pd.DataFrame,
+    gb_df: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
     postcode_mapper: pd.DataFrame,
-    df_ni: pd.DataFrame,
+    ni_df: pd.DataFrame,
     uk_output: bool = False,
 ):
     """Generate outputs aggregated to ITL levels 1 and 2.
 
     Args:
-        df_gb (pd.DataFrame): GB microdata with weights applied.
+        gb_df (pd.DataFrame): GB microdata with weights applied.
         config (Dict[str, Any]): Project config.
         write_csv (Callable): A function to write to a csv file.
         run_id (int): The current run ID.
         postcode_mapper (pd.DataFrame): Postcode to regional code mapping df.
-        df_ni (pd.DataFrame): NI microdata (weights are 1),
+        ni_df (pd.DataFrame): NI microdata (weights are 1),
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
     """
     # Declare Config Values
     OUTPUT_PATH = config["outputs_paths"]["outputs_master"]
     CURRENT_YEAR = config["years"]["survey_year"]
 
-    # Subset GB Data
-    df = df_gb[["postcodes_harmonised", "formtype", "211"]]
+    GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
+    BASE_COLS = ["postcodes_harmonised", "formtype", "211"]
+    df = gb_df[GEO_COLS + BASE_COLS]
 
     # conditionally include NI responses to produce UK
     if uk_output:
-        if not df_ni.empty:
+        if not ni_df.empty:
             # Clean NI data and join
-            df_ni["postcodes_harmonised"] = pd.NA
-            df_ni = df_ni[["postcodes_harmonised", "formtype", "211"]]
-            df = df.append(df_ni, ignore_index=True).copy()
+            ni_df["postcodes_harmonised"] = pd.NA
+            ni_df = ni_df[GEO_COLS + BASE_COLS]
+            df = df.append(ni_df, ignore_index=True).copy()
         else:
             # warn that UK output cannot be produced as there is no NI data
             OutputMainLogger.warning(
@@ -121,9 +122,7 @@ def output_intram_by_itl(
             return
 
     # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
-    GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
-    BASE_COLS = ["postcodes_harmonised", "formtype", "211"]
-    df = df[GEO_COLS + BASE_COLS]
+
     itl2 = df.groupby(GEO_COLS).agg({"211": "sum"}).reset_index()
     itl1 = itl2.drop(GEO_COLS[:2], axis=1).copy()
     itl1 = itl1.groupby(GEO_COLS[2:]).agg({"211": "sum"}).copy().reset_index()
@@ -134,7 +133,7 @@ def output_intram_by_itl(
     itl2 = rename_itl(itl2, 2, CURRENT_YEAR)
 
     # Export UK outputs
-    area = "gb" if df_ni is None else "uk"
+    area = "gb" if ni_df is None else "uk"
     itl_dfs = [itl1, itl2]
     for i, itl_df in enumerate(itl_dfs, start=1):
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
