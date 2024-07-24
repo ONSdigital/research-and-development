@@ -2,12 +2,12 @@ config_validation:
   validate: True
   path: src/user_config_schema.yaml
 years:
-  survey_year: 2022
+  survey_year: 2023
 global:
   # Staging and validation settings
   postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: True
+  load_ni_data: False
   # Construction Settings
   run_construction: False
   run_all_data_construction: False
@@ -15,11 +15,13 @@ global:
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: False  # whether to load previous year data for MoR
+  load_backdata: True  # whether to load previous year data for MoR
+  # Backdata output settings
+  output_backdata: True
   # QA output settings
   output_full_responses: False
   output_ni_full_responses: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_mapping_qa: False
   output_mapping_ni_qa: False
   output_auto_outliers: False
@@ -48,7 +50,6 @@ hdfs_paths:
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
-  history_path: "BERD_V7_Anonymised"
   # Imputation and outliers input paths
   backdata_path: ""
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
@@ -80,7 +81,7 @@ hdfs_paths:
   postcodes_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
   ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
-  cellno_2023_path: 'berd_2023_cellno_coverage.csv'
+  cellno_path: 'berd_2023_cellno_coverage_TEMP.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
   sic_pg_num_mapper_path: 'sic_pg_num_2023.csv'
