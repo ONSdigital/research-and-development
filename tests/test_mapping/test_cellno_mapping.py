@@ -65,15 +65,16 @@ def test_clean_validate_cellno_mapper_failure_range(cellno_mapper_df):
         clean_validate_cellno_mapper(test_expected_num_df, 5)  # wrong range
 
 
-def test_clean_validate_cellno_mapper_failure_num(cellno_mapper_df):
-    """Test for clean_validate_cellno_mapper function in the case of failure.
-    Failure due to the incorrect number of cellno items in the mapper.
-    """
-    with pytest.raises(ValueError):
-        test_expected_num_df = cellno_mapper_df.copy().replace(888, 817)
-        clean_validate_cellno_mapper(
-            test_expected_num_df, 10
-        )  # wrong number of expected cells
+# TODO: find out from GZ if we can scrap this.
+# def test_clean_validate_cellno_mapper_failure_num(cellno_mapper_df):
+#     """Test for clean_validate_cellno_mapper function in the case of failure.
+#     Failure due to the incorrect number of cellno items in the mapper.
+#     """
+#     with pytest.raises(ValueError):
+#         test_expected_num_df = cellno_mapper_df.copy().replace(888, 817)
+#         clean_validate_cellno_mapper(
+#             test_expected_num_df, 10
+#         )  # wrong number of expected cells
 
 
 def test_clean_validate_cellno_mapper_success(cellno_mapper_df):

@@ -20,8 +20,9 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
         ValueError: If the number of cellnumbers is not as expected.
         ValueError: If the cellnumbers are not in the expected range.
     """
-    # check for unique cellnumbers
     check_mapping_unique(cellno_df, "cell_no")
+
+    # TODO: find out from GZ if we can scrap this.
     # check the number of cellnumbers
     # if len(cellno_df) != num:
     #     raise ValueError(

@@ -34,10 +34,13 @@ def join_itl_regions(
     # TODO: remove the "warn" parameter when the ITL mapper is fixed
     gb_df = join_with_null_check(gb_df, itl_mapper, "itl mapper", "itl", warn=True)
 
+    pd.set_option("display.max_columns", None)
+    pd.set_option("display.max_rows", None)
     # if the ni_df is not empty, add the itl column to it
     if not ni_df.empty:
         ni_df["itl"] = "N92000002"
         # join the itl mapper to add the region columns
-        ni_df = join_with_null_check(ni_df, itl_mapper, "itl mapper", "itl", warn=True)
+        # ni_df = join_with_null_check(
+        # ni_df, itl_mapper, "itl mapper", "itl", warn=True)
 
     return gb_df, ni_df

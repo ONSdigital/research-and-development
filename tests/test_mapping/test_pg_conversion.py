@@ -240,7 +240,7 @@ class TestRunPgConversion(object):
         self, sic_pg_num, pg_num_alpha, gb_full_responses, gb_expected
     ):
         """Tests for run_pg_conversion."""
-        ni_df = None
+        ni_df = pd.DataFrame()
 
         responses = (gb_full_responses, ni_df)
 
@@ -254,4 +254,4 @@ class TestRunPgConversion(object):
         expected = gb_expected
         pd.testing.assert_frame_equal(gb_result, expected)
 
-        assert ni_result is None, "ni_result should be None"
+        assert ni_result.empty, "ni_result should be an empty df."
