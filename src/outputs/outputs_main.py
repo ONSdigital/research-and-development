@@ -56,7 +56,6 @@ def run_outputs(  # noqa: C901
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    # Remove instance 0 from weighted df, so that it does not go to Tau outputs
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(

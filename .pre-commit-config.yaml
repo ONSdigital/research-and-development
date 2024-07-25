@@ -33,14 +33,14 @@ repos:
           - id: black
             name: black - consistent Python code formatting (auto-fixes)
             language_version: python # Should be a command that runs python3.6+
-            exclude: .*/tests/.*|^\.cruft\.json$|.*\tests\.*|helpers/.*
+            exclude: .*/tests/.*|^\.cruft\.json$|.*\tests\.*|helpers/.*|^tests
             args: ["--experimental-string-processing", "--line-length=88"]
     - repo: https://github.com/PyCQA/flake8
       rev: 5.0.4
       hooks:
           - id: flake8
             name: flake8 - Python linting
-            exclude: .*/tests*|^\.cruft\.json|helpers/.*|.*\tests*$
+            exclude: .*/tests*|^\.cruft\.json|helpers/.*|.*\tests*$|^tests
     - repo: https://github.com/nbQA-dev/nbQA
       rev: 0.12.0
       hooks:

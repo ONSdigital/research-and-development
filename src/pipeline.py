@@ -18,6 +18,7 @@ from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
+
 MainLogger = logging.getLogger(__name__)
 
 
@@ -163,7 +164,6 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         "estimated",
-        output_file=True,
     )
     weighted_responses_df = run_site_apportionment(
         weighted_responses_df,
@@ -171,19 +171,9 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         "weighted",
-        output_file=True,
     )
     MainLogger.info("Finished Site Apportionment module.")
 
-    # Data processing: Regional Apportionment
-
-    # Data processing: Aggregation
-
-    # Data display: Visualisations
-
-    # Data output: Disclosure Control
-
-    # Data output: File Outputs
     MainLogger.info("Starting Outputs...")
 
     run_outputs(

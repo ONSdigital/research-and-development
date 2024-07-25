@@ -25,6 +25,7 @@ def config():
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
             "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
             "manual_outliers_path": "07_outliers/man_out/man_out.csv",
+            "backdata_path": "2021_data/backdata.csv",
             "all_data_construction_file_path": (
                 "04_construction/man_con/construction_file.csv"
             ),
@@ -80,6 +81,7 @@ def test_get_paths(config):
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
         "manual_outliers_path": "07_outliers/man_out/man_out.csv",
         "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
+        "backdata_path": "2021_data/backdata.csv",
         "all_data_construction_file_path": (
             "04_construction/man_con/construction_file.csv"
         ),
@@ -108,6 +110,7 @@ def expected_staging_dict():
         "manual_imp_trim_path": (
             "R:/DAP_emulation/2022_surveys/BERD/06_imputation/man_trim/trim_qa.csv"
         ),
+        "backdata_path": "2021_data/backdata.csv",
     }
     return expected_staging_dict
 
