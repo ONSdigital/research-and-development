@@ -57,7 +57,7 @@ class TestCheckForDuplicates(object):
 
 class TestValidateConstructionReferences(object):
     """Tests for validate_construction_references."""
-    
+
     @pytest.fixture(scope="function")
     def snapshot_df(self) -> pd.DataFrame:
         """Fixture for a dummy snapshot df."""
@@ -86,15 +86,15 @@ class TestValidateConstructionReferences(object):
         return const_df
 
     def test_validate_construction_references(
-            self, 
+            self,
             snapshot_df,
-            construction_df, 
+            construction_df,
             caplog
         ):
-        """Tests for passing all constructors (new + non new)."""
+        """Tests for passing all constructions (new + non new)."""
         expected_logs = [
             "All passed references from construction file in snapshot",
-            "References not marked as new constructors are all in the original dataset",
+            "References not marked as new constructions are all in the original dataset",
             "Reference(s) in construction file not in snapshot: [4]",
             "All references marked as 'new' are validated as new.",
         ]
@@ -107,10 +107,10 @@ class TestValidateConstructionReferences(object):
             records = [rec.msg for rec in caplog.records]
             for log in expected_logs:
                 assert (log in records), ("Log {log} not found.")
-        
 
-    def test_regular_constructors_raises(self, snapshot_df, construction_df):
-        """Tests for failing regular constructors (non new)."""
+
+    def test_regular_constructions_raises(self, snapshot_df, construction_df):
+        """Tests for failing regular constructions (non new)."""
         msg = (
             r"References in construction file are not included in the original "
             rf"data: .*4.*"
@@ -124,8 +124,8 @@ class TestValidateConstructionReferences(object):
             )
 
 
-    def test_new_constructors_raises(self, snapshot_df, construction_df):
-        """Tests for failing new constructors."""
+    def test_new_constructions_raises(self, snapshot_df, construction_df):
+        """Tests for failing new constructions."""
         msg = (
             r"References in the construction file labelled 'new' are already in"
             r" the dataset.*"
@@ -140,4 +140,3 @@ class TestValidateConstructionReferences(object):
                 df=construction_df,
                 snapshot_df=snapshot_df,
             )
-            
