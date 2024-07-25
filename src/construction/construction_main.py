@@ -15,6 +15,7 @@ from src.construction.construction_validation import (
     concat_construction_dfs,
     validate_columns_not_empty,
     validate_short_to_long,
+    validate_construction_references,
 )
 from src.staging.validation import validate_data_with_schema
 from src.staging import postcode_validation as pcval
@@ -136,6 +137,13 @@ def run_construction(  # noqa: C901
                     )
     if not is_northern_ireland:
         validate_short_to_long(construction_df, construction_logger)
+    
+    # validate the references passed in construction
+    validate_construction_references(
+        df=construction_df,
+        snapshot_df=snapshot_df,
+        logger=construction_logger,
+    )
 
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
