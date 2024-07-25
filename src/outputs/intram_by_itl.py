@@ -6,7 +6,7 @@ import pathlib
 import os
 import re
 from datetime import datetime
-from typing import Callable, Dict, Any, Union
+from typing import Callable, Dict, Any, Union, Tuple
 
 # Third Party Imports
 import pandas as pd
@@ -78,30 +78,22 @@ def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
     return df
 
 
-def output_intram_by_itl(
+def aggregate_itl(
     gb_df: pd.DataFrame,
-    config: Dict[str, Any],
-    write_csv: Callable,
-    run_id: int,
-    postcode_mapper: pd.DataFrame,
     ni_df: pd.DataFrame,
+    CURRENT_YEAR,
     uk_output: bool = False,
-):
-    """Generate outputs aggregated to ITL levels 1 and 2.
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Aggregates a dataframe to an ITL level.
 
     Args:
-        gb_df (pd.DataFrame): GB microdata with weights applied.
-        config (Dict[str, Any]): Project config.
-        write_csv (Callable): A function to write to a csv file.
-        run_id (int): The current run ID.
-        postcode_mapper (pd.DataFrame): Postcode to regional code mapping df.
-        ni_df (pd.DataFrame): NI microdata (weights are 1),
+        gb_df (pd.DataFrame): The GB microdata with weights applied.
+        ni_df (pd.DataFrame): The NI microdata (weights are 1).
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
-    """
-    # Declare Config Values
-    OUTPUT_PATH = config["outputs_paths"]["outputs_master"]
-    CURRENT_YEAR = config["years"]["survey_year"]
 
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The ITL1 and ITL2 dataframes.
+    """
     GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
     BASE_COLS = ["postcodes_harmonised", "formtype", "211"]
     df = gb_df[GEO_COLS + BASE_COLS]
@@ -126,10 +118,38 @@ def output_intram_by_itl(
     itl1 = itl2.drop(GEO_COLS[:2], axis=1).copy()
     itl1 = itl1.groupby(GEO_COLS[2:]).agg({"211": "sum"}).copy().reset_index()
 
-    # Clean data rady for export
+    # # Clean data rady for export
     itl2 = itl2.drop(GEO_COLS[2:], axis=1)
     itl1 = rename_itl(itl1, 1, CURRENT_YEAR)
     itl2 = rename_itl(itl2, 2, CURRENT_YEAR)
+
+    return itl1, itl2
+
+
+def output_intram_by_itl(
+    gb_df: pd.DataFrame,
+    ni_df: pd.DataFrame,
+    config: Dict[str, Any],
+    write_csv: Callable,
+    run_id: int,
+    uk_output: bool = False,
+):
+    """Generate outputs aggregated to ITL levels 1 and 2.
+
+    Args:
+        gb_df (pd.DataFrame): GB microdata with weights applied.
+        ni_df (pd.DataFrame): NI microdata (weights are 1),
+        config (Dict[str, Any]): Project config.
+        write_csv (Callable): A function to write to a csv file.
+        run_id (int): The current run ID.
+        uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
+    """
+    # Declare Config Values
+    OUTPUT_PATH = config["outputs_paths"]["outputs_master"]
+    CURRENT_YEAR = config["years"]["survey_year"]
+
+    # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
+    itl1, itl2 = aggregate_itl(gb_df, ni_df, CURRENT_YEAR, uk_output)
 
     # Export UK outputs
     area = "gb" if ni_df is None else "uk"

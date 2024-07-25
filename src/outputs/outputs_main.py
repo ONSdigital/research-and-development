@@ -146,7 +146,7 @@ def run_outputs(  # noqa: C901
     if config["global"]["output_intram_by_pg_uk"]:
         OutputMainLogger.info("Starting Intram by PG (UK) output...")
         output_intram_by_pg(
-            outputs_df, pg_detailed, config, write_csv, run_id, ni_full_responses
+            outputs_df, ni_full_responses, pg_detailed, config, write_csv, run_id
         )
         OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
@@ -155,11 +155,10 @@ def run_outputs(  # noqa: C901
         OutputMainLogger.info("Starting Intram by ITL (GB) output...")
         output_intram_by_itl(
             outputs_df,
+            ni_full_responses,
             config,
             write_csv,
             run_id,
-            postcode_mapper,
-            ni_full_responses,
         )
         OutputMainLogger.info("Finished Intram by ITL (GB) output.")
 
@@ -168,11 +167,10 @@ def run_outputs(  # noqa: C901
         OutputMainLogger.info("Starting Intram by ITL (UK) output...")
         output_intram_by_itl(
             outputs_df,
+            ni_full_responses,
             config,
             write_csv,
             run_id,
-            postcode_mapper,
-            ni_full_responses,
             uk_output=True,
         )
         OutputMainLogger.info("Finished Intram by ITL (UK) output.")
