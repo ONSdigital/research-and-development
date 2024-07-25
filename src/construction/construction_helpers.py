@@ -63,10 +63,10 @@ def _convert_formtype(formtype_value: str) -> str:
             return None
     else:
         return None
-    
+
 
 def prepare_forms_gb(
-        snapshot_df: pd.DataFrame, 
+        snapshot_df: pd.DataFrame,
         construction_df: pd.DataFrame
     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Prepare GB forms.
@@ -83,11 +83,13 @@ def prepare_forms_gb(
         construction_df["formtype"] = construction_df["formtype"].apply(
             _convert_formtype
         )
-    # Prepare the short to long form constructions, if any (N/A to NI)
-    if "short_to_long" in construction_df.construction_type.unique():
-        snapshot_df = prepare_short_to_long(
-            snapshot_df, construction_df
-        )
+
+    if "construction_type" in construction_df.columns:
+        # Prepare the short to long form constructions, if any (N/A to NI)
+        if "short_to_long" in construction_df.construction_type.unique():
+            snapshot_df = prepare_short_to_long(
+                snapshot_df, construction_df
+            )
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
     construction_df = create_period_year(construction_df)

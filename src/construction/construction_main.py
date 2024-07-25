@@ -61,11 +61,11 @@ def run_construction(  # noqa: C901
         postcode_schema_path = "./config/postcode_construction_schema.toml"
 
     # Skip this module if not needed
-    if run_construction is False:
-        construction_logger.info("Skipping Construction...")
-        return snapshot_df
+    if not run_construction and not run_postcode_construction:
+            construction_logger.info("Skipping Construction...")
+            return snapshot_df
 
-    # Obtain construction paths 
+    # Obtain construction paths
     paths = config[f"construction_paths"]
     if is_northern_ireland:
         construction_file_path = paths["construction_file_path_ni"]
@@ -74,14 +74,29 @@ def run_construction(  # noqa: C901
         postcode_construction_fpath = paths["postcode_construction_file_path"]
 
     # Check the construction file exists and has records, then read it
-    construction_df = read_construction_file(
-        path=construction_file_path,
-        logger=construction_logger,
-        read_csv_func=read_csv,
-        file_exists_func=check_file_exists
-    )
-    if isinstance(construction_df, type(None)):
-        return snapshot_df
+    if run_construction:
+        construction_df = read_construction_file(
+            path=construction_file_path,
+            logger=construction_logger,
+            read_csv_func=read_csv,
+            file_exists_func=check_file_exists
+        )
+
+        if isinstance(construction_df, type(None)):
+            construction_df = pd.DataFrame()
+            return construction_df
+
+        else:
+            # validate and merge schemas
+            validate_data_with_schema(construction_df, schema_path)
+            check_for_duplicates(
+                df=construction_df,
+                columns=["reference", "instance"],
+                logger=construction_logger
+            )
+    else:
+        construction_df = pd.DataFrame()
+
     # read in postcode construction file
     if run_postcode_construction:
         pc_construction_df = read_construction_file(
@@ -92,20 +107,15 @@ def run_construction(  # noqa: C901
         )
         if isinstance(pc_construction_df, type(None)):
             run_postcode_construction = False
-
-    # validate and merge schemas
-    validate_data_with_schema(construction_df, schema_path)
-    check_for_duplicates(
-        df=construction_df, 
-        columns=["reference", "instance"], 
-        logger=construction_logger
-    )
+            pc_construction_df = pd.DataFrame()
+    else:
+        pc_construction_df = pd.DataFrame()
 
     if run_postcode_construction:
         validate_data_with_schema(pc_construction_df, postcode_schema_path)
         check_for_duplicates(
-            df=pc_construction_df, 
-            columns=["reference", "instance"], 
+            df=pc_construction_df,
+            columns=["reference", "instance"],
             logger=construction_logger
         )
         validate_columns_not_empty(
@@ -114,30 +124,31 @@ def run_construction(  # noqa: C901
             logger=construction_logger,
             _raise=True,
         )
-    
+
     construction_df = concat_construction_dfs(
-        df1=construction_df, 
+        df1=construction_df,
         df2=pc_construction_df,
         validate_dupes=True,
         logger=construction_logger
     )
     # clean construction type column
-    construction_df.construction_type = (
-        construction_df.construction_type.apply(
-            lambda x: clean_construction_type(x)
+    if "construction_type" in construction_df.columns:
+        construction_df.construction_type = (
+            construction_df.construction_type.apply(
+                lambda x: clean_construction_type(x)
+            )
         )
-    )
-    # validate that 'construction_type' is valid
-    valid_types = ["short_to_long", "new", np.NaN]
-    if False in list(
-        construction_df.construction_type.isin(valid_types)
-    ):
-        raise ValueError(
-            f"Invalid value for construction_type. Expected one of {valid_types}"
-                    )
+        # validate that 'construction_type' is valid
+        valid_types = ["short_to_long", "new", np.NaN]
+        if False in list(
+            construction_df.construction_type.isin(valid_types)
+        ):
+            raise ValueError(
+                f"Invalid value for construction_type. Expected one of {valid_types}"
+                        )
     if not is_northern_ireland:
         validate_short_to_long(construction_df, construction_logger)
-    
+
     # validate the references passed in construction
     validate_construction_references(
         df=construction_df,
@@ -160,7 +171,7 @@ def run_construction(  # noqa: C901
         updated_snapshot_df, construction_df = (
             prepare_forms_gb(updated_snapshot_df, construction_df)
         )
-        
+
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
