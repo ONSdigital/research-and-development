@@ -170,6 +170,49 @@ def create_exports_config(config: dict) -> dict:
     return config["export_paths"]
 
 
+def validate_mapping_filenames(config: dict) -> dict: 
+    year = str(config["years"]["survey_year"])
+    year_mapper_dict = config[f"{year}_mappers"]
+    bool_dict = {}
+    msg = ""
+
+    for key, value in year_mapper_dict.items():
+        bool_dict[key] = True
+        # check string is not empty
+        if (not value) or (value == ""):
+            bool_dict[key] = False   
+            msg += f"{key} is empty"
+            #raise ValueError(f"{value} is empty.")
+
+       # check filename is correct
+        if value != 'v1':
+            validate_file_extension(value, '.csv')
+            bool_dict[key] = False   
+            # msg += f"{value} is the incorrect file type."
+
+       # check year is correct
+        if value != 'v1':
+            if year not in value:
+                bool_dict[key] = False
+                msg += f"{year} is not included in {key}."
+                #raise ValueError(f"{year} is not included in {key}.")
+    
+    return bool_dict, msg
+
+
+
+def filename_validation(config:dict) -> dict:
+    """Checks that the mapping filenames are valid"""
+    bool_dict, msg = validate_mapping_filenames(config)
+
+    if all(bool_dict.values()):
+        PathHelpLogger.info("All mapping filenames are valid.")
+    else:
+        PathHelpLogger.error("There are errors with the mapping filenames.")
+        raise ValueError(msg)
+        
+    return config
+
 def update_config_with_paths(config: dict, modules: list) -> dict:
     """Update the config with all the paths needed for the pipeline.
 
@@ -189,35 +232,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
 
-    return config
-
-
-def validate_mapping_filenames(config: dict) -> dict: 
-    year = str(config["years"]["survey_year"])
-    year_mapper_dict = config[f"{year}_mappers"]
-    bool_dict = {}
-
-    for key, value in year_mapper_dict.items():
-        bool_dict[key] = True
-        # check string is not empty
-        if (not value) or (value == ""):
-            bool_dict[key] = False   
-            raise ValueError(f"{value} is empty.")
-
-       # check filename is correct
-        if value != 'v1':
-            validate_file_extension(value, '.csv')
-            bool_dict[key] = False   
-
-       # check year is correct
-        if value != 'v1':
-            if year not in value:
-                bool_dict[key] = False
-                raise ValueError(f"{year} is not included in {key}.")
-    
-    if all(bool_dict.values()):
-        PathHelpLogger.info("All mapping filenames are valid.")  
-    else:
-        PathHelpLogger.info("There are errors with the mapping filenames.")     
+        ## add in function below
+    config = filename_validation(config)
 
     return config

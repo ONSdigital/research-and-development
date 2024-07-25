@@ -4,7 +4,7 @@ from typing import Union, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
-from src.utils.path_helpers import update_config_with_paths, validate_mapping_filenames
+from src.utils.path_helpers import update_config_with_paths
 
 
 def config_setup(user_config_path: str, dev_config_path: str) -> Dict:

@@ -295,31 +295,4 @@ class TestValidateMappingFilenames(object):
             } 
 
         validate_mapping_filenames(config)
-    return config
-
-    test = TestValidateMappingFilenames()
-
-------------------------------------------------------------------------------------------------------------
-
-def not_blank(config: dict, section: str, mapper_name: str) -> bool:
-    my_file = config[section][mapper_name]
-    not_blank = (my_file != '') and (not (my_file is None))
-
-    return not_blank
-
-
-print(not_blank(config, '2023_mappers', 'ultfoc_mapper_path'))
-#print(f"The filename {my_file} is not blank: {not_blank}")
-
-['itl_mapper_path', 'ultfoc_mapper_path']
-my_mappers = list(config['2022_mappers'].keys())
-
-section = '2023_mappers'
-not_blank_list = [not_blank(config, section, x) for x in my_mappers]
-
-all(not_blank_list)
-
-
-
-
-    
+    return config   

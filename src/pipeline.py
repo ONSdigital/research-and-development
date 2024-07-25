@@ -68,7 +68,7 @@ def run_pipeline(user_config_path, dev_config_path):
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
     
-    config = validate_mapping_filenames(config) # 
+    #config = validate_mapping_filenames(config) # 
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 
