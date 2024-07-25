@@ -8,6 +8,7 @@ def get_paths(config: dict) -> dict:
     paths = config[f"{network_or_hdfs}_paths"]
     paths["year"] = config["years"]["survey_year"]
     paths["berd_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/BERD/")
+    paths["pnp_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/PNP/")
     return paths
 
 

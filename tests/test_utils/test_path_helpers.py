@@ -91,7 +91,7 @@ def test_get_paths(config):
         "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         "year": 2022,
         "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
-        "pnp_path": "R:/DAP_emulation/2023_surveys/PNP/",
+        "pnp_path": "R:/DAP_emulation/2022_surveys/PNP/",
     }
     network_paths = get_paths(config)
 
