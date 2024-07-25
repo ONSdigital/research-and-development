@@ -39,8 +39,5 @@ def join_itl_regions(
     # if the ni_df is not empty, add the itl column to it
     if not ni_df.empty:
         ni_df["itl"] = "N92000002"
-        # join the itl mapper to add the region columns
-        # ni_df = join_with_null_check(
-        # ni_df, itl_mapper, "itl mapper", "itl", warn=True)
 
     return gb_df, ni_df
