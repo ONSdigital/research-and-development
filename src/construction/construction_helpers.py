@@ -8,12 +8,13 @@ import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
 
+
 def read_construction_file(
-        path: Union[str, pathlib.Path],
-        logger: logging.Logger,
-        read_csv_func: Callable,
-        file_exists_func: Callable
-    ) -> pd.DataFrame:
+    path: Union[str, pathlib.Path],
+    logger: logging.Logger,
+    read_csv_func: Callable,
+    file_exists_func: Callable,
+) -> pd.DataFrame:
     """Read in a construction file, with related logging.
 
     Args:
@@ -33,13 +34,9 @@ def read_construction_file(
             logger.info(f"Successfully read construction file from {path}.")
             return construction_df
         except pd.errors.EmptyDataError:
-            logger.warning(
-                f"Construction file {path} is empty, skipping..."
-            )
+            logger.warning(f"Construction file {path} is empty, skipping...")
             return None
-    logger.warning(
-        "Construction file not found, skipping construction..."
-    )
+    logger.warning("Construction file not found, skipping construction...")
     return None
 
 
@@ -63,12 +60,11 @@ def _convert_formtype(formtype_value: str) -> str:
             return None
     else:
         return None
-    
+
 
 def prepare_forms_gb(
-        snapshot_df: pd.DataFrame, 
-        construction_df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Prepare GB forms.
 
     Args:
@@ -83,11 +79,11 @@ def prepare_forms_gb(
         construction_df["formtype"] = construction_df["formtype"].apply(
             _convert_formtype
         )
-    # Prepare the short to long form constructions, if any (N/A to NI)
-    if "short_to_long" in construction_df.construction_type.unique():
-        snapshot_df = prepare_short_to_long(
-            snapshot_df, construction_df
-        )
+
+    if "construction_type" in construction_df.columns:
+        # Prepare the short to long form constructions, if any (N/A to NI)
+        if "short_to_long" in construction_df.construction_type.unique():
+            snapshot_df = prepare_short_to_long(snapshot_df, construction_df)
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
     construction_df = create_period_year(construction_df)
@@ -110,7 +106,8 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     # Check which references are going to be converted to long forms
     # and how many instances they have
     ref_count = construction_df.loc[
-        construction_df["construction_type"].str.lower() == "short_to_long", "reference"  # noqa: E712
+        construction_df["construction_type"].str.lower() == "short_to_long",
+        "reference",  # noqa: E712
     ].value_counts()
 
     # Create conversion df
