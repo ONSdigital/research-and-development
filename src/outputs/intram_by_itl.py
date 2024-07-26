@@ -17,7 +17,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 def save_detailed_csv(
     df: pd.DataFrame,
-    dir: Union[pathlib.Path, str],
+    output_dir: Union[pathlib.Path, str],
     survey_year: str,
     title: str,
     run_id: int,
@@ -28,7 +28,7 @@ def save_detailed_csv(
 
     Args:
         df (pd.DataFrame): The dataframe to save
-        dir (Union[pathlib.Path, str]): The directory to save the dataframe to.
+        output_dir (Union[pathlib.Path, str]): The directory to save the dataframe to.
         survey_year (str): The year that the data is from (from config).
         title (str): The filename to save the df as (excluding date, run id).
         run_id (int): The current run ID.
@@ -43,7 +43,7 @@ def save_detailed_csv(
     """
     date = datetime.now().strftime("%y-%m-%d")
     save_name = f"{survey_year}_{title}_{date}_v{run_id}.csv"
-    save_path = os.path.join(dir, save_name)
+    save_path = os.path.join(output_dir, save_name)
     if not overwrite and os.path.exists(save_path):
         raise FileExistsError(
             f"File '{save_path}' already exists. Pass overwrite=True if you "
@@ -144,16 +144,16 @@ def output_intram_by_itl(
     itl1, itl2 = aggregate_itl(gb_df, ni_df, CURRENT_YEAR, uk_output)
 
     # Export UK outputs
-    area = "gb" if ni_df is None else "uk"
+    area = "gb" if not uk_output else "uk"
     itl_dfs = [itl1, itl2]
     for i, itl_df in enumerate(itl_dfs, start=1):
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
         save_detailed_csv(
-            df=itl_df,
-            dir=output_dir,
-            survey_year=config["years"]["survey_year"],
-            title=f"output_intram_{area}_itl{i}",
-            run_id=run_id,
-            write_csv=write_csv,
+            itl_df,
+            output_dir,
+            config["years"]["survey_year"],
+            f"output_intram_{area}_itl{i}",
+            run_id,
+            write_csv,
             overwrite=True,
         )
