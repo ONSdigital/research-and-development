@@ -149,7 +149,7 @@ def clean_construction_type(value: str) -> str:
         return np.NaN
     # remove whitespaces
     cleaned = "_".join(cleaned.split())
-    return value
+    return cleaned
 
 
 def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:

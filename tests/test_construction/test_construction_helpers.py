@@ -1,5 +1,6 @@
 """Tests for construction_helpers.py"""
 import pandas as pd
+import numpy as np
 from pandas._testing import assert_frame_equal
 import logging
 import pytest
@@ -102,3 +103,120 @@ class TestPrepareFormGB:
         # Check the output
         assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
         assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output)
+
+
+class TestShortToLong:
+    """Test for prepare_forms_gb()."""
+
+    # Create updated snapshot df
+    def create_test_snapshot_df(self):
+        """Create a test snapshot df"""
+        input_cols = ["reference", "instance", "other"]
+        data = [
+            ["A", 0, None],
+            ["B", 0, "A"],
+            ["C", 1, "A"],
+        ]
+        input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_snapshot_df
+
+    # Create construction df
+    def create_test_construction_df(self):
+        """Create a test construction df"""
+        input_cols = ["reference", "instance", "construction_type"]
+        data = [
+            ["A", 0, None],
+            ["B", 0, "short_to_long"],
+            ["B", 1, "short_to_long"],
+            ["B", 2, "short_to_long"],
+            ["C", 1, "new"],
+        ]
+        input_construction_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_construction_df
+
+    # Create an expected dataframe for the test
+    def create_expected_snapshot_output(self):
+        """Create expected snapshot output df"""
+        output_cols = ["reference", "instance", "other"]
+        data = [
+            ["A", 0, None],
+            ["B", 0, "A"],
+            ["B", 1, "A"],
+            ["B", 2, "A"],
+            ["C", 1, "A"],
+        ]
+        output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_snapshot_df
+
+    def test_prepare_short_to_long(self):
+        """Test for prepare_short_to_long()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        input_construction_df = self.create_test_construction_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+
+        # Run the function
+        snapshot_output = prepare_short_to_long(
+            input_snapshot_df, input_construction_df
+        )
+
+        snapshot_output = snapshot_output.sort_values(
+            ["reference", "instance"], ascending=[True, True]
+        ).reset_index(drop=True)
+
+        # Check the output
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
+
+
+def test_clean_construction_type():
+    assert clean_construction_type("new") == "new"
+    assert clean_construction_type("Short to Long") == "short_to_long"
+    assert clean_construction_type("  ") is np.NaN
+    assert clean_construction_type("") is np.NaN
+    assert clean_construction_type(None) is np.NaN
+
+
+class TestFinaliseFormsGB:
+    """Test for finalise_forms_gb()."""
+
+    # Create updated snapshot df
+    def create_test_snapshot_df(self):
+        """Create a test snapshot df"""
+        input_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
+        data = [
+            ["A", "0001", 1, "AB12 3CD", None, None, "Form sent out"],
+            ["B", "0006", 0, None, "AB12 3CD", "AB12 3CD", "Form sent out"],
+            ["C", "0001", 1, "X11 1XX", "AB12 3CD", None, "Form sent out"],
+            ["D", "0006", 0, None, "X11 1XX", None, "Other"],
+            ["E", "0006", 0, None, None, None, "Other"],
+            ["F", "0001", 1, "ab12 3cd", None, None, "Other"],
+        ]
+        input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_snapshot_df
+
+    # Create an expected dataframe for the test
+    def create_expected_snapshot_output(self):
+        """Create expected snapshot output df"""
+        output_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
+        data = [
+            ["A", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Form sent out"],
+            ["B", "0006", None, None, "AB12 3CD", "AB12 3CD", "Form sent out"],
+            ["C", "0001", 1, "X11  1XX", "AB12 3CD", "X11  1XX", "Form sent out"],
+            ["D", "0006", 0, None, "X11  1XX", "X11  1XX", "Other"],
+            ["E", "0006", 0, None, None, None, "Other"],
+            ["F", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Other"],
+        ]
+        output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_snapshot_df
+
+    def test_finalise_forms_gb(self):
+        """Test for finalise_forms_gb()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+
+        # Run the function
+        snapshot_output = finalise_forms_gb(input_snapshot_df)
+
+        # Check the output
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
