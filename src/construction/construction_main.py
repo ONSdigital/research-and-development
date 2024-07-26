@@ -9,6 +9,7 @@ from src.construction.construction_helpers import (
     read_construction_file,
     prepare_forms_gb,
     clean_construction_type,
+    remove_short_to_long_0,
 )
 from src.construction.construction_validation import (
     check_for_duplicates,
@@ -108,6 +109,8 @@ def run_construction(  # noqa: C901
         if isinstance(pc_construction_df, type(None)):
             run_postcode_construction = False
             pc_construction_df = pd.DataFrame()
+        else:
+            pc_construction_df["construction_type"] = np.NaN
     else:
         pc_construction_df = pd.DataFrame()
 
@@ -162,6 +165,7 @@ def run_construction(  # noqa: C901
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
+
     # Run GB specific actions
     if not is_northern_ireland:
         updated_snapshot_df, construction_df = prepare_forms_gb(
@@ -195,6 +199,11 @@ def run_construction(  # noqa: C901
     updated_snapshot_df = updated_snapshot_df.astype(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
+
+    if "construction_type" in construction_df.columns:
+        if construction_df["construction_type"].str.contains("short_to_long").any():
+            construction_df.reset_index(inplace=True)
+            updated_snapshot_df = remove_short_to_long_0(updated_snapshot_df, construction_df)
 
     # Run GB specific actions
     if not is_northern_ireland:
