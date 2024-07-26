@@ -260,7 +260,7 @@ def run_staging(  # noqa: C901
     # Output the staged PNP data.
     if config["global"]["output_pnp_full_responses"]:
         StagingMainLogger.info("Starting output of staged PNP data...")
-        staging_folder = config["pnp_paths"]["staging_qa_path"]
+        staging_folder = staging_dict["pnp_staging_qa_path"]
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         staged_filename = (
