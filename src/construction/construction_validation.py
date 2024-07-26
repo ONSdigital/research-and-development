@@ -6,11 +6,10 @@ import pandas as pd
 
 from src.utils.defence import type_defence
 
+
 def check_for_duplicates(
-        df: pd.DataFrame,
-        columns: Union[list, str],
-        logger: logging.Logger = None
-    ) -> None:
+    df: pd.DataFrame, columns: Union[list, str], logger: logging.Logger = None
+) -> None:
     """Check a dataframe for duplicate values across multiple columns.
 
     Args:
@@ -42,11 +41,11 @@ def check_for_duplicates(
 
 
 def concat_construction_dfs(
-        df1: pd.DataFrame,
-        df2: pd.DataFrame,
-        validate_dupes: bool = False,
-        logger: logging.Logger = None
-    ) -> pd.DataFrame:
+    df1: pd.DataFrame,
+    df2: pd.DataFrame,
+    validate_dupes: bool = False,
+    logger: logging.Logger = None,
+) -> pd.DataFrame:
     """Merge the construction and postcode construction dataframes into one.
 
     Args:
@@ -74,11 +73,11 @@ def concat_construction_dfs(
 
 
 def validate_columns_not_empty(
-        df: pd.DataFrame,
-        columns: Union[str, list],
-        logger: logging.Logger = None,
-        _raise: bool = True,
-    ) -> None:
+    df: pd.DataFrame,
+    columns: Union[str, list],
+    logger: logging.Logger = None,
+    _raise: bool = True,
+) -> None:
     """Validate that all columns in a set are not empty.
 
     Args:
@@ -110,9 +109,7 @@ def validate_columns_not_empty(
     # validate whether there are missing values in all columns of a row
     if len(df[columns].dropna(axis=0, how="all")) != len(df):
         if _raise:
-            raise ValueError(
-                f"Columns {columns} are both empty."
-            )
+            raise ValueError(f"Columns {columns} are both empty.")
         else:
             logger.info(f"Columns {columns} are both empty.")
     # write confirmation to log
@@ -121,10 +118,7 @@ def validate_columns_not_empty(
     return None
 
 
-def validate_short_to_long(
-        df: pd.DataFrame,
-        logger: logging.Logger = None
-    ) -> None:
+def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> None:
     """Validate the short_to_long construction records.
 
     Args:
@@ -140,12 +134,10 @@ def validate_short_to_long(
     type_defence(logger, "logger", (logging.Logger, type(None)))
     # validates that all key columns have values
     validate_columns_not_empty(
-        df=df,
-        columns=["reference", "instance", "period"],
-        logger=logger
+        df=df, columns=["reference", "instance", "period"], logger=logger
     )
     # refine dataframe to required data
-    df = df[df.construction_type=="short_to_long"]
+    df = df[df.construction_type == "short_to_long"]
     df = df[["reference", "instance", "period"]]
     # validate that all short_to_long constructions have instance=0
     min_df = df.groupby(["reference", "period"]).agg("min").reset_index()
@@ -159,10 +151,8 @@ def validate_short_to_long(
 
 
 def _references_in_snapshot(
-        df: pd.DataFrame,
-        snapshot_refs: list,
-        logger: logging.Logger = None
-    ) -> Tuple[bool, list]:
+    df: pd.DataFrame, snapshot_refs: list, logger: logging.Logger = None
+) -> Tuple[bool, list]:
     """Determine if the references in a df are in a snapshot.
 
     Args:
@@ -178,11 +168,11 @@ def _references_in_snapshot(
     type_defence(snapshot_refs, "snapshot_refs", list)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     # add a new column to the dataframe indicating if the ref is present
-    valid_df = (
-        df.join(df[["reference"]].isin(snapshot_refs), how="left", rsuffix="_valid")
+    valid_df = df.join(
+        df[["reference"]].isin(snapshot_refs), how="left", rsuffix="_valid"
     )
     # obtain a df of invalid references (not in snpashot)
-    invalid_refs = valid_df[valid_df.reference_valid==False]
+    invalid_refs = valid_df[valid_df.reference_valid == False]
     if len(invalid_refs) > 0:
         inv = invalid_refs["reference"].unique()
         if logger:
@@ -191,17 +181,13 @@ def _references_in_snapshot(
             )
         return (False, list(inv))
     if logger:
-        logger.info(
-            "All passed references from construction file in snapshot"
-        )
+        logger.info("All passed references from construction file in snapshot")
     return (True, [])
 
 
 def validate_construction_references(
-        df: pd.DataFrame,
-        snapshot_df: pd.DataFrame,
-        logger: logging.Logger = None
-    ) -> None:
+    df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
+) -> None:
     """Validate the construction references for both new and non-new constructions.
 
     Args:
@@ -220,13 +206,11 @@ def validate_construction_references(
     type_defence(snapshot_df, "snapshot_df", pd.DataFrame)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     snapshot_refs = list(snapshot_df.reference.unique())
-    new_constructions = df[df.construction_type=="new"]
-    reg_constructions = df[df.construction_type!="new"]
+    new_constructions = df[df.construction_type == "new"]
+    reg_constructions = df[df.construction_type != "new"]
     # non new constructions
     refs_valid, refs = _references_in_snapshot(
-        df=reg_constructions,
-        snapshot_refs=snapshot_refs,
-        logger=logger
+        df=reg_constructions, snapshot_refs=snapshot_refs, logger=logger
     )
     if not refs_valid:
         raise ValueError(
@@ -236,14 +220,12 @@ def validate_construction_references(
     if logger:
         logger.info(
             "References not marked as new constructions are all in the original dataset"
-            )
+        )
     # new constructions
     if new_constructions.empty:
         return None
     refs_valid, refs = _references_in_snapshot(
-        df=new_constructions,
-        snapshot_refs=snapshot_refs,
-        logger=logger
+        df=new_constructions, snapshot_refs=snapshot_refs, logger=logger
     )
     if refs_valid:
         raise ValueError(

@@ -1,9 +1,12 @@
 """Function to run the mapping of foreign ownership (ultfoc)"""
 
+import logging
 import pandas as pd
 from typing import Tuple
 
 from src.mapping import mapping_helpers as hlp
+
+MappingLogger = logging.getLogger(__name__)
 
 
 def validate_ultfoc_mapper(ultfoc_mapper: pd.DataFrame) -> None:
@@ -60,4 +63,6 @@ def join_fgn_ownership(
     mapped_gb_df.drop(columns=["ruref"], inplace=True)
     mapped_gb_df["ultfoc"] = mapped_gb_df["ultfoc"].fillna("GB")
     mapped_gb_df["ultfoc"] = mapped_gb_df["ultfoc"].replace("", "GB")
+
+    MappingLogger.info("ultfoc mapping and validation successfully completed.")
     return mapped_gb_df, mapped_ni_df

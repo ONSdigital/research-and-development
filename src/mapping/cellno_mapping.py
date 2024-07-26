@@ -1,9 +1,12 @@
 """Functions to clean and validate the cell no mapper."""
 import pandas as pd
+import logging
 
 from typing import Tuple
 
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
+
+MappingLogger = logging.getLogger(__name__)
 
 
 def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFrame:

@@ -9,7 +9,6 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   # Construction Settings
-  run_construction: False
   run_all_data_construction: False
   run_postcode_construction: False
   run_ni_construction: False
