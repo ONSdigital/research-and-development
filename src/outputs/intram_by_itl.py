@@ -100,20 +100,12 @@ def aggregate_itl(
 
     # conditionally include NI responses to produce UK
     if uk_output:
-        if not ni_df.empty:
-            ni_df = ni_df.copy()[["formtype", "211"]]
-            for col in GEO_COLS + ["postcodes_harmonised"]:
-                ni_df[col] = pd.NA
-            df = df.append(ni_df, ignore_index=True).copy()
-        else:
-            # warn that UK output cannot be produced as there is no NI data
-            OutputMainLogger.warning(
-                "NI data is was not. Intram_by_itl_UK output cannot be produced."
-            )
-            return
+        ni_df = ni_df.copy()[["formtype", "211"]]
+        for col in GEO_COLS + ["postcodes_harmonised"]:
+            ni_df[col] = pd.NA
+        df = df.append(ni_df, ignore_index=True).copy()
 
     # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
-
     itl2 = df.groupby(GEO_COLS).agg({"211": "sum"}).reset_index()
     itl1 = itl2.drop(GEO_COLS[:2], axis=1).copy()
     itl1 = itl1.groupby(GEO_COLS[2:]).agg({"211": "sum"}).copy().reset_index()

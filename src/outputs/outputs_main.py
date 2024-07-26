@@ -164,16 +164,21 @@ def run_outputs(  # noqa: C901
 
     # Running Intram by ITL (UK)
     if config["global"]["output_intram_uk_itl"]:
-        OutputMainLogger.info("Starting Intram by ITL (UK) output...")
-        output_intram_by_itl(
-            outputs_df,
-            ni_full_responses,
-            config,
-            write_csv,
-            run_id,
-            uk_output=True,
-        )
-        OutputMainLogger.info("Finished Intram by ITL (UK) output.")
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by ITL (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by ITL (UK) output...")
+            output_intram_by_itl(
+                outputs_df,
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by ITL (UK) output.")
 
     # Running frozen group
     if config["global"]["output_frozen_group"]:
