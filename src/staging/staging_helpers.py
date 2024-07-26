@@ -407,7 +407,6 @@ def filter_pnp_data(full_responses):
         pandas.DataFrame: DataFrame without rows where 'legalstatus' == '7'
 
     """
-
     # create dataframe with PNP data legalstatus=='7'
     pnp_full_responses = full_responses.loc[(full_responses["legalstatus"] == "7")]
     # filter out PNP data or equivalently records with legalstatus!='7'

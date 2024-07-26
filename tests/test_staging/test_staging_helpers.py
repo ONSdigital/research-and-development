@@ -397,7 +397,7 @@ class TestStageValidateHarmonisePostcodes(object):
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"
 
 
-class Testfilter_pnp_data:
+class TestFilterPnpData:
     """Tests for the filter_pnp_data function."""
 
     def create_input_df(self):
