@@ -159,7 +159,8 @@ def remove_short_to_long_0(updated_snapshot_df, construction_df):
         construction_df (pd.DataFrame): The construction df.
 
     Returns:
-        pd.DataFrame: The updated snapshot df with instance 0 removed for short to long constructions.
+        pd.DataFrame: The updated snapshot df with instance 0
+        removed for short to long constructions.
     """
     short_to_long_references = construction_df.loc[
         construction_df["construction_type"].str.lower() == "short_to_long",
@@ -167,7 +168,10 @@ def remove_short_to_long_0(updated_snapshot_df, construction_df):
     ].unique()
 
     updated_snapshot_df = updated_snapshot_df[
-        ~(updated_snapshot_df["reference"].isin(short_to_long_references) & (updated_snapshot_df["instance"] == 0))
+        ~(
+            updated_snapshot_df["reference"].isin(short_to_long_references)
+            & (updated_snapshot_df["instance"] == 0)
+        )
     ]
 
     return updated_snapshot_df

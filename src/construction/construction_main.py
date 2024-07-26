@@ -203,7 +203,9 @@ def run_construction(  # noqa: C901
     if "construction_type" in construction_df.columns:
         if construction_df["construction_type"].str.contains("short_to_long").any():
             construction_df.reset_index(inplace=True)
-            updated_snapshot_df = remove_short_to_long_0(updated_snapshot_df, construction_df)
+            updated_snapshot_df = remove_short_to_long_0(
+                updated_snapshot_df, construction_df
+            )
 
     # Run GB specific actions
     if not is_northern_ireland:
