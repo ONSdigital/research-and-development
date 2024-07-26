@@ -67,19 +67,19 @@ class TestAddConstructedNonresponders:
         output_construction_df = pd.DataFrame(data=data, columns=output_cols)
         return output_construction_df
 
-def test_add_constructed_nonresponders(self):
-    """Test for add_constructed_nonresponders()."""
-    # Create test dataframes
-    input_snapshot_df = self.create_test_snapshot_df()
-    input_construction_df = self.create_test_construction_df()
-    expected_snapshot_output = self.create_expected_snapshot_output()
-    expected_construction_output = self.create_expected_construction_output()
+    def test_add_constructed_nonresponders(self):
+        """Test for add_constructed_nonresponders()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        input_construction_df = self.create_test_construction_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+        expected_construction_output = self.create_expected_construction_output()
 
-    # Run the function
-    snapshot_output, construction_output = add_constructed_nonresponders(
-        input_snapshot_df, input_construction_df
-    )
+        # Run the function
+        snapshot_output, construction_output = add_constructed_nonresponders(
+            input_snapshot_df, input_construction_df
+        )
 
-    # Check the output
-    assert_frame_equal(snapshot_output, expected_snapshot_output)
-    assert_frame_equal(construction_output, expected_construction_output)
+        # Check the output
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
+        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output)
