@@ -9,6 +9,7 @@ from src.construction.construction_helpers import (
     read_construction_file,
     prepare_forms_gb,
     clean_construction_type,
+    add_constructed_nonresponders,
 )
 from src.construction.construction_validation import (
     check_for_duplicates,
@@ -162,6 +163,7 @@ def run_construction(  # noqa: C901
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
+
     # Run GB specific actions
     if not is_northern_ireland:
         updated_snapshot_df, construction_df = prepare_forms_gb(
@@ -171,6 +173,10 @@ def run_construction(  # noqa: C901
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
+
+    # Add constructed non-reponponders (i.e. new rows) to df
+    if construction_df["construction_type"].str.contains('new').any():
+        updated_snapshot_df, construction_df = add_constructed_nonresponders(updated_snapshot_df, construction_df)
 
     # Update the values with the constructed ones
     construction_df.set_index(
