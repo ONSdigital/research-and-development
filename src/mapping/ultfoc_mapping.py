@@ -58,5 +58,6 @@ def join_fgn_ownership(
         mapped_df.drop(columns=["ruref"], inplace=True)
         mapped_df["ultfoc"] = mapped_df["ultfoc"].fillna("GB")
         mapped_df["ultfoc"] = mapped_df["ultfoc"].replace("", "GB")
+
         MappingLogger.info("ultfoc mapping successfully completed.")
         return mapped_df
