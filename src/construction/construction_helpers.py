@@ -152,7 +152,7 @@ def clean_construction_type(value: str) -> str:
 
 
 def add_constructed_nonresponders(updated_snapshot_df, construction_df):
-    new_rows = construction_df["construction_type"].str.contains("new", na = False)
+    new_rows = construction_df["construction_type"].str.contains("new", na=False)
     rows_to_add = construction_df[new_rows]
     construction_df = construction_df[~new_rows]
     updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
