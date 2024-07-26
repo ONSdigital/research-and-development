@@ -1,8 +1,10 @@
 """Functions to clean and validate the cell no mapper."""
 import pandas as pd
+import logging
 
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
 
+MappingLogger = logging.getLogger(__name__)
 
 def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFrame:
     """Clean and validate the cellno mapper dataframe.
@@ -53,4 +55,5 @@ def validate_join_cellno_mapper(
     cellno_df = clean_validate_cellno_mapper(cellno_df, num)
     df = join_with_null_check(df, cellno_df, "cellno", "cellnumber")
 
+    MappingLogger.info("cellno mapping successfully completed.")
     return df
