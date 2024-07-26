@@ -1,5 +1,6 @@
 """Read and validate construction files the construction module."""
 import logging
+import pandas as pd
 from typing import Callable
 
 from src.construction.construction_helpers import (
@@ -14,13 +15,15 @@ from src.staging.validation import validate_data_with_schema
 
 construction_logger = logging.getLogger(__name__)
 
+
 def read_validate_construction_files(
     config: dict,
     check_file_exists: Callable,
     read_csv: Callable,
     is_northern_ireland: bool = False,
     run_construction: bool = False,
-    run_postcode_construction: bool = False,):
+    run_postcode_construction: bool = False,
+):
     """Read and validate construction files the construction module."""
 
     # Obtain construction paths

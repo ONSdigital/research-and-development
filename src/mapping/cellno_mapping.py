@@ -6,6 +6,7 @@ from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_che
 
 MappingLogger = logging.getLogger(__name__)
 
+
 def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFrame:
     """Clean and validate the cellno mapper dataframe.
 
