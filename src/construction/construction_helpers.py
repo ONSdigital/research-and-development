@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
+from src.staging import postcode_validation as pcval
 
 
 def read_construction_file(
@@ -149,3 +150,44 @@ def clean_construction_type(value: str) -> str:
     # remove whitespaces
     cleaned = "_".join(cleaned.split())
     return value
+
+
+def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
+    """Tasks to prepare the GB forms for the next stage in pipeline.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot df.
+
+    Returns:
+        pd.DataFrame: The updated snapshot df with postcodes_harmonised
+        and short forms reset.
+    """
+
+    # Long form records with a postcode in 601 use this as the postcode
+    long_form_cond = ~updated_snapshot_df["601"].isnull()
+    updated_snapshot_df.loc[
+        long_form_cond, "postcodes_harmonised"
+    ] = updated_snapshot_df["601"]
+
+    # Short form records with nothing in 601 use referencepostcode instead
+    short_form_cond = (updated_snapshot_df["601"].isnull()) & (
+        ~updated_snapshot_df["referencepostcode"].isnull()
+    )
+    updated_snapshot_df.loc[
+        short_form_cond, "postcodes_harmonised"
+    ] = updated_snapshot_df["referencepostcode"]
+
+    # Top up all new postcodes so they're all eight characters exactly
+    postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
+    for col in postcode_cols:
+        updated_snapshot_df[col] = updated_snapshot_df[col].apply(
+            pcval.format_postcodes
+        )
+
+    # Reset shortforms with status 'Form sent out' to instance=None
+    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
+        updated_snapshot_df.status == "Form sent out"
+    )
+    updated_snapshot_df.loc[form_sent_condition, "instance"] = None
+
+    return updated_snapshot_df
