@@ -15,6 +15,7 @@ from src.utils.config import (
     _check_has_schema,
     _validate_path,
     _nulltype_conversion,
+    validate_freezing_config_settings,
 )
 
 
@@ -314,3 +315,158 @@ class TestValidateConfig(object):
         }
         with pytest.raises(error_type, match=msg):
             validate_config(dummy_config)
+
+
+class TestValidateFreezingConfigSettings(object):
+    """Tests for validate_freezing_config_settings."""
+
+    def test_validate_freezing_config_settings_no_errors(self):
+        """Test validate_freezing_config_settings with no errors."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": True,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_first_snapshot_and_run_frozen_data(self):
+        """Test validate_freezing_config_settings with run_first_snapshot_of_results and run_frozen_data both True."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": True,
+                "run_frozen_data": True,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_first_snapshot_without_frozen_snapshot_path(self):
+        """Test validate_freezing_config_settings with run_first_snapshot_of_results True but no frozen_snapshot_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": True,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": None,
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_frozen_data_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with run_frozen_data True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": True,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_load_updated_snapshot_without_secondary_snapshot_path(self):
+        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no secondary_snapshot_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": True,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "secondary_snapshot_path": None,
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_load_updated_snapshot_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": True,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_updates_and_freeze_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with run_updates_and_freeze True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_updates_and_freeze_without_freezing_adds_and_amends_path(self):
+        """Test validate_freezing_config_settings with run_updates_and_freeze True but no freezing_adds_and_amends_path."""
+        user_config = {
+            "global": {
+                "run_first_snapshot_of_results": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "freezing_adds_and_amends_path": None,
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_freezing_config_settings(user_config)

@@ -8,6 +8,11 @@ global:
   postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
+  # Freezing settings
+  run_first_snapshot_of_results: True
+  load_updated_snapshot_for_comparison: False
+  run_frozen_data: False
+  run_updates_and_freeze: False
   # Construction Settings
   run_all_data_construction: False
   run_postcode_construction: False
@@ -19,6 +24,8 @@ global:
   output_backdata: True
   # QA output settings
   output_full_responses: False
+  output_frozen_csv: False
+  output_freezing_adds_and_amends: False
   output_ni_full_responses: False
   output_imputation_qa: False
   output_mapping_qa: False
@@ -45,10 +52,13 @@ global:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  frozen_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # first snapshot of run
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
+  # Frozen data paths
+  frozen_data_staged_path: None # "02_freezing/frozen_data_staged/"
+  freezing_adds_and_amends_path: None # "02_freezing/freezing_adds_and_amends/"
   # Imputation and outliers input paths
   backdata_path: ""
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"

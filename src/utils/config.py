@@ -48,6 +48,7 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
+        validate_freezing_config_settings(user_config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -286,3 +287,46 @@ def validate_config(config: dict) -> None:
             validation_item=validation_config[validation_item],
             item_name=validation_item,
         )
+
+
+def validate_freezing_config_settings(user_config):
+    """Check that correct combination of freezing settings are used."""
+
+    run_first_snapshot_of_results = user_config["global"]["run_first_snapshot_of_results"]
+    run_frozen_data = user_config["global"]["run_frozen_data"]
+    frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
+    frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
+    load_updated_snapshot_for_comparison = user_config["global"]["load_updated_snapshot_for_comparison"]
+    secondary_snapshot_path = user_config["hdfs_paths"]["secondary_snapshot_path"]
+    run_updates_and_freeze = user_config["global"]["run_updates_and_freeze"]
+    freezing_adds_and_amends_path = user_config["hdfs_paths"]["freezing_adds_and_amends_path"]
+
+
+    if run_first_snapshot_of_results and run_frozen_data:
+        raise ValueError(
+            "Cannot run first snapshot of results and run frozen data at the same time."
+        )
+
+    if run_first_snapshot_of_results:
+        if frozen_snapshot_path is None:
+            raise ValueError(
+                "If running first snapshot of results, a frozen snapshot path must be provided."
+            )
+
+    if run_frozen_data:
+        if frozen_data_staged_path is None:
+            raise ValueError(
+                "If running frozen data, a frozen data staged path must be provided."
+            )
+
+    if load_updated_snapshot_for_comparison:
+        if secondary_snapshot_path is None or frozen_data_staged_path is None:
+            raise ValueError(
+                "If loading an updated snapshot for comparison, a secondary snapshot path and frozen data staged path must be provided."
+            )
+
+    if run_updates_and_freeze:
+        if frozen_data_staged_path is None or freezing_adds_and_amends_path is None:
+            raise ValueError(
+                "If running updates and freezing, a frozen data staged path and freezing adds and amends path must be provided."
+            )
