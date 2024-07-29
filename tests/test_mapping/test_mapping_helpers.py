@@ -9,11 +9,7 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     create_additional_ni_cols,
-<<<<<<< HEAD
-    validate_mapper_config
-=======
-    join_with_null_check,
->>>>>>> origin/develop
+    join_with_null_check
 )
 
 from src.utils.path_helpers import validate_mapping_filenames
@@ -258,41 +254,65 @@ class TestCreateAdditionalNiCols(object):
 
 class TestValidateMappingFilenames(object):
     @pytest.fixture(scope="module")
-    def test_validate_mapper_config_raises_file_incorrect(self, config):
-            with pytest.raises(error_type, match = match):
-                config = {
-                    'survey_year' : {2022,},
-                    '2022_mappers': {'itl_mapper_path': "itl_2022.cs",
-                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-                    'ultfoc_mapper_path': None,}
+    def test_validate_mapper_config_raises_file_incorrect(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "itl_2022.cs",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
             } 
 
-        validate_mapping_filenames(config)
-    return config
+        bool_dict = {}
 
-    def test_validate_mapper_config_raises_year_incorrect(self, config):
-            with pytest.raises(error_type, match = match):
-                config = {
-                    'survey_year' : {2022,},
-                    '2022_mappers': {'itl_mapper_path': "itl_202.csv",
-                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-                    'ultfoc_mapper_path': None,}
+        validate_mapping_filenames(config)
+        return config
+
+        expected_bool = {False, True}
+
+        assert bool_dict.equals(
+            expected_bool
+            ), "Output from test_validate_mapper_config_raises_file_incorrect not as expected."
+
+
+    def test_validate_mapper_config_raises_year_incorrect(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "itl_202.csv",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
             } 
 
-        validate_mapping_filenames(config)
-    return config
+        bool_dict = {}
 
-    def test_validate_mapper_config_raises_missing_file(self, config):
-            with pytest.raises(error_type, match = match):
-                config = {
-                    'survey_year' : {2022,},
-                    '2022_mappers': {'itl_mapper_path': ,
-                    'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-                    '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-                    'ultfoc_mapper_path': None,}
+        validate_mapping_filenames(config)
+        return bool_dict
+
+        expected_bool = {False, True}
+
+        assert bool_dict.equals(
+            expected_bool
+            ), "Output from test_validate_mapper_config_raises_year_incorrect not as expected."
+
+
+
+    def test_validate_mapper_config_raises_missing_file(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
             } 
 
+        bool_dict = {}
+
         validate_mapping_filenames(config)
-    return config   
+        return bool_dict   
+
+        expected_bool = {False, False}
+
+        assert bool_dict.equals(
+            expected_bool
+            ), "Output from test_validate_mapper_config_raises_missing_file not as expected."

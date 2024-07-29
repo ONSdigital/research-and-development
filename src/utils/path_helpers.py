@@ -181,7 +181,7 @@ def validate_mapping_filenames(config: dict) -> dict:
         # check string is not empty
         if (not value) or (value == ""):
             bool_dict[key] = False   
-            msg += f"{key} is empty"
+            msg += f"{key} is empty."
 
        # check filename is correct
         if value != 'v1':
