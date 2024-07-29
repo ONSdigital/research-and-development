@@ -16,6 +16,7 @@ from src.utils.config import (
     _validate_path,
     _nulltype_conversion,
     validate_freezing_config_settings,
+    validate_construction_config_settings,
 )
 
 
@@ -470,3 +471,74 @@ class TestValidateFreezingConfigSettings(object):
         }
         with pytest.raises(ValueError):
             validate_freezing_config_settings(user_config)
+
+
+class TestValidateConstructionConfigSettings(object):
+    """Tests for validate_freezing_config_settings."""
+
+    def test_validate_construction_config_settings_no_errors(self):
+        """Test validate_construction_config_settings with no errors."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": True,
+                "run_postcode_construction": True,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": None,
+            },
+        }
+        validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_all_data_no_file(self):
+        """Test validate_construction_config_settings with no all data file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": True,
+                "run_postcode_construction": False,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": None,
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": "/path/to/ni",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_postcodes_no_file(self):
+        """Test validate_construction_config_settings with no postcode file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": False,
+                "run_postcode_construction": True,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": None,
+                "construction_file_path_ni": "/path/to/ni",
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_ni_no_file(self):
+        """Test validate_construction_config_settings with no ni file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": False,
+                "run_postcode_construction": False,
+                "run_ni_construction": True,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": None,
+            },
+        }
+        with pytest.raises(ValueError):
+            validate_construction_config_settings(user_config)
