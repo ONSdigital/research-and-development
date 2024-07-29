@@ -49,6 +49,7 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
         validate_freezing_config_settings(user_config)
+        validate_construction_config_settings(user_config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -329,4 +330,34 @@ def validate_freezing_config_settings(user_config):
         if frozen_data_staged_path is None or freezing_adds_and_amends_path is None:
             raise ValueError(
                 "If running updates and freezing, a frozen data staged path and freezing adds and amends path must be provided."
+            )
+
+
+def validate_construction_config_settings(user_config):
+    """Check that correct combination of construction settings are used."""
+
+    run_all_data_construction = user_config["global"]["run_all_data_construction"]
+    run_postcode_construction = user_config["global"]["run_postcode_construction"]
+    run_ni_construction = user_config["global"]["run_ni_construction"]
+    all_data_construction_file_path = user_config["hdfs_paths"]["all_data_construction_file_path"]
+    postcode_construction_file_path = user_config["hdfs_paths"]["postcode_construction_file_path"]
+    construction_file_path_ni = user_config["hdfs_paths"]["construction_file_path_ni"]
+
+
+    if run_all_data_construction:
+        if all_data_construction_file_path is None:
+            raise ValueError(
+                "If running all data construction, a construction file path must be provided."
+            )
+
+    if run_postcode_construction:
+        if postcode_construction_file_path is None:
+            raise ValueError(
+                "If running postcode construction, a postcode construction file path must be provided."
+            )
+
+    if run_ni_construction:
+        if construction_file_path_ni is None:
+            raise ValueError(
+                "If running NI construction, a construction file path must be provided."
             )
