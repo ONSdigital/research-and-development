@@ -87,7 +87,7 @@ class TestPrepareFormGB:
         output_construction_df = pd.DataFrame(data=data, columns=output_cols)
         return output_construction_df
 
-    def test_add_constructed_nonresponders(self):
+    def test_prepare_forms_gb(self):
         """Test for add_constructed_nonresponders()."""
         # Create test dataframes
         input_snapshot_df = self.create_test_snapshot_df()
@@ -101,12 +101,12 @@ class TestPrepareFormGB:
         )
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
-        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output)
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
+        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"
 
 
-class TestShortToLong:
-    """Test for prepare_forms_gb()."""
+class TestPrepareShortToLong:
+    """Test for prepare_short_to_long()."""
 
     # Create updated snapshot df
     def create_test_snapshot_df(self):
@@ -165,7 +165,7 @@ class TestShortToLong:
         ).reset_index(drop=True)
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
 
 
 def test_clean_construction_type():
@@ -219,4 +219,4 @@ class TestFinaliseFormsGB:
         snapshot_output = finalise_forms_gb(input_snapshot_df)
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
