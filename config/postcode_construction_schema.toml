@@ -8,6 +8,15 @@ Min_values = 11001603625
 Max_values = 19891309165
 Possible_Categorical_Values = ["nan"]
 
+[period]
+Description = "nan"
+Deduced_Data_Type = "Int64"
+Nullable = false
+Current_Data_Type = "str"
+Length = 6
+Min_values = "nan"
+Max_values = "nan"
+
 [referencepostcode]
 Description = "nan"
 Deduced_Data_Type = "str"
@@ -50,14 +59,3 @@ Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_categorical_Values = ["nan"]
-
-[construction_type]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = true
-Current_Data_Type = "str"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_categorical_Values = ["nan"]
