@@ -186,7 +186,9 @@ def _references_in_snapshot(
 
 
 def validate_construction_references(
-    construction_df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
+    construction_df: pd.DataFrame,
+    snapshot_df: pd.DataFrame,
+    logger: logging.Logger = None,
 ) -> None:
     """Validate the construction references for both new and non-new constructions.
 
@@ -231,7 +233,9 @@ def validate_construction_references(
 
 
 def _ref_instance_in_snapshot(
-    construction_df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
+    construction_df: pd.DataFrame,
+    snapshot_df: pd.DataFrame,
+    logger: logging.Logger = None,
 ) -> None:
     """Determine if the reference/instance combination is already present in snapshot.
 
@@ -252,15 +256,29 @@ def _ref_instance_in_snapshot(
     construction_df_copy = construction_df.copy()
 
     # create a key to check if ref/instance combo exists
-    snapshot_df_copy['ref_instance'] = snapshot_df_copy['reference'].astype(str) + ": " + snapshot_df_copy['instance'].astype(str)
-    construction_df_copy['ref_instance'] = construction_df_copy['reference'].astype(str) + ": " + construction_df_copy['instance'].astype(str)
+    snapshot_df_copy["ref_instance"] = (
+        snapshot_df_copy["reference"].astype(str)
+        + ": "
+        + snapshot_df_copy["instance"].astype(str)
+    )
+    construction_df_copy["ref_instance"] = (
+        construction_df_copy["reference"].astype(str)
+        + ": "
+        + construction_df_copy["instance"].astype(str)
+    )
 
-    invalid_combo = pd.merge(construction_df_copy, snapshot_df_copy, on='ref_instance', how='inner')
+    invalid_combo = pd.merge(
+        construction_df_copy, snapshot_df_copy, on="ref_instance", how="inner"
+    )
 
     if invalid_combo.empty:
-        logger.info("All reference/instance combinations marked as 'new' have been checked against the snapshot and validated.")
+        logger.info(
+            "All reference/instance combinations marked as 'new' have been checked"
+            " against the snapshot and validated."
+        )
     if not invalid_combo.empty:
-        invalid_combo_ref = invalid_combo['ref_instance'].unique()
+        invalid_combo_ref = invalid_combo["ref_instance"].unique()
         raise ValueError(
-            f"Reference/instance combinations marked as 'new' are already in the dataset: {invalid_combo_ref}"
+            "Reference/instance combinations marked as 'new' are already in the"
+            f" dataset: {invalid_combo_ref}"
         )
