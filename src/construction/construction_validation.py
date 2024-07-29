@@ -151,12 +151,12 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
 
 
 def _references_in_snapshot(
-    df: pd.DataFrame, snapshot_refs: list, logger: logging.Logger = None
+    construction_df: pd.DataFrame, snapshot_refs: list, logger: logging.Logger = None
 ) -> Tuple[bool, list]:
     """Determine if the references in a df are in a snapshot.
 
     Args:
-        df (pd.DataFrame): The construction df (With references).
+        construction_df (pd.DataFrame): The construction df (With references).
         snapshot_refs (list): A list of the references in the snapshot df.
         logger (logging.Logger): The logger to log to.
 
@@ -164,12 +164,12 @@ def _references_in_snapshot(
         Tuple[bool, list]: Whether or not all references are in the snapshot,
             a list of all references missing from the snapshot.
     """
-    type_defence(df, "df", pd.DataFrame)
+    type_defence(construction_df, "construction_df", pd.DataFrame)
     type_defence(snapshot_refs, "snapshot_refs", list)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     # add a new column to the dataframe indicating if the ref is present
-    valid_df = df.join(
-        df[["reference"]].isin(snapshot_refs), how="left", rsuffix="_valid"
+    valid_df = construction_df.join(
+        construction_df[["reference"]].isin(snapshot_refs), how="left", rsuffix="_valid"
     )
     # obtain a df of invalid references (not in snpashot)
     invalid_refs = valid_df[valid_df.reference_valid == False]
@@ -186,12 +186,12 @@ def _references_in_snapshot(
 
 
 def validate_construction_references(
-    df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
+    construction_df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
 ) -> None:
     """Validate the construction references for both new and non-new constructions.
 
     Args:
-        df (pd.DataFrame): The construction dataframe.
+        construction_df (pd.DataFrame): The construction dataframe.
         snapshot_df (pd.DataFrame): The snapshot dataframe.
         logger (logging.Logger, optional): The logger. Defaults to None.
 
@@ -202,15 +202,16 @@ def validate_construction_references(
     Returns:
         None
     """
-    type_defence(df, "df", pd.DataFrame)
+    type_defence(construction_df, "construction_df", pd.DataFrame)
     type_defence(snapshot_df, "snapshot_df", pd.DataFrame)
     type_defence(logger, "logger", (logging.Logger, type(None)))
     snapshot_refs = list(snapshot_df.reference.unique())
-    new_constructions = df[df.construction_type == "new"]
-    reg_constructions = df[df.construction_type != "new"]
+    new_constructions = construction_df[construction_df.construction_type == "new"]
+    reg_constructions = construction_df[construction_df.construction_type != "new"]
+
     # non new constructions
     refs_valid, refs = _references_in_snapshot(
-        df=reg_constructions, snapshot_refs=snapshot_refs, logger=logger
+        construction_df=reg_constructions, snapshot_refs=snapshot_refs, logger=logger
     )
     if not refs_valid:
         raise ValueError(
@@ -224,14 +225,42 @@ def validate_construction_references(
     # new constructions
     if new_constructions.empty:
         return None
-    refs_valid, refs = _references_in_snapshot(
-        df=new_constructions, snapshot_refs=snapshot_refs, logger=logger
+    _ref_instance_in_snapshot(
+        construction_df=new_constructions, snapshot_df=snapshot_df, logger=logger
     )
-    if refs_valid:
+
+
+def _ref_instance_in_snapshot(
+    construction_df: pd.DataFrame, snapshot_df: pd.DataFrame, logger: logging.Logger = None
+) -> None:
+    """Determine if the reference/instance combination is already present in snapshot.
+
+    Args:
+        construction_df (pd.DataFrame): The construction df (With references).
+        snapshot_df (pd.DataFrame): The snapshot dataframe.
+        logger (logging.Logger): The logger to log to.
+
+    Returns:
+        Tuple[bool, list]: Whether references/instance are in the snapshot,
+            a list of all references/instances already in the snapshot.
+    """
+    type_defence(construction_df, "construction_df", pd.DataFrame)
+    type_defence(snapshot_df, "snapshot_df", pd.DataFrame)
+    type_defence(logger, "logger", (logging.Logger, type(None)))
+
+    snapshot_df_copy = snapshot_df.copy()
+    construction_df_copy = construction_df.copy()
+
+    # create a key to check if ref/instance combo exists
+    snapshot_df_copy['ref_instance'] = snapshot_df_copy['reference'].astype(str) + ": " + snapshot_df_copy['instance'].astype(str)
+    construction_df_copy['ref_instance'] = construction_df_copy['reference'].astype(str) + ": " + construction_df_copy['instance'].astype(str)
+
+    invalid_combo = pd.merge(construction_df_copy, snapshot_df_copy, on='ref_instance', how='inner')
+
+    if invalid_combo.empty:
+        logger.info("All reference/instance combinations marked as 'new' have been checked against the snapshot and validated.")
+    if not invalid_combo.empty:
+        invalid_combo_ref = invalid_combo['ref_instance'].unique()
         raise ValueError(
-            "References in the construction file labelled 'new' are already in"
-            " the dataset."
+            f"Reference/instance combinations marked as 'new' are already in the dataset: {invalid_combo_ref}"
         )
-    if logger:
-        logger.info("All references marked as 'new' are validated as new.")
-    return None

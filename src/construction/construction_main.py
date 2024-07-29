@@ -148,7 +148,7 @@ def run_construction(  # noqa: C901
 
     # validate the references passed in construction
     validate_construction_references(
-        df=construction_df,
+        construction_df=construction_df,
         snapshot_df=snapshot_df,
         logger=construction_logger,
     )
