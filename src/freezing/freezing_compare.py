@@ -71,7 +71,7 @@ def get_amendments(main_snapshot, secondary_snapshot):
 
         return amendments_df
     else:
-        construction_logger.info("No amendments found.")
+        freezing_logger.info("No amendments found.")
         return None
 
 
@@ -107,27 +107,27 @@ def get_additions(main_snapshot, secondary_snapshot):
         additions_df["accept_changes"] = False
         return additions_df
     else:
-        construction_logger.info("No additions found.")
+        freezing_logger.info("No additions found.")
         return None
 
 
-def output_construction_files(amendments_df, additions_df, config, write_csv, run_id):
+def output_freezing_files(amendments_df, additions_df, config, write_csv, run_id):
     """Save CSVs of amendments and additions for user approval."""
     # Prepare output paths
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
-    construction_folder = paths["construction_path"]
+    freezing_folder = paths["freezing_path"]
     amendments_filename = os.path.join(
-        construction_folder,
-        "auto_construction",
-        f"{survey_year}_construction_amendments_{tdate}_v{run_id}.csv",
+        freezing_folder,
+        "auto_freezing",
+        f"{survey_year}_freezing_amendments_{tdate}_v{run_id}.csv",
     )
     additions_filename = os.path.join(
-        construction_folder,
-        "auto_construction",
-        f"{survey_year}_construction_additions_{tdate}_v{run_id}.csv",
+        freezing_folder,
+        "auto_freezing",
+        f"{survey_year}_freezing_additions_{tdate}_v{run_id}.csv",
     )
 
     # Check if the dataframes are empty before writing

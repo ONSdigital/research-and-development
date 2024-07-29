@@ -5,7 +5,7 @@ from typing import Callable
 from datetime import datetime
 
 
-construction_logger = logging.getLogger(__name__)
+freezing_logger = logging.getLogger(__name__)
 
 
 def run_freezing(
@@ -33,13 +33,13 @@ def run_freezing(
         run_id (int): The run id for this run.
     Returns:
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
-            and added from the construction files.
+            and added from the freezing files.
     """
     # Skip this module if the secondary snapshot isn't loaded
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
-    load_manual_construction = config["global"]["load_manual_construction"]
-    if load_manual_construction is False:
-        construction_logger.info("Skipping Construction...")
+    load_manual_freezing = config["global"]["load_manual_freezing"]
+    if load_manual_freezing is False:
+        freezing_logger.info("Skipping freezing...")
         return main_snapshot
 
     # ! For now, we add the year column since neither file has it
@@ -47,15 +47,15 @@ def run_freezing(
     if load_updated_snapshot is True:
         secondary_snapshot["year"] = 2022
 
-        # Use the secondary snapshot to generate construction files for the next run
+        # Use the secondary snapshot to generate freezing files for the next run
         additions_df = get_additions(main_snapshot, secondary_snapshot)
         amendments_df = get_amendments(main_snapshot, secondary_snapshot)
-        output_construction_files(
+        output_freezing_files(
             amendments_df, additions_df, config, write_csv, run_id
         )
 
-    # Read the construction files from the last run and apply them
-    constructed_df = apply_construction(
+    # Read the freezing files from the last run and apply them
+    constructed_df = apply_freezing(
         main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
     )
     constructed_df.reset_index(drop=True, inplace=True)
