@@ -89,5 +89,6 @@ def read_validate_construction_files(
             logger=construction_logger,
             _raise=True,
         )
+        pc_construction_df["force_imputation"] = True
 
     return construction_df, pc_construction_df
