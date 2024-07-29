@@ -4,7 +4,6 @@ import numpy as np
 from pandas._testing import assert_frame_equal
 import logging
 import pytest
-from pytest_mock import mocker
 
 from src.construction.construction_helpers import (
     _convert_formtype,
