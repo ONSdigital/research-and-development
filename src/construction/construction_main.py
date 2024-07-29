@@ -50,6 +50,7 @@ def run_construction(  # noqa: C901
     """
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
+        run_postcode_construction = False
     else:
         run_construction = config["global"]["run_all_data_construction"]
         run_postcode_construction = config["global"]["run_postcode_construction"]
@@ -112,10 +113,6 @@ def run_construction(  # noqa: C901
         updated_snapshot_df, construction_df = prepare_forms_gb(
             updated_snapshot_df, construction_df
         )
-
-    # NI data has no instance but needs an instance of 1
-    if is_northern_ireland:
-        construction_df["instance"] = 1
 
     # Update the values with the constructed ones
     construction_df.set_index(

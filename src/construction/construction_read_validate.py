@@ -46,7 +46,10 @@ def read_validate_construction_files(
             read_csv_func=read_csv,
             file_exists_func=check_file_exists,
         )
-
+        # NI data has no instance but needs an instance of 1
+        if is_northern_ireland:
+            construction_df["instance"] = 1
+            construction_df["construction_type"] = None
         if isinstance(construction_df, type(None)):
             construction_df = pd.DataFrame()
             return construction_df
