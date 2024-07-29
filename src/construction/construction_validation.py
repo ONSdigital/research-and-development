@@ -240,13 +240,12 @@ def _ref_instance_in_snapshot(
     """Determine if the reference/instance combination is already present in snapshot.
 
     Args:
-        construction_df (pd.DataFrame): The construction df (With references).
+        construction_df (pd.DataFrame): The construction df.
         snapshot_df (pd.DataFrame): The snapshot dataframe.
         logger (logging.Logger): The logger to log to.
 
     Returns:
-        Tuple[bool, list]: Whether references/instance are in the snapshot,
-            a list of all references/instances already in the snapshot.
+        None
     """
     type_defence(construction_df, "construction_df", pd.DataFrame)
     type_defence(snapshot_df, "snapshot_df", pd.DataFrame)
