@@ -69,11 +69,10 @@ def output_intram_by_pg(
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     filename = (
-        f"{survey_year}_output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
+        f"{survey_year}_output_intram_by_pg_{'uk' if uk_output else 'gb'}"
         f"_{tdate}_v{run_id}.csv"
     )
     write_csv(
-        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
-        f"/{filename}",
+        f"{output_path}/output_intram_by_pg_{'uk' if uk_output else 'gb'}/{filename}",
         df_merge,
     )
