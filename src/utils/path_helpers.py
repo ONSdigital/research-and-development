@@ -1,6 +1,8 @@
 """This module contains helper functions for creating paths."""
 import os
+import logging
 
+PathHelpLogger = logging.getLogger(__name__)
 
 def get_paths(config: dict) -> dict:
     """Return either network_paths or hdfs_paths despending on the environment."""
@@ -54,6 +56,44 @@ def create_staging_config(config: dict) -> dict:
     paths = get_paths(config)
     berd_path = paths["berd_path"]
 
+    ### new code here, you're using paths[]
+    survey_year = str(config["years"]["survey_year"])    
+    snapshot_path_dict = paths["snapshot_path"]
+    print("--------------------------------------", snapshot_path_dict)
+    secondary_snapshot_path_dict = paths["secondary_snapshot_path"]
+    bool_dict = {}
+    msg = ""
+    
+   # for value in snapshot_path_dict:
+    for value in snapshot_path_dict:
+        bool_dict['Key'] = True
+        if f"{survey_year}12" not in value:
+            bool_dict['Key'] = False
+            msg += f"{survey_year} is not included in the snapshot path."
+            
+    for value in secondary_snapshot_path_dict:
+        bool_dict['Key'] = True
+        if secondary_snapshot_path_dict:
+            if survey_year not in value:
+                bool_dict['Key'] = False
+                msg += f"{survey_year} is not included in {value}."
+
+    # if all(bool_dict.values()):
+    #     PathHelpLogger.info("The snapshot paths are valid.")
+    # else:
+    #     PathHelpLogger.error("There are errors with the snapshot paths.")
+    #     raise ValueError(msg)
+
+
+
+
+
+
+
+
+
+
+
     staging_dict = create_module_config(config, "staging")
 
     # add new paths to the staging section of the config
@@ -61,11 +101,10 @@ def create_staging_config(config: dict) -> dict:
     staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
     staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
     staging_dict["backdata_path"] = paths["backdata_path"]
-    staging_dict[
-        "pnp_staging_qa_path"
-    ] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
+    staging_dict["pnp_staging_qa_path"] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
+    
 
     return staging_dict
 

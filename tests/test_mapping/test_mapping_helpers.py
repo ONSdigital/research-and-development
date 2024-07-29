@@ -250,3 +250,26 @@ class TestCreateAdditionalNiCols(object):
         assert output_df.equals(
             expected_df
         ), "Output from create_additional_ni_cols not as expected."
+
+
+class TestValidateSnapshotFilenames(object):
+    @pytest.fixture(scope="module")
+    def test_validate_snapshot_filenames_fail(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            'global' : {'load_updated_snapshot' : False,}, 
+            'network_paths': {'snapshot_path': "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
+            'secondary_snapshot_path': "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json",}
+            } 
+
+        bool_dict = {}
+
+        create_staging_config(config)
+        return config
+
+        expected_bool = {False, False}
+
+
+        assert bool_dict.equals(
+            expected_bool
+            ), "Output from test_validate_snapshot_filenames_fail does not work as expected."
