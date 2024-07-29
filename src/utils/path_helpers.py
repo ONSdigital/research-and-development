@@ -182,24 +182,21 @@ def validate_mapping_filenames(config: dict) -> dict:
         if (not value) or (value == ""):
             bool_dict[key] = False   
             msg += f"{key} is empty"
-            #raise ValueError(f"{value} is empty.")
 
        # check filename is correct
         if value != 'v1':
-            validate_file_extension(value, '.csv')
-            bool_dict[key] = False   
-            # msg += f"{value} is the incorrect file type."
+            file_type = '.csv'
+            if file_type not in value:
+                bool_dict[key] = False
+                msg += f"The file: {value} is not a {file_type} file type."
 
        # check year is correct
         if value != 'v1':
             if year not in value:
                 bool_dict[key] = False
                 msg += f"{year} is not included in {key}."
-                #raise ValueError(f"{year} is not included in {key}.")
     
     return bool_dict, msg
-
-
 
 def filename_validation(config:dict) -> dict:
     """Checks that the mapping filenames are valid"""
