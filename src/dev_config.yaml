@@ -58,7 +58,7 @@ outputs_paths:
   #TODO: add all the output subpaths
   outputs_master: ""
 pnp_paths:
-  staging_qa_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/PNP/01_staging"
+  staging_qa_path: "01_staging/pnp_staging_qa"
 export_paths:
   export_folder: "outgoing_export"
 network_paths:
@@ -115,7 +115,7 @@ run_log_sql:
   log_db: "test_runlog"
   log_mode: "append"
 estimation:
-  num_expected_cellnos: 589  # the number of cell_no items expected in the coverage mapper
+  num_expected_cellnos: 582  # the number of cell_no items expected in the coverage mapper
   numeric_cols: ["701", "702", "703", "704", "705", "706", "707", "709", "710", "711"]
 imputation:
   lf_target_vars:

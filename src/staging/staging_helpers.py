@@ -404,11 +404,12 @@ def filter_pnp_data(full_responses):
             The DataFrame containing the full resonses data.
 
     Returns:
-        pandas.DataFrame: DataFrame without rows where 'legalstatus' == '7'
-
+        Tuple[pd.DataFrame, pd.DataFrame]: Two dataframes; the BERD data without
+        PNP data and the PNP data
     """
-
-    # filter out PNP data or equivalently records with legalstatus=7
+    # create dataframe with PNP data legalstatus=='7'
+    pnp_full_responses = full_responses.loc[(full_responses["legalstatus"] == "7")]
+    # filter out PNP data or equivalently records with legalstatus!='7'
     full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
 
-    return full_responses
+    return full_responses, pnp_full_responses

@@ -19,6 +19,7 @@ global:
   output_backdata: False
   # QA output settings
   output_full_responses: False
+  output_pnp_full_responses: False
   output_ni_full_responses: False
   output_imputation_qa: False
   output_mapping_qa: False
@@ -45,7 +46,7 @@ global:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json"
+  snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
