@@ -135,20 +135,33 @@ def run_outputs(  # noqa: C901
         OutputMainLogger.info("Starting Intram by PG (GB) output...")
         output_intram_by_pg(
             outputs_df,
+            ni_full_responses,
             pg_detailed,
             config,
             write_csv,
             run_id,
+            uk_output=False,
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
 
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
-        OutputMainLogger.info("Starting Intram by PG (UK) output...")
-        output_intram_by_pg(
-            outputs_df, ni_full_responses, pg_detailed, config, write_csv, run_id
-        )
-        OutputMainLogger.info("Finished Intram by PG (UK) output.")
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by PG (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by PG (UK) output...")
+            output_intram_by_pg(
+                outputs_df,
+                ni_full_responses,
+                pg_detailed,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
     # Running Intram by ITL (GB)
     if config["global"]["output_intram_gb_itl"]:

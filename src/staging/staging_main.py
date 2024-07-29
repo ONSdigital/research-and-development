@@ -90,8 +90,7 @@ def run_staging(  # noqa: C901
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
-        # seaparate PNP data equivalent to legalstatus=7 from full_responses
-        full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
+
         if load_updated_snapshot:
             secondary_full_responses = helpers.load_snapshot_feather(
                 secondary_feather_file, read_feather
@@ -242,6 +241,10 @@ def run_staging(  # noqa: C901
         config,
         StagingMainLogger,
     )
+
+    # seaparate PNP data from full_responses (BERD data)
+    # NOTE: PNP data can be output for QA but won't be further processed in the pipeline
+    full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
 
     # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
