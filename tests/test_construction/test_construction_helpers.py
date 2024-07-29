@@ -7,7 +7,7 @@ from src.construction.construction_helpers import (
 )
 
 
-class TestAddConstructedNonresponders:
+class TestRemoveShortToLong0:
     """Test for add_constructed_nonresponders()."""
 
     # Create updated snapshot df
@@ -20,6 +20,8 @@ class TestAddConstructedNonresponders:
             ["B", 1],
             ["B", 2],
             ["C", 0],
+            ["C", 1],
+            ["C", 2],
         ]
         input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
         return input_snapshot_df
@@ -45,11 +47,13 @@ class TestAddConstructedNonresponders:
             ["B", 1],
             ["B", 2],
             ["C", 0],
+            ["C", 1],
+            ["C", 2],
         ]
         output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
         return output_snapshot_df
 
-    def test_add_constructed_nonresponders(self):
+    def test_remove_short_to_long_0(self):
         """Test for add_constructed_nonresponders()."""
         # Create test dataframes
         input_snapshot_df = self.create_test_snapshot_df()
@@ -62,12 +66,4 @@ class TestAddConstructedNonresponders:
         )
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
-
-
-
-
-
-
-
-
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Output is not as expected"
