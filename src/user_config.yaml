@@ -24,8 +24,6 @@ global:
   output_backdata: True
   # QA output settings
   output_full_responses: False
-  output_frozen_csv: False
-  output_freezing_adds_and_amends: False
   output_ni_full_responses: False
   output_imputation_qa: False
   output_mapping_qa: False
@@ -56,9 +54,11 @@ hdfs_paths:
   secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
-  # Frozen data paths
+  # Freezing data paths
   frozen_data_staged_path: None # "02_freezing/frozen_data_staged/"
-  freezing_adds_and_amends_path: None # "02_freezing/freezing_adds_and_amends/"
+  freezing_changes_to_review_path: None # "02_freezing/changes_to_review/"
+  freezing_additions_path: None # "02_freezing/freezing_updates/"
+  freezing_amendments_path: None # "02_freezing/freezing_updates/"
   # Imputation and outliers input paths
   backdata_path: ""
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"

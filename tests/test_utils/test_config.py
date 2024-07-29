@@ -334,7 +334,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         validate_freezing_config_settings(user_config)
@@ -352,7 +353,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -371,7 +373,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": None,
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -390,7 +393,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -409,7 +413,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "secondary_snapshot_path": None,
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -428,7 +433,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -447,7 +453,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": "/path/to/freezing_adds_and_amends",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
         with pytest.raises(ValueError):
@@ -466,7 +473,8 @@ class TestValidateFreezingConfigSettings(object):
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "secondary_snapshot_path": "/path/to/secondary_snapshot",
-                "freezing_adds_and_amends_path": None,
+                "freezing_additions_path": None,
+                "freezing_amendments_path": None,
             },
         }
         with pytest.raises(ValueError):
