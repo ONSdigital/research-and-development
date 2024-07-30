@@ -8,6 +8,7 @@ def get_paths(config: dict) -> dict:
     paths = config[f"{network_or_hdfs}_paths"]
     paths["year"] = config["years"]["survey_year"]
     paths["berd_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/BERD/")
+    paths["pnp_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/PNP/")
     return paths
 
 
@@ -60,6 +61,9 @@ def create_staging_config(config: dict) -> dict:
     staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
     staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
     staging_dict["backdata_path"] = paths["backdata_path"]
+    staging_dict[
+        "pnp_staging_qa_path"
+    ] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
 

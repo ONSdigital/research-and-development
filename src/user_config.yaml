@@ -21,9 +21,10 @@ global:
   load_manual_imputation: False
   load_backdata: True  # whether to load previous year data for MoR
   # Backdata output settings
-  output_backdata: True
+  output_backdata: False
   # QA output settings
   output_full_responses: False
+  output_pnp_full_responses: True
   output_ni_full_responses: False
   output_imputation_qa: False
   output_mapping_qa: False
@@ -90,7 +91,7 @@ hdfs_paths:
   postcodes_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
   ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
-  cellno_path: 'berd_2023_cellno_coverage_TEMP.csv'
+  cellno_path: 'berd_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
   sic_pg_num_mapper_path: 'sic_pg_num_2023.csv'
