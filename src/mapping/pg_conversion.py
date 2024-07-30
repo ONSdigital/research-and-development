@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 
-PgLogger = logging.getLogger(__name__)
+MappingLogger = logging.getLogger(__name__)
 
 
 def sic_to_pg_mapper(
@@ -60,7 +60,7 @@ def sic_to_pg_mapper(
         df[pg_column].isnull(), sic_column
     ].map(map_dict)
 
-    PgLogger.info("Product group nulls successfully mapped from SIC.")
+    MappingLogger.info("Product group nulls successfully mapped from SIC.")
 
     return df
 
@@ -129,9 +129,6 @@ def pg_to_pg_mapper(
 
     # Then convert the pg column and the new column to categorigal datatypes
     df = df.astype({pg_column: "category", "pg_numeric": "category"})
-
-    PgLogger.info("Numeric product groups successfully mapped to letters.")
-
     return df
 
 
@@ -157,4 +154,5 @@ def run_pg_conversion(
     # PG numeric to alpha_numeric mapping for long forms
     df = pg_to_pg_mapper(df, pg_num_alpha, pg_column)
 
+    MappingLogger.info("Product group mapping successfully completed.")
     return df
