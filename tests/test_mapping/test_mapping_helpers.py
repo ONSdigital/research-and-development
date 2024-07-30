@@ -253,7 +253,6 @@ class TestCreateAdditionalNiCols(object):
         ), "Output from create_additional_ni_cols not as expected."
 
 class TestValidateMappingFilenames(object):
-    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_file_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -264,14 +263,12 @@ class TestValidateMappingFilenames(object):
             } 
 
         result, message = validate_mapping_filenames(config)
-                
+
         expected_bool = {False, True}
 
-        assert result.equals(
-            expected_bool
-            ), "Output from test_validate_mapper_config_raises_file_incorrect not as expected."
+        assert (result == expected_bool,
+             "Output from test_validate_mapper_config_raises_file_incorrect not as expected.")
 
-    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_year_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -285,12 +282,9 @@ class TestValidateMappingFilenames(object):
 
         expected_bool = {False, True}
 
-        assert result.equals(
-            expected_bool
-            ), "Output from test_validate_mapper_config_raises_year_incorrect not as expected."
+        assert (result == expected_bool,
+         "Output from test_validate_mapper_config_raises_year_incorrect not as expected.")
 
-
-    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_missing_file(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -304,6 +298,5 @@ class TestValidateMappingFilenames(object):
 
         expected_bool = {False, False}
 
-        assert result.equals(
-            expected_bool
-            ), "Output from test_validate_mapper_config_raises_missing_file not as expected."
+        assert (result == expected_bool, 
+        "Output from test_validate_mapper_config_raises_missing_file not as expected.")
