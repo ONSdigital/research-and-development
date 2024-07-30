@@ -90,8 +90,8 @@ def run_staging(  # noqa: C901
         # Load data from first feather file found
         StagingMainLogger.info("Skipping data validation. Loading from feather")
         full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
-        # filter out PNP data equivalent to legalstatus=7
-        full_responses = helpers.filter_pnp_data(full_responses)
+        # seaparate PNP data equivalent to legalstatus=7 from full_responses
+        full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
         if load_updated_snapshot:
             secondary_full_responses = helpers.load_snapshot_feather(
                 secondary_feather_file, read_feather
@@ -256,6 +256,20 @@ def run_staging(  # noqa: C901
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
+
+    # Output the staged PNP data.
+    if config["global"]["output_pnp_full_responses"]:
+        StagingMainLogger.info("Starting output of staged PNP data...")
+        staging_folder = staging_dict["pnp_staging_qa_path"]
+        tdate = datetime.now().strftime("%y-%m-%d")
+        survey_year = config["years"]["survey_year"]
+        staged_filename = (
+            f"{survey_year}_staged_PNP_full_responses_{tdate}_v{run_id}.csv"
+        )
+        write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
+        StagingMainLogger.info("Finished output of staged PNP data.")
+    else:
+        StagingMainLogger.info("Skipping output of staged PNP data...")
 
     # Return staged BERD data, additional data and mappers
     return (
