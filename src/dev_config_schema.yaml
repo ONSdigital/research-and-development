@@ -93,10 +93,6 @@ run_log_sql:
   dtype: "str"
   accept_nonetype: False
 estimation:
-  num_expected_cellnos:
-    singular: True
-    dtype: "int"
-    accept_nonetype: False
   numeric_cols:
     singular: True
     dtype: "list[str]"
