@@ -1,4 +1,4 @@
-"""Tests for construction_helpers.py"""
+"""Tests for construction_helpers.py."""
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
