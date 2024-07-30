@@ -88,7 +88,6 @@ def run_construction(  # noqa: C901
             return construction_df
 
         else:
-            # validate and merge schemas
             validate_data_with_schema(construction_df, schema_path)
             check_for_duplicates(
                 df=construction_df,
@@ -126,6 +125,7 @@ def run_construction(  # noqa: C901
             _raise=True,
         )
 
+    # merge construction files
     construction_df = concat_construction_dfs(
         df1=construction_df,
         df2=pc_construction_df,
