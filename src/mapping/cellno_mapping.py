@@ -25,13 +25,6 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame, num: int) -> pd.DataFr
     """
     check_mapping_unique(cellno_df, "cell_no")
 
-    # TODO: find out from GZ if we can scrap this.
-    # check the number of cellnumbers
-    # if len(cellno_df) != num:
-    #     raise ValueError(
-    #         f"Coverage mapper does not have the expected {num} number of cellnumbers."
-    #     )
-    # check the range of the cellnumbers
     if not cellno_df["cell_no"].between(1, 817).all():
         raise ValueError("Cellnumbers are not in the expected range of 1 to 817.")
 
@@ -48,7 +41,7 @@ def validate_join_cellno_mapper(
     """Validate the join_cellno_mapper function.
 
     Args:
-        df (pd.DataFrame): The shortform responses dataframe.
+        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
         config (dict): The configuration dictionary.
 

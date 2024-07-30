@@ -33,7 +33,7 @@ def join_fgn_ownership(
     Validate and join the foreign ownership (ultfoc) mapper to the responses dataframes.
 
     Args:
-        df (pd.DataFrame): The main DataFrame.
+        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         mapper_df (pd.DataFrame): The mapper DataFrame.
 
     Returns:

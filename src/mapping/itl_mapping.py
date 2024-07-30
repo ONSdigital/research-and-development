@@ -15,7 +15,7 @@ def join_itl_regions(
     """Joins the itl regions onto the full dataframe using the mapper provided
 
     Args:
-        df (pd.DataFrame): Full dataframe
+        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
         formtype (list): List of the formtypes to run through function
 

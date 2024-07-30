@@ -146,7 +146,7 @@ def run_pg_conversion(
     Then map from numeric to alpha-numeric.
 
     Args:
-        df (pd.DataFrame): Dataframe of full responses data
+        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         pg_num_alpha (pd.DataFrame): Mapper from numeric to alpha-numeric PG.
         pg_column: The original product group column, default 201
 
