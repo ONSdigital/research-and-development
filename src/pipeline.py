@@ -7,6 +7,7 @@ from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
+from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
@@ -32,6 +33,14 @@ def run_pipeline(user_config_path, dev_config_path):
     """
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
+
+    # Set up the logger
+    global_config = config["global"]
+    logger = logger_creator(global_config)
+
+    # validate the filenames in the config
+    config = filename_validation(config)
+
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
@@ -46,7 +55,6 @@ def run_pipeline(user_config_path, dev_config_path):
         raise ImportError
 
     # Set up the run logger
-    global_config = config["global"]
     runlog_obj = runlog.RunLog(
         config,
         version,
@@ -59,14 +67,14 @@ def run_pipeline(user_config_path, dev_config_path):
     runlog_obj.create_runlog_files()
     runlog_obj.write_config_log()
     runlog_obj.write_mainlog()
-    logger = logger_creator(global_config)
+
     run_id = runlog_obj.run_id
     MainLogger.info(f"Reading user config from {user_config_path}.")
     MainLogger.info(f"Reading developer config from {dev_config_path}.")
 
     MainLogger.info("Launching Pipeline .......................")
     logger.info("Collecting logging parameters ..........")
-    
+
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
 

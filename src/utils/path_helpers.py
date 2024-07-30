@@ -1,9 +1,9 @@
 """This module contains helper functions for creating paths."""
 import os
 import logging
-from src.utils.defence import validate_file_extension
 
 PathHelpLogger = logging.getLogger(__name__)
+
 
 def get_paths(config: dict) -> dict:
     """Return either network_paths or hdfs_paths despending on the environment."""
@@ -174,7 +174,7 @@ def create_exports_config(config: dict) -> dict:
     return config["export_paths"]
 
 
-def validate_mapping_filenames(config: dict) -> dict: 
+def validate_mapping_filenames(config: dict) -> dict:
     year = str(config["years"]["survey_year"])
     year_mapper_dict = config[f"{year}_mappers"]
     bool_dict = {}
@@ -184,25 +184,26 @@ def validate_mapping_filenames(config: dict) -> dict:
         bool_dict[key] = True
         # check string is not empty
         if (not value) or (value == ""):
-            bool_dict[key] = False   
+            bool_dict[key] = False
             msg += f"{key} is empty."
 
-       # check filename is correct
-        if value != 'v1':
-            file_type = '.csv'
+        # check filename is correct
+        if value != "v1":
+            file_type = ".csv"
             if file_type not in value:
                 bool_dict[key] = False
                 msg += f"The file: {value} is not a {file_type} file type."
 
-       # check year is correct
-        if value != 'v1':
+        # check year is correct
+        if value != "v1":
             if year not in value:
                 bool_dict[key] = False
                 msg += f"{year} is not included in {key}."
-    
+
     return bool_dict, msg
 
-def filename_validation(config:dict) -> dict:
+
+def filename_validation(config: dict) -> dict:
     """Checks that the mapping filenames are valid"""
     bool_dict, msg = validate_mapping_filenames(config)
 
@@ -211,8 +212,9 @@ def filename_validation(config:dict) -> dict:
     else:
         PathHelpLogger.error("There are errors with the mapping filenames.")
         raise ValueError(msg)
-        
+
     return config
+
 
 def update_config_with_paths(config: dict, modules: list) -> dict:
     """Update the config with all the paths needed for the pipeline.
@@ -232,8 +234,5 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
 
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
-
-    ## validate the file names in the config file. Checks any missingness, survey year is in the filename and the file is a csv
-    config = filename_validation(config)
 
     return config
