@@ -2,8 +2,6 @@
 import pandas as pd
 import numpy as np
 from pandas._testing import assert_frame_equal
-import logging
-import pytest
 
 from src.construction.construction_helpers import (
     _convert_formtype,
@@ -27,11 +25,11 @@ def test__convert_formtype():
 
 
 class TestPrepareFormGB:
-    """Test for prepare_forms_gb()."""
+    """Tests for prepare_forms_gb()."""
 
     # Create updated snapshot df
     def create_test_snapshot_df(self):
-        """Create a test snapshot df"""
+        """Create a test snapshot df."""
         input_cols = ["reference", "period", "instance", "status", "formtype"]
         data = [
             ["A", 202412, None, "Form sent out", "0001"],
@@ -45,7 +43,7 @@ class TestPrepareFormGB:
 
     # Create construction df
     def create_test_construction_df(self):
-        """Create a test construction df"""
+        """Create a test construction df."""
         input_cols = ["reference", "construction_type", "formtype", "instance", "period"]
         data = [
             ["F", "new", "6", 0, 202412],
@@ -59,7 +57,7 @@ class TestPrepareFormGB:
 
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self):
-        """Create expected snapshot output df"""
+        """Create expected snapshot output df."""
         output_cols = ["reference", "period", "instance", "status", "formtype", "period_year"]
         data = [
             ["A", 202412, 1, "Form sent out", "0001", 2024],
@@ -73,7 +71,7 @@ class TestPrepareFormGB:
 
     # Create construction df
     def create_expected_construction_output(self):
-        """Create expected construction output df"""
+        """Create expected construction output df."""
 
         output_cols = ["reference", "construction_type", "formtype", "instance", "period", "period_year"]
         data = [
@@ -100,8 +98,12 @@ class TestPrepareFormGB:
         )
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
-        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"
+        assert_frame_equal(
+            snapshot_output.reset_index(drop=True), expected_snapshot_output
+        ), "Snapshot output is not as expected"
+        assert_frame_equal(
+            construction_output.reset_index(drop=True), expected_construction_output
+        ), "Construction output is not as expected"
 
 
 class TestPrepareShortToLong:
@@ -109,7 +111,7 @@ class TestPrepareShortToLong:
 
     # Create updated snapshot df
     def create_test_snapshot_df(self):
-        """Create a test snapshot df"""
+        """Create a test snapshot df."""
         input_cols = ["reference", "instance", "other"]
         data = [
             ["A", 0, None],
@@ -121,7 +123,7 @@ class TestPrepareShortToLong:
 
     # Create construction df
     def create_test_construction_df(self):
-        """Create a test construction df"""
+        """Create a test construction df."""
         input_cols = ["reference", "instance", "construction_type"]
         data = [
             ["A", 0, None],
@@ -135,7 +137,7 @@ class TestPrepareShortToLong:
 
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self):
-        """Create expected snapshot output df"""
+        """Create expected snapshot output df."""
         output_cols = ["reference", "instance", "other"]
         data = [
             ["A", 0, None],
@@ -164,7 +166,9 @@ class TestPrepareShortToLong:
         ).reset_index(drop=True)
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
+        assert_frame_equal(
+            snapshot_output.reset_index(drop=True), expected_snapshot_output
+        ), "Snapshot output is not as expected"
 
 
 def test_clean_construction_type():
