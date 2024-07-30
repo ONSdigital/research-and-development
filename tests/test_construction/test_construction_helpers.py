@@ -184,7 +184,7 @@ class TestFinaliseFormsGB:
 
     # Create updated snapshot df
     def create_test_snapshot_df(self):
-        """Create a test snapshot df"""
+        """Create a test snapshot df."""
         input_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
         data = [
             ["A", "0001", 1, "AB12 3CD", None, None, "Form sent out"],
@@ -199,7 +199,7 @@ class TestFinaliseFormsGB:
 
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self):
-        """Create expected snapshot output df"""
+        """Create expected snapshot output df."""
         output_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
         data = [
             ["A", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Form sent out"],
