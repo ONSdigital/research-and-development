@@ -11,8 +11,8 @@ class TestRemoveShortToLong0:
     """Test for add_constructed_nonresponders()."""
 
     # Create updated snapshot df
-    def create_test_snapshot_df(self):
-        """Create a test snapshot df"""
+    def create_test_snapshot_df(self) -> pd.DataFrame:
+        """Create a test snapshot df."""
         input_cols = ["reference", "instance"]
         data = [
             ["A", 1],
@@ -27,8 +27,8 @@ class TestRemoveShortToLong0:
         return input_snapshot_df
 
     # Create construction df
-    def create_test_construction_df(self):
-        """Create a test construction df"""
+    def create_test_construction_df(self) -> pd.DataFrame:
+        """Create a test construction df."""
         input_cols = ["reference", "construction_type"]
         data = [
             ["A", "new"],
@@ -39,8 +39,8 @@ class TestRemoveShortToLong0:
         return input_construction_df
 
     # Create an expected dataframe for the test
-    def create_expected_snapshot_output(self):
-        """Create expected snapshot output df"""
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
+        """Create expected snapshot output df."""
         output_cols = ["reference", "instance"]
         data = [
             ["A", 1],
