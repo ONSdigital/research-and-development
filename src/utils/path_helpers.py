@@ -229,7 +229,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)
 
-        ## add in function below
+    ## validate the file names in the config file. Checks any missingness, survey year is in the filename and the file is a csv
     config = filename_validation(config)
 
     return config

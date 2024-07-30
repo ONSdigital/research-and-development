@@ -253,7 +253,7 @@ class TestCreateAdditionalNiCols(object):
         ), "Output from create_additional_ni_cols not as expected."
 
 class TestValidateMappingFilenames(object):
-    @pytest.fixture(scope="module")
+    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_file_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -263,18 +263,15 @@ class TestValidateMappingFilenames(object):
             'ultfoc_mapper_path': None,}
             } 
 
-        bool_dict = {}
-
-        validate_mapping_filenames(config)
-        return config
-
+        result, message = validate_mapping_filenames(config)
+                
         expected_bool = {False, True}
 
-        assert bool_dict.equals(
+        assert result.equals(
             expected_bool
             ), "Output from test_validate_mapper_config_raises_file_incorrect not as expected."
 
-
+    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_year_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -284,19 +281,16 @@ class TestValidateMappingFilenames(object):
             'ultfoc_mapper_path': None,}
             } 
 
-        bool_dict = {}
-
-        validate_mapping_filenames(config)
-        return bool_dict
+        result, message = validate_mapping_filenames(config)
 
         expected_bool = {False, True}
 
-        assert bool_dict.equals(
+        assert result.equals(
             expected_bool
             ), "Output from test_validate_mapper_config_raises_year_incorrect not as expected."
 
 
-
+    @pytest.fixture(scope="function")
     def test_validate_mapper_config_raises_missing_file(self):
         config = {
             'years' : {'survey_year': 2022,},
@@ -306,13 +300,10 @@ class TestValidateMappingFilenames(object):
             'ultfoc_mapper_path': None,}
             } 
 
-        bool_dict = {}
-
-        validate_mapping_filenames(config)
-        return bool_dict   
+        result, message = validate_mapping_filenames(config)
 
         expected_bool = {False, False}
 
-        assert bool_dict.equals(
+        assert result.equals(
             expected_bool
             ), "Output from test_validate_mapper_config_raises_missing_file not as expected."

@@ -1,7 +1,6 @@
 """Specific functions applied in mapping_main.py"""
 import pandas as pd
 import logging
-from src.utils.defence import validate_file_extension
 
 MappingLogger = logging.getLogger(__name__)
 
