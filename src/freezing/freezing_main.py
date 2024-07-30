@@ -1,8 +1,9 @@
-import os
+# import os
 import logging
 import pandas as pd
 from typing import Callable
-from datetime import datetime
+
+# from datetime import datetime
 
 
 freezing_logger = logging.getLogger(__name__)
@@ -35,38 +36,36 @@ def run_freezing(
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
             and added from the freezing files.
     """
-    # Skip this module if the secondary snapshot isn't loaded
-    load_updated_snapshot = config["global"]["load_updated_snapshot"]
-    load_manual_freezing = config["global"]["load_manual_freezing"]
-    if load_manual_freezing is False:
-        freezing_logger.info("Skipping freezing...")
-        return main_snapshot
+    # # Skip this module if the secondary snapshot isn't loaded
+    # load_updated_snapshot = config["global"]["load_updated_snapshot"]
+    # load_manual_freezing = config["global"]["load_manual_freezing"]
+    # if load_manual_freezing is False:
+    #     freezing_logger.info("Skipping freezing...")
+    #     return main_snapshot
 
-    # ! For now, we add the year column since neither file has it
-    main_snapshot["year"] = 2022
-    if load_updated_snapshot is True:
-        secondary_snapshot["year"] = 2022
+    # # ! For now, we add the year column since neither file has it
+    # main_snapshot["year"] = 2022
+    # if load_updated_snapshot is True:
+    #     secondary_snapshot["year"] = 2022
 
-        # Use the secondary snapshot to generate freezing files for the next run
-        additions_df = get_additions(main_snapshot, secondary_snapshot)
-        amendments_df = get_amendments(main_snapshot, secondary_snapshot)
-        output_freezing_files(
-            amendments_df, additions_df, config, write_csv, run_id
-        )
+    #     # Use the secondary snapshot to generate freezing files for the next run
+    #     additions_df = get_additions(main_snapshot, secondary_snapshot)
+    #     amendments_df = get_amendments(main_snapshot, secondary_snapshot)
+    #     output_freezing_files(amendments_df, additions_df, config, write_csv, run_id)
 
-    # Read the freezing files from the last run and apply them
-    constructed_df = apply_freezing(
-        main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
-    )
-    constructed_df.reset_index(drop=True, inplace=True)
+    # # Read the freezing files from the last run and apply them
+    # constructed_df = apply_freezing(
+    #     main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
+    # )
+    # constructed_df.reset_index(drop=True, inplace=True)
 
-    return constructed_df
-
+    return None
 
 
 def read_frozen_csv():
     # new functionality
     pass
+
 
 def freeze_data():
     # new functionality
