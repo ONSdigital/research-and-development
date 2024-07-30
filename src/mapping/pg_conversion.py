@@ -50,7 +50,7 @@ def sic_to_pg_mapper(
             mapless_errors.append(key)
 
     if mapless_errors:
-        PgLogger.error(
+        MappingLogger.error(
             f"Mapping doesnt exist for the following SIC numbers: {mapless_errors}"
         )
         raise Exception("Errors in the SIC to PG numeric mapper.")
@@ -120,7 +120,7 @@ def pg_to_pg_mapper(
             mapless_errors.append(key)
 
     if mapless_errors:
-        PgLogger.error(
+        MappingLogger.error(
             f"Mapping doesnt exist for the following product groups: {mapless_errors}"
         )
         raise Exception("Errors in the PG numeric to alpha-numeric mapper.")

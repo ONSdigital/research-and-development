@@ -1,4 +1,4 @@
-import os
+# import os
 import logging
 import pandas as pd
 from typing import Callable
@@ -38,6 +38,7 @@ def run_freezing(
 
     frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
+    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
 
     if run_first_snapshot_of_results:
         updated_snapshot = main_snapshot.copy()
@@ -79,8 +80,6 @@ def run_freezing(
     return updated_snapshot
 
 
-
 def read_frozen_csv():
     # new functionality
     pass
-

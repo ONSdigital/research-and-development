@@ -64,7 +64,9 @@ def run_staging(  # noqa: C901
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
 
-    snapshot_name = os.path.basename(staging_dict["frozen_snapshot_path"]).split(".", 1)[0]
+    snapshot_name = os.path.basename(staging_dict["frozen_snapshot_path"]).split(
+        ".", 1
+    )[0]
     feather_path = staging_dict["feather_output"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
