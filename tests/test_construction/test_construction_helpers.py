@@ -222,4 +222,6 @@ class TestFinaliseFormsGB:
         snapshot_output = finalise_forms_gb(input_snapshot_df)
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
+        assert_frame_equal(
+            snapshot_output.reset_index(drop=True), expected_snapshot_output
+        ), "Snapshot output is not as expected"
