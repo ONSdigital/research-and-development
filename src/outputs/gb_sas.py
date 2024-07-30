@@ -42,9 +42,6 @@ def output_gb_sas(
     # Map the sizebands based on frozen employment
     df1 = map_o.map_sizebands(df1)
 
-    # Map the itl regions using the postcodes
-    df1 = map_o.join_itl_regions(df1, postcode_mapper)
-
     # Create C_lnd_bl
     df1["C_lnd_bl"] = df1[["219", "220"]].fillna(0).sum(axis=1)
 
