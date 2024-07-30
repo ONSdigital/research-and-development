@@ -29,20 +29,20 @@ global:
   output_estimation_qa: False
   output_apportionment_qa: False
   # Final output settings
-  output_long_form: False
-  output_short_form: False
-  output_gb_sas: False
+  output_long_form: True
+  output_short_form: True
+  output_gb_sas: True
   output_ni_sas: False
-  output_tau: False
+  output_tau: True
   output_intram_by_pg_gb: True
   output_intram_by_pg_uk: True
   output_intram_gb_itl: True
   output_intram_uk_itl: True
-  output_intram_by_civil_defence: False
-  output_intram_by_sic: False
-  output_fte_total_qa: False
-  output_status_filtered: False
-  output_frozen_group: False
+  output_intram_by_civil_defence: True
+  output_intram_by_sic: True
+  output_fte_total_qa: True
+  output_status_filtered: True
+  output_frozen_group: True
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
@@ -80,7 +80,7 @@ hdfs_paths:
   mappers_version: "v1"
   postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
-  ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
+  ultfoc_mapper_path: "BERD_2023_ultfoc.csv"
   cellno_path: 'BERD_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
