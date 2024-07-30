@@ -25,7 +25,7 @@ class TestAddConstructedNonresponders:
 
     # Create construction df
     def create_test_construction_df(self):
-        """Create a test construction df"""
+        """Create a test construction df."""
         input_cols = ["reference", "construction_type"]
         data = [
             ["F", "new"],
@@ -39,7 +39,7 @@ class TestAddConstructedNonresponders:
 
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self):
-        """Create expected snapshot output df"""
+        """Create expected snapshot output df."""
         output_cols = ["reference", "construction_type"]
         data = [
             ["A", None],
@@ -55,7 +55,7 @@ class TestAddConstructedNonresponders:
 
     # Create construction df
     def create_expected_construction_output(self):
-        """Create expected construction output df"""
+        """Create expected construction output df."""
 
         output_cols = ["reference", "construction_type"]
 
