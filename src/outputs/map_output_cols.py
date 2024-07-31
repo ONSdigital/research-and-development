@@ -102,49 +102,6 @@ def create_cora_status_col(df, main_col="statusencoded"):
     return df
 
 
-def join_itl_regions(
-    df: pd.DataFrame,
-    postcode_mapper: pd.DataFrame,
-    postcode_col="postcodes_harmonised",
-    formtype: list = ["0001", "0006"],
-):
-    """Joins the itl regions onto the full dataframe using the mapper provided
-
-    Args:
-        df (pd.DataFrame): Full dataframe
-        postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
-        formtype (list): List of the formtypes to run through function
-
-    Returns:
-        df: Dataframe with column "ua_county" for regions
-    """
-    try:
-        to_keep = df["formtype"].isin(formtype)
-
-        # filter for long and short forms only
-        filtered_df = df.copy().loc[to_keep]
-
-        # the remainder of the dataframe is the NI data
-        ni_df = df.copy().loc[~to_keep]
-
-        # Perform left join on filtered dataframe
-        df = filtered_df.merge(
-            postcode_mapper, how="left", left_on=postcode_col, right_on="pcd2"
-        )
-        df.drop(columns=["pcd2"], inplace=True)
-
-        ni_df["itl"] = "N92000002"
-
-        complete_df = pd.concat([df, ni_df]).reset_index(drop=True)
-
-        return complete_df
-
-    except Exception as e:
-        raise ValueError(
-            "An error occurred while combining df and postcode_mapper: " + str(e)
-        )
-
-
 def map_to_numeric(df: pd.DataFrame):
     """Map q713 and q714 in dataframe from letters to numeric format
     Yes is mapped to 1

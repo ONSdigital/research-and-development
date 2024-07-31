@@ -9,39 +9,36 @@ OutputMainLogger = logging.getLogger(__name__)
 
 def output_intram_by_pg(
     gb_df: pd.DataFrame,
+    ni_df: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ni_df: pd.DataFrame = None,
+    uk_output: bool = False,
 ):
     """Run the outputs module.
 
     Args:
-        gb_df (pd.DataFrame): The dataset main with weights not applied
+        gb_df (pd.DataFrame): The dataset main
+        ni_df (pd.DataFrame): The NI datasets
         pg_detailed (pd.DataFrame): Detailed info for the product groups.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        ni_df (pd.DataFrame): The NI datasets without weights applied.
-
+        uk_output (bool): If True, the output will include NI data.
     """
     output_path = config["outputs_paths"]["outputs_master"]
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
-    # evaluate if NI data is included and clean
-    if not isinstance(ni_df, (pd.DataFrame, type(None))):
-        raise TypeError(f"'ni_df' expected type pd.DataFrame. Got {type(ni_df)}")
-    if ni_df is not None:
-        if not ni_df.empty:
-            # defence
-            # work out cols to select
-            cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
-            gb_df = gb_df[cols_to_keep]
-            ni_df = ni_df[cols_to_keep]
-            gb_df = gb_df.append(ni_df)
+
+    if uk_output:
+        cols_to_keep = [col for col in gb_df.columns if col in ni_df.columns]
+        gb_df = gb_df[cols_to_keep]
+        ni_df = ni_df[cols_to_keep]
+        # append the NI data to the GB data
+        gb_df = gb_df.append(ni_df)
 
     # Group by PG and aggregate intram
     df_agg = gb_df.groupby([key_col]).agg({value_col: "sum"}).reset_index()
@@ -72,11 +69,10 @@ def output_intram_by_pg(
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     filename = (
-        f"{survey_year}_output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
+        f"{survey_year}_output_intram_by_pg_{'uk' if uk_output else 'gb'}"
         f"_{tdate}_v{run_id}.csv"
     )
     write_csv(
-        f"{output_path}/output_intram_by_pg_{'uk' if ni_df is not None else 'gb'}"
-        f"/{filename}",
+        f"{output_path}/output_intram_by_pg_{'uk' if uk_output else 'gb'}/{filename}",
         df_merge,
     )
