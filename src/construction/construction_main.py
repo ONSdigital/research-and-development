@@ -10,6 +10,7 @@ from src.construction.construction_read_validate import read_validate_constructi
 from src.construction.construction_helpers import (
     prepare_forms_gb,
     clean_construction_type,
+    add_constructed_nonresponders,
     finalise_forms_gb,
 )
 from src.construction.construction_validation import (
@@ -69,6 +70,7 @@ def run_construction(  # noqa: C901
         run_postcode_construction,
     )
 
+    # merge construction files
     construction_df = concat_construction_dfs(
         df1=construction_df,
         df2=pc_construction_df,
@@ -92,7 +94,7 @@ def run_construction(  # noqa: C901
 
     # validate the references passed in construction
     validate_construction_references(
-        df=construction_df,
+        construction_df=construction_df,
         snapshot_df=snapshot_df,
         logger=construction_logger,
     )
@@ -111,6 +113,16 @@ def run_construction(  # noqa: C901
     # Run GB specific actions
     if not is_northern_ireland:
         updated_snapshot_df, construction_df = prepare_forms_gb(
+            updated_snapshot_df, construction_df
+        )
+
+    # NI data has no instance but needs an instance of 1
+    if is_northern_ireland:
+        construction_df["instance"] = 1
+
+    # Add constructed non-responders (i.e. new rows) to df
+    if "new" in construction_df["construction_type"].values:
+        updated_snapshot_df, construction_df = add_constructed_nonresponders(
             updated_snapshot_df, construction_df
         )
 

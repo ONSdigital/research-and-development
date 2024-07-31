@@ -163,26 +163,31 @@ def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
         and short forms reset.
     """
 
+    constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == True]
+    not_constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == False]
+
     # Long form records with a postcode in 601 use this as the postcode
-    long_form_cond = ~updated_snapshot_df["601"].isnull()
-    updated_snapshot_df.loc[
+    long_form_cond = ~constructed_df["601"].isnull()
+    constructed_df.loc[
         long_form_cond, "postcodes_harmonised"
-    ] = updated_snapshot_df["601"]
+    ] = constructed_df["601"]
 
     # Short form records with nothing in 601 use referencepostcode instead
-    short_form_cond = (updated_snapshot_df["601"].isnull()) & (
-        ~updated_snapshot_df["referencepostcode"].isnull()
+    short_form_cond = (constructed_df["601"].isnull()) & (
+        ~constructed_df["referencepostcode"].isnull()
     )
-    updated_snapshot_df.loc[
+    constructed_df.loc[
         short_form_cond, "postcodes_harmonised"
-    ] = updated_snapshot_df["referencepostcode"]
+    ] = constructed_df["referencepostcode"]
 
     # Top up all new postcodes so they're all eight characters exactly
     postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
     for col in postcode_cols:
-        updated_snapshot_df[col] = updated_snapshot_df[col].apply(
+        constructed_df[col] = constructed_df[col].apply(
             pcval.format_postcodes
         )
+
+    updated_snapshot_df = pd.concat([constructed_df, not_constructed_df]).reset_index(drop=True)
 
     # Reset shortforms with status 'Form sent out' to instance=None
     form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
@@ -191,3 +196,23 @@ def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
     updated_snapshot_df.loc[form_sent_condition, "instance"] = None
 
     return updated_snapshot_df
+
+
+def add_constructed_nonresponders(
+    updated_snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Add constructed non-responders to the snapshot dataframe.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot dataframe.
+        construction_df (pd.DataFrame): The construction dataframe.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The updated snapshot dataframe and the
+            modified construction dataframe.
+    """
+    new_rows = construction_df["construction_type"].str.contains("new", na=False)
+    rows_to_add = construction_df[new_rows]
+    construction_df = construction_df[~new_rows]
+    updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
+    return updated_snapshot_df, construction_df

@@ -49,7 +49,7 @@ def config():
         },
         "2022_mappers": {
             "mappers_version": "v1",
-            "postcodes_mapper": "pcodes_2022.csv",
+            "postcode_mapper": "pcodes_2022.csv",
             "itl_mapper_path": "itl_2022.csv",
         },
         "mapping_paths": {
@@ -66,6 +66,7 @@ def config():
             "qa_path": "outliers_qa",
             "auto_outliers_path": "auto_outliers",
         },
+        "pnp_paths": {"staging_qa_path" : "01_staging/pnp_staging_qa"},
         "export_paths": {"export_folder": "outgoing_export"},
     }
     return config
@@ -91,6 +92,7 @@ def test_get_paths(config):
         "construction_file_path_ni": "04_construction/man_con/con_file_ni.csv",
         "year": 2022,
         "berd_path": "R:/DAP_emulation/2022_surveys/BERD/",
+        "pnp_path": "R:/DAP_emulation/2022_surveys/PNP/",
     }
     network_paths = get_paths(config)
 
@@ -111,6 +113,9 @@ def expected_staging_dict():
             "R:/DAP_emulation/2022_surveys/BERD/06_imputation/man_trim/trim_qa.csv"
         ),
         "backdata_path": "2021_data/backdata.csv",
+        "pnp_staging_qa_path": (
+            "R:/DAP_emulation/2022_surveys/PNP/01_staging/pnp_staging_qa"
+        ),
     }
     return expected_staging_dict
 
@@ -143,7 +148,7 @@ def test_create_mapping_config(config):
     """Test create_mapping_config function."""
 
     expected_mapping_dict = {
-        "postcodes_mapper": "R:/DAP_emulation/2022_surveys/mappers/v1/pcodes_2022.csv",
+        "postcode_mapper": "R:/DAP_emulation/2022_surveys/mappers/v1/pcodes_2022.csv",
         "itl_mapper_path": "R:/DAP_emulation/2022_surveys/mappers/v1/itl_2022.csv",
         "qa_path": "R:/DAP_emulation/2022_surveys/BERD/05_mapping/mapping_qa",
     }

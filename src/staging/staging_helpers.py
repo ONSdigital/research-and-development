@@ -367,9 +367,9 @@ def stage_validate_harmonise_postcodes(
     staging_dict = config["staging_paths"]
 
     # Load the master list of postcodes
-    postcode_masterlist = staging_dict["postcode_masterlist"]
-    check_file_exists(postcode_masterlist, raise_error=True)
-    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_mapper = config["mapping_paths"]["postcode_mapper"]
+    check_file_exists(postcode_mapper, raise_error=True)
+    postcode_mapper = read_csv(postcode_mapper)
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
@@ -404,11 +404,12 @@ def filter_pnp_data(full_responses):
             The DataFrame containing the full resonses data.
 
     Returns:
-        pandas.DataFrame: DataFrame without rows where 'legalstatus' == '7'
-
+        Tuple[pd.DataFrame, pd.DataFrame]: Two dataframes; the BERD data without
+        PNP data and the PNP data
     """
-
-    # filter out PNP data or equivalently records with legalstatus=7
+    # create dataframe with PNP data legalstatus=='7'
+    pnp_full_responses = full_responses.loc[(full_responses["legalstatus"] == "7")]
+    # filter out PNP data or equivalently records with legalstatus!='7'
     full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
 
-    return full_responses
+    return full_responses, pnp_full_responses
