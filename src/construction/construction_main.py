@@ -174,8 +174,8 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         construction_df["instance"] = 1
 
-    # Add constructed non-reponponders (i.e. new rows) to df
-    if construction_df["construction_type"].str.contains("new").any():
+    # Add constructed non-responders (i.e. new rows) to df
+    if construction_df["construction_type"] == "new":
         updated_snapshot_df, construction_df = add_constructed_nonresponders(
             updated_snapshot_df, construction_df
         )

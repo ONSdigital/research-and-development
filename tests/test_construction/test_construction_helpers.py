@@ -81,5 +81,5 @@ class TestAddConstructedNonresponders:
         )
 
         # Check the output
-        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output)
-        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output)
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
+        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"

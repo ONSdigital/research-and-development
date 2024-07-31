@@ -162,7 +162,7 @@ def add_constructed_nonresponders(
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: The updated snapshot dataframe and the
-        modified construction dataframe.
+            modified construction dataframe.
     """
     new_rows = construction_df["construction_type"].str.contains("new", na=False)
     rows_to_add = construction_df[new_rows]
