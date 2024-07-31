@@ -1,7 +1,9 @@
 """Read and validate construction files the construction module."""
 import logging
+from typing import Callable, Tuple
+
 import pandas as pd
-from typing import Callable
+
 
 from src.construction.construction_helpers import (
     read_construction_file,
@@ -23,8 +25,25 @@ def read_validate_construction_files(
     is_northern_ireland: bool = False,
     run_construction: bool = False,
     run_postcode_construction: bool = False,
-):
-    """Read and validate construction files the construction module."""
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Read and validate construction files for the construction module.
+
+    Function reads config to determine which constructions are required/if it
+    is for Northern Ireland. It then reads the construction files and validates.
+
+    Args:
+        config (dict): The pipeline configuration.
+        check_file_exists (Callable): Function to check if file exists.
+        read_csv (Callable): Function to read a csv file.
+        is_northern_ireland (bool, optional): If true, do construction on Northern Ireland
+            data instead of GB data.
+        run_construction (bool, optional): If true, run the all data construction.
+        run_postcode_construction (bool, optional): If true, run the postcode only construction.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The construction dataframes for all and
+            postcode constructions.
+    """
 
     # Obtain construction paths
     paths = config["construction_paths"]
@@ -55,7 +74,7 @@ def read_validate_construction_files(
             return construction_df
 
         else:
-            # validate and merge schemas
+            # Validate construction data and check it doens't contain duplicates
             validate_data_with_schema(construction_df, schema_path)
             check_for_duplicates(
                 df=construction_df,

@@ -1,6 +1,7 @@
 """Tests for construction_helpers.py."""
 import pandas as pd
 import numpy as np
+
 from pandas._testing import assert_frame_equal
 
 from src.construction.construction_helpers import (
@@ -14,24 +15,26 @@ from src.construction.construction_helpers import (
 )
 
 
-
 def test__convert_formtype():
-    assert _convert_formtype("1") == "0001"
-    assert _convert_formtype("1.0") == "0001"
-    assert _convert_formtype("0001") == "0001"
-    assert _convert_formtype("6") == "0006"
-    assert _convert_formtype("6.0") == "0006"
-    assert _convert_formtype("0006") == "0006"
-    assert _convert_formtype("2") is None
-    assert _convert_formtype("") is None
-    assert _convert_formtype(None) is None
+    """Test for _convert_formtype()."""
+    msg = "Converted formtype not as expected"
+    assert _convert_formtype("1") == "0001", msg
+    assert _convert_formtype("1.0") == "0001", msg
+    assert _convert_formtype("0001") == "0001", msg
+    assert _convert_formtype("6") == "0006", msg
+    assert _convert_formtype("6.0") == "0006", msg
+    assert _convert_formtype("0006") == "0006", msg
+    assert _convert_formtype(1) == "0001", msg
+    assert _convert_formtype("2") is None, msg
+    assert _convert_formtype("") is None, msg
+    assert _convert_formtype(None) is None, msg
 
 
 class TestPrepareFormGB:
     """Tests for prepare_forms_gb()."""
 
     # Create updated snapshot df
-    def create_test_snapshot_df(self):
+    def create_test_snapshot_df(self) -> pd.DataFrame:
         """Create a test snapshot df."""
         input_cols = ["reference", "period", "instance", "status", "formtype"]
         data = [
@@ -45,7 +48,7 @@ class TestPrepareFormGB:
         return input_snapshot_df
 
     # Create construction df
-    def create_test_construction_df(self):
+    def create_test_construction_df(self) -> pd.DataFrame:
         """Create a test construction df."""
         input_cols = ["reference", "construction_type", "formtype", "instance", "period"]
         data = [
@@ -59,7 +62,7 @@ class TestPrepareFormGB:
         return input_construction_df
 
     # Create an expected dataframe for the test
-    def create_expected_snapshot_output(self):
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
         output_cols = ["reference", "period", "instance", "status", "formtype", "period_year"]
         data = [
@@ -73,7 +76,7 @@ class TestPrepareFormGB:
         return output_snapshot_df
 
     # Create construction df
-    def create_expected_construction_output(self):
+    def create_expected_construction_output(self) -> pd.DataFrame:
         """Create expected construction output df."""
 
         output_cols = ["reference", "construction_type", "formtype", "instance", "period", "period_year"]
@@ -113,7 +116,7 @@ class TestPrepareShortToLong:
     """Test for prepare_short_to_long()."""
 
     # Create updated snapshot df
-    def create_test_snapshot_df(self):
+    def create_test_snapshot_df(self) -> pd.DataFrame:
         """Create a test snapshot df."""
         input_cols = ["reference", "instance", "other"]
         data = [
@@ -125,7 +128,7 @@ class TestPrepareShortToLong:
         return input_snapshot_df
 
     # Create construction df
-    def create_test_construction_df(self):
+    def create_test_construction_df(self) -> pd.DataFrame:
         """Create a test construction df."""
         input_cols = ["reference", "instance", "construction_type"]
         data = [
@@ -139,7 +142,7 @@ class TestPrepareShortToLong:
         return input_construction_df
 
     # Create an expected dataframe for the test
-    def create_expected_snapshot_output(self):
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
         output_cols = ["reference", "instance", "other"]
         data = [
@@ -175,18 +178,20 @@ class TestPrepareShortToLong:
 
 
 def test_clean_construction_type():
-    assert clean_construction_type("new") == "new"
-    assert clean_construction_type("Short to Long") == "short_to_long"
-    assert clean_construction_type("  ") is np.NaN
-    assert clean_construction_type("") is np.NaN
-    assert clean_construction_type(None) is np.NaN
+    """Test for clean_construction_type()."""
+    msg = "Cleaned construction type not as expected"
+    assert clean_construction_type("new") == "new", msg
+    assert clean_construction_type("Short to Long") == "short_to_long", msg
+    assert clean_construction_type("  ") is np.NaN, msg
+    assert clean_construction_type("") is np.NaN, msg
+    assert clean_construction_type(None) is np.NaN, msg
 
 
 class TestFinaliseFormsGB:
     """Test for finalise_forms_gb()."""
 
     # Create updated snapshot df
-    def create_test_snapshot_df(self):
+    def create_test_snapshot_df(self) -> pd.DataFrame:
         """Create a test snapshot df."""
         input_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status", "is_constructed"]
         data = [
@@ -201,7 +206,7 @@ class TestFinaliseFormsGB:
         return input_snapshot_df
 
     # Create an expected dataframe for the test
-    def create_expected_snapshot_output(self):
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
         output_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status", "is_constructed"]
         data = [
@@ -236,7 +241,7 @@ class TestAddConstructedNonresponders:
     """Test for add_constructed_nonresponders()."""
 
     # Create updated snapshot df
-    def create_test_snapshot_df(self):
+    def create_test_snapshot_df(self) -> pd.DataFrame:
         """Create a test snapshot df"""
         input_cols = ["reference"]
         data = [
@@ -250,7 +255,7 @@ class TestAddConstructedNonresponders:
         return input_snapshot_df
 
     # Create construction df
-    def create_test_construction_df(self):
+    def create_test_construction_df(self) -> pd.DataFrame:
         """Create a test construction df."""
         input_cols = ["reference", "construction_type"]
         data = [
@@ -264,7 +269,7 @@ class TestAddConstructedNonresponders:
         return input_construction_df
 
     # Create an expected dataframe for the test
-    def create_expected_snapshot_output(self):
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
         output_cols = ["reference", "construction_type"]
         data = [
@@ -280,7 +285,7 @@ class TestAddConstructedNonresponders:
         return output_snapshot_df
 
     # Create construction df
-    def create_expected_construction_output(self):
+    def create_expected_construction_output(self) -> pd.DataFrame:
         """Create expected construction output df."""
 
         output_cols = ["reference", "construction_type"]

@@ -51,6 +51,7 @@ def _convert_formtype(formtype_value: str) -> str:
         str: The standardised value for formtype.
     """
     if pd.notnull(formtype_value):
+        formtype_value = str(formtype_value)
         if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
             return "0001"
         elif (
@@ -160,7 +161,7 @@ def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: The updated snapshot df with postcodes_harmonised
-        and short forms reset.
+            and short forms reset.
     """
 
     constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == True]

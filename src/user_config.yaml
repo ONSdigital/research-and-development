@@ -9,8 +9,8 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   # Construction Settings
-  run_all_data_construction: True
-  run_postcode_construction: True
+  run_all_data_construction: False
+  run_postcode_construction: False
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
