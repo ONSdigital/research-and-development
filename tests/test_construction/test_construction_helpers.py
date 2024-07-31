@@ -1,4 +1,4 @@
-"""Tests for construction_helpers.py"""
+"""Tests for construction_helpers.py."""
 import pandas as pd
 import numpy as np
 from pandas._testing import assert_frame_equal
@@ -9,7 +9,10 @@ from src.construction.construction_helpers import (
     prepare_short_to_long,
     clean_construction_type,
     finalise_forms_gb,
+    add_constructed_nonresponders,
+    remove_short_to_long_0,
 )
+
 
 
 def test__convert_formtype():
@@ -185,14 +188,14 @@ class TestFinaliseFormsGB:
     # Create updated snapshot df
     def create_test_snapshot_df(self):
         """Create a test snapshot df."""
-        input_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
+        input_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status", "is_constructed"]
         data = [
-            ["A", "0001", 1, "AB12 3CD", None, None, "Form sent out"],
-            ["B", "0006", 0, None, "AB12 3CD", "AB12 3CD", "Form sent out"],
-            ["C", "0001", 1, "X11 1XX", "AB12 3CD", None, "Form sent out"],
-            ["D", "0006", 0, None, "X11 1XX", None, "Other"],
-            ["E", "0006", 0, None, None, None, "Other"],
-            ["F", "0001", 1, "ab12 3cd", None, None, "Other"],
+            ["A", "0001", 1, "AB12 3CD", None, None, "Form sent out", False],
+            ["B", "0006", 0, None, "AB12 3CD", "AB12 3CD", "Form sent out", True],
+            ["C", "0001", 1, "X11 1XX", "AB12 3CD", None, "Form sent out", True],
+            ["D", "0006", 0, None, "X11 1XX", None, "Other", True],
+            ["E", "0006", 0, None, None, None, "Other", False],
+            ["F", "0001", 1, "ab12 3cd", None, None, "Other", True],
         ]
         input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
         return input_snapshot_df
@@ -200,14 +203,14 @@ class TestFinaliseFormsGB:
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self):
         """Create expected snapshot output df."""
-        output_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status"]
+        output_cols = ["reference", "formtype", "instance", "601", "referencepostcode", "postcodes_harmonised", "status", "is_constructed"]
         data = [
-            ["A", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Form sent out"],
-            ["B", "0006", None, None, "AB12 3CD", "AB12 3CD", "Form sent out"],
-            ["C", "0001", 1, "X11  1XX", "AB12 3CD", "X11  1XX", "Form sent out"],
-            ["D", "0006", 0, None, "X11  1XX", "X11  1XX", "Other"],
-            ["E", "0006", 0, None, None, None, "Other"],
-            ["F", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Other"],
+            ["A", "0001", 1, "AB12 3CD", None, None, "Form sent out", False],
+            ["B", "0006", None, None, "AB12 3CD", "AB12 3CD", "Form sent out", True],
+            ["C", "0001", 1, "X11  1XX", "AB12 3CD", "X11  1XX", "Form sent out", True],
+            ["D", "0006", 0, None, "X11  1XX", "X11  1XX", "Other", True],
+            ["E", "0006", 0, None, None, None, "Other", False],
+            ["F", "0001", 1, "AB12 3CD", None, "AB12 3CD", "Other", True],
         ]
         output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
         return output_snapshot_df
@@ -221,7 +224,150 @@ class TestFinaliseFormsGB:
         # Run the function
         snapshot_output = finalise_forms_gb(input_snapshot_df)
 
+        snapshot_output = snapshot_output.sort_values("reference").reset_index(drop=True)
+
         # Check the output
         assert_frame_equal(
-            snapshot_output.reset_index(drop=True), expected_snapshot_output
+            snapshot_output, expected_snapshot_output
         ), "Snapshot output is not as expected"
+
+
+class TestAddConstructedNonresponders:
+    """Test for add_constructed_nonresponders()."""
+
+    # Create updated snapshot df
+    def create_test_snapshot_df(self):
+        """Create a test snapshot df"""
+        input_cols = ["reference"]
+        data = [
+            ["A"],
+            ["B"],
+            ["C"],
+            ["D"],
+            ["E"],
+        ]
+        input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_snapshot_df
+
+    # Create construction df
+    def create_test_construction_df(self):
+        """Create a test construction df."""
+        input_cols = ["reference", "construction_type"]
+        data = [
+            ["F", "new"],
+            ["G", "short_to_long"],
+            ["H", None],
+            ["I", "new"],
+            ["J", None],
+        ]
+        input_construction_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_construction_df
+
+    # Create an expected dataframe for the test
+    def create_expected_snapshot_output(self):
+        """Create expected snapshot output df."""
+        output_cols = ["reference", "construction_type"]
+        data = [
+            ["A", None],
+            ["B", None],
+            ["C", None],
+            ["D", None],
+            ["E", None],
+            ["F", "new"],
+            ["I", "new"],
+        ]
+        output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_snapshot_df
+
+    # Create construction df
+    def create_expected_construction_output(self):
+        """Create expected construction output df."""
+
+        output_cols = ["reference", "construction_type"]
+
+        data = [
+            ["G", "short_to_long"],
+            ["H", None],
+            ["J", None],
+        ]
+        output_construction_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_construction_df
+
+    def test_add_constructed_nonresponders(self):
+        """Test for add_constructed_nonresponders()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        input_construction_df = self.create_test_construction_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+        expected_construction_output = self.create_expected_construction_output()
+
+        # Run the function
+        snapshot_output, construction_output = add_constructed_nonresponders(
+            input_snapshot_df, input_construction_df
+        )
+
+        # Check the output
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
+        assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"
+
+
+class TestRemoveShortToLong0:
+    """Test for remove_short_to_long_0()."""
+
+    # Create updated snapshot df
+    def create_test_snapshot_df(self) -> pd.DataFrame:
+        """Create a test snapshot df."""
+        input_cols = ["reference", "instance"]
+        data = [
+            ["A", 1],
+            ["B", 0],
+            ["B", 1],
+            ["B", 2],
+            ["C", 0],
+            ["C", 1],
+            ["C", 2],
+        ]
+        input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_snapshot_df
+
+    # Create construction df
+    def create_test_construction_df(self) -> pd.DataFrame:
+        """Create a test construction df."""
+        input_cols = ["reference", "construction_type"]
+        data = [
+            ["A", "new"],
+            ["B", "short_to_long"],
+            ["C", None],
+        ]
+        input_construction_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_construction_df
+
+    # Create an expected dataframe for the test
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
+        """Create expected snapshot output df."""
+        output_cols = ["reference", "instance"]
+        data = [
+            ["A", 1],
+            ["B", 1],
+            ["B", 2],
+            ["C", 0],
+            ["C", 1],
+            ["C", 2],
+        ]
+        output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_snapshot_df
+
+    def test_remove_short_to_long_0(self):
+        """Test for remove_short_to_long_0()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        input_construction_df = self.create_test_construction_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+
+        # Run the function
+        snapshot_output = remove_short_to_long_0(
+            input_snapshot_df, input_construction_df
+        )
+
+        # Check the output
+        assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Output is not as expected"

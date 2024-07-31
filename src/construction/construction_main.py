@@ -11,6 +11,7 @@ from src.construction.construction_helpers import (
     prepare_forms_gb,
     clean_construction_type,
     add_constructed_nonresponders,
+    remove_short_to_long_0,
     finalise_forms_gb,
 )
 from src.construction.construction_validation import (
@@ -77,6 +78,13 @@ def run_construction(  # noqa: C901
         validate_dupes=True,
         logger=construction_logger,
     )
+
+    # to ensure compatibility, change short_to_long to construction_type
+    # short_to_long used for 2022
+    if "short_to_long" in construction_df.columns:
+        construction_df.rename(columns={"short_to_long": "construction_type"}, inplace=True)
+        construction_df.loc[construction_df["construction_type"] == True, "construction_type"] = "short_to_long"
+
     # clean construction type column
     if "construction_type" in construction_df.columns:
         construction_df.construction_type = construction_df.construction_type.apply(
@@ -149,6 +157,13 @@ def run_construction(  # noqa: C901
     updated_snapshot_df = updated_snapshot_df.astype(
         {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
     )
+
+    if "construction_type" in construction_df.columns:
+        if "short_to_long" in construction_df["construction_type"].values:
+            construction_df.reset_index(inplace=True)
+            updated_snapshot_df = remove_short_to_long_0(
+                updated_snapshot_df, construction_df
+            )
 
     # Run GB specific actions
     if not is_northern_ireland:
