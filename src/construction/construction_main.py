@@ -206,26 +206,32 @@ def run_construction(  # noqa: C901
 
     # Run GB specific actions
     if not is_northern_ireland:
+
+        constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == True]
+        not_constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == False]
+
         # Long form records with a postcode in 601 use this as the postcode
-        long_form_cond = ~updated_snapshot_df["601"].isnull()
-        updated_snapshot_df.loc[
+        long_form_cond = ~constructed_df["601"].isnull()
+        constructed_df.loc[
             long_form_cond, "postcodes_harmonised"
-        ] = updated_snapshot_df["601"]
+        ] = constructed_df["601"]
 
         # Short form records with nothing in 601 use referencepostcode instead
-        short_form_cond = (updated_snapshot_df["601"].isnull()) & (
-            ~updated_snapshot_df["referencepostcode"].isnull()
+        short_form_cond = (constructed_df["601"].isnull()) & (
+            ~constructed_df["referencepostcode"].isnull()
         )
-        updated_snapshot_df.loc[
+        constructed_df.loc[
             short_form_cond, "postcodes_harmonised"
-        ] = updated_snapshot_df["referencepostcode"]
+        ] = constructed_df["referencepostcode"]
 
         # Top up all new postcodes so they're all eight characters exactly
         postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
         for col in postcode_cols:
-            updated_snapshot_df[col] = updated_snapshot_df[col].apply(
+            constructed_df[col] = constructed_df[col].apply(
                 pcval.format_postcodes
             )
+
+        updated_snapshot_df = pd.concat([constructed_df, not_constructed_df]).reset_index(drop=True)
 
         # Reset shortforms with status 'Form sent out' to instance=None
         form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
