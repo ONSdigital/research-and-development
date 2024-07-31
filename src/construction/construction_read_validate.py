@@ -79,7 +79,7 @@ def read_validate_construction_files(
             return construction_df
 
         else:
-            # Validate construction data and check it doens't contain duplicates
+            # Validate construction data and check it doesn't contain duplicates
             validate_data_with_schema(construction_df, schema_path)
             check_for_duplicates(
                 df=construction_df,
