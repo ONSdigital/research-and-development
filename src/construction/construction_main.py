@@ -175,7 +175,7 @@ def run_construction(  # noqa: C901
         construction_df["instance"] = 1
 
     # Add constructed non-responders (i.e. new rows) to df
-    if construction_df["construction_type"] == "new":
+    if "new" in construction_df["construction_type"].values:
         updated_snapshot_df, construction_df = add_constructed_nonresponders(
             updated_snapshot_df, construction_df
         )
