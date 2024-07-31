@@ -35,10 +35,11 @@ def read_validate_construction_files(
         config (dict): The pipeline configuration.
         check_file_exists (Callable): Function to check if file exists.
         read_csv (Callable): Function to read a csv file.
-        is_northern_ireland (bool, optional): If true, do construction on Northern Ireland
-            data instead of GB data.
+        is_northern_ireland (bool, optional): If true, do construction
+            on Northern Ireland data instead of GB data.
         run_construction (bool, optional): If true, run the all data construction.
-        run_postcode_construction (bool, optional): If true, run the postcode only construction.
+        run_postcode_construction (bool, optional): If true, run the postcode
+            only construction.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: The construction dataframes for all and

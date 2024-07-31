@@ -82,8 +82,12 @@ def run_construction(  # noqa: C901
     # to ensure compatibility, change short_to_long to construction_type
     # short_to_long used for 2022
     if "short_to_long" in construction_df.columns:
-        construction_df.rename(columns={"short_to_long": "construction_type"}, inplace=True)
-        construction_df.loc[construction_df["construction_type"] == True, "construction_type"] = "short_to_long"
+        construction_df.rename(
+            columns={"short_to_long": "construction_type"}, inplace=True
+        )
+        construction_df.loc[
+            construction_df["construction_type"] == True, "construction_type"
+        ] = "short_to_long"
 
     # clean construction type column
     if "construction_type" in construction_df.columns:
