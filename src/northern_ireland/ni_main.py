@@ -32,11 +32,6 @@ def run_ni(
         DataFrame: A dataframe containing staged and validated Northern Ireland
             data with any constructed records amended.
     """
-    load_ni_data = config["global"]["load_ni_data"]
-    if not load_ni_data:
-        NIModuleLogger.info("Skipping Northern Ireland data...")
-        return None
-
     NIModuleLogger.info("Starting Northern Ireland data staging and validation...")
     ni_full_responses_df = run_ni_staging(
         config,

@@ -7,7 +7,7 @@ global:
   # Staging and validation settings
   postcode_csv_check: True
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
-  load_ni_data: False
+  load_ni_data: True
   # Construction Settings
   run_all_data_construction: True
   run_postcode_construction: True
@@ -29,20 +29,20 @@ global:
   output_estimation_qa: False
   output_apportionment_qa: False
   # Final output settings
-  output_long_form: False
-  output_short_form: False
-  output_gb_sas: False
+  output_long_form: True
+  output_short_form: True
+  output_gb_sas: True
   output_ni_sas: False
-  output_tau: False
-  output_intram_by_pg_gb: False
-  output_intram_by_pg_uk: False
-  output_intram_gb_itl: False
-  output_intram_uk_itl: False
-  output_intram_by_civil_defence: False
-  output_intram_by_sic: False
-  output_fte_total_qa: False
-  output_status_filtered: False
-  output_frozen_group: False
+  output_tau: True
+  output_intram_by_pg_gb: True
+  output_intram_by_pg_uk: True
+  output_intram_gb_itl: True
+  output_intram_uk_itl: True
+  output_intram_by_civil_defence: True
+  output_intram_by_sic: True
+  output_fte_total_qa: True
+  output_status_filtered: True
+  output_frozen_group: True
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
@@ -64,7 +64,7 @@ hdfs_paths:
   # mapper paths
 2022_mappers:
   mappers_version: "v1"
-  postcodes_mapper: "postcodes_2022.csv"
+  postcode_mapper: "postcodes_2022.csv"
   itl_mapper_path: "itl_2022.csv"
   ultfoc_mapper_path: "BERD_2022_ultfoc.csv"
   ref_list_817_mapper_path: "BERD_2022_ref_list.csv"
@@ -78,10 +78,10 @@ hdfs_paths:
   sic_division_detailed_mapper_path: "sic_div_detailed_2022.csv"
 2023_mappers:
   mappers_version: "v1"
-  postcodes_mapper: "postcodes_2023.csv"
+  postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
-  ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
-  cellno_path: 'berd_2023_cellno_coverage.csv'
+  ultfoc_mapper_path: "BERD_2023_ultfoc.csv"
+  cellno_path: 'BERD_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
   sic_pg_num_mapper_path: 'sic_pg_num_2023.csv'

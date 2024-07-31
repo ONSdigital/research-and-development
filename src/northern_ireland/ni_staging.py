@@ -1,6 +1,7 @@
 """Stage and Validate Northern Ireland BERD data."""
 
 import logging
+import os
 from typing import Callable, Tuple
 from datetime import datetime
 import pandas as pd
@@ -103,7 +104,7 @@ def run_ni_staging(
         staged_filename = (
             f"{survey_year}_staged_NI_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{staging_folder}/{staged_filename}", ni_responses_df)
+        write_csv(os.path.join(staging_folder, staged_filename), ni_responses_df)
         NIStagingLogger.info("Finished output of staged NI data.")
     else:
         NIStagingLogger.info("Skipping output of staged NI data...")
