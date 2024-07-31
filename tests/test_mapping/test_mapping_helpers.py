@@ -9,9 +9,10 @@ from src.mapping.mapping_helpers import (
     check_mapping_unique,
     update_ref_list,
     create_additional_ni_cols,
-    join_with_null_check,
+    join_with_null_check
 )
 
+from src.utils.path_helpers import validate_mapping_filenames
 
 class TestJoinWithNullCheck(object):
     """Tests for join_with_null_check function."""
@@ -251,6 +252,7 @@ class TestCreateAdditionalNiCols(object):
             expected_df
         ), "Output from create_additional_ni_cols not as expected."
 
+<<<<<<< HEAD
 
 class TestValidateSnapshotFilenames(object):
     @pytest.fixture(scope="module")
@@ -273,3 +275,53 @@ class TestValidateSnapshotFilenames(object):
         assert bool_dict.equals(
             expected_bool
             ), "Output from test_validate_snapshot_filenames_fail does not work as expected."
+=======
+class TestValidateMappingFilenames(object):
+    def test_validate_mapper_config_raises_file_incorrect(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "itl_2022.cs",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
+            } 
+
+        result, message = validate_mapping_filenames(config)
+
+        expected_bool = {False, True}
+
+        assert (result == expected_bool,
+             "Output from test_validate_mapper_config_raises_file_incorrect not as expected.")
+
+    def test_validate_mapper_config_raises_year_incorrect(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "itl_202.csv",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
+            } 
+
+        result, message = validate_mapping_filenames(config)
+
+        expected_bool = {False, True}
+
+        assert (result == expected_bool,
+         "Output from test_validate_mapper_config_raises_year_incorrect not as expected.")
+
+    def test_validate_mapper_config_raises_missing_file(self):
+        config = {
+            'years' : {'survey_year': 2022,},
+            '2022_mappers': {'itl_mapper_path': "",
+            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
+            'ultfoc_mapper_path': None,}
+            } 
+
+        result, message = validate_mapping_filenames(config)
+
+        expected_bool = {False, False}
+
+        assert (result == expected_bool, 
+        "Output from test_validate_mapper_config_raises_missing_file not as expected.")
+>>>>>>> origin/develop

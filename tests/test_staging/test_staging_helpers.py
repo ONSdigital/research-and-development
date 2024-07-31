@@ -282,6 +282,7 @@ class TestStageValidateHarmonisePostcodes(object):
             "global": {"postcode_csv_check": True},
             "years": {"survey_year": 2022},
             "staging_paths": {"pcode_val_path": tmp_path, "postcode_masterlist": "ml"},
+            "mapping_paths": {"postcode_mapper": "ml"},
         }
         return config
 
