@@ -171,8 +171,11 @@ def add_constructed_nonresponders(
     return updated_snapshot_df, construction_df
 
 
-def remove_short_to_long_0(updated_snapshot_df, construction_df):
-    """Remove instance 0 for short to long constructions
+def remove_short_to_long_0(
+    updated_snapshot_df: pd.DataFrame,
+    construction_df: pd.DataFrame
+    )-> pd.DataFrame:
+    """Remove instance 0 for short to long constructions.
 
     Args:
         updated_snapshot_df (pd.DataFrame): The updated snapshot df.
@@ -180,10 +183,10 @@ def remove_short_to_long_0(updated_snapshot_df, construction_df):
 
     Returns:
         pd.DataFrame: The updated snapshot df with instance 0
-        removed for short to long constructions.
+            removed for short to long constructions.
     """
     short_to_long_references = construction_df.loc[
-        construction_df["construction_type"].str.lower() == "short_to_long",
+        construction_df["construction_type"]=="short_to_long",
         "reference",
     ].unique()
 

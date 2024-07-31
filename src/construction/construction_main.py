@@ -215,7 +215,7 @@ def run_construction(  # noqa: C901
     )
 
     if "construction_type" in construction_df.columns:
-        if construction_df["construction_type"].str.contains("short_to_long").any():
+        if "short_to_long" in construction_df["construction_type"].values:
             construction_df.reset_index(inplace=True)
             updated_snapshot_df = remove_short_to_long_0(
                 updated_snapshot_df, construction_df

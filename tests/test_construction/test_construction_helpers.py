@@ -88,7 +88,7 @@ class TestAddConstructedNonresponders:
 
 
 class TestRemoveShortToLong0:
-    """Test for add_constructed_nonresponders()."""
+    """Test for remove_short_to_long_0()."""
 
     # Create updated snapshot df
     def create_test_snapshot_df(self) -> pd.DataFrame:
@@ -134,7 +134,7 @@ class TestRemoveShortToLong0:
         return output_snapshot_df
 
     def test_remove_short_to_long_0(self):
-        """Test for add_constructed_nonresponders()."""
+        """Test for remove_short_to_long_0()."""
         # Create test dataframes
         input_snapshot_df = self.create_test_snapshot_df()
         input_construction_df = self.create_test_construction_df()
