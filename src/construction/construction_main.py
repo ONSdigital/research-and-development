@@ -75,6 +75,10 @@ def run_construction(  # noqa: C901
 
     # Check the construction file exists and has records, then read it
     if run_construction:
+        if not check_file_exists(construction_file_path):
+            raise FileNotFoundError(
+                f"Construction file not found at: {construction_file_path}"
+            )
         construction_df = read_construction_file(
             path=construction_file_path,
             logger=construction_logger,
@@ -99,6 +103,10 @@ def run_construction(  # noqa: C901
 
     # read in postcode construction file
     if run_postcode_construction:
+        if not check_file_exists(postcode_construction_fpath):
+            raise FileNotFoundError(
+                f"PC construction file not found at: {postcode_construction_fpath}"
+            )
         pc_construction_df = read_construction_file(
             path=postcode_construction_fpath,
             logger=construction_logger,
