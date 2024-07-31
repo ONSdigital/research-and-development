@@ -151,6 +151,26 @@ def clean_construction_type(value: str) -> str:
     return value
 
 
+def add_constructed_nonresponders(
+    updated_snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Add constructed non-responders to the snapshot dataframe.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot dataframe.
+        construction_df (pd.DataFrame): The construction dataframe.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The updated snapshot dataframe and the
+            modified construction dataframe.
+    """
+    new_rows = construction_df["construction_type"].str.contains("new", na=False)
+    rows_to_add = construction_df[new_rows]
+    construction_df = construction_df[~new_rows]
+    updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
+    return updated_snapshot_df, construction_df
+
+
 def remove_short_to_long_0(updated_snapshot_df, construction_df):
     """Remove instance 0 for short to long constructions
 

@@ -62,25 +62,14 @@ def test_clean_validate_cellno_mapper_failure_range(cellno_mapper_df):
     """
     with pytest.raises(ValueError):
         test_expected_num_df = cellno_mapper_df
-        clean_validate_cellno_mapper(test_expected_num_df, 5)  # wrong range
-
-
-def test_clean_validate_cellno_mapper_failure_num(cellno_mapper_df):
-    """Test for clean_validate_cellno_mapper function in the case of failure.
-    Failure due to the incorrect number of cellno items in the mapper.
-    """
-    with pytest.raises(ValueError):
-        test_expected_num_df = cellno_mapper_df.copy().replace(888, 817)
-        clean_validate_cellno_mapper(
-            test_expected_num_df, 10
-        )  # wrong number of expected cells
+        clean_validate_cellno_mapper(test_expected_num_df)  # wrong range
 
 
 def test_clean_validate_cellno_mapper_success(cellno_mapper_df):
     """Test for clean_validate_cellno_mapper function in the case of success."""
     success_df = cellno_mapper_df.copy().replace(888, 817)
 
-    result = clean_validate_cellno_mapper(success_df, 5)
+    result = clean_validate_cellno_mapper(success_df)
 
     assert result.shape == (5, 2)
     assert result["cellnumber"].nunique() == 5
@@ -106,6 +95,6 @@ def test_clean_validate_cellno_mapper_success(cellno_mapper_df, expected_clean_m
     """Test for clean_validate_cellno_mapper function in the case of success."""
     success_df = cellno_mapper_df.copy().replace(888, 817)
 
-    result = clean_validate_cellno_mapper(success_df, 5)
+    result = clean_validate_cellno_mapper(success_df)
 
     pd.testing.assert_frame_equal(result, expected_clean_mapper, check_dtype=False)

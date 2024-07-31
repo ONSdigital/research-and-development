@@ -58,8 +58,10 @@ class TestJoinFgnOwnership(object):
 
     def test_join_fgn_ownership(self, main_input, mapper_input, exp_output):
         """General tests for join_pg_numeric"""
-        output = join_fgn_ownership(main_input, mapper_input)
-        assert output.equals(
+        ni_df = pd.DataFrame()
+        input_data = (main_input, ni_df)
+        gb_output, ni_output = join_fgn_ownership(input_data, mapper_input)
+        assert gb_output.equals(
             exp_output
         ), "Output from join_fgn_ownership not as expected."
 

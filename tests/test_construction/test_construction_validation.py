@@ -95,12 +95,11 @@ class TestValidateConstructionReferences(object):
         expected_logs = [
             "All passed references from construction file in snapshot",
             "References not marked as new constructions are all in the original dataset",
-            "Reference(s) in construction file not in snapshot: [4]",
-            "All references marked as 'new' are validated as new.",
+            "All reference/instance combinations marked as 'new' have been checked against the snapshot and validated.",
         ]
         with caplog.at_level(logging.INFO):
             validate_construction_references(
-                df=construction_df,
+                construction_df=construction_df,
                 snapshot_df=snapshot_df,
                 logger=test_logger
             )
@@ -119,7 +118,7 @@ class TestValidateConstructionReferences(object):
         construction_df["construction_type"] = ""
         with pytest.raises(ValueError, match=msg):
             validate_construction_references(
-                df=construction_df,
+                construction_df=construction_df,
                 snapshot_df=snapshot_df,
             )
 
@@ -127,8 +126,8 @@ class TestValidateConstructionReferences(object):
     def test_new_constructions_raises(self, snapshot_df, construction_df):
         """Tests for failing new constructions."""
         msg = (
-            r"References in the construction file labelled 'new' are already in"
-            r" the dataset.*"
+            r"Reference/instance combinations marked as"
+            r" 'new' are already in the dataset: ['4: 1']*"
         )
         # add the 'new' ref to the snapshot df
         snapshot_df = snapshot_df.append(pd.DataFrame(
@@ -137,6 +136,6 @@ class TestValidateConstructionReferences(object):
         ))
         with pytest.raises(ValueError, match=msg):
             validate_construction_references(
-                df=construction_df,
+                construction_df=construction_df,
                 snapshot_df=snapshot_df,
             )
