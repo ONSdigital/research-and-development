@@ -56,43 +56,27 @@ def create_staging_config(config: dict) -> dict:
     paths = get_paths(config)
     berd_path = paths["berd_path"]
 
-    ### new code here, you're using paths[]
     survey_year = str(config["years"]["survey_year"])    
-    snapshot_path_dict = paths["snapshot_path"]
-    print("--------------------------------------", snapshot_path_dict)
-    secondary_snapshot_path_dict = paths["secondary_snapshot_path"]
     bool_dict = {}
     msg = ""
-    
-   # for value in snapshot_path_dict:
-    for value in snapshot_path_dict:
-        bool_dict['Key'] = True
-        if f"{survey_year}12" not in value:
-            bool_dict['Key'] = False
-            msg += f"{survey_year} is not included in the snapshot path."
-            
-    for value in secondary_snapshot_path_dict:
-        bool_dict['Key'] = True
-        if secondary_snapshot_path_dict:
-            if survey_year not in value:
+
+    for key, value in paths.items():
+        bool_dict[key] = True
+        if key == "snapshot_path":
+            if f"{survey_year}12" not in value:
                 bool_dict['Key'] = False
-                msg += f"{survey_year} is not included in {value}."
+                msg += f"{survey_year} is not included in the snapshot path."
+        if config['global']['load_updated_snapshot']:
+            if key == 'secondary_snapshot_path':
+                if f"{survey_year}12" not in value:
+                    bool_dict['Key'] = False
+                    msg += f"{survey_year} is not included in the secondary snapshot path."
 
-    # if all(bool_dict.values()):
-    #     PathHelpLogger.info("The snapshot paths are valid.")
-    # else:
-    #     PathHelpLogger.error("There are errors with the snapshot paths.")
-    #     raise ValueError(msg)
-
-
-
-
-
-
-
-
-
-
+    if all(bool_dict.values()):
+        PathHelpLogger.info("The snapshot paths are valid.")
+    else:
+        PathHelpLogger.error("There are errors with the snapshot paths.")
+        raise ValueError(msg)
 
     staging_dict = create_module_config(config, "staging")
 
