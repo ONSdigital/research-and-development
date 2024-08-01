@@ -10,6 +10,7 @@ from src.construction.construction_validation import (
     validate_construction_references,
     concat_construction_dfs,
     validate_columns_not_empty,
+    validate_short_to_long,
 )
 
 test_logger = logging.getLogger(__name__)
@@ -269,3 +270,44 @@ class TestValidateColumnsNotEmpty(object):
                 all_construction_df, 
                 columns=["reference", "instance"]
             )
+
+
+class TestValidateShortToLong(object):
+    """Tests for validate_short_to_long."""
+
+    @pytest.fixture(scope="function")
+    def short_to_long_df(self) -> pd.DataFrame:
+        """A small construction df for testing."""
+        columns = ["reference", "instance", "period"]
+        data = [
+            [1, 0, 0],
+            [1, 1, 0],
+            [2, 0, 0],
+            [3, 0, 0],
+            [3, 1, 0],
+            [3, 0, 1],
+            [4, 0, 2],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        df["construction_type"] = "short_to_long"
+        return df
+    
+    def test_validate_short_to_long(self, short_to_long_df):
+        """Passing tests for short_to_long."""
+        returned = validate_short_to_long(short_to_long_df)
+        assert isinstance(returned, type(None)), (
+            "validate_short_to_long returned an unexpected value."
+        )
+
+    def test_validate_short_to_long_raises(self, short_to_long_df):
+        """Test that validate_short_to_long raises when there is no instance=0."""
+        # set up an error condition
+        short_to_long_df.loc[short_to_long_df.reference==4, "instance"] = 1
+        print(short_to_long_df)
+        # test that the error is raised
+        msg = (
+            "Short to long construction requires at least record where instance=0 for"
+            "each reference/period.*"
+        )
+        with pytest.raises(ValueError, match=msg):
+            validate_short_to_long(short_to_long_df)
