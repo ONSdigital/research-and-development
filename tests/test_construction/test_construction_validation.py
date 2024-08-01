@@ -9,6 +9,7 @@ from src.construction.construction_validation import (
     check_for_duplicates,
     validate_construction_references,
     concat_construction_dfs,
+    validate_columns_not_empty,
 )
 
 test_logger = logging.getLogger(__name__)
@@ -216,3 +217,55 @@ class TestConcatConstructionDfs(object):
                 validate_dupes=True
             )
     
+
+class TestValidateColumnsNotEmpty(object):
+    """Tests for validate_columns_not_empty."""
+
+    def test_validate_columns_not_empty(self, all_construction_df):
+        """Passing tests for validate_columns_not_empty."""
+        # one column - passed as string
+        validate_columns_not_empty(all_construction_df, "reference")
+        # two columns - passed as list
+        validate_columns_not_empty(all_construction_df, ["reference", "instance"])
+        # one column - passed as list
+        validate_columns_not_empty(all_construction_df, ["instance"])
+
+    @pytest.mark.parametrize(
+            "columns",
+            [   
+                "test",
+                ["test"],
+                ["test", "test2"],
+            ]
+    )
+    def test_validate_columns_not_empty_col_missing(
+            self,
+            all_construction_df,
+            columns,
+        ):
+        """Failing tests for validate_columns_not_empty when a column is missing."""
+        # normalies var for error message
+        if isinstance(columns, str):
+            columns = [columns]
+        # test if errors are correctly raised
+        msg = rf"Column.* test missing from dataframe.*"
+        with pytest.raises(IndexError, match=msg):
+            validate_columns_not_empty(
+                all_construction_df, columns
+            )
+    
+    def test_validate_columns_not_empty_raises(self, all_construction_df):
+        """Test that an error is raised when columns have missing values."""
+        # create nan col
+        all_construction_df.loc[
+            all_construction_df.reference==0, "reference"
+        ] = np.NaN
+        all_construction_df.loc[
+            all_construction_df.instance==1, "instance"
+        ] = np.NaN
+        msg = "Column.*'reference', 'instance'.* are all empty"
+        with pytest.raises(ValueError, match=msg):
+            validate_columns_not_empty(
+                all_construction_df, 
+                columns=["reference", "instance"]
+            )

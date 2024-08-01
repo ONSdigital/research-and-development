@@ -105,13 +105,13 @@ def validate_columns_not_empty(
     # check passed columns are in the dataframe
     for column in columns:
         if column not in df.columns:
-            raise IndexError(f"Column {column} is not in the passed dataframe.")
+            raise IndexError(f"Column(s) {column} missing from dataframe.")
     # validate whether there are missing values in all columns of a row
     if len(df[columns].dropna(axis=0, how="all")) != len(df):
         if _raise:
-            raise ValueError(f"Columns {columns} are both empty.")
+            raise ValueError(f"Column(s) {columns} are all empty.")
         else:
-            logger.info(f"Columns {columns} are both empty.")
+            logger.info(f"Column(s) {columns} are all empty.")
     # write confirmation to log
     if logger:
         logger.info(f"All rows have a valid value for one of columns {columns}.")
