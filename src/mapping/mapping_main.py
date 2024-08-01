@@ -1,5 +1,6 @@
 """The main file for the mapping module."""
 import logging
+import os
 from datetime import datetime
 from typing import Callable
 
@@ -7,6 +8,7 @@ from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
 from src.mapping.ultfoc_mapping import join_fgn_ownership
 from src.mapping.cellno_mapping import validate_join_cellno_mapper
+from src.mapping.itl_mapping import join_itl_regions
 from src.staging import staging_helpers as stage_hlp
 from src.staging import validation as val
 
@@ -16,6 +18,7 @@ MappingMainLogger = logging.getLogger(__name__)
 def run_mapping(
     full_responses,
     ni_full_responses,
+    postcode_mapper,
     config: dict,
     write_csv: Callable,
     run_id: int,
@@ -67,48 +70,40 @@ def run_mapping(
         )
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
 
+    # create a tuple for the full_responses and ni_full_responses
+    responses = (full_responses, ni_full_responses)
     # Join the mappers to the full responses dataframe, with validation.
-    full_responses = run_pg_conversion(full_responses, pg_num_alpha, sic_pg_num)
-    full_responses = join_fgn_ownership(full_responses, ultfoc_mapper)
-    full_responses = validate_join_cellno_mapper(full_responses, cellno_df, config)
+    responses = run_pg_conversion(responses, pg_num_alpha, sic_pg_num)
+    responses = join_fgn_ownership(responses, ultfoc_mapper)
+    responses = validate_join_cellno_mapper(responses, cellno_df, config)
+    responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
 
-    if ni_full_responses is not None:
+    # unpack the responses
+    full_responses, ni_full_responses = responses
+
+    if not ni_full_responses.empty:
         ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
-        ni_full_responses = run_pg_conversion(
-            ni_full_responses, pg_num_alpha, sic_pg_num
-        )
-        ni_full_responses = join_fgn_ownership(
-            ni_full_responses,
-            ultfoc_mapper,
-            is_northern_ireland=True,
-        )
 
     # output QA files
     qa_path = config["mapping_paths"]["qa_path"]
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
 
     if config["global"]["output_mapping_qa"]:
         MappingMainLogger.info("Outputting Mapping QA files.")
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
         full_responses_filename = (
             f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
         )
-
-        write_csv(f"{qa_path}/{full_responses_filename}", full_responses)  # Changed
+        write_csv(os.path.join(qa_path, full_responses_filename), full_responses)
     MappingMainLogger.info("Finished Mapping QA calculation.")
 
-    if config["global"]["output_mapping_ni_qa"]:
+    if config["global"]["output_mapping_ni_qa"] and not ni_full_responses.empty:
         MappingMainLogger.info("Outputting Mapping NI QA files.")
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
         full_responses_NI_filename = (
             f"{survey_year}_full_responses_ni_mapped_{tdate}_v{run_id}.csv"
         )
-
-        write_csv(
-            f"{qa_path}/{full_responses_NI_filename}", ni_full_responses
-        )  # Changed
+        write_csv(os.path.join(qa_path, full_responses_NI_filename), ni_full_responses)
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
-    return (full_responses, ni_full_responses, itl_mapper)
+    return (full_responses, ni_full_responses)

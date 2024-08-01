@@ -49,7 +49,7 @@ def config():
         },
         "2022_mappers": {
             "mappers_version": "v1",
-            "postcodes_mapper": "pcodes_2022.csv",
+            "postcode_mapper": "pcodes_2022.csv",
             "itl_mapper_path": "itl_2022.csv",
         },
         "mapping_paths": {
@@ -148,7 +148,7 @@ def test_create_mapping_config(config):
     """Test create_mapping_config function."""
 
     expected_mapping_dict = {
-        "postcodes_mapper": "R:/DAP_emulation/2022_surveys/mappers/v1/pcodes_2022.csv",
+        "postcode_mapper": "R:/DAP_emulation/2022_surveys/mappers/v1/pcodes_2022.csv",
         "itl_mapper_path": "R:/DAP_emulation/2022_surveys/mappers/v1/itl_2022.csv",
         "qa_path": "R:/DAP_emulation/2022_surveys/BERD/05_mapping/mapping_qa",
     }
