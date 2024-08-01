@@ -367,9 +367,9 @@ def stage_validate_harmonise_postcodes(
     staging_dict = config["staging_paths"]
 
     # Load the master list of postcodes
-    postcode_masterlist = staging_dict["postcode_masterlist"]
-    check_file_exists(postcode_masterlist, raise_error=True)
-    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_mapper = config["mapping_paths"]["postcode_mapper"]
+    check_file_exists(postcode_mapper, raise_error=True)
+    postcode_mapper = read_csv(postcode_mapper)
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame

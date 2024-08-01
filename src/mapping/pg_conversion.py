@@ -1,6 +1,8 @@
 import pandas as pd
 import logging
 
+from typing import Tuple
+
 MappingLogger = logging.getLogger(__name__)
 
 
@@ -133,26 +135,32 @@ def pg_to_pg_mapper(
 
 
 def run_pg_conversion(
-    df: pd.DataFrame,
+    responses: Tuple[pd.DataFrame, pd.DataFrame],
     pg_num_alpha: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
     pg_column: str = "201",
 ):
     """Run the product group (PG) mapping functions.
 
+    Where product group is null, map it from SIC.
+    Then map from numeric to alpha-numeric.
+
     Args:
-        df (pd.DataFrame): Dataframe of full responses data
+        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         pg_num_alpha (pd.DataFrame): Mapper from numeric to alpha-numeric PG.
         pg_column: The original product group column, default 201
 
     Returns:
         (pd.DataFrame): Dataframe with mapped values
     """
-    # Where product group is null, map it from SIC.
-    df = sic_to_pg_mapper(df, sic_pg_num, pg_column)
+    gb_df, ni_df = responses
 
-    # PG numeric to alpha_numeric mapping for long forms
-    df = pg_to_pg_mapper(df, pg_num_alpha, pg_column)
+    gb_df = sic_to_pg_mapper(gb_df, sic_pg_num, pg_column)
+    gb_df = pg_to_pg_mapper(gb_df, pg_num_alpha, pg_column)
 
-    MappingLogger.info("Product group mapping successfully completed.")
-    return df
+    if not ni_df.empty:
+        ni_df = sic_to_pg_mapper(ni_df, sic_pg_num, pg_column)
+        ni_df = pg_to_pg_mapper(ni_df, pg_num_alpha, pg_column)
+
+    MappingLogger.info("Product group mapping and validation successfully completed.")
+    return gb_df, ni_df

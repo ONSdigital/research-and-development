@@ -113,9 +113,6 @@ def output_short_form(
     # Map the sizebands based on frozen employment
     df = map_o.map_sizebands(df)
 
-    # Map the itl regions using the postcodes
-    df = map_o.join_itl_regions(df, postcode_itl_mapper)
-
     # Map q713 and q714 to numeric format
     df = map_o.map_to_numeric(df)
 

@@ -1,12 +1,14 @@
 """The main pipeline"""
 # Core Python modules
 import logging
+import pandas as pd
 
 # Our local modules
 from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
+from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
 from src.freezing.freezing_main import run_freezing
 from src.northern_ireland.ni_main import run_ni
@@ -34,6 +36,13 @@ def run_pipeline(user_config_path, dev_config_path):
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
 
+    # Set up the logger
+    global_config = config["global"]
+    logger = logger_creator(global_config)
+
+    # validate the filenames in the config
+    config = filename_validation(config)
+
     # Check the environment switch
     network_or_hdfs = config["global"]["network_or_hdfs"]
 
@@ -48,7 +57,6 @@ def run_pipeline(user_config_path, dev_config_path):
         raise ImportError
 
     # Set up the run logger
-    global_config = config["global"]
     runlog_obj = runlog.RunLog(
         config,
         version,
@@ -61,7 +69,7 @@ def run_pipeline(user_config_path, dev_config_path):
     runlog_obj.create_runlog_files()
     runlog_obj.write_config_log()
     runlog_obj.write_mainlog()
-    logger = logger_creator(global_config)
+
     run_id = runlog_obj.run_id
     MainLogger.info(f"Reading user config from {user_config_path}.")
     MainLogger.info(f"Reading developer config from {dev_config_path}.")
@@ -105,11 +113,17 @@ def run_pipeline(user_config_path, dev_config_path):
     MainLogger.info("Finished Freezing...")
 
     # Northern Ireland staging and construction
-    MainLogger.info("Starting NI module...")
-    ni_df = run_ni(
-        config, mods.rd_file_exists, mods.rd_read_csv, mods.rd_write_csv, run_id
-    )
-    MainLogger.info("Finished NI Data Ingest.")
+    load_ni_data = config["global"]["load_ni_data"]
+    if load_ni_data:
+        MainLogger.info("Starting NI module...")
+        ni_df = run_ni(
+            config, mods.rd_file_exists, mods.rd_read_csv, mods.rd_write_csv, run_id
+        )
+        MainLogger.info("Finished NI Data Ingest.")
+    else:
+        # If NI data is not loaded, set ni_df to an empty dataframe
+        MainLogger.info("NI data not loaded.")
+        ni_df = pd.DataFrame()
 
     # Construction module
     MainLogger.info("Starting Construction...")
@@ -120,9 +134,10 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
+    (mapped_df, ni_full_responses) = run_mapping(
         full_responses,
         ni_df,
+        postcode_mapper,
         config,
         mods.rd_write_csv,
         run_id,
@@ -182,7 +197,6 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         postcode_mapper,
-        itl_mapper,
         pg_detailed,
         itl1_detailed,
         civil_defence_detailed,

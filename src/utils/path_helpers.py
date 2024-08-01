@@ -1,5 +1,8 @@
 """This module contains helper functions for creating paths."""
 import os
+import logging
+
+PathHelpLogger = logging.getLogger(__name__)
 
 
 def get_paths(config: dict) -> dict:
@@ -169,6 +172,48 @@ def create_exports_config(config: dict) -> dict:
     export_folder = os.path.join(root_path, folder_name)
     config["export_paths"] = {"export_folder": f"{export_folder}/"}
     return config["export_paths"]
+
+
+def validate_mapping_filenames(config: dict) -> dict:
+    year = str(config["years"]["survey_year"])
+    year_mapper_dict = config[f"{year}_mappers"]
+    bool_dict = {}
+    msg = ""
+
+    for key, value in year_mapper_dict.items():
+        bool_dict[key] = True
+        # check string is not empty
+        if (not value) or (value == ""):
+            bool_dict[key] = False
+            msg += f"{key} is empty."
+
+        # check filename is correct
+        if value != "v1":
+            file_type = ".csv"
+            if file_type not in value:
+                bool_dict[key] = False
+                msg += f"The file: {value} is not a {file_type} file type."
+
+        # check year is correct
+        if value != "v1":
+            if year not in value:
+                bool_dict[key] = False
+                msg += f"{year} is not included in {key}."
+
+    return bool_dict, msg
+
+
+def filename_validation(config: dict) -> dict:
+    """Checks that the mapping filenames are valid"""
+    bool_dict, msg = validate_mapping_filenames(config)
+
+    if all(bool_dict.values()):
+        PathHelpLogger.info("All mapping filenames are valid.")
+    else:
+        PathHelpLogger.error("There are errors with the mapping filenames.")
+        raise ValueError(msg)
+
+    return config
 
 
 def update_config_with_paths(config: dict, modules: list) -> dict:
