@@ -19,8 +19,8 @@ from src.utils.local_file_mods import write_local_csv as write_csv
 
 # Input folder and file names
 in_fol = "D:/data/res_dev/regression\input/"
-in_file_old = "full_estimation_qa_2024-02-02_v106.csv"
-in_file_new = "full_estimation_qa_2024-02-02_v107_TEST.csv"
+in_file_old = "2023_full_estimation_qa_2024-02-02_v106.csv"
+in_file_new = "2023_full_estimation_qa_2024-02-02_v107_TEST.csv"
 
 # Output folder and file
 out_fol = "D:/data/res_dev/regression/output/"

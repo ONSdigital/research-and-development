@@ -254,6 +254,49 @@ def create_r_and_d_instance(
     return final_df, mult_604_qa_df
 
 
+def create_imp_class_col(
+    df: pd.DataFrame,
+    col_first_half: str,
+    col_second_half: str,
+    class_name: str = "imp_class",
+) -> pd.DataFrame:
+    """Creates a column for the imputation class.
+
+    This is done by concatenating the R&D business type, C or D from  q200
+    and the product group from  q201.
+
+    Long forms with cellnumber 817 are treated as a special case.
+
+    Args:
+        df (pd.DataFrame): Full dataframe
+        col_first_half (str): The first half of the class string
+        "200" is generally used.
+        col_second_half (str): The second half of the class string
+        "201" is generally used.
+        class_name (str): The name of the column to save the class to.
+        Defaults to "imp_class"
+    Returns:
+        pd.DataFrame: Dataframe which contains a new column with the
+        imputation classes.
+    """
+    df = df.copy()
+
+    # changing type of Civil or Defence column 200 helps with imputation classes
+    df[col_first_half] = df[col_first_half].astype("category")
+
+    # Create class col with concatenation
+    if col_second_half is None:
+        df[class_name] = df[col_first_half].astype(str)
+    else:
+        df[class_name] = (
+            df[col_first_half].astype(str) + "_" + df[col_second_half].astype(str)
+        )
+
+    df.loc[df.cellnumber == 817, class_name] = df[class_name] + "_817"
+
+    return df
+
+
 def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     """Splits the dataframe in based on if it was trimmed or not"""
 

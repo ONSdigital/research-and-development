@@ -6,6 +6,7 @@ import numpy as np
 from typing import Dict, Tuple
 
 from src.imputation import tmi_imputation as tmi
+from src.imputation import imputation_helpers as hlp
 
 CivdefLogger = logging.getLogger(__name__)
 
@@ -112,7 +113,7 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     valid entries that can be used for imputation.
     """
     # create imputation classes based on product group and rusic
-    df = tmi.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
+    df = hlp.create_imp_class_col(df, "201", "rusic", "pg_sic_class")
 
     # flag empty pg_sic_classes in new bool col "empty_pgsic_class"
     df = calc_empty_group(df, "pg_sic_class", "empty_pgsic_group")
@@ -120,7 +121,7 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     # create a new imputation class called "pg_class" based on product group
     # (col 201) only, to be used when imputation cannot be performed using
     # both prodcut group and SIC.
-    df = tmi.create_imp_class_col(df, "201", None, "pg_class")
+    df = hlp.create_imp_class_col(df, "201", None, "pg_class")
 
     # flag empty pg_classes in new bool col "empty_pg_class"
     df = calc_empty_group(df, "pg_class", "empty_pg_group")

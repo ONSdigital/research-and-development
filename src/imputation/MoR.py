@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 
 from src.imputation.tmi_imputation import (
-    create_imp_class_col,
     trim_bounds,
     calculate_totals,
 )
@@ -14,7 +13,7 @@ good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
 
-def run_mor(df, backdata, impute_vars, lf_target_vars, config):
+def run_mor(df, backdata, impute_vars, config):
     """Function to implement Mean of Ratios method.
 
     This is implemented by first carrying forward data from last year
@@ -31,6 +30,8 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
         pd.DataFrame: df with MoR applied.
         pd.DataFrame: QA DataFrame showing how imputation links are calculated.
     """
+    lf_target_vars = config["imputation"]["lf_target_vars"]
+    # sf_target_variables = list(config["breakdowns"])
 
     to_impute_df, remainder_df, backdata = mor_preprocessing(df, backdata)
 
@@ -62,11 +63,8 @@ def mor_preprocessing(df, backdata):
     # Add a QA column for the group size
     df["cf_group_size"] = np.nan
 
-    # TODO move this to imputation main
-    # Select only values to be imputed
-    df = create_imp_class_col(df, "200", "201")
-
-    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
+    # create a mask to select only the records that need imputing
+    imputation_cond = (df["selectiontype"] != "P") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
@@ -139,8 +137,6 @@ def carry_forwards(df, backdata, impute_vars):
         ].fillna(0)
 
     df.loc[match_cond, "imp_marker"] = "CF"
-
-    df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
 
     # Drop merge related columns
     to_drop = [

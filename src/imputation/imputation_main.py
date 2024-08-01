@@ -63,6 +63,9 @@ def run_imputation(
     df.loc[clear_responders_mask, "imp_marker"] = "R"
     df.loc[~clear_responders_mask, "imp_marker"] = "no_imputation"
 
+    # create imputation classes and record these in column imp_class
+    df = hlp.create_imp_class_col(df, "200", "201")
+
     # Create an 'instance' of value 1 for non-responders and refs with 'No R&D'
     df = hlp.instance_fix(df)
     df, wrong_604_qa_df = hlp.create_r_and_d_instance(df)
@@ -95,8 +98,7 @@ def run_imputation(
     # Run MoR
     if backdata is not None:
         # MoR will be re-written with new backdata
-        lf_target_vars = config["imputation"]["lf_target_vars"]
-        df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
+        df, links_df = run_mor(df, backdata, to_impute_cols, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)

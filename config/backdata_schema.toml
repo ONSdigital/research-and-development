@@ -274,38 +274,6 @@ Deduced_Data_Type = "float64"
 old_name = "604"
 Deduced_Data_Type = "float64"
 
-[708]
-old_name = "708"
-Deduced_Data_Type = "object"
-
-[period]
-old_name = "period"
-Deduced_Data_Type = "int64"
-
-[survey]
-old_name = "survey"
-Deduced_Data_Type = "int64"
-
-[status]
-old_name = "status"
-Deduced_Data_Type = "object"
-
-[formid]
-old_name = "formid"
-Deduced_Data_Type = "int64"
-
-[formtype]
-old_name = "formtype"
-Deduced_Data_Type = "int64"
-
-[cellnumber]
-old_name = "cellnumber"
-Deduced_Data_Type = "int64"
-
-[pg_numeric]
-old_name = "pg_numeric"
-Deduced_Data_Type = "float64"
-
 [emp_researcher]
 old_name = "emp_researcher"
 Deduced_Data_Type = "float64"
@@ -357,6 +325,36 @@ Deduced_Data_Type = "float64"
 [headcount_total]
 old_name = "headcount_total"
 Deduced_Data_Type = "float64"
+
+[period]
+old_name = "period"
+Deduced_Data_Type = "int64"
+
+[status]
+old_name = "status"
+Deduced_Data_Type = "object"
+
+[formid]
+old_name = "formid"
+Deduced_Data_Type = "int64"
+
+[formtype]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
+
+[cellnumber]
+old_name = "cellnumber"
+Deduced_Data_Type = "int64"
+
+[pg_numeric]
+old_name = "pg_numeric"
+Deduced_Data_Type = "float64"
+
+[is_constructed]
+Deduced_Data_Type = "object"
+
+[force_construction]
+Deduced_Data_Type = "object"
 
 [imp_class]
 old_name = "imp_class"
