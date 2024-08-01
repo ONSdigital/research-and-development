@@ -63,14 +63,17 @@ def mor_preprocessing(df, backdata):
     df["cf_group_size"] = np.nan
 
     # TODO move this to imputation main
-    # Select only values to be imputed
+    # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
 
-    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
+    stat_cond = df["status"].isin(bad_statuses)
+    sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
+    lf_cond = (df["formtype"] == "0001")
+    imputation_cond = stat_cond & (sf_cond | lf_cond)
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
-    clear_status_cond = backdata["status"].isin(good_statuses)
+    clear_status_cond = backdata["imp_marker"] == "R"
 
     # Only pick up clear statuses from backdata
     backdata = backdata.loc[clear_status_cond, :]
@@ -121,7 +124,7 @@ def carry_forwards(df, backdata, impute_vars):
     match_cond = df["_merge"] == "both"
 
     # Replace the values of certain columns with the values from the back data
-    replace_vars = ["instance", "200", "201", "601", "602", "604"]
+    replace_vars = ["instance", "200", "201", "601", "602", "604", "imp_class"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
@@ -140,7 +143,7 @@ def carry_forwards(df, backdata, impute_vars):
 
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
+    # df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
 
     # Drop merge related columns
     to_drop = [
