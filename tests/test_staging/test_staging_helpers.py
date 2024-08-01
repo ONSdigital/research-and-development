@@ -10,6 +10,7 @@ from datetime import date
 # Third Party Imports
 import pandas as pd
 import numpy as np
+from pandas import DataFrame as pandasDF
 import pyarrow.feather as feather
 
 # Local Imports
@@ -22,6 +23,7 @@ from src.staging.staging_helpers import (
     load_validate_secondary_snapshot,
     df_to_feather,
     stage_validate_harmonise_postcodes,
+    filter_pnp_data,
 )
 from src.utils.local_file_mods import (
     rd_file_exists as check_file_exists,
@@ -280,6 +282,7 @@ class TestStageValidateHarmonisePostcodes(object):
             "global": {"postcode_csv_check": True},
             "years": {"survey_year": 2022},
             "staging_paths": {"pcode_val_path": tmp_path, "postcode_masterlist": "ml"},
+            "mapping_paths": {"postcode_mapper": "ml"},
         }
         return config
 
@@ -393,3 +396,81 @@ class TestStageValidateHarmonisePostcodes(object):
         assert (
             filename in files
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"
+
+
+class TestFilterPnpData:
+    """Tests for the filter_pnp_data function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "instance",
+            "legalstatus",
+            "statusencoded",
+            "postcodes_harmonised",
+        ]
+
+        data = [
+            [49900000404, 0, "1", "210", "AB15 3GU"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
+            [49900000409, 1, "1", "100", "CB1 3NF"],
+            [49900000510, 2, "7", "201", "BA1 5DA"],
+            [49912758922, 3, "1", "303", "DE72 3AU"],
+            [49900187320, 4, "2", "304", "NP30 7ZZ"],
+            [49900184433, 1, "7", "210", "CF10 BZZ"],
+            [49911791786, 1, "4", "201", "CF10 BZZ"],
+            [49901183959, 4, "1", "309", "SA50 5BE"],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        input_df["legalstatus"].astype("category")
+        input_df["statusencoded"].astype("category")
+        return input_df
+
+    def create_exp_output_df(self):
+        """Create an output dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "instance",
+            "legalstatus",
+            "statusencoded",
+            "postcodes_harmonised",
+        ]
+
+        data1 = [
+            [49900000404, 0, "1", "210", "AB15 3GU"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
+            [49900000409, 1, "1", "100", "CB1 3NF"],
+            [49912758922, 3, "1", "303", "DE72 3AU"],
+            [49900187320, 4, "2", "304", "NP30 7ZZ"],
+            [49911791786, 1, "4", "201", "CF10 BZZ"],
+            [49901183959, 4, "1", "309", "SA50 5BE"],
+        ]
+        exp1_output_df = pandasDF(data=data1, columns=exp_output_columns)
+        exp1_output_df["legalstatus"].astype("category")
+        exp1_output_df["statusencoded"].astype("category")
+
+        data2 = [
+            [49900000510, 2.0, "7", "201", "BA1 5DA"],
+            [49900184433, 1.0, "7", "210", "CF10 BZZ"],
+        ]
+        exp2_output_df = pandasDF(data=data2, columns=exp_output_columns)
+        exp2_output_df["legalstatus"].astype("category")
+        exp2_output_df["statusencoded"].astype("category")
+
+        return exp1_output_df, exp2_output_df
+
+    def test_filter_pnp_data(self):
+        """Test for the filter_pnp_data function."""
+        input_df = self.create_input_df()
+        exp1_df, exp2_df = self.create_exp_output_df()
+
+        result1_df, result2_df = filter_pnp_data(input_df)
+
+        pd.testing.assert_frame_equal(
+            result1_df.reset_index(drop=True), exp1_df.reset_index(drop=True)
+        )
+        pd.testing.assert_frame_equal(
+            result2_df.reset_index(drop=True), exp2_df.reset_index(drop=True)
+        )

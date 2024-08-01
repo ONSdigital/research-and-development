@@ -4,6 +4,8 @@ import pandas as pd
 from typing import List, Dict, Tuple, Callable
 from itertools import chain
 
+from src.staging.validation import load_schema
+
 ImputationHelpersLogger = logging.getLogger(__name__)
 
 
@@ -335,3 +337,26 @@ def tidy_imputation_dataframe(
     df = df.drop(columns=to_drop)
 
     return df
+
+
+def create_new_backdata(backdata: pd.DataFrame, config) -> pd.DataFrame:
+    """Create a new backdata dataframe with the required columns from schema.
+
+    Use the backdata toml schema to select the required columns from the backdata.
+    filter for the clear and imputed statuses.
+
+    Args:
+        backdata (pd.DataFrame): The backdata dataframe.
+
+    Returns:
+        pd.DataFrame: The filtered backdata with only the required columns.
+    """
+    # filter for the clear and imputed statuses
+    imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
+    backdata = backdata.loc[backdata["imp_marker"].isin(imp_markers_to_keep)]
+
+    # get the wanted columns from the backdata schema
+    schema = load_schema("./config/backdata_schema.toml")
+    wanted_cols = list(schema.keys())
+
+    return backdata[wanted_cols]

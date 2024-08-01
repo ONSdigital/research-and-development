@@ -1,11 +1,13 @@
 """Main pipeline file for the exporting of files"""
+import os
 
 from importlib import reload
 from src.outputs import export_files
 
 reload(export_files)
 
-config_path = r"src\developer_config.yaml"
+user_path = os.path.join("src", "user_config.yaml")
+dev_path = os.path.join("src", "dev_config.yaml")
 
 if __name__ == "__main__":
-    export_files.run_export(config_path)
+    export_files.run_export(user_path, dev_path)

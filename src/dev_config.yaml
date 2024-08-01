@@ -42,6 +42,7 @@ imputation_paths:
   folder: "06_imputation"
   qa_path: "imputation_qa"
   manual_trimming_path: "manual_trimming"
+  backdata_out_path: "backdata_output"
 outliers_paths:
   folder: "07_outliers"
   qa_path: "outliers_qa"
@@ -56,41 +57,51 @@ outputs_paths:
   folder: "10_outputs"
   #TODO: add all the output subpaths
   outputs_master: ""
+pnp_paths:
+  staging_qa_path: "01_staging/pnp_staging_qa"
 export_paths:
   export_folder: "outgoing_export"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs" # dev config
-  snapshot_path: "survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
-  secondary_snapshot_path: "berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
+  # snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # dev config
+  secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Imputation and outliers input paths
-  backdata_path: "R:/BERD Results System Development 2023/2021_data/validation-extract-responses-202112.csv"
+  # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
+  backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_24-07-19_v604.csv"
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   # Construction paths
-  construction_file_path: "04_construction/manual_construction/test_construction_file.csv"
+  all_data_construction_file_path: "04_construction/manual_construction/2023_test_construction_file.csv"
+  postcode_construction_file_path: "04_construction/manual_construction/2023_test_postcode_construction_file.csv"
   construction_file_path_ni: "04_construction/manual_construction/test_construction_ni_file.csv"
   # postcode paths
-  postcode_masterlist: "ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
+  postcode_masterlist: "R:/BERD Results System Development 2023/DAP_emulation/ONS_Postcode_Reference/postcodes_pcd2_itl.csv"
   pcode_val_path: "01_staging/staging_qa/postcode_validation"
 # schema paths
 schema_paths:
+  manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
   short_form_schema: "config/output_schemas/short_form_schema.toml"
   long_form_schema: "config/output_schemas/long_form_schema.toml"
   tau_schema: "config/output_schemas/tau_schema.toml"
   gb_sas_schema: "config/output_schemas/gb_sas_schema.toml"
   ni_sas_schema: "config/output_schemas/ni_sas_schema.toml"
-  intram_by_pg_schema: "config/output_schemas/intram_by_pg_schema.toml"
-  intram_by_itl1_schema: "config/output_schemas/intram_by_itl1_schema.toml"
-  manual_trimming_schema: "config/output_schemas/manual_trimming_qa_schema.toml"
-  cora_mapper_schema: "/config/cora_schema.toml"
-  sic_pg_utf_schema : "/config/sic_pg_utf_schema.toml"
-  status_filtered_schema: "config/output_schemas/status_filtered_schema.toml"
-  fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
-  intram_by_civil_defence_schema: "config/output_schemas/intram_by_civil_defence_schema.toml"
+  intram_by_pg_gb_schema: "config/output_schemas/intram_by_pg_gb_schema.toml"
+  intram_by_pg_uk_schema: "config/output_schemas/intram_by_pg_uk_schema.toml"
+  intram_gb_itl1_schema: "config/output_schemas/intram_gb_itl1_schema.toml"
+  intram_gb_itl2_schema: "config/output_schemas/intram_gb_itl2_schema.toml"
+  intram_uk_itl1_schema: "config/output_schemas/intram_uk_itl1_schema.toml"
+  intram_uk_itl2_schema: "config/output_schemas/intram_uk_itl2_schema.toml"
   intram_by_sic_schema: "config/output_schemas/intram_by_sic_schema.toml"
+  status_filtered_qa_schema: "config/output_schemas/status_filtered_qa_schema.toml"
+  fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
+  full_estimation_qa_schema: "config/output_schemas/full_estimation_qa_schema.toml"
+  full_responses_imputed_schema: "config/output_schemas/full_responses_imputed_schema.toml"
+  staged_BERD_full_responses_schema: "config/output_schemas/staged_BERD_full_responses_schema.toml"
+  invalid_unrecognised_postcodes_schema: "config/output_schemas/invalid_unrecognised_postcodes_schema.toml"
 # Export config for users
 outliers:
   flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.

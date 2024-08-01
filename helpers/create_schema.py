@@ -8,16 +8,25 @@ import pandas as pd
 import os
 
 # Imputation file location and name
-input_dir = "R:\\BERD Results System Development 2023\\DAP_emulation\\2022_surveys\\BERD\\05_mapping\\mapping_qa"
+root = "R:/BERD Results System Development 2023/DAP_emulation/"
+input_dir = "2023_surveys/BERD/05_mapping/mapping_qa/"
 
-pref = "2022_full_responses_qa_24-07-10_v29"
-suff = ".csv"
+# test = "R:\BERD Results System Development 2023\DAP_emulation\2023_surveys\BERD\05_mapping\mapping_qa\2023_full_responses_mapped_24-07-31_v769.csv"
+
+output_name = "full_responses_mapped"
+year = 2023
+suff = "24-07-31_v769.csv"
 
 # Output folder for all schemas
 out_dir = r"config\output_schemas"
 
 # Read the top 10 rows, inferrring the schema from csv
-mypath = os.path.join(input_dir, pref + suff)
+mypath = os.path.join(root, input_dir, f"{year}_{output_name}_{suff}")
+
+# check the file exists
+if not os.path.exists(mypath):
+    raise FileNotFoundError(f"File not found: {mypath}")
+
 df = pd.read_csv(mypath, nrows=10)
 
 # Get column names  as data types as dict of strings
@@ -35,7 +44,7 @@ for col in schema:
     S = S + s
 
 # Output the schema toml file
-mypath = os.path.join(out_dir, pref + "_schema.toml")
+mypath = os.path.join(out_dir, output_name + "_schema.toml")
 text_file = open(mypath, "w")
 text_file.write(S)
 text_file.close()

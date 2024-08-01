@@ -2,7 +2,6 @@
 # Standard Library Imports
 import logging
 from typing import Callable, Dict, Any
-from datetime import datetime
 
 # Third Party Imports
 import pandas as pd
@@ -32,7 +31,6 @@ def run_outputs(  # noqa: C901
     write_csv: Callable,
     run_id: int,
     postcode_mapper: pd.DataFrame,
-    itl_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
@@ -52,14 +50,12 @@ def run_outputs(  # noqa: C901
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): Links postcode to region code
-        itl_mapper (pd.DataFrame): Links region to ITL codes
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    # Remove instance 0 from weighted df, so that it does not go to Tau outputs
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
@@ -139,51 +135,63 @@ def run_outputs(  # noqa: C901
         OutputMainLogger.info("Starting Intram by PG (GB) output...")
         output_intram_by_pg(
             outputs_df,
+            ni_full_responses,
             pg_detailed,
             config,
             write_csv,
             run_id,
+            uk_output=False,
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
 
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
-        OutputMainLogger.info("Starting Intram by PG (UK) output...")
-        output_intram_by_pg(
-            outputs_df, pg_detailed, config, write_csv, run_id, ni_full_responses
-        )
-        OutputMainLogger.info("Finished Intram by PG (UK) output.")
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by PG (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by PG (UK) output...")
+            output_intram_by_pg(
+                outputs_df,
+                ni_full_responses,
+                pg_detailed,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
     # Running Intram by ITL (GB)
     if config["global"]["output_intram_gb_itl"]:
         OutputMainLogger.info("Starting Intram by ITL (GB) output...")
-        start = datetime.now()
         output_intram_by_itl(
             outputs_df,
+            ni_full_responses,
             config,
             write_csv,
             run_id,
-            postcode_mapper,
-            itl_mapper,
         )
-        OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
         OutputMainLogger.info("Finished Intram by ITL (GB) output.")
 
     # Running Intram by ITL (UK)
     if config["global"]["output_intram_uk_itl"]:
-        OutputMainLogger.info("Starting Intram by ITL (UK) output...")
-        start = datetime.now()
-        output_intram_by_itl(
-            outputs_df,
-            config,
-            write_csv,
-            run_id,
-            postcode_mapper,
-            itl_mapper,
-            ni_full_responses,
-        )
-        OutputMainLogger.info(f"Process took: {datetime.now() - start}.")
-        OutputMainLogger.info("Finished Intram by ITL (UK) output.")
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by ITL (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by ITL (UK) output...")
+            output_intram_by_itl(
+                outputs_df,
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by ITL (UK) output.")
 
     # Running frozen group
     if config["global"]["output_frozen_group"]:

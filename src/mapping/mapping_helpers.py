@@ -27,6 +27,53 @@ def mapper_null_checks(
         raise ValueError(f"{mapper_name} mapper contains null values in {col2}.")
 
 
+def join_with_null_check(
+    df: pd.DataFrame,
+    mapper_df: pd.DataFrame,
+    mapper_name: str,
+    join_col: str,
+    warn: bool = False,
+) -> pd.DataFrame:
+    """Perform a left join on two DataFrames and check for nulls on the join.
+
+    Args:
+        df (pd.DataFrame): The main DataFrame.
+        mapper_df (pd.DataFrame): The mapper DataFrame.
+        mapper_name (str): The name of the mapper being validated.
+        join_col (str): The column to join on.
+        warn (bool, optional): Whether to warn instead of raising an error.
+
+    Returns:
+        pd.DataFrame: The merged DataFrame.
+
+    Raises:
+        ValueError: Raised if nulls are found in the join and 'warn' bool is False.
+
+    """
+    df = df.merge(
+        mapper_df,
+        how="left",
+        on=join_col,
+        indicator=True,
+    )
+
+    # Check for nulls in the join. Either warn or raise an error.
+    filter_df = df.loc[df[join_col].notnull() & df._merge.eq("left_only")]
+    if not filter_df.empty:
+        msg = (
+            f"Nulls found in the join on {join_col} of {mapper_name} mapper."
+            f"The following {join_col} values are not in the {mapper_name} mapper: "
+            f"{filter_df[join_col].unique()}"
+        )
+        if warn:
+            MappingLogger.warning(msg)
+        else:
+            raise ValueError(msg)
+
+    df = df.drop("_merge", axis=1)
+    return df
+
+
 def col_validation_checks(
     mapper_df: pd.DataFrame,
     mapper_name: str,
@@ -96,12 +143,12 @@ def check_mapping_unique(
     """
     Checks if a column contains unique values.
 
-    Parameters:
-    mapper_df (pd.DataFrame): The mapper DataFrame to check.
-    col_to_check (str): The name of the column to check.
+    Args:
+        mapper_df (pd.DataFrame): The mapper DataFrame to check.
+        col_to_check (str): The name of the column to check.
 
     Raises:
-    ValueError: If the column does not contain unique values.
+        ValueError: If the column does not contain unique values.
     """
     if not mapper_df[col_to_check].is_unique:
         raise ValueError(f"Column {col_to_check} is not unique.")

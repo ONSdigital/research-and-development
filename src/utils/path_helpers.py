@@ -1,4 +1,8 @@
 """This module contains helper functions for creating paths."""
+import os
+import logging
+
+PathHelpLogger = logging.getLogger(__name__)
 
 
 def get_paths(config: dict) -> dict:
@@ -6,7 +10,8 @@ def get_paths(config: dict) -> dict:
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     paths["year"] = config["years"]["survey_year"]
-    paths["berd_path"] = f"{paths['root']}{paths['year']}_surveys/BERD/"
+    paths["berd_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/BERD/")
+    paths["pnp_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/PNP/")
     return paths
 
 
@@ -26,7 +31,8 @@ def create_module_config(config: dict, module_name: str) -> dict:
     berd_path = paths["berd_path"]
 
     module_conf = config[f"{module_name}_paths"]
-    folder_path = f"{berd_path}{module_conf['folder']}"
+    # add the folder to the BERD path
+    folder_path = os.path.join(berd_path, module_conf["folder"])
 
     # we next prefix the folder path to the imputation paths.
     module_dict = {
@@ -49,16 +55,18 @@ def create_staging_config(config: dict) -> dict:
         dict: A configuration dictionary will all paths needed for staging.
     """
     paths = get_paths(config)
-    root_path = paths["root"]
     berd_path = paths["berd_path"]
 
     staging_dict = create_module_config(config, "staging")
 
     # add new paths to the staging section of the config
-    staging_dict["snapshot_path"] = f"{root_path}{paths['snapshot_path']}"
-    ss_path = f"{root_path}{paths['secondary_snapshot_path']}"
-    staging_dict["secondary_snapshot_path"] = ss_path
-    staging_dict["postcode_masterlist"] = f"{root_path}{paths['postcode_masterlist']}"
+    staging_dict["snapshot_path"] = paths["snapshot_path"]
+    staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
+    staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
+    staging_dict["backdata_path"] = paths["backdata_path"]
+    staging_dict[
+        "pnp_staging_qa_path"
+    ] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
 
@@ -83,9 +91,8 @@ def create_ni_staging_config(config: dict) -> dict:
     ni_staging_dict = create_module_config(config, "ni")
 
     # add in the path to the ni_full_responses
-    ni_staging_dict[
-        "ni_full_responses"
-    ] = f"{berd_path}{paths['ni_full_responses_path']}"  # noqa
+    ni_path = paths["ni_full_responses_path"]
+    ni_staging_dict["ni_full_responses"] = os.path.join(berd_path, ni_path)
 
     return ni_staging_dict
 
@@ -107,10 +114,10 @@ def create_mapping_config(config: dict) -> dict:
     year = paths["year"]
     year_dict = config[f"{year}_mappers"]
 
-    paths["mappers"] = f"{paths['root']}{paths['year']}_surveys/mappers/"
+    paths["mappers"] = os.path.join(root_path, f"{paths['year']}_surveys/mappers/")
 
     version = year_dict["mappers_version"]
-    map_folder = f"{root_path}{year}_surveys/mappers/{version}/"
+    map_folder = os.path.join(paths["mappers"], f"{version}/")
 
     mapping_dict = {
         k: f"{map_folder}{v}" for k, v in year_dict.items() if k != "mappers_version"
@@ -137,13 +144,76 @@ def create_construction_config(config: dict) -> dict:
     # now update add construction paths
     paths = get_paths(config)
     berd_path = paths["berd_path"]
-    construction_dict[
-        "construction_file_path"
-    ] = f"{berd_path}{paths['construction_file_path']}"
-    construction_dict[
-        "construction_file_path_ni"
-    ] = f"{berd_path}{paths['construction_file_path_ni']}"
+    construction_dict["all_data_construction_file_path"] = os.path.join(
+        berd_path, paths["all_data_construction_file_path"]
+    )
+    construction_dict["construction_file_path_ni"] = os.path.join(
+        berd_path, paths["construction_file_path_ni"]
+    )
+    construction_dict["postcode_construction_file_path"] = os.path.join(
+        berd_path, paths["postcode_construction_file_path"]
+    )
+
     return construction_dict
+
+
+def create_exports_config(config: dict) -> dict:
+    """Create a configuration dictionary with all paths needed for exports.
+
+    Args:
+        config (dict): The pipeline configuration.
+    Returns:
+        dict: A dictionary with all the paths needed for the exports module.
+    """
+    paths = get_paths(config)
+    root_path = paths["root"]
+    folder_name = config["export_paths"]["export_folder"]
+
+    export_folder = os.path.join(root_path, folder_name)
+    config["export_paths"] = {"export_folder": f"{export_folder}/"}
+    return config["export_paths"]
+
+
+def validate_mapping_filenames(config: dict) -> dict:
+    year = str(config["years"]["survey_year"])
+    year_mapper_dict = config[f"{year}_mappers"]
+    bool_dict = {}
+    msg = ""
+
+    for key, value in year_mapper_dict.items():
+        bool_dict[key] = True
+        # check string is not empty
+        if (not value) or (value == ""):
+            bool_dict[key] = False
+            msg += f"{key} is empty."
+
+        # check filename is correct
+        if value != "v1":
+            file_type = ".csv"
+            if file_type not in value:
+                bool_dict[key] = False
+                msg += f"The file: {value} is not a {file_type} file type."
+
+        # check year is correct
+        if value != "v1":
+            if year not in value:
+                bool_dict[key] = False
+                msg += f"{year} is not included in {key}."
+
+    return bool_dict, msg
+
+
+def filename_validation(config: dict) -> dict:
+    """Checks that the mapping filenames are valid"""
+    bool_dict, msg = validate_mapping_filenames(config)
+
+    if all(bool_dict.values()):
+        PathHelpLogger.info("All mapping filenames are valid.")
+    else:
+        PathHelpLogger.error("There are errors with the mapping filenames.")
+        raise ValueError(msg)
+
+    return config
 
 
 def update_config_with_paths(config: dict, modules: list) -> dict:
@@ -160,6 +230,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
     config["ni_paths"] = create_ni_staging_config(config)
     config["mapping_paths"] = create_mapping_config(config)
     config["construction_paths"] = create_construction_config(config)
+    config["export_paths"] = create_exports_config(config)
 
     for module_name in modules:
         config[f"{module_name}_paths"] = create_module_config(config, module_name)

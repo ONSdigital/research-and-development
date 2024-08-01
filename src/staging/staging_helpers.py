@@ -60,7 +60,7 @@ def getmappername(mapper_path_key: str, split: bool) -> str:
     The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
 
-    Parameters:
+    Args:
     mapper_path_key (str): The key from which to extract the mapper name.
     split (bool): Whether to replace underscores in the name with spaces.
 
@@ -116,7 +116,7 @@ def load_validate_mapper(
     mapper_name = getmappername(mapper_path_key, split=True)
 
     # Log the loading of the mapper
-    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
+    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
     mods.rd_file_exists(mapper_path, raise_error=True)
@@ -182,7 +182,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
         dataframes into a full responses dataframe, and validates the full
         responses dataframe against a combined schema.
 
-    Parameters:
+    Args:
         snapshot_path (str): The path to the JSON file containing the snapshot
         data.
         load_json (function): The function to use to load the JSON file.
@@ -244,7 +244,7 @@ def load_validate_secondary_snapshot(
     dataframes into a full responses dataframe, and validates the full responses
     dataframe against a combined schema.
 
-    Parameters:
+    Args:
         load_json (function): The function to use to load the JSON file.
         secondary_snapshot_path (str): The path to the JSON file containing the
         secondary snapshot data.
@@ -346,20 +346,20 @@ def stage_validate_harmonise_postcodes(
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
-    Parameters:
-    config (Dict): A dictionary containing configuration options.
-    full_responses (pd.DataFrame): The DataFrame containing the data to be
-    validated.
-    run_id (str): The run ID for this execution.
-    check_file_exists (Callable): A function that checks if a file exists.
-    read_csv (Callable): A function that reads a CSV file into a DataFrame.
-    write_csv (Callable): A function that writes a DataFrame to a CSV file.
+    Args:
+        config (Dict): A dictionary containing configuration options.
+        full_responses (pd.DataFrame): The DataFrame containing the data to be
+        validated.
+        run_id (str): The run ID for this execution.
+        check_file_exists (Callable): A function that checks if a file exists.
+        read_csv (Callable): A function that reads a CSV file into a DataFrame.
+        write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
@@ -367,9 +367,9 @@ def stage_validate_harmonise_postcodes(
     staging_dict = config["staging_paths"]
 
     # Load the master list of postcodes
-    postcode_masterlist = staging_dict["postcode_masterlist"]
-    check_file_exists(postcode_masterlist, raise_error=True)
-    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_mapper = config["mapping_paths"]["postcode_mapper"]
+    check_file_exists(postcode_mapper, raise_error=True)
+    postcode_mapper = read_csv(postcode_mapper)
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
@@ -393,3 +393,23 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
+
+
+def filter_pnp_data(full_responses):
+    """
+    Filter out all PNP data or equivalently all records with legalstatus of 7
+
+    Args:
+        full_responses (pandas.DataFrame):
+            The DataFrame containing the full resonses data.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: Two dataframes; the BERD data without
+        PNP data and the PNP data
+    """
+    # create dataframe with PNP data legalstatus=='7'
+    pnp_full_responses = full_responses.loc[(full_responses["legalstatus"] == "7")]
+    # filter out PNP data or equivalently records with legalstatus!='7'
+    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
+
+    return full_responses, pnp_full_responses
