@@ -5,7 +5,7 @@ import numpy as np
 from pandas._testing import assert_frame_equal
 
 from src.construction.construction_helpers import (
-    _convert_formtype,
+    convert_formtype,
     prepare_forms_gb,
     prepare_short_to_long,
     clean_construction_type,
@@ -15,19 +15,19 @@ from src.construction.construction_helpers import (
 )
 
 
-def test__convert_formtype():
-    """Test for _convert_formtype()."""
+def test_convert_formtype():
+    """Test for convert_formtype()."""
     msg = "Converted formtype not as expected"
-    assert _convert_formtype("1") == "0001", msg
-    assert _convert_formtype("1.0") == "0001", msg
-    assert _convert_formtype("0001") == "0001", msg
-    assert _convert_formtype("6") == "0006", msg
-    assert _convert_formtype("6.0") == "0006", msg
-    assert _convert_formtype("0006") == "0006", msg
-    assert _convert_formtype(1) == "0001", msg
-    assert _convert_formtype("2") is None, msg
-    assert _convert_formtype("") is None, msg
-    assert _convert_formtype(None) is None, msg
+    assert convert_formtype("1") == "0001", msg
+    assert convert_formtype("1.0") == "0001", msg
+    assert convert_formtype("0001") == "0001", msg
+    assert convert_formtype("6") == "0006", msg
+    assert convert_formtype("6.0") == "0006", msg
+    assert convert_formtype("0006") == "0006", msg
+    assert convert_formtype(1) == "0001", msg
+    assert convert_formtype("2") is None, msg
+    assert convert_formtype("") is None, msg
+    assert convert_formtype(None) is None, msg
 
 
 class TestPrepareFormGB:

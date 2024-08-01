@@ -204,11 +204,9 @@ def run_staging(  # noqa: C901
         backdata_path = staging_dict["backdata_path"]
         check_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
-        # To be added once schema is defined
-        # Network schema file matches working schema on DAP
-        # val.validate_data_with_schema(
-        #     backdata_path, "./config/backdata_schema.toml"
-        # )
+        val.validate_data_with_schema(
+            backdata_path, "./config/backdata_schema.toml"
+        )
 
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
