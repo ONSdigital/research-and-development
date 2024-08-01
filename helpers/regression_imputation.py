@@ -21,15 +21,20 @@ from src.utils.local_file_mods import rd_write_csv as write_csv
 # Input folder and file names
 root_folder = "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/"
 in_fol = "06_imputation/imputation_qa/"
-in_file_old = "2023_full_responses_imputed_24-07-26_v647.csv"
-in_file_new = "2023_full_responses_imputed_24-08-01_v672.csv"
+file_stub = "2023_full_responses_imputed"
+date_old = "24-08-01"
+date_new = "24-08-01"
+version_old = "v32"
+version_new = "v674"
+in_file_old = f"{file_stub}_{date_old}_{version_old}.csv"
+in_file_new = f"{file_stub}_{date_new}_{version_new}.csv"
 
 # Output folder and file
 out_fol = "R:/BERD Results System Development 2023/DAP_emulation/analysis/"
-out_file = "imputation_merged_v660_v672.csv"
+out_file = f"imputation_merged_{version_old}_{version_new}.csv"
 
 # Columns to select
-key_cols = ["reference", "200", "201", "formtype"]
+key_cols = ["reference", "200", "201", "formtype", "cellnumber"]
 value_col = "211_imputed"
 other_cols = [
     "instance",

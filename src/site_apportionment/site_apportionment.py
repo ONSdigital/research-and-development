@@ -57,10 +57,12 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
         ValueError: If the percent column for short forms is not blank.
     """
     # If the percent column for short forms is not blank, raise an error.
-    short_forms = df[df[form_col] == short_code]
-    if not short_forms[percent_col].isna().all():
-        raise ValueError("Percent column for short forms should be blank.")
-    df.loc[df[form_col] == short_code, percent_col] = 100
+
+    # TODO: This is not the case where a short form has been imputed from a LF in MoR
+    # short_forms = df[df[form_col] == short_code]
+    # if not short_forms[percent_col].isna().all():
+    #     raise ValueError("Percent column for short forms should be blank.")
+    # df.loc[df[form_col] == short_code, percent_col] = 100
 
     # Condition for long forms with status "Form sent out"
     # Note: those imputed by MoR will have had the postcode column imputed, so we check

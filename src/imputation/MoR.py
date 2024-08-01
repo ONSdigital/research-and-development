@@ -38,6 +38,7 @@ def run_mor(df, backdata, impute_vars, config):
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
 
+    # Perform MoR for longforms
     gr_df = calculate_growth_rates(remainder_df, backdata, lf_target_vars)
     links_df = calculate_links(gr_df, lf_target_vars, config)
 
@@ -68,7 +69,7 @@ def mor_preprocessing(df, backdata):
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
-    clear_status_cond = backdata["status"].isin(good_statuses)
+    clear_status_cond = backdata["imp_marker"] == "R"
 
     # Only pick up clear statuses from backdata
     backdata = backdata.loc[clear_status_cond, :]
@@ -119,7 +120,7 @@ def carry_forwards(df, backdata, impute_vars):
     match_cond = df["_merge"] == "both"
 
     # Replace the values of certain columns with the values from the back data
-    replace_vars = ["instance", "200", "201", "601", "602", "604"]
+    replace_vars = ["instance", "200", "201", "601", "602", "604", "imp_class"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
