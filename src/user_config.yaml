@@ -19,10 +19,10 @@ global:
   output_backdata: False
   # QA output settings
   output_full_responses: False
-  output_pnp_full_responses: False
+  output_pnp_full_responses: True
   output_ni_full_responses: False
   output_imputation_qa: True
-  output_mapping_qa: False
+  output_mapping_qa: True
   output_mapping_ni_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -31,10 +31,10 @@ global:
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
+  output_gb_sas: True
   output_ni_sas: False
   output_tau: False
-  output_intram_by_pg_gb: False
+  output_intram_by_pg_gb: True
   output_intram_by_pg_uk: False
   output_intram_gb_itl: False
   output_intram_uk_itl: False

@@ -47,16 +47,8 @@ def run_mor(df, backdata, impute_vars, config):
         carried_forwards_df, remainder_df, backdata, impute_vars, config, "short"
     )
 
-    # this old code has been moved to the calculate_mor func
-    # gr_df = calculate_growth_rates(remainder_df, backdata, lf_target_vars)
-    # links_df = calculate_links(gr_df, lf_target_vars, config)
-
-    # carried_forwards_df = apply_links(
-    #     carried_forwards_df, links_df, lf_target_vars, config
-    # )
-
     # Calculate totals as with TMI for longforms only
-    imputed_df_long = calculate_totals(carried_forwards_df)
+    imputed_df_long = calculate_totals(imputed_df_long)
 
     imputed_df = pd.concat(
         [remainder_df, imputed_df_long, imputed_df_short]
@@ -84,7 +76,7 @@ def mor_preprocessing(df, backdata):
 
     stat_cond = df["status"].isin(bad_statuses)
     sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
-    lf_cond = (df["formtype"] == "0001")
+    lf_cond = df["formtype"] == "0001"
     imputation_cond = stat_cond & (sf_cond | lf_cond)
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
@@ -295,7 +287,7 @@ def group_calc_link(group, target_vars, config):
     return group
 
 
-def apply_links(cf_df, links_df, target_vars, config):
+def apply_links(cf_df, links_df, target_vars, config, formtype):
     """Apply the links to the carried forwards values.
 
     Args:
@@ -303,6 +295,7 @@ def apply_links(cf_df, links_df, target_vars, config):
         links_df (pd.DataFrame): DataFrame containing calculated links.
         target_vars ([string]): List of target variables.
         config (Dict): Dictorary of configuration.
+        formtype (str): whether the formtype is long or short.
     """
     # Reduce the mor_df so we only have the variables we need and one row
     # per imputation class
@@ -329,7 +322,10 @@ def apply_links(cf_df, links_df, target_vars, config):
         cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
     # Apply MoR for the breakdown variables under 211 and 305
-    q_targets = ["211", "305"]
+    if formtype == "long":
+        q_targets = ["211", "305"]
+    else:
+        q_targets = list(config["breakdowns"])
     for var in q_targets:
         for breakdown in config["breakdowns"][var]:
             # As above but using different elements to multiply
@@ -378,16 +374,20 @@ def calculate_mor(cf_df, remainder_df, backdata, impute_vars, config, formtype):
         backdata = backdata.copy().loc[(backdata["formtype"] == "0006"), :]
 
     else:
-        #TODO: the complex cases of short to long, long to short.
+        # TODO: the complex cases of short to long, long to short.
 
         # for now, don't impute short forms
         links_df = pd.DataFrame()
         return cf_df, links_df
 
-
     gr_df = calculate_growth_rates(remainder_df, backdata, target_vars)
     links_df = calculate_links(gr_df, target_vars, config)
 
-    imputed_df = apply_links(cf_df, links_df, target_vars, config)
+    if formtype == "long":
+        links_df["formtype"] = "0001"
+    else:
+        links_df["formtype"] = "0006"
+
+    imputed_df = apply_links(cf_df, links_df, target_vars, config, formtype)
 
     return imputed_df, links_df
