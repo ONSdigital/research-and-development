@@ -303,7 +303,6 @@ class TestValidateShortToLong(object):
         """Test that validate_short_to_long raises when there is no instance=0."""
         # set up an error condition
         short_to_long_df.loc[short_to_long_df.reference==4, "instance"] = 1
-        print(short_to_long_df)
         # test that the error is raised
         msg = (
             "Short to long construction requires at least record where instance=0 for"
