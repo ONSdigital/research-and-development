@@ -41,17 +41,32 @@ def create_client(config):
 
 ################################################################################
 # Read a CSV file into a Pandas dataframe
-def s3_read_csv(config, client, filepath, cols=None) -> pd.DataFrame:
-    with client.get_object(Bucket=config["s3_bucket"], Key=filepath)['Body'] as csv_f:
-        df = pd.read_csv(csv_f)
-    return df
+def s3_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+    """Reads a csv from s3 bucket into a Pandas Dataframe
+    Args:
+        filepath (str): Filepath (Specified in config)
+        cols (List[str]): Optional list of columns to be read in
+    Returns:
+        pd.DataFrame: Dataframe created from csv
+    """
+    with client.get_object(Bucket=config["s3_bucket"], Key=filepath)['Body'] as csv_file:
+        if not cols:
+            df_from_s3 = pd.read_csv(csv_file, thousands=',')
+        else:
+            try:
+                df_from_s3 = pd.read_csv(csv_file, usecols=cols, thousands=',')
+            except Exception:
+                s3_logger.error(f"Could not find specified columns in {filepath}")
+                s3_logger.info("Columns specified: " + str(cols))
+                raise ValueError
+    return df_from_s3
   
 
 ###############################################################################
 
 client = create_client(config)
 mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
-mydf = s3_read_csv(config, client, mypath)
+mydf = s3_read_csv(mypath, ['value'])
 mydf.head()
 
 # def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
