@@ -1,8 +1,19 @@
-# def get_amendments(main_snapshot, secondary_snapshot):
+# def get_amendments(
+#     main_snapshot: pd.DataFrame,
+#     secondary_snapshot: pd.DataFrame,
+#     ) -> pd.DataFrame:
 #     """Get amended records from secondary snapshot.
 
 #     Get all records that are present in both the main snapshot and the updated
 #     snapshot, and have matching keys.
+
+#     Args:
+#         main_snapshot (pd.DataFrame): The staged and validated snapshot data.
+#         secondary_snapshot (pd.DataFrame): The staged and validated updated
+#             snapshot data.
+
+#     Returns:
+#         amendments_df (pd.DataFrame): The records that have changed.
 #     """
 #     key_cols = ["reference", "year", "instance"]
 #     numeric_cols = [
@@ -75,10 +86,21 @@
 #         return None
 
 
-# def get_additions(main_snapshot, secondary_snapshot):
+# def get_additions(
+#     main_snapshot: pd.DataFrame,
+#     secondary_snapshot: pd.DataFrame,
+#     ) -> pd.DataFrame:
 #     """Get added records from secondary snapshot.
 
-#     Get all records that are present in the updated snapshot but not the main snapshot
+#     Get all records that are present in the updated snapshot but not the main
+
+#     Args:
+#         main_snapshot (pd.DataFrame): The staged and validated snapshot data.
+#         secondary_snapshot (pd.DataFrame): The staged and validated updated
+#             snapshot data.
+
+#     Returns:
+#         additions_df (pd.DataFrame): The records that have been added.
 #     """
 #     key_cols = ["reference", "year", "instance"]
 
@@ -111,8 +133,26 @@
 #         return None
 
 
-# def output_freezing_files(amendments_df, additions_df, config, write_csv, run_id):
-#     """Save CSVs of amendments and additions for user approval."""
+# def output_freezing_files(
+#     amendments_df: pd.DataFrame,
+#     additions_df: pd.DataFrame,
+#     config: dict,
+#     write_csv: Callable,
+#     run_id: int,
+#     ) -> bool:
+#     """Save CSVs of amendments and additions for user approval.
+
+#     Args:
+#         amendments_df (pd.DataFrame): The records that have changed.
+#         additions_df (pd.DataFrame): The records that have been added.
+#         config (dict): The pipeline configuration
+#         write_csv (callable): Function to write to a csv file. This will be the
+#             hdfs or network version depending on settings.
+#         run_id (int): The run id for this run.
+
+#     Returns:
+#         bool: True if the files were written successfully.
+#     """
 #     # Prepare output paths
 #     network_or_hdfs = config["global"]["network_or_hdfs"]
 #     paths = config[f"{network_or_hdfs}_paths"]

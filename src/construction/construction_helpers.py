@@ -41,7 +41,7 @@ def read_construction_file(
     return None
 
 
-def _convert_formtype(formtype_value: str) -> str:
+def convert_formtype(formtype_value: str) -> str:
     """Convert the formtype to a standardised format.
 
     Args:
@@ -79,7 +79,7 @@ def prepare_forms_gb(
     # Convert formtype to "0001" or "0006"
     if "formtype" in construction_df.columns:
         construction_df["formtype"] = construction_df["formtype"].apply(
-            _convert_formtype
+            convert_formtype
         )
 
     if "construction_type" in construction_df.columns:
