@@ -13,18 +13,24 @@ config = {
 }
 file = "user/dominic.bean/iris.csv"
 ################################################################################
-client = boto3.client("s3")
-raz_client.configure_ranger_raz(client, ssl_file=config["ssl_file"])
+def create_client(config):
+    client = boto3.client("s3")
+    raz_client.configure_ranger_raz(client, ssl_file=config["ssl_file"])
+    return client
 ################################################################################
-list_files(client, config["s3_bucket"], "/user/george.zorinyants")
+# list_files(client, config["s3_bucket"], "/user/george.zorinyants")
 
 ################################################################################
 # Read a CSV file into a Pandas dataframe
-with client.get_object(Bucket=config["s3_bucket"], Key='user/george.zorinyants/pg_num_alpha_2023.csv')['Body'] as csv_f:
-  rescue_df = pd.read_csv(csv_f)
+def s3_read_csv(mypath, config, client):
+    with client.get_object(Bucket=config["s3_bucket"], Key=mypath)['Body'] as csv_f:
+        df = pd.read_csv(csv_f)
+    return df
   
-rescue_df.head()
 
+mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
+mydf = s3_read_csv(mypath, config, client)
+mdf.head()
 ################################################################################
 # Create a dataframe and write to a CSV file
 my_data = {"coutry": ["a", "b"], "value": [1, 2]}
