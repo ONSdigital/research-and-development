@@ -64,7 +64,9 @@ def run_staging(  # noqa: C901
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
 
-    snapshot_name = os.path.basename(staging_dict["snapshot_path"]).split(".", 1)[0]
+    snapshot_name = os.path.basename(staging_dict["frozen_snapshot_path"]).split(
+        ".", 1
+    )[0]
     feather_path = staging_dict["feather_output"]
     feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
@@ -106,11 +108,11 @@ def run_staging(  # noqa: C901
     else:  # Read from JSON
 
         # Check data file exists, raise an error if it does not.
-        snapshot_path = staging_dict["snapshot_path"]
+        frozen_snapshot_path = staging_dict["frozen_snapshot_path"]
         secondary_snapshot_path = staging_dict["secondary_snapshot_path"]
-        check_file_exists(snapshot_path, raise_error=True)
+        check_file_exists(frozen_snapshot_path, raise_error=True)
         full_responses, response_rate = helpers.load_val_snapshot_json(
-            snapshot_path, load_json, config, network_or_hdfs
+            frozen_snapshot_path, load_json, config, network_or_hdfs
         )
 
         StagingMainLogger.info(
