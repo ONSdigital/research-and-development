@@ -110,7 +110,8 @@ def get_amendments(main_snapshot, secondary_snapshot):
 
         # ? I think this is the way to do it:
         # ?     Take a slice of the df which is just the cols ending with _diff_nonzero
-        # ?     Do a column-wise any() on this slice, which returns a series where the value is True if any of the *_diff_nonzero cols in that row were True
+        # ?     Do a column-wise any() on this slice, which returns a series where the
+        #       value is True if any of the *_diff_nonzero cols in that row were True
         # ?     Add that series as a column to the original df
         # ?     Remove any rows from the df where is_any_diff_nonzero is False
         # ! Can't test this without a real secondary snapshot file
@@ -182,17 +183,18 @@ def output_construction_files(amendments_df, additions_df, config, write_csv, ru
     # Prepare output paths
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
     construction_folder = paths["construction_path"]
     amendments_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_amendments_{tdate}_v{run_id}.csv",
+        f"{survey_year}_construction_amendments_{tdate}_v{run_id}.csv",
     )
     additions_filename = os.path.join(
         construction_folder,
         "auto_construction",
-        f"construction_additions_{tdate}_v{run_id}.csv",
+        f"{survey_year}_construction_additions_{tdate}_v{run_id}.csv",
     )
 
     # Check if the dataframes are empty before writing
@@ -241,9 +243,12 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
             )
 
     # Save the constructed dataframe as a CSV
-    tdate = datetime.now().strftime("%Y-%m-%d")
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
     construction_output_filepath = os.path.join(
-        paths["root"], "construction", f"constructed_snapshot_{tdate}_v{run_id}.csv"
+        paths["root"],
+        "construction",
+        f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv",
     )
     write_csv(construction_output_filepath, constructed_df)
     return constructed_df
@@ -252,8 +257,19 @@ def apply_construction(main_df, config, check_file_exists, read_csv, write_csv, 
 def apply_amendments(main_df, amendments_df):
     """Apply amendments to the main snapshot."""
     key_cols = ["reference", "year", "instance"]
-    numeric_cols = ["219", "220", "242", "243", "244", "245",
-                    "246", "247", "248", "249", "250"]
+    numeric_cols = [
+        "219",
+        "220",
+        "242",
+        "243",
+        "244",
+        "245",
+        "246",
+        "247",
+        "248",
+        "249",
+        "250",
+    ]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
     accepted_amendments_df = amendments_df.drop(

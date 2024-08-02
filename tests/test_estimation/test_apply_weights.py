@@ -5,23 +5,32 @@ import src.estimation.apply_weights as appw
 from pandas._testing import assert_frame_equal
 
 
-class TestApplyWeights():
+class TestApplyWeights:
     """Test for apply_weights()"""
+
     # Tests that estimation cols are created, correctly calculated and rounded
     # Includes a np.nan and 0
     # Tests the cols_list output is correct
 
-
     # Create config dictionary
     def create_config_dict(self):
         """Creates config dictionary for test"""
-        config = {"estimation": {"numeric_cols": ["701", "702", "703"]},
-                  "breakdowns": {"211": ["202", "203", "204"],
-                                 "305": ["302", "303", "304"],
-                                 "emp_total": ["emp_researcher", "emp_technician", "emp_other"],
-                                 "headcount_total": ["headcount_res_m", "headcount_res_f", "headcount_tec_m",
-                                                     "headcount_tec_f", "headcount_oth_m", "headcount_oth_f"]}
-                                                 }
+        config = {
+            "estimation": {"numeric_cols": ["701", "702", "703"]},
+            "breakdowns": {
+                "211": ["202", "203", "204"],
+                "305": ["302", "303", "304"],
+                "emp_total": ["emp_researcher", "emp_technician", "emp_other"],
+                "headcount_total": [
+                    "headcount_res_m",
+                    "headcount_res_f",
+                    "headcount_tec_m",
+                    "headcount_tec_f",
+                    "headcount_oth_m",
+                    "headcount_oth_f",
+                ],
+            },
+        }
         return config
 
     # Create an input dataframe for the test
@@ -55,7 +64,6 @@ class TestApplyWeights():
             "headcount_oth_f",
             "a_weight",
         ]
-
         data = [
             ["1", np.nan, 1.5968726069999999, 0.254832457, 1501.531337, 500.8443931, 499.9360421, 500.75090159999996, 29.94531777, 9.602584921, 9.653985014, 10.68874783, 6.486029315, 2.533542905, 2.308242877, 1.644243533, 35.5, 17.6, 17.9, 5.2, 5.0, 5.9, 6.1, 6.4, 6.8, 2.5],
             ["2", 0.0, 0.484444627, 0.660795649, 1501.150221, 499.7596024, 501.6974991, 499.6931194, 31.82855842, 10.97246129, 10.18047899, 10.67561814, 9.256449084, 3.6957475310000003, 3.053765916, 2.5069356369999998, 31.3, 15.6, 15.7, 5.1, 5.0, 5.2, 5.3, 5.3, 5.4, 6.0],
@@ -153,7 +161,12 @@ class TestApplyWeights():
 
         result_df, cols_list = appw.apply_weights(input_df, config, 4)
 
-        input_columns.remove("reference"); input_columns.remove("a_weight")
+        input_columns.remove("reference")
+        input_columns.remove("a_weight")
 
-        assert_frame_equal(result_df, exp_output_df, check_like=True, check_exact=False, rtol=0.05)
-        assert sorted(cols_list) == sorted(input_columns), "input column list and returned column list are not equal"
+        assert_frame_equal(
+            result_df, exp_output_df, check_like=True, check_exact=False, rtol=0.05
+        )
+        assert sorted(cols_list) == sorted(
+            input_columns
+        ), "input column list and returned column list are not equal"

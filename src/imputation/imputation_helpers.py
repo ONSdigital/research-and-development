@@ -4,6 +4,8 @@ import pandas as pd
 from typing import List, Dict, Tuple, Callable
 from itertools import chain
 
+from src.staging.validation import load_schema
+
 ImputationHelpersLogger = logging.getLogger(__name__)
 
 
@@ -37,9 +39,9 @@ def create_notnull_mask(df: pd.DataFrame, col: str) -> pd.Series:
     return df[col].str.len() > 0
 
 
-def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
+def create_mask(df: pd.DataFrame, options: List) -> pd.Series:
     """Create a dataframe mask based on listed options - retrun Bool column.
-    
+
     Options include:
         - 'clear_status': rows with one of the clear statuses
         - 'instance_zero': rows with instance = 0
@@ -49,15 +51,15 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
     """
     clear_mask = df["status"].isin(["Clear", "Clear - overridden"])
     instance_mask = df.instance == 0
-    no_r_and_d_mask = df["604"]=="No"
+    no_r_and_d_mask = df["604"] == "No"
     postcode_only_mask = df["211"].isnull() & ~df["601"].isnull()
 
     # Set initial values for the mask series as a column in the dataframe
     df = df.copy()
     df["mask_col"] = False
-    
+
     if "clear_status" in options:
-        df["mask_col"] =  df["mask_col"] & clear_mask
+        df["mask_col"] = df["mask_col"] & clear_mask
 
     if "instance_zero" in options:
         df["mask_col"] = df["mask_col"] & instance_mask
@@ -67,7 +69,7 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
 
     if "no_r_and_d" in options:
         df["mask_col"] = df["mask_col"] & no_r_and_d_mask
-        
+
     if "postcode_only" in options:
         df["mask_col"] = df["mask_col"] & postcode_only_mask
 
@@ -75,6 +77,8 @@ def create_mask(df:pd.DataFrame, options:List)-> pd.Series:
         df["mask_col"] = df["mask_col"] & ~postcode_only_mask
 
     return df["mask_col"]
+
+
 def instance_fix(df: pd.DataFrame):
     """Set instance to 1 for longforms with status 'Form sent out.'
 
@@ -128,7 +132,7 @@ def copy_first_to_group(df: pd.DataFrame, col_to_update: str) -> pd.Series:
 def get_mult_604_mask(df: pd.DataFrame) -> pd.Series:
     """Return mask for long form references with "No" in col 604 but >1 instance.
 
-    Fill nulls as where any of the columns in the mask has a null value, 
+    Fill nulls as where any of the columns in the mask has a null value,
     the mask will be null"""
     mult_604_mask = (
         (df["formtype"] == "0001") & (df["604"] == "No") & (df["instance"] != 0)
@@ -138,7 +142,7 @@ def get_mult_604_mask(df: pd.DataFrame) -> pd.Series:
 
 def fix_604_error(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Filter out rows with 604 error and create qa dataframe with the rows with errors.
-    
+
     Return the filtered data frame and a second qa dataframe with
     all references with no R&D but more than one instance for output.
 
@@ -213,8 +217,8 @@ def check_604_fix(df) -> pd.DataFrame:
 
 
 def create_r_and_d_instance(
-        df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
+    df: pd.DataFrame,
+) -> Tuple[pd.DataFrame, pd.DataFrame, List]:
     """Create a duplicate of long form records with no R&D and set instance to 1.
 
     These references initailly have one entry with instance 0.
@@ -242,9 +246,9 @@ def create_r_and_d_instance(
 
     # check that the fix has worked and drop duplicates for now if not
     final_df, check_df = check_604_fix(updated_df)
-    #TODO: it shouldn't be necessary to drop duplicates if the fix works properly.
+    # TODO: it shouldn't be necessary to drop duplicates if the fix works properly.
     ImputationHelpersLogger.info("The following references are 'No R&D' ")
-    ImputationHelpersLogger.info( "but have too many rows- duplicates will be dropped:")
+    ImputationHelpersLogger.info("but have too many rows- duplicates will be dropped:")
     ImputationHelpersLogger.info(check_df)
 
     return final_df, mult_604_qa_df
@@ -319,14 +323,40 @@ def tidy_imputation_dataframe(
         col
         for col in df.columns
         if (
-            col.endswith("prev") | col.endswith("imputed") | col.endswith("link")
-            | col.endswith("sf_exp_grouping") | col.endswith("trim") 
+            col.endswith("prev")
+            | col.endswith("imputed")
+            | col.endswith("link")
+            | col.endswith("sf_exp_grouping")
+            | col.endswith("trim")
         )
     ]
 
     to_drop += ["200_original", "pg_sic_class", "empty_pgsic_group", "empty_pg_group"]
     to_drop += ["200_imp_marker"]
-    
+
     df = df.drop(columns=to_drop)
 
     return df
+
+
+def create_new_backdata(backdata: pd.DataFrame, config) -> pd.DataFrame:
+    """Create a new backdata dataframe with the required columns from schema.
+
+    Use the backdata toml schema to select the required columns from the backdata.
+    filter for the clear and imputed statuses.
+
+    Args:
+        backdata (pd.DataFrame): The backdata dataframe.
+
+    Returns:
+        pd.DataFrame: The filtered backdata with only the required columns.
+    """
+    # filter for the clear and imputed statuses
+    imp_markers_to_keep: list = ["R", "TMI", "CF", "MoR", "constructed"]
+    backdata = backdata.loc[backdata["imp_marker"].isin(imp_markers_to_keep)]
+
+    # get the wanted columns from the backdata schema
+    schema = load_schema("./config/backdata_schema.toml")
+    wanted_cols = list(schema.keys())
+
+    return backdata[wanted_cols]

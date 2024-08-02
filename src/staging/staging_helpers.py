@@ -10,18 +10,17 @@ from datetime import datetime
 from typing import Callable, Tuple, Dict, Union
 
 # Our own modules
-from src.utils.wrappers import time_logger_wrap
 from src.staging import validation as val
 from src.staging import postcode_validation as pcval
-from src.staging import spp_parser, history_loader
 from src.staging import spp_snapshot_processing as processing
+from src.staging import spp_parser
 
 
 # Create logger for this module
 StagingHelperLogger = logging.getLogger(__name__)
 
 
-def fix_anon_data(responses_df, config):
+def fix_anon_data(responses_df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """
     Fixes anonymised snapshot data for use in the DevTest environment.
 
@@ -52,51 +51,7 @@ def fix_anon_data(responses_df, config):
     return responses_df
 
 
-def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Update long form references that should be on the reference list.
-
-    For the first year (processing 2022 data) only, several references
-    should have been designated on the "reference list", ie, should have been
-    assigned cellnumber = 817, but were wrongly assigned a different cellnumber.
-
-    Args:
-        full_df (pd.DataFrame): The full_responses dataframe
-        ref_list_df (pd.DataFrame): The mapper containing updates for the cellnumber
-    Returns:
-        df (pd.DataFrame): with cellnumber and selectiontype cols updated.
-    """
-    ref_list_filtered = ref_list_df.loc[
-        (ref_list_df.formtype == "1") & (ref_list_df.cellnumber != 817)
-    ]
-    df = pd.merge(
-        full_df,
-        ref_list_filtered[["reference", "cellnumber"]],
-        how="outer",
-        on="reference",
-        suffixes=("", "_new"),
-        indicator=True,
-    )
-    # check no items in the reference list mapper are missing from the full responses
-    missing_refs = df.loc[df["_merge"] == "right_only"]
-    if not missing_refs.empty:
-        msg = (
-            "The following references in the reference list mapper are not in the data:"
-        )
-        raise ValueError(msg + str(missing_refs.reference.unique()))
-
-    # update cellnumber and selectiontype where there is a match
-    match_cond = df["_merge"] == "both"
-    df = df.copy()
-    df.loc[match_cond, "cellnumber"] = 817
-    df.loc[match_cond, "selectiontype"] = "L"
-
-    df = df.drop(["_merge", "cellnumber_new"], axis=1)
-
-    return df
-
-
-def getmappername(mapper_path_key, split):
+def getmappername(mapper_path_key: str, split: bool) -> str:
     """
     Extracts the mapper name from a given path key.
 
@@ -105,7 +60,7 @@ def getmappername(mapper_path_key, split):
     The name is assumed to be the part of the key before the first underscore.
     If the 'split' parameter is True, underscores in the name are replaced with spaces.
 
-    Parameters:
+    Args:
     mapper_path_key (str): The key from which to extract the mapper name.
     split (bool): Whether to replace underscores in the name with spaces.
 
@@ -122,20 +77,13 @@ def getmappername(mapper_path_key, split):
 
 
 def load_validate_mapper(
-    mapper_path_key,
-    paths,
-    file_exists_func,
-    read_csv_func,
-    logger,
-    val_with_schema_func: Callable,
-    one_to_many_val_func: Callable,
-    *args,
-):
+    mapper_path_key: str, config: dict, logger: logging.Logger
+) -> pd.DataFrame:
     """
     Loads a specified mapper, validates it using a schema and an optional
     validation function.
 
-    This function first retrieves the path of the mapper from the provided paths
+    This function first retrieves the path of the mapper from the provided config
     dictionary using the mapper_path_key. It then checks if the file exists at
     the mapper path. If the file exists, it is read into a DataFrame. The
     DataFrame is then validated against a schema, which is located at a path
@@ -143,20 +91,9 @@ def load_validate_mapper(
     is called with the DataFrame and any additional arguments.
 
     Args:
-        mapper_path_key (str): The key to retrieve the mapper path from the
-        paths dictionary.
-
-        paths (dict): A dictionary containing paths.
-        file_exists_func (Callable): A function to check if a file exists at a
-        given path.
-        read_csv_func (Callable): A function to read a CSV file into a
-        DataFrame.
+        mapper_path_key (str): The key to retrieve the mapper path from the config.
+        config (dict): A dictionary containing configuration options.
         logger (logging.Logger): A logger to log information and errors.
-        val_with_schema_func (Callable): A function to validate a DataFrame
-        against a schema.
-        validation_func (Callable, optional): An optional function to perform
-        additional validation on the DataFrame.
-        *args: Additional arguments to pass to the validation function.
 
     Returns:
         pd.DataFrame: The loaded and validated mapper DataFrame.
@@ -165,81 +102,40 @@ def load_validate_mapper(
         FileNotFoundError: If no file exists at the mapper path.
         ValidationError: If the DataFrame fails schema validation or the validation func
     """
-    # Get the path of the mapper from the paths dictionary
-    mapper_path = paths[mapper_path_key]
+    # Get the path of the mapper from the config dictionary
+    mapper_path = config["mapping_paths"][mapper_path_key]
+    network_or_hdfs = config["global"]["network_or_hdfs"]
+
+    if network_or_hdfs == "network":
+        from src.utils import local_file_mods as mods
+
+    elif network_or_hdfs == "hdfs":
+        from src.utils import hdfs_mods as mods
 
     # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
 
     # Log the loading of the mapper
-    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} to File...")
+    logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
-    file_exists_func(mapper_path, raise_error=True)
+    mods.rd_file_exists(mapper_path, raise_error=True)
 
     # Read the file at the mapper path into a DataFrame
-    mapper_df = read_csv_func(mapper_path)
+    mapper_df = mods.rd_read_csv(mapper_path)
 
     # Construct the path of the schema from the mapper name
     schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
     schema_path = f"./config/{schema_prefix}_schema.toml"
 
     # Validate the DataFrame against the schema
-    val_with_schema_func(mapper_df, schema_path)
-
-    # If a one-to-many validation function is provided, validate the DataFrame
-    if one_to_many_val_func:
-        # Prepend the DataFrame to the arguments
-        args = (mapper_df,) + args
-        # Call the validation function with the DataFrame and the other arguments
-        one_to_many_val_func(*args)  # args include "col_many" and "col_one"
+    val.validate_data_with_schema(mapper_df, schema_path)
 
     # Log the successful loading of the mapper
     logger.info(f"{mapper_name} loaded successfully")
 
     # Return the loaded and validated DataFrame
     return mapper_df
-
-
-def load_historic_data(config: dict, paths: dict, read_csv: Callable) -> dict:
-    """Load historic data into the pipeline.
-
-    Args:
-        config (dict): The pipeline configuration
-        paths (dict): The paths to the data files
-        read_csv (Callable): Function to read a csv file.
-            This will be the hdfs or network version depending on settings.
-
-    Returns:
-        dict: A dictionary of history data loaded into the pipeline.
-    """
-    curent_year = config["years"]["current_year"]
-    years_to_load = config["years"]["previous_years_to_load"]
-    years_gen = history_loader.history_years(curent_year, years_to_load)
-
-    if years_gen is None:
-        StagingHelperLogger.info("No historic data to load for this run.")
-        return {}
-    else:
-        StagingHelperLogger.info("Loading historic data...")
-        history_path = paths["history_path"]
-        dict_of_hist_dfs = history_loader.load_history(
-            years_gen, history_path, read_csv
-        )
-        # Check if it has loaded and is not empty
-        if isinstance(dict_of_hist_dfs, dict) and bool(dict_of_hist_dfs):
-            StagingHelperLogger.info(
-                "Dictionary of history data: %s loaded into pipeline",
-                ", ".join(dict_of_hist_dfs),
-            )
-            StagingHelperLogger.info("Historic data loaded.")
-        else:
-            StagingHelperLogger.warning(
-                "Problem loading historic data. Dict may be empty or not present"
-            )
-            raise Exception("The historic data did not load")
-
-    return dict_of_hist_dfs if dict_of_hist_dfs else {}
 
 
 def check_snapshot_feather_exists(
@@ -269,7 +165,6 @@ def check_snapshot_feather_exists(
         return check_file_exists(feather_file_to_check)
 
 
-@time_logger_wrap
 def load_snapshot_feather(feather_file, read_feather):
     snapdata = read_feather(feather_file)
     StagingHelperLogger.info(f"{feather_file} loaded")
@@ -287,7 +182,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
         dataframes into a full responses dataframe, and validates the full
         responses dataframe against a combined schema.
 
-    Parameters:
+    Args:
         snapshot_path (str): The path to the JSON file containing the snapshot
         data.
         load_json (function): The function to use to load the JSON file.
@@ -338,7 +233,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
 
 
 def load_validate_secondary_snapshot(
-        load_json, secondary_snapshot_path, config, network_or_hdfs
+    load_json, secondary_snapshot_path, config, network_or_hdfs
 ):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
@@ -349,7 +244,7 @@ def load_validate_secondary_snapshot(
     dataframes into a full responses dataframe, and validates the full responses
     dataframe against a combined schema.
 
-    Parameters:
+    Args:
         load_json (function): The function to use to load the JSON file.
         secondary_snapshot_path (str): The path to the JSON file containing the
         secondary snapshot data.
@@ -395,11 +290,11 @@ def load_validate_secondary_snapshot(
 
 
 def df_to_feather(
-        dir: Union[pathlib.Path, str],
-        save_name: str,
-        df: pd.DataFrame,
-        write_feather: Callable,
-        overwrite: bool = True
+    dir: Union[pathlib.Path, str],
+    save_name: str,
+    df: pd.DataFrame,
+    write_feather: Callable,
+    overwrite: bool = True,
 ) -> None:
     """_summary_
 
@@ -432,7 +327,6 @@ def df_to_feather(
 
 def stage_validate_harmonise_postcodes(
     config: Dict,
-    paths: Dict,
     full_responses: pd.DataFrame,
     run_id: str,
     check_file_exists: Callable,
@@ -452,29 +346,30 @@ def stage_validate_harmonise_postcodes(
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
-    Parameters:
-    config (Dict): A dictionary containing configuration options.
-    paths (Dict): A dictionary containing paths to various files.
-    full_responses (pd.DataFrame): The DataFrame containing the data to be
-    validated.
-    run_id (str): The run ID for this execution.
-    check_file_exists (Callable): A function that checks if a file exists.
-    read_csv (Callable): A function that reads a CSV file into a DataFrame.
-    write_csv (Callable): A function that writes a DataFrame to a CSV file.
+    Args:
+        config (Dict): A dictionary containing configuration options.
+        full_responses (pd.DataFrame): The DataFrame containing the data to be
+        validated.
+        run_id (str): The run ID for this execution.
+        check_file_exists (Callable): A function that checks if a file exists.
+        read_csv (Callable): A function that reads a CSV file into a DataFrame.
+        write_csv (Callable): A function that writes a DataFrame to a CSV file.
 
     Returns:
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
-    Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
-    and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing the original DataFrame
+        and the master list of postcodes.
     """
     # Log the start of postcode validation
     StagingHelperLogger.info("Starting PostCode Validation")
 
+    staging_dict = config["staging_paths"]
+
     # Load the master list of postcodes
-    postcode_masterlist = paths["postcode_masterlist"]
-    check_file_exists(postcode_masterlist, raise_error=True)
-    postcode_mapper = read_csv(postcode_masterlist)
+    postcode_mapper = config["mapping_paths"]["postcode_mapper"]
+    check_file_exists(postcode_mapper, raise_error=True)
+    postcode_mapper = read_csv(postcode_mapper)
     postcode_masterlist = postcode_mapper["pcd2"]
 
     # Validate the postcode column in the full_responses DataFrame
@@ -486,12 +381,35 @@ def stage_validate_harmonise_postcodes(
     StagingHelperLogger.info("Saving Invalid Postcodes to File")
 
     # Save the invalid postcodes to a CSV file
-    pcodes_folder = paths["postcode_path"]
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    invalid_filename = f"invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    pcodes_folder = staging_dict["pcode_val_path"]
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    invalid_filename = (
+        f"{survey_year}_invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+    )
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
 
     # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
     return full_responses, postcode_mapper
+
+
+def filter_pnp_data(full_responses):
+    """
+    Filter out all PNP data or equivalently all records with legalstatus of 7
+
+    Args:
+        full_responses (pandas.DataFrame):
+            The DataFrame containing the full resonses data.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: Two dataframes; the BERD data without
+        PNP data and the PNP data
+    """
+    # create dataframe with PNP data legalstatus=='7'
+    pnp_full_responses = full_responses.loc[(full_responses["legalstatus"] == "7")]
+    # filter out PNP data or equivalently records with legalstatus!='7'
+    full_responses = full_responses.loc[(full_responses["legalstatus"] != "7")]
+
+    return full_responses, pnp_full_responses

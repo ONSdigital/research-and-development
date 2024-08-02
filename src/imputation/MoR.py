@@ -1,17 +1,14 @@
 """Functions for the Mean of Ratios (MoR) methods."""
 import itertools
+import re
 import pandas as pd
 import numpy as np
-import re
 
-from src.staging import postcode_validation as pcval
-from src.imputation.apportionment import run_apportionment
 from src.imputation.tmi_imputation import (
     create_imp_class_col,
     trim_bounds,
     calculate_totals,
 )
-
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
@@ -62,26 +59,16 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-    # Convert backdata column names from qXXX to XXX
-    # Note that this is only applicable when using the backdata on the network
-    p = re.compile(r"q\d{3}")
-    cols = [col for col in list(backdata.columns) if p.match(col)]
-    to_rename = {col: col[1:] for col in cols}
-    backdata = backdata.rename(columns=to_rename)
-
     # Add a QA column for the group size
     df["cf_group_size"] = np.nan
 
     # TODO move this to imputation main
     # Select only values to be imputed
     df = create_imp_class_col(df, "200", "201")
-    backdata = create_imp_class_col(backdata, "200", "201")
 
     imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
-
-    backdata = run_apportionment(backdata)
 
     clear_status_cond = backdata["status"].isin(good_statuses)
 
@@ -132,11 +119,6 @@ def carry_forwards(df, backdata, impute_vars):
 
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
-
-    # Apply the postcode formatting to clean the postcodes in col 601 of the back data
-    df.loc[match_cond, "601_prev"] = df.loc[match_cond, "601_prev"].apply(
-        pcval.format_postcodes
-    )
 
     # Replace the values of certain columns with the values from the back data
     replace_vars = ["instance", "200", "201", "601", "602", "604"]
@@ -244,11 +226,13 @@ def calculate_links(gr_df, target_vars, config):
 def get_threshold_value(config: dict) -> int:
     """Read, validate and return threshold value from the config."""
     threshold_num = config["imputation"]["mor_threshold"]
-    if (type(threshold_num) == int) & (threshold_num >=0):
+    if (type(threshold_num) == int) & (threshold_num >= 0):
         return threshold_num
     else:
-        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
-                        "of the config must be zero or a positive integer.")
+        raise Exception(
+            "The variable 'mor_threshold' in the 'imputation' section "
+            "of the config must be zero or a positive integer."
+        )
 
 
 def group_calc_link(group, target_vars, config):

@@ -1,97 +1,15 @@
 """Map the missing columns that are required for the outputs"""
+import logging
 
 import pandas as pd
 import numpy as np
 
-
-def join_pg_numeric(
-    main_df: pd.DataFrame, mapper_df: pd.DataFrame, cols_pg: list = ["201"]
-) -> pd.DataFrame:
-    """
-    Add a new column with numeric PD using a mapper.
-
-    Args:
-        main_df (pd.DataFrame): The main DataFrame.
-        mapper_df (pd.DataFrame): The mapper DataFrame.
-        cols_pg (list): PG clumns to be converted from alpha to numeric
-
-    Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
-    """
-    for mycol in cols_pg:
-        try:
-            # Perform left join
-            combined_df = main_df.merge(
-                mapper_df, how="left", left_on=mycol, right_on="pg_alpha"
-            )
-            combined_df.rename(columns={"pg_numeric": mycol + "_numeric"}, inplace=True)
-            combined_df = combined_df.drop(columns=["pg_alpha"])
-
-        except Exception as e:
-            raise ValueError(
-                "An error occurred while combining main_df and mapper_df: " + str(e)
-            )
-    return combined_df
-
-
-def join_fgn_ownership(
-    main_df: pd.DataFrame, mapper_df: pd.DataFrame, formtype: list = ["0001", "0006"]
-) -> pd.DataFrame:
-    """
-    Combine two DataFrames using a left join based on specified columns.
-
-    Args:
-        main_df (pd.DataFrame): The main DataFrame.
-        mapper_csv_path (pd.DataFrame): The mapper DataFrame.
-        formtype (list): List of the formtypes to run through function
-
-    Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
-    """
-
-    try:
-        to_keep = main_df["formtype"].isin(formtype)
-        # filter for long and short forms only
-        filtered_df = main_df.copy().loc[to_keep]
-
-        # the remainder of the dataframe is the NI data
-        ni_df = main_df.copy().loc[~to_keep]
-
-        # Perform left join on filtered dataframe
-        combined_df = filtered_df.merge(
-            mapper_df, how="left", left_on="reference", right_on="ruref"
-        )
-        combined_df.drop(columns=["ruref"], inplace=True)
-
-        # If the filtered_df already had "ultfoc", which is the case for TAU,
-        # then after merging we will have two columns, ultfoc_x - blank, not
-        # needed, and ultfoc_y - with the codes we need. The following  section
-        # renames ultfoc_y to ultfoc, removes ultfoc_x and restores the
-        # original column order.
-        old_cols = list(main_df.columns)
-        new_cols = list(combined_df.columns)
-        if "ultfoc_y" in new_cols:
-            combined_df = combined_df.rename(columns={"ultfoc_y": "ultfoc"})
-            combined_df = combined_df[old_cols]
-
-
-        main_df = pd.concat([combined_df, ni_df]).reset_index(drop=True)
-
-        # If foreign ownership is empty, we fill it with "GB" for long, short
-        # and NI
-        main_df["ultfoc"] = main_df["ultfoc"].fillna("GB")
-
-        return main_df
-
-    except Exception as e:
-        raise ValueError(
-            "An error occurred while combining main_df and mapper_df: " + str(e)
-        )
+OutputMainLogger = logging.getLogger(__name__)
 
 
 def map_sizebands(
     df: pd.DataFrame,
-):
+) -> pd.DataFrame:
     """Generate sizebands from the frozen (IDBR) employent column
 
     Args:
@@ -143,8 +61,32 @@ def create_cora_status_col(df, main_col="statusencoded"):
         df: main data with cora status column added
     """
     # Create hardcoded dictionary for mapping
-    status_before = ["100", "101", "102", "200", "201", "210", "211", "302", "303", "304", "309"]
-    status_after = ["200", "100", "1000", "400", "500", "600", "800", "1200", "1300", "900", "1400"]
+    status_before = [
+        "100",
+        "101",
+        "102",
+        "200",
+        "201",
+        "210",
+        "211",
+        "302",
+        "303",
+        "304",
+        "309",
+    ]
+    status_after = [
+        "200",
+        "100",
+        "1000",
+        "400",
+        "500",
+        "600",
+        "800",
+        "1200",
+        "1300",
+        "900",
+        "1400",
+    ]
 
     cora_dict = dict(zip(status_before, status_after))
 
@@ -158,49 +100,6 @@ def create_cora_status_col(df, main_col="statusencoded"):
     ].map(cora_dict)
 
     return df
-
-
-def join_itl_regions(
-    df: pd.DataFrame,
-    postcode_mapper: pd.DataFrame,
-    postcode_col="postcodes_harmonised",
-    formtype: list = ["0001", "0006"],
-):
-    """Joins the itl regions onto the full dataframe using the mapper provided
-
-    Args:
-        df (pd.DataFrame): Full dataframe
-        postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
-        formtype (list): List of the formtypes to run through function
-
-    Returns:
-        df: Dataframe with column "ua_county" for regions
-    """
-    try:
-        to_keep = df["formtype"].isin(formtype)
-
-        # filter for long and short forms only
-        filtered_df = df.copy().loc[to_keep]
-
-        # the remainder of the dataframe is the NI data
-        ni_df = df.copy().loc[~to_keep]
-
-        # Perform left join on filtered dataframe
-        df = filtered_df.merge(
-            postcode_mapper, how="left", left_on=postcode_col, right_on="pcd2"
-        )
-        df.drop(columns=["pcd2"], inplace=True)
-
-        ni_df["itl"] = "N92000002"
-
-        complete_df = pd.concat([df, ni_df]).reset_index(drop=True)
-
-        return complete_df
-
-    except Exception as e:
-        raise ValueError(
-            "An error occurred while combining df and postcode_mapper: " + str(e)
-        )
 
 
 def map_to_numeric(df: pd.DataFrame):
@@ -234,8 +133,8 @@ def map_to_numeric(df: pd.DataFrame):
 
 
 def map_FG_cols_to_numeric(
-    df: pd.DataFrame,
-    col_list: list = ["251", "307", "308","309"]):
+    df: pd.DataFrame, col_list: list = ["251", "307", "308", "309"]
+):
     """Map specified cols in dataframe from letters to numeric format
     Yes is mapped to 1
     No is mapped to 2

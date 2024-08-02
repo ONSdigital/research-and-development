@@ -3,6 +3,7 @@
 import os
 import pytest
 import pathlib
+from unittest.mock import Mock
 from typing import Tuple
 from datetime import date
 import logging
@@ -11,12 +12,12 @@ from unittest.mock import patch
 # Third Party Imports
 import pandas as pd
 import numpy as np
+from pandas import DataFrame as pandasDF
 import pyarrow.feather as feather
 
 # Local Imports
 from src.staging.staging_helpers import (
     fix_anon_data,
-    update_ref_list,
     getmappername,
     load_validate_mapper,
     check_snapshot_feather_exists,
@@ -25,13 +26,14 @@ from src.staging.staging_helpers import (
     load_validate_secondary_snapshot,
     df_to_feather,
     stage_validate_harmonise_postcodes,
+    filter_pnp_data,
 )
 from src.utils.local_file_mods import (
-    local_file_exists as check_file_exists,
-    local_read_feather as read_feather,
-    local_write_feather as write_feather,
-    read_local_csv as read_csv,
-    write_local_csv as write_csv,
+    rd_file_exists as check_file_exists,
+    rd_read_feather as read_feather,
+    rd_write_feather as write_feather,
+    rd_read_csv as read_csv,
+    rd_write_csv as write_csv,
 )
 
 
@@ -94,76 +96,19 @@ class TestFixAnonData(object):
         assert output.equals(expected_output), "fix_anon_data not behaving as expected."
 
 
-class TestUpdateRefList(object):
-    """Tests for update_ref_list."""
-
-    @pytest.fixture(scope="function")
-    def full_input_df(self):
-        """Main input data for update_ref_list tests."""
-        columns = ["reference", "instance", "formtype", "cellnumber"]
-        data = [
-            [49900001031, 0.0, 6, 674],
-            [49900001530, 0.0, 6, 805],
-            [49900001601, 0.0, 1, 117],
-            [49900001601, 1.0, 1, 117],
-            [49900003099, 0.0, 6, 41],
-        ]
-        df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
-        return df
-
-    @pytest.fixture(scope="function")
-    def ref_list_input(self):
-        """Reference list df input for update_ref_list tests."""
-        columns = ["reference", "cellnumber", "selectiontype", "formtype"]
-        data = [[49900001601, 117, "C", "1"]]
-        df = pd.DataFrame(columns=columns, data=data)
-        df["formtype"] = df["formtype"].apply(lambda x: str(x))
-        return df
-
-    @pytest.fixture(scope="function")
-    def expected_output(self):
-        """Expected output for update_ref_list tests."""
-        columns = ["reference", "instance", "formtype", "cellnumber", "selectiontype"]
-        data = [
-            [49900001031, 0.0, "6", 674, np.nan],
-            [49900001530, 0.0, "6", 805, np.nan],
-            [49900001601, 0.0, "1", 817, "L"],
-            [49900001601, 1.0, "1", 817, "L"],
-            [49900003099, 0.0, "6", 41, np.nan],
-        ]
-        df = pd.DataFrame(columns=columns, data=data)
-        return df
-
-    def test_update_ref_list(self, full_input_df, ref_list_input, expected_output):
-        """General tests for update_ref_list."""
-        output = update_ref_list(full_input_df, ref_list_input)
-        assert output.equals(
-            expected_output
-        ), "update_ref_list not behaving as expected"
-
-    def test_update_ref_list_raises(self, full_input_df, ref_list_input):
-        """Test the raises in update_ref_list."""
-        # add a non valid reference
-        ref_list_input.loc[1] = [34567123123, 117, "C", "1"]
-        error_msg = r"The following references in the reference list mapper are.*"
-        with pytest.raises(ValueError, match=error_msg):
-            update_ref_list(full_input_df, ref_list_input)
-
-
 class TestGetMapperName(object):
     """Tests for getmappername."""
 
     def test_getmappername(self):
         """General tests for getmappername."""
-        test_str = "cellno_2022_path"
+        test_str = "cellno_path"
         # with split
         assert (
-            getmappername(test_str, True) == "cellno 2022"
+            getmappername(test_str, True) == "cellno"
         ), "getmappername not behaving as expected when split=True"
         # without split
         assert (
-            getmappername(test_str, False) == "cellno_2022"
+            getmappername(test_str, False) == "cellno"
         ), "getmappername not behaving as expected when split=False"
 
 
@@ -219,8 +164,6 @@ class TestLoadValidateMapper(object):
         mock_val_with_schema_func.assert_called_once_with(mapper_df, schema_path)
         mock_one_to_many_val_func.assert_called_once_with(mapper_df, col_many, col_one)
         assert output.equals(mapper_df), "load_validate_mapper not behaving as expected."
-
-# load_historic_data: deprecated function
 
 
 class TestCheckSnapshotFeatherExists(object):
@@ -465,15 +408,20 @@ class TestStageValidateHarmonisePostcodes(object):
     """Tests for stage_validate_harmonise_postcodes."""
 
     @pytest.fixture(scope="function")
-    def config(self) -> pd.DataFrame:
+    def config(self, tmp_path) -> pd.DataFrame:
         """Test config."""
-        config = {"global": {"postcode_csv_check": True}}
+        config = {
+            "global": {"postcode_csv_check": True},
+            "years": {"survey_year": 2022},
+            "staging_paths": {"pcode_val_path": tmp_path, "postcode_masterlist": "ml"},
+            "mapping_paths": {"postcode_mapper": "ml"},
+        }
         return config
 
-    def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
-        """Test paths."""
-        paths = {"postcode_path": pc_path, "postcode_masterlist": pc_ml}
-        return paths
+    # def create_paths(self, pc_path, pc_ml) -> pd.DataFrame:
+    #     """Test paths."""
+    #     paths = {"pcode_val_path": pc_path, "postcode_masterlist": pc_ml}
+    #     return paths
 
     @pytest.fixture(scope="function")
     def full_responses(self) -> pd.DataFrame:
@@ -496,14 +444,13 @@ class TestStageValidateHarmonisePostcodes(object):
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
-    def postcode_masterlist(self, dir: pathlib.Path) -> pathlib.Path:
-        """Write the postcode masterlist and return path."""
-        postcode_df = pd.DataFrame(
-            {"pcd2": ["NP44 2NZ", "CE1  4OY", "RH12 1XL", "CE11 8IU"]}
-        )
-        save_path = pathlib.Path(os.path.join(dir, "postcodes_masterlist.csv"))
-        postcode_df.to_csv(save_path)
-        return save_path
+    def mock_read_csv(self, file_path, **kwargs):
+        """Mock function to read a CSV file."""
+        return pd.DataFrame({"pcd2": ["NP44 2NZ", "CE1  4OY", "RH12 1XL", "CE11 8IU"]})
+
+    def mock_check_file_exists(self, file_path, raise_error=True):
+        """Mock function to check if a file exists."""
+        return True
 
     @pytest.fixture(scope="function")
     def full_responses_output(self) -> pd.DataFrame:
@@ -536,12 +483,12 @@ class TestStageValidateHarmonisePostcodes(object):
     @pytest.fixture(scope="function")
     def pc_mapper_output(self) -> pd.DataFrame:
         """Expected output for postcode_mapper"""
-        columns = ["Unnamed: 0", "pcd2"]
+        columns = ["pcd2"]
         data = [
-            [0, "NP44 2NZ"],
-            [1, "CE1  4OY"],
-            [2, "RH12 1XL"],
-            [3, "CE11 8IU"],
+            ["NP44 2NZ"],
+            ["CE1  4OY"],
+            ["RH12 1XL"],
+            ["CE11 8IU"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -549,22 +496,19 @@ class TestStageValidateHarmonisePostcodes(object):
     def get_todays_date(self) -> str:
         """Get the date in the format YYYY-MM-DD. Used for filenames."""
         today = date.today()
-        today_str = today.strftime(r"%Y-%m-%d")
+        today_str = today.strftime(r"%y-%m-%d")
         return today_str
 
     def test_stage_validate_harmonise_postcodes(
         self, full_responses, config, pc_mapper_output, full_responses_output, tmp_path
     ):
         """General tests for stage_validate_harmonise_postcodes."""
-        pc_path = self.postcode_masterlist(tmp_path)
-        paths = self.create_paths(tmp_path, pc_path)
         fr, pm = stage_validate_harmonise_postcodes(
             config=config,
-            paths=paths,
             full_responses=full_responses,
             run_id=1,
-            check_file_exists=check_file_exists,
-            read_csv=read_csv,
+            check_file_exists=self.mock_check_file_exists,
+            read_csv=self.mock_read_csv,
             write_csv=write_csv,
         )
         # test direct function outputs
@@ -578,7 +522,87 @@ class TestStageValidateHarmonisePostcodes(object):
         )
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
-        filename = f"invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        filename = (
+            f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+        )
         assert (
             filename in files
         ), "stage_validate_harmonise_postcodes failed to save out invalid PCs"
+
+
+class TestFilterPnpData:
+    """Tests for the filter_pnp_data function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_columns = [
+            "reference",
+            "instance",
+            "legalstatus",
+            "statusencoded",
+            "postcodes_harmonised",
+        ]
+
+        data = [
+            [49900000404, 0, "1", "210", "AB15 3GU"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
+            [49900000409, 1, "1", "100", "CB1 3NF"],
+            [49900000510, 2, "7", "201", "BA1 5DA"],
+            [49912758922, 3, "1", "303", "DE72 3AU"],
+            [49900187320, 4, "2", "304", "NP30 7ZZ"],
+            [49900184433, 1, "7", "210", "CF10 BZZ"],
+            [49911791786, 1, "4", "201", "CF10 BZZ"],
+            [49901183959, 4, "1", "309", "SA50 5BE"],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_columns)
+        input_df["legalstatus"].astype("category")
+        input_df["statusencoded"].astype("category")
+        return input_df
+
+    def create_exp_output_df(self):
+        """Create an output dataframe for the test."""
+        exp_output_columns = [
+            "reference",
+            "instance",
+            "legalstatus",
+            "statusencoded",
+            "postcodes_harmonised",
+        ]
+
+        data1 = [
+            [49900000404, 0, "1", "210", "AB15 3GU"],
+            [49900000406, np.NaN, "2", "210", "BA1 5DA"],
+            [49900000409, 1, "1", "100", "CB1 3NF"],
+            [49912758922, 3, "1", "303", "DE72 3AU"],
+            [49900187320, 4, "2", "304", "NP30 7ZZ"],
+            [49911791786, 1, "4", "201", "CF10 BZZ"],
+            [49901183959, 4, "1", "309", "SA50 5BE"],
+        ]
+        exp1_output_df = pandasDF(data=data1, columns=exp_output_columns)
+        exp1_output_df["legalstatus"].astype("category")
+        exp1_output_df["statusencoded"].astype("category")
+
+        data2 = [
+            [49900000510, 2.0, "7", "201", "BA1 5DA"],
+            [49900184433, 1.0, "7", "210", "CF10 BZZ"],
+        ]
+        exp2_output_df = pandasDF(data=data2, columns=exp_output_columns)
+        exp2_output_df["legalstatus"].astype("category")
+        exp2_output_df["statusencoded"].astype("category")
+
+        return exp1_output_df, exp2_output_df
+
+    def test_filter_pnp_data(self):
+        """Test for the filter_pnp_data function."""
+        input_df = self.create_input_df()
+        exp1_df, exp2_df = self.create_exp_output_df()
+
+        result1_df, result2_df = filter_pnp_data(input_df)
+
+        pd.testing.assert_frame_equal(
+            result1_df.reset_index(drop=True), exp1_df.reset_index(drop=True)
+        )
+        pd.testing.assert_frame_equal(
+            result2_df.reset_index(drop=True), exp2_df.reset_index(drop=True)
+        )
