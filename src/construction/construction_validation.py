@@ -146,7 +146,7 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
     min_df = df.groupby(["reference", "period"]).agg("min").reset_index()
     if not np.array_equal(min_df.instance.unique(), [0]):
         raise ValueError(
-            "Short to long construction requires at least record where instance=0 for"
+            "Short to long construction requires a record where instance=0 for "
             "each reference/period."
         )
     if logger:

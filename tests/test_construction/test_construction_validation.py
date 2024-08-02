@@ -189,7 +189,7 @@ class TestConcatConstructionDfs(object):
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
-    
+
     def test_concat_construction_dfs(self, all_construction_df, postcode_construction_df):
         """A passing tests for concat_construction_dfs, without duplicate checks."""
         output = concat_construction_dfs(
@@ -198,10 +198,10 @@ class TestConcatConstructionDfs(object):
         pd.testing.assert_frame_equal(output, self.expected_output()), (
             "Dataframe not as expected after concating dfs."
         )
-    
+
     def test_concat_construction_dfs_dupes(
-            self, 
-            all_construction_df, 
+            self,
+            all_construction_df,
             postcode_construction_df
     ):
         """Test for duplicates in two construction dataframes."""
@@ -213,11 +213,11 @@ class TestConcatConstructionDfs(object):
             ValueError, match=r"Duplicates found in construction file.*"
         ):
             concat_construction_dfs(
-                all_construction_df, 
-                postcode_construction_df, 
+                all_construction_df,
+                postcode_construction_df,
                 validate_dupes=True
             )
-    
+
 
 class TestValidateColumnsNotEmpty(object):
     """Tests for validate_columns_not_empty."""
@@ -233,7 +233,7 @@ class TestValidateColumnsNotEmpty(object):
 
     @pytest.mark.parametrize(
             "columns",
-            [   
+            [
                 "test",
                 ["test"],
                 ["test", "test2"],
@@ -254,7 +254,7 @@ class TestValidateColumnsNotEmpty(object):
             validate_columns_not_empty(
                 all_construction_df, columns
             )
-    
+
     def test_validate_columns_not_empty_raises(self, all_construction_df):
         """Test that an error is raised when columns have missing values."""
         # create nan col
@@ -267,7 +267,7 @@ class TestValidateColumnsNotEmpty(object):
         msg = "Column.*'reference', 'instance'.* are all empty"
         with pytest.raises(ValueError, match=msg):
             validate_columns_not_empty(
-                all_construction_df, 
+                all_construction_df,
                 columns=["reference", "instance"]
             )
 
@@ -291,7 +291,7 @@ class TestValidateShortToLong(object):
         df = pd.DataFrame(data=data, columns=columns)
         df["construction_type"] = "short_to_long"
         return df
-    
+
     def test_validate_short_to_long(self, short_to_long_df):
         """Passing tests for short_to_long."""
         returned = validate_short_to_long(short_to_long_df)
@@ -305,7 +305,7 @@ class TestValidateShortToLong(object):
         short_to_long_df.loc[short_to_long_df.reference==4, "instance"] = 1
         # test that the error is raised
         msg = (
-            "Short to long construction requires at least record where instance=0 for"
+            "Short to long construction requires a record where instance=0 for "
             "each reference/period.*"
         )
         with pytest.raises(ValueError, match=msg):
