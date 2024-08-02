@@ -18,11 +18,11 @@ global:
   # Backdata output settings
   output_backdata: False
   # QA output settings
-  output_full_responses: False
+  output_full_responses: True
   output_pnp_full_responses: False
   output_ni_full_responses: False
-  output_imputation_qa: False
-  output_mapping_qa: False
+  output_mapping_qa: True
+  output_imputation_qa: True
   output_mapping_ni_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -31,10 +31,10 @@ global:
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: False
+  output_gb_sas: True
   output_ni_sas: False
   output_tau: False
-  output_intram_by_pg_gb: False
+  output_intram_by_pg_gb: True
   output_intram_by_pg_uk: False
   output_intram_gb_itl: False
   output_intram_uk_itl: False
@@ -81,6 +81,7 @@ hdfs_paths:
   postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
   ultfoc_mapper_path: "BERD_2023_ultfoc.csv"
+  ref_list_817_mapper_path: "BERD_2023_ref_list.csv"
   cellno_path: 'BERD_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'

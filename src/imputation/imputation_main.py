@@ -95,8 +95,7 @@ def run_imputation(
     # Run MoR
     if backdata is not None:
         # MoR will be re-written with new backdata
-        lf_target_vars = config["imputation"]["lf_target_vars"]
-        df, links_df = run_mor(df, backdata, to_impute_cols, lf_target_vars, config)
+        df, links_df = run_mor(df, backdata, to_impute_cols, config)
 
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)
