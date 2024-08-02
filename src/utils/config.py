@@ -359,8 +359,8 @@ def validate_construction_config_settings(user_config):
     if run_all_data_construction:
         if all_data_construction_file_path is None:
             raise ValueError(
-                "If running all data construction, a construction file path must be"
-                " provided."
+                "If running all data construction, an all data construction file path"
+                " must be provided."
             )
 
     if run_postcode_construction:
@@ -373,5 +373,6 @@ def validate_construction_config_settings(user_config):
     if run_ni_construction:
         if construction_file_path_ni is None:
             raise ValueError(
-                "If running NI construction, a construction file path must be provided."
+                "If running NI construction, a NI construction file path must be"
+                " provided."
             )

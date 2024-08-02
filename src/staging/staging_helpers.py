@@ -171,7 +171,9 @@ def load_snapshot_feather(feather_file, read_feather):
     return snapdata
 
 
-def load_val_snapshot_json(frozen_snapshot_path, load_json, config, network_or_hdfs):
+def load_val_snapshot_json(
+    frozen_snapshot_path: str, load_json: Callable, config: dict, network_or_hdfs: str
+) -> Tuple[pd.DataFrame, str]:
     """
     Loads and validates a snapshot of survey data from a JSON file.
 

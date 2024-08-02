@@ -357,7 +357,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="Cannot run first snapshot of results"
+                           " and run frozen data at the same time."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_run_first_snapshot_without_frozen_snapshot_path(self):
@@ -377,7 +379,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running first snapshot of results,"
+                           " a frozen snapshot path must be provided."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_run_frozen_data_without_frozen_data_staged_path(self):
@@ -397,7 +401,8 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running frozen data, a frozen data staged path must be provided."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_load_updated_snapshot_without_secondary_snapshot_path(self):
@@ -417,7 +422,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If loading an updated snapshot for comparison,"
+                           " a secondary snapshot path and frozen data staged path must be provided."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_load_updated_snapshot_without_frozen_data_staged_path(self):
@@ -437,7 +444,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If loading an updated snapshot for comparison,"
+                           " a secondary snapshot path and frozen data staged path must be provided."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_run_updates_and_freeze_without_frozen_data_staged_path(self):
@@ -457,7 +466,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running updates and freezing,"
+                           " a frozen data staged path and a freezing adds or amends path must be provided."):
             validate_freezing_config_settings(user_config)
 
     def test_validate_freezing_config_settings_run_updates_and_freeze_without_freezing_adds_and_amends_path(self):
@@ -477,7 +488,9 @@ class TestValidateFreezingConfigSettings(object):
                 "freezing_amendments_path": None,
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running updates and freezing,"
+                           " a frozen data staged path and a freezing adds or amends path must be provided."):
             validate_freezing_config_settings(user_config)
 
 
@@ -514,7 +527,9 @@ class TestValidateConstructionConfigSettings(object):
                 "construction_file_path_ni": "/path/to/ni",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running all data construction,"
+                           " an all data construction file path must be provided."):
             validate_construction_config_settings(user_config)
 
     def test_validate_construction_config_settings_run_postcodes_no_file(self):
@@ -531,7 +546,9 @@ class TestValidateConstructionConfigSettings(object):
                 "construction_file_path_ni": "/path/to/ni",
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running postcode construction,"
+                           " a postcode construction file path must be provided."):
             validate_construction_config_settings(user_config)
 
     def test_validate_construction_config_settings_run_ni_no_file(self):
@@ -548,5 +565,7 @@ class TestValidateConstructionConfigSettings(object):
                 "construction_file_path_ni": None,
             },
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError,
+                           match="If running NI construction,"
+                           " a NI construction file path must be provided."):
             validate_construction_config_settings(user_config)
