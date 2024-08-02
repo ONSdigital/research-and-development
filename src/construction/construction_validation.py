@@ -3,6 +3,7 @@ import logging
 from typing import Union, Tuple
 
 import pandas as pd
+import numpy as np
 
 from src.utils.defence import type_defence
 
@@ -105,13 +106,13 @@ def validate_columns_not_empty(
     # check passed columns are in the dataframe
     for column in columns:
         if column not in df.columns:
-            raise IndexError(f"Column {column} is not in the passed dataframe.")
+            raise IndexError(f"Column(s) {column} missing from dataframe.")
     # validate whether there are missing values in all columns of a row
     if len(df[columns].dropna(axis=0, how="all")) != len(df):
         if _raise:
-            raise ValueError(f"Columns {columns} are both empty.")
+            raise ValueError(f"Column(s) {columns} are all empty.")
         else:
-            logger.info(f"Columns {columns} are both empty.")
+            logger.info(f"Column(s) {columns} are all empty.")
     # write confirmation to log
     if logger:
         logger.info(f"All rows have a valid value for one of columns {columns}.")
@@ -138,15 +139,18 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
     )
     # refine dataframe to required data
     df = df[df.construction_type == "short_to_long"]
+    if len(df) == 0:
+        return None
     df = df[["reference", "instance", "period"]]
     # validate that all short_to_long constructions have instance=0
     min_df = df.groupby(["reference", "period"]).agg("min").reset_index()
-    if len(min_df.instance) > 1 and min_df.instance[0] != 0:
+    if not np.array_equal(min_df.instance.unique(), [0]):
         raise ValueError(
-            "Short to long construction requires at least record where instance=0 for"
+            "Short to long construction requires a record where instance=0 for "
             "each reference/period."
         )
-    logger.info("All short_to_long construction rows have valid instances.")
+    if logger:
+        logger.info("All short_to_long construction rows have valid instances.")
     return None
 
 
