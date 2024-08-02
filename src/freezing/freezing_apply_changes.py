@@ -1,5 +1,27 @@
-# def apply_freezing(main_df, config, check_file_exists, read_csv, write_csv, run_id):
-#     """Read user-edited freezing files and apply them to the main snapshot."""
+# def apply_freezing(
+#     main_df: pd.DataFrame,
+#     config: dict,
+#     check_file_exists: Callable,
+#     read_csv: Callable,
+#     write_csv: Callable,
+#     run_id: int
+#     ) -> pd.DataFrame:
+#     """Read user-edited freezing files and apply them to the main snapshot.
+#     Args:
+#         main_df (pd.DataFrame): The main snapshot.
+#         config (dict): The pipeline configuration.
+#         check_file_exists (callable): Function to check if file exists. This will
+#             be the hdfs or network version depending on settings.
+#         read_csv (callable): Function to read a csv file. This will be the hdfs or
+#             network version depending on settings.
+#         write_csv (callable): Function to write to a csv file. This will be the
+#             hdfs or network version depending on settings.
+#         run_id (int): The run id for this run.
+
+#     Returns:
+#         constructed_df (pd.DataFrame): As main_df but with records amended and added
+#             from the freezing files.
+#     """
 #     # Prepare filepaths to read from
 #     network_or_hdfs = config["global"]["network_or_hdfs"]
 #     paths = config[f"{network_or_hdfs}_paths"]
@@ -46,8 +68,19 @@
 #     return constructed_df
 
 
-# def apply_amendments(main_df, amendments_df):
-#     """Apply amendments to the main snapshot."""
+# def apply_amendments(
+#     main_df: pd.DataFrame,
+#     amendments_df: pd.DataFrame,
+#     ) -> pd.DataFrame:
+#     """Apply amendments to the main snapshot.
+
+#     Args:
+#         main_df (pd.DataFrame): The main snapshot.
+#         amendments_df (pd.DataFrame): The amendments to apply.
+
+#     Returns:
+#         amended_df (pd.DataFrame): The main snapshot with amendments applied.
+#     """
 #     key_cols = ["reference", "year", "instance"]
 #     numeric_cols = [
 #         "219",
@@ -94,8 +127,19 @@
 #     return amended_df
 
 
-# def apply_additions(main_df, additions_df):
-#     """Apply additions to the main snapshot."""
+# def apply_additions(
+#     main_df: pd.DataFrame,
+#     additions_df: pd.DataFrame,
+#     ) -> pd.DataFrame:
+#     """Apply additions to the main snapshot.
+
+#     Args:
+#         main_df (pd.DataFrame): The main snapshot.
+#         additions_df (pd.DataFrame): The additions to apply.
+
+#     Returns:
+#         added_df (pd.DataFrame): The main snapshot with additions applied.
+#     """
 #     # Drop records where accept_changes is False and if any remain, add them to main df
 #     accepted_additions_df = additions_df.drop(
 #         additions_df[~additions_df["accept_changes"]].index
