@@ -1,27 +1,58 @@
-"""All general functions for the hdfs file system which uses PyDoop.
-    These functions will need to be tested separately, using mocking.
+"""All general functions for the s3 bucket file system which uses boto3.
 """
 
-import pandas as pd
+import boto3
+import raz_client
 import json
+import pandas as pd
+from io import StringIO
 import logging
 from typing import List
 import subprocess
 import os
 
+from rdsa_utils.cdp.helpers.s3_utils import *
+
+#########################################################################
+
+working_dir = r"/home/cdsw/research-and-development"
+os.chdir(working_dir)
+print(os.getcwd())
+
+#########################################################################
+
 from src.utils.wrappers import time_logger_wrap
 
-# try:
-#     import pydoop.hdfs as hdfs
+# set up logging
+s3_logger = logging.getLogger(__name__)
 
-#     # from src.utils.hdfs_mods import read_hdfs_csv, write_hdfs_csv
-#     HDFS_AVAILABLE = True
-# except ImportError:
-#     HDFS_AVAILABLE = False
+#########################################################################
+# Load configuration; this could be from a file, environment, etc.
+config = {
+   "ssl_file": "/etc/pki/tls/certs/ca-bundle.crt",
+   "s3_bucket": "onscdp-dev-data01-5320d6ca",
+}
+#########################################################################
+def create_client(config):
+    client = boto3.client("s3")
+    raz_client.configure_ranger_raz(client, ssl_file=config["ssl_file"])
+    return client
 
-# # set up logging
-# hdfs_logger = logging.getLogger(__name__)
 
+################################################################################
+# Read a CSV file into a Pandas dataframe
+def s3_read_csv(config, client, filepath, cols=None) -> pd.DataFrame:
+    with client.get_object(Bucket=config["s3_bucket"], Key=filepath)['Body'] as csv_f:
+        df = pd.read_csv(csv_f)
+    return df
+  
+
+###############################################################################
+
+client = create_client(config)
+mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
+mydf = s3_read_csv(config, client, mypath)
+mydf.head()
 
 # def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
 #     """Reads a csv from DAP into a Pandas Dataframe
