@@ -35,6 +35,16 @@ def run_freezing(
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
             and added from the freezing files.
     """
+    # return frozen snapshot if config allows
+    load_frozen_data_only = config["global"]["load_frozen_data_only"]
+    frozen_data_staged_path = config["global"]["frozen_data_staged_path"]
+    if load_frozen_data_only:
+        freezing_logger.info("Loading frozen data...")
+        frozen_snapshot = read_csv(frozen_data_staged_path)
+        freezing_logger.info(
+            "Frozen data successfully read from {frozen_data_staged_path}"
+        )
+        return frozen_snapshot
     # # Skip this module if the secondary snapshot isn't loaded
     # load_updated_snapshot = config["global"]["load_updated_snapshot"]
     # load_manual_freezing = config["global"]["load_manual_freezing"]

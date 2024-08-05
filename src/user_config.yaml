@@ -13,6 +13,7 @@ global:
   load_updated_snapshot_for_comparison: False
   run_frozen_data: False
   run_updates_and_freeze: False
+  load_frozen_data_only: False
   # Construction Settings
   run_all_data_construction: False
   run_postcode_construction: False
