@@ -36,9 +36,9 @@ def run_freezing(
             and added from the freezing files.
     """
     # return frozen snapshot if config allows
-    load_frozen_data_only = config["global"]["load_frozen_data_only"]
+    run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
     frozen_data_staged_path = config["global"]["frozen_data_staged_path"]
-    if load_frozen_data_only:
+    if not run_first_snapshot_of_results:
         freezing_logger.info("Loading frozen data...")
         frozen_snapshot = read_csv(frozen_data_staged_path)
         freezing_logger.info(
