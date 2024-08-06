@@ -14,7 +14,7 @@ def run_freezing(
     config: dict,
     # check_file_exists: Callable,
     write_csv: Callable,
-    # read_csv: Callable,
+    read_csv: Callable,
     run_id: int,
 ) -> pd.DataFrame:
     """Run the freezing module.
@@ -35,10 +35,18 @@ def run_freezing(
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
             and added from the freezing files.
     """
-
-    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    # return frozen snapshot if config allows
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+
+    if not run_first_snapshot_of_results:
+        FreezingLogger.info("Loading frozen data...")
+        frozen_data_staged_csv = read_csv(frozen_data_staged_path)
+        FreezingLogger.info(
+            "Frozen data successfully read from {frozen_data_staged_path}"
+        )
+        return frozen_data_staged_csv
 
     if run_first_snapshot_of_results:
         updated_snapshot = main_snapshot.copy()
