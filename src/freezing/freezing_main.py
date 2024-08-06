@@ -4,6 +4,8 @@ from typing import Callable
 
 import pandas as pd
 
+from src.staging.validation import validate_data_with_schema
+
 
 FreezingLogger = logging.getLogger(__name__)
 
@@ -43,6 +45,9 @@ def run_freezing(
     if not run_first_snapshot_of_results:
         FreezingLogger.info("Loading frozen data...")
         frozen_data_staged_csv = read_csv(frozen_data_staged_path)
+        validate_data_with_schema(
+            frozen_data_staged_path, "./config/frozen_data_staged_schema.toml"
+        )
         FreezingLogger.info(
             "Frozen data successfully read from {frozen_data_staged_path}"
         )
