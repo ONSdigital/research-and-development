@@ -23,11 +23,11 @@ global:
   # Backdata output settings
   output_backdata: False
   # QA output settings
-  output_full_responses: True
+  output_full_responses: False
   output_pnp_full_responses: False
   output_ni_full_responses: False
-  output_mapping_qa: True
-  output_imputation_qa: True
+  output_mapping_qa: False
+  output_imputation_qa: False
   output_mapping_ni_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
@@ -36,10 +36,10 @@ global:
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: True
+  output_gb_sas: False
   output_ni_sas: False
   output_tau: False
-  output_intram_by_pg_gb: True
+  output_intram_by_pg_gb: False
   output_intram_by_pg_uk: False
   output_intram_gb_itl: False
   output_intram_uk_itl: False
@@ -56,7 +56,7 @@ hdfs_paths:
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
-  frozen_data_staged_path: None # "02_freezing/frozen_data_staged/"
+  frozen_data_staged_path: "02_freezing/frozen_data_staged"
   freezing_changes_to_review_path: None # "02_freezing/changes_to_review/"
   freezing_additions_path: None # "02_freezing/freezing_updates/"
   freezing_amendments_path: None # "02_freezing/freezing_updates/"
