@@ -10,6 +10,7 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
+from src.freezing.freezing_main import run_freezing
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
 from src.mapping.mapping_main import run_mapping
@@ -105,6 +106,11 @@ def run_pipeline(user_config_path, dev_config_path):
         run_id,
     )
     MainLogger.info("Finished Data Ingest.")
+
+    # Freezing module
+    MainLogger.info("Starting Freezing...")
+    full_responses = run_freezing(full_responses, config, mods.rd_write_csv, run_id)
+    MainLogger.info("Finished Freezing...")
 
     # Northern Ireland staging and construction
     load_ni_data = config["global"]["load_ni_data"]
