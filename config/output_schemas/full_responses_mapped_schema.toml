@@ -4,10 +4,6 @@ Deduced_Data_Type = "int64"
 
 [instance]
 old_name = "instance"
-Deduced_Data_Type = "float64"
-
-[period_year]
-old_name = "period_year"
 Deduced_Data_Type = "int64"
 
 [101]
@@ -336,7 +332,7 @@ Deduced_Data_Type = "float64"
 
 [712]
 old_name = "712"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [713]
 old_name = "713"
@@ -512,7 +508,7 @@ Deduced_Data_Type = "float64"
 
 [companyregistrationnumber]
 old_name = "companyregistrationnumber"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "int64"
 
 [numberlivelocalunits]
 old_name = "numberlivelocalunits"
@@ -573,18 +569,6 @@ Deduced_Data_Type = "int64"
 [postcodes_harmonised]
 old_name = "postcodes_harmonised"
 Deduced_Data_Type = "object"
-
-[is_constructed]
-old_name = "is_constructed"
-Deduced_Data_Type = "bool"
-
-[force_imputation]
-old_name = "force_imputation"
-Deduced_Data_Type = "bool"
-
-[construction_type]
-old_name = "construction_type"
-Deduced_Data_Type = "float64"
 
 [pg_numeric]
 old_name = "pg_numeric"
