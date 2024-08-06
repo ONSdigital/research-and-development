@@ -40,11 +40,11 @@ def run_freezing(
     frozen_data_staged_path = config["global"]["frozen_data_staged_path"]
     if not run_first_snapshot_of_results:
         freezing_logger.info("Loading frozen data...")
-        frozen_snapshot = read_csv(frozen_data_staged_path)
+        frozen_data_staged_csv = read_csv(frozen_data_staged_path)
         freezing_logger.info(
             "Frozen data successfully read from {frozen_data_staged_path}"
         )
-        return frozen_snapshot
+        return frozen_data_staged_csv
     # # Skip this module if the secondary snapshot isn't loaded
     # load_updated_snapshot = config["global"]["load_updated_snapshot"]
     # load_manual_freezing = config["global"]["load_manual_freezing"]
