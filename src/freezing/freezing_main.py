@@ -37,7 +37,9 @@ def run_freezing(
     """
     # return frozen snapshot if config allows
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
-    frozen_data_staged_path = config["global"]["frozen_data_staged_path"]
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+
     if not run_first_snapshot_of_results:
         FreezingLogger.info("Loading frozen data...")
         frozen_data_staged_csv = read_csv(frozen_data_staged_path)
@@ -45,9 +47,6 @@ def run_freezing(
             "Frozen data successfully read from {frozen_data_staged_path}"
         )
         return frozen_data_staged_csv
-
-    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
-    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
 
     if run_first_snapshot_of_results:
         updated_snapshot = main_snapshot.copy()
