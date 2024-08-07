@@ -72,7 +72,7 @@ network_paths:
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Freezing data paths
-  frozen_data_staged_path: None #"02_freezing/frozen_data_staged/"
+  frozen_data_staged_path: None #"02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-05_v817.csv"
   freezing_changes_to_review_path: None # "02_freezing/changes_to_review/"
   freezing_additions_path: None # "02_freezing/freezing_updates/"
   freezing_amendments_path: None # "02_freezing/freezing_updates/"
