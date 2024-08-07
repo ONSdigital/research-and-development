@@ -1,15 +1,11 @@
-["Area Code (ITL1)"]
+["Area Code (ITL2)"]
 old_name = "None"
 Deduced_Data_Type = "str"
 
-["Country or region (ITL1)"]
+["Region (ITL2)"]
 old_name = "None"
 Deduced_Data_Type = "str"
 
-["2023"]
+["Year Total q211"]
 old_name = "None"
 Deduced_Data_Type = "float64"
-
-["Notes"]
-old_name = "None"
-Deduced_Data_Type = "str"

@@ -1,23 +1,21 @@
 """Functions for the Mean of Ratios (MoR) methods."""
 import itertools
+import re
 import pandas as pd
 import numpy as np
-import re
 
-from src.staging.validation import postcode_topup
-from src.imputation.apportionment import run_apportionment
 from src.imputation.tmi_imputation import (
     create_imp_class_col,
     trim_bounds,
     calculate_totals,
 )
-
+from src.construction.construction_helpers import convert_formtype
 
 good_statuses = ["Clear", "Clear - overridden"]
 bad_statuses = ["Form sent out", "Check needed"]
 
 
-def run_mor(df, backdata, impute_vars, lf_target_vars, config):
+def run_mor(df, backdata, impute_vars, config):
     """Function to implement Mean of Ratios method.
 
     This is implemented by first carrying forward data from last year
@@ -28,7 +26,6 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
         df (pd.DataFrame): Processed full responses DataFrame
         backdata (pd.DataFrame): One period of backdata.
         impute_vars ([string]): List of variables to impute.
-        lf_target_vars ([string]): List of long form target vars.
 
     Returns:
         pd.DataFrame: df with MoR applied.
@@ -40,17 +37,25 @@ def run_mor(df, backdata, impute_vars, lf_target_vars, config):
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
 
-    gr_df = calculate_growth_rates(remainder_df, backdata, lf_target_vars)
-    links_df = calculate_links(gr_df, lf_target_vars, config)
-
-    carried_forwards_df = apply_links(
-        carried_forwards_df, links_df, lf_target_vars, config
+    # apply MoR for long form responders
+    imputed_df_long, links_df_long = calculate_mor(
+        carried_forwards_df, remainder_df, backdata, impute_vars, config, "long"
     )
-    # Calculate totals as with TMI
-    carried_forwards_df = calculate_totals(carried_forwards_df)
 
-    imputed_df = pd.concat([remainder_df, carried_forwards_df]).reset_index(drop=True)
+    # apply MoR for short form responders
+    imputed_df_short, links_df_short = calculate_mor(
+        carried_forwards_df, remainder_df, backdata, impute_vars, config, "short"
+    )
+
+    # Calculate totals as with TMI for longforms only
+    imputed_df_long = calculate_totals(imputed_df_long)
+
+    imputed_df = pd.concat(
+        [remainder_df, imputed_df_long, imputed_df_short]
+    ).reset_index(drop=True)
     imputed_df = imputed_df.drop("cf_group_size", axis=1)
+
+    links_df = pd.concat([links_df_long, links_df_short]).reset_index(drop=True)
 
     return imputed_df, links_df
 
@@ -62,31 +67,25 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-    # Convert backdata column names from qXXX to XXX
-    # Note that this is only applicable when using the backdata on the network
-    p = re.compile(r"q\d{3}")
-    cols = [col for col in list(backdata.columns) if p.match(col)]
-    to_rename = {col: col[1:] for col in cols}
-    backdata = backdata.rename(columns=to_rename)
-
     # Add a QA column for the group size
     df["cf_group_size"] = np.nan
 
     # TODO move this to imputation main
-    # Select only values to be imputed
+    # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
-    backdata = create_imp_class_col(backdata, "200", "201")
 
-    imputation_cond = (df["formtype"] == "0001") & (df["status"].isin(bad_statuses))
+    stat_cond = df["status"].isin(bad_statuses)
+    sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
+    lf_cond = df["formtype"] == "0001"
+    imputation_cond = stat_cond & (sf_cond | lf_cond)
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 
-    backdata = run_apportionment(backdata)
+    # Ensure backdata is as we require
+    wanted_cond = backdata["imp_marker"].isin(["R", "CF", "MoR", "TMI"])
+    backdata = backdata.copy().loc[wanted_cond, :]
 
-    clear_status_cond = backdata["status"].isin(good_statuses)
-
-    # Only pick up clear statuses from backdata
-    backdata = backdata.loc[clear_status_cond, :]
+    backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
 
     return to_impute_df, remainder_df, backdata
 
@@ -133,19 +132,14 @@ def carry_forwards(df, backdata, impute_vars):
     # Copy values from relevant columns where references match
     match_cond = df["_merge"] == "both"
 
-    # Apply the postcode top-up to clean the postcodes in col 601 of the back data
-    df.loc[match_cond, "601_prev"] = df.loc[match_cond, "601_prev"].apply(
-        postcode_topup
-    )
-
     # Replace the values of certain columns with the values from the back data
-    replace_vars = ["instance", "200", "201", "601", "602", "604"]
+    replace_vars = ["instance", "200", "201", "601", "602", "604", "imp_class"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
     # Update the postcodes_harmonised column from the updated column 601
     df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
-    
+
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
         df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
@@ -158,7 +152,7 @@ def carry_forwards(df, backdata, impute_vars):
 
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
+    # df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
 
     # Drop merge related columns
     to_drop = [
@@ -180,10 +174,6 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         prev_df (pd.DataFrame): pre-processed backdata.
         target_vars ([string]): target vars to impute.
     """
-    # Only calculate links for long form responders
-    current_df = current_df.copy().loc[current_df["formtype"] == "0001", :]
-    # prev_df = prev_df.copy().loc[prev_df["formtype"] == "0001", :]
-
     # Ensure we only have one row per reference/imp_class for previous and current data
     prev_df = (
         prev_df[["reference", "imp_class"] + target_vars]
@@ -244,12 +234,14 @@ def calculate_links(gr_df, target_vars, config):
 def get_threshold_value(config: dict) -> int:
     """Read, validate and return threshold value from the config."""
     threshold_num = config["imputation"]["mor_threshold"]
-    if (type(threshold_num) == int) & (threshold_num >=0):
+    if (type(threshold_num) == int) & (threshold_num >= 0):
         return threshold_num
     else:
-        raise Exception("The variable 'mor_threshold' in the 'imputation' section "
-                        "of the config must be zero or a positive integer.")
-        
+        raise Exception(
+            "The variable 'mor_threshold' in the 'imputation' section "
+            "of the config must be zero or a positive integer."
+        )
+
 
 def group_calc_link(group, target_vars, config):
     """Apply the MoR method to each group
@@ -284,7 +276,7 @@ def group_calc_link(group, target_vars, config):
                 valid_group_size = False
 
         # If the group is a valid size, and there are non-null, non-zero values for this
-        # 'var', then calculate the mean        
+        # 'var', then calculate the mean
         if valid_group_size & (sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0):
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
@@ -295,7 +287,7 @@ def group_calc_link(group, target_vars, config):
     return group
 
 
-def apply_links(cf_df, links_df, target_vars, config):
+def apply_links(cf_df, links_df, target_vars, config, formtype):
     """Apply the links to the carried forwards values.
 
     Args:
@@ -303,6 +295,7 @@ def apply_links(cf_df, links_df, target_vars, config):
         links_df (pd.DataFrame): DataFrame containing calculated links.
         target_vars ([string]): List of target variables.
         config (Dict): Dictorary of configuration.
+        formtype (str): whether the formtype is long or short.
     """
     # Reduce the mor_df so we only have the variables we need and one row
     # per imputation class
@@ -329,7 +322,10 @@ def apply_links(cf_df, links_df, target_vars, config):
         cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
     # Apply MoR for the breakdown variables under 211 and 305
-    q_targets = ["211", "305"]
+    if formtype == "long":
+        q_targets = ["211", "305"]
+    else:
+        q_targets = list(config["breakdowns"])
     for var in q_targets:
         for breakdown in config["breakdowns"][var]:
             # As above but using different elements to multiply
@@ -347,3 +343,51 @@ def apply_links(cf_df, links_df, target_vars, config):
     # Drop _merge column
     cf_df = cf_df.drop("_merge", axis=1)
     return cf_df
+
+
+def calculate_mor(cf_df, remainder_df, backdata, impute_vars, config, formtype):
+    """Apply the MoR method to long form responders.
+
+    Args:
+        cf_df (pd.DataFrame): DataFrame of carried forwards values to impute.
+        remainder_df (pd.DataFrame): DataFrame of remaining values.
+        backdata (pd.DataFrame): One period of backdata.
+        target_vars ([string]): List of target variables.
+        impute_vars ([string]): List of variables to impute.
+        config (Dict): The configuration settings for the pipeline.
+        formtype (str): The formtype of the data being imputed.
+
+    Returns:
+        pd.DataFrame: df with MoR applied for long forms
+        pd.DataFrame: QA DataFrame showing how imputation links are calculated.
+    """
+    if formtype == "long":
+        target_vars = config["imputation"]["lf_target_vars"]
+        cf_df = cf_df.copy().loc[cf_df["formtype"] == "0001", :]
+        remainder_df = remainder_df.copy().loc[remainder_df["formtype"] == "0001", :]
+        backdata = backdata.copy().loc[backdata["formtype"] == "0001", :]
+
+    elif formtype == "short":
+        target_vars = list(config["breakdowns"])
+        cf_df = cf_df.copy().loc[(cf_df["formtype"] == "0006"), :]
+        remainder_df = remainder_df.copy().loc[(remainder_df["formtype"] == "0006"), :]
+        backdata = backdata.copy().loc[(backdata["formtype"] == "0006"), :]
+
+    else:
+        # TODO: the complex cases of short to long, long to short.
+
+        # for now, don't impute short forms
+        links_df = pd.DataFrame()
+        return cf_df, links_df
+
+    gr_df = calculate_growth_rates(remainder_df, backdata, target_vars)
+    links_df = calculate_links(gr_df, target_vars, config)
+
+    if formtype == "long":
+        links_df["formtype"] = "0001"
+    else:
+        links_df["formtype"] = "0006"
+
+    imputed_df = apply_links(cf_df, links_df, target_vars, config, formtype)
+
+    return imputed_df, links_df

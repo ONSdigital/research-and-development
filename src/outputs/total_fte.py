@@ -21,8 +21,7 @@ def qa_output_total_fte(
         run_id (int): The current run id
 
     """
-    NETWORK_OR_HDFS = config["global"]["network_or_hdfs"]
-    output_path = config[f"{NETWORK_OR_HDFS}_paths"]["output_path"]
+    output_path = config["outputs_paths"]["outputs_master"]
 
     totals_names = ["emp_total", "emp_researcher", "emp_technician", "emp_other"]
     totals_values = [
@@ -36,6 +35,7 @@ def qa_output_total_fte(
     )
 
     # Outputting the CSV file with timestamp and run_id
-    tdate = datetime.now().strftime("%Y-%m-%d")
-    filename = f"total_fte_qa_{tdate}_v{run_id}.csv"
+    tdate = datetime.now().strftime("%y-%m-%d")
+    survey_year = config["years"]["survey_year"]
+    filename = f"{survey_year}_total_fte_qa_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_fte_total_qa/{filename}", qa_total_fte_df)

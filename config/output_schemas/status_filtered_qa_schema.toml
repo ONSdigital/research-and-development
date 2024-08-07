@@ -6,10 +6,6 @@ Deduced_Data_Type = "int64"
 old_name = "instance"
 Deduced_Data_Type = "int64"
 
-[period_year]
-old_name = "period_year"
-Deduced_Data_Type = "int64"
-
 [101]
 old_name = "101"
 Deduced_Data_Type = "object"
@@ -340,11 +336,11 @@ Deduced_Data_Type = "float64"
 
 [713]
 old_name = "713"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "float64"
 
 [714]
 old_name = "714"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "float64"
 
 [9000]
 old_name = "9000"
@@ -512,7 +508,7 @@ Deduced_Data_Type = "float64"
 
 [companyregistrationnumber]
 old_name = "companyregistrationnumber"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "int64"
 
 [numberlivelocalunits]
 old_name = "numberlivelocalunits"
@@ -528,7 +524,7 @@ Deduced_Data_Type = "int64"
 
 [legalstatus]
 old_name = "legalstatus"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "int64"
 
 [reportingunitmarker]
 old_name = "reportingunitmarker"
@@ -552,7 +548,7 @@ Deduced_Data_Type = "object"
 
 [tradingstyle]
 old_name = "tradingstyle"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "float64"
 
 [selectiontype]
 old_name = "selectiontype"
@@ -568,7 +564,7 @@ Deduced_Data_Type = "object"
 
 [statusencoded]
 old_name = "statusencoded"
-Deduced_Data_Type = "category"
+Deduced_Data_Type = "int64"
 
 [postcodes_harmonised]
 old_name = "postcodes_harmonised"
@@ -576,15 +572,7 @@ Deduced_Data_Type = "object"
 
 [pg_numeric]
 old_name = "pg_numeric"
-Deduced_Data_Type = "float64"
-
-[is_constructed]
-old_name = "is_constructed"
-Deduced_Data_Type = "bool"
-
-[force_imputation]
-old_name = "force_imputation"
-Deduced_Data_Type = "bool"
+Deduced_Data_Type = "int64"
 
 [emp_researcher]
 old_name = "emp_researcher"
@@ -652,7 +640,7 @@ Deduced_Data_Type = "bool"
 
 [manual_outlier]
 old_name = "manual_outlier"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [outlier]
 old_name = "outlier"

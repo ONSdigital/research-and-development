@@ -1,0 +1,125 @@
+# singular: bool: Whether to validate a single config item, or validate multiple
+# (multiple = there are multiple items below the current config value)
+# dtype: [str, int, float, bool, path, list[<type> or any]]
+# accept_nonetype: bool: whether or not to accept None
+# max: [int, float]: applies only to int/float dtype, optional (inclusive)
+# min: [int, float]: applies only to int/float dtype, optional (inclusive)
+# filetype: str: applies to only path dtype, optional (using '.' optional)
+global:
+  # Logging settings
+  log_to_file:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  logging_level:
+    singular: True
+    dtype: "str"
+    accept_nonetype: False
+  table_config:
+    singular: True
+    dtype: "str"
+    accept_nonetype: False
+  # Environment settings
+  dev_test :
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  network_or_hdfs:
+    singular: True
+    dtype: "str"
+    accept_nonetype: False
+  # Construction Settings
+  load_reference_list:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  load_from_feather:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  # Apportionment to sites settings
+  apportion_sites:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+runlog_writer:
+  write_csv:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  write_hdf5:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  write_sql:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  display:
+    singular: True
+    dtype: "bool"
+    accept_nonetype: False
+  log_path:
+    singular: True
+    dtype: "path"
+    accept_nonetype: False
+network_paths:
+  singular: False
+  dtype: "path"
+  accept_nonetype: True
+schema_paths:
+  singular: False
+  dtype: "path"
+  accept_nonetype: False
+  filetype: ".toml"
+# Export config for users
+outliers:
+  flag_cols:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+devtest:
+  seltype_list:
+    singular: True
+    dtype: "list[int]"
+    accept_nonetype: False
+log_filenames:
+  singular: False
+  dtype: "path"
+  accept_nonetype: False
+  filetype: ".csv"
+run_log_sql:
+  singular: False
+  dtype: "str"
+  accept_nonetype: False
+estimation:
+  numeric_cols:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+imputation:
+  lf_target_vars:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+  sum_cols:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+breakdowns:
+  "211":
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+  "305":
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+  emp_total:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False
+  headcount_total:
+    singular: True
+    dtype: "list[str]"
+    accept_nonetype: False

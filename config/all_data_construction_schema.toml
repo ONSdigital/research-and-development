@@ -16,7 +16,6 @@ Current_Data_Type = "str"
 Length = 6
 Min_values = "nan"
 Max_values = "nan"
-Possible_Categorical_Values = [202012]
 
 [survey]
 Description = "All values are 002"
@@ -1562,14 +1561,12 @@ Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_categorical_Values = ["nan"]
 
-[short_to_long]
+[construction_type]
 Description = "nan"
-Deduced_Data_Type = "boolean"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"
 Max_values = "nan"
-Possible_categorical_Values = ["nan"]

@@ -9,11 +9,12 @@ import src.pipeline as src
 
 # reload the pipeline module to implement any changes
 reload(src)
-config_path = os.path.join("src", "developer_config.yaml")
+user_path = os.path.join("src", "user_config.yaml")
+dev_path = os.path.join("src", "dev_config.yaml")
 
 start = time.time()
-run_time = src.run_pipeline(start, config_path)
+run_time = src.run_pipeline(user_path, dev_path)
 
 min_secs = divmod(round(run_time), 60)
 
-print(f"Time taken for pipeline: {min_secs[0]}mins and {min_secs[1]}seconds")
+print(f"Time taken for pipeline: {min_secs[0]} mins and {min_secs[1]} seconds")

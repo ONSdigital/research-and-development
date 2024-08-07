@@ -1,8 +1,12 @@
 """The main file for the Outputs module."""
+# Standard Library Imports
 import logging
-import pandas as pd
 from typing import Callable, Dict, Any
 
+# Third Party Imports
+import pandas as pd
+
+# Local Imports
 from src.outputs.form_output_prep import form_output_prep
 from src.outputs.frozen_group import output_frozen_group
 from src.outputs.short_form import output_short_form
@@ -11,8 +15,7 @@ from src.outputs.tau import output_tau
 from src.outputs.gb_sas import output_gb_sas
 from src.outputs.ni_sas import output_ni_sas
 from src.outputs.intram_by_pg import output_intram_by_pg
-from src.outputs.intram_by_itl1 import output_intram_by_itl1
-from src.outputs.intram_uk_itl_1_2 import output_intram_uk_itl_1_2
+from src.outputs.intram_by_itl import output_intram_by_itl
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
@@ -20,23 +23,18 @@ from src.outputs.total_fte import qa_output_total_fte
 OutputMainLogger = logging.getLogger(__name__)
 
 
-def run_outputs(
+def run_outputs(  # noqa: C901
     estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    ultfoc_mapper: pd.DataFrame,
     postcode_mapper: pd.DataFrame,
-    itl_mapper: pd.DataFrame,
-    sic_pg_num: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
-    pg_num_alpha: pd.DataFrame,
-    sic_pg_alpha: pd.DataFrame,
 ):
 
     """Run the outputs module.
@@ -52,25 +50,16 @@ def run_outputs(
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): Links postcode to region code
-        itl_mapper (pd.DataFrame): Links region to ITL codes
-        sic_pg_num (pd.DataFrame): Maps SIC to numeric PG
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
         itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
-        pg_num_alpha (pd.DataFrame): Mapper for product group conversions (num to alpha)
-        sic_pg_num (pd.DataFrame): Mapper for product group conversions
     """
 
-    # Remove instance 0 from weighted df, so that it does not go to Tau outputs
     weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
 
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
-        estimated_df,
-        weighted_df,
-        ni_full_responses,
-        pg_num_alpha,
-        sic_pg_num,
+        estimated_df, weighted_df, ni_full_responses
     )
 
     # Running short form output
@@ -81,7 +70,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
@@ -97,7 +85,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
         )
         OutputMainLogger.info("Finished long form output.")
 
@@ -113,7 +100,6 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished TAU output.")
@@ -126,74 +112,86 @@ def run_outputs(
             config,
             write_csv,
             run_id,
-            ultfoc_mapper,
             postcode_mapper,
         )
         OutputMainLogger.info("Finished GB SAS output.")
 
     # Running NI SAS output
     if config["global"]["output_ni_sas"]:
-        OutputMainLogger.info("Starting NI SAS output...")
-        output_ni_sas(
-            ni_full_responses,
-            config,
-            write_csv,
-            run_id,
-        )
-        OutputMainLogger.info("Finished NI SAS output.")
+        if not config["global"]["load_ni_data"]:
+            OutputMainLogger.info("Skipping NI SAS output as NI data is NOT loaded...")
+        else:
+            OutputMainLogger.info("Starting NI SAS output...")
+            output_ni_sas(
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+            )
+            OutputMainLogger.info("Finished NI SAS output.")
 
     # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
         OutputMainLogger.info("Starting Intram by PG (GB) output...")
         output_intram_by_pg(
             outputs_df,
+            ni_full_responses,
             pg_detailed,
             config,
             write_csv,
             run_id,
+            uk_output=False,
         )
         OutputMainLogger.info("Finished Intram by PG (GB) output.")
-    
+
     # Running Intram by PG output (UK)
     if config["global"]["output_intram_by_pg_uk"]:
-        OutputMainLogger.info("Starting Intram by PG (UK) output...")
-        output_intram_by_pg(
-            outputs_df,
-            pg_detailed,
-            config,
-            write_csv,
-            run_id,
-            ni_full_responses
-        )
-        OutputMainLogger.info("Finished Intram by PG (UK) output.")
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by PG (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by PG (UK) output...")
+            output_intram_by_pg(
+                outputs_df,
+                ni_full_responses,
+                pg_detailed,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by PG (UK) output.")
 
-    # Running Intram by ITL1
-    if config["global"]["output_intram_by_itl1"]:
-        OutputMainLogger.info("Starting  Intram by ITL1 output...")
-        output_intram_by_itl1(
-            outputs_df,
-            config,
-            write_csv,
-            run_id,
-            postcode_mapper,
-            itl_mapper,
-            itl1_detailed,
-        )
-        OutputMainLogger.info("Finished  Intram by ITL1 output.")
-
-    # Running Intram UK by ITL 1 and 2
-    if config["global"]["output_intram_uk_itl2"]:
-        OutputMainLogger.info("Starting  Intram UK by ITL 1 and 2 output...")
-        output_intram_uk_itl_1_2(
+    # Running Intram by ITL (GB)
+    if config["global"]["output_intram_gb_itl"]:
+        OutputMainLogger.info("Starting Intram by ITL (GB) output...")
+        output_intram_by_itl(
             outputs_df,
             ni_full_responses,
             config,
             write_csv,
             run_id,
-            postcode_mapper,
-            itl_mapper,
         )
-        OutputMainLogger.info("Finished  Intram UK by ITL 1 and 2 output.")
+        OutputMainLogger.info("Finished Intram by ITL (GB) output.")
+
+    # Running Intram by ITL (UK)
+    if config["global"]["output_intram_uk_itl"]:
+        if (not config["global"]["load_ni_data"]) or ni_full_responses.empty:
+            OutputMainLogger.info(
+                "Skipping Intram by ITL (UK) output as NI data is NOT loaded..."
+            )
+        else:
+            OutputMainLogger.info("Starting Intram by ITL (UK) output...")
+            output_intram_by_itl(
+                outputs_df,
+                ni_full_responses,
+                config,
+                write_csv,
+                run_id,
+                uk_output=True,
+            )
+            OutputMainLogger.info("Finished Intram by ITL (UK) output.")
 
     # Running frozen group
     if config["global"]["output_frozen_group"]:
@@ -201,7 +199,6 @@ def run_outputs(
         output_frozen_group(
             outputs_df,
             ni_full_responses,
-            ultfoc_mapper,
             config,
             write_csv,
             run_id,

@@ -1,1157 +1,367 @@
-# Network schema file matches working schema on DAP
-
 [reference]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = false
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = 11001603625
-Max_values = 19891309165
-Possible_Categorical_Values = ["nan"]
-
-[status]
-Description = "nan"
-Deduced_Data_Type = "category"
-Nullable = false
-Current_Data_Type = "str"
-Length = ">=1"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["Clear", "Clear - overridden", "Form saved", "Clear - overridden SE", "Form sent out", "Check needed", "Combined child (NIL2)", "Out of scope (NIL3)", "Ceased trading (NIL4)", "Dormant (NIL5)", "Part year return (NIL8)", "No UK activity (NIL9)"]
+old_name = "reference"
+Deduced_Data_Type = "int64"
 
 [instance]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan"]
-q_code = ""
-old_ref = "nan"
+old_name = "instance"
+Deduced_Data_Type = "int64"
 
 [101]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan",]
-q_code = ""
-old_ref = "nan"
-
-[102]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan",]
-q_code = ""
-old_ref = "nan"
+old_name = "101"
+Deduced_Data_Type = "object"
 
 [103]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan",]
-q_code = ""
-old_ref = "nan"
+old_name = "103"
+Deduced_Data_Type = "float64"
 
 [104]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = ["nan",]
-q_code = ""
-old_ref = "nan"
+old_name = "104"
+Deduced_Data_Type = "float64"
 
 [200]
-Description = "Business type: Civil or Defence"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_Categorical_Values = []
-q_code = ""
-old_ref = "c_or_d"
+old_name = "200"
+Deduced_Data_Type = "object"
 
 [201]
-Description = "Published Product Group"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_Categorical_Values = []
-q_code = ""
-old_ref = "selgrpno"
+old_name = "201"
+Deduced_Data_Type = "object"
 
 [202]
-Description = "Salaries & Wages"
+old_name = "202"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_Categorical_Values = []
-q_code = "q202"
-old_ref = "slries"
 
 [203]
-Description = "Other current expenditure"
+old_name = "203"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_Categorical_Values = []
-q_code = "q203"
-old_ref = "curr_oth"
 
 [204]
-Description = "Total Current Expenditure"
+old_name = "204"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q204"
-old_ref = "curr_tot"
 
 [205]
-Description = "Basic Research"
+old_name = "205"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q205"
-old_ref = "res_bas"
 
 [206]
-Description = "Applied Research"
+old_name = "206"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q206"
-old_ref = "res_app"
 
 [207]
-Description = "Experimental Development"
+old_name = "207"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q207"
-old_ref = "experm"
 
 [209]
-Description = "Equipment & Machinery CapEx"
+old_name = "209"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q209"
-old_ref = "cxplm"
 
 [210]
-Description = "Total Capex."
+old_name = "210"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q210"
-old_ref = "None"
 
 [211]
-Description = "Total Inhouse Expenditure"
+old_name = "211"
 Deduced_Data_Type = "float64"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q211"
-old_ref = "intram"
 
 [212]
-Description = "Own Funds"
+old_name = "212"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q212"
-old_ref = "own_f"
 
 [214]
-Description = "Funding - UK government"
+old_name = "214"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q214"
-old_ref = "ex_uk_gv"
 
 [216]
-Description = "Funding - Other UK Private Bus/Public Orgs"
+old_name = "216"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q216"
-old_ref = "ex_uk"
 
 [218]
-Description = "Total Funding"
+old_name = "218"
 Deduced_Data_Type = "float64"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q218"
-old_ref = "f_tot"
 
 [219]
-Description = "Land Acquired for R&D (Split of Land & Build CapEx)"
+old_name = "219"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q219"
-old_ref = "None"
 
 [220]
-Description = "Buildings acquired/constructed for R&D (Split of Land & Build CapEx)"
+old_name = "220"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q220"
-old_ref = "None"
 
 [221]
-Description = "Expenditure on computer software only (of which from Equipment & Machinery CapEx)"
+old_name = "221"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q221"
-old_ref = "None"
 
 [222]
-Description = "Purchase of Materials (Split of Other current)"
+old_name = "222"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q222"
-old_ref = "None"
 
 [223]
-Description = "Purchase of Services (Split of Other current)"
+old_name = "223"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q223"
-old_ref = "None"
 
 [225]
-Description = "Ownership - Own Business"
+old_name = "225"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q225"
-old_ref = "None"
 
 [226]
-Description = "Ownership - UK Government"
+old_name = "226"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q226"
-old_ref = "None"
 
 [227]
-Description = "Ownership - Other UK Priv Bus"
+old_name = "227"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q227"
-old_ref = "None"
 
 [228]
-Description = "Ownership - Other UK Orgs"
+old_name = "228"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q228"
-old_ref = "None"
 
 [229]
-Description = "Ownership - Bus Enterprises in Group Outside UK"
+old_name = "229"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q229"
-old_ref = "None"
 
 [237]
-Description = "Ownership - not owned freely available"
+old_name = "237"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q237"
-old_ref = "None"
 
 [242]
-Description = "Funding - Any other UK organisations"
+old_name = "242"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q242"
-old_ref = "None"
 
 [243]
-Description = "Funding - Business Enterprises in group outside UK"
+old_name = "243"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q243"
-old_ref = "None"
 
 [244]
-Description = "Funding - Other Business Enterprises outside UK"
+old_name = "244"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q244"
-old_ref = "None"
 
 [245]
-Description = "Funding - Other Governments outside UK"
+old_name = "245"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q245"
-old_ref = "None"
 
 [246]
-Description = "Funding - Higher Education Est Outside UK"
+old_name = "246"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q246"
-old_ref = "None"
 
 [247]
-Description = "Funding - Non-profit Orgs outside UK"
+old_name = "247"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q247"
-old_ref = "None"
 
 [248]
-Description = "Funding - International Orgs"
+old_name = "248"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q248"
-old_ref = "None"
 
 [249]
-Description = "Funding - Any other orgs outside UK"
+old_name = "249"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q249"
-old_ref = "None"
 
 [250]
-Description = "Funding - UK Higher Education Establishments"
+old_name = "250"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q250"
-old_ref = "None"
 
 [251]
-Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) LONG FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q251"
-old_ref = "None"
+old_name = "251"
+Deduced_Data_Type = "object"
 
 [300]
-Description = "nan"
+old_name = "300"
 Deduced_Data_Type = "object"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [301]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
+old_name = "301"
+Deduced_Data_Type = "float64"
 
 [302]
-Description = "Purchased/funded R&D in the UK (Yes or No)"
+old_name = "302"
 Deduced_Data_Type = "float64"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q302"
-old_ref = "None"
 
 [303]
-Description = "Purchased Outside UK (Govt Funded)"
+old_name = "303"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q303"
-old_ref = "None"
 
 [304]
-Description = "Purchased Outside UK (Other)"
+old_name = "304"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q304"
-old_ref = "None"
 
 [305]
-Description = "Total Purchased"
+old_name = "305"
 Deduced_Data_Type = "float64"
-Nullable = "Yes"
-Length = "# an integer of the length, or N/A"
-Min_values = 0
-Max_values = 1000000
-Possible_categorical_Values = []
-q_code = "q305"
-old_ref = "None"
 
 [307]
-Description = "Tax credit claim submitted or intended for purchased work commissioned in UK (Y/N) LONG FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q307"
-old_ref = "None"
+old_name = "307"
+Deduced_Data_Type = "object"
 
 [308]
-Description = "Tax credit claim submitted/intended for purchased work outside Ukorig. Funded by UK gov (Y/N) LONG FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q308"
-old_ref = "None"
+old_name = "308"
+Deduced_Data_Type = "object"
 
 [309]
-Description = "Tax credit claim submitted or intended for all other purchased work outside the UK (Y/N) LONG FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q309"
-old_ref = "None"
+old_name = "309"
+Deduced_Data_Type = "object"
 
 [405]
-Description ="emp_researcher (Defence)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "405"
+Deduced_Data_Type = "float64"
 
 [406]
-Description ="emp_researcher (Civil)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "406"
+Deduced_Data_Type = "float64"
 
 [407]
-Description ="emp_technician (Civil)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "407"
+Deduced_Data_Type = "float64"
 
 [408]
-Description ="emp_technician (Defence)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "408"
+Deduced_Data_Type = "float64"
 
 [409]
-Description ="emp_other (Civil)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "409"
+Deduced_Data_Type = "float64"
 
 [410]
-Description ="emp_other (Defence)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "410"
+Deduced_Data_Type = "float64"
 
 [411]
-Description ="total fte(Civil)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "411"
+Deduced_Data_Type = "float64"
 
 [412]
-Description ="total fte(Defence)"
-Deduced_Data_Type ="float64"
-Nullable ="Yes"
-Length ="# an integer of the length, or N/A"
-Min_values = 0
-Max_values =1000000
-Possible_categorical_Values =[ ]
-q_code =""
+old_name = "412"
+Deduced_Data_Type = "float64"
 
 [501]
-Description = "nan"
+old_name = "501"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [502]
-Description = "nan"
+old_name = "502"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [503]
-Description = "nan"
+old_name = "503"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [504]
-Description = "nan"
+old_name = "504"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [505]
-Description = "nan"
+old_name = "505"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [506]
-Description = "nan"
+old_name = "506"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [507]
-Description = "nan"
+old_name = "507"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [508]
-Description = "nan"
+old_name = "508"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [601]
-Description = "nan"
+old_name = "601"
 Deduced_Data_Type = "object"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [602]
-Description = "nan"
+old_name = "602"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[603]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [604]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[605]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-
-[701]
-Description = "nan"
+old_name = "604"
 Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[702]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "Int64"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[703]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[704]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[705]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[706]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[707]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
 [708]
-Description = "nan"
-Deduced_Data_Type = "str"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[709]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[710]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[711]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[712]
-Description = "nan"
+old_name = "708"
 Deduced_Data_Type = "object"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
 
-[713]
-Description = "Tax credit claim submitted or intended for In-house expenditure (Y/N) SHORT FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q713"
-old_ref = "None"
+[period]
+old_name = "period"
+Deduced_Data_Type = "int64"
 
-[714]
-Description = "Tax credit claim submitted or intended for purchased R&D (Y/N) SHORT FORM"
-Deduced_Data_Type = "str"
-Nullable = "No"
-Length = "# an integer of the length, or N/A"
-Min_values = "None"
-Max_values = "None"
-Possible_categorical_Values = []
-q_code = "q714"
-old_ref = "None"
+[survey]
+old_name = "survey"
+Deduced_Data_Type = "int64"
 
-[9000]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
+[status]
+old_name = "status"
+Deduced_Data_Type = "object"
 
-[9001]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
+[formid]
+old_name = "formid"
+Deduced_Data_Type = "int64"
 
-[9002]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9003]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9004]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9005]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9006]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9007]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9008]
-Description = "nan"
-Deduced_Data_Type = "float64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9009]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9010]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9011]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9012]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
-
-[9013]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = "nan"
-Current_Data_Type = "object"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [ "nan",]
-q_code = ""
-old_ref = "nan"
+[formtype]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
 
 [cellnumber]
-Description = "nan"
-Deduced_Data_Type = "Int64"
-Nullable = false
-Current_Data_Type = "Int64"
-Length = "nan"
-Min_values = "nan"
-Max_values = "nan"
-Possible_Categorical_Values = [0]
+old_name = "cellnumber"
+Deduced_Data_Type = "int64"
+
+[pg_numeric]
+old_name = "pg_numeric"
+Deduced_Data_Type = "float64"
+
+[emp_researcher]
+old_name = "emp_researcher"
+Deduced_Data_Type = "float64"
+
+[emp_technician]
+old_name = "emp_technician"
+Deduced_Data_Type = "float64"
+
+[emp_other]
+old_name = "emp_other"
+Deduced_Data_Type = "float64"
+
+[emp_total]
+old_name = "emp_total"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m]
+old_name = "headcount_res_m"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f]
+old_name = "headcount_res_f"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m]
+old_name = "headcount_tec_m"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f]
+old_name = "headcount_tec_f"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m]
+old_name = "headcount_oth_m"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f]
+old_name = "headcount_oth_f"
+Deduced_Data_Type = "float64"
+
+[headcount_tot_m]
+old_name = "headcount_tot_m"
+Deduced_Data_Type = "float64"
+
+[headcount_tot_f]
+old_name = "headcount_tot_f"
+Deduced_Data_Type = "float64"
+
+[headcount_total]
+old_name = "headcount_total"
+Deduced_Data_Type = "float64"
+
+[imp_class]
+old_name = "imp_class"
+Deduced_Data_Type = "object"
+
+[imp_marker]
+old_name = "imp_marker"
+Deduced_Data_Type = "object"
