@@ -2,10 +2,12 @@
 import os
 import logging
 import pandas as pd
+from pandas import DataFrame as pandasDF
+
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
-def breakdown_validation(df: pd.DataFrame) -> dict :
+def breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     bool_dict = {}
     msg = ""
 
@@ -24,61 +26,62 @@ def breakdown_validation(df: pd.DataFrame) -> dict :
     df['check13'] = df['406'] + df['408'] + df['410'] != df['412'] #
 
     false_df = df[df.isin([True]).any(axis=1)]
+    
+    if len(false_df) > 0 :
+        msg += "There are issues with the logic of the columns.\n "
 
     for index, row in false_df.iterrows():
         if row['check1']:
             bool_dict[index] = False
-            msg += f"222 + 223 does not equal 203 for reference: {row['reference']}. "
+            msg += f"Columns 222 + 223 do not equal column 203 for reference: {row['reference']}.\n "
         if row['check2']:
             bool_dict[index] = False
-            msg += f"202 + 223 does not equal 204 for reference: {row['reference']}. "
+            msg += f"Columns 202 + 223 do not equal column 204 for reference: {row['reference']}.\n "
         if row['check3']:
             bool_dict[index] = False
-            msg += f"205 + 206 + 207 does not equal 204 for reference: {row['reference']}. "
+            msg += f"Columns 205 + 206 + 207 do not equal column 204 for reference: {row['reference']}.\n "
         if row['check4']:
             bool_dict[index] = False
-            msg += f"221 is greater than 209 for reference: {row['reference']}. "
+            msg += f"Columns 221 is greater than column 209 for reference: {row['reference']}.\n "
         if row['check5']:
             bool_dict[index] = False
-            msg += f"219 + 220 + 209 does not equal 210 for reference: {row['reference']}. "
+            msg += f"Columns 219 + 220 + 209 do not equal column 210 for reference: {row['reference']}.\n "
         if row['check6']:
             bool_dict[index] = False
-            msg += f"204 + 210 + 209 does not equal 211 for reference: {row['reference']}. "
+            msg += f"Columns 204 + 210 + 209 do not equal column 211 for reference: {row['reference']}.\n "
         if row['check7']:
             bool_dict[index] = False
-            msg += f"212 + 246 does not equal 218 and 212 + 246 does not equal 211 for reference: {row['reference']}. "
+            msg += f"Columns 212 + 246 do not equal 218 and Columns 212 + 246 do not equal column 211 for reference: {row['reference']}.\n "
         if row['check8']:
             bool_dict[index] = False
-            msg += f"225 + 226 + 227 + 228 + 229 + 237 does not equal 218 for reference: {row['reference']}. "
+            msg += f"Columns 225 + 226 + 227 + 228 + 229 + 237 do not equal column 218 for reference: {row['reference']}.\n "
         if row['check9']:
             bool_dict[index] = False
-            msg += f"302 + 303 + 304 does not equal 305 for reference: {row['reference']}. "
+            msg += f"Columns 302 + 303 + 304 do not equal column 305 for reference: {row['reference']}.\n "
         if row['check10']:
             bool_dict[index] = False
-            msg += f"501 + 503 + 505 does not equal 507 for reference: {row['reference']}. "
+            msg += f"Columns 501 + 503 + 505 do not equal column 507 for reference: {row['reference']}.\n "
         if row['check11']:
             bool_dict[index] = False
-            msg += f"502 + 504 + 506 does not equal 508 for reference: {row['reference']}. "
+            msg += f"Columns 502 + 504 + 506 do not equal column 508 for reference: {row['reference']}.\n "
         if row['check12']:
             bool_dict[index] = False
-            msg += f"405 + 407 + 409 does not equal 411 for reference: {row['reference']}. "
+            msg += f"Columns 405 + 407 + 409 do not equal column 411 for reference: {row['reference']}.\n "
         if row['check13']:
             bool_dict[index] = False
-            msg += f"406 + 408 + 410 does not equal 412 for reference: {row['reference']}. " 
-        else:
-            msg += "There are no issues with the breakdown values."   
+            msg += f"Columns 406 + 408 + 410 do not equal column 412 for reference: {row['reference']}.\n " 
 
     return bool_dict, msg
 
 
-def filename_validation(config: dict) -> dict:
+def filename_validation(df: pd.DataFrame) -> pd.DataFrame:
     """Checks that the mapping filenames are valid"""
-    bool_dict, msg = breakdown_validation(config) # needs adjusting
+    bool_dict, msg = breakdown_validation(df)
 
     if all(bool_dict.values()):
-        BreakdownValidationLogger.info("All breakdown values are valid.")
+        BreakdownValidationLogger.info("All breakdown values are valid.\n")
     else:
-        BreakdownValidationLogger.error("There are errors with the breakdown values, please adjust the references that have issues.")
+        BreakdownValidationLogger.error("There are errors with the breakdown values, please make the adjustments for the references that have issues.\n")
         raise ValueError(msg)
 
-    return config
+    return df
