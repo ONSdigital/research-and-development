@@ -29,7 +29,7 @@ staging_paths:
   pcode_val_path: "staging_qa/postcode_validation"
 freezing_paths:
   folder: "02_freezing"
-  frozen_data_staged_path: "frozen_data_staged"
+  frozen_data_staged_path: "frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-05_v817.csv"
   changes_to_review_path: "changes_to_review"
   freezing_updates_path: "freezing_updates"
 ni_paths:

@@ -9,7 +9,7 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   # Freezing settings
-  run_first_snapshot_of_results: True
+  run_first_snapshot_of_results: False
   load_updated_snapshot_for_comparison: False
   run_frozen_data: False
   run_updates_and_freeze: False
