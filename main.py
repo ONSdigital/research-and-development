@@ -3,7 +3,7 @@ import time
 import os
 print(os.getcwd())
 
-os.chdir("/home/cdsw/research-and-development")
+# os.chdir("/home/cdsw/research-and-development")
 
 import src.pipeline as src
 

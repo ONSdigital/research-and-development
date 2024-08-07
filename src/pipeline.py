@@ -107,81 +107,6 @@ def run_pipeline(user_config_path, dev_config_path):
     )
     MainLogger.info("Finished Data Ingest.")
 
-<<<<<<< HEAD
-    # TODO: This is a temporary measure until we have full anon data:
-    # to stop the pipeline on dev_test after staging
-    if not (network_or_hdfs == "hdfs" and config["global"]["dev_test"]):
-
-        # Northern Ireland staging and construction
-        MainLogger.info("Starting NI module...")
-        ni_df = run_ni(config, check_file_exists, read_csv, write_csv, run_id)
-        MainLogger.info("Finished NI Data Ingest.")
-
-        # Construction module
-        MainLogger.info("Starting Construction...")
-        full_responses = run_construction(
-            full_responses, config, check_file_exists, read_csv
-        )
-        MainLogger.info("Finished Construction...")
-
-        # Imputation module
-        MainLogger.info("Starting Imputation...")
-        imputed_df = run_imputation(
-            full_responses,
-            manual_trimming_df,
-            pg_num_alpha,
-            sic_pg_num,
-            backdata,
-            config,
-            write_csv,
-            run_id,
-        )
-        MainLogger.info("Finished  Imputation...")
-
-        # Outlier detection module
-        MainLogger.info("Starting Outlier Detection...")
-        outliered_responses_df = run_outliers(
-            imputed_df, manual_outliers, config, write_csv, run_id
-        )
-        MainLogger.info("Finished Outlier module.")
-
-        # Estimation module
-        MainLogger.info("Starting Estimation...")
-        estimated_responses_df, weighted_responses_df = run_estimation(
-            outliered_responses_df, cellno_df, config, write_csv, run_id
-        )
-        MainLogger.info("Finished Estimation module.")
-
-        # Data processing: Apportionment to sites
-        estimated_responses_df = run_site_apportionment(
-            estimated_responses_df,
-            config,
-            write_csv,
-            run_id,
-            "estimated",
-            output_file=True,
-        )
-        weighted_responses_df = run_site_apportionment(
-            weighted_responses_df,
-            config,
-            write_csv,
-            run_id,
-            "weighted",
-            output_file=True,
-        )
-        MainLogger.info("Finished Site Apportionment module.")
-
-        # Data processing: Regional Apportionment
-
-        # Data processing: Aggregation
-
-        # Data display: Visualisations
-
-        # Data output: Disclosure Control
-
-        # Data output: File Outputs
-        MainLogger.info("Starting Outputs...")
-=======
     # Freezing module
     MainLogger.info("Starting Freezing...")
     full_responses = run_freezing(full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id)
@@ -277,28 +202,7 @@ def run_pipeline(user_config_path, dev_config_path):
         civil_defence_detailed,
         sic_division_detailed,
     )
->>>>>>> origin
 
-        run_outputs(
-            estimated_responses_df,
-            weighted_responses_df,
-            ni_df,
-            config,
-            write_csv,
-            run_id,
-            ultfoc_mapper,
-            postcode_mapper,
-            itl_mapper,
-            sic_pg_num,
-            pg_detailed,
-            itl1_detailed,
-            civil_defence_detailed,
-            sic_division_detailed,
-            pg_num_alpha,
-            sic_pg_num,
-        )
-
-        MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
 
