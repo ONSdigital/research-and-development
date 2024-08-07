@@ -56,6 +56,7 @@ def run_freezing(
 
     if run_first_snapshot_of_results:
         updated_snapshot = main_snapshot.copy()
+        updated_snapshot = _add_last_frozen_column(updated_snapshot)
 
     # # Skip this module if the secondary snapshot isn't loaded
     # load_updated_snapshot = config["global"]["load_updated_snapshot"]
