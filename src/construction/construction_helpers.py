@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
+from src.staging import postcode_validation as pcval
 
 
 def read_construction_file(
@@ -40,7 +41,7 @@ def read_construction_file(
     return None
 
 
-def _convert_formtype(formtype_value: str) -> str:
+def convert_formtype(formtype_value: str) -> str:
     """Convert the formtype to a standardised format.
 
     Args:
@@ -50,6 +51,7 @@ def _convert_formtype(formtype_value: str) -> str:
         str: The standardised value for formtype.
     """
     if pd.notnull(formtype_value):
+        formtype_value = str(formtype_value)
         if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
             return "0001"
         elif (
@@ -77,7 +79,7 @@ def prepare_forms_gb(
     # Convert formtype to "0001" or "0006"
     if "formtype" in construction_df.columns:
         construction_df["formtype"] = construction_df["formtype"].apply(
-            _convert_formtype
+            convert_formtype
         )
 
     if "construction_type" in construction_df.columns:
@@ -148,7 +150,53 @@ def clean_construction_type(value: str) -> str:
         return np.NaN
     # remove whitespaces
     cleaned = "_".join(cleaned.split())
-    return value
+    return cleaned
+
+
+def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
+    """Tasks to prepare the GB forms for the next stage in pipeline.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot df.
+
+    Returns:
+        pd.DataFrame: The updated snapshot df with postcodes_harmonised
+            and short forms reset.
+    """
+
+    constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == True]
+    not_constructed_df = updated_snapshot_df[
+        updated_snapshot_df.is_constructed == False
+    ]
+
+    # Long form records with a postcode in 601 use this as the postcode
+    long_form_cond = ~constructed_df["601"].isnull()
+    constructed_df.loc[long_form_cond, "postcodes_harmonised"] = constructed_df["601"]
+
+    # Short form records with nothing in 601 use referencepostcode instead
+    short_form_cond = (constructed_df["601"].isnull()) & (
+        ~constructed_df["referencepostcode"].isnull()
+    )
+    constructed_df.loc[short_form_cond, "postcodes_harmonised"] = constructed_df[
+        "referencepostcode"
+    ]
+
+    # Top up all new postcodes so they're all eight characters exactly
+    postcode_cols = ["601", "referencepostcode", "postcodes_harmonised"]
+    for col in postcode_cols:
+        constructed_df[col] = constructed_df[col].apply(pcval.format_postcodes)
+
+    updated_snapshot_df = pd.concat([constructed_df, not_constructed_df]).reset_index(
+        drop=True
+    )
+
+    # Reset shortforms with status 'Form sent out' to instance=None
+    form_sent_condition = (updated_snapshot_df.formtype == "0006") & (
+        updated_snapshot_df.status == "Form sent out"
+    )
+    updated_snapshot_df.loc[form_sent_condition, "instance"] = None
+
+    return updated_snapshot_df
 
 
 def add_constructed_nonresponders(
@@ -169,3 +217,31 @@ def add_constructed_nonresponders(
     construction_df = construction_df[~new_rows]
     updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
     return updated_snapshot_df, construction_df
+
+
+def remove_short_to_long_0(
+    updated_snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
+) -> pd.DataFrame:
+    """Remove instance 0 for short to long constructions.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot df.
+        construction_df (pd.DataFrame): The construction df.
+
+    Returns:
+        pd.DataFrame: The updated snapshot df with instance 0
+            removed for short to long constructions.
+    """
+    short_to_long_references = construction_df.loc[
+        construction_df["construction_type"] == "short_to_long",
+        "reference",
+    ].unique()
+
+    updated_snapshot_df = updated_snapshot_df[
+        ~(
+            updated_snapshot_df["reference"].isin(short_to_long_references)
+            & (updated_snapshot_df["instance"] == 0)
+        )
+    ]
+
+    return updated_snapshot_df

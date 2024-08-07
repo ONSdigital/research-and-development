@@ -29,6 +29,9 @@ staging_paths:
   pcode_val_path: "staging_qa/postcode_validation"
 freezing_paths:
   folder: "02_freezing"
+  frozen_data_staged_path: "frozen_data_staged"
+  changes_to_review_path: "changes_to_review"
+  freezing_updates_path: "freezing_updates"
 ni_paths:
   folder: "03_northern_ireland"
   ni_staging_output_path: "ni_staging_qa"
@@ -64,13 +67,18 @@ export_paths:
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs" # dev config
+  frozen_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # dev config
   # snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/survey_return_data/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
-  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # dev config
   secondary_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/berd_survey/anonymised/v1/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # TODO Check if this works
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
+  # Freezing data paths
+  frozen_data_staged_path: None #"02_freezing/frozen_data_staged/"
+  freezing_changes_to_review_path: None # "02_freezing/changes_to_review/"
+  freezing_additions_path: None # "02_freezing/freezing_updates/"
+  freezing_amendments_path: None # "02_freezing/freezing_updates/"
   # Imputation and outliers input paths
   # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
-  backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_24-07-19_v604.csv"
+  backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_published_v347.csv"
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
   manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
   # Construction paths

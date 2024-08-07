@@ -171,7 +171,9 @@ def load_snapshot_feather(feather_file, read_feather):
     return snapdata
 
 
-def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
+def load_val_snapshot_json(
+    frozen_snapshot_path: str, load_json: Callable, config: dict, network_or_hdfs: str
+) -> Tuple[pd.DataFrame, str]:
     """
     Loads and validates a snapshot of survey data from a JSON file.
 
@@ -183,7 +185,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
         responses dataframe against a combined schema.
 
     Args:
-        snapshot_path (str): The path to the JSON file containing the snapshot
+        frozen_snapshot_path (str): The path to the JSON file containing the snapshot
         data.
         load_json (function): The function to use to load the JSON file.
         config (dict): A dictionary containing configuration options.
@@ -197,7 +199,7 @@ def load_val_snapshot_json(snapshot_path, load_json, config, network_or_hdfs):
     StagingHelperLogger.info("Loading SPP snapshot data from json file")
 
     # Load data from JSON file
-    snapdata = load_json(snapshot_path)
+    snapdata = load_json(frozen_snapshot_path)
 
     contributors_df, responses_df = spp_parser.parse_snap_data(snapdata)
 
