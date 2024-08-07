@@ -9,7 +9,7 @@ global:
   load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   # Freezing settings
-  run_first_snapshot_of_results: False
+  run_first_snapshot_of_results: True
   load_updated_snapshot_for_comparison: False
   run_frozen_data: False
   run_updates_and_freeze: False
@@ -56,10 +56,11 @@ hdfs_paths:
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-05_v817.csv"
-  freezing_changes_to_review_path: None # "02_freezing/changes_to_review/"
-  freezing_additions_path: None # "02_freezing/freezing_updates/"
-  freezing_amendments_path: None # "02_freezing/freezing_updates/"
+  frozen_data_staged_output_path: "02_freezing/frozen_data_staged"
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v881"
+  freezing_changes_to_review_path: "02_freezing/changes_to_review"
+  freezing_additions_path: "02_freezing/freezing_updates"
+  freezing_amendments_path: "02_freezing/freezing_updates"
   # Imputation and outliers input paths
   backdata_path: ""
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"

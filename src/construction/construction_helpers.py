@@ -8,6 +8,7 @@ import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
 from src.staging import postcode_validation as pcval
+from src.utils.helpers import convert_formtype
 
 
 def read_construction_file(
@@ -41,27 +42,7 @@ def read_construction_file(
     return None
 
 
-def convert_formtype(formtype_value: str) -> str:
-    """Convert the formtype to a standardised format.
 
-    Args:
-        formtype_value (str): The value to standardise.
-
-    Returns:
-        str: The standardised value for formtype.
-    """
-    if pd.notnull(formtype_value):
-        formtype_value = str(formtype_value)
-        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
-            return "0001"
-        elif (
-            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
-        ):
-            return "0006"
-        else:
-            return None
-    else:
-        return None
 
 
 def prepare_forms_gb(

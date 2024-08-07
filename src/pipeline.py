@@ -79,37 +79,31 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Data Ingest
     MainLogger.info("Starting Data Ingest...")
-    
-    use_frozen_data = (not config["global"]["run_first_snapshot_of_results"])
-    if not use_frozen_data:
-        # Staging and validatation and Data Transmutation
-        MainLogger.info("Starting Staging and Validation...")
-        (
-            full_responses,
-            secondary_full_responses,  # may be needed later for freezing
-            manual_outliers,
-            postcode_mapper,
-            backdata,
-            pg_detailed,
-            itl1_detailed,
-            civil_defence_detailed,
-            sic_division_detailed,
-            manual_trimming_df,
-        ) = run_staging(
-            config,
-            mods.rd_file_exists,
-            mods.rd_load_json,
-            mods.rd_read_csv,
-            mods.rd_write_csv,
-            mods.rd_read_feather,
-            mods.rd_write_feather,
-            mods.rd_isfile,
-            run_id,
-        )
-    else:
-        MainLogger.info("Skipping staging and validation to read in frozen data...")
-        # create empty dataframe to pass to freezing
-        full_responses = pd.DataFrame()
+
+    # Staging and validatation and Data Transmutation
+    MainLogger.info("Starting Staging and Validation...")
+    (
+        full_responses,
+        # secondary_full_responses,  # may be needed later for freezing
+        manual_outliers,
+        postcode_mapper,
+        backdata,
+        pg_detailed,
+        itl1_detailed,
+        civil_defence_detailed,
+        sic_division_detailed,
+        manual_trimming_df,
+    ) = run_staging(
+        config,
+        mods.rd_file_exists,
+        mods.rd_load_json,
+        mods.rd_read_csv,
+        mods.rd_write_csv,
+        mods.rd_read_feather,
+        mods.rd_write_feather,
+        mods.rd_isfile,
+        run_id,
+    )
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
