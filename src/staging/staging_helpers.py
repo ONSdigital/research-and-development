@@ -103,12 +103,12 @@ def load_validate_mapper(
     """
     # Get the path of the mapper from the config dictionary
     mapper_path = config["mapping_paths"][mapper_path_key]
-    network_or_hdfs = config["global"]["network_or_hdfs"]
+    platform = config["global"]["platform"]
 
-    if network_or_hdfs == "network":
+    if platform == "network":
         from src.utils import local_file_mods as mods
 
-    elif network_or_hdfs == "hdfs":
+    elif platform == "hdfs":
         from src.utils import hdfs_mods as mods
 
     # Get the name of the mapper from the mapper path key
@@ -171,7 +171,7 @@ def load_snapshot_feather(feather_file, read_feather):
 
 
 def load_val_snapshot_json(
-    frozen_snapshot_path: str, load_json: Callable, config: dict, network_or_hdfs: str
+    frozen_snapshot_path: str, load_json: Callable, config: dict, platform: str
 ) -> Tuple[pd.DataFrame, str]:
     """
     Loads and validates a snapshot of survey data from a JSON file.
@@ -188,7 +188,7 @@ def load_val_snapshot_json(
         data.
         load_json (function): The function to use to load the JSON file.
         config (dict): A dictionary containing configuration options.
-        network_or_hdfs (str): A string indicating whether the data is being
+        platform (str): A string indicating whether the data is being
         loaded from a network or HDFS.
 
     Returns:
@@ -212,7 +212,7 @@ def load_val_snapshot_json(
     # )
     # val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+    if platform == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
 
     # Data Transmutation
@@ -220,7 +220,7 @@ def load_val_snapshot_json(
     # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
+    if platform == "hdfs" and config["global"]["dev_test"]:
         full_responses = fix_anon_data(full_responses, config)
 
     StagingHelperLogger.info(
@@ -239,7 +239,7 @@ def load_val_snapshot_json(
 
 
 def load_validate_secondary_snapshot(
-    load_json, secondary_snapshot_path, config, network_or_hdfs
+    load_json, secondary_snapshot_path, config, platform
 ):
     """
     Loads and validates a secondary snapshot of survey data from a JSON file.
@@ -270,7 +270,7 @@ def load_validate_secondary_snapshot(
 
     # applied fix as secondary responses does not include instance column:
     # already a fix in place for DevTest environment (see load_val_snapshot_json())
-    if network_or_hdfs == "network":
+    if platform == "network":
         secondary_responses_df["instance"] = 0
 
     # Validate secondary snapshot data

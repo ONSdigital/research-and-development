@@ -116,7 +116,7 @@ def get_file_choice(paths, config: dict):
     return selection_dict
 
 
-def check_files_exist(file_list: List, network_or_hdfs: str, isfile: callable):
+def check_files_exist(file_list: List, platform: str, isfile: callable):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
@@ -127,7 +127,7 @@ def check_files_exist(file_list: List, network_or_hdfs: str, isfile: callable):
     # Check the existence of every file using is_file
     for file in file_list:
         file_path = Path(file)  # Changes to path if str
-        OutgoingLogger.debug(f"Using {network_or_hdfs} isfile function")
+        OutgoingLogger.debug(f"Using {platform} isfile function")
         if not isfile(file_path):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
@@ -222,22 +222,22 @@ def run_export(user_config_path: str, dev_config_path: str):
     logging.basicConfig(level=logging_levels[logging_level.upper()])
 
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
+    platform = config["global"]["platform"]
 
-    if network_or_hdfs == "network":
+    if platform == "network":
         from src.utils import local_file_mods as mods
 
-    elif network_or_hdfs == "hdfs":
+    elif platform == "hdfs":
         from src.utils import hdfs_mods as mods
 
     else:
-        OutgoingLogger.error("The network_or_hdfs configuration is wrong")
+        OutgoingLogger.error("The platform configuration is wrong")
         raise ImportError
 
-    OutgoingLogger.info(f"Using the {network_or_hdfs} file system as data source.")
+    OutgoingLogger.info(f"Using the {platform} file system as data source.")
 
     # Define paths
-    paths = config[f"{network_or_hdfs}_paths"]  # Dynamically get paths based on config
+    paths = config[f"{platform}_paths"]  # Dynamically get paths based on config
     output_path = config["outputs_paths"]["outputs_master"]
     export_folder = config["export_paths"]["export_folder"]
 
@@ -245,7 +245,7 @@ def run_export(user_config_path: str, dev_config_path: str):
     file_select_dict = get_file_choice(paths, config)
 
     # Check that files exist
-    check_files_exist(list(file_select_dict.values()), network_or_hdfs, mods.rd_isfile)
+    check_files_exist(list(file_select_dict.values()), platform, mods.rd_isfile)
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(

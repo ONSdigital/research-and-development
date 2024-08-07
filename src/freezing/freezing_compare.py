@@ -154,8 +154,8 @@
 #         bool: True if the files were written successfully.
 #     """
 #     # Prepare output paths
-#     network_or_hdfs = config["global"]["network_or_hdfs"]
-#     paths = config[f"{network_or_hdfs}_paths"]
+#     platform = config["global"]["platform"]
+#     paths = config[f"{platform}_paths"]
 #     tdate = datetime.now().strftime("%y-%m-%d")
 #     survey_year = config["years"]["survey_year"]
 #     freezing_folder = paths["freezing_path"]

@@ -15,7 +15,7 @@ from tests.test_outputs.conftest import read_config
 
 # Assign config values to paths
 config = read_config()
-LOCATION = config["global"]["network_or_hdfs"]
+LOCATION = config["global"]["platform"]
 
 # create logger (required pass to function)
 TestLogger = logging.getLogger(__name__)

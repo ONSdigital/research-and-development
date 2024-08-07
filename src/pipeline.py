@@ -44,16 +44,19 @@ def run_pipeline(user_config_path, dev_config_path):
     config = filename_validation(config)
 
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
+    platform = config["global"]["platform"]
 
-    if network_or_hdfs == "network":
+    if platform == "network":
         from src.utils import local_file_mods as mods
 
-    elif network_or_hdfs == "hdfs":
+    elif platform == "hdfs":
         from src.utils import hdfs_mods as mods
 
+    elif platform == "s3":
+        from src.utils import s3_mods as mods
+
     else:
-        MainLogger.error("The network_or_hdfs configuration is wrong")
+        MainLogger.error("The platform configuration is wrong")
         raise ImportError
 
     # Set up the run logger

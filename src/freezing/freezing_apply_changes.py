@@ -23,8 +23,8 @@
 #             from the freezing files.
 #     """
 #     # Prepare filepaths to read from
-#     network_or_hdfs = config["global"]["network_or_hdfs"]
-#     paths = config[f"{network_or_hdfs}_paths"]
+#     platform = config["global"]["platform"]
+#     paths = config[f"{platform}_paths"]
 #     amendments_filepath = paths["freezing_amend_path"]
 #     additions_filepath = paths["freezing_add_path"]
 

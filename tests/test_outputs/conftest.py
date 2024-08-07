@@ -18,7 +18,7 @@ def read_config() -> dict:
 
 
 CONFIG = read_config()
-LOCATION = CONFIG["global"]["network_or_hdfs"]
+LOCATION = CONFIG["global"]["platform"]
 
 
 @pytest.fixture(scope="module")

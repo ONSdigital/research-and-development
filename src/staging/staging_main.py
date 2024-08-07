@@ -56,8 +56,8 @@ def run_staging(  # noqa: C901
             sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
     """
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    is_network = network_or_hdfs == "network"
+    platform = config["global"]["platform"]
+    is_network = platform == "network"
     load_from_feather = config["global"]["load_from_feather"]
     load_updated_snapshot = config["global"]["load_updated_snapshot"]
 
@@ -112,7 +112,7 @@ def run_staging(  # noqa: C901
         secondary_snapshot_path = staging_dict["secondary_snapshot_path"]
         check_file_exists(frozen_snapshot_path, raise_error=True)
         full_responses, response_rate = helpers.load_val_snapshot_json(
-            frozen_snapshot_path, load_json, config, network_or_hdfs
+            frozen_snapshot_path, load_json, config, platform
         )
 
         StagingMainLogger.info(
@@ -138,7 +138,7 @@ def run_staging(  # noqa: C901
                 load_json,
                 secondary_snapshot_path,
                 config,
-                network_or_hdfs,
+                platform,
             )
         else:
             secondary_full_responses = None

@@ -16,7 +16,7 @@ from rdsa_utils.cdp.helpers.s3_utils import *
 #########################################################################
 
 working_dir = r"/home/cdsw/research-and-development"
-os.chdir(working_dir)
+#os.chdir(working_dir)
 print(os.getcwd())
 
 #########################################################################
