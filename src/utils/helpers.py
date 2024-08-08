@@ -1,7 +1,12 @@
 """Define helper functions that wrap regularly-used functions."""
 
-import toml
+from typing import Union
+
+import pandas as pd
 import yaml
+import toml
+
+from src.utils.defence import type_defence
 
 # Define paths
 user_config_path = "config/userconfig.toml"
@@ -59,3 +64,27 @@ def period_select() -> tuple:
     period_dict = user_config_reader()["period"]
 
     return period_dict["start_period"], period_dict["end_period"]
+
+
+def values_in_column(
+        df: pd.DataFrame, 
+        col_name: str, 
+        values: Union[list, pd.Series]
+    ) -> bool:
+    """Determine whether a list of values are all present in a dataframe column.
+
+    Args:
+        df (pd.DataFrame): The dataframe.
+        col_name (str): The column name.
+        values (Union[list, pd.Series]): The values to check.
+
+    Returns:
+        bool: Whether or values are in the column.
+    """
+    type_defence(df, "df", pd.DataFrame)
+    type_defence(col_name, "col_name", str)
+    type_defence(values, "values", (list, pd.Series))
+    if isinstance(values, pd.Series):
+        values = list(values)
+    result = set(values).issubset(set(df[col_name]))
+    return result

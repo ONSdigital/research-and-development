@@ -6,8 +6,7 @@ from typing import Union, Callable
 
 import pandas as pd
 
-# TODO: Create a utils function to replicate this, for any column given a set of values
-from src.construction.construction_validation import _references_in_snapshot
+from src.utils.helpers import values_in_column
 
 def apply_freezing(
     main_df: pd.DataFrame,
@@ -83,22 +82,85 @@ def apply_freezing(
     return constructed_df
 
 
+def validate_any_refinst_in_frozen(
+        frozen_df: pd.DataFrame,
+        df2: pd.DataFrame,
+    ) -> bool:
+    frozen_copy = frozen_df.copy()
+    df2_copy = df2.copy()
+    frozen_copy["refinst"] = (
+        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(str)
+    )
+    df2_copy["refinst"] = (
+        df2_copy["reference"].astype(str) + df2_copy["instance"].astype(str)
+    )
+    result = any([x in frozen_copy["refinst"] for x in df2_copy["refinst"]])
+    return result
+
+
+def validate_all_refinst_in_frozen(
+        frozen_df: pd.DataFrame,
+        df2: pd.DataFrame,
+    ) -> bool:
+    """Validate that all ref/inst combinations in a list are in a df.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen snapshot df.
+        df2 (pd.DataFrame): The ammendments/additions df.
+
+    Returns:
+        bool: Whether all ref/inst are in the dataframe. 
+    """
+    frozen_copy = frozen_df.copy()
+    frozen_copy["refinst"] = (
+        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(str)
+    )
+    result = values_in_column(
+        frozen_copy,
+        "refinst",
+        df2["reference"].astype(str) + df2["instance"].astype(str)
+    )
+    return result
+
+
 def validate_amendments_df(
-        df: pd.DataFrame,
+        frozen_df: pd.DataFrame,
+        amendments_df: pd.DataFrame,
         freezing_logger: logging.Logger,
-    ) -> None:
-    # check all columns are present (in staged frozen data)
+    ) -> bool:
     # check that all ref/inst combs are in staged frozen data
-    pass
+    freezing_logger.info(
+        "Checking if all ref/inst in the amendments df are present in the frozen"
+        " data..."
+    )
+    present = validate_all_refinst_in_frozen(frozen_df, amendments_df)
+    if not present: 
+        freezing_logger.info(
+            "Not all reference/instance combinations found within the amendments"
+            "file are present in the snapshot."
+        )
+        return False
+    return True
 
-
-def validate_amendments_df(
-        df: pd.DataFrame,
+def validate_additions_df(
+        frozen_df: pd.DataFrame,
+        additions_df: pd.DataFrame,
         freezing_logger: logging.Logger,
     ) -> None:
-    # check all columns are present (in staged frozen data)
-    # check that all ref/inst combs are not in staged frozen data
-    pass
+    # check that all ref/inst combs are not staged frozen data
+    freezing_logger.info(
+        "Checking if all ref/inst in the amendments df are missing from the frozen"
+        " data..."
+    )
+
+    any_present = validate_any_refinst_in_frozen(frozen_df, additions_df)
+    if any_present: 
+        freezing_logger.info(
+            "Some reference/instance combinations from the additions file are "
+            "present in the frozen data."
+        )
+        return False
+    return True
     
 
 def apply_amendments(
