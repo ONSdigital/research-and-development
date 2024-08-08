@@ -8,8 +8,6 @@ import toml
 
 from src.utils.defence import type_defence
 
-import pandas as pd
-
 # Define paths
 user_config_path = "config/userconfig.toml"
 
