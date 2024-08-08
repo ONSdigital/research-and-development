@@ -7,6 +7,7 @@ from typing import Union, Callable
 import pandas as pd
 
 from src.utils.helpers import values_in_column
+from src.freezing.freezing_utils import _add_last_frozen_column
 
 def apply_freezing(
     main_df: pd.DataFrame,
@@ -166,6 +167,7 @@ def validate_additions_df(
 def apply_amendments(
     main_df: pd.DataFrame,
     amendments_df: pd.DataFrame,
+    run_id: int,
     freezing_logger: logging.Logger
     ) -> pd.DataFrame:
     """Apply amendments to the main snapshot.
@@ -179,21 +181,6 @@ def apply_amendments(
     """
     if not validate_amendments_df(main_df, amendments_df, freezing_logger):
         freezing_logger("Skipping amendments since the amendments csv is invalid...")
-    key_cols = ["reference", "year", "instance"]
-    numeric_cols = [
-        "219",
-        "220",
-        "242",
-        "243",
-        "244",
-        "245",
-        "246",
-        "247",
-        "248",
-        "249",
-        "250",
-    ]
-    numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
 
     accepted_amendments_df = amendments_df.drop(
         amendments_df[~amendments_df.accept_changes].index
@@ -205,18 +192,22 @@ def apply_amendments(
         )
         return main_df
 
-    # Drop the diff columns
+    # Drop the diff columns and accept_changes col
     accepted_amendments_df = accepted_amendments_df.drop(
         columns=[col for col in accepted_amendments_df.columns if col.endswith("_diff")]
     )
+    accepted_amendments_df = accepted_amendments_df.drop("accept_changes", axis=1)
 
-    # Join the amendments onto the main snapshot
-    amended_df = pd.merge(main_df, accepted_amendments_df, how="left", on=key_cols)
+    #rename columns
+    accepted_amendments_df.columns = [
+        col.replace("_updated", "") for col in accepted_amendments_df.columns
+    ]
 
-    # Drop the old numeric cols and rename the amended cols
-    amended_df = amended_df.drop(columns=numeric_cols)
-    cols_to_rename = dict(zip(numeric_cols_new, numeric_cols))
-    amended_df = amended_df.rename(columns=cols_to_rename, errors="raise")
+    # update last_frozen column
+    accepted_amendments_df = _add_last_frozen_column(accepted_amendments_df, run_id)
+
+    # add amended records to main df
+    amended_df = pd.concat([main_df, accepted_amendments_df])
 
     freezing_logger.info(
         f"{accepted_amendments_df.shape[0]} records amended during freezing"
@@ -228,6 +219,7 @@ def apply_amendments(
 def apply_additions(
     main_df: pd.DataFrame,
     additions_df: pd.DataFrame,
+    run_id: int,
     freezing_logger: logging.Logger
     ) -> pd.DataFrame:
     """Apply additions to the main snapshot.
@@ -246,6 +238,7 @@ def apply_additions(
         additions_df[~additions_df["accept_changes"]].index
     )
     if accepted_additions_df.shape[0] > 0:
+        accepted_additions_df = _add_last_frozen_column(accepted_additions_df, run_id)
         added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
         freezing_logger.info(
             f"{accepted_additions_df.shape[0]} records added during freezing"
