@@ -40,24 +40,21 @@ def run_freezing(
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
             and added from the freezing files.
     """
-    # return frozen snapshot if config allows
+    # Determine freezing settings
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
+    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
-    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    run_frozen_data = config["global"]["run_frozen_data"]
 
-    if not run_first_snapshot_of_results:
-        FreezingLogger.info("Loading frozen data...")
-        prepared_frozen_data = read_csv(frozen_data_staged_path)
-        validate_data_with_schema(
-            prepared_frozen_data, "./config/frozen_data_staged_schema.toml"
-        )
 
-        prepared_frozen_data["formtype"] = prepared_frozen_data["formtype"].apply(
-            convert_formtype
-        )
-        FreezingLogger.info(
-            "Frozen data successfully read from {frozen_data_staged_path}"
-        )
+    if load_updated_snapshot_for_comparison:
+        updated_snapshot = main_snapshot.copy()
+        frozen_data_for_comparison = read_frozen_csv(config, read_csv)
+        # temp for pipeline to run
+        prepared_frozen_data = updated_snapshot.copy()
+
+    elif run_frozen_data:
+        prepared_frozen_data = read_frozen_csv(config, read_csv)
 
     else:
         prepared_frozen_data = main_snapshot.copy()
@@ -100,9 +97,6 @@ def run_freezing(
 
     return prepared_frozen_data
 
-def read_frozen_csv():
-    # new functionality
-    pass
 
 # function ready for use
 def _add_last_frozen_column(
@@ -124,3 +118,31 @@ def _add_last_frozen_column(
     last_frozen = f"{todays_date}_v{str(run_id)}"
     frozen_df["last_frozen"] = last_frozen
     return frozen_df
+
+
+def read_frozen_csv(config: dict,
+                    read_csv: Callable) -> pd.DataFrame:
+    """Read the frozen data csv in.
+
+    Args:
+        config (dict): The pipeline configuration.
+        read_csv (callable): Function to read a csv file. This will be the
+            hdfs or network version depending on settings.
+
+    Returns:
+        pd.DataFrame: The frozen data csv.
+    """
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    FreezingLogger.info("Loading frozen data...")
+    frozen_csv = read_csv(frozen_data_staged_path)
+    validate_data_with_schema(
+        frozen_csv, "./config/frozen_data_staged_schema.toml"
+    )
+
+    frozen_csv["formtype"] = frozen_csv["formtype"].apply(
+        convert_formtype
+    )
+    FreezingLogger.info(
+        "Frozen data successfully read from {frozen_data_staged_path}"
+    )
+    return frozen_csv

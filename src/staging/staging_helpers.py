@@ -138,33 +138,6 @@ def load_validate_mapper(
     return mapper_df
 
 
-def check_snapshot_feather_exists(
-    config: dict,
-    check_file_exists: Callable,
-    feather_file_to_check,
-    secondary_feather_file,
-) -> bool:
-    """Check if one or both of snapshot feather files exists.
-
-    Conifg arguments decide whether to check for one or both.
-
-    Args:
-        config (dict): The pipeline configuration
-        check_file_exists (Callable): Function to check if file exists
-            This will be the hdfs or network version depending on settings.
-
-    Returns:
-        bool: True if the feather file exists, False otherwise.
-    """
-
-    if config["global"]["load_updated_snapshot"]:
-        return check_file_exists(feather_file_to_check) and check_file_exists(
-            secondary_feather_file
-        )
-    else:
-        return check_file_exists(feather_file_to_check)
-
-
 def load_snapshot_feather(feather_file, read_feather):
     snapdata = read_feather(feather_file)
     StagingHelperLogger.info(f"{feather_file} loaded")
@@ -232,63 +205,6 @@ def load_val_snapshot_json(
     )
 
     return full_responses, res_rate
-
-
-def load_validate_secondary_snapshot(
-    load_json, secondary_snapshot_path, config, network_or_hdfs
-):
-    """
-    Loads and validates a secondary snapshot of survey data from a JSON file.
-
-    This function reads a JSON file containing a secondary snapshot of survey
-    data, parses the data into contributors and responses dataframes, validates
-    the data against predefined schemas, combines the contributors and responses
-    dataframes into a full responses dataframe, and validates the full responses
-    dataframe against a combined schema.
-
-    Args:
-        load_json (function): The function to use to load the JSON file.
-        secondary_snapshot_path (str): The path to the JSON file containing the
-        secondary snapshot data.
-
-    Returns:
-        pandas.DataFrame: A DataFrame containing the full responses from the
-        secondary snapshot.
-    """
-    # Load secondary snapshot data
-    StagingHelperLogger.info("Loading secondary snapshot data from json file")
-    secondary_snapdata = load_json(secondary_snapshot_path)
-
-    # Parse secondary snapshot data
-    secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(
-        secondary_snapdata
-    )
-
-    # applied fix as secondary responses does not include instance column:
-    # already a fix in place for DevTest environment (see load_val_snapshot_json())
-    if network_or_hdfs == "network":
-        secondary_responses_df["instance"] = 0
-
-    # Validate secondary snapshot data
-    StagingHelperLogger.info("Validating secondary snapshot data...")
-    val.validate_data_with_schema(
-        secondary_contributors_df, "./config/contributors_schema.toml"
-    )
-    val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
-
-    # Create secondary full responses dataframe
-    secondary_full_responses = processing.full_responses(
-        secondary_contributors_df, secondary_responses_df
-    )
-    # Validate and force data types for the secondary full responses df
-    val.combine_schemas_validate_full_df(
-        secondary_full_responses,
-        "./config/contributors_schema.toml",
-        "./config/wide_responses.toml",
-    )
-
-    # return secondary_full_responses
-    return secondary_full_responses
 
 
 def df_to_feather(
