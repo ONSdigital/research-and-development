@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 from typing import Callable
 
@@ -95,7 +96,7 @@ def run_freezing(
         filename = (
             f"{survey_year}_FROZEN_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{frozen_data_staged_output_path}/{filename}", prepared_frozen_data)
+        write_csv(os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data)
 
     return prepared_frozen_data
 
