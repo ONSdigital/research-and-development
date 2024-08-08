@@ -2,12 +2,19 @@
 import os
 import logging
 import pandas as pd
-from pandas import DataFrame as pandasDF
-
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
-def breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
+def breakdown_validation(df: pd.DataFrame) -> dict:
+    """Function to check that the breakdown values match the criteria provided. 
+    
+    Args:
+        df - the BERD 2023 form dataframe that is to be checked
+    Returns:
+        A boolean dicttionary and messages which update based upon if there are any
+        issues with the logic of the columns.   
+    
+    """
     bool_dict = {}
     msg = ""
 
@@ -26,9 +33,11 @@ def breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     df['check13'] = df['406'] + df['408'] + df['410'] != df['412'] #
 
     false_df = df[df.isin([True]).any(axis=1)]
-    
+    # if rows is all null raise error (missingness)
     if len(false_df) > 0 :
         msg += "There are issues with the logic of the columns.\n "
+    else:
+        msg += "There are no issues with the logic of the columns.\n"
 
     for index, row in false_df.iterrows():
         if row['check1']:
@@ -74,8 +83,8 @@ def breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     return bool_dict, msg
 
 
-def filename_validation(df: pd.DataFrame) -> pd.DataFrame:
-    """Checks that the mapping filenames are valid"""
+def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
+    """Runs the breakdown_validation function and outputs the msg to the logger"""
     bool_dict, msg = breakdown_validation(df)
 
     if all(bool_dict.values()):
