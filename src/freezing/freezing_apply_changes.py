@@ -175,6 +175,8 @@ def apply_amendments(
     Args:
         main_df (pd.DataFrame): The main snapshot.
         amendments_df (pd.DataFrame): The amendments to apply.
+        run_id (int): The current run id.
+        freezing_logger (logging.Logger): The logger.
 
     Returns:
         amended_df (pd.DataFrame): The main snapshot with amendments applied.
@@ -227,6 +229,8 @@ def apply_additions(
     Args:
         main_df (pd.DataFrame): The main snapshot.
         additions_df (pd.DataFrame): The additions to apply.
+        run_id (int): The current run id.
+        freezing_logger (logging.Logger): The logger.
 
     Returns:
         added_df (pd.DataFrame): The main snapshot with additions applied.
