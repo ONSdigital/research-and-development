@@ -8,6 +8,8 @@ import toml
 
 from src.utils.defence import type_defence
 
+import pandas as pd
+
 # Define paths
 user_config_path = "config/userconfig.toml"
 
@@ -64,6 +66,52 @@ def period_select() -> tuple:
     period_dict = user_config_reader()["period"]
 
     return period_dict["start_period"], period_dict["end_period"]
+
+
+def convert_formtype(formtype_value: str) -> str:
+    """Convert the formtype to a standardised format.
+
+    Args:
+        formtype_value (str): The value to standardise.
+
+    Returns:
+        str: The standardised value for formtype.
+    """
+    if pd.notnull(formtype_value):
+        formtype_value = str(formtype_value)
+        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
+            return "0001"
+        elif (
+            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
+        ):
+            return "0006"
+        else:
+            return None
+    else:
+        return None
+
+
+def convert_formtype(formtype_value: str) -> str:
+    """Convert the formtype to a standardised format.
+
+    Args:
+        formtype_value (str): The value to standardise.
+
+    Returns:
+        str: The standardised value for formtype.
+    """
+    if pd.notnull(formtype_value):
+        formtype_value = str(formtype_value)
+        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
+            return "0001"
+        elif (
+            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
+        ):
+            return "0006"
+        else:
+            return None
+    else:
+        return None
 
 
 def values_in_column(

@@ -1,8 +1,13 @@
-# import os
 import logging
+import os
 from datetime import datetime
 from typing import Callable
+
 import pandas as pd
+
+from src.staging.validation import validate_data_with_schema
+from src.utils.defence import type_defence
+from src.utils.helpers import convert_formtype
 
 
 FreezingLogger = logging.getLogger(__name__)
@@ -37,19 +42,26 @@ def run_freezing(
     """
     # return frozen snapshot if config allows
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
-    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
 
     if not run_first_snapshot_of_results:
         FreezingLogger.info("Loading frozen data...")
-        frozen_data_staged_csv = read_csv(frozen_data_staged_path)
+        prepared_frozen_data = read_csv(frozen_data_staged_path)
+        validate_data_with_schema(
+            prepared_frozen_data, "./config/frozen_data_staged_schema.toml"
+        )
+
+        prepared_frozen_data["formtype"] = prepared_frozen_data["formtype"].apply(
+            convert_formtype
+        )
         FreezingLogger.info(
             "Frozen data successfully read from {frozen_data_staged_path}"
         )
-        return frozen_data_staged_csv
 
-    if run_first_snapshot_of_results:
-        updated_snapshot = main_snapshot.copy()
+    else:
+        prepared_frozen_data = main_snapshot.copy()
+        prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
     # # Skip this module if the secondary snapshot isn't loaded
     # load_updated_snapshot = config["global"]["load_updated_snapshot"]
@@ -77,17 +89,38 @@ def run_freezing(
     # constructed_df.reset_index(drop=True, inplace=True)
 
     if run_first_snapshot_of_results or run_updates_and_freeze:
+        frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
         FreezingLogger.info("Outputting frozen data file.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         filename = (
             f"{survey_year}_FROZEN_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{frozen_data_staged_path}/{filename}", updated_snapshot)
+        write_csv(os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data)
 
-    return updated_snapshot
-
+    return prepared_frozen_data
 
 def read_frozen_csv():
     # new functionality
     pass
+
+# function ready for use
+def _add_last_frozen_column(
+        frozen_df: pd.DataFrame,
+        run_id: int
+    ) -> pd.DataFrame:
+    """Add the last_frozen column to staged data.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen data.
+        run_id (int): The current run id.
+
+    Returns:
+        pd.DataFrame: A dataframe containing the updated last_frozen column.
+    """
+    type_defence(frozen_df, "frozen_df", pd.DataFrame)
+    type_defence(run_id, "run_id", int)
+    todays_date = datetime.today().strftime("%y-%m-%d")
+    last_frozen = f"{todays_date}_v{str(run_id)}"
+    frozen_df["last_frozen"] = last_frozen
+    return frozen_df
