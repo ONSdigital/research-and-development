@@ -129,6 +129,36 @@ def create_mapping_config(config: dict) -> dict:
 
     return mapping_dict
 
+def create_freezing_config(config: dict) -> dict:
+    """Create a configuration dictionary with all paths needed for freezing module.
+
+    Args:
+        config (dict): The pipeline configuration.
+
+    Returns:
+        dict: A dictionary with all the paths needed for the freezing module.
+    """
+    freezing_dict = create_module_config(config, "freezing")
+
+    # now update add freezing paths
+    paths = get_paths(config)
+    berd_path = paths["berd_path"]
+    freezing_dict["frozen_data_staged_path"] = os.path.join(
+        berd_path, paths["frozen_data_staged_path"]
+    )
+    freezing_dict["freezing_changes_to_review_path"] = os.path.join(
+        berd_path, paths["freezing_changes_to_review_path"]
+    )
+    freezing_dict["freezing_additions_path"] = os.path.join(
+        berd_path, paths["freezing_additions_path"]
+    )
+    freezing_dict["freezing_amendments_path"] = os.path.join(
+        berd_path, paths["freezing_amendments_path"]
+    )
+
+    return freezing_dict
+
+
 
 def create_construction_config(config: dict) -> dict:
     """Create a configuration dictionary with all paths needed for construction module.
@@ -227,6 +257,7 @@ def update_config_with_paths(config: dict, modules: list) -> dict:
         dict: The updated configuration dictionary.
     """
     config["staging_paths"] = create_staging_config(config)
+    config["freezing_paths"] = create_freezing_config(config)
     config["ni_paths"] = create_ni_staging_config(config)
     config["mapping_paths"] = create_mapping_config(config)
     config["construction_paths"] = create_construction_config(config)

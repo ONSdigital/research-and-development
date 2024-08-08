@@ -82,10 +82,9 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-
     (
         full_responses,
-        secondary_full_responses,  # may be needed later for freezing
+        # secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
         postcode_mapper,
         backdata,
@@ -105,12 +104,13 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_isfile,
         run_id,
     )
-    MainLogger.info("Finished Data Ingest.")
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
     full_responses = run_freezing(full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id)
     MainLogger.info("Finished Freezing...")
+
+    MainLogger.info("Finished Data Ingest.")
 
     # Northern Ireland staging and construction
     load_ni_data = config["global"]["load_ni_data"]
