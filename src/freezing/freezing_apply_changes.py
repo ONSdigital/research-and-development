@@ -177,6 +177,8 @@ def apply_amendments(
     Returns:
         amended_df (pd.DataFrame): The main snapshot with amendments applied.
     """
+    if not validate_amendments_df(main_df, amendments_df, freezing_logger):
+        freezing_logger("Skipping amendments since the amendments csv is invalid...")
     key_cols = ["reference", "year", "instance"]
     numeric_cols = [
         "219",
@@ -237,6 +239,8 @@ def apply_additions(
     Returns:
         added_df (pd.DataFrame): The main snapshot with additions applied.
     """
+    if not validate_additions_df(main_df, additions_df, freezing_logger):
+        freezing_logger("Skipping additions since the additions csv is invalid...")
     # Drop records where accept_changes is False and if any remain, add them to main df
     accepted_additions_df = additions_df.drop(
         additions_df[~additions_df["accept_changes"]].index
