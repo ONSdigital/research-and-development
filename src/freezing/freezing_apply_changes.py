@@ -57,7 +57,12 @@ def apply_freezing(
                 f"Amendments file ({amendments_filepath}) is empty, skipping..."
             )
         else:
-            constructed_df = apply_amendments(main_df, amendments_df)
+            constructed_df = apply_amendments(
+                main_df, 
+                amendments_df,
+                run_id, 
+                freezing_logger,
+            )
 
     # apply additions
     if additions_exist:
@@ -68,7 +73,12 @@ def apply_freezing(
         )
         else:
             additions_df["instance"] = additions_df["instance"].astype("Int64")
-            constructed_df = apply_additions(main_df, additions_df)
+            constructed_df = apply_additions(
+                main_df, 
+                additions_df, 
+                run_id, 
+                freezing_logger
+            )
 
 
     # Save the constructed dataframe as a CSV
