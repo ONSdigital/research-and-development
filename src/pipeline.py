@@ -48,12 +48,16 @@ def run_pipeline(user_config_path, dev_config_path):
 
     if platform == "network":
         from src.utils import local_file_mods as mods
+        config["client"] = None
 
     elif platform == "hdfs":
         from src.utils import hdfs_mods as mods
+        config["client"] = None
 
     elif platform == "s3":
         from src.utils import s3_mods as mods
+        s3_client = mods.create_client(config)
+        config["client"] = s3_client
 
     else:
         MainLogger.error("The platform configuration is wrong")
@@ -63,7 +67,6 @@ def run_pipeline(user_config_path, dev_config_path):
     runlog_obj = runlog.RunLog(
         config,
         version,
-        mods.rd_open,
         mods.rd_file_exists,
         mods.rd_mkdir,
         mods.rd_read_csv,
@@ -85,10 +88,9 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
-
     (
         full_responses,
-        secondary_full_responses,  # may be needed later for freezing
+        # secondary_full_responses,  # may be needed later for freezing
         manual_outliers,
         postcode_mapper,
         backdata,
@@ -108,12 +110,15 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_isfile,
         run_id,
     )
-    MainLogger.info("Finished Data Ingest.")
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
-    full_responses = run_freezing(full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id)
+    full_responses = run_freezing(
+        full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id
+    )
     MainLogger.info("Finished Freezing...")
+
+    MainLogger.info("Finished Data Ingest.")
 
     # Northern Ireland staging and construction
     load_ni_data = config["global"]["load_ni_data"]

@@ -32,13 +32,13 @@ def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
         pd.DataFrame: Dataframe created from csv
     """
     # Open the file in read mode
-    with open(filepath, "r") as file:
+    with open(filepath, "r", encoding="utf-8") as file:
         # Import csv file and convert to Dataframe
         if not cols:
             df = pd.read_csv(file, thousands=",")
         else:
             try:
-                df = pd.read_csv(file, usecols=cols, thousands=",")
+                df = pd.read_csv(file, usecols=cols, thousands=",", encoding="utf-8")
             except Exception:
                 lfmod_logger.error(f"Could not find specified columns in {filepath}")
                 lfmod_logger.info("Columns specified: " + str(cols))
@@ -152,17 +152,6 @@ def rd_mkdir(path):
     """
     os.mkdir(path)
     return None
-
-
-def rd_open(filepath, mode):
-    """Opens a file on a local network drive
-
-    Args:
-        filepath (string) -- The filepath
-        mode (string) -- The mode to open the file in
-    """
-    file = open(filepath, mode)
-    return file
 
 
 @time_logger_wrap

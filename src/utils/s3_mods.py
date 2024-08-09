@@ -15,9 +15,9 @@ from rdsa_utils.cdp.helpers.s3_utils import *
 
 #########################################################################
 
-working_dir = r"/home/cdsw/research-and-development"
-#os.chdir(working_dir)
-print(os.getcwd())
+# working_dir = r"/home/cdsw/research-and-development"
+# #os.chdir(working_dir)
+# print(os.getcwd())
 
 #########################################################################
 
@@ -35,13 +35,13 @@ config = {
 #########################################################################
 def create_client(config):
     client = boto3.client("s3")
-    raz_client.configure_ranger_raz(client, ssl_file=config["ssl_file"])
+    raz_client.configure_ranger_raz(client, ssl_file=config["s3"]["ssl_file"])
     return client
 
 
 ################################################################################
 # Read a CSV file into a Pandas dataframe
-def s3_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     """Reads a csv from s3 bucket into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
@@ -49,7 +49,11 @@ def s3_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
-    with client.get_object(Bucket=config["s3_bucket"], Key=filepath)['Body'] as csv_file:
+    s3_client = config["client"]
+    with s3_client.get_object(
+        Bucket=config["s3"]["s3_bucket"],
+        Key=filepath
+        )['Body'] as csv_file:
         if not cols:
             df_from_s3 = pd.read_csv(csv_file, thousands=',')
         else:
@@ -66,7 +70,7 @@ def s3_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
 
 client = create_client(config)
 mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
-mydf = s3_read_csv(mypath, ['value'])
+mydf = rd_read_csv(mypath, ['value'])
 mydf.head()
 
 # def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:

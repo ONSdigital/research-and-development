@@ -137,33 +137,6 @@ def load_validate_mapper(
     return mapper_df
 
 
-def check_snapshot_feather_exists(
-    config: dict,
-    check_file_exists: Callable,
-    feather_file_to_check,
-    secondary_feather_file,
-) -> bool:
-    """Check if one or both of snapshot feather files exists.
-
-    Conifg arguments decide whether to check for one or both.
-
-    Args:
-        config (dict): The pipeline configuration
-        check_file_exists (Callable): Function to check if file exists
-            This will be the hdfs or network version depending on settings.
-
-    Returns:
-        bool: True if the feather file exists, False otherwise.
-    """
-
-    if config["global"]["load_updated_snapshot"]:
-        return check_file_exists(feather_file_to_check) and check_file_exists(
-            secondary_feather_file
-        )
-    else:
-        return check_file_exists(feather_file_to_check)
-
-
 def load_snapshot_feather(feather_file, read_feather):
     snapdata = read_feather(feather_file)
     StagingHelperLogger.info(f"{feather_file} loaded")
@@ -238,6 +211,7 @@ def load_val_snapshot_json(
     return full_responses, res_rate
 
 
+<<<<<<< HEAD
 def load_validate_secondary_snapshot(
     load_json, secondary_snapshot_path, config, platform
 ):
@@ -295,6 +269,8 @@ def load_validate_secondary_snapshot(
     return secondary_full_responses
 
 
+=======
+>>>>>>> RDRP-966_remove_rd_open
 def df_to_feather(
     dir: Union[pathlib.Path, str],
     save_name: str,
