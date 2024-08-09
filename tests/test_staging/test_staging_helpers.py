@@ -115,13 +115,11 @@ class TestGetMapperName(object):
 class TestLoadValidateMapper(object):
     """Tests for load_validate_mapper."""
 
-    @patch("src.utils.local_file_mods.check_file_exists")
-    @patch("src.utils.local_file_mods.read_local_csv")
+    @patch("src.utils.local_file_mods.rd_file_exists")
+    @patch("src.utils.local_file_mods.rd_read_csv")
     @patch("src.staging.validation.validate_data_with_schema")
-    @patch("src.staging.validation.validate_many_to_one")
     def test_load_validate_mapper(
         self,
-        mock_one_to_many_val_func,
         mock_val_with_schema_func,
         mock_read_csv_func,
         mock_file_exists_func,
@@ -133,13 +131,20 @@ class TestLoadValidateMapper(object):
 
         # Mock data
         mapper_path_key = "test_mapper_path"
-        paths = {"test_mapper_path": "/path/to/mapper.csv"}
+
+        config = {
+            "mapping_paths": {
+                "test_mapper_path": "/path/to/mapper.csv"
+            },
+            "global": {
+                "network_or_hdfs": "network",
+            },
+        }
+
         mapper_df = pd.DataFrame(
             {"col_one": [1, 2, 3, 4, 5, 6], "col_many": ["A", "A", "B", "C", "D", "D"]}
         )
         schema_path = "./config/test_schema.toml"
-        col_many = "col_many"
-        col_one = "col_one"
 
         # Set mock return values
         mock_file_exists_func.return_value = True
@@ -148,21 +153,14 @@ class TestLoadValidateMapper(object):
         # Call the function
         output = load_validate_mapper(
             mapper_path_key,
-            paths,
-            mock_file_exists_func,
-            mock_read_csv_func,
+            config,
             test_logger,
-            mock_val_with_schema_func,
-            mock_one_to_many_val_func,
-            col_many,
-            col_one,
         )
 
         # Assertions
         mock_file_exists_func.assert_called_once_with("/path/to/mapper.csv", raise_error=True)
         mock_read_csv_func.assert_called_once_with("/path/to/mapper.csv")
         mock_val_with_schema_func.assert_called_once_with(mapper_df, schema_path)
-        mock_one_to_many_val_func.assert_called_once_with(mapper_df, col_many, col_one)
         assert output.equals(mapper_df), "load_validate_mapper not behaving as expected."
 
 
@@ -243,7 +241,7 @@ class TestLoadSnapshotFeather(object):
 class TestLoadValSnapshotJson(object):
     """Tests for the load_val_snapshot_json function."""
 
-    @patch("src.utils.local_file_mods.load_local_json")
+    @patch("src.utils.local_file_mods.rd_load_json")
     @patch("src.staging.validation.validate_data_with_schema")
     @patch("src.staging.spp_snapshot_processing.full_responses")
     @patch("src.staging.validation.combine_schemas_validate_full_df")
@@ -283,46 +281,6 @@ class TestLoadValSnapshotJson(object):
             res_rate == expected_res_rate
         ), "The response rate calculated by load_val_snapshot_json does not match the expected value."
         mock_load_json.assert_called_once_with(snapshot_path)
-        mock_validate_data_with_schema.assert_called()
-        mock_combine_schemas_validate_full_df.assert_called()
-
-
-class TestLoadValidateSecondarySnapshot(object):
-    """Tests for the load_validate_secondary_snapshot function."""
-
-    @patch("src.utils.local_file_mods.load_local_json")
-    @patch("src.staging.validation.validate_data_with_schema")
-    @patch("src.staging.spp_snapshot_processing.full_responses")
-    @patch("src.staging.validation.combine_schemas_validate_full_df")
-    def test_load_validate_secondary_snapshot(
-        self,
-        mock_combine_schemas_validate_full_df,
-        mock_full_responses,
-        mock_validate_data_with_schema,
-        mock_load_json
-    ):
-        """Ensure load_validate_secondary_snapshot behaves correctly."""
-        secondary_snapshot_path = "path/to/secondary_snapshot.json"
-        network_or_hdfs = "network"
-        config = {
-            "global": {"dev_test": False},
-            "schema_paths": {
-                "contributors_schema": "path/to/contributors_schema.toml",
-                "long_response_schema": "path/to/long_response_schema.toml",
-                "wide_responses_schema": "path/to/wide_responses_schema.toml",
-            },
-        }
-
-        mock_load_json.return_value = {
-            "contributors": [{"reference": i} for i in range(1, 5)],
-            "responses": [{"reference": i} for i in range(1, 3)],
-        }
-
-        load_validate_secondary_snapshot(
-            mock_load_json, secondary_snapshot_path, config, network_or_hdfs
-        )
-
-        mock_load_json.assert_called_once_with(secondary_snapshot_path)
         mock_validate_data_with_schema.assert_called()
         mock_combine_schemas_validate_full_df.assert_called()
 
