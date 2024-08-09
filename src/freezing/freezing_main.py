@@ -46,7 +46,6 @@ def run_freezing(
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
     run_frozen_data = config["global"]["run_frozen_data"]
 
-
     if load_updated_snapshot_for_comparison:
         updated_snapshot = main_snapshot.copy()
         frozen_data_for_comparison = read_frozen_csv(config, read_csv)
@@ -120,8 +119,10 @@ def _add_last_frozen_column(
     return frozen_df
 
 
-def read_frozen_csv(config: dict,
-                    read_csv: Callable) -> pd.DataFrame:
+def read_frozen_csv(
+    config: dict,
+    read_csv: Callable
+) -> pd.DataFrame:
     """Read the frozen data csv in.
 
     Args:
@@ -143,6 +144,6 @@ def read_frozen_csv(config: dict,
         convert_formtype
     )
     FreezingLogger.info(
-        "Frozen data successfully read from {frozen_data_staged_path}"
+        f"Frozen data successfully read from {frozen_data_staged_path}"
     )
     return frozen_csv
