@@ -48,6 +48,8 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
+        validate_freezing_config_settings(user_config)
+        validate_construction_config_settings(user_config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -286,3 +288,91 @@ def validate_config(config: dict) -> None:
             validation_item=validation_config[validation_item],
             item_name=validation_item,
         )
+
+
+def validate_freezing_config_settings(user_config):
+    """Check that correct combination of freezing settings are used."""
+
+    run_first_snapshot_of_results = user_config["global"][
+        "run_first_snapshot_of_results"
+    ]
+    run_frozen_data = user_config["global"]["run_frozen_data"]
+    frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
+    frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
+    load_updated_snapshot_for_comparison = user_config["global"][
+        "load_updated_snapshot_for_comparison"
+    ]
+    updated_snapshot_path = user_config["hdfs_paths"]["updated_snapshot_path"]
+    run_updates_and_freeze = user_config["global"]["run_updates_and_freeze"]
+    freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
+    freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
+
+    if run_first_snapshot_of_results and run_frozen_data:
+        raise ValueError(
+            "Cannot run first snapshot of results and run frozen data at the same time."
+        )
+
+    if run_first_snapshot_of_results:
+        if frozen_snapshot_path is None:
+            raise ValueError(
+                "If running first snapshot of results, a frozen snapshot path must be"
+                " provided."
+            )
+
+    if run_frozen_data:
+        if frozen_data_staged_path is None:
+            raise ValueError(
+                "If running frozen data, a frozen data staged path must be provided."
+            )
+
+    if load_updated_snapshot_for_comparison:
+        if updated_snapshot_path is None or frozen_data_staged_path is None:
+            raise ValueError(
+                "If loading an updated snapshot for comparison, a secondary snapshot"
+                " path and frozen data staged path must be provided."
+            )
+
+    if run_updates_and_freeze:
+        if frozen_data_staged_path is None or (
+            freezing_additions_path is None or freezing_amendments_path is None
+        ):
+            raise ValueError(
+                "If running updates and freezing, a frozen data staged path and a"
+                " freezing adds or amends path must be provided."
+            )
+
+
+def validate_construction_config_settings(user_config):
+    """Check that correct combination of construction settings are used."""
+
+    run_all_data_construction = user_config["global"]["run_all_data_construction"]
+    run_postcode_construction = user_config["global"]["run_postcode_construction"]
+    run_ni_construction = user_config["global"]["run_ni_construction"]
+    all_data_construction_file_path = user_config["hdfs_paths"][
+        "all_data_construction_file_path"
+    ]
+    postcode_construction_file_path = user_config["hdfs_paths"][
+        "postcode_construction_file_path"
+    ]
+    construction_file_path_ni = user_config["hdfs_paths"]["construction_file_path_ni"]
+
+    if run_all_data_construction:
+        if all_data_construction_file_path is None:
+            raise ValueError(
+                "If running all data construction, an all data construction file path"
+                " must be provided."
+            )
+
+    if run_postcode_construction:
+        if postcode_construction_file_path is None:
+            raise ValueError(
+                "If running postcode construction, a postcode construction file path"
+                " must be provided."
+            )
+
+    if run_ni_construction:
+        if construction_file_path_ni is None:
+            raise ValueError(
+                "If running NI construction, a NI construction file path must be"
+                " provided."
+            )
