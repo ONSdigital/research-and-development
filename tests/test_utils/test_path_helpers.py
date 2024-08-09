@@ -20,7 +20,7 @@ def config():
         "network_paths": {
             "root": "R:/DAP_emulation/",
             "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-            "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
+            "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
             "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
             "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
@@ -88,7 +88,7 @@ def test_get_paths(config):
     expected_network_paths = {
         "root": "R:/DAP_emulation/",
         "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-        "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
+        "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
         "manual_outliers_path": "07_outliers/man_out/man_out.csv",
@@ -119,7 +119,7 @@ def expected_staging_dict():
     expected_staging_dict = {
         "feather_output": "R:/DAP_emulation/2022_surveys/BERD/01_staging/feather",
         "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-        "secondary_snapshot_path": "secondary_snapshot_path/snap2.csv",
+        "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "manual_outliers_path": (
             "R:/DAP_emulation/2022_surveys/BERD/07_outliers/man_out/man_out.csv"

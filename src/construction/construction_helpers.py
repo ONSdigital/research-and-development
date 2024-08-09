@@ -42,9 +42,6 @@ def read_construction_file(
     return None
 
 
-
-
-
 def prepare_forms_gb(
     snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:

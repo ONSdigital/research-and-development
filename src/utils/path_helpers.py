@@ -61,7 +61,7 @@ def create_staging_config(config: dict) -> dict:
 
     # add new paths to the staging section of the config
     staging_dict["frozen_snapshot_path"] = paths["frozen_snapshot_path"]
-    staging_dict["secondary_snapshot_path"] = paths["secondary_snapshot_path"]
+    staging_dict["updated_snapshot_path"] = paths["updated_snapshot_path"]
     staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
     staging_dict["backdata_path"] = paths["backdata_path"]
     staging_dict[
@@ -129,6 +129,7 @@ def create_mapping_config(config: dict) -> dict:
 
     return mapping_dict
 
+
 def create_freezing_config(config: dict) -> dict:
     """Create a configuration dictionary with all paths needed for freezing module.
 
@@ -157,7 +158,6 @@ def create_freezing_config(config: dict) -> dict:
     )
 
     return freezing_dict
-
 
 
 def create_construction_config(config: dict) -> dict:
