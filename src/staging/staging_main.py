@@ -71,9 +71,9 @@ def run_staging(  # noqa: C901
         feather_path = staging_dict["feather_output"]
 
         if stage_frozen_snapshot:
-            snapshot_name = os.path.basename(staging_dict["frozen_snapshot_path"]).split(
-                ".", 1
-            )[0]
+            snapshot_name = os.path.basename(
+                staging_dict["frozen_snapshot_path"]
+            ).split(".", 1)[0]
 
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
@@ -107,7 +107,7 @@ def run_staging(  # noqa: C901
             elif stage_updated_snapshot:
                 snapshot_path = staging_dict["updated_snapshot_path"]
 
-            rd_file_exists(frozen_snapshot_path, raise_error=True)
+            rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
                 snapshot_path, load_json, config, network_or_hdfs
             )
@@ -120,7 +120,10 @@ def run_staging(  # noqa: C901
             val.check_data_shape(full_responses, raise_error=True)
 
             # Validate the postcodes in data loaded from JSON
-            full_responses, postcode_mapper = helpers.stage_validate_harmonise_postcodes(
+            (
+                full_responses,
+                postcode_mapper,
+            ) = helpers.stage_validate_harmonise_postcodes(
                 config,
                 full_responses,
                 run_id,
@@ -140,7 +143,9 @@ def run_staging(  # noqa: C901
         val.flag_no_rand_spenders(full_responses, "raise")
 
     else:
-        StagingMainLogger.info("Skipping json file staging and validation to read in frozen data...")
+        StagingMainLogger.info(
+            "Skipping json file staging and validation to read in frozen data..."
+        )
         # create empty dataframe to pass to freezing
         full_responses = pd.DataFrame()
 
@@ -149,7 +154,6 @@ def run_staging(  # noqa: C901
         postcode_mapper = config["mapping_paths"]["postcode_mapper"]
         rd_file_exists(postcode_mapper, raise_error=True)
         postcode_mapper = read_csv(postcode_mapper)
-
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -197,9 +201,7 @@ def run_staging(  # noqa: C901
         backdata_path = staging_dict["backdata_path"]
         rd_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
-        val.validate_data_with_schema(
-            backdata_path, "./config/backdata_schema.toml"
-        )
+        val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
 
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
