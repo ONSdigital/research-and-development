@@ -192,7 +192,7 @@ def validate_additions_df(
         )
         return False
     return True
-    
+
 
 def apply_amendments(
     main_df: pd.DataFrame,
@@ -214,9 +214,13 @@ def apply_amendments(
     if not validate_amendments_df(main_df, amendments_df, freezing_logger):
         freezing_logger("Skipping amendments since the amendments csv is invalid...")
 
-    accepted_amendments_df = amendments_df.drop(
-        amendments_df[~amendments_df.accept_changes].index
-    )
+    changes_refs = amendments_df[
+        amendments_df.accept_changes==True
+    ].reference.unique()
+
+    accepted_amendments_df = amendments_df[
+        amendments_df.reference.isin(changes_refs)
+    ]
 
     if accepted_amendments_df.shape[0] == 0:
         freezing_logger.info(
@@ -244,7 +248,6 @@ def apply_amendments(
     freezing_logger.info(
         f"{accepted_amendments_df.shape[0]} records amended during freezing"
     )
-    # update last_frozen columns
     return amended_df
 
 
@@ -268,9 +271,13 @@ def apply_additions(
     if not validate_additions_df(main_df, additions_df, freezing_logger):
         freezing_logger("Skipping additions since the additions csv is invalid...")
     # Drop records where accept_changes is False and if any remain, add them to main df
-    accepted_additions_df = additions_df.drop(
-        additions_df[~additions_df["accept_changes"]].index
-    )
+    changes_refs = additions_df[
+        additions_df.accept_changes==True
+    ].reference.unique()
+
+    accepted_additions_df = additions_df[
+        additions_df.reference.isin(changes_refs)
+    ]
     if accepted_additions_df.shape[0] > 0:
         accepted_additions_df = _add_last_frozen_column(accepted_additions_df, run_id)
         added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
@@ -280,5 +287,4 @@ def apply_additions(
     else:
         freezing_logger.info("Additions file contained no records marked for inclusion")
         return main_df
-    # update last_frozen column
     return added_df
