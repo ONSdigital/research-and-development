@@ -29,6 +29,7 @@ def apply_freezing(
         write_csv (callable): Function to write to a csv file. This will be the
             hdfs or network version depending on settings.
         run_id (int): The run id for this run.
+        freezing_logger (logging.Logger): The logger to log to.
 
     Returns:
         constructed_df (pd.DataFrame): As main_df but with records amended and added
@@ -57,7 +58,7 @@ def apply_freezing(
                 f"Amendments file ({amendments_filepath}) is empty, skipping..."
             )
         else:
-            constructed_df = apply_amendments(
+            main_df = apply_amendments(
                 main_df, 
                 amendments_df,
                 run_id, 
@@ -73,30 +74,29 @@ def apply_freezing(
         )
         else:
             additions_df["instance"] = additions_df["instance"].astype("Int64")
-            constructed_df = apply_additions(
+            main_df = apply_additions(
                 main_df, 
                 additions_df, 
                 run_id, 
                 freezing_logger
             )
 
-
-    # Save the constructed dataframe as a CSV
-    tdate = datetime.now().strftime("%y-%m-%d")
-    survey_year = config["years"]["survey_year"]
-    freezing_output_filepath = os.path.join(
-        paths["root"],
-        "freezing",
-        f"{survey_year}_constructed_snapshot_{tdate}_v{run_id}.csv",
-    )
-    write_csv(freezing_output_filepath, constructed_df)
-    return constructed_df
+    return main_df
 
 
 def validate_any_refinst_in_frozen(
         frozen_df: pd.DataFrame,
         df2: pd.DataFrame,
     ) -> bool:
+    """Validate that any of the ref/inst combinations from df2 are in the frozen df.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen csv df
+        df2 (pd.DataFrame): A second dataframe.
+
+    Returns:
+        bool: Whether any ref/inst combs from df2 are in frozen_df.
+    """
     frozen_copy = frozen_df.copy()
     df2_copy = df2.copy()
     frozen_copy["refinst"] = (
@@ -116,7 +116,7 @@ def validate_all_refinst_in_frozen(
     """Validate that all ref/inst combinations in a list are in a df.
 
     Args:
-        frozen_df (pd.DataFrame): The frozen snapshot df.
+        frozen_df (pd.DataFrame): The frozen csv df.
         df2 (pd.DataFrame): The ammendments/additions df.
 
     Returns:
@@ -139,6 +139,16 @@ def validate_amendments_df(
         amendments_df: pd.DataFrame,
         freezing_logger: logging.Logger,
     ) -> bool:
+    """Validate the amendments df.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen csv df.
+        amendments_df (pd.DataFrame): The amendments df.
+        freezing_logger (logging.Logger): The logger to log to.
+
+    Returns:
+        bool: Whether or not the amendments df is valid.
+    """
     # check that all ref/inst combs are in staged frozen data
     freezing_logger.info(
         "Checking if all ref/inst in the amendments df are present in the frozen"
@@ -158,6 +168,16 @@ def validate_additions_df(
         additions_df: pd.DataFrame,
         freezing_logger: logging.Logger,
     ) -> None:
+    """Validate the additions df.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen csv df.
+        additions_df (pd.DataFrame): The additions df.
+        freezing_logger (logging.Logger): The logger to log to.
+
+    Returns:
+        bool: Whether or not the additions df is valid.
+    """
     # check that all ref/inst combs are not staged frozen data
     freezing_logger.info(
         "Checking if all ref/inst in the amendments df are missing from the frozen"
