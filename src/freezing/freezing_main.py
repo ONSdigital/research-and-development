@@ -41,7 +41,6 @@ def run_freezing(
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
     run_frozen_data = config["global"]["run_frozen_data"]
 
-
     if load_updated_snapshot_for_comparison:
         FreezingLogger.info("Comparing the updated snapshot with the frozen data.")
         updated_snapshot = snapshot_df.copy()
@@ -78,16 +77,15 @@ def run_freezing(
         filename = (
             f"{survey_year}_FROZEN_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data)
+        write_csv(
+            os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data
+        )
 
     return prepared_frozen_data
 
 
 # function ready for use
-def _add_last_frozen_column(
-        frozen_df: pd.DataFrame,
-        run_id: int
-    ) -> pd.DataFrame:
+def _add_last_frozen_column(frozen_df: pd.DataFrame, run_id: int) -> pd.DataFrame:
     """Add the last_frozen column to staged data.
 
     Args:
@@ -105,8 +103,7 @@ def _add_last_frozen_column(
     return frozen_df
 
 
-def read_frozen_csv(config: dict,
-                    read_csv: Callable) -> pd.DataFrame:
+def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
     """Read the frozen data csv in.
 
     Args:
@@ -120,14 +117,8 @@ def read_frozen_csv(config: dict,
     frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
     FreezingLogger.info("Loading frozen data...")
     frozen_csv = read_csv(frozen_data_staged_path)
-    validate_data_with_schema(
-        frozen_csv, "./config/frozen_data_staged_schema.toml"
-    )
+    validate_data_with_schema(frozen_csv, "./config/frozen_data_staged_schema.toml")
 
-    frozen_csv["formtype"] = frozen_csv["formtype"].apply(
-        convert_formtype
-    )
-    FreezingLogger.info(
-        "Frozen data successfully read from {frozen_data_staged_path}"
-    )
+    frozen_csv["formtype"] = frozen_csv["formtype"].apply(convert_formtype)
+    FreezingLogger.info(f"Frozen data successfully read from {frozen_data_staged_path}")
     return frozen_csv

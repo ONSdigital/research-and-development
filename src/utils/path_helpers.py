@@ -129,6 +129,7 @@ def create_mapping_config(config: dict) -> dict:
 
     return mapping_dict
 
+
 def create_freezing_config(config: dict) -> dict:
     """Create a configuration dictionary with all paths needed for freezing module.
 
@@ -157,7 +158,6 @@ def create_freezing_config(config: dict) -> dict:
     )
 
     return freezing_dict
-
 
 
 def create_construction_config(config: dict) -> dict:

@@ -63,7 +63,7 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     #     raise ValueError("Percent column for short forms should be blank.")
 
     # we reset the percent column to 100 for short forms
-    #TODO: Check what the proceedure should be for imputed short forms.
+    # TODO: Check what the proceedure should be for imputed short forms.
     df.loc[df[form_col] == short_code, percent_col] = 100
 
     # Condition for long forms with status "Form sent out"
