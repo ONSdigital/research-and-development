@@ -23,6 +23,7 @@ def get_amendments(
     Returns:
         amendments_df (pd.DataFrame): The records that have changed.
     """
+    FreezingLogger.info("Looking for records that have changed in the updated snapshot.")
     key_cols = ["reference", "period", "instance"]
     numeric_cols = [
         "219",
@@ -100,11 +101,12 @@ def get_additions(
 
     Args:
         frozen_csv (pd.DataFrame): The staged and validated frozen data.
-        updated_snapshot
+        updated_snapshot (pd.DataFrame): The staged and validated updated snapshot data.
 
     Returns:
-        additions_df (pd.DataFrame): The records that have been added.
+        additions_df (pd.DataFrame): The new records identified in the updated snapshot data.
     """
+    FreezingLogger.info("Looking for new records in the updated snapshot.")
     key_cols = ["reference", "period", "instance"]
 
     # To do a right anti-join, we need to do a full outer join first, then
@@ -174,4 +176,9 @@ def output_freezing_files(
         )
         write_csv(os.path.join(freezing_changes_to_review_path, filename), additions_df)
 
-    return True
+    if amendments_df is None and additions_df is None:
+        FreezingLogger.info("No changes to review found.")
+        return False
+    else:
+        FreezingLogger.info("File(s) to review output sucessfully.")
+        return True

@@ -26,8 +26,6 @@ def run_freezing(
     Args:
         snapshot_df (pd.DataFrame): The staged and vaildated snapshot data.
         config (dict): The pipeline configuration
-        check_file_exists (callable): Function to check if file exists. This will
-            be the hdfs or network version depending on settings.
         write_csv (callable): Function to write to a csv file. This will be the
             hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs or
@@ -45,6 +43,7 @@ def run_freezing(
 
 
     if load_updated_snapshot_for_comparison:
+        FreezingLogger.info("Comparing the updated snapshot with the frozen data.")
         updated_snapshot = snapshot_df.copy()
         frozen_data_for_comparison = read_frozen_csv(config, read_csv)
         frozen_data_for_comparison = frozen_data_for_comparison.convert_dtypes()
