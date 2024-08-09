@@ -66,7 +66,7 @@ def run_staging(  # noqa: C901
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
 
-    stage_frozen_snapshot = config["global"]["run_first_snapshot_of_results"]
+    stage_frozen_snapshot = config["global"]["run_with_snapshot_until_freezing"]
     stage_updated_snapshot = config["global"]["load_updated_snapshot_for_comparison"]
     if stage_frozen_snapshot or stage_updated_snapshot:
         feather_path = staging_dict["feather_output"]
