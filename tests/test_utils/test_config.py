@@ -333,7 +333,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -352,7 +352,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -374,7 +374,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": None,
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -396,7 +396,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -405,8 +405,8 @@ class TestValidateFreezingConfigSettings(object):
                            match="If running frozen data, a frozen data staged path must be provided."):
             validate_freezing_config_settings(user_config)
 
-    def test_validate_freezing_config_settings_load_updated_snapshot_without_secondary_snapshot_path(self):
-        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no secondary_snapshot_path."""
+    def test_validate_freezing_config_settings_load_updated_snapshot_without_updated_snapshot_path(self):
+        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no updated_snapshot_path."""
         user_config = {
             "global": {
                 "run_first_snapshot_of_results": False,
@@ -417,7 +417,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
-                "secondary_snapshot_path": None,
+                "updated_snapshot_path": None,
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -439,7 +439,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -461,7 +461,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -483,7 +483,7 @@ class TestValidateFreezingConfigSettings(object):
             "hdfs_paths": {
                 "frozen_snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
-                "secondary_snapshot_path": "/path/to/secondary_snapshot",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": None,
                 "freezing_amendments_path": None,
             },

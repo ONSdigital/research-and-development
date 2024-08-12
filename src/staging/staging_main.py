@@ -15,7 +15,7 @@ StagingMainLogger = logging.getLogger(__name__)
 
 def run_staging(  # noqa: C901
     config: dict,
-    check_file_exists: Callable,
+    rd_file_exists: Callable,
     load_json: Callable,
     read_csv: Callable,
     write_csv: Callable,
@@ -35,7 +35,7 @@ def run_staging(  # noqa: C901
 
     Args:
         config (dict): The pipeline configuration
-        check_file_exists (Callable): Function to check if file exists
+        rd_file_exists (Callable): Function to check if file exists
             This will be the hdfs or network version depending on settings.
         load_json (Callable): Function to load a json file.
             This will be the hdfs or network version depending on settings.
@@ -61,36 +61,32 @@ def run_staging(  # noqa: C901
     network_or_hdfs = config["global"]["network_or_hdfs"]
     is_network = network_or_hdfs == "network"
     load_from_feather = config["global"]["load_from_feather"]
-    load_updated_snapshot = config["global"]["load_updated_snapshot"]
-
 
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
 
-    use_frozen_snapshot_data = (not config["global"]["run_first_snapshot_of_results"])
-    if not use_frozen_snapshot_data:
-
-        snapshot_name = os.path.basename(staging_dict["frozen_snapshot_path"]).split(
-            ".", 1
-        )[0]
+    stage_frozen_snapshot = config["global"]["run_first_snapshot_of_results"]
+    stage_updated_snapshot = config["global"]["load_updated_snapshot_for_comparison"]
+    if stage_frozen_snapshot or stage_updated_snapshot:
         feather_path = staging_dict["feather_output"]
-        feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
-        if load_updated_snapshot:
-            secondary_snapshot_name = os.path.basename(
-                staging_dict["secondary_snapshot_path"]
+        if stage_frozen_snapshot:
+            snapshot_name = os.path.basename(
+                staging_dict["frozen_snapshot_path"]
             ).split(".", 1)[0]
-            secondary_feather_file = os.path.join(
-                feather_path, f"{secondary_snapshot_name}.feather"
-            )
-        else:
-            secondary_feather_file = None
 
-        # Check if the if the snapshot feather and optionally the secondary
-        # snapshot feather exist
-        feather_files_exist = helpers.check_snapshot_feather_exists(
-            config, check_file_exists, feather_file, secondary_feather_file
-        )
+            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
+
+        elif stage_updated_snapshot:
+            updated_snapshot_name = os.path.basename(
+                staging_dict["updated_snapshot_path"]
+            ).split(".", 1)[0]
+            feather_file = os.path.join(
+                feather_path, f"{updated_snapshot_name}.feather"
+            )
+
+        # Check if the if the snapshot feather exists
+        feather_files_exist = rd_file_exists(feather_file)
 
         # Only read from feather if feather files exist and we are on network
         READ_FROM_FEATHER = is_network & feather_files_exist & load_from_feather
@@ -99,26 +95,21 @@ def run_staging(  # noqa: C901
             StagingMainLogger.info("Skipping data validation. Loading from feather")
             full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
 
-            if load_updated_snapshot:
-                secondary_full_responses = helpers.load_snapshot_feather(
-                    secondary_feather_file, read_feather
-                )
-            else:
-                secondary_full_responses = None
-
             # Read in postcode mapper (needed later in the pipeline)
             postcode_mapper = config["mapping_paths"]["postcode_mapper"]
-            check_file_exists(postcode_mapper, raise_error=True)
+            rd_file_exists(postcode_mapper, raise_error=True)
             postcode_mapper = read_csv(postcode_mapper)
 
         else:  # Read from JSON
-
             # Check data file exists, raise an error if it does not.
-            frozen_snapshot_path = staging_dict["frozen_snapshot_path"]
-            secondary_snapshot_path = staging_dict["secondary_snapshot_path"]
-            check_file_exists(frozen_snapshot_path, raise_error=True)
+            if stage_frozen_snapshot:
+                snapshot_path = staging_dict["frozen_snapshot_path"]
+            elif stage_updated_snapshot:
+                snapshot_path = staging_dict["updated_snapshot_path"]
+
+            rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
-                frozen_snapshot_path, load_json, config, network_or_hdfs
+                snapshot_path, load_json, config, network_or_hdfs
             )
 
             StagingMainLogger.info(
@@ -129,24 +120,17 @@ def run_staging(  # noqa: C901
             val.check_data_shape(full_responses, raise_error=True)
 
             # Validate the postcodes in data loaded from JSON
-            full_responses, postcode_mapper = helpers.stage_validate_harmonise_postcodes(
+            (
+                full_responses,
+                postcode_mapper,
+            ) = helpers.stage_validate_harmonise_postcodes(
                 config,
                 full_responses,
                 run_id,
-                check_file_exists,
+                rd_file_exists,
                 read_csv,
                 write_csv,
             )
-            # TODO : this code hasn't been updated to use the new paths (in staging)
-            if load_updated_snapshot:
-                secondary_full_responses = helpers.load_validate_secondary_snapshot(
-                    load_json,
-                    secondary_snapshot_path,
-                    config,
-                    network_or_hdfs,
-                )
-            else:
-                secondary_full_responses = None
 
             # Write both snapshots to feather file at given path
             if is_network:
@@ -154,34 +138,28 @@ def run_staging(  # noqa: C901
                 helpers.df_to_feather(
                     feather_path, feather_fname, full_responses, write_feather
                 )
-                if secondary_full_responses is not None:
-                    s_feather_fname = f"{secondary_snapshot_name}.feather"
-                    helpers.df_to_feather(
-                        feather_path,
-                        s_feather_fname,
-                        secondary_full_responses,
-                        write_feather,
-                    )
 
         # Flag invalid records
         val.flag_no_rand_spenders(full_responses, "raise")
+
     else:
-        StagingMainLogger.info("Skipping json file staging and validation to read in frozen data...")
+        StagingMainLogger.info(
+            "Skipping json file staging and validation to read in frozen data..."
+        )
         # create empty dataframe to pass to freezing
         full_responses = pd.DataFrame()
 
         StagingMainLogger.info("Loading postcode mapper")
         # Read in postcode mapper (needed later in the pipeline)
         postcode_mapper = config["mapping_paths"]["postcode_mapper"]
-        check_file_exists(postcode_mapper, raise_error=True)
+        rd_file_exists(postcode_mapper, raise_error=True)
         postcode_mapper = read_csv(postcode_mapper)
-
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = staging_dict["manual_outliers_path"]
-        check_file_exists(manual_path, raise_error=True)
+        rd_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
         manual_outliers = read_csv(manual_path, wanted_cols)
         manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
@@ -221,11 +199,9 @@ def run_staging(  # noqa: C901
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
         backdata_path = staging_dict["backdata_path"]
-        check_file_exists(backdata_path, raise_error=True)
+        rd_file_exists(backdata_path, raise_error=True)
         backdata = read_csv(backdata_path)
-        val.validate_data_with_schema(
-            backdata_path, "./config/backdata_schema.toml"
-        )
+        val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
 
         StagingMainLogger.info("Backdata File Loaded Successfully...")
     else:
@@ -261,7 +237,7 @@ def run_staging(  # noqa: C901
 
     # seaparate PNP data from full_responses (BERD data)
     # NOTE: PNP data can be output for QA but won't be further processed in the pipeline
-    if not use_frozen_snapshot_data:
+    if stage_frozen_snapshot or stage_updated_snapshot:
         full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
 
     # Output the staged BERD data.

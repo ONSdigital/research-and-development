@@ -6,7 +6,6 @@ years:
 global:
   # Staging and validation settings
   postcode_csv_check: True
-  load_updated_snapshot: False # Whether to load the updated snapshots for amendments and additions
   load_ni_data: False
   # Freezing settings
   run_first_snapshot_of_results: True
@@ -51,13 +50,13 @@ global:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
-  secondary_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # first snapshot of run
+  updated_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
-  frozen_data_staged_output_path: "02_freezing/frozen_data_staged"
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v881"
+  frozen_data_staged_output_path: "02_freezing/frozen_data_staged" # path for folder
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v901" # path to file
   freezing_changes_to_review_path: "02_freezing/changes_to_review"
   freezing_additions_path: "02_freezing/changes_to_review/"
   freezing_amendments_path: "02_freezing/freezing_updates"

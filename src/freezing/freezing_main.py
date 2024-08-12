@@ -41,24 +41,22 @@ def run_freezing(
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
             and added from the freezing files.
     """
-    # return frozen snapshot if config allows
+    # Determine freezing settings
     run_first_snapshot_of_results = config["global"]["run_first_snapshot_of_results"]
+    load_updated_snapshot_for_comparison = config["global"][
+        "load_updated_snapshot_for_comparison"
+    ]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
-    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    run_frozen_data = config["global"]["run_frozen_data"]
 
-    if not run_first_snapshot_of_results:
-        FreezingLogger.info("Loading frozen data...")
-        prepared_frozen_data = read_csv(frozen_data_staged_path)
-        validate_data_with_schema(
-            prepared_frozen_data, "./config/frozen_data_staged_schema.toml"
-        )
+    if load_updated_snapshot_for_comparison:
+        updated_snapshot = main_snapshot.copy()
+        frozen_data_for_comparison = read_frozen_csv(config, read_csv)
+        # temp for pipeline to run
+        prepared_frozen_data = updated_snapshot.copy()
 
-        prepared_frozen_data["formtype"] = prepared_frozen_data["formtype"].apply(
-            convert_formtype
-        )
-        FreezingLogger.info(
-            "Frozen data successfully read from {frozen_data_staged_path}"
-        )
+    elif run_frozen_data:
+        prepared_frozen_data = read_frozen_csv(config, read_csv)
 
     else:
         prepared_frozen_data = main_snapshot.copy()
@@ -90,18 +88,17 @@ def run_freezing(
     constructed_df.reset_index(drop=True, inplace=True)
 
     if run_first_snapshot_of_results or run_updates_and_freeze:
-        frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
+        frozen_data_staged_output_path = config["freezing_paths"][
+            "frozen_data_staged_output_path"
+        ]
         FreezingLogger.info("Outputting frozen data file.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
         filename = (
             f"{survey_year}_FROZEN_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data)
+        write_csv(
+            os.path.join(frozen_data_staged_output_path, filename), prepared_frozen_data
+        )
 
     return prepared_frozen_data
-
-def read_frozen_csv():
-    # new functionality
-    pass
-
