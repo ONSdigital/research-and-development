@@ -9,6 +9,7 @@ from src.freezing.freezing_utils import  _add_last_frozen_column
 from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
 from src.utils.helpers import convert_formtype
+from src.utils.defence import type_defence
 
 
 FreezingLogger = logging.getLogger(__name__)
@@ -102,3 +103,42 @@ def run_freezing(
         )
 
     return prepared_frozen_data
+
+# function ready for use
+def _add_last_frozen_column(frozen_df: pd.DataFrame, run_id: int) -> pd.DataFrame:
+    """Add the last_frozen column to staged data.
+
+    Args:
+        frozen_df (pd.DataFrame): The frozen data.
+        run_id (int): The current run id.
+
+    Returns:
+        pd.DataFrame: A dataframe containing the updated last_frozen column.
+    """
+    type_defence(frozen_df, "frozen_df", pd.DataFrame)
+    type_defence(run_id, "run_id", int)
+    todays_date = datetime.today().strftime("%y-%m-%d")
+    last_frozen = f"{todays_date}_v{str(run_id)}"
+    frozen_df["last_frozen"] = last_frozen
+    return frozen_df
+
+
+def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
+    """Read the frozen data csv in.
+
+    Args:
+        config (dict): The pipeline configuration.
+        read_csv (callable): Function to read a csv file. This will be the
+            hdfs or network version depending on settings.
+
+    Returns:
+        pd.DataFrame: The frozen data csv.
+    """
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    FreezingLogger.info("Loading frozen data...")
+    frozen_csv = read_csv(frozen_data_staged_path)
+    validate_data_with_schema(frozen_csv, "./config/frozen_data_staged_schema.toml")
+
+    frozen_csv["formtype"] = frozen_csv["formtype"].apply(convert_formtype)
+    FreezingLogger.info(f"Frozen data successfully read from {frozen_data_staged_path}")
+    return frozen_csv

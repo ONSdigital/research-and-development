@@ -45,7 +45,7 @@ def apply_freezing(
     print(additions_filepath)
 
     # If each file exists, read it and call the function to apply them
-    if not (amendments_exist and additions_exist):
+    if not (amendments_exist or additions_exist):
         freezing_logger.info("No amendments or additions to apply, skipping...")
         return main_df
 
