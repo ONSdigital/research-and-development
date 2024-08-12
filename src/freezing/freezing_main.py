@@ -82,10 +82,11 @@ def run_freezing(
     #     )
 
     # # Read the freezing files from the last run and apply them
-    prepared_frozen_data = apply_freezing(
-        prepared_frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
-    )
-    prepared_frozen_data.reset_index(drop=True, inplace=True)
+    if run_updates_and_freeze:
+        prepared_frozen_data = apply_freezing(
+            prepared_frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
+        )
+        prepared_frozen_data.reset_index(drop=True, inplace=True)
 
     if run_first_snapshot_of_results or run_updates_and_freeze:
         frozen_data_staged_output_path = config["freezing_paths"][
