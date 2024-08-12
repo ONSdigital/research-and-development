@@ -33,7 +33,7 @@ freezing_paths:
   frozen_data_staged_path: "frozen_data_staged"
   freezing_changes_to_review_path: "changes_to_review"
   freezing_amendments_path: "freezing_updates"
-  freezing_additions_path: "changes_to_review/2023_freezing_additions_to_review_24-08-09_v934.csv"
+  freezing_additions_path: "freezing_updates"
 ni_paths:
   folder: "03_northern_ireland"
   ni_staging_output_path: "ni_staging_qa"
@@ -76,8 +76,8 @@ network_paths:
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged/"
   frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-08_v892.csv"
   freezing_changes_to_review_path: "02_freezing/changes_to_review/"
-  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/changes_to_review/2023_freezing_additions_to_review_24-08-09_v934.csv"
-  freezing_amendments_path: "02_freezing/freezing_updates/"
+  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/JC_2023_freezing_additions_to_review_24-08-09_v925.csv"
+  freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/JC_2023_freezing_amendments_to_review_24-08-09_v925.csv"
   # Imputation and outliers input paths
   # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
   backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_published_v347.csv"

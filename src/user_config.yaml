@@ -58,7 +58,7 @@ hdfs_paths:
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged" # path for folder
   frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v901" # path to file
   freezing_changes_to_review_path: "02_freezing/changes_to_review"
-  freezing_additions_path: "02_freezing/changes_to_review/"
+  freezing_additions_path: "02_freezing/freezing_updates"
   freezing_amendments_path: "02_freezing/freezing_updates"
   # Imputation and outliers input paths
   backdata_path: ""
