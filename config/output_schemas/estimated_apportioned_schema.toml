@@ -582,6 +582,26 @@ Deduced_Data_Type = "object"
 old_name = "uni_count"
 Deduced_Data_Type = "int64"
 
+[itl]
+old_name = "itl"
+Deduced_Data_Type = "object"
+
+[ITL221CD]
+old_name = "ITL221CD"
+Deduced_Data_Type = "object"
+
+[ITL221NM]
+old_name = "ITL221NM"
+Deduced_Data_Type = "object"
+
+[ITL121CD]
+old_name = "ITL121CD"
+Deduced_Data_Type = "object"
+
+[ITL121NM]
+old_name = "ITL121NM"
+Deduced_Data_Type = "object"
+
 [emp_researcher]
 old_name = "emp_researcher"
 Deduced_Data_Type = "float64"

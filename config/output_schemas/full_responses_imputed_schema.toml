@@ -862,10 +862,6 @@ Deduced_Data_Type = "float64"
 old_name = "imp_class"
 Deduced_Data_Type = "object"
 
-[period_year]
-old_name = "period_year"
-Deduced_Data_Type = "float64"
-
 [202_prev]
 old_name = "202_prev"
 Deduced_Data_Type = "float64"
@@ -1108,14 +1104,6 @@ Deduced_Data_Type = "float64"
 
 [headcount_oth_f_link]
 old_name = "headcount_oth_f_link"
-Deduced_Data_Type = "float64"
-
-[emp_total_link]
-old_name = "emp_total_link"
-Deduced_Data_Type = "float64"
-
-[headcount_total_link]
-old_name = "headcount_total_link"
 Deduced_Data_Type = "float64"
 
 [200_original]

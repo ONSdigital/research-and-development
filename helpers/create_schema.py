@@ -9,13 +9,13 @@ import os
 
 # Imputation file location and name
 root = "R:/BERD Results System Development 2023/DAP_emulation/"
-input_dir = "2023_surveys/BERD/07_outliers/outliers_qa/"
+input_dir = "2023_surveys/BERD/09_apportionment/apportionment_qa/"
 
 # test = "R:\BERD Results System Development 2023\DAP_emulation\2023_surveys\BERD\05_mapping\mapping_qa\2023_full_responses_mapped_24-07-31_v769.csv"
 
-output_name = "outliers_qa"
+output_name = "estimated_apportioned"
 year = 2023
-suff = "24-08-12_v8.csv"
+suff = "24-08-12_v9.csv"
 
 # Output folder for all schemas
 out_dir = r"config\output_schemas"

@@ -6,10 +6,6 @@ Deduced_Data_Type = "int64"
 old_name = "instance"
 Deduced_Data_Type = "int64"
 
-[period_year]
-old_name = "period_year"
-Deduced_Data_Type = "int64"
-
 [101]
 old_name = "101"
 Deduced_Data_Type = "object"
@@ -336,7 +332,7 @@ Deduced_Data_Type = "float64"
 
 [712]
 old_name = "712"
-Deduced_Data_Type = "object"
+Deduced_Data_Type = "float64"
 
 [713]
 old_name = "713"
@@ -574,17 +570,37 @@ Deduced_Data_Type = "int64"
 old_name = "postcodes_harmonised"
 Deduced_Data_Type = "object"
 
-[is_constructed]
-old_name = "is_constructed"
-Deduced_Data_Type = "bool"
-
-[force_imputation]
-old_name = "force_imputation"
-Deduced_Data_Type = "bool"
-
 [pg_numeric]
 old_name = "pg_numeric"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "int64"
+
+[ultfoc]
+old_name = "ultfoc"
+Deduced_Data_Type = "object"
+
+[uni_count]
+old_name = "uni_count"
+Deduced_Data_Type = "int64"
+
+[itl]
+old_name = "itl"
+Deduced_Data_Type = "object"
+
+[ITL221CD]
+old_name = "ITL221CD"
+Deduced_Data_Type = "object"
+
+[ITL221NM]
+old_name = "ITL221NM"
+Deduced_Data_Type = "object"
+
+[ITL121CD]
+old_name = "ITL121CD"
+Deduced_Data_Type = "object"
+
+[ITL121NM]
+old_name = "ITL121NM"
+Deduced_Data_Type = "object"
 
 [emp_researcher]
 old_name = "emp_researcher"
@@ -901,3 +917,4 @@ Deduced_Data_Type = "float64"
 [headcount_oth_f_estimated]
 old_name = "headcount_oth_f_estimated"
 Deduced_Data_Type = "float64"
+
