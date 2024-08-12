@@ -209,7 +209,7 @@ def apply_amendments(
         amended_df (pd.DataFrame): The main snapshot with amendments applied.
     """
     if not validate_amendments_df(main_df, amendments_df, freezing_logger):
-        freezing_logger("Skipping amendments since the amendments csv is invalid...")
+        freezing_logger.info("Skipping amendments since the amendments csv is invalid...")
 
     changes_refs = amendments_df[
         amendments_df.accept_changes==True

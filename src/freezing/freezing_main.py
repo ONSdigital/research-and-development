@@ -83,8 +83,9 @@ def run_freezing(
 
     # # Read the freezing files from the last run and apply them
     if run_updates_and_freeze:
+        frozen_data = read_frozen_csv(config, read_csv)
         prepared_frozen_data = apply_freezing(
-            prepared_frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
+            frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
         )
         prepared_frozen_data.reset_index(drop=True, inplace=True)
 
