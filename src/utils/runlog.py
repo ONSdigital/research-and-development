@@ -183,7 +183,10 @@ class RunLog:
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
-            nrow = {k: [v] for k, v in dct[i][0].items()}
+            if i != "client":
+                nrow = {k: [v] for k, v in dct[i][0].items()}
+            else:
+                nrow = {}
             self.ndct.update(nrow)
         config_log_df = pd.DataFrame(self.ndct)
         # Add run_id and user to configs

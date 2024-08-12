@@ -188,7 +188,7 @@ def load_val_snapshot_json(
     # the anonymised snapshot data we use in the DevTest environment
     # does not include the instance column. This fix should be removed
     # when new anonymised data is given.
-    if platform == "hdfs" and config["global"]["dev_test"]:
+    if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
         full_responses = fix_anon_data(full_responses, config)
 
     StagingHelperLogger.info(
