@@ -37,12 +37,10 @@ def apply_freezing(
     paths = config[f"{network_or_hdfs}_paths"]
     amendments_filepath = paths["freezing_amendments_path"]
     additions_filepath = paths["freezing_additions_path"]
-    print(paths)
 
     # Check if the freezing files exist
     amendments_exist = check_file_exists(amendments_filepath)
     additions_exist = check_file_exists(additions_filepath)
-    print(additions_filepath)
 
     # If each file exists, read it and call the function to apply them
     if not (amendments_exist or additions_exist):
