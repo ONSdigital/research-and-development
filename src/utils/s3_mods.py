@@ -15,9 +15,9 @@ from rdsa_utils.cdp.helpers.s3_utils import *
 
 #########################################################################
 
-# working_dir = r"/home/cdsw/research-and-development"
-# #os.chdir(working_dir)
-# print(os.getcwd())
+working_dir = r"/home/cdsw/research-and-development"
+os.chdir(working_dir)
+print(os.getcwd())
 
 #########################################################################
 
@@ -28,10 +28,10 @@ s3_logger = logging.getLogger(__name__)
 
 #########################################################################
 # Load configuration; this could be from a file, environment, etc.
-config = {
+config = {"s3": {
    "ssl_file": "/etc/pki/tls/certs/ca-bundle.crt",
    "s3_bucket": "onscdp-dev-data01-5320d6ca",
-}
+}}
 #########################################################################
 def create_client(config):
     client = boto3.client("s3")
@@ -68,46 +68,48 @@ def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
 
 ###############################################################################
 
-client = create_client(config)
-mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
-mydf = rd_read_csv(mypath, ['value'])
-mydf.head()
+s3_client = create_client(config)
+config["client"] = s3_client
 
-# def read_hdfs_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
-#     """Reads a csv from DAP into a Pandas Dataframe
-#     Args:
-#         filepath (str): Filepath (Specified in config)
-#         cols (List[str]): Optional list of columns to be read in
-#     Returns:
-#         pd.DataFrame: Dataframe created from csv
-#     """
-#     # Open the file in read mode inside Hadoop context
-#     with hdfs.open(filepath, "r") as file:
-#         # Import csv file and convert to Dataframe
-#         if not cols:
-#             df_from_hdfs = pd.read_csv(file, thousands=',')
-#         else:
-#             try:
-#                 df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=',')
-#             except Exception:
-#                 hdfs_logger.error(f"Could not find specified columns in {filepath}")
-#                 hdfs_logger.info("Columns specified: " + str(cols))
-#                 raise ValueError
-#     return df_from_hdfs
+###############################################################################
+#mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
+#mydf = rd_read_csv(mypath, ['value'])
+#mydf.head()
 
+def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
+    """Writes a Pandas Dataframe to csv in s3 bucket
 
-# def write_hdfs_csv(filepath: str, data: pd.DataFrame):
-#     """Writes a Pandas Dataframe to csv in DAP
+    Args:
+        filepath (str): Filepath (Specified in config)
+        data (pd.DataFrame): Data to be stored
+    """
+    # Create an Unput-Output buffer
+    csv_buffer = StringIO()
+    
+    # Write the dataframe to the buffer in the CSV format 
+    df.to_csv(csv_buffer, header=True, date_format="%Y-%m-%d %H:%M:%S.%f+00", index=False)
+    
+    # "Rewind" the stream to the start of the buffer
+    csv_buffer.seek(0) 
+    
+    # Use the boto3 client from the config
+    s3_client = config["client"]
+    
+    # Write the buffer into the s3 bucket
+    _ = s3_client.put_object(
+        Bucket=config["s3"]["s3_bucket"], 
+        Body=csv_buffer.getvalue(), 
+        Key=filepath
+    )
+    return None
 
-#     Args:
-#         filepath (str): Filepath (Specified in config)
-#         data (pd.DataFrame): Data to be stored
-#     """
-#     # Open the file in write mode
-#     with hdfs.open(filepath, "wt") as file:
-#         # Write dataframe to DAP context
-#         data.to_csv(file, date_format="%Y-%m-%d %H:%M:%S.%f+00", index=False)
-#     return None
+# Create a dataframe and write to a CSV file
+my_data = {"coutry": ["a", "b"], "value": [1, 2]}
+df = pd.DataFrame(my_data)
+df.head()
+mypath = "user/george.zorinyants/test_rd_write.csv"
+rd_write_csv(mypath, df)
+
 
 
 # def hdfs_load_json(filepath: str) -> dict:
