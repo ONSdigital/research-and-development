@@ -33,7 +33,7 @@ freezing_paths:
   frozen_data_staged_path: "frozen_data_staged"
   freezing_changes_to_review_path: "changes_to_review"
   freezing_amendments_path: "freezing_updates"
-  freezing_additions_path: "freezing_updates"
+  freezing_additions_path: "changes_to_review/2023_freezing_additions_to_review_24-08-09_v934.csv"
 ni_paths:
   folder: "03_northern_ireland"
   ni_staging_output_path: "ni_staging_qa"
