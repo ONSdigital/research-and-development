@@ -14,7 +14,6 @@ def apply_freezing(
     config: dict,
     check_file_exists: Callable,
     read_csv: Callable,
-    write_csv: Callable,
     run_id: int,
     freezing_logger: logging.Logger,
     ) -> pd.DataFrame:
@@ -26,8 +25,6 @@ def apply_freezing(
             be the hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs or
             network version depending on settings.
-        write_csv (callable): Function to write to a csv file. This will be the
-            hdfs or network version depending on settings.
         run_id (int): The run id for this run.
         freezing_logger (logging.Logger): The logger to log to.
 
@@ -39,7 +36,7 @@ def apply_freezing(
     network_or_hdfs = config["global"]["network_or_hdfs"]
     paths = config[f"{network_or_hdfs}_paths"]
     amendments_filepath = paths["freezing_amendments_path"]
-    additions_filepath = paths["freezing_add_path"]
+    additions_filepath = paths["freezing_additions_path"]
 
     # Check if the freezing files exist
     amendments_exist = check_file_exists(amendments_filepath)

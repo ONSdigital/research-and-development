@@ -6,6 +6,7 @@ from typing import Callable
 import pandas as pd
 
 from src.freezing.freezing_utils import  _add_last_frozen_column
+from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
 from src.utils.helpers import convert_formtype
 
@@ -17,7 +18,7 @@ def run_freezing(
     main_snapshot: pd.DataFrame,
     # secondary_snapshot: pd.DataFrame,
     config: dict,
-    # check_file_exists: Callable,
+    check_file_exists: Callable,
     write_csv: Callable,
     read_csv: Callable,
     run_id: int,
@@ -83,10 +84,10 @@ def run_freezing(
     #     )
 
     # # Read the freezing files from the last run and apply them
-    # constructed_df = apply_freezing(
-    #     main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
-    # )
-    # constructed_df.reset_index(drop=True, inplace=True)
+    constructed_df = apply_freezing(
+        main_snapshot, config, check_file_exists, read_csv, run_id, FreezingLogger
+    )
+    constructed_df.reset_index(drop=True, inplace=True)
 
     if run_first_snapshot_of_results or run_updates_and_freeze:
         frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
