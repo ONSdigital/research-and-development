@@ -155,7 +155,7 @@ def validate_amendments_df(
     if not present: 
         freezing_logger.info(
             "Not all reference/instance combinations found within the amendments"
-            "file are present in the snapshot."
+            " file are present in the snapshot."
         )
         return False
     return True
