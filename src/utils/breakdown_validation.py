@@ -33,11 +33,15 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
     df['check13'] = df['406'] + df['408'] + df['410'] != df['412'] #
 
     false_df = df[df.isin([True]).any(axis=1)]
-    # if rows is all null raise error (missingness)
+
+    if false_df.isna().any().any():
+        msg += "There are rows that are null.\n"
+
     if len(false_df) > 0 :
-        msg += "There are issues with the logic of the columns.\n "
+        msg += "There are issues with the logic of the columns.\n"
     else:
         msg += "There are no issues with the logic of the columns.\n"
+
 
     for index, row in false_df.iterrows():
         if row['check1']:
