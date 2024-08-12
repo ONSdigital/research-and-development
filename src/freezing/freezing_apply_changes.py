@@ -210,6 +210,7 @@ def apply_amendments(
     """
     if not validate_amendments_df(main_df, amendments_df, freezing_logger):
         freezing_logger.info("Skipping amendments since the amendments csv is invalid...")
+        return main_df
 
     changes_refs = amendments_df[
         amendments_df.accept_changes==True
@@ -267,6 +268,7 @@ def apply_additions(
     """
     if not validate_additions_df(main_df, additions_df, freezing_logger):
         freezing_logger("Skipping additions since the additions csv is invalid...")
+        return main_df
     # Drop records where accept_changes is False and if any remain, add them to main df
     changes_refs = additions_df[
         additions_df.accept_changes==True
