@@ -46,22 +46,23 @@ def run_pipeline(user_config_path, dev_config_path):
     # Check the environment switch
     platform = config["global"]["platform"]
 
-    if platform == "network":
-        from src.utils import local_file_mods as mods
-        config["client"] = None
-
-    elif platform == "hdfs":
-        from src.utils import hdfs_mods as mods
-        config["client"] = None
-
-    elif platform == "s3":
+    if platform == "s3":
         from src.utils import s3_mods as mods
-        s3_client = mods.create_client(config)
-        config["client"] = s3_client
 
+        # Creating boto3 client and adding it to the config dict
+        config["client"] = mods.create_client(config)
     else:
-        MainLogger.error("The platform configuration is wrong")
-        raise ImportError
+        
+        # If it's not s3, there is no need for a client. Adding a None for
+        # consistency.
+        config["client"] = None
+        if platform == "network":
+            from src.utils import local_file_mods as mods
+        elif platform == "hdfs":
+            from src.utils import hdfs_mods as mods
+        else:
+            MainLogger.error("The platform configuration is wrong")
+            raise ImportError
 
     # Set up the run logger
     runlog_obj = runlog.RunLog(

@@ -116,11 +116,14 @@ def get_file_choice(paths, config: dict):
     return selection_dict
 
 
-def check_files_exist(file_list: List, platform: str, isfile: callable):
+def check_files_exist(file_list: List, config: dict, isfile: callable):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
     # Check if the output dirs supplied are string, change to list if so
+
+    platform = config["globak"]["platform"]
+
     if isinstance(file_list, str):
         file_list = [file_list]
 
@@ -224,15 +227,23 @@ def run_export(user_config_path: str, dev_config_path: str):
     # Check the environment switch
     platform = config["global"]["platform"]
 
-    if platform == "network":
-        from src.utils import local_file_mods as mods
+    if platform == "s3":
+        from src.utils import s3_mods as mods
 
-    elif platform == "hdfs":
-        from src.utils import hdfs_mods as mods
-
+        # Creating boto3 client and adding it to the config dict
+        config["client"] = mods.create_client(config)
     else:
-        OutgoingLogger.error("The platform configuration is wrong")
-        raise ImportError
+        
+        # If it's not s3, there is no need for a client. Adding a None for
+        # consistency.
+        config["client"] = None
+        if platform == "network":
+            from src.utils import local_file_mods as mods
+        elif platform == "hdfs":
+            from src.utils import hdfs_mods as mods
+        else:
+            MainLogger.error("The platform configuration is wrong")
+            raise ImportError
 
     OutgoingLogger.info(f"Using the {platform} file system as data source.")
 
@@ -245,7 +256,7 @@ def run_export(user_config_path: str, dev_config_path: str):
     file_select_dict = get_file_choice(paths, config)
 
     # Check that files exist
-    check_files_exist(list(file_select_dict.values()), platform, mods.rd_isfile)
+    check_files_exist(list(file_select_dict.values()), config, mods.rd_isfile)
 
     # Creating a manifest object using the Manifest class in manifest_output.py
     manifest = Manifest(

@@ -147,7 +147,7 @@
 #         additions_df (pd.DataFrame): The records that have been added.
 #         config (dict): The pipeline configuration
 #         write_csv (callable): Function to write to a csv file. This will be the
-#             hdfs or network version depending on settings.
+#             s3, hdfs or network version depending on settings.
 #         run_id (int): The run id for this run.
 
 #     Returns:

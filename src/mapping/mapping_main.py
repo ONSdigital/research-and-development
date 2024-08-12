@@ -29,6 +29,7 @@ def run_mapping(
         "ultfoc_mapper_path",
         config,
         MappingMainLogger,
+        mods,
     )
 
     # Load ITL mapper
@@ -36,6 +37,7 @@ def run_mapping(
         "itl_mapper_path",
         config,
         MappingMainLogger,
+        mods,
     )
 
     # Loading cell number coverage
@@ -43,6 +45,7 @@ def run_mapping(
         "cellno_path",
         config,
         MappingMainLogger,
+        mods,
     )
 
     # Load and validate the PG mappers
@@ -50,6 +53,7 @@ def run_mapping(
         "pg_num_alpha_mapper_path",
         config,
         MappingMainLogger,
+        mods,
     )
     val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
 
@@ -58,6 +62,7 @@ def run_mapping(
         "sic_pg_num_mapper_path",
         config,
         MappingMainLogger,
+        mods,
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
@@ -68,6 +73,7 @@ def run_mapping(
             "ref_list_817_mapper_path",
             config,
             MappingMainLogger,
+            mods,
         )
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
 

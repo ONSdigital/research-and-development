@@ -30,11 +30,11 @@ def run_freezing(
             snapshot data.
         config (dict): The pipeline configuration
         check_file_exists (callable): Function to check if file exists. This will
-            be the hdfs or network version depending on settings.
+            be the s3, hdfs or network version depending on settings.
         write_csv (callable): Function to write to a csv file. This will be the
+            s3, hdfs or network version depending on settings.
+        read_csv (callable): Function to read a csv file. This will be the s3,
             hdfs or network version depending on settings.
-        read_csv (callable): Function to read a csv file. This will be the hdfs or
-            network version depending on settings.
         run_id (int): The run id for this run.
     Returns:
         constructed_df (pd.DataFrame): As main_snapshot but with records amended
@@ -127,7 +127,7 @@ def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
 
     Args:
         config (dict): The pipeline configuration.
-        read_csv (callable): Function to read a csv file. This will be the
+        read_csv (callable): Function to read a csv file. This will be the s3,
             hdfs or network version depending on settings.
 
     Returns:

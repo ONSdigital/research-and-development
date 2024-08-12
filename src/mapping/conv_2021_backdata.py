@@ -24,11 +24,13 @@ def do_pg_conv(backdata, config) -> pd.DataFrame:
         "pg_num_alpha_mapper_path",
         config,
         MappingMainLogger,
+        mods,
     )
 
     backdata = pg_to_pg_mapper(
         backdata,
         pg_num_alpha,
+        mods,
     )
     return backdata
 

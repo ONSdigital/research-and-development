@@ -76,7 +76,10 @@ def getmappername(mapper_path_key: str, split: bool) -> str:
 
 
 def load_validate_mapper(
-    mapper_path_key: str, config: dict, logger: logging.Logger
+    mapper_path_key: str,
+    config: dict,
+    logger: logging.Logger,
+    mods: callable,
 ) -> pd.DataFrame:
     """
     Loads a specified mapper, validates it using a schema and an optional
@@ -103,14 +106,7 @@ def load_validate_mapper(
     """
     # Get the path of the mapper from the config dictionary
     mapper_path = config["mapping_paths"][mapper_path_key]
-    platform = config["global"]["platform"]
-
-    if platform == "network":
-        from src.utils import local_file_mods as mods
-
-    elif platform == "hdfs":
-        from src.utils import hdfs_mods as mods
-
+    
     # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
 
@@ -144,7 +140,7 @@ def load_snapshot_feather(feather_file, read_feather):
 
 
 def load_val_snapshot_json(
-    frozen_snapshot_path: str, load_json: Callable, config: dict, platform: str
+    frozen_snapshot_path: str, load_json: Callable, config: dict,
 ) -> Tuple[pd.DataFrame, str]:
     """
     Loads and validates a snapshot of survey data from a JSON file.
@@ -161,7 +157,6 @@ def load_val_snapshot_json(
         data.
         load_json (function): The function to use to load the JSON file.
         config (dict): A dictionary containing configuration options.
-        platform (str): A string indicating whether the data is being
         loaded from a network or HDFS.
 
     Returns:
@@ -185,7 +180,7 @@ def load_val_snapshot_json(
     # )
     # val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
-    if platform == "hdfs" and config["global"]["dev_test"]:
+    if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
 
     # Data Transmutation
@@ -211,66 +206,6 @@ def load_val_snapshot_json(
     return full_responses, res_rate
 
 
-<<<<<<< HEAD
-def load_validate_secondary_snapshot(
-    load_json, secondary_snapshot_path, config, platform
-):
-    """
-    Loads and validates a secondary snapshot of survey data from a JSON file.
-
-    This function reads a JSON file containing a secondary snapshot of survey
-    data, parses the data into contributors and responses dataframes, validates
-    the data against predefined schemas, combines the contributors and responses
-    dataframes into a full responses dataframe, and validates the full responses
-    dataframe against a combined schema.
-
-    Args:
-        load_json (function): The function to use to load the JSON file.
-        secondary_snapshot_path (str): The path to the JSON file containing the
-        secondary snapshot data.
-
-    Returns:
-        pandas.DataFrame: A DataFrame containing the full responses from the
-        secondary snapshot.
-    """
-    # Load secondary snapshot data
-    StagingHelperLogger.info("Loading secondary snapshot data from json file")
-    secondary_snapdata = load_json(secondary_snapshot_path)
-
-    # Parse secondary snapshot data
-    secondary_contributors_df, secondary_responses_df = spp_parser.parse_snap_data(
-        secondary_snapdata
-    )
-
-    # applied fix as secondary responses does not include instance column:
-    # already a fix in place for DevTest environment (see load_val_snapshot_json())
-    if platform == "network":
-        secondary_responses_df["instance"] = 0
-
-    # Validate secondary snapshot data
-    StagingHelperLogger.info("Validating secondary snapshot data...")
-    val.validate_data_with_schema(
-        secondary_contributors_df, "./config/contributors_schema.toml"
-    )
-    val.validate_data_with_schema(secondary_responses_df, "./config/long_response.toml")
-
-    # Create secondary full responses dataframe
-    secondary_full_responses = processing.full_responses(
-        secondary_contributors_df, secondary_responses_df
-    )
-    # Validate and force data types for the secondary full responses df
-    val.combine_schemas_validate_full_df(
-        secondary_full_responses,
-        "./config/contributors_schema.toml",
-        "./config/wide_responses.toml",
-    )
-
-    # return secondary_full_responses
-    return secondary_full_responses
-
-
-=======
->>>>>>> RDRP-966_remove_rd_open
 def df_to_feather(
     dir: Union[pathlib.Path, str],
     save_name: str,

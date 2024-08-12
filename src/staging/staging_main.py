@@ -95,20 +95,10 @@ def run_staging(  # noqa: C901
             StagingMainLogger.info("Skipping data validation. Loading from feather")
             full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
 
-<<<<<<< HEAD
-        # Check data file exists, raise an error if it does not.
-        frozen_snapshot_path = staging_dict["frozen_snapshot_path"]
-        secondary_snapshot_path = staging_dict["secondary_snapshot_path"]
-        check_file_exists(frozen_snapshot_path, raise_error=True)
-        full_responses, response_rate = helpers.load_val_snapshot_json(
-            frozen_snapshot_path, load_json, config, platform
-        )
-=======
             # Read in postcode mapper (needed later in the pipeline)
             postcode_mapper = config["mapping_paths"]["postcode_mapper"]
             rd_file_exists(postcode_mapper, raise_error=True)
             postcode_mapper = read_csv(postcode_mapper)
->>>>>>> RDRP-966_remove_rd_open
 
         else:  # Read from JSON
             # Check data file exists, raise an error if it does not.
@@ -117,16 +107,10 @@ def run_staging(  # noqa: C901
             elif stage_updated_snapshot:
                 snapshot_path = staging_dict["updated_snapshot_path"]
 
-<<<<<<< HEAD
-        # Data validation of json or feather data
-        # TODO: this temp switched off while working on dev_test_branch
-        # val.check_data_shape(full_responses, raise_error=True)
-=======
             rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
-                snapshot_path, load_json, config, network_or_hdfs
+                snapshot_path, load_json, config, 
             )
->>>>>>> RDRP-966_remove_rd_open
 
             StagingMainLogger.info(
                 f"Response rate: {response_rate}"
@@ -141,15 +125,11 @@ def run_staging(  # noqa: C901
                 postcode_mapper,
             ) = helpers.stage_validate_harmonise_postcodes(
                 config,
-<<<<<<< HEAD
-                platform,
-=======
                 full_responses,
                 run_id,
                 rd_file_exists,
                 read_csv,
                 write_csv,
->>>>>>> RDRP-966_remove_rd_open
             )
 
             # Write both snapshots to feather file at given path
@@ -159,11 +139,6 @@ def run_staging(  # noqa: C901
                     feather_path, feather_fname, full_responses, write_feather
                 )
 
-<<<<<<< HEAD
-    # Flag invalid records
-    # TODO: this temp switched off while working on dev_test_branch
-    # val.flag_no_rand_spenders(full_responses, "raise")
-=======
         # Flag invalid records
         val.flag_no_rand_spenders(full_responses, "raise")
 
@@ -179,7 +154,6 @@ def run_staging(  # noqa: C901
         postcode_mapper = config["mapping_paths"]["postcode_mapper"]
         rd_file_exists(postcode_mapper, raise_error=True)
         postcode_mapper = read_csv(postcode_mapper)
->>>>>>> RDRP-966_remove_rd_open
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -239,6 +213,7 @@ def run_staging(  # noqa: C901
         "itl1_detailed_mapper_path",
         config,
         StagingMainLogger,
+        mods,
     )
 
     # Loading Civil or Defence detailed mapper
@@ -246,6 +221,7 @@ def run_staging(  # noqa: C901
         "civil_defence_detailed_mapper_path",
         config,
         StagingMainLogger,
+        mods,
     )
 
     # Loading SIC division detailed mapper
@@ -253,12 +229,14 @@ def run_staging(  # noqa: C901
         "sic_division_detailed_mapper_path",
         config,
         StagingMainLogger,
+        mods,
     )
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
         config,
         StagingMainLogger,
+        mods,
     )
 
     # seaparate PNP data from full_responses (BERD data)
