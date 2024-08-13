@@ -114,10 +114,11 @@ def create_mapping_config(config: dict) -> dict:
     year = paths["year"]
     year_dict = config[f"{year}_mappers"]
 
-    paths["mappers"] = os.path.join(root_path, f"{paths['year']}_surveys/mappers/")
-
     version = year_dict["mappers_version"]
-    map_folder = os.path.join(paths["mappers"], f"{version}/")
+
+    map_folder = os.path.join(root_path, f"{paths['year']}_surveys/mappers/{version}/")
+
+    paths["mappers"] = map_folder
 
     mapping_dict = {
         k: f"{map_folder}{v}" for k, v in year_dict.items() if k != "mappers_version"
