@@ -126,7 +126,7 @@ def validate_all_refinst_in_frozen(
     result = values_in_column(
         frozen_copy,
         "refinst",
-        df2["reference"].astype(str) + df2["instance"].astype(str)
+        df2["reference"].astype(str) + df2["instance"].astype(float).astype(str)
     )
     return result
 
