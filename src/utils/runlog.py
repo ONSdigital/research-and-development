@@ -133,20 +133,15 @@ class RunLog:
             columns (list): Example: ["a","b","c","d"]
         """
 
-        # Check if the file exists
+        # Check if the runolg file exists. There may be no runlog if the
+        # pipeline is running for the first time, run_id 1. If so,
+        # create a CSV file with column names and no data rows, so that new
+        # entries can be inserted in it.
         if not self.file_exists_func(filepath):
             # Create an empty dataframe with column names
             df = pd.DataFrame(columns=columns)
             # Create new csv file in specified folder
             self.write_csv_func(filepath, df)
-
-            # Old code below - to remove
-            # open the file in write mode inside Hadoop context
-            # with self.file_open_func(filepath, "wt") as file:
-                # writer = csv.writer(file)
-                # Add the headers to the new csv
-                # writer.writerow(columns)
-
         return None
 
     def create_runlog_files(self):
