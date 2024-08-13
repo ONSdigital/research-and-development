@@ -154,17 +154,6 @@ def rd_mkdir(path):
     return None
 
 
-def rd_open(filepath, mode):
-    """Opens a file on a local network drive
-
-    Args:
-        filepath (string) -- The filepath
-        mode (string) -- The mode to open the file in
-    """
-    file = open(filepath, mode)
-    return file
-
-
 @time_logger_wrap
 def rd_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
