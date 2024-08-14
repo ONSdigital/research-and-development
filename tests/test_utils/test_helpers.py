@@ -49,5 +49,5 @@ class TestValuesInColumn(object):
             values=values
         )
         assert result == expected, (
-            "Retruned value from values_in_column not as expected."
+            "Returned value from values_in_column not as expected."
         )
