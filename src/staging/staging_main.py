@@ -78,11 +78,11 @@ def run_staging(  # noqa: C901
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
         elif stage_updated_snapshot:
-            updated_snapshot_name = os.path.basename(
+            snapshot_name = os.path.basename(
                 staging_dict["updated_snapshot_path"]
             ).split(".", 1)[0]
             feather_file = os.path.join(
-                feather_path, f"{updated_snapshot_name}.feather"
+                feather_path, f"{snapshot_name}.feather"
             )
 
         # Check if the if the snapshot feather exists
@@ -132,7 +132,7 @@ def run_staging(  # noqa: C901
                 write_csv,
             )
 
-            # Write both snapshots to feather file at given path
+            # Write snapshot to feather file at given path
             if is_network:
                 feather_fname = f"{snapshot_name}.feather"
                 helpers.df_to_feather(
