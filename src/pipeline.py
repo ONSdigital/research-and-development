@@ -60,7 +60,6 @@ def run_pipeline(user_config_path, dev_config_path):
     runlog_obj = runlog.RunLog(
         config,
         version,
-        mods.rd_open,
         mods.rd_file_exists,
         mods.rd_mkdir,
         mods.rd_read_csv,
