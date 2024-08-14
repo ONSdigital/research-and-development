@@ -280,6 +280,7 @@ def apply_additions(
     accepted_additions_df = additions_df[
         additions_df.reference.isin(changes_refs)
     ]
+    accepted_additions_df = accepted_additions_df.drop("accept_changes", axis=1)
     if accepted_additions_df.shape[0] > 0:
         accepted_additions_df = _add_last_frozen_column(accepted_additions_df, run_id)
         added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
