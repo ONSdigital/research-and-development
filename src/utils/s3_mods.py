@@ -13,6 +13,9 @@ import os
 
 from rdsa_utils.cdp.helpers.s3_utils import *
 
+# set up logging
+rd_logger = logging.getLogger(__name__)
+
 #########################################################################
 
 working_dir = r"/home/cdsw/research-and-development"
@@ -41,29 +44,38 @@ def create_client(config):
 
 ################################################################################
 # Read a CSV file into a Pandas dataframe
-def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
-    """Reads a csv from s3 bucket into a Pandas Dataframe
+def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
+    """Reads a csv from s3 bucket into a Pandas Dataframe using pydoop. 
+    If "thousands" argument is not specified, sets it to ",". 
+    Allows to use any additional keyword arguments of Pandas read_csv method.
+
     Args:
         filepath (str): Filepath (Specified in config)
-        cols (List[str]): Optional list of columns to be read in
+        kwargs: Optional dictionary of Pandas read_csv arguments
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
+    # Open the boto3 client
     s3_client = config["client"]
     with s3_client.get_object(
         Bucket=config["s3"]["s3_bucket"],
         Key=filepath
-        )['Body'] as csv_file:
-        if not cols:
-            df_from_s3 = pd.read_csv(csv_file, thousands=',')
-        else:
-            try:
-                df_from_s3 = pd.read_csv(csv_file, usecols=cols, thousands=',')
-            except Exception:
-                s3_logger.error(f"Could not find specified columns in {filepath}")
-                s3_logger.info("Columns specified: " + str(cols))
-                raise ValueError
-    return df_from_s3
+    )['Body'] as file:
+        
+        # If "thousands" argument is not specified, set it to ","
+        if "thousands" not in kwargs:
+            kwargs["thousands"] = ","
+
+        # Read the scv file using the path and keyword arguments
+        try:
+            df = pd.read_csv(file, **kwargs)
+        except Exception:
+            if "usecols" in kwargs:
+                rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
+            rd_logger.error(f"Could not read specified file: {filepath}")
+
+            raise ValueError
+    return df
   
 
 ###############################################################################
@@ -73,7 +85,7 @@ config["client"] = s3_client
 
 ###############################################################################
 #mypath = 'user/george.zorinyants/pg_num_alpha_2023.csv'
-#mydf = rd_read_csv(mypath, ['value'])
+#mydf = rd_read_csv(mypath, usecols=["coutry"])
 #mydf.head()
 
 def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
@@ -104,27 +116,30 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
     return None
 
 # Create a dataframe and write to a CSV file
-my_data = {"coutry": ["a", "b"], "value": [1, 2]}
-df = pd.DataFrame(my_data)
-df.head()
-mypath = "user/george.zorinyants/test_rd_write.csv"
-rd_write_csv(mypath, df)
+#my_data = {"coutry": ["a", "b"], "value": [1, 2]}
+#df = pd.DataFrame(my_data)
+#df.head()
+#mypath = "user/george.zorinyants/test2_rd_write.csv"
+#rd_write_csv(mypath, df)
 
 
+def rd_load_json(filepath: str) -> dict:
+    """Function to load JSON data from s3 bucket
+    Args:
+        filepath (string): The filepath in Hue
+    """
+    # Use the boto3 client from the config
+    s3_client = config["client"]
+    
+    # Load the json file using the client method
+    with s3_client.get_object(Bucket=config["s3"]["s3_bucket"], Key=filepath)['Body'] as json_file:
+        datadict = json.load(json_file)
+    
+    return datadict
 
-# def hdfs_load_json(filepath: str) -> dict:
-#     """Function to load JSON data from DAP
-#     Args:
-#         filepath (string): The filepath in Hue
-#     """
-
-#     # Open the file in read mode inside Hadoop context
-#     with hdfs.open(filepath, "r") as file:
-#         # Import csv file and convert to Dataframe
-#         datadict = json.load(file)
-
-#     return datadict
-
+mypath = "user/george.zorinyants/snapshot.json"
+mydict = rd_load_json(mypath)
+print(mydict)
 
 # def hdfs_file_exists(filepath: str, raise_error=False) -> bool:
 #     """Function to check file exists in hdfs.
