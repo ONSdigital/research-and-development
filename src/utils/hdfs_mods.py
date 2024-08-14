@@ -167,17 +167,6 @@ def rd_mkdir(path):
     return None
 
 
-def rd_open(filepath, mode):
-    """Function to open a file in HDFS
-
-    Args:
-        filepath (string) -- The filepath in Hue
-        mode (string) -- The mode to open the file in
-    """
-    file = hdfs.open(filepath, mode)
-    return file
-
-
 @time_logger_wrap
 def rd_write_feather(filepath, df):
     """Function to write dataframe as feather file in HDFS"""
