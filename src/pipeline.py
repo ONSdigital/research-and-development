@@ -113,9 +113,13 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
-    full_responses = run_freezing(
-        full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id
-    )
+    full_responses = run_freezing(full_responses,
+                                  config,
+                                  mods.rd_write_csv,
+                                  mods.rd_read_csv,
+                                  mods.rd_file_exists,
+                                  run_id
+                                )
     MainLogger.info("Finished Freezing...")
 
     MainLogger.info("Finished Data Ingest.")

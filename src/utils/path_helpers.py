@@ -58,7 +58,6 @@ def create_staging_config(config: dict) -> dict:
     berd_path = paths["berd_path"]
 
     staging_dict = create_module_config(config, "staging")
-
     # add new paths to the staging section of the config
     staging_dict["frozen_snapshot_path"] = paths["frozen_snapshot_path"]
     staging_dict["updated_snapshot_path"] = paths["updated_snapshot_path"]
