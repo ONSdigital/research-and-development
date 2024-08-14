@@ -33,25 +33,28 @@ rd_logger = logging.getLogger(__name__)
 
 
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
-    """Reads a csv from DAP into a Pandas Dataframe
+    """Reads a csv from DAP into a Pandas Dataframe. If "thousands" argument is
+    not specified, sets it to ","
     Args:
         filepath (str): Filepath (Specified in config)
-        **kwargs: Keyward arguments of Pandas read_csv
+        kwargs: Optional dictionary of Pandas read_csv arguments
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
     # Open the file in read mode inside Hadoop context
     with hdfs.open(filepath, "r") as file:
-        # Import csv file and convert to Dataframe
-        if not cols:
-            df_from_hdfs = pd.read_csv(file, thousands=",")
-        else:
-            try:
-                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=",")
-            except Exception:
-                rd_logger.error(f"Could not find specified columns in {filepath}")
-                rd_logger.info("Columns specified: " + str(cols))
-                raise ValueError
+        # If "thousands" argument is not specified, set it to ","
+        if "thousands" not in kwargs:
+            kwargs["thousands"] = ","
+        
+        # Read the scv file using the path and keyword arguments
+        try:
+            df_from_hdfs = pd.read_csv(file, **kwargs)
+        except Exception:
+            rd_logger.error(f"Could not read specified file: {filepath}")
+            if "usecols" in kwargs:
+                rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
+            raise ValueError
     return df_from_hdfs
 
 
@@ -160,6 +163,17 @@ def rd_mkdir(path):
     """
     hdfs.mkdir(path)
     return None
+
+
+def rd_open(filepath, mode):
+    """Function to open a file in HDFS
+
+    Args:
+        filepath (string) -- The filepath in Hue
+        mode (string) -- The mode to open the file in
+    """
+    file = hdfs.open(filepath, mode)
+    return file
 
 
 @time_logger_wrap
