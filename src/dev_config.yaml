@@ -11,7 +11,7 @@ global:
   platform: "network" #whether to load from hdfs, network (Windows) or s3 (CDP)
   # Construction Settings
   load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: False
+  load_from_feather: True
   # Apportionment to sites settings
   apportion_sites: True
 runlog_writer:
