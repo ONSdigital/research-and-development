@@ -11,7 +11,7 @@ from typing import List
 import subprocess
 import os
 
-from rdsa_utils.cdp.helpers.s3_utils import *
+from rdsa_utils.cdp.helpers.s3_utils import file_exists
 
 # set up logging
 rd_logger = logging.getLogger(__name__)
@@ -141,23 +141,28 @@ mypath = "user/george.zorinyants/snapshot.json"
 mydict = rd_load_json(mypath)
 print(mydict)
 
-# def hdfs_file_exists(filepath: str, raise_error=False) -> bool:
-#     """Function to check file exists in hdfs.
+def rd_file_exists(filepath: str, raise_error=False) -> bool:
+    """Function to check file exists in hdfs.
 
-#         Args:
-#             filepath (string) -- The filepath in Hue
+        Args:
+            filepath (string) -- The filepath in s3
 
-#         Returns:
-#             Bool - A boolean value which is true if file exists
-#     .
-#     """
+        Returns:
+            Bool - A boolean value which is true if file exists
+    """
 
-#     file_exists = hdfs.path.exists(filepath)
+    result = file_exists(
+        client=config["client"],
+        bucket_name=config["s3"]["s3_bucket"],
+        object_name=filepath)
 
-#     if not file_exists and raise_error:
-#         raise FileExistsError(f"File: {filepath} does not exist")
+    if not result and raise_error:
+        raise FileExistsError(f"File: {filepath} does not exist")
 
-#     return file_exists
+    return result
+
+mypath = "user/george.zorinyants/snapshot.json"
+print(rd_file_exists(mypath))
 
 
 # def hdfs_file_size(filepath: str) -> int:
