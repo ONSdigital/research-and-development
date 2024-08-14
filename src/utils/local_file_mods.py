@@ -44,7 +44,7 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         
         # Read the scv file using the path and keyword arguments
         try:
-            df_from_hdfs = pd.read_csv(file, **kwargs)
+            df = pd.read_csv(file, **kwargs)
         except Exception:
             rd_logger.error(f"Could not read specified file: {filepath}")
             if "usecols" in kwargs:

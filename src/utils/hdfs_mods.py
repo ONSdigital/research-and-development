@@ -33,8 +33,10 @@ rd_logger = logging.getLogger(__name__)
 
 
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
-    """Reads a csv from DAP into a Pandas Dataframe. If "thousands" argument is
-    not specified, sets it to ","
+    """Reads a csv from HDFS into a Pandas Dataframe using pydoop. 
+    If "thousands" argument is not specified, sets it to ",". 
+    Allows to use any additional keyword arguments of Pandas read_csv method.
+
     Args:
         filepath (str): Filepath (Specified in config)
         kwargs: Optional dictionary of Pandas read_csv arguments
@@ -49,13 +51,13 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         
         # Read the scv file using the path and keyword arguments
         try:
-            df_from_hdfs = pd.read_csv(file, **kwargs)
+            df = pd.read_csv(file, **kwargs)
         except Exception:
             rd_logger.error(f"Could not read specified file: {filepath}")
             if "usecols" in kwargs:
                 rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
             raise ValueError
-    return df_from_hdfs
+    return df
 
 
 def rd_write_csv(filepath: str, data: pd.DataFrame):
