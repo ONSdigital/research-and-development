@@ -5,8 +5,9 @@ from typing import Callable
 
 import pandas as pd
 
+from src.freezing.freezing_utils import  _add_last_frozen_column
+from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
-from src.utils.defence import type_defence
 from src.utils.helpers import convert_formtype
 from src.freezing.freezing_compare import get_additions, get_amendments, output_freezing_files
 
@@ -19,6 +20,7 @@ def run_freezing(
     config: dict,
     write_csv: Callable,
     read_csv: Callable,
+    check_file_exists: Callable,
     run_id: int,
 ) -> pd.DataFrame:
     """Run the freezing module.
@@ -30,6 +32,7 @@ def run_freezing(
             hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs or
             network version depending on settings.
+        check_file_exists (callable): Function to check if a file exists.
         run_id (int): The run id for this run.
     Returns:
         prepared_frozen_data (pd.DataFrame): As snapshot_df but with records amended
@@ -55,6 +58,14 @@ def run_freezing(
         )
         prepared_frozen_data = snapshot_df.copy()
 
+    # Read the freezing files and apply them
+    elif run_updates_and_freeze:
+        frozen_data = read_frozen_csv(config, read_csv)
+        prepared_frozen_data = apply_freezing(
+            frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
+        )
+        prepared_frozen_data.reset_index(drop=True, inplace=True)
+
     elif run_frozen_data:
         prepared_frozen_data = read_frozen_csv(config, read_csv)
 
@@ -62,12 +73,6 @@ def run_freezing(
         prepared_frozen_data = snapshot_df.copy()
         prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
-
-    # # Read the freezing files from the last run and apply them
-    # constructed_df = apply_freezing(
-    #     main_snapshot, config, check_file_exists, read_csv, write_csv, run_id
-    # )
-    # constructed_df.reset_index(drop=True, inplace=True)
 
     if run_with_snapshot_until_freezing or run_updates_and_freeze:
         frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
@@ -82,25 +87,6 @@ def run_freezing(
         )
 
     return prepared_frozen_data
-
-
-# function ready for use
-def _add_last_frozen_column(frozen_df: pd.DataFrame, run_id: int) -> pd.DataFrame:
-    """Add the last_frozen column to staged data.
-
-    Args:
-        frozen_df (pd.DataFrame): The frozen data.
-        run_id (int): The current run id.
-
-    Returns:
-        pd.DataFrame: A dataframe containing the updated last_frozen column.
-    """
-    type_defence(frozen_df, "frozen_df", pd.DataFrame)
-    type_defence(run_id, "run_id", int)
-    todays_date = datetime.today().strftime("%y-%m-%d")
-    last_frozen = f"{todays_date}_v{str(run_id)}"
-    frozen_df["last_frozen"] = last_frozen
-    return frozen_df
 
 
 def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
