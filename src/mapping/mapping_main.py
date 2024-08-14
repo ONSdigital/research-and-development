@@ -20,7 +20,9 @@ def run_mapping(
     ni_full_responses,
     postcode_mapper,
     config: dict,
-    write_csv: Callable,
+    rd_read_csv: Callable,
+    rd_write_csv: Callable,
+    rd_file_exists: Callable,
     run_id: int,
 ):
 
@@ -29,7 +31,8 @@ def run_mapping(
         "ultfoc_mapper_path",
         config,
         MappingMainLogger,
-        mods,
+        rd_file_exists,
+        rd_read_csv
     )
 
     # Load ITL mapper
@@ -37,7 +40,8 @@ def run_mapping(
         "itl_mapper_path",
         config,
         MappingMainLogger,
-        mods,
+        rd_file_exists,
+        rd_read_csv,
     )
 
     # Loading cell number coverage
@@ -45,7 +49,8 @@ def run_mapping(
         "cellno_path",
         config,
         MappingMainLogger,
-        mods,
+        rd_file_exists,
+        rd_read_csv,    
     )
 
     # Load and validate the PG mappers
@@ -53,7 +58,8 @@ def run_mapping(
         "pg_num_alpha_mapper_path",
         config,
         MappingMainLogger,
-        mods,
+        rd_file_exists,
+        rd_read_csv,
     )
     val.validate_many_to_one(pg_num_alpha, "pg_numeric", "pg_alpha")
 
@@ -62,7 +68,8 @@ def run_mapping(
         "sic_pg_num_mapper_path",
         config,
         MappingMainLogger,
-        mods,
+        rd_file_exists,
+        rd_read_csv,
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
@@ -73,7 +80,8 @@ def run_mapping(
             "ref_list_817_mapper_path",
             config,
             MappingMainLogger,
-            mods,
+            rd_file_exists,
+            rd_read_csv,
         )
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
 
@@ -101,7 +109,9 @@ def run_mapping(
         full_responses_filename = (
             f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
         )
-        write_csv(os.path.join(qa_path, full_responses_filename), full_responses)
+        rd_write_csv(
+            os.path.join(qa_path, full_responses_filename), full_responses
+        )
     MappingMainLogger.info("Finished Mapping QA calculation.")
 
     if config["global"]["output_mapping_ni_qa"] and not ni_full_responses.empty:
@@ -109,7 +119,9 @@ def run_mapping(
         full_responses_NI_filename = (
             f"{survey_year}_full_responses_ni_mapped_{tdate}_v{run_id}.csv"
         )
-        write_csv(os.path.join(qa_path, full_responses_NI_filename), ni_full_responses)
+        rd_write_csv(
+            os.path.join(qa_path, full_responses_NI_filename), ni_full_responses
+        )
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df

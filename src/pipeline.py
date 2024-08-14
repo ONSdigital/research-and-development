@@ -108,7 +108,6 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         mods.rd_read_feather,
         mods.rd_write_feather,
-        mods.rd_isfile,
         run_id,
     )
 
@@ -148,7 +147,9 @@ def run_pipeline(user_config_path, dev_config_path):
         ni_df,
         postcode_mapper,
         config,
+        mods.rd_read_csv,
         mods.rd_write_csv,
+        mods.rd_file_exists,
         run_id,
     )
     MainLogger.info("Finished Mapping...")
