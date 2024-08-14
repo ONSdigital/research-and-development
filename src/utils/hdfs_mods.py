@@ -32,11 +32,11 @@ except ImportError:
 rd_logger = logging.getLogger(__name__)
 
 
-def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
+def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     """Reads a csv from DAP into a Pandas Dataframe
     Args:
         filepath (str): Filepath (Specified in config)
-        cols (List[str]): Optional list of columns to be read in
+        **kwargs: Keyward arguments of Pandas read_csv
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
