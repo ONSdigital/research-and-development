@@ -136,3 +136,13 @@ def rd_mkdir(path: str):
     ) 
     
     return None
+
+
+def rd_write_feather(filepath, df):
+    """Placeholder Function to write dataframe as feather file in HDFS"""
+    return None
+
+
+def rd_read_feather(filepath):
+    """Placeholder Function to read feather file from HDFS"""
+    return None
