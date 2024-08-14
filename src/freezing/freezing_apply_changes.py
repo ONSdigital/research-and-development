@@ -240,6 +240,9 @@ def apply_amendments(
     # update last_frozen column
     accepted_amendments_df = _add_last_frozen_column(accepted_amendments_df, run_id)
 
+    # drop records to be amended from main df
+    main_df = main_df[~main_df.reference.isin(changes_refs)]
+
     # add amended records to main df
     amended_df = pd.concat([main_df, accepted_amendments_df])
 
