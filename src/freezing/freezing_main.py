@@ -59,7 +59,7 @@ def run_freezing(
         prepared_frozen_data = read_frozen_csv(config, read_csv)
 
     else:
-        prepared_frozen_data = main_snapshot.copy()
+        prepared_frozen_data = snapshot_df.copy()
         prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
 
