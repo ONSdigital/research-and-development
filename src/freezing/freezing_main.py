@@ -20,6 +20,7 @@ def run_freezing(
     config: dict,
     write_csv: Callable,
     read_csv: Callable,
+    check_file_exists: Callable,
     run_id: int,
 ) -> pd.DataFrame:
     """Run the freezing module.
@@ -31,6 +32,7 @@ def run_freezing(
             hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs or
             network version depending on settings.
+        check_file_exists (callable): Function to check if a file exists.
         run_id (int): The run id for this run.
     Returns:
         prepared_frozen_data (pd.DataFrame): As snapshot_df but with records amended
@@ -56,6 +58,14 @@ def run_freezing(
         )
         prepared_frozen_data = snapshot_df.copy()
 
+    # Read the freezing files and apply them
+    elif run_updates_and_freeze:
+        frozen_data = read_frozen_csv(config, read_csv)
+        prepared_frozen_data = apply_freezing(
+            frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
+        )
+        prepared_frozen_data.reset_index(drop=True, inplace=True)
+
     elif run_frozen_data:
         prepared_frozen_data = read_frozen_csv(config, read_csv)
 
@@ -63,14 +73,6 @@ def run_freezing(
         prepared_frozen_data = snapshot_df.copy()
         prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
-
-    # # Read the freezing files from the last run and apply them
-    if run_updates_and_freeze:
-        frozen_data = read_frozen_csv(config, read_csv)
-        prepared_frozen_data = apply_freezing(
-            frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
-        )
-        prepared_frozen_data.reset_index(drop=True, inplace=True)
 
     if run_with_snapshot_until_freezing or run_updates_and_freeze:
         frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
@@ -85,6 +87,7 @@ def run_freezing(
         )
 
     return prepared_frozen_data
+
 
 def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
     """Read the frozen data csv in.
