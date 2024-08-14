@@ -293,8 +293,8 @@ def validate_config(config: dict) -> None:
 def validate_freezing_config_settings(user_config):
     """Check that correct combination of freezing settings are used."""
 
-    run_first_snapshot_of_results = user_config["global"][
-        "run_first_snapshot_of_results"
+    run_with_snapshot_until_freezing = user_config["global"][
+        "run_with_snapshot_until_freezing"
     ]
     run_frozen_data = user_config["global"]["run_frozen_data"]
     frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
@@ -307,12 +307,12 @@ def validate_freezing_config_settings(user_config):
     freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
     freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
 
-    if run_first_snapshot_of_results and run_frozen_data:
+    if run_with_snapshot_until_freezing and run_frozen_data:
         raise ValueError(
             "Cannot run first snapshot of results and run frozen data at the same time."
         )
 
-    if run_first_snapshot_of_results:
+    if run_with_snapshot_until_freezing:
         if frozen_snapshot_path is None:
             raise ValueError(
                 "If running first snapshot of results, a frozen snapshot path must be"
