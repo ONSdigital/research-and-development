@@ -7,7 +7,31 @@ from src.freezing.freezing_compare import get_amendments, get_additions
 
 
 class TestGetAmendments:
-    """Tests for get_amendments()"""
+    """Tests for get_amendments()."""
+
+    def add_numeric_cols(
+        self,
+        df,
+        expected = False
+    ) -> pd.DataFrame:
+        """Numerical columns for test dataframes."""
+        numeric_cols = [
+            "203", "204", "205", "206", "207", "209", "210",
+            "211", "212", "214", "216", "218", "219", "220", "221", "222",
+            "223", "225", "226", "227", "228", "229", "237", "242", "243",
+            "244", "245", "246", "247", "248", "249", "250", "405", "406",
+            "407", "408", "409", "410", "411", "412", "501", "502", "503",
+            "504", "505", "506", "507", "508", "602", "701", "702", "703",
+            "704", "705", "706", "707", "709", "711",
+        ]
+        for col in numeric_cols:
+            df[col] = None
+        if expected:
+            for col in numeric_cols:
+                df[f"{col}_diff"] = None
+        return df
+
+
     # Create test frozen df
     def create_test_frozen_df(self) -> pd.DataFrame:
         """Create a test frozen df."""
@@ -20,20 +44,7 @@ class TestGetAmendments:
             ["E", 202412, None, 4.0, 5.0, "E", "F"],
         ]
         input_frozen_df = pd.DataFrame(data=data, columns=input_cols)
-
-        numeric_cols = [
-            "203", "204", "205", "206", "207", "209", "210",
-            "211", "212", "214", "216", "218", "219", "220", "221", "222",
-            "223", "225", "226", "227", "228", "229", "237", "242", "243",
-            "244", "245", "246", "247", "248", "249", "250", "405", "406",
-            "407", "408", "409", "410", "411", "412", "501", "502", "503",
-            "504", "505", "506", "507", "508", "602", "701", "702", "703",
-            "704", "705", "706", "707", "709", "711",
-        ]
-
-        for col in numeric_cols:
-            input_frozen_df[col] = None
-
+        input_frozen_df = self.add_numeric_cols(input_frozen_df)
         return input_frozen_df
 
 
@@ -49,20 +60,7 @@ class TestGetAmendments:
             ["E", 202412, None, 10.0, 1.0, "E", "F"], # 201 & 202 by 6, -4
         ]
         input_amendments_df = pd.DataFrame(data=data, columns=input_cols)
-
-        numeric_cols = [
-            "203", "204", "205", "206", "207", "209", "210",
-            "211", "212", "214", "216", "218", "219", "220", "221", "222",
-            "223", "225", "226", "227", "228", "229", "237", "242", "243",
-            "244", "245", "246", "247", "248", "249", "250", "405", "406",
-            "407", "408", "409", "410", "411", "412", "501", "502", "503",
-            "504", "505", "506", "507", "508", "602", "701", "702", "703",
-            "704", "705", "706", "707", "709", "711",
-        ]
-
-        for col in numeric_cols:
-            input_amendments_df[col] = None
-
+        input_amendments_df = self.add_numeric_cols(input_amendments_df)
         return input_amendments_df
 
 
@@ -78,22 +76,7 @@ class TestGetAmendments:
             ["E", 202412, None, 10.0, 1.0, "E", "F", 6.0, -4.0, None, None, False],
         ]
         input_expected_outcome_df = pd.DataFrame(data=data, columns=input_cols)
-
-        numeric_cols = [
-            "203", "204", "205", "206", "207", "209", "210",
-            "211", "212", "214", "216", "218", "219", "220", "221", "222",
-            "223", "225", "226", "227", "228", "229", "237", "242", "243",
-            "244", "245", "246", "247", "248", "249", "250", "405", "406",
-            "407", "408", "409", "410", "411", "412", "501", "502", "503",
-            "504", "505", "506", "507", "508", "602", "701", "702", "703",
-            "704", "705", "706", "707", "709", "711",
-        ]
-
-        for col in numeric_cols:
-            input_expected_outcome_df[col] = None
-        for col in numeric_cols:
-            input_expected_outcome_df[f"{col}_diff"] = None
-
+        input_expected_outcome_df = self.add_numeric_cols(input_expected_outcome_df, expected = True)
         return input_expected_outcome_df
 
 
@@ -111,11 +94,10 @@ class TestGetAmendments:
 
         expected_outcome_df = expected_outcome_df[result.columns]
 
-        print(result)
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result
-        ), "get amends output is not as expected"
+        ), "get_amendments() output is not as expected."
 
 
 class TestGetAdditions:
@@ -132,7 +114,6 @@ class TestGetAdditions:
             ["E", 202412, None, 4.0],
         ]
         input_frozen_df = pd.DataFrame(data=data, columns=input_cols)
-
         return input_frozen_df
 
 
@@ -151,7 +132,6 @@ class TestGetAdditions:
             ["H", 202412, 1.0, None]
         ]
         input_additions_df = pd.DataFrame(data=data, columns=input_cols)
-
         return input_additions_df
 
 
@@ -165,7 +145,6 @@ class TestGetAdditions:
             ["H", 202412, 1.0, None, False]
         ]
         input_expected_outcome_df = pd.DataFrame(data=data, columns=input_cols)
-
         return input_expected_outcome_df
 
 
@@ -184,4 +163,4 @@ class TestGetAdditions:
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result.reset_index(drop=True)
-        ), "get additions output is not as expected"
+        ), "get_additions() output is not as expected."
