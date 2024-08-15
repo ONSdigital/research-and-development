@@ -267,7 +267,7 @@ def apply_additions(
         added_df (pd.DataFrame): The main snapshot with additions applied.
     """
     if not validate_additions_df(main_df, additions_df, freezing_logger):
-        freezing_logger("Skipping additions since the additions csv is invalid...")
+        freezing_logger.info("Skipping additions since the additions csv is invalid...")
         return main_df
     # Drop records where accept_changes is False and if any remain, add them to main df
     changes_refs = additions_df[

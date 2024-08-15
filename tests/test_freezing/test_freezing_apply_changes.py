@@ -160,11 +160,11 @@ class TestApplyAmendments(object):
     def test_apply_amendments_invalid(self, frozen_df, dummy_amendments, caplog):
         """Tests for apply_amendments when amendments_df is invalid."""
         with caplog.at_level(logging.INFO):
-            # alter amendments
+            # alter additions
             dummy_amendments["reference"] = 6
             result = apply_amendments(frozen_df, dummy_amendments, 1, test_logger)
             assert_frame_equal(result, frozen_df), (
-                "Original df not returned when no amendments are found"
+                "Original df not returned when amendments are invalid."
             )
             # check logger messages
             expected_logs = [
@@ -175,15 +175,14 @@ class TestApplyAmendments(object):
             for log in expected_logs:
                 assert (log in records), ("error")
 
-
     def test_apply_amendments_no_amendments(self, frozen_df, dummy_amendments, caplog):
         """Tests for apply_amendments when the amendments df is empty."""
         with caplog.at_level(logging.INFO):
-            # alter amendments
+            # alter additions
             dummy_amendments["accept_changes"] = False
             result = apply_amendments(frozen_df, dummy_amendments, 1, test_logger)
             assert_frame_equal(result, frozen_df), (
-                "Original df not returned when amendments are invalid..."
+                "Original df not returned when no amendments are found."
             )
             # check logger messages
             expected_logs = [
@@ -193,4 +192,82 @@ class TestApplyAmendments(object):
             records = [rec.msg for rec in caplog.records]
             for log in expected_logs:
                 assert (log in records), ("error")
-                
+
+
+class TestApplyAdditions(object):
+    """Tests for apply_additions."""
+
+    @pytest.fixture(scope="function")
+    def dummy_additions(self) -> pd.DataFrame:
+        """A dummy amendments dataframe."""
+        columns = ["reference", "instance", "num", "non_num", "accept_changes"]
+        data = [
+            [3, 0, 10, True, True],
+            [3, 1, 11, False, False],
+        ]
+        df = pd.DataFrame(columns=columns, data=data)
+        return df
+
+    def expected_additions(self) -> pd.DataFrame:
+        """The expected dataframe after amendments are applied."""
+        columns = ["reference", "instance", "num", "non_num"]
+        data = [
+            [0, 1, 4, True],
+            [0, 2, 5, False],
+            [1, 1, 8, True],
+            [1, 2, 9, True],
+            [2, 1, 10, False],
+            [3, 0, 10, True],
+            [3, 1, 11, False],
+        ]
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
+
+    def test_apply_additions(self, frozen_df, dummy_additions):
+        """General tests for apply_additions"""
+        amended = apply_additions(frozen_df, dummy_additions, 1, test_logger)
+        amended.drop("last_frozen", axis=1, inplace=True)
+        amended.sort_values(by=["reference", "instance"], ascending=True, inplace=True)
+        expected = self.expected_additions()
+        print(amended)
+        print(expected)
+        assert_frame_equal(amended, expected), (
+            "Additions not applied as expected."
+        )
+
+    def test_apply_additions_invalid(self, frozen_df, dummy_additions, caplog):
+        """Tests for apply_additions when additions_df is invalid."""
+        with caplog.at_level(logging.INFO):
+            # alter amendments
+            dummy_additions["reference"] = 0
+            result = apply_additions(frozen_df, dummy_additions, 1, test_logger)
+            print(result)
+            assert_frame_equal(result, frozen_df), (
+                "Original df not returned when additions are invalid"
+            )
+            # check logger messages
+            expected_logs = [
+                "Skipping additions since the additions csv is invalid..."
+
+            ]
+            records = [rec.msg for rec in caplog.records]
+            for log in expected_logs:
+                assert (log in records), ("error")
+
+    def test_apply_additions_no_amendments(self, frozen_df, dummy_additions, caplog):
+        """Tests for apply_additions when the additions df is empty."""
+        with caplog.at_level(logging.INFO):
+            # alter amendments
+            dummy_additions["accept_changes"] = False
+            result = apply_additions(frozen_df, dummy_additions, 1, test_logger)
+            assert_frame_equal(result, frozen_df), (
+                "Original df not returned when additions are invalid..."
+            )
+            # check logger messages
+            expected_logs = [
+                "Additions file contained no records marked for inclusion"
+
+            ]
+            records = [rec.msg for rec in caplog.records]
+            for log in expected_logs:
+                assert (log in records), ("error")
