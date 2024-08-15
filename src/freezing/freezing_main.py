@@ -5,7 +5,7 @@ from typing import Callable
 
 import pandas as pd
 
-from src.freezing.freezing_utils import  _add_last_frozen_column
+from src.freezing.freezing_utils import  _add_last_frozen_column, validate_main_config
 from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
 from src.utils.helpers import convert_formtype
@@ -38,11 +38,14 @@ def run_freezing(
         prepared_frozen_data (pd.DataFrame): As snapshot_df but with records amended
             and added from the freezing files.
     """
-    # Determine freezing settings
-    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
-    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
-    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
-    run_frozen_data = config["global"]["run_frozen_data"]
+    
+    # Determine and validate freezing settings
+    (
+        run_with_snapshot_until_freezing,
+        load_updated_snapshot_for_comparison,
+        run_updates_and_freeze, 
+        run_frozen_data,
+    ) = validate_main_config(config)
 
     if load_updated_snapshot_for_comparison:
         FreezingLogger.info("Comparing the updated snapshot with the frozen data.")
