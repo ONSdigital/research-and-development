@@ -102,7 +102,7 @@ def validate_any_refinst_in_frozen(
     df2_copy["refinst"] = (
         df2_copy["reference"].astype(str) + df2_copy["instance"].astype(str)
     )
-    result = any([x in frozen_copy["refinst"] for x in df2_copy["refinst"]])
+    result = any([x in list(frozen_copy["refinst"]) for x in list(df2_copy["refinst"])])
     return result
 
 
@@ -121,7 +121,7 @@ def validate_all_refinst_in_frozen(
     """
     frozen_copy = frozen_df.copy()
     frozen_copy["refinst"] = (
-        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(str)
+        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(float).astype(str)
     )
     result = values_in_column(
         frozen_copy,
