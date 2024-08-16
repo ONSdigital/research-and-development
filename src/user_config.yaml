@@ -18,7 +18,7 @@ global:
   run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
-  load_backdata: False  # whether to load previous year data for MoR
+  load_backdata: True  # whether to load previous year data for MoR
   # Backdata output settings
   output_backdata: False
   # QA output settings
@@ -26,8 +26,8 @@ global:
   output_pnp_full_responses: False
   output_ni_full_responses: False
   output_mapping_qa: False
-  output_imputation_qa: False
   output_mapping_ni_qa: False
+  output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
@@ -56,7 +56,7 @@ hdfs_paths:
   feather_path: "staging/feather"
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged" # path for folder
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v906" # path to file
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v906" # pragma: allowlist secret
   freezing_changes_to_review_path: "02_freezing/changes_to_review"
   freezing_additions_path: "02_freezing/freezing_updates"
   freezing_amendments_path: "02_freezing/freezing_updates"
