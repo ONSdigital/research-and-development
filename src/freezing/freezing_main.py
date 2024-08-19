@@ -38,7 +38,8 @@ def run_freezing(
         prepared_frozen_data (pd.DataFrame): As snapshot_df but with records amended
             and added from the freezing files.
     """
-    # Determine freezing settings
+    
+    # read in validated config settings
     run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
     load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
