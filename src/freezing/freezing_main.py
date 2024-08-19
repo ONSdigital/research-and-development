@@ -39,13 +39,11 @@ def run_freezing(
             and added from the freezing files.
     """
     
-    # Determine and validate freezing settings
-    (
-        run_with_snapshot_until_freezing,
-        load_updated_snapshot_for_comparison,
-        run_updates_and_freeze, 
-        run_frozen_data,
-    ) = validate_main_config(config)
+    # read in validated config settings
+    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
+    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
+    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+    run_frozen_data = config["global"]["run_frozen_data"]
 
     if load_updated_snapshot_for_comparison:
         FreezingLogger.info("Comparing the updated snapshot with the frozen data.")
