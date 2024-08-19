@@ -51,8 +51,8 @@ class TestValidateAnyRefinstInFrozen(object):
     def test_validate_any_refinst_in_frozen_true(self, dummy_refinst_df):
         """A test for validate_any_refinst_in_frozen returning 'True'."""
         df2 = create_refinst_df(data=[
-                [0, 1, True],#present
-                [5, 1, True],#not present
+                [0, 1, True], # present
+                [5, 1, True], # not present
             ]
         )
         result = validate_any_refinst_in_frozen(dummy_refinst_df, df2)
@@ -64,8 +64,8 @@ class TestValidateAnyRefinstInFrozen(object):
     def test_validate_any_refinst_in_frozen_false(self, dummy_refinst_df):
         """A test for validate_any_refinst_in_frozen returning 'False'."""
         df2 = create_refinst_df(data=[
-                [0, 3, True],#not present
-                [5, 1, True],#not present
+                [0, 3, True], # not present
+                [5, 1, True], # not present
             ]
         )
         result = validate_any_refinst_in_frozen(dummy_refinst_df, df2)
@@ -80,8 +80,8 @@ class TestValidateAllRefinstInFrozen(object):
     def test_validate_all_refinst_in_frozen_true(self, dummy_refinst_df):
         """A test for validate_all_refinst_in_frozen returning 'True'."""
         df2 = create_refinst_df(data=[
-                [0, 1, True],#present
-                [2, 0, True],#present
+                [0, 1, True], # present
+                [2, 0, True], # present
             ]
         )
         result = validate_all_refinst_in_frozen(dummy_refinst_df, df2)
@@ -92,8 +92,8 @@ class TestValidateAllRefinstInFrozen(object):
     def test_validate_all_refinst_in_frozen_false(self, dummy_refinst_df):
         """A test for validate_all_refinst_in_frozen returning 'False'."""
         df2 = create_refinst_df(data=[
-                [0, 1, True],#present
-                [5, 1, True],#not present
+                [0, 1, True], # present
+                [5, 1, True], # not present
             ]
         )
         result = validate_all_refinst_in_frozen(dummy_refinst_df, df2)
