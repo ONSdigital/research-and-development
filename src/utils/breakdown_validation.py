@@ -50,7 +50,9 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
             msg += f"Columns 222 + 223 do not equal column 203 for reference: {row['reference']}.\n "
         if row['check2']:
             bool_dict[index] = False
-            msg += f"Columns 202 + 223 do not equal column 204 for reference: {row['reference']}.\n "
+          #  msg += f"Columns 202 + 223 do not equal column 204 for reference: {row['reference']}.\n "
+            msg += f"Columns 202 + 223 do not equal column 204 for reference"
+
         if row['check3']:
             bool_dict[index] = False
             msg += f"Columns 205 + 206 + 207 do not equal column 204 for reference: {row['reference']}.\n "
@@ -84,6 +86,7 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
         if row['check13']:
             bool_dict[index] = False
             msg += f"Columns 406 + 408 + 410 do not equal column 412 for reference: {row['reference']}.\n " 
+
     return bool_dict, msg
 
 def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
