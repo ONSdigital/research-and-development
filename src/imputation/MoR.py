@@ -133,12 +133,23 @@ def carry_forwards(df, backdata, impute_vars):
     match_cond = df["_merge"] == "both"
 
     # Replace the values of certain columns with the values from the back data
-    replace_vars = ["instance", "200", "201", "601", "602", "604", "imp_class"]
+    replace_vars = ["instance", "200", "201", "601", "602", "604"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
     # Update the postcodes_harmonised column from the updated column 601
     df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
+
+    # Update the imputation class based on the new 200 and 201 values
+    df.loc[match_cond, "imp_class"] = (
+        df.loc[match_cond, "200"].astype(str)
+        + "_"
+        + df.loc[match_cond, "201"].astype(str)
+    )
+    # Update the imp_class for the 817 special cases
+    df.loc[match_cond & (df["cellnumber"] == 817), "imp_class"] = (
+        df.loc[match_cond & (df["cellnumber"] == 817), "imp_class"] + "_817"
+    )
 
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
@@ -167,6 +178,28 @@ def carry_forwards(df, backdata, impute_vars):
     return df
 
 
+def filter_for_links(df: pd.DataFrame, is_current: bool) -> pd.DataFrame:
+    """Filter the data to only include the relevant rows for calculating links.
+
+    Args:
+        df (pd.DataFrame): DataFrame of data to filter.
+        is_current (bool): Whether the data is the current or previous period.
+
+    Returns:
+        pd.DataFrame: Filtered DataFrame.
+    """
+    # Filter out imputation classes that are missing either "200" or "201"
+    nan_mask = df["imp_class"].str.contains("nan").apply(lambda x: not x)
+    # Select only clear, or equivalently, imp_marker R.
+    # Exclude PRN cells in the current period.
+    if is_current:
+        mask = (df["imp_marker"] == "R") & (df["selectiontype"] != "P") & nan_mask
+    else:
+        mask = (df["imp_marker"] == "R") & nan_mask
+
+    return df.loc[mask, :]
+
+
 def calculate_growth_rates(current_df, prev_df, target_vars):
     """Calculate the growth rates between previous and current data.
 
@@ -185,10 +218,9 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     """
     # Select only clear, or equivalently, imp_marker R.
     # Exclude PRN cells in the current period.
-    prev_df = prev_df.copy().loc[prev_df["imp_marker"] == "R"]
-    current_df = current_df.copy().loc[
-        (current_df["imp_marker"] == "R") & (current_df["selectiontype"] != "P")
-    ]
+
+    prev_df = filter_for_links(prev_df.copy(), is_current=False)
+    current_df = filter_for_links(current_df.copy(), is_current=True)
 
     # Ensure we only have one row per reference/imp_class for previous and current data
     prev_df = (
