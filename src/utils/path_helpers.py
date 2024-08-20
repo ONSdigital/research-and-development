@@ -40,6 +40,25 @@ def create_module_config(config: dict, module_name: str) -> dict:
 
     return module_dict
 
+def staging_validation(config: dict) -> dict:
+    paths = get_paths(config)
+    survey_year = str(config["years"]["survey_year"])    
+    msg = ""
+
+    if f"{survey_year}12" not in paths['frozen_snapshot_path']:
+        msg += f"{survey_year} is not included in the frozen snapshot path.\n"
+
+    if f"{survey_year}12" not in paths['updated_snapshot_path']:
+        msg += f"{survey_year} is not included in the updated snapshot path.\n"
+                       
+    if msg == "":
+        PathHelpLogger.info("The snapshot paths are valid.")
+        print("There are no issues")
+    else:
+        PathHelpLogger.error("There are errors with the snapshot paths.")
+        raise ValueError(msg)
+
+    return msg
 
 def create_staging_config(config: dict) -> dict:
     """Create a configuration dict with all full paths needed for staging.
@@ -57,26 +76,7 @@ def create_staging_config(config: dict) -> dict:
     berd_path = paths["berd_path"]
 
     survey_year = str(config["years"]["survey_year"])    
-    bool_dict = {}
     msg = ""
-
-    for key, value in paths.items():
-        bool_dict[key] = True
-        if key == "snapshot_path":
-            if f"{survey_year}12" not in value:
-                bool_dict['Key'] = False
-                msg += f"{survey_year} is not included in the snapshot path."
-        if config['global']['load_updated_snapshot']:
-            if key == 'secondary_snapshot_path':
-                if f"{survey_year}12" not in value:
-                    bool_dict['Key'] = False
-                    msg += f"{survey_year} is not included in the secondary snapshot path."
-
-    if all(bool_dict.values()):
-        PathHelpLogger.info("The snapshot paths are valid.")
-    else:
-        PathHelpLogger.error("There are errors with the snapshot paths.")
-        raise ValueError(msg)
 
     staging_dict = create_module_config(config, "staging")
     # add new paths to the staging section of the config

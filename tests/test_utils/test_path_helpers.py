@@ -10,6 +10,7 @@ from src.utils.path_helpers import (
     create_module_config,
     create_exports_config,
     update_config_with_paths,
+    staging_validation
 )
 
 
@@ -141,6 +142,41 @@ def test_create_staging_config(config, expected_staging_dict):
     staging_dict = create_staging_config(config)
 
     assert staging_dict == expected_staging_dict, "Staging config is not as expected"
+
+
+def test_validate_snapshot_files_success(config):
+    """Tests for staging_validation function."""
+    config = {
+        
+        'years' : {'survey_year': 2023,},
+              'global': {'network_or_hdfs': "network"},
+              'network_paths': { 'root': "R:/BERD Results System Development 2023/DAP_emulation/",
+              'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
+              'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
+              }
+        } 
+
+    message = staging_validation(config)
+
+    expected_message = "There are no issues"
+
+    assert (message == expected_message,
+        "Output from test_validate_snapshot_files_incorrect not as expected.")
+
+def test_validate_snapshot_files_fail(config):
+    """Tests for staging_validation function."""
+    config = {
+        
+        'years' : {'survey_year': 2023,},
+              'global': {'network_or_hdfs': "network"},
+              'network_paths': { 'root': "R:/BERD Results System Development 2023/DAP_emulation/",
+              'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
+              'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
+              }
+        } 
+
+    with pytest.raises(ValueError):
+        staging_validation(config)
 
 
 def test_create_ni_staging_config(config):

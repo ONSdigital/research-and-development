@@ -300,22 +300,3 @@ class TestValidateMappingFilenames(object):
 
         assert (result == expected_bool, 
         "Output from test_validate_mapper_config_raises_missing_file not as expected.")
-
-
-
-class TestValidateSnapshotFiles(object):
-        """Tests for create_staging_config function."""
-    def test_validate_snapshot_files_incorrect(self):
-        config = {
-            'years' : {'survey_year': 2022,},
-            'global': {'load_updated_snapshot': True},
-            'hdfs_paths': {'snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
-            'secondary_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json',}
-            } 
-
-        result, message = create_staging_config(config)
-
-        expected_bool = {False, False}
-
-        assert (result == expected_bool,
-             "Output from test_validate_snapshot_files_incorrect not as expected.")
