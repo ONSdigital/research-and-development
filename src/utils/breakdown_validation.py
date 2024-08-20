@@ -95,7 +95,7 @@ def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     if all(bool_dict.values()):
         BreakdownValidationLogger.info("All breakdown values are valid.\n")
     else:
-        BreakdownValidationLogger.error("There are errors with the breakdown values, please make the adjustments for the references that have issues.\n")
+        BreakdownValidationLogger.error(f"There are {len(msg)} errors with the breakdown values, please make the adjustments for the references that have issues.\n")
         raise ValueError(msg)
 
     return df
