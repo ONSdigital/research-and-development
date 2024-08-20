@@ -11,6 +11,7 @@ from pandas.testing import assert_frame_equal
 # Local Imports
 from src.imputation.sf_expansion import run_sf_expansion
 
+pytestmark = pytest.mark.runwip
 
 class TestRunTmi(object):
     """Tests for run_sf_expansion."""

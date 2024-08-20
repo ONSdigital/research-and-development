@@ -16,23 +16,40 @@ def pytest_addoption(parser):
         default=False,
         help="Run HDFS tests.",
     )
+    parser.addoption(
+        "--runwip",
+        action="store_true",
+        default=False,
+        help="Run WIP tests."
+    )
 
 
 def pytest_configure(config):
     """Add ini value line."""
     config.addinivalue_line("markers", "runhdfs: Run HDFS related tests.")
+    config.addinivalue_line("markers", "runwip: Run work in progress tests.")
+
 
 
 def pytest_collection_modifyitems(config, items):  # noqa:C901
     """Handle switching based on cli args."""
 
     # do full test suite when all flags are given
-    if config.getoption("--runhdfs"):
+    if (
+        config.getoption("--runhdfs") &
+        config.getoption("--runwip")
+    ):
         return
 
-    # do not add runhdfs marks when the --runhdfs flag is passed
+    # do not add marks when the markers flags are passed
     if not config.getoption("--runhdfs"):
         skip_hdfs = pytest.mark.skip(reason="Need --runhdfs option to run.")
         for item in items:
             if "runhdfs" in item.keywords:
+                item.add_marker(skip_hdfs)
+    
+    if not config.getoption("--runwip"):
+        skip_hdfs = pytest.mark.skip(reason="Need --runwip option to run.")
+        for item in items:
+            if "runwip" in item.keywords:
                 item.add_marker(skip_hdfs)

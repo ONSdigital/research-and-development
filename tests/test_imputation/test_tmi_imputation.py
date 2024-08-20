@@ -11,6 +11,7 @@ from pandas.testing import assert_frame_equal
 # Local Imports
 from src.imputation.tmi_imputation import run_tmi
 
+pytestmark = pytest.mark.runwip
 
 class TestRunTmi(object):
     """Tests for run_tmi."""
