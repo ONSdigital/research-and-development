@@ -40,7 +40,8 @@ class TestRunMoR(object):
             self, 
             dummy_mor_df, 
             dummy_mor_backdata, 
-            expected_mor_output
+            expected_mor_output,
+            imputation_config
         ):
         """General tests for run_mor."""
         impute_vars = []
@@ -48,7 +49,7 @@ class TestRunMoR(object):
             df=dummy_mor_df, 
             backdata=dummy_mor_backdata, 
             impute_vars=impute_vars, 
-            config=dummy_config
+            config=imputation_config
         )
         assert_frame_equal(imputed, expected_mor_output), (
             "run_mor() not imputing data as expected."
