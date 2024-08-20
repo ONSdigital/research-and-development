@@ -15,6 +15,9 @@ from src.utils.config import (
     _check_has_schema,
     _validate_path,
     _nulltype_conversion,
+    validate_freezing_config_settings,
+    validate_construction_config_settings,
+    validate_freezing_run_config
 )
 
 
@@ -314,3 +317,273 @@ class TestValidateConfig(object):
         }
         with pytest.raises(error_type, match=msg):
             validate_config(dummy_config)
+
+
+class TestValidateFreezingConfigSettings(object):
+    """Tests for validate_freezing_config_settings."""
+
+    def test_validate_freezing_config_settings_no_errors(self):
+        """Test validate_freezing_config_settings with no errors."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": True,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": False,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_first_snapshot_without_frozen_snapshot_path(self):
+        """Test validate_freezing_config_settings with run_with_snapshot_until_freezing True but no frozen_snapshot_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": True,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": False,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": None,
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running first snapshot of results,"
+                           " a frozen snapshot path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_frozen_data_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with run_frozen_data True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": True,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": False,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running frozen data, a frozen data staged path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_load_updated_snapshot_without_updated_snapshot_path(self):
+        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no updated_snapshot_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": True,
+                "run_updates_and_freeze": False,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "updated_snapshot_path": None,
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If loading an updated snapshot for comparison,"
+                           " a secondary snapshot path and frozen data staged path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_load_updated_snapshot_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": True,
+                "run_updates_and_freeze": False,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If loading an updated snapshot for comparison,"
+                           " a secondary snapshot path and frozen data staged path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_updates_and_freeze_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with run_updates_and_freeze True but no frozen_data_staged_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": None,
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": "/path/to/freezing_adds",
+                "freezing_amendments_path": "/path/to/freezing_amends",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running updates and freezing,"
+                           " a frozen data staged path and a freezing adds or amends path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+    def test_validate_freezing_config_settings_run_updates_and_freeze_without_freezing_adds_and_amends_path(self):
+        """Test validate_freezing_config_settings with run_updates_and_freeze True but no freezing_adds_and_amends_path."""
+        user_config = {
+            "global": {
+                "run_with_snapshot_until_freezing": False,
+                "run_frozen_data": False,
+                "load_updated_snapshot_for_comparison": False,
+                "run_updates_and_freeze": True,
+            },
+            "hdfs_paths": {
+                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
+                "updated_snapshot_path": "/path/to/updated_snapshot",
+                "freezing_additions_path": None,
+                "freezing_amendments_path": None,
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running updates and freezing,"
+                           " a frozen data staged path and a freezing adds or amends path must be provided."):
+            validate_freezing_config_settings(user_config)
+
+
+class TestValidateConstructionConfigSettings(object):
+    """Tests for validate_freezing_config_settings."""
+
+    def test_validate_construction_config_settings_no_errors(self):
+        """Test validate_construction_config_settings with no errors."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": True,
+                "run_postcode_construction": True,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": None,
+            },
+        }
+        validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_all_data_no_file(self):
+        """Test validate_construction_config_settings with no all data file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": True,
+                "run_postcode_construction": False,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": None,
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": "/path/to/ni",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running all data construction,"
+                           " an all data construction file path must be provided."):
+            validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_postcodes_no_file(self):
+        """Test validate_construction_config_settings with no postcode file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": False,
+                "run_postcode_construction": True,
+                "run_ni_construction": False,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": None,
+                "construction_file_path_ni": "/path/to/ni",
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running postcode construction,"
+                           " a postcode construction file path must be provided."):
+            validate_construction_config_settings(user_config)
+
+    def test_validate_construction_config_settings_run_ni_no_file(self):
+        """Test validate_construction_config_settings with no ni file."""
+        user_config = {
+            "global": {
+                "run_all_data_construction": False,
+                "run_postcode_construction": False,
+                "run_ni_construction": True,
+            },
+            "hdfs_paths": {
+                "all_data_construction_file_path": "/path/to/all_data",
+                "postcode_construction_file_path": "/path/to/postcodes",
+                "construction_file_path_ni": None,
+            },
+        }
+        with pytest.raises(ValueError,
+                           match="If running NI construction,"
+                           " a NI construction file path must be provided."):
+            validate_construction_config_settings(user_config)
+
+
+class TestValidateFreezingRunConfig(object):
+    """Tests for validate_main_config."""
+
+    def create_input_config(self, values: Union[tuple, list]) -> dict:
+        """Create a dummy input config.
+
+        Args:
+            values (Union[tuple, list]): The values to apply to the config.
+
+        Returns:
+            dict: The dummy config dictionary.
+        """
+        config = {
+            "global": {
+                "run_with_snapshot_until_freezing": values[0],
+                "load_updated_snapshot_for_comparison": values[1],
+                "run_updates_and_freeze": values[2],
+                "run_frozen_data": values[3]
+            }
+        }
+        return config
+
+    def test_validate_freezing_run_config(self):
+        """General tests for validate_main_config."""
+        config = self.create_input_config([True, False, False,  False])
+        results = validate_freezing_run_config(config=config)
+        assert results == (True, False, False, False), (
+            "Freezing config validation did not return the expected config values."
+        )
+
+
+    def test_validate_freezing_run_config_raises(self):
+        """Failing tests for validate_main_config."""
+        config = self.create_input_config(values=[True, True, True, False])
+        msg = "Only one type of pipeline run is allowed.*"
+        with pytest.raises(ValueError, match=msg):
+            validate_freezing_run_config(config)

@@ -1,10 +1,10 @@
 """Simple utils to assist the config."""
 from copy import deepcopy
-from typing import Union, Dict
+from typing import Union, Tuple, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
-from src.utils.path_helpers import update_config_with_paths, validate_mapping_filenames
+from src.utils.path_helpers import update_config_with_paths
 
 
 def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
@@ -48,6 +48,8 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
+        validate_freezing_config_settings(user_config)
+        validate_construction_config_settings(user_config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -286,3 +288,117 @@ def validate_config(config: dict) -> None:
             validation_item=validation_config[validation_item],
             item_name=validation_item,
         )
+
+
+def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
+    """Validate the four main config parameters of the freezing module.
+
+    Args:
+        config (dict): The pipeline config.
+
+    Raises:
+        ValueError: Raised if multiple pipeline run options are True.
+
+    Returns:
+        Tuple[bool, bool, bool, bool]: The main freezing config settings.
+    """
+    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
+    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
+    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+    run_frozen_data = config["global"]["run_frozen_data"]
+    values = [
+        run_with_snapshot_until_freezing,
+        load_updated_snapshot_for_comparison,
+        run_updates_and_freeze,
+        run_frozen_data
+    ]
+    if len([val for val in values if val==True]) > 1:
+        raise ValueError(
+            "Only one type of pipeline run is allowed (freezing). Please update"
+            " the user config."
+        )
+    return tuple(values)
+
+
+def validate_freezing_config_settings(user_config: dict):
+    """Check that correct combination of freezing settings are used."""
+
+    # Determine and validate freezing settings
+    (
+        run_with_snapshot_until_freezing,
+        load_updated_snapshot_for_comparison,
+        run_updates_and_freeze, 
+        run_frozen_data,
+    ) = validate_freezing_run_config(user_config)
+
+    frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
+    frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
+
+    updated_snapshot_path = user_config["hdfs_paths"]["updated_snapshot_path"]
+    freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
+    freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
+
+    if run_with_snapshot_until_freezing:
+        if frozen_snapshot_path is None:
+            raise ValueError(
+                "If running first snapshot of results, a frozen snapshot path must be"
+                " provided."
+            )
+
+    if run_frozen_data:
+        if frozen_data_staged_path is None:
+            raise ValueError(
+                "If running frozen data, a frozen data staged path must be provided."
+            )
+
+    if load_updated_snapshot_for_comparison:
+        if updated_snapshot_path is None or frozen_data_staged_path is None:
+            raise ValueError(
+                "If loading an updated snapshot for comparison, a secondary snapshot"
+                " path and frozen data staged path must be provided."
+            )
+
+    if run_updates_and_freeze:
+        if frozen_data_staged_path is None or (
+            freezing_additions_path is None or freezing_amendments_path is None
+        ):
+            raise ValueError(
+                "If running updates and freezing, a frozen data staged path and a"
+                " freezing adds or amends path must be provided."
+            )
+
+
+def validate_construction_config_settings(user_config):
+    """Check that correct combination of construction settings are used."""
+
+    run_all_data_construction = user_config["global"]["run_all_data_construction"]
+    run_postcode_construction = user_config["global"]["run_postcode_construction"]
+    run_ni_construction = user_config["global"]["run_ni_construction"]
+    all_data_construction_file_path = user_config["hdfs_paths"][
+        "all_data_construction_file_path"
+    ]
+    postcode_construction_file_path = user_config["hdfs_paths"][
+        "postcode_construction_file_path"
+    ]
+    construction_file_path_ni = user_config["hdfs_paths"]["construction_file_path_ni"]
+
+    if run_all_data_construction:
+        if all_data_construction_file_path is None:
+            raise ValueError(
+                "If running all data construction, an all data construction file path"
+                " must be provided."
+            )
+
+    if run_postcode_construction:
+        if postcode_construction_file_path is None:
+            raise ValueError(
+                "If running postcode construction, a postcode construction file path"
+                " must be provided."
+            )
+
+    if run_ni_construction:
+        if construction_file_path_ni is None:
+            raise ValueError(
+                "If running NI construction, a NI construction file path must be"
+                " provided."
+            )
