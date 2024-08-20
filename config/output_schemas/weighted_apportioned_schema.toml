@@ -268,7 +268,7 @@ Deduced_Data_Type = "float64"
 
 [601]
 old_name = "601"
-Deduced_Data_Type = "float64"
+Deduced_Data_Type = "object"
 
 [602]
 old_name = "602"
@@ -436,11 +436,11 @@ Deduced_Data_Type = "object"
 
 [frozensicoutdated]
 old_name = "frozensicoutdated"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "float64"
 
 [rusicoutdated]
 old_name = "rusicoutdated"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "float64"
 
 [frozensic]
 old_name = "frozensic"
@@ -662,255 +662,23 @@ Deduced_Data_Type = "float64"
 old_name = "imp_marker"
 Deduced_Data_Type = "object"
 
-[211_imputed]
-old_name = "211_imputed"
-Deduced_Data_Type = "float64"
-
-[305_imputed]
-old_name = "305_imputed"
-Deduced_Data_Type = "float64"
-
-[emp_total_imputed]
-old_name = "emp_total_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_total_imputed]
-old_name = "headcount_total_imputed"
-Deduced_Data_Type = "float64"
-
-[202_imputed]
-old_name = "202_imputed"
-Deduced_Data_Type = "float64"
-
-[203_imputed]
-old_name = "203_imputed"
-Deduced_Data_Type = "float64"
-
-[204_imputed]
-old_name = "204_imputed"
-Deduced_Data_Type = "float64"
-
-[205_imputed]
-old_name = "205_imputed"
-Deduced_Data_Type = "float64"
-
-[206_imputed]
-old_name = "206_imputed"
-Deduced_Data_Type = "float64"
-
-[207_imputed]
-old_name = "207_imputed"
-Deduced_Data_Type = "float64"
-
-[209_imputed]
-old_name = "209_imputed"
-Deduced_Data_Type = "float64"
-
-[210_imputed]
-old_name = "210_imputed"
-Deduced_Data_Type = "float64"
-
-[212_imputed]
-old_name = "212_imputed"
-Deduced_Data_Type = "float64"
-
-[214_imputed]
-old_name = "214_imputed"
-Deduced_Data_Type = "float64"
-
-[216_imputed]
-old_name = "216_imputed"
-Deduced_Data_Type = "float64"
-
-[218_imputed]
-old_name = "218_imputed"
-Deduced_Data_Type = "float64"
-
-[219_imputed]
-old_name = "219_imputed"
-Deduced_Data_Type = "float64"
-
-[220_imputed]
-old_name = "220_imputed"
-Deduced_Data_Type = "float64"
-
-[221_imputed]
-old_name = "221_imputed"
-Deduced_Data_Type = "float64"
-
-[222_imputed]
-old_name = "222_imputed"
-Deduced_Data_Type = "float64"
-
-[223_imputed]
-old_name = "223_imputed"
-Deduced_Data_Type = "float64"
-
-[225_imputed]
-old_name = "225_imputed"
-Deduced_Data_Type = "float64"
-
-[226_imputed]
-old_name = "226_imputed"
-Deduced_Data_Type = "float64"
-
-[227_imputed]
-old_name = "227_imputed"
-Deduced_Data_Type = "float64"
-
-[228_imputed]
-old_name = "228_imputed"
-Deduced_Data_Type = "float64"
-
-[229_imputed]
-old_name = "229_imputed"
-Deduced_Data_Type = "float64"
-
-[237_imputed]
-old_name = "237_imputed"
-Deduced_Data_Type = "float64"
-
-[242_imputed]
-old_name = "242_imputed"
-Deduced_Data_Type = "float64"
-
-[243_imputed]
-old_name = "243_imputed"
-Deduced_Data_Type = "float64"
-
-[244_imputed]
-old_name = "244_imputed"
-Deduced_Data_Type = "float64"
-
-[245_imputed]
-old_name = "245_imputed"
-Deduced_Data_Type = "float64"
-
-[246_imputed]
-old_name = "246_imputed"
-Deduced_Data_Type = "float64"
-
-[247_imputed]
-old_name = "247_imputed"
-Deduced_Data_Type = "float64"
-
-[248_imputed]
-old_name = "248_imputed"
-Deduced_Data_Type = "float64"
-
-[249_imputed]
-old_name = "249_imputed"
-Deduced_Data_Type = "float64"
-
-[250_imputed]
-old_name = "250_imputed"
-Deduced_Data_Type = "float64"
-
-[302_imputed]
-old_name = "302_imputed"
-Deduced_Data_Type = "float64"
-
-[303_imputed]
-old_name = "303_imputed"
-Deduced_Data_Type = "float64"
-
-[304_imputed]
-old_name = "304_imputed"
-Deduced_Data_Type = "float64"
-
-[emp_researcher_imputed]
-old_name = "emp_researcher_imputed"
-Deduced_Data_Type = "float64"
-
-[emp_technician_imputed]
-old_name = "emp_technician_imputed"
-Deduced_Data_Type = "float64"
-
-[emp_other_imputed]
-old_name = "emp_other_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_res_m_imputed]
-old_name = "headcount_res_m_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_res_f_imputed]
-old_name = "headcount_res_f_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_tec_m_imputed]
-old_name = "headcount_tec_m_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_tec_f_imputed]
-old_name = "headcount_tec_f_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_oth_m_imputed]
-old_name = "headcount_oth_m_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_oth_f_imputed]
-old_name = "headcount_oth_f_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_tot_m_imputed]
-old_name = "headcount_tot_m_imputed"
-Deduced_Data_Type = "float64"
-
-[headcount_tot_f_imputed]
-old_name = "headcount_tot_f_imputed"
-Deduced_Data_Type = "float64"
-
-[200_original]
-old_name = "200_original"
-Deduced_Data_Type = "float64"
-
-[pg_sic_class]
-old_name = "pg_sic_class"
-Deduced_Data_Type = "object"
-
-[empty_pgsic_group]
-old_name = "empty_pgsic_group"
-Deduced_Data_Type = "object"
-
-[empty_pg_group]
-old_name = "empty_pg_group"
-Deduced_Data_Type = "object"
-
-[200_imp_marker]
-old_name = "200_imp_marker"
-Deduced_Data_Type = "object"
-
 [imp_class]
 old_name = "imp_class"
 Deduced_Data_Type = "object"
 
-[211_trim]
-old_name = "211_trim"
-Deduced_Data_Type = "object"
-
-[305_trim]
-old_name = "305_trim"
-Deduced_Data_Type = "object"
-
-[manual_trim]
-old_name = "manual_trim"
+[auto_outlier]
+old_name = "auto_outlier"
 Deduced_Data_Type = "bool"
 
-[211_sf_exp_grouping]
-old_name = "211_sf_exp_grouping"
-Deduced_Data_Type = "object"
+[manual_outlier]
+old_name = "manual_outlier"
+Deduced_Data_Type = "float64"
 
-[305_sf_exp_grouping]
-old_name = "305_sf_exp_grouping"
-Deduced_Data_Type = "object"
+[outlier]
+old_name = "outlier"
+Deduced_Data_Type = "bool"
 
-[emp_total_sf_exp_grouping]
-old_name = "emp_total_sf_exp_grouping"
-Deduced_Data_Type = "object"
-
-[headcount_total_sf_exp_grouping]
-old_name = "headcount_total_sf_exp_grouping"
-Deduced_Data_Type = "object"
+[a_weight]
+old_name = "a_weight"
+Deduced_Data_Type = "float64"
 
