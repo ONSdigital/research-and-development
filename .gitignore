@@ -892,7 +892,7 @@ data/processed/*
 *.zip
 
 # create exception for data folder in tests
-tests/data/*.csv
+!tests/data/*.csv
 
 # Ignore the `docs/reference/api` folder
 docs/reference/api/*
