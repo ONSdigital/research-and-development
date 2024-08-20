@@ -570,6 +570,10 @@ Deduced_Data_Type = "int64"
 old_name = "postcodes_harmonised"
 Deduced_Data_Type = "object"
 
+[last_frozen]
+old_name = "last_frozen"
+Deduced_Data_Type = "object"
+
 [pg_numeric]
 old_name = "pg_numeric"
 Deduced_Data_Type = "int64"
