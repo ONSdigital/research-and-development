@@ -68,6 +68,7 @@ def input_large_csv(
     key_cols = ["pcd2", "itl"]
 
     # read in the postcode lookup file
+    print(f"Reading the postcode  lookup file {in_file}...")
     df = read_csv_func(in_file, cols=key_cols)
 
     time_taken = (datetime.now() - start_time).total_seconds()
@@ -100,6 +101,7 @@ def output_large_csv(
     out_path = out_fol + f"postcodes_{survey_year}.csv"
 
     # write the reduced file to the new destination
+    print(f"Saving the postcode mapper file {out_path}...")
     write_csv_func(out_path, df)
 
     print("file saved to " + out_fol)
