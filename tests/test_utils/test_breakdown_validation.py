@@ -23,18 +23,25 @@ class TestBreakdownValidation:
         return input_df
 
 
+    def test_breakdown_validation_success(self):
+        """Test for run_breakdown_validation function where the values match."""
+        input_df = self.create_input_df()
+        input_df = input_df.loc[(input_df['reference'] == 'B')]
+        msg = 'All breakdown values are valid.\n'
+        assert run_breakdown_validation(input_df) == msg
+ 
     def test_breakdown_validation_fail(self):
-        "Test for run_breakdown_validation function where the values do not meet the criteria"
+        """Test for run_breakdown_validation function where the values do not meet the criteria."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'A')]
-        msg = 'Columns 202 + 223 do not equal column 204 for reference'
-        with pytest.raises(ValueError , match = msg):
-            input_df = run_breakdown_validation(input_df)  
-
-
-    # def test_breakdown_validation_success(self):
-    #     "Test for run_breakdown_validation function where the values match."
-    #     input_df = self.create_input_df()
-    #     input_df = input_df.loc[(input_df['reference'] == 'B')]
-    #     msg = 'There are no issues.'
-    #     assert run_breakdown_validation(input_df) == msg
+        with pytest.raises(ValueError):
+            run_breakdown_validation(input_df)
+ 
+    def test_breakdown_validation_msg(self):
+        """Test for run_breakdown_validation function to check the returned message."""
+        input_df = self.create_input_df()
+        input_df = input_df.loc[(input_df['reference'] == 'A')]
+        msg = "Columns 202 + 223 do not equal column 204 for reference: A.\n "
+        with pytest.raises(ValueError) as e:
+            run_breakdown_validation(input_df)
+        assert str(e.value) == msg

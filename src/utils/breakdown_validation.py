@@ -7,8 +7,7 @@ from pandas import DataFrame as pandasDF
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
-def breakdown_validation(df: pd.DataFrame) -> dict:
-    """Function to validate the breakdown totals from the imputation."""
+"""Function to validate the breakdown totals from the imputation."""
 def breakdown_validation(df: pd.DataFrame) -> dict:
     """Function to check that the breakdown values match the criteria provided. 
     
@@ -50,9 +49,7 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
             msg += f"Columns 222 + 223 do not equal column 203 for reference: {row['reference']}.\n "
         if row['check2']:
             bool_dict[index] = False
-          #  msg += f"Columns 202 + 223 do not equal column 204 for reference: {row['reference']}.\n "
-            msg += f"Columns 202 + 223 do not equal column 204 for reference"
-
+            msg += f"Columns 202 + 223 do not equal column 204 for reference: {row['reference']}.\n "
         if row['check3']:
             bool_dict[index] = False
             msg += f"Columns 205 + 206 + 207 do not equal column 204 for reference: {row['reference']}.\n "
@@ -86,7 +83,10 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
         if row['check13']:
             bool_dict[index] = False
             msg += f"Columns 406 + 408 + 410 do not equal column 412 for reference: {row['reference']}.\n " 
-
+        if True in bool_dict.values():
+            bool_dict[index] = True
+            msg += "All breakdown values are valid.\n"
+    
     return bool_dict, msg
 
 def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
@@ -94,8 +94,9 @@ def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     bool_dict, msg = breakdown_validation(df)
     if all(bool_dict.values()):
         BreakdownValidationLogger.info("All breakdown values are valid.\n")
+        msg
     else:
-        BreakdownValidationLogger.error(f"There are {len(msg)} errors with the breakdown values, please make the adjustments for the references that have issues.\n")
+        BreakdownValidationLogger.error(f"There are {len(bool_dict)} errors with the breakdown values, please make the adjustments for the references that have issues.\n")
         raise ValueError(msg)
 
     return df
