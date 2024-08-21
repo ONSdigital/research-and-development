@@ -72,4 +72,4 @@ repos:
             entry: WARNING- csvs for test about to be committed. Double check there is no sensitive data!
             language: fail
             files: .*\.(csv|feather|xlsx|zip|hdf5|h5|txt|json|xml|hd|parquet)
-            exclude: .*/tests/.* | "requirements.txt"
+            exclude: tests/.* | "requirements.txt"
