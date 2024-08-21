@@ -74,6 +74,10 @@ def mor_preprocessing(df, backdata):
     # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
 
+    # ensure the "formtype" column is in the correct format
+    df["formtype"] = df["formtype"].apply(convert_formtype)
+    backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
+
     stat_cond = df["status"].isin(bad_statuses)
     sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
     lf_cond = df["formtype"] == "0001"
@@ -84,8 +88,6 @@ def mor_preprocessing(df, backdata):
     # Ensure backdata is as we require
     wanted_cond = backdata["imp_marker"].isin(["R", "CF", "MoR", "TMI"])
     backdata = backdata.copy().loc[wanted_cond, :]
-
-    backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
 
     return to_impute_df, remainder_df, backdata
 
