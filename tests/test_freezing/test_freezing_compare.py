@@ -16,7 +16,7 @@ class TestGetAmendments:
     ) -> pd.DataFrame:
         """Numerical columns for test dataframes."""
         numeric_cols = [
-            "203", "204", "205", "206", "207", "209", "210",
+            "201", "204", "205", "206", "207", "209", "210",
             "211", "212", "214", "216", "218", "219", "220", "221", "222",
             "223", "225", "226", "227", "228", "229", "237", "242", "243",
             "244", "245", "246", "247", "248", "249", "250", "405", "406",
@@ -35,7 +35,7 @@ class TestGetAmendments:
     # Create test frozen df
     def create_test_frozen_df(self) -> pd.DataFrame:
         """Create a test frozen df."""
-        input_cols = ["reference", "period", "instance", "201", "202", "200", "601"]
+        input_cols = ["reference", "period", "instance", "203", "202", "200", "601"]
         data = [
             ["A", 202412, 2.0, 1.0, 2.0, "A", None],
             ["B", 202412, None, None, 1.0, "B", "C"],
@@ -51,7 +51,7 @@ class TestGetAmendments:
     # Create test amendments df
     def create_test_amendments_df(self) -> pd.DataFrame:
         """Create a test amendments df."""
-        input_cols = ["reference", "period", "instance", "201", "202", "200", "601"]
+        input_cols = ["reference", "period", "instance", "203", "202", "200", "601"]
         data = [
             ["A", 202412, 2.0, 1.0, 2.0, "A", None], # No diffs
             ["B", 202412, None, None, 1.0, "A", "B"], # 200 diff "A"
@@ -67,7 +67,7 @@ class TestGetAmendments:
     # Create expected outcome df
     def create_test_expected_outcome_df(self) -> pd.DataFrame:
         """Create a test expected_outcome df."""
-        input_cols = ["reference", "period", "instance", "201", "202", "200", "601", "201_diff", "202_diff", "200_diff", "601_diff", "accept_changes"]
+        input_cols = ["reference", "period", "instance", "203", "202", "200", "601", "203_diff", "202_diff", "200_diff", "601_diff", "accept_changes"]
         data = [
             ["A", 202412, 2.0, 1.0, 2.0, "A", None, 0.0, 0.0, None, None, False],
             ["B", 202412, None, None, 1.0, "A", "B", None, 0.0, "A", "B", False],
