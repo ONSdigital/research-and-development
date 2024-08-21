@@ -13,20 +13,20 @@ import logging
 import pathlib
 import hashlib
 import shutil
-from typing import List, Union
+from typing import Union
 
 import yaml
 
 from src.utils.wrappers import time_logger_wrap
 
 # Set up logger
-lfmod_logger = logging.getLogger(__name__)
+LocalModLogger = logging.getLogger(__name__)
 
 
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
-    """Reads a csv file from a local Windows drive or a network drive into a 
-    Pandas Dataframe using Python open() function. 
-    If "thousands" argument is not specified, sets it to ",". 
+    """Reads a csv file from a local Windows drive or a network drive into a
+    Pandas Dataframe using Python open() function.
+    If "thousands" argument is not specified, sets it to ",".
     Allows to use any additional keyword arguments of Pandas read_csv method.
 
     Args:
@@ -41,14 +41,14 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         # If "thousands" argument is not specified, set it to ","
         if "thousands" not in kwargs:
             kwargs["thousands"] = ","
-        
+
         # Read the scv file using the path and keyword arguments
         try:
             df = pd.read_csv(file, **kwargs)
         except Exception:
-            rd_logger.error(f"Could not read specified file: {filepath}")
+            LocalModLogger.error(f"Could not read specified file: {filepath}")
             if "usecols" in kwargs:
-                rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
+                LocalModLogger.info("Columns not found: " + str(kwargs["usecols"]))
             raise ValueError
     return df
 
@@ -141,12 +141,12 @@ def check_file_exists(filename: str, filepath: str) -> bool:
     # If file exists locally and is non-empty
     if rd_file and file_size > 0:
         output = True
-        lfmod_logger.info(f"File {filename} exists and is non-empty")
+        LocalModLogger.info(f"File {filename} exists and is non-empty")
 
     # If file exists locally but is empty
     elif rd_file and file_size == 0:
         output = False
-        lfmod_logger.warning(f"File {filename} exists but is empty")
+        LocalModLogger.warning(f"File {filename} exists but is empty")
 
     return output
 
