@@ -2,6 +2,7 @@
 import os
 import logging
 import pandas as pd
+import numpy as np
 from pandas import DataFrame as pandasDF
 
 
@@ -21,7 +22,7 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
     bool_dict = {}
     msg = ""
     
-    df['check1'] = df['222'] + df['223'] != df['203'] 
+    df['check1'] = df['222'] + df['223'] != df['203']
     df['check2'] = df['202'] + df['203'] != df['204'] 
     df['check3'] = df['205'] + df['206'] + df['207'] != df['204'] 
     df['check4'] = df['221'] > df['209'] 
@@ -85,13 +86,16 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
             msg += f"Columns 406 + 408 + 410 do not equal column 412 for reference: {row['reference']}.\n " 
         if True in bool_dict.values():
             bool_dict[index] = True
-            msg += "All breakdown values are valid.\n"
+            msg += f"All breakdown values are valid for references: {row['reference']}.\n"
     
     return bool_dict, msg
 
 def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     """Runs the breakdown_validation function and outputs the msg to the logger"""
-    bool_dict, msg = breakdown_validation(df)
+    not_null_df = df[~df.isnull().any(axis=1)]
+
+    bool_dict, msg = breakdown_validation(not_null_df) 
+
     if all(bool_dict.values()):
         BreakdownValidationLogger.info("All breakdown values are valid.\n")
         msg

@@ -1,7 +1,7 @@
 from src.utils.breakdown_validation import breakdown_validation, run_breakdown_validation
 from pandas import DataFrame as pandasDF
 import pytest
-
+import logging
 
 class TestBreakdownValidation:
     """Unit tests for breakdown_validation function."""
@@ -23,13 +23,15 @@ class TestBreakdownValidation:
         return input_df
 
 
-    def test_breakdown_validation_success(self):
+    def test_breakdown_validation_success(self, caplog):
         """Test for run_breakdown_validation function where the values match."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'B')]
         msg = 'All breakdown values are valid.\n'
-        assert run_breakdown_validation(input_df) == msg
- 
+        with caplog.at_level(logging.INFO):
+            run_breakdown_validation(input_df)
+            assert msg in caplog.text
+  
     def test_breakdown_validation_fail(self):
         """Test for run_breakdown_validation function where the values do not meet the criteria."""
         input_df = self.create_input_df()
