@@ -146,8 +146,17 @@ def _get_random_civdef(seed: int, proportions: Tuple[float, float]) -> str:
 def assign_random_civdef(
     df: pd.DataFrame, proportions: Tuple[float, float]
 ) -> pd.DataFrame:
-    """Assign "C" for civil or "D" for defence randomly based on
-    the proportions supplied.
+    """Assign "C" or "D" randomly based on the proportions supplied.
+
+    C is for Civil, while D is for Defence.
+    Each assignment is based on a given seed.
+
+    Args:
+        df (pd.DataFrame): The dataframe to create the imputed column within.
+        proportions (Tuple[float, float]): The proportions of C and D.
+
+    Returns:
+        pd.DataFrame: The updated dataframe.
     """
 
     df["200_imputed"] = df["reference"].apply(lambda x: _get_random_civdef(int(x), proportions))

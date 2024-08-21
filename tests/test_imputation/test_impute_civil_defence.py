@@ -1,14 +1,14 @@
-import pandas as pd
+import pytest
 import numpy as np
 from pandas import DataFrame as pandasDF
 from pandas._testing import assert_frame_equal
 
 from src.imputation.tmi_imputation import run_tmi
 from src.imputation.impute_civ_def import (
-    impute_civil_defence,
     prep_cd_imp_classes,
     create_civdef_dict,
     calc_cd_proportions,
+    _get_random_civdef,
 )
 
 
@@ -857,3 +857,26 @@ class TestPrepCDImpClasses2:
         result_df = prep_cd_imp_classes(input_df)
 
         assert_frame_equal(result_df, expected_df)
+
+
+class TestGetRandomCivdef(object):
+    """Tests for _get_random_civdef."""
+
+    @pytest.mark.parametrize(
+            "seed, proportions", 
+            [
+                (12345, [0.4, 0.6]),
+                (1, [0.52, 0.48]),
+                (54321, [0.1, 0.9]),
+                (9999999, [0.95, 0.05]),
+            ]
+    )
+    def test__get_random_civdef(self, seed, proportions):
+        """General tests for _get_random_civdef."""
+        # ensure the seed continues to give the same value with a given proportion
+        values = []
+        for i in range(10):
+            rand = _get_random_civdef(seed=seed, proportions=proportions)
+            values.append(rand)
+        unique = set(values)
+        assert len(unique) == 1, "Multiple random values found from one seed."
