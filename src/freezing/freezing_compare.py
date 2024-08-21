@@ -26,7 +26,7 @@ def get_amendments(
     FreezingLogger.info("Looking for records that have changed in the updated snapshot.")
     key_cols = ["reference", "period", "instance"]
     numeric_cols = [
-        "201", "202", "203", "204", "205", "206", "207", "209", "210",
+        "202", "203", "204", "205", "206", "207", "209", "210",
         "211", "212", "214", "216", "218", "219", "220", "221", "222",
         "223", "225", "226", "227", "228", "229", "237", "242", "243",
         "244", "245", "246", "247", "248", "249", "250", "405", "406",
@@ -37,6 +37,7 @@ def get_amendments(
 
     non_numeric_cols = [
         "200",
+        "201",
         "601",
     ]
     numeric_cols_new = [f"{i}_updated" for i in numeric_cols]
