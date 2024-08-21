@@ -1,8 +1,8 @@
 """All general functions for the s3 bucket file system which uses boto3.
+This is unfinished PLEASE DO NOT REVIEW
 """
 
-import boto3
-import raz_client
+
 import json
 import pandas as pd
 from io import StringIO
@@ -10,6 +10,9 @@ import logging
 from typing import List
 import subprocess
 import os
+
+import boto3 # Disabled so we can work in CDH and Windows
+import raz_client
 
 from rdsa_utils.cdp.helpers.s3_utils import *
 

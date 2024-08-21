@@ -1,19 +1,27 @@
 """The main pipeline"""
+
 # Core Python modules
 import logging
 import pandas as pd
 
+
 # Our local modules
 from src.utils import runlog
+
 from src._version import __version__ as version
 from src.utils.config import config_setup
+
 from src.utils.wrappers import logger_creator
+
 from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
+
 from src.freezing.freezing_main import run_freezing
+
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
 from src.mapping.mapping_main import run_mapping
+
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
@@ -52,7 +60,6 @@ def run_pipeline(user_config_path, dev_config_path):
         # Creating boto3 client and adding it to the config dict
         config["client"] = mods.create_client(config)
     else:
-        
         # If it's not s3, there is no need for a client. Adding a None for
         # consistency.
         config["client"] = None
@@ -89,6 +96,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Staging and validatation and Data Transmutation
     MainLogger.info("Starting Staging and Validation...")
+
     (
         full_responses,
         # secondary_full_responses,  # may be needed later for freezing
@@ -113,13 +121,15 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
-    full_responses = run_freezing(full_responses,
-                                  config,
-                                  mods.rd_write_csv,
-                                  mods.rd_read_csv,
-                                  mods.rd_file_exists,
-                                  run_id
-                                )
+    jls_extract_var = full_responses
+    full_responses = run_freezing(
+        jls_extract_var,
+        config,
+        mods.rd_write_csv,
+        mods.rd_read_csv,
+        mods.rd_file_exists,
+        run_id
+    )
     MainLogger.info("Finished Freezing...")
 
     MainLogger.info("Finished Data Ingest.")
@@ -216,7 +226,6 @@ def run_pipeline(user_config_path, dev_config_path):
         civil_defence_detailed,
         sic_division_detailed,
     )
-
 
     MainLogger.info("Finishing Pipeline .......................")
 
