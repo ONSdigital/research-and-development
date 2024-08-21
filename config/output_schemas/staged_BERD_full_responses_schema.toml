@@ -569,7 +569,3 @@ Deduced_Data_Type = "int64"
 [postcodes_harmonised]
 old_name = "postcodes_harmonised"
 Deduced_Data_Type = "object"
-<<<<<<< HEAD
-
-=======
->>>>>>> origin
