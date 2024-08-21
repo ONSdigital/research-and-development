@@ -4,11 +4,7 @@ import re
 import pandas as pd
 import numpy as np
 
-from src.imputation.tmi_imputation import (
-    create_imp_class_col,
-    trim_bounds,
-    calculate_totals,
-)
+from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
 from src.construction.construction_helpers import convert_formtype
 
 good_statuses = ["Clear", "Clear - overridden"]
@@ -46,9 +42,6 @@ def run_mor(df, backdata, impute_vars, config):
     imputed_df_short, links_df_short = calculate_mor(
         carried_forwards_df, remainder_df, backdata, impute_vars, config, "short"
     )
-
-    # Calculate totals as with TMI for longforms only
-    imputed_df_long = calculate_totals(imputed_df_long)
 
     imputed_df = pd.concat(
         [remainder_df, imputed_df_long, imputed_df_short]
