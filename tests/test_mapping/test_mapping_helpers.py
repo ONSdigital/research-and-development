@@ -12,8 +12,7 @@ from src.mapping.mapping_helpers import (
     join_with_null_check
 )
 
-from src.utils.path_helpers import validate_mapping_filenames, create_staging_config
-
+from src.utils.path_helpers import validate_mapping_filenames
 class TestJoinWithNullCheck(object):
     """Tests for join_with_null_check function."""
 

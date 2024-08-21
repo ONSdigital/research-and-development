@@ -146,13 +146,11 @@ def test_create_staging_config(config, expected_staging_dict):
 
 def test_validate_snapshot_files_success(config):
     """Tests for staging_validation function."""
-    config = {
-        
-        'years' : {'survey_year': 2023,},
+    config = {'years' : {'survey_year': 2023,},
               'global': {'network_or_hdfs': "network"},
-              'network_paths': { 'root': "R:/BERD Results System Development 2023/DAP_emulation/",
-              'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
-              'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
+              'network_paths': { 'root': "R:/DAP_emulation/",
+              'frozen_snapshot_path': "/2023_snapshots/snapshot_file-202312.json",
+              'updated_snapshot_path': '2023_snapshots/updated_snapshot_file-202312.json',
               }
         } 
 
