@@ -1,5 +1,17 @@
 """conftest.py.
 
+This file contains the test configuration for the whole test suite.
+
+Within the pytest_addoption function, the markers can be configured, ready to add
+to specific tests. Any tests marked with these markers will be skipped by default 
+(if default=False). To call these tests with pytest, add the command line argument 
+'-m --{marker}'.
+To mark a test, use pytest.mark.{marker}.
+
+When setting up a new marker, the 'pytest_collection_modifyitems' and 
+'pytest_configure' functions must be updated accordingly.
+
+
 `pytest` configuration file. Currently used to flag tests for set-up only.
 Reworked example from pytest docs:
 https://docs.pytest.org/en/latest/example/simple.html.
