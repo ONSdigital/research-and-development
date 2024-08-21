@@ -210,7 +210,7 @@ class TestGetRandomCivdef(object):
     @pytest.mark.parametrize(
             "seed, proportions",
             [
-                (12345, [0.4, 0.6]),
+                (1234567891011, [0.4, 0.6]),
                 (1, [0.52, 0.48]),
                 (54321, [0.1, 0.9]),
                 (9999999, [0.95, 0.05]),
@@ -222,7 +222,7 @@ class TestGetRandomCivdef(object):
         values = []
         print(f"seed: {seed}, proportions: {proportions}")
         for i in range(10):
-            rand = _get_random_civdef(seed=seed, proportions=proportions)
+            rand = _get_random_civdef(ref=seed, proportions=proportions)
             values.append(rand)
             print(f"rand: {rand}")
         unique = set(values)

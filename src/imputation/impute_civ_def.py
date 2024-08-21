@@ -128,17 +128,18 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _get_random_civdef(seed: int, proportions: Tuple[float, float]) -> str:
+def _get_random_civdef(ref: int, proportions: Tuple[float, float]) -> str:
     """Get a random value (C or D) using proportions and a given seed.
 
     Args:
-        seed (int): The seed used by the randomiser.
+        ref (int): The reference, to be used as a seed used by the randomiser.
         proportions (Tuple[float, float]): The proportion of C and D in the data.
 
     Returns:
         str: The randomised values (C or D).
     """
-    np.random.seed(seed=seed)
+    ref_seed = ref % 1000
+    np.random.seed(seed=ref_seed)
     value = np.random.choice(["C", "D"], size=1, p=proportions)[0]
     return value
 
