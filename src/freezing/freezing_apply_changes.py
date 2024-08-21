@@ -101,7 +101,7 @@ def validate_any_refinst_in_frozen(
     df2_copy["refinst"] = (
         df2_copy["reference"].astype(str) + df2_copy["instance"].astype(str)
     )
-    result = any([x in frozen_copy["refinst"] for x in df2_copy["refinst"]])
+    result = any([x in list(frozen_copy["refinst"]) for x in list(df2_copy["refinst"])])
     return result
 
 
@@ -120,7 +120,7 @@ def validate_all_refinst_in_frozen(
     """
     frozen_copy = frozen_df.copy()
     frozen_copy["refinst"] = (
-        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(str)
+        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(float).astype(str)
     )
     result = values_in_column(
         frozen_copy,
@@ -235,16 +235,13 @@ def apply_amendments(
     accepted_amendments_df.columns = [
         col.replace("_updated", "") for col in accepted_amendments_df.columns
     ]
-
     # update last_frozen column
     accepted_amendments_df = _add_last_frozen_column(accepted_amendments_df, run_id)
 
     # drop records to be amended from main df
     main_df = main_df[~main_df.reference.isin(changes_refs)]
-
     # add amended records to main df
     amended_df = pd.concat([main_df, accepted_amendments_df])
-
     freezing_logger.info(
         f"{accepted_amendments_df.shape[0]} records amended during freezing"
     )
@@ -269,7 +266,7 @@ def apply_additions(
         added_df (pd.DataFrame): The main snapshot with additions applied.
     """
     if not validate_additions_df(main_df, additions_df, freezing_logger):
-        freezing_logger("Skipping additions since the additions csv is invalid...")
+        freezing_logger.info("Skipping additions since the additions csv is invalid...")
         return main_df
     # Drop records where accept_changes is False and if any remain, add them to main df
     changes_refs = additions_df[
