@@ -1,10 +1,10 @@
 """Simple utils to assist the config."""
 from copy import deepcopy
-from typing import Union, Dict
+from typing import Union, Tuple, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
-from src.utils.path_helpers import update_config_with_paths, validate_mapping_filenames
+from src.utils.path_helpers import update_config_with_paths
 
 
 def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
@@ -290,29 +290,55 @@ def validate_config(config: dict) -> None:
         )
 
 
-def validate_freezing_config_settings(user_config):
+def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
+    """Validate the four main config parameters of the freezing module.
+
+    Args:
+        config (dict): The pipeline config.
+
+    Raises:
+        ValueError: Raised if multiple pipeline run options are True.
+
+    Returns:
+        Tuple[bool, bool, bool, bool]: The main freezing config settings.
+    """
+    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
+    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
+    run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
+    run_frozen_data = config["global"]["run_frozen_data"]
+    values = [
+        run_with_snapshot_until_freezing,
+        load_updated_snapshot_for_comparison,
+        run_updates_and_freeze,
+        run_frozen_data
+    ]
+    if len([val for val in values if val==True]) > 1:
+        raise ValueError(
+            "Only one type of pipeline run is allowed (freezing). Please update"
+            " the user config."
+        )
+    return tuple(values)
+
+
+def validate_freezing_config_settings(user_config: dict):
     """Check that correct combination of freezing settings are used."""
 
-    run_first_snapshot_of_results = user_config["global"][
-        "run_first_snapshot_of_results"
-    ]
-    run_frozen_data = user_config["global"]["run_frozen_data"]
+    # Determine and validate freezing settings
+    (
+        run_with_snapshot_until_freezing,
+        load_updated_snapshot_for_comparison,
+        run_updates_and_freeze, 
+        run_frozen_data,
+    ) = validate_freezing_run_config(user_config)
+
     frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
     frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
-    load_updated_snapshot_for_comparison = user_config["global"][
-        "load_updated_snapshot_for_comparison"
-    ]
+
     updated_snapshot_path = user_config["hdfs_paths"]["updated_snapshot_path"]
-    run_updates_and_freeze = user_config["global"]["run_updates_and_freeze"]
     freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
     freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
 
-    if run_first_snapshot_of_results and run_frozen_data:
-        raise ValueError(
-            "Cannot run first snapshot of results and run frozen data at the same time."
-        )
-
-    if run_first_snapshot_of_results:
+    if run_with_snapshot_until_freezing:
         if frozen_snapshot_path is None:
             raise ValueError(
                 "If running first snapshot of results, a frozen snapshot path must be"

@@ -1,9 +1,12 @@
 """Define helper functions that wrap regularly-used functions."""
 
-import toml
-import yaml
+from typing import Union
 
 import pandas as pd
+import yaml
+import toml
+
+from src.utils.defence import type_defence
 
 # Define paths
 user_config_path = "config/userconfig.toml"
@@ -84,3 +87,50 @@ def convert_formtype(formtype_value: str) -> str:
             return None
     else:
         return None
+
+
+def convert_formtype(formtype_value: str) -> str:
+    """Convert the formtype to a standardised format.
+
+    Args:
+        formtype_value (str): The value to standardise.
+
+    Returns:
+        str: The standardised value for formtype.
+    """
+    if pd.notnull(formtype_value):
+        formtype_value = str(formtype_value)
+        if formtype_value == "1" or formtype_value == "1.0" or formtype_value == "0001":
+            return "0001"
+        elif (
+            formtype_value == "6" or formtype_value == "6.0" or formtype_value == "0006"
+        ):
+            return "0006"
+        else:
+            return None
+    else:
+        return None
+
+
+def values_in_column(
+        df: pd.DataFrame, 
+        col_name: str, 
+        values: Union[list, pd.Series]
+    ) -> bool:
+    """Determine whether a list of values are all present in a dataframe column.
+
+    Args:
+        df (pd.DataFrame): The dataframe.
+        col_name (str): The column name.
+        values (Union[list, pd.Series]): The values to check.
+
+    Returns:
+        bool: Whether or values are in the column.
+    """
+    type_defence(df, "df", pd.DataFrame)
+    type_defence(col_name, "col_name", str)
+    type_defence(values, "values", (list, pd.Series))
+    if isinstance(values, pd.Series):
+        values = list(values)
+    result = set(values).issubset(set(df[col_name]))
+    return result
