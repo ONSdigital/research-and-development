@@ -232,18 +232,17 @@ def run_export(user_config_path: str, dev_config_path: str):
 
         # Creating boto3 client and adding it to the config dict
         config["client"] = mods.create_client(config)
-    else:
-        
-        # If it's not s3, there is no need for a client. Adding a None for
-        # consistency.
+    elif platform == "network":
+        # If the platform is "network" or "hdfs", there is no need for a client.
+        # Adding a client = None for consistency.
         config["client"] = None
-        if platform == "network":
-            from src.utils import local_file_mods as mods
-        elif platform == "hdfs":
-            from src.utils import hdfs_mods as mods
-        else:
-            MainLogger.error("The platform configuration is wrong")
-            raise ImportError
+        from src.utils import local_file_mods as mods
+    elif platform == "hdfs":
+        config["client"] = None
+        from src.utils import hdfs_mods as mods
+    else:
+        OutgoingLogger.error(f"The selected platform {platform} is wrong")
+        raise ImportError(f"Cannot import {platform}_mods")
 
     OutgoingLogger.info(f"Using the {platform} file system as data source.")
 

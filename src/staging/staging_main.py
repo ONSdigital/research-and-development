@@ -114,7 +114,7 @@ def run_staging(  # noqa: C901
 
             rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
-                snapshot_path, rd_load_json, config, 
+                snapshot_path, rd_load_json, config,
             )
 
             StagingMainLogger.info(
@@ -185,8 +185,7 @@ def run_staging(  # noqa: C901
     manual_trim_path = staging_dict["manual_imp_trim_path"]
 
     if (
-        config["global"]["load_manual_imputation"] and
-        rd_file_exists(manual_trim_path)
+        config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path)
     ):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
@@ -256,14 +255,6 @@ def run_staging(  # noqa: C901
     if stage_frozen_snapshot or stage_updated_snapshot:
         full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
 
-    # Output the staged BERD data.
-    # For synthetic data - begin
-    # mypath = r"/home/cdsw/research-and-development/config/synthetic_schemas/full_responses_schema.toml"
-    # from helpers.reverse_staging import save_schema
-    # save_schema(full_responses, mypath)    
-    # For synthetic data - end
-    
-    
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = staging_dict["staging_output_path"]
@@ -272,7 +263,7 @@ def run_staging(  # noqa: C901
         staged_filename = (
             f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        mods.rd_write_csv(f"{staging_folder}/{staged_filename}", full_responses)
+        rd_write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")

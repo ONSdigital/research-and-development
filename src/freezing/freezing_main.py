@@ -5,7 +5,7 @@ from typing import Callable
 
 import pandas as pd
 
-from src.freezing.freezing_utils import  _add_last_frozen_column
+from src.freezing.freezing_utils import _add_last_frozen_column
 from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
 from src.utils.helpers import convert_formtype

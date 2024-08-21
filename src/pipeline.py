@@ -51,18 +51,17 @@ def run_pipeline(user_config_path, dev_config_path):
 
         # Creating boto3 client and adding it to the config dict
         config["client"] = mods.create_client(config)
-    else:
-        
-        # If it's not s3, there is no need for a client. Adding a None for
-        # consistency.
+    elif platform == "network":
+        # If the platform is "network" or "hdfs", there is no need for a client.
+        # Adding a client = None for consistency.
         config["client"] = None
-        if platform == "network":
-            from src.utils import local_file_mods as mods
-        elif platform == "hdfs":
-            from src.utils import hdfs_mods as mods
-        else:
-            MainLogger.error("The platform configuration is wrong")
-            raise ImportError
+        from src.utils import local_file_mods as mods
+    elif platform == "hdfs":
+        config["client"] = None
+        from src.utils import hdfs_mods as mods
+    else:
+        MainLogger.error(f"The selected platform {platform} is wrong")
+        raise ImportError(f"Cannot import {platform}_mods")
 
     # Set up the run logger
     runlog_obj = runlog.RunLog(
@@ -113,13 +112,14 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
-    full_responses = run_freezing(full_responses,
-                                  config,
-                                  mods.rd_write_csv,
-                                  mods.rd_read_csv,
-                                  mods.rd_file_exists,
-                                  run_id
-                                )
+    full_responses = run_freezing(
+        full_responses,
+        config,
+        mods.rd_write_csv,
+        mods.rd_read_csv,
+        mods.rd_file_exists,
+        run_id
+    )
     MainLogger.info("Finished Freezing...")
 
     MainLogger.info("Finished Data Ingest.")
@@ -216,7 +216,6 @@ def run_pipeline(user_config_path, dev_config_path):
         civil_defence_detailed,
         sic_division_detailed,
     )
-
 
     MainLogger.info("Finishing Pipeline .......................")
 

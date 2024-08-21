@@ -97,7 +97,7 @@ def load_validate_mapper(
         mapper_path_key (str): The key to retrieve the mapper path from the config.
         config (dict): A dictionary containing configuration options.
         logger (logging.Logger): A logger to log information and errors.
-        rd_file_exists (callable): A platform-specific function that checks if a 
+        rd_file_exists (callable): A platform-specific function that checks if a
             file exists in a certain path.
         rd_read_csv(callable): A platform-specific function that reads a csv
             file into a Pandas dataframe from a given path.
@@ -111,7 +111,7 @@ def load_validate_mapper(
     """
     # Get the path of the mapper from the config dictionary
     mapper_path = config["mapping_paths"][mapper_path_key]
-    
+
     # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
 
@@ -181,9 +181,10 @@ def load_val_snapshot_json(
 
     # Validate snapshot data
     # TODO: this temp switched off while working on dev_test_branch
-    # val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml"
-    # )
-    # val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+    val.validate_data_with_schema(
+        contributors_df, "./config/contributors_schema.toml"
+    )
+    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
     if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
@@ -202,11 +203,11 @@ def load_val_snapshot_json(
     # Validate and force data types for the full responses df
     # TODO Find a fix for the datatype casting before uncommenting
     # TODO commented out for Dev test for now
-    # val.combine_schemas_validate_full_df(
-    #     full_responses,
-    #     "./config/contributors_schema.toml",
-    #     "./config/wide_responses.toml",
-    # )
+    val.combine_schemas_validate_full_df(
+        full_responses,
+        "./config/contributors_schema.toml",
+        "./config/wide_responses.toml",
+    )
 
     return full_responses, res_rate
 
