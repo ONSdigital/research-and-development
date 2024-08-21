@@ -128,14 +128,29 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def random_assign_civdef(
+def _get_random_civdef(seed: int, proportions: Tuple[float, float]) -> str:
+    """Get a random value (C or D) using proportions and a given seed.
+
+    Args:
+        seed (int): The seed used by the randomiser.
+        proportions (Tuple[float, float]): The proportion of C and D in the data.
+
+    Returns:
+        str: The randomised values (C or D).
+    """
+    np.random.seed(seed=seed)
+    value = np.random.choice(["C", "D"], size=1, p=proportions)[0]
+    return value
+    
+
+def assign_random_civdef(
     df: pd.DataFrame, proportions: Tuple[float, float]
 ) -> pd.DataFrame:
     """Assign "C" for civil or "D" for defence randomly based on
     the proportions supplied.
     """
-    np.random.seed(seed=42)
-    df["200_imputed"] = np.random.choice(["C", "D"], size=len(df), p=proportions)
+
+    df["200_imputed"] = df["reference"].apply(lambda x: _get_random_civdef(int(x), proportions))
     return df
 
 
@@ -177,7 +192,7 @@ def apply_civdev_imputation(
 
     # randomly assign civil or defence based on proportions in whole clear df
     to_impute_df = df.loc[to_impute_mask].copy()
-    to_impute_df = random_assign_civdef(to_impute_df, proportions)
+    to_impute_df = assign_random_civdef(to_impute_df, proportions)
     to_impute_df["200_imp_marker"] = "fall_back_imputed"
 
     # PASS 2: refine based on product group imputation class
