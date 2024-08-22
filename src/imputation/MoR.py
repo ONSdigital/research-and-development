@@ -128,16 +128,21 @@ def carry_forwards(df, backdata, impute_vars):
     match_cond = df["_merge"] == "both"
 
     # Replace the values of certain columns with the values from the back data
-    replace_vars = ["instance", "200", "201", "601", "602", "604", "imp_class"]
+    replace_vars = ["instance", "200", "201", "601", "602", "604"]
     for var in replace_vars:
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
     # Update the postcodes_harmonised column from the updated column 601
     df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
 
+    # Update the imputation classes based on the new 200 and 201 values
+    df = create_imp_class_col(df, "200", "201")
+
     # Update the varibles to be imputed by the corresponding previous values
     for var in impute_vars:
-        df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"]
+        df.loc[match_cond, f"{var}_imputed"] = df.loc[match_cond, f"{var}_prev"].fillna(
+            0
+        )
 
         # fill nulls with zeros if col 211 is not null
         fillna_cond = ~df["211"].isnull()
@@ -147,37 +152,74 @@ def carry_forwards(df, backdata, impute_vars):
 
     df.loc[match_cond, "imp_marker"] = "CF"
 
-    # df.loc[match_cond] = create_imp_class_col(df, "200_prev", "201_prev")
+    # other columns we would like to keep from the backdata for QA purposes
+    more_cols = ["formtype"]
 
     # Drop merge related columns
     to_drop = [
         column
         for column in df.columns
         if (column.endswith("_prev"))
-        & (re.search("(.*)_prev|.*", column).group(1) not in impute_vars)
+        & (re.search("(.*)_prev|.*", column).group(1) not in (impute_vars + more_cols))
     ]
     to_drop += ["_merge"]
     df = df.drop(to_drop, axis=1)
     return df
 
 
+def filter_for_links(df: pd.DataFrame, is_current: bool) -> pd.DataFrame:
+    """Filter the data to only include the relevant rows for calculating links.
+
+    Args:
+        df (pd.DataFrame): DataFrame of data to filter.
+        is_current (bool): Whether the data is the current or previous period.
+
+    Returns:
+        pd.DataFrame: Filtered DataFrame.
+    """
+    # Filter out imputation classes that are missing either "200" or "201"
+    nan_mask = df["imp_class"].str.contains("nan").apply(lambda x: not x)
+    # Select only clear, or equivalently, imp_marker R.
+    # Exclude PRN cells in the current period.
+    if is_current:
+        mask = (df["imp_marker"] == "R") & (df["selectiontype"] != "P") & nan_mask
+    else:
+        mask = (df["imp_marker"] == "R") & nan_mask
+
+    return df.loc[mask, :]
+
+
 def calculate_growth_rates(current_df, prev_df, target_vars):
     """Calculate the growth rates between previous and current data.
+
+    Growth rates are caclucated for "matched pairs": where the reference and imp_class
+    are the same in both the current and previous data. This is done for clear
+    responders only (imp_marker = R).
+
+    PRN sampled cells (which only occur in short forms) are not included for the current
+    period, a matched pair could still be valid if the reference was PRN in the previous
+    period.
 
     Args:
         current_df (pd.DataFrame): pre-processed current data.
         prev_df (pd.DataFrame): pre-processed backdata.
         target_vars ([string]): target vars to impute.
     """
+    # Select only clear, or equivalently, imp_marker R.
+    # Exclude PRN cells in the current period.
+
+    prev_df = filter_for_links(prev_df.copy(), is_current=False)
+    current_df = filter_for_links(current_df.copy(), is_current=True)
+
     # Ensure we only have one row per reference/imp_class for previous and current data
     prev_df = (
-        prev_df[["reference", "imp_class"] + target_vars]
+        prev_df[["reference", "imp_class", "imp_marker"] + target_vars]
         .groupby(["reference", "imp_class"])
         .sum()
     ).reset_index()
 
     current_df = (
-        current_df[["reference", "imp_class"] + target_vars]
+        current_df[["reference", "imp_class", "imp_marker"] + target_vars]
         .groupby(["reference", "imp_class"])
         .sum()
     ).reset_index()
