@@ -159,7 +159,7 @@ def run_staging(  # noqa: C901
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
-        manual_outliers = read_csv(manual_path, wanted_cols)
+        manual_outliers = read_csv(manual_path, usecols=wanted_cols)
         manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
             False
         )
@@ -180,7 +180,7 @@ def run_staging(  # noqa: C901
     if config["global"]["load_manual_imputation"] and isfile(manual_trim_path):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
-        manual_trim_df = read_csv(manual_trim_path, wanted_cols)
+        manual_trim_df = read_csv(manual_trim_path, usecols=wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
         manual_trim_df = manual_trim_df.drop_duplicates(
