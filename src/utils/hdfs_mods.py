@@ -54,6 +54,8 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
             df = pd.read_csv(file, **kwargs)
         except Exception:
             rd_logger.error(f"Could not read specified file: {filepath}")
+            if kwargs:
+                rd_logger.info("The following arguments failed: " + str(kwargs))
             if "usecols" in kwargs:
                 rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
             raise ValueError

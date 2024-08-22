@@ -47,6 +47,8 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
             df = pd.read_csv(file, **kwargs)
         except Exception:
             LocalModLogger.error(f"Could not read specified file: {filepath}")
+            if kwargs:
+                LocalModLogger.info("The following arguments failed: " + str(kwargs))
             if "usecols" in kwargs:
                 LocalModLogger.info("Columns not found: " + str(kwargs["usecols"]))
             raise ValueError
