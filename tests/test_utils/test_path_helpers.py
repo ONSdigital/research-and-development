@@ -155,9 +155,7 @@ def test_validate_snapshot_files_success(config):
         } 
 
     message = staging_validation(config)
-
     expected_message = "There are no issues"
-
     assert (message == expected_message,
         "Output from test_validate_snapshot_files_incorrect not as expected.")
 
