@@ -134,3 +134,70 @@ def values_in_column(
         values = list(values)
     result = set(values).issubset(set(df[col_name]))
     return result
+
+def tree_to_list(
+    tree: dict, sep: str ="/", path_list: list = [], prefix: str = ""
+) -> list:
+    """
+    Converts a directory tree that is provided as a  dictionary to a list of
+    full paths. This is done recursively, so the number of tiers is not
+    pre-defined. Returns a list of absolute directory paths. 
+    Directory and subdirectory names must be the keys in the dictionary.
+    Directory that has no sub-directories must point to an empty dictionary {}.
+
+    Example
+    Input data
+    mydict = {
+        "BERD": {
+            "01":{},
+            "02":{},
+        },    
+        "PNP": {
+            "03":{},
+            "04":{"qa":{}},
+        },
+    }
+
+    Usage: tree_to_list(mydict, prefix="R:/2023")
+    
+    Result: 
+    ['R:/2023/BERD', 'R:/2023/BERD/01', 'R:/2023/BERD/02', 'R:/2023/PNP',
+    'R:/2023/PNP/03', 'R:/2023/PNP/04', 'R:/2023/PNP/04/qa']
+
+    Args:
+        tree (dict): The whole tree or its branch
+        sep (str): Separator, forward slash by default
+        path_list (list): A list of full paths that is populated when the function
+            runs. Must be empty when you call the function.
+        prefix (str): The common prefix. It should start with the platform-
+        specific root, such as "R:/dap_emulation" or "dapsen/workspace_zone_res_dev",
+        followed by the year_surveys. Don't add a forward slash at the end.
+
+    Returns:
+        A list of all absolute paths
+
+    """
+
+    # The recursive iteration will proceed until the current tree is not empty.
+    # The recursive iterations will stop once we reach thre lowest level
+    # indicated by an empty dictionary. 
+    if tree:
+
+        # For a non-empty dictionary, iterating through all top-level keys.
+        for key in tree:
+            if prefix == "":
+                # If the prefix is empty, we don't want to start from slash. We
+                # just set the prefix to be the key, which is the directory name
+                mypref = key
+            else:
+                # If the prefix is not empty, we add the separator and the 
+                # directory name to it
+                mypref = prefix + sep + key
+            
+            # The pdated prefix is appended to the path list 
+            path_list += [mypref]
+
+            # Doing the same for the underlying sub-directory
+            path_list = tree_to_list(tree[key], sep, path_list, mypref)
+
+    return path_list
