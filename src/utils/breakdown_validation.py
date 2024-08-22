@@ -92,15 +92,21 @@ def breakdown_validation(df: pd.DataFrame) -> dict:
 
 def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
     """Runs the breakdown_validation function and outputs the msg to the logger"""
-    not_null_df = df[~df.isnull().any(axis=1)]
+    not_null_df = df.dropna(subset=['222', '223', '203', '202', '204', '205', '206', '207', '221', '209', '219', '220', '210', '204', '211', '212', 
+    '214', '216', '242', '250', '243', '244', '245', '246', '218', '225', '226', '227', '228', '229', '237', '302', '303', '304', '305', '501', '503', 
+    '505', '507', '502', '504', '506', '508', '405', '407', '409', '411', '406', '408', '410', '412'])
+
+    print(not_null_df)
 
     bool_dict, msg = breakdown_validation(not_null_df) 
+
+    issue_counts = sum(value == True for value in bool_dict.values())
 
     if all(bool_dict.values()):
         BreakdownValidationLogger.info("All breakdown values are valid.\n")
         msg
     else:
-        BreakdownValidationLogger.error(f"There are {len(bool_dict)} errors with the breakdown values, please make the adjustments for the references that have issues.\n")
+        BreakdownValidationLogger.error(f"There are {issue_counts} errors with the breakdown values, please make the adjustments for the references that have issues.\n")
         raise ValueError(msg)
 
     return df
