@@ -32,27 +32,34 @@ except ImportError:
 rd_logger = logging.getLogger(__name__)
 
 
-def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
-    """Reads a csv from DAP into a Pandas Dataframe
+def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
+    """Reads a csv from HDFS into a Pandas Dataframe using pydoop. 
+    If "thousands" argument is not specified, sets it to ",". 
+    Allows to use any additional keyword arguments of Pandas read_csv method.
+
     Args:
         filepath (str): Filepath (Specified in config)
-        cols (List[str]): Optional list of columns to be read in
+        kwargs: Optional dictionary of Pandas read_csv arguments
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
     # Open the file in read mode inside Hadoop context
     with hdfs.open(filepath, "r") as file:
-        # Import csv file and convert to Dataframe
-        if not cols:
-            df_from_hdfs = pd.read_csv(file, thousands=",")
-        else:
-            try:
-                df_from_hdfs = pd.read_csv(file, usecols=cols, thousands=",")
-            except Exception:
-                rd_logger.error(f"Could not find specified columns in {filepath}")
-                rd_logger.info("Columns specified: " + str(cols))
-                raise ValueError
-    return df_from_hdfs
+        # If "thousands" argument is not specified, set it to ","
+        if "thousands" not in kwargs:
+            kwargs["thousands"] = ","
+        
+        # Read the scv file using the path and keyword arguments
+        try:
+            df = pd.read_csv(file, **kwargs)
+        except Exception:
+            rd_logger.error(f"Could not read specified file: {filepath}")
+            if kwargs:
+                rd_logger.info("The following arguments failed: " + str(kwargs))
+            if "usecols" in kwargs:
+                rd_logger.info("Columns not found: " + str(kwargs["usecols"]))
+            raise ValueError
+    return df
 
 
 def rd_write_csv(filepath: str, data: pd.DataFrame):

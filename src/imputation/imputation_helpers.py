@@ -303,6 +303,51 @@ def fill_sf_zeros(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def calculate_totals(df):
+    """Calculate the employment and headcount totals for the imputed columns.
+
+    This should be carried out for long form entries only as emp_total and
+    headcount_total are themselves target variables in short forms.
+
+    Imputation is applied to "target variables", and after this, imputed values for
+    "breakdown variables" are calculated. After both MoR and TMI imputation have been
+    carried out, but before short form expansion imputation, the totals for employment
+    and headcount are calculated.
+
+    Args:
+        df (pd.DataFrame): The dataframe with imputed data
+
+    Returns:
+        pd.DataFrame: The dataframe with the totals calculated
+    """
+    mask = df["formtype"] == "0001"
+
+    df.loc[mask, "emp_total_imputed"] = (
+        df.loc[mask, "emp_researcher_imputed"]
+        + df.loc[mask, "emp_technician_imputed"]
+        + df.loc[mask, "emp_other_imputed"]
+    )
+
+    df.loc[mask, "headcount_tot_m_imputed"] = (
+        df.loc[mask, "headcount_res_m_imputed"]
+        + df.loc[mask, "headcount_tec_m_imputed"]
+        + df.loc[mask, "headcount_oth_m_imputed"]
+    )
+
+    df.loc[mask, "headcount_tot_f_imputed"] = (
+        df.loc[mask, "headcount_res_f_imputed"]
+        + df.loc[mask, "headcount_tec_f_imputed"]
+        + df.loc[mask, "headcount_oth_f_imputed"]
+    )
+
+    df.loc[mask, "headcount_total_imputed"] = (
+        df.loc[mask, "headcount_tot_m_imputed"]
+        + df.loc[mask, "headcount_tot_f_imputed"]
+    )
+
+    return df
+
+
 def tidy_imputation_dataframe(
     df: pd.DataFrame,
     config: Dict,

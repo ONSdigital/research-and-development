@@ -126,17 +126,18 @@ class RunLog:
         return write_csv_setting, write_hdf5_setting, write_sql_setting
 
     def log_csv_creator(self, filepath: str, columns: list) -> None:
-        """Creates a csv file in DAP with user
-        defined headers if it doesn't exist.
+        """Creates a csv file in DAP with user-defined headers if it doesn't
+        exist. There may be no runlog if the pipeline is running for the first
+        time, run_id would be 1. If so, create a CSV file with column names and
+        no data rows, so that new entries can be inserted in it.
+
         Args:
             filename (string): Example: "name_of_file.csv"
             columns (list): Example: ["a","b","c","d"]
-        """
 
-        # Check if the runolg file exists. There may be no runlog if the
-        # pipeline is running for the first time, run_id 1. If so,
-        # create a CSV file with column names and no data rows, so that new
-        # entries can be inserted in it.
+        Returns: None
+        """
+        # Check if the runolg file exists. 
         if not self.file_exists_func(filepath):
             # Create an empty dataframe with column names
             df = pd.DataFrame(columns=columns)
