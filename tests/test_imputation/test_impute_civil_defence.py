@@ -213,7 +213,7 @@ class TestGetRandomCivdef(object):
                 (1234567891011, [0.4, 0.6]),
                 (1, [0.52, 0.48]),
                 (54321, [0.1, 0.9]),
-                (9999999, [0.95, 0.05]),
+                (9999999, [0.75, 0.25]),
             ]
     )
     def test__get_random_civdef(self, seed, proportions):
