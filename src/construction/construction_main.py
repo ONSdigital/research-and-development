@@ -28,6 +28,8 @@ def run_construction(  # noqa: C901
     config: dict,
     check_file_exists: Callable,
     read_csv: Callable,
+    is_run_all_data_construction: bool = False,
+    is_run_postcode_construction: bool = False,
     is_northern_ireland: bool = False,
 ) -> pd.DataFrame:
     """Run the construction module.
@@ -53,8 +55,11 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
         run_postcode_construction = False
-    else:
+    elif is_run_all_data_construction:
         run_construction = config["global"]["run_all_data_construction"]
+        run_postcode_construction = False
+    elif is_run_postcode_construction:
+        run_construction = False
         run_postcode_construction = config["global"]["run_postcode_construction"]
 
     # Skip this module if not needed
@@ -101,15 +106,15 @@ def run_construction(  # noqa: C901
                 f"Invalid value for construction_type. Expected one of {valid_types}"
             )
 
-    if not is_northern_ireland:
+    if not is_northern_ireland and not is_run_postcode_construction:
         validate_short_to_long(construction_df, construction_logger)
 
-    # validate the references passed in construction
-    validate_construction_references(
-        construction_df=construction_df,
-        snapshot_df=snapshot_df,
-        logger=construction_logger,
-    )
+        # validate the references passed in construction
+        validate_construction_references(
+            construction_df=construction_df,
+            snapshot_df=snapshot_df,
+            logger=construction_logger,
+        )
 
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")

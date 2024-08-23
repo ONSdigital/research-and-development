@@ -15,6 +15,7 @@ from src.imputation.short_to_long import run_short_to_long
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.imputation.MoR import run_mor
+from src.construction.construction_main import run_construction
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -28,6 +29,8 @@ def run_imputation(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    rd_file_exists: Callable,
+    rd_read_csv: Callable,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
 
@@ -151,6 +154,16 @@ def run_imputation(
         write_csv(os.path.join(qa_path, links_filename), links_df)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
+
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    if run_postcode_construction:
+        imputed_df = run_construction(
+            imputed_df,
+            config,
+            rd_file_exists,
+            rd_read_csv,
+            is_run_postcode_construction = True,
+        )
 
     # remove rows and columns no longer needed from the imputed dataframe
     imputed_df = hlp.tidy_imputation_dataframe(
