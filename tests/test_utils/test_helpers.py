@@ -75,6 +75,13 @@ class TestTreeToList:
         }
         return tree
 
+    # Create an input tree with a type error for negative test
+    def create_wrong_type_tree(self):
+
+        # The value must be an empty dictionary, not an empty list
+        bad_tree = {"BERD": []}
+        return bad_tree
+
     # Create an expected dataframe for the test
     def create_expected_list(self):
         exp_output_list = [
@@ -87,6 +94,10 @@ class TestTreeToList:
         """Test for atree_to_list()"""
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
+        bad_tree = self.create_wrong_type_tree()
 
         result_list = tree_to_list(inp_tree, prefix="R:/2023")
         assert result_list == exp_output_list
+
+        with pytest.raises(TypeError):
+            tree_to_list(bad_tree, prefix="R:/2023")
