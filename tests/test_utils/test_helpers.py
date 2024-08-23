@@ -7,6 +7,7 @@ from src.utils.helpers import (
     convert_formtype, values_in_column, tree_to_list
 )
 
+
 def test_convert_formtype():
     """Test for convert_formtype()."""
     msg = "Converted formtype not as expected"
@@ -32,16 +33,15 @@ class TestValuesInColumn(object):
             {"col": [1, 2, 3, 5, 6, 8, 0]}
         )
         return df
-    
 
     @pytest.mark.parametrize(
-            "values, expected",
-            [
-                ([1, 2, 3], True),#True/List
-                (pd.Series([0, 5, 8]), True),#True/Series
-                ([1, 2, 4], False),#False/List
-                (pd.Series([15]), False),#False/Series
-            ]
+        "values, expected",
+        [
+            ([1, 2, 3], True),  # True/List
+            (pd.Series([0, 5, 8]), True),  # True/Series
+            ([1, 2, 4], False),  # False/List
+            (pd.Series([15]), False),  # False/Series
+        ]
     )
     def test_valuies_in_column(self, dummy_df, values, expected):
         """General tests for values_in_column."""
@@ -91,7 +91,7 @@ class TestTreeToList:
         return exp_output_list
 
     def test_tree_to_list(self):
-        """Test for atree_to_list()"""
+        """Test for tree_to_list()"""
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
         bad_tree = self.create_wrong_type_tree()

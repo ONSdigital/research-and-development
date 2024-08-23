@@ -156,9 +156,11 @@ def tree_to_list(
 
     """
 
+    # Input must be a dictionary of dictionaries or an empty dictionary
     if isinstance(tree, dict):
-        # The recursive iteration will proceed until the current tree is not empty.
-        # The recursive iterations will stop once we reach thre lowest level
+
+        # The recursive iteration will proceed if the current tree is not empty.
+        # The recursive iterations will stop once we reach the lowest level
         # indicated by an empty dictionary.
         if tree:
 
