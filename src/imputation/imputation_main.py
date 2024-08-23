@@ -100,6 +100,9 @@ def run_imputation(
     # Run TMI for long forms and short forms
     imputed_df, qa_df = tmi.run_tmi(df, config)
 
+    # Perform TMI step 5, which calculates employment and headcount totals
+    imputed_df = hlp.calculate_totals(imputed_df)
+
     # After imputation, correction to overwrite the "604" == "No" in any records with
     # Status "check needed"
     chk_mask = imputed_df["status"].str.contains("Check needed")
@@ -130,6 +133,7 @@ def run_imputation(
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation QA files.")
+        links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = (
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
@@ -144,9 +148,7 @@ def run_imputation(
         write_csv(os.path.join(qa_path, trim_qa_filename), trimming_qa_output)
         write_csv(os.path.join(qa_path, full_imp_filename), imputed_df)
         write_csv(os.path.join(qa_path, wrong_604_filename), wrong_604_qa_df)
-        if config["global"]["load_backdata"]:
-            links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
-            write_csv(os.path.join(qa_path, links_filename), links_df)
+        write_csv(os.path.join(qa_path, links_filename), links_df)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 

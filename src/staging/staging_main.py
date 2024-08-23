@@ -84,9 +84,7 @@ def run_staging(  # noqa: C901
             snapshot_name = os.path.basename(
                 staging_dict["updated_snapshot_path"]
             ).split(".", 1)[0]
-            feather_file = os.path.join(
-                feather_path, f"{snapshot_name}.feather"
-            )
+            feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
 
         # Check if the if the snapshot feather exists
         feather_files_exist = rd_file_exists(feather_file)
@@ -166,7 +164,11 @@ def run_staging(  # noqa: C901
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
+<<<<<<< HEAD
         manual_outliers = rd_read_csv(manual_path, wanted_cols)
+=======
+        manual_outliers = read_csv(manual_path, usecols=wanted_cols)
+>>>>>>> origin
         manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
             False
         )
@@ -202,6 +204,7 @@ def run_staging(  # noqa: C901
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
+<<<<<<< HEAD
     if config["global"]["load_backdata"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Backdata File")
@@ -209,11 +212,16 @@ def run_staging(  # noqa: C901
         rd_file_exists(backdata_path, raise_error=True)
         backdata = rd_read_csv(backdata_path)
         val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
+=======
+    # stage the backdata for MoR
+    StagingMainLogger.info("Loading Backdata File")
+    backdata_path = staging_dict["backdata_path"]
+    rd_file_exists(backdata_path, raise_error=True)
+    backdata = read_csv(backdata_path)
+    val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
+>>>>>>> origin
 
-        StagingMainLogger.info("Backdata File Loaded Successfully...")
-    else:
-        backdata = None
-        StagingMainLogger.info("Loading of Backdata File skipped")
+    StagingMainLogger.info("Backdata File Loaded Successfully...")
 
     # Loading ITL1 detailed mapper
     itl1_detailed_mapper = helpers.load_validate_mapper(

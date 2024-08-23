@@ -362,33 +362,6 @@ def apply_tmi(df, target_variables, mean_dict):
     return final_df
 
 
-def calculate_totals(df):
-
-    df["emp_total_imputed"] = (
-        df["emp_researcher_imputed"]
-        + df["emp_technician_imputed"]
-        + df["emp_other_imputed"]
-    )
-
-    df["headcount_tot_m_imputed"] = (
-        df["headcount_res_m_imputed"]
-        + df["headcount_tec_m_imputed"]
-        + df["headcount_oth_m_imputed"]
-    )
-
-    df["headcount_tot_f_imputed"] = (
-        df["headcount_res_f_imputed"]
-        + df["headcount_tec_f_imputed"]
-        + df["headcount_oth_f_imputed"]
-    )
-
-    df["headcount_total_imputed"] = (
-        df["headcount_tot_m_imputed"] + df["headcount_tot_f_imputed"]
-    )
-
-    return df
-
-
 def run_longform_tmi(
     longform_df: pd.DataFrame,
     config: Dict[str, Any],
@@ -426,10 +399,7 @@ def run_longform_tmi(
     tmi_df.loc[qa_df.index, "305_trim"] = qa_df["305_trim"]
 
     # TMI Step 4: expansion imputation
-    expanded_df = ximp.run_expansion(tmi_df, config)
-
-    # TMI Step 5: Calculate headcount and employment totals
-    final_df = calculate_totals(expanded_df)
+    final_df = ximp.run_expansion(tmi_df, config)
 
     TMILogger.info("TMI long form imputation completed.")
     return final_df, qa_df

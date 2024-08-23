@@ -76,15 +76,15 @@ network_paths:
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged/"
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-14_v993.csv"
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-19_v690.csv"
   freezing_changes_to_review_path: "02_freezing/changes_to_review/"
-  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-08-14_v994.csv"
-  freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-08-14_v994.csv"
+  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-08-19_v689.csv"
+  freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-08-19_v689.csv"
   # Imputation and outliers input paths
   # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
   backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_published_v347.csv"
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
-  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/2023_manual_outlier_24-08-21_v703.csv"
   # Construction paths
   all_data_construction_file_path: "04_construction/manual_construction/2023_test_construction_file.csv"
   postcode_construction_file_path: "04_construction/manual_construction/2023_test_postcode_construction_file.csv"
