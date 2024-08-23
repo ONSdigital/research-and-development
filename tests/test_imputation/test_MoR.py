@@ -19,7 +19,7 @@ class TestRunMoR(object):
     @pytest.fixture(scope="function")
     def dummy_mor_df(self) -> pd.DataFrame:
         """A dummy dataframe used for testing MoR imputation."""
-        fpath = os.path.join("tests/data/imputation/imp_AD_E_rand.csv")
+        fpath = os.path.join("tests/data/imputation/to_impute_anon.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"instance": "Int64"})
         return df
@@ -27,7 +27,7 @@ class TestRunMoR(object):
     @pytest.fixture(scope="function")
     def dummy_mor_backdata(self) -> pd.DataFrame:
         """Dummy backdata used for testing MoR imputation."""
-        fpath = os.path.join("tests/data/imputation/backdata_AD_E_rand.csv")
+        fpath = os.path.join("tests/data/imputation/backdata_anon.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"instance": "Int64"})
         return df
@@ -35,7 +35,7 @@ class TestRunMoR(object):
     @pytest.fixture(scope="function")
     def expected_mor_output(self) -> pd.DataFrame:
         """The expected output from run_mor."""
-        fpath = os.path.join("tests/data/imputation/imp_AD_E_rand.csv")
+        fpath = os.path.join("tests/data/imputation/backdata_anon.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"instance": "Int64"})
         return df
