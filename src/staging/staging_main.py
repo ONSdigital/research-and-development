@@ -204,7 +204,7 @@ def run_staging(  # noqa: C901
     StagingMainLogger.info("Loading Backdata File")
     backdata_path = staging_dict["backdata_path"]
     rd_file_exists(backdata_path, raise_error=True)
-    backdata = read_csv(backdata_path)
+    backdata = rd_read_csv(backdata_path)
     val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
 
     StagingMainLogger.info("Backdata File Loaded Successfully...")
