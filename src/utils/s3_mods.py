@@ -153,12 +153,15 @@ def rd_load_json(filepath: str) -> dict:
 def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check file exists in s3.
 
-        Args:
-            filepath (str): The filepath in s3
-            raise_error (bool): A switch to raise FileExistsError or not.
+    Args:
+        filepath (str): The filepath in s3.
+        raise_error (bool): A switch to raise FileExistsError or not.
 
-        Returns:
-            result (bool): A boolean value which is true if the file exists.
+    Raises:
+        FileExistsError: Raised if no file exists at the given filepath.
+
+    Returns:
+        result (bool): A boolean value which is true if the file exists.
     """
 
     result = file_exists(
@@ -175,11 +178,11 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
 def rd_mkdir(path: str) -> None:
     """Function to create a directory in s3 bucket.
 
-        Args:
-            path (str): The directory path to create
+    Args:
+        path (str): The directory path to create
 
-        Returns:
-            None
+    Returns:
+        None
     """
     _ = create_folder_on_s3(
         client=config["client"],
