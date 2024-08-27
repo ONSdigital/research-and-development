@@ -96,11 +96,12 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
 
 
 def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
-    """Writes a Pandas Dataframe to csv in s3 bucket
+    """Write a Pandas Dataframe to csv in an s3 bucket.
 
     Args:
-        filepath (str): Filepath (Specified in config)
-        data (pd.DataFrame): Data to be stored
+        filepath (str): The filepath to save the dataframe to.
+        data (pd.DataFrame): THe dataframe to write to the passed path.
+
     Returns:
         None
     """
