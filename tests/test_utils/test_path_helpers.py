@@ -1,5 +1,6 @@
 """Tests for path_helpers.py """
 import pytest
+import logging
 
 from src.utils.path_helpers import (
     get_paths,
@@ -10,7 +11,8 @@ from src.utils.path_helpers import (
     create_module_config,
     create_exports_config,
     update_config_with_paths,
-    staging_validation
+    staging_validation,
+    staging_validation_logger
 )
 
 
@@ -20,8 +22,8 @@ def config():
         "global": {"network_or_hdfs": "network"},
         "network_paths": {
             "root": "R:/DAP_emulation/",
-            "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-            "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
+            "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+            "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
             "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
             "manual_imp_trim_path": "06_imputation/man_trim/trim_qa.csv",
@@ -80,6 +82,7 @@ def config():
         },
         "pnp_paths": {"staging_qa_path" : "01_staging/pnp_staging_qa"},
         "export_paths": {"export_folder": "outgoing_export"},
+
     }
     return config
 
@@ -88,8 +91,8 @@ def test_get_paths(config):
     """Test get_paths function."""
     expected_network_paths = {
         "root": "R:/DAP_emulation/",
-        "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-        "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
+        "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+        "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
         "manual_outliers_path": "07_outliers/man_out/man_out.csv",
@@ -119,8 +122,8 @@ def test_get_paths(config):
 def expected_staging_dict():
     expected_staging_dict = {
         "feather_output": "R:/DAP_emulation/2022_surveys/BERD/01_staging/feather",
-        "frozen_snapshot_path": "frozen_snapshot_path/snap.csv",
-        "updated_snapshot_path": "updated_snapshot_path/snap2.csv",
+        "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+        "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "manual_outliers_path": (
             "R:/DAP_emulation/2022_surveys/BERD/07_outliers/man_out/man_out.csv"
@@ -159,21 +162,21 @@ def test_validate_snapshot_files_success(config):
     assert (message == expected_message,
         "Output from test_validate_snapshot_files_incorrect not as expected.")
 
-def test_validate_snapshot_files_fail(config):
+def test_validate_snapshot_files_fail(config, caplog):
     """Tests for staging_validation function."""
     config = {
         
         'years' : {'survey_year': 2023,},
               'global': {'network_or_hdfs': "network"},
-              'network_paths': { 'root': "R:/BERD Results System Development 2023/DAP_emulation/",
+              'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
               'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
               'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
               }
         } 
-
-    with pytest.raises(ValueError):
-        staging_validation(config)
-
+    msg = 'There are errors with the snapshot paths.\n'
+    with caplog.at_level(logging.INFO):
+        staging_validation_logger(config)
+        assert msg in caplog.text
 
 def test_create_ni_staging_config(config):
     """Test create_ni_staging_config function."""

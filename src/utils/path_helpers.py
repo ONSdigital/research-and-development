@@ -62,7 +62,6 @@ def staging_validation_logger(config: dict) -> dict:
         print("There are no issues with the snapshot paths. \n")
     else:
         PathHelpLogger.error("There are errors with the snapshot paths.\n")
-        raise ValueError(msg)
 
     return config
 
