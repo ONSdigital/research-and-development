@@ -199,7 +199,7 @@ def add_constructed_nonresponders(
     for col in missing_columns:
         rows_to_add[col] = np.nan
     rows_to_add = prep_new_rows(rows_to_add, updated_snapshot_df)
-    rows_to_add[updated_snapshot_df.columns]
+    rows_to_add = rows_to_add[updated_snapshot_df.columns]
     updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
     return updated_snapshot_df, construction_df
 
