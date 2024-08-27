@@ -80,7 +80,7 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         if "thousands" not in kwargs:
             kwargs["thousands"] = ","
 
-        # Read the scv file using the path and keyword arguments
+        # Read the csv file using the path and keyword arguments
         try:
             df = pd.read_csv(file, **kwargs)
         except Exception:
