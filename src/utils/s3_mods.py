@@ -105,7 +105,7 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
     Returns:
         None
     """
-    # Create an Unput-Output buffer
+    # Create an Input-Output buffer
     csv_buffer = StringIO()
 
     # Write the dataframe to the buffer in the CSV format
