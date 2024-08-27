@@ -83,15 +83,12 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         # Read the scv file using the path and keyword arguments
         try:
             df = pd.read_csv(file, **kwargs)
-        except Exception:
-            if "usecols" in kwargs:
-                s3_logger.info("Columns not found: " + str(kwargs["usecols"]))
-            if kwargs:
-                s3_logger.info("The following arguments failed: " + str(kwargs))
-
-            s3_logger.error(f"Could not read specified file: {filepath}")
-
-            raise ValueError
+        except Exception as e:
+            s3_logger.error(
+                f"Could not read specified file {filepath}. Error: {e}"
+            )
+ 
+            raise e
     return df
 
 
