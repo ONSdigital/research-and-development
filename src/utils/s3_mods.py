@@ -39,11 +39,11 @@ from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
 # set up logging
 s3_logger = logging.getLogger(__name__)
 
-
 def create_client(config: dict):
-    """Initialises and configures a boto3 client. Configures the raz_client,
-    which is needed for authentication between CDSW session and the s3 server,
-    using the parameters stored in the config.
+    """Initialise and configure a boto3 client. 
+    
+    This function configures the raz_client, which is needed for authentication 
+    between CDSW session and the s3 server, using the parameters stored in the config.
 
     Args:
         config (dict): Combined config (s3 parameters are in developer config)
