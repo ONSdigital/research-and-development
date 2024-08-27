@@ -132,11 +132,13 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
 
 
 def rd_load_json(filepath: str) -> dict:
-    """Function to load JSON data from s3 bucket using a boto3 client
+    """Load JSON data from an s3 bucket using a boto3 client.
+
     Args:
-        filepath (string): The filepath in Hue s3 bucket
+        filepath (string): The filepath in Hue s3 bucket.
+
     Returns:
-        datadict (dict): The entire content of the JSON file
+        datadict (dict): The entire contents of the JSON file.
     """
     # Use the boto3 client from the config
     s3_client = config["client"]
