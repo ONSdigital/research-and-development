@@ -180,7 +180,6 @@ def load_val_snapshot_json(
     StagingHelperLogger.info("Finished Data Ingest...")
 
     # Validate snapshot data
-    # TODO: this temp switched off while working on dev_test_branch
     val.validate_data_with_schema(
         contributors_df, "./config/contributors_schema.toml"
     )
