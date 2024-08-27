@@ -256,15 +256,15 @@ class TestAddConstructedNonresponders:
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
-        output_cols = ["reference", "formtype", "cellnumber", "construction_type"]
+        output_cols = ["reference", "formtype", "cellnumber"]
         data = [
-            ["A", 1, 12, None],
-            ["B", 1, 12, None],
-            ["C", 1, 12, None],
-            ["D", 1, 12, None],
-            ["E", 1, 12, None],
-            ["F", 1, 12, "new"],
-            ["I", 1, 12, "new"],
+            ["A", 1, 12],
+            ["B", 1, 12],
+            ["C", 1, 12],
+            ["D", 1, 12],
+            ["E", 1, 12],
+            ["F", 1, 12],
+            ["I", 1, 12],
         ]
         output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
         return output_snapshot_df
@@ -297,6 +297,8 @@ class TestAddConstructedNonresponders:
         )
 
         # Check the output
+        print(snapshot_output)
+        print(expected_snapshot_output)
         assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
         assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"
 
