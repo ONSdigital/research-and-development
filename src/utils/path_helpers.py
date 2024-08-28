@@ -40,7 +40,7 @@ def create_module_config(config: dict, module_name: str) -> dict:
 
     return module_dict
 
-def staging_validation(config: dict) -> dict:
+def snapshot_validation(config: dict) -> dict:
     paths = get_paths(config)
     survey_year = str(config["years"]["survey_year"])    
     msg = ""
@@ -48,20 +48,21 @@ def staging_validation(config: dict) -> dict:
     if f"{survey_year}12" not in paths['frozen_snapshot_path']:
         msg += f"{survey_year} is not included in the frozen snapshot path.\n"
 
-    if f"{survey_year}12" not in paths['updated_snapshot_path']:
+    if paths['updated_snapshot_path'] != "" or f"{survey_year}12" not in paths['updated_snapshot_path']:
         msg += f"{survey_year} is not included in the updated snapshot path.\n"
-                       
+      
+                      
     return msg
 
-def staging_validation_logger(config: dict) -> dict:
+def snapshot_validation_logger(config: dict) -> dict:
     """Checks that the mapping filenames are valid"""
-    msg = staging_validation(config)
+    msg = snapshot_validation(config)
 
     if msg == "":
         PathHelpLogger.info("The snapshot paths are valid.")
-        print("There are no issues with the snapshot paths. \n")
     else:
         PathHelpLogger.error("There are errors with the snapshot paths.\n")
+        raise ValueError(msg)
 
     return config
 
@@ -77,7 +78,7 @@ def create_staging_config(config: dict) -> dict:
     Returns:
         dict: A configuration dictionary will all paths needed for staging.
     """
-    config = staging_validation_logger(config)
+    config = snapshot_validation_logger(config)
     
     paths = get_paths(config)
     berd_path = paths["berd_path"]
