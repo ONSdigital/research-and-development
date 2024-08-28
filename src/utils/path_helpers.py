@@ -48,10 +48,9 @@ def snapshot_validation(config: dict) -> dict:
     if f"{survey_year}12" not in paths['frozen_snapshot_path']:
         msg += f"{survey_year} is not included in the frozen snapshot path.\n"
 
-    if paths['updated_snapshot_path'] != "" or f"{survey_year}12" not in paths['updated_snapshot_path']:
+    if paths['updated_snapshot_path'] is not None and (f"{survey_year}12" not in paths['updated_snapshot_path']):
         msg += f"{survey_year} is not included in the updated snapshot path.\n"
       
-                      
     return msg
 
 def snapshot_validation_logger(config: dict) -> dict:
@@ -59,7 +58,7 @@ def snapshot_validation_logger(config: dict) -> dict:
     msg = snapshot_validation(config)
 
     if msg == "":
-        PathHelpLogger.info("The snapshot paths are valid.")
+        PathHelpLogger.info("The snapshot paths are valid.\n")
     else:
         PathHelpLogger.error("There are errors with the snapshot paths.\n")
         raise ValueError(msg)
