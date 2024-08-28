@@ -132,9 +132,15 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Construction module
     MainLogger.info("Starting Construction...")
-    full_responses = run_construction(
-        full_responses, config, mods.rd_file_exists, mods.rd_read_csv
-    )
+    run_all_data_construction = config["global"]["run_all_data_construction"]
+    if run_all_data_construction:
+        full_responses = run_construction(
+            full_responses,
+            config,
+            mods.rd_file_exists,
+            mods.rd_read_csv,
+            is_run_all_data_construction = True,
+        )
     MainLogger.info("Finished Construction...")
 
     # Mapping module
@@ -158,6 +164,8 @@ def run_pipeline(user_config_path, dev_config_path):
         config,
         mods.rd_write_csv,
         run_id,
+        mods.rd_file_exists,
+        mods.rd_read_csv
     )
     MainLogger.info("Finished  Imputation...")
 
