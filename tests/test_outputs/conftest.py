@@ -27,6 +27,8 @@ def write_csv_func() -> Callable:
     # import the correct write_csv (assumption config is correct)
     if LOCATION.lower() == "network":
         from src.utils.local_file_mods import rd_write_csv as write_csv
+    elif LOCATION.lower() == "s3":
+        from src.utils.s3_mods import rd_write_csv as write_csv
     else:
         from src.utils.hdfs_mods import rd_write_csv as write_csv
     return write_csv
