@@ -56,7 +56,7 @@ class TestValuesInColumn(object):
 
 
 class TestTreeToList:
-    """Test for tree_to_list()"""
+    """Test for tree_to_list()."""
 
     # Tests that a tree is correctly converted to a list.
     # Tests that it raises a TypeError if the input is not a dictionary.
@@ -91,7 +91,7 @@ class TestTreeToList:
         return exp_output_list
 
     def test_tree_to_list(self):
-        """Test for tree_to_list()"""
+        """Test for tree_to_list()."""
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
         bad_tree = self.create_wrong_type_tree()

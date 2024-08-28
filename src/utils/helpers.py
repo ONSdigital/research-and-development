@@ -117,8 +117,10 @@ def tree_to_list(
     tree: dict, sep: str = "/", path_list: list = [], prefix: str = ""
 ) -> list:
     """
-    Converts a directory tree that is provided as a  dictionary to a list of
-    full paths. This is done recursively, so the number of tiers is not
+    Convert a dictionary of paths to a list.
+
+    This function converts a directory tree that is provided as a dictionary to a 
+    list of full paths. This is done recursively, so the number of tiers is not
     pre-defined. Returns a list of absolute directory paths.
     Directory and subdirectory names must be the keys in the dictionary.
     Directory that has no sub-directories must point to an empty dictionary {}.
@@ -148,8 +150,8 @@ def tree_to_list(
         path_list (list): A list of full paths that is populated when the function
             runs. Must be empty when you call the function.
         prefix (str): The common prefix. It should start with the platform-
-        specific root, such as "R:/dap_emulation" or "dapsen/workspace_zone_res_dev",
-        followed by the year_surveys. Don't add a forward slash at the end.
+            specific root, such as "R:/dap_emulation" or "dapsen/workspace_zone_res_dev",
+            followed by the year_surveys. Do not add a forward slash at the end.
 
     Returns:
         A list of all absolute paths
