@@ -180,7 +180,6 @@ def load_val_snapshot_json(
     StagingHelperLogger.info("Finished Data Ingest...")
 
     # Validate snapshot data
-    # TODO: this temp switched off while working on dev_test_branch
     val.validate_data_with_schema(
         contributors_df, "./config/contributors_schema.toml"
     )
@@ -201,8 +200,6 @@ def load_val_snapshot_json(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
     # Validate and force data types for the full responses df
-    # TODO Find a fix for the datatype casting before uncommenting
-    # TODO commented out for Dev test for now
     val.combine_schemas_validate_full_df(
         full_responses,
         "./config/contributors_schema.toml",

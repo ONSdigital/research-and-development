@@ -39,11 +39,11 @@ from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
 # set up logging
 s3_logger = logging.getLogger(__name__)
 
-
 def create_client(config: dict):
-    """Initialises and configures a boto3 client. Configures the raz_client,
-    which is needed for authentication between CDSW session and the s3 server,
-    using the parameters stored in the config.
+    """Initialise and configure a boto3 client. 
+    
+    This function configures the raz_client, which is needed for authentication 
+    between CDSW session and the s3 server, using the parameters stored in the config.
 
     Args:
         config (dict): Combined config (s3 parameters are in developer config)
@@ -80,7 +80,7 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         if "thousands" not in kwargs:
             kwargs["thousands"] = ","
 
-        # Read the scv file using the path and keyword arguments
+        # Read the csv file using the path and keyword arguments
         try:
             df = pd.read_csv(file, **kwargs)
         except Exception as e:
@@ -93,15 +93,16 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
 
 
 def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
-    """Writes a Pandas Dataframe to csv in s3 bucket
+    """Write a Pandas Dataframe to csv in an s3 bucket.
 
     Args:
-        filepath (str): Filepath (Specified in config)
-        data (pd.DataFrame): Data to be stored
+        filepath (str): The filepath to save the dataframe to.
+        data (pd.DataFrame): THe dataframe to write to the passed path.
+
     Returns:
         None
     """
-    # Create an Unput-Output buffer
+    # Create an Input-Output buffer
     csv_buffer = StringIO()
 
     # Write the dataframe to the buffer in the CSV format
@@ -128,11 +129,13 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
 
 
 def rd_load_json(filepath: str) -> dict:
-    """Function to load JSON data from s3 bucket using a boto3 client
+    """Load JSON data from an s3 bucket using a boto3 client.
+
     Args:
-        filepath (string): The filepath in Hue s3 bucket
+        filepath (string): The filepath in Hue s3 bucket.
+
     Returns:
-        datadict (dict): The entire content of the JSON file
+        datadict (dict): The entire contents of the JSON file.
     """
     # Use the boto3 client from the config
     s3_client = config["client"]
@@ -150,12 +153,15 @@ def rd_load_json(filepath: str) -> dict:
 def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """Function to check file exists in s3.
 
-        Args:
-            filepath (str): The filepath in s3
-            raise_error (bool): A switch to raise FileExistsError or not.
+    Args:
+        filepath (str): The filepath in s3.
+        raise_error (bool): A switch to raise FileExistsError or not.
 
-        Returns:
-            result (bool): A boolean value which is true if the file exists.
+    Raises:
+        FileExistsError: Raised if no file exists at the given filepath.
+
+    Returns:
+        result (bool): A boolean value which is true if the file exists.
     """
 
     result = file_exists(
@@ -172,11 +178,11 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
 def rd_mkdir(path: str) -> None:
     """Function to create a directory in s3 bucket.
 
-        Args:
-            path (str): The directory path to create
+    Args:
+        path (str): The directory path to create
 
-        Returns:
-            None
+    Returns:
+        None
     """
     _ = create_folder_on_s3(
         client=config["client"],
