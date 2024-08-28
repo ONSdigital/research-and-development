@@ -46,6 +46,13 @@ def run_construction(  # noqa: C901
             will be the hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs
             or network version depending on settings.
+        is_run_all_data_construction (bool): A logical parameter to perform all 
+            construction. If this flag is True, and there is a construction
+            file, all construction steps will be done before the imputation.
+        is_run_postcode_construction (bool): A logical parameter to perform
+            postcode construction. If this flag is True, and there is a postcode
+            construction file, the postcode constructions will be done after the
+            imputation.
         is_northern_ireland (bool): If true, do construction on Northern Ireland
             data instead of England, Wales and Scotland data.
     Returns:
