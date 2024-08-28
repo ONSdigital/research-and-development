@@ -1,16 +1,22 @@
 """Script that creates all directories"""
-# import os
+import os
+os.chdir("../../../../home/cdsw/research-and-development")
 
 # from importlib import reload
 
 from src.utils.helpers import tree_to_list
-import src.utils.local_file_mods as mods
+import src.utils.s3_mods as mods
 # reload(tree_to_list)
 
 
+print(os.getcwd())
 def run_make_dirs():
-    root = "D:/data/res_dev"
+    root = "/user/george.zorinyants"
+    
 
+    
+#    tree = {"2023_surveys": {}}
+    
     tree = {"2023_surveys": {
             "BERD": {
                 "01_staging": {
@@ -81,8 +87,19 @@ def run_make_dirs():
     dir_list = tree_to_list(tree, prefix=root)
     for s in dir_list:
         print(s)
-        mods.rd_mkdir(s)
+        mods.rd_mkdir(s, config)
 
 
 if __name__ == "__main__":
+        # Define the comfig
+    config = {
+        "s3": {
+            "ssl_file": "/etc/pki/tls/certs/ca-bundle.crt",
+            "s3_bucket": "onscdp-dev-data01-5320d6ca"
+        },
+    }
+    
+    # Create boto3 cloent and put it in the config
+    
+    config["client"] = mods.create_client(config)
     run_make_dirs()
