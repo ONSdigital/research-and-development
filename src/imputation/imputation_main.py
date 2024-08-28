@@ -15,6 +15,7 @@ from src.imputation.short_to_long import run_short_to_long
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.imputation.MoR import run_mor
+from src.construction.construction_main import run_construction
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -28,6 +29,8 @@ def run_imputation(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
+    rd_file_exists: Callable,
+    rd_read_csv: Callable,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
 
@@ -42,10 +45,15 @@ def run_imputation(
     5) Short form expansion imputation: imputing for questions not asked in short forms
 
     Args:
-        df (pd.DataFrame): the full responses spp data
-        mapper (pd.DataFrame): dataframe with sic to product group mapper info
-        backdata (pd.DataFrame): responses data for the previous period
-        config (Dict): the configuration settings
+        df (pd.DataFrame): the main dataset to run through imputation
+        manual_trimming_df (pd.DataFrame): dataframe with boolean column indicating
+            which references should be manually trimmed in imputation
+        backdata (pd.DataFrame): previous year's data
+        config (dict): the configuration settings.
+        write_csv (Callable): function to write a dataframe to a csv file
+        run_id (int): unique identifier for the run
+        rd_file_exists (Callable): function to check if a file exists
+        rd_read_csv (Callable): function to read a csv file
 
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
@@ -151,6 +159,16 @@ def run_imputation(
         write_csv(os.path.join(qa_path, links_filename), links_df)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
+
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    if run_postcode_construction:
+        imputed_df = run_construction(
+            imputed_df,
+            config,
+            rd_file_exists,
+            rd_read_csv,
+            is_run_postcode_construction = True,
+        )
 
     # remove rows and columns no longer needed from the imputed dataframe
     imputed_df = hlp.tidy_imputation_dataframe(
