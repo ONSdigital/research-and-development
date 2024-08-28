@@ -39,9 +39,12 @@ def expansion_impute(
     # Create a mask to exclude trimmed values
     exclude_trim_mask = group_copy[trim_col].isin([False])
 
+    # Create a mask to exclude short froms imputed by MoR or CF
+    excl_mor_mask = ~group_copy["imp_marker"].isin(["MoR", "CF"])
+
     # Masks to select correct records for summing
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
-    to_expand_mask = short_mask
+    to_expand_mask = short_mask & excl_mor_mask
 
     # Condition for positive values in the master column
     pos_cond = group_copy[master_col] > 0
