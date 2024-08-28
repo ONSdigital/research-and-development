@@ -139,8 +139,8 @@ class TestTreeToList:
 
     def test_tree_to_list_negative(self):
             '''
-            Test for tree_to_list(). Runs a  negative test to demonstrate
-            that the function would raise a TypeError if the input dictionary has
+            Test for tree_to_list(). Runs a negative test to demonstrate that
+            the function would raise a TypeError if the input dictionary has
             values other than dictionaries and shows a correct error message.        
 
             Args:
