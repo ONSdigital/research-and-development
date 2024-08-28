@@ -114,7 +114,7 @@ def values_in_column(
 
 
 def tree_to_list(
-    tree: dict, sep: str = "/", path_list: list = [], prefix: str = ""
+    tree: dict, path_list: list = [], prefix: str = ""
 ) -> list:
     """
     Convert a dictionary of paths to a list.
@@ -146,7 +146,6 @@ def tree_to_list(
 
     Args:
         tree (dict): The whole tree or its branch
-        sep (str): Separator, forward slash by default
         path_list (list): A list of full paths that is populated when the function
             runs. Must be empty when you call the function.
         prefix (str): The common prefix. It should start with the platform-
@@ -157,6 +156,8 @@ def tree_to_list(
         A list of all absolute paths
 
     """
+    # Separator is hardcoded to avoid any errors.
+    sep = "/"
 
     # Input must be a dictionary of dictionaries or an empty dictionary
     if isinstance(tree, dict):
@@ -181,7 +182,7 @@ def tree_to_list(
                 path_list += [mypref]
 
                 # Doing the same for the underlying sub-directory
-                path_list = tree_to_list(tree[key], sep, path_list, mypref)
+                path_list = tree_to_list(tree[key], path_list, mypref)
 
         return path_list
     else:
