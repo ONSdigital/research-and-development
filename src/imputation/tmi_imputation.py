@@ -189,6 +189,7 @@ def trim_bounds(
     full_length = len(df[variable])
     if len(df.loc[df[variable] > 0, variable]) <= trim_threshold:
         df[f"{variable}_trim"] = False
+        trimmed_length = full_length
     else:
         df = filter_by_column_content(df, "trim_check", ["above_trim_threshold"])
         df.reset_index(drop=True, inplace=True)
@@ -208,8 +209,16 @@ def trim_bounds(
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
         df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] = False
-
-    return df
+        trimmed_length = len(
+            df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] == False
+        )
+    num_of_zeroes = len(df[df[variable] == 0])
+    qa_df = {
+        f"{variable}_full_length": [full_length],
+        f"{variable}_trimmed_length": [trimmed_length],
+        f"{variable}_zeroes": [num_of_zeroes],
+    }
+    return df, qa_df
 
 
 def calculate_mean(
@@ -287,6 +296,9 @@ def create_mean_dict(
     grp = filtered_df.groupby("imp_class")
     class_keys = list(grp.groups.keys())
 
+    # gather qa df's
+    trim_qa_dfs = []
+
     for var in target_variable_list:
         for k in class_keys:
             # Get subgroup dataframe
@@ -295,7 +307,7 @@ def create_mean_dict(
             sorted_df = sort_df(var, subgrp)
 
             # Apply trimming
-            trimmed_df = trim_bounds(sorted_df, var, config)
+            trimmed_df, trim_qa = trim_bounds(sorted_df, var, config)
 
             tr_df = trimmed_df.set_index("pre_index")
 
@@ -309,7 +321,13 @@ def create_mean_dict(
                 mean_dict[var] = means
             else:
                 mean_dict[var].update(means)
+            
+            # format qa
+            trim_qa["class"] = k
+            trim_qa_dfs.append(trim_qa)
 
+    full_qa = pd.concat(trim_qa_dfs, axis=1)
+    full_qa.to_csv("tmi_og_test.csv")
     df = pd.concat(df_list)
     df["qa_index"] = df.index
     df = df.groupby(["pre_index"], as_index=False).first()
