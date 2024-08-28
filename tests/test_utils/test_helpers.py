@@ -130,7 +130,6 @@ class TestTreeToList:
         Returns:
             None
         '''
-
         # Prepare inputs and expected output
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
@@ -141,5 +140,9 @@ class TestTreeToList:
         assert result_list == exp_output_list
 
         # Run negative test
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError) as excinfo:
             tree_to_list(bad_tree, prefix="R:/2023")
+        assert (
+            str(excinfo.value) ==
+            "Input must be a dictionary, but <class 'list'> is given"
+        )
