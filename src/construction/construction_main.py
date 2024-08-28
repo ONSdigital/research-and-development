@@ -120,7 +120,7 @@ def run_construction(  # noqa: C901
         validate_construction_references(
             construction_df=construction_df,
             snapshot_df=snapshot_df,
-            logger=construction_logger,
+            logger=construction_logger, 
         )
 
     # Drop columns without constructed values
