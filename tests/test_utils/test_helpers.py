@@ -117,12 +117,10 @@ class TestTreeToList:
         ]
         return exp_output_list
 
-    def test_tree_to_list(self):
+    def test_tree_to_list_positive(self):
         '''
         Test for tree_to_list(). Runs a positive test to assert that the actual 
-        result equls the expected result, and a negative test to demonstrate
-        that the function would raise a TypeError if the input dictionary has
-        values other than dictionaries.        
+        result equls the expected result.        
 
         Args:
             self (class): An instance of TestTreeToList unit-test class.
@@ -133,16 +131,31 @@ class TestTreeToList:
         # Prepare inputs and expected output
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
-        bad_tree = self.create_wrong_type_tree()
 
         # Run positive test
         result_list = tree_to_list(inp_tree, prefix="R:/2023")
         assert result_list == exp_output_list
 
-        # Run negative test
-        with pytest.raises(TypeError) as excinfo:
-            tree_to_list(bad_tree, prefix="R:/2023")
-        assert (
-            str(excinfo.value) ==
-            "Input must be a dictionary, but <class 'list'> is given"
-        )
+
+    def test_tree_to_list_negative(self):
+            '''
+            Test for tree_to_list(). Runs a  negative test to demonstrate
+            that the function would raise a TypeError if the input dictionary has
+            values other than dictionaries and shows a correct error message.        
+
+            Args:
+                self (class): An instance of TestTreeToList unit-test class.
+
+            Returns:
+                None
+            '''
+            # Prepare an "bad" input with deliberate type error
+            bad_tree = self.create_wrong_type_tree()
+
+            # Run negative test
+            with pytest.raises(TypeError) as excinfo:
+                tree_to_list(bad_tree, prefix="R:/2023")
+            assert (
+                str(excinfo.value) ==
+                "Input must be a dictionary, but <class 'list'> is given"
+            )
