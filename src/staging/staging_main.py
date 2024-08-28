@@ -15,13 +15,12 @@ StagingMainLogger = logging.getLogger(__name__)
 
 def run_staging(  # noqa: C901
     config: dict,
-    rd_file_exists: Callable,
-    load_json: Callable,
-    read_csv: Callable,
-    write_csv: Callable,
-    read_feather: Callable,
-    write_feather: Callable,
-    isfile: Callable,
+    rd_file_exists: callable,
+    rd_load_json: callable,
+    rd_read_csv: callable,
+    rd_write_csv: callable,
+    rd_read_feather: Callable,
+    rd_write_feather: Callable,
     run_id: int,
 ) -> Tuple:
     """Run the staging and validation module.
@@ -36,13 +35,17 @@ def run_staging(  # noqa: C901
     Args:
         config (dict): The pipeline configuration
         rd_file_exists (Callable): Function to check if file exists
-            This will be the hdfs or network version depending on settings.
-        load_json (Callable): Function to load a json file.
-            This will be the hdfs or network version depending on settings.
-        read_csv (Callable): Function to read a csv file.
-            This will be the hdfs or network version depending on settings.
-        write_csv (Callable): Function to write to a csv file.
-            This will be the hdfs or network version depending on settings.
+            Avaible in s3, hdfs or network version depending "platform".
+        rd_load_json (Callable): Function to load a json file.
+            Avaible in s3, hdfs or network version depending "platform".
+        rd_read_csv (Callable): Function to read a csv file.
+            Avaible in s3, hdfs or network version depending "platform".
+        rd_write_csv (Callable): Function to write to a csv file.
+            Avaible in s3, hdfs or network version depending "platform".
+        rd_read_feather (Callable): Function to read feather files to Pandas
+            Available in HDFS and Windows only.
+        rd_write_feather (Callable): Function to write feather files from Pandas
+            Available in HDFS and Windows only.
         run_id (int): The run id for this run.
     Returns:
         tuple
@@ -58,8 +61,8 @@ def run_staging(  # noqa: C901
             sic_pg_alpha (pd.DataFrame): SIC code to product group alpha mapper.
     """
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    is_network = network_or_hdfs == "network"
+    platform = config["global"]["platform"]
+    is_network = platform == "network"
     load_from_feather = config["global"]["load_from_feather"]
 
     # set up dictionaries with all the paths needed for the staging module
@@ -91,12 +94,14 @@ def run_staging(  # noqa: C901
         if READ_FROM_FEATHER:
             # Load data from first feather file found
             StagingMainLogger.info("Skipping data validation. Loading from feather")
-            full_responses = helpers.load_snapshot_feather(feather_file, read_feather)
+            full_responses = helpers.load_snapshot_feather(
+                feather_file,
+                rd_read_feather)
 
             # Read in postcode mapper (needed later in the pipeline)
             postcode_mapper = config["mapping_paths"]["postcode_mapper"]
             rd_file_exists(postcode_mapper, raise_error=True)
-            postcode_mapper = read_csv(postcode_mapper)
+            postcode_mapper = rd_read_csv(postcode_mapper)
 
         else:  # Read from JSON
             # Check data file exists, raise an error if it does not.
@@ -107,7 +112,7 @@ def run_staging(  # noqa: C901
 
             rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
-                snapshot_path, load_json, config, network_or_hdfs
+                snapshot_path, rd_load_json, config,
             )
 
             StagingMainLogger.info(
@@ -126,15 +131,15 @@ def run_staging(  # noqa: C901
                 full_responses,
                 run_id,
                 rd_file_exists,
-                read_csv,
-                write_csv,
+                rd_read_csv,
+                rd_write_csv,
             )
 
             # Write snapshot to feather file at given path
             if is_network:
                 feather_fname = f"{snapshot_name}.feather"
                 helpers.df_to_feather(
-                    feather_path, feather_fname, full_responses, write_feather
+                    feather_path, feather_fname, full_responses, rd_write_feather
                 )
 
         # Flag invalid records
@@ -151,7 +156,7 @@ def run_staging(  # noqa: C901
         # Read in postcode mapper (needed later in the pipeline)
         postcode_mapper = config["mapping_paths"]["postcode_mapper"]
         rd_file_exists(postcode_mapper, raise_error=True)
-        postcode_mapper = read_csv(postcode_mapper)
+        postcode_mapper = rd_read_csv(postcode_mapper)
 
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
@@ -159,7 +164,11 @@ def run_staging(  # noqa: C901
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
         wanted_cols = ["reference", "manual_outlier"]
+<<<<<<< HEAD
+        manual_outliers = rd_read_csv(manual_path, wanted_cols)
+=======
         manual_outliers = read_csv(manual_path, usecols=wanted_cols)
+>>>>>>> origin
         manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
             False
         )
@@ -177,10 +186,12 @@ def run_staging(  # noqa: C901
     # Get the latest manual trim file
     manual_trim_path = staging_dict["manual_imp_trim_path"]
 
-    if config["global"]["load_manual_imputation"] and isfile(manual_trim_path):
+    if (
+        config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path)
+    ):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
-        manual_trim_df = read_csv(manual_trim_path, usecols=wanted_cols)
+        manual_trim_df = rd_read_csv(manual_trim_path, wanted_cols)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
         manual_trim_df = manual_trim_df.drop_duplicates(
@@ -193,12 +204,22 @@ def run_staging(  # noqa: C901
         manual_trim_df = None
         StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
 
+<<<<<<< HEAD
+    if config["global"]["load_backdata"]:
+        # Stage the manual outliers file
+        StagingMainLogger.info("Loading Backdata File")
+        backdata_path = staging_dict["backdata_path"]
+        rd_file_exists(backdata_path, raise_error=True)
+        backdata = rd_read_csv(backdata_path)
+        val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
+=======
     # stage the backdata for MoR
     StagingMainLogger.info("Loading Backdata File")
     backdata_path = staging_dict["backdata_path"]
     rd_file_exists(backdata_path, raise_error=True)
     backdata = read_csv(backdata_path)
     val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
+>>>>>>> origin
 
     StagingMainLogger.info("Backdata File Loaded Successfully...")
 
@@ -207,6 +228,8 @@ def run_staging(  # noqa: C901
         "itl1_detailed_mapper_path",
         config,
         StagingMainLogger,
+        rd_file_exists,
+        rd_read_csv,
     )
 
     # Loading Civil or Defence detailed mapper
@@ -214,6 +237,8 @@ def run_staging(  # noqa: C901
         "civil_defence_detailed_mapper_path",
         config,
         StagingMainLogger,
+        rd_file_exists,
+        rd_read_csv,
     )
 
     # Loading SIC division detailed mapper
@@ -221,12 +246,16 @@ def run_staging(  # noqa: C901
         "sic_division_detailed_mapper_path",
         config,
         StagingMainLogger,
+        rd_file_exists,
+        rd_read_csv,
     )
 
     pg_detailed_mapper = helpers.load_validate_mapper(
         "pg_detailed_mapper_path",
         config,
         StagingMainLogger,
+        rd_file_exists,
+        rd_read_csv
     )
 
     # seaparate PNP data from full_responses (BERD data)
@@ -234,7 +263,6 @@ def run_staging(  # noqa: C901
     if stage_frozen_snapshot or stage_updated_snapshot:
         full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
 
-    # Output the staged BERD data.
     if config["global"]["output_full_responses"]:
         StagingMainLogger.info("Starting output of staged BERD data...")
         staging_folder = staging_dict["staging_output_path"]
@@ -243,7 +271,7 @@ def run_staging(  # noqa: C901
         staged_filename = (
             f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{staging_folder}/{staged_filename}", full_responses)
+        rd_write_csv(f"{staging_folder}/{staged_filename}", full_responses)
         StagingMainLogger.info("Finished output of staged BERD data.")
     else:
         StagingMainLogger.info("Skipping output of staged BERD data...")
@@ -257,7 +285,7 @@ def run_staging(  # noqa: C901
         staged_filename = (
             f"{survey_year}_staged_PNP_full_responses_{tdate}_v{run_id}.csv"
         )
-        write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
+        rd_write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
         StagingMainLogger.info("Finished output of staged PNP data.")
     else:
         StagingMainLogger.info("Skipping output of staged PNP data...")

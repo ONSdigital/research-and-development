@@ -20,7 +20,7 @@ class RunLog:
     ):
         # config based attrs
         self.config = config
-        self.environment = config["global"]["network_or_hdfs"]
+        self.environment = config["global"]["platform"]
         self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
         self.log_filenames = config["log_filenames"]
         # user information
@@ -179,7 +179,10 @@ class RunLog:
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
-            nrow = {k: [v] for k, v in dct[i][0].items()}
+            if i != "client":
+                nrow = {k: [v] for k, v in dct[i][0].items()}
+            else:
+                nrow = {}
             self.ndct.update(nrow)
         config_log_df = pd.DataFrame(self.ndct)
         # Add run_id and user to configs

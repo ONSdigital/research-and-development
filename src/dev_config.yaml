@@ -8,7 +8,7 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
-  network_or_hdfs: "network" #whether to load from hdfs or network (local Python)
+  platform: "network" #whether to load from hdfs, network (Windows) or s3 (CDP)
   # Construction Settings
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
@@ -21,6 +21,8 @@ runlog_writer:
   display: False # Display the runlog in the terminal
   log_path: "/ons/rdbe_dev/"
 hdfs_paths:
+  logs_foldername: "/ons/rdbe_dev/logs/run_logs"
+s3_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
 staging_paths:
   folder: "01_staging"
@@ -193,3 +195,6 @@ breakdowns:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
+s3:
+  ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
+  s3_bucket: "onscdp-dev-data01-5320d6ca"
