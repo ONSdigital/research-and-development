@@ -278,15 +278,15 @@ class TestValidateShortToLong(object):
     @pytest.fixture(scope="function")
     def short_to_long_df(self) -> pd.DataFrame:
         """A small construction df for testing."""
-        columns = ["reference", "instance", "period"]
+        columns = ["reference", "instance", "period", "formtype"]
         data = [
-            [1, 0, 0],
-            [1, 1, 0],
-            [2, 0, 0],
-            [3, 0, 0],
-            [3, 1, 0],
-            [3, 0, 1],
-            [4, 0, 2],
+            [1, 0, 0, "0006"],
+            [1, 1, 0, "0006"],
+            [2, 0, 0, "0006"],
+            [3, 0, 0, "0006"],
+            [3, 1, 0, "0006"],
+            [3, 0, 1, "0006"],
+            [4, 0, 2, "0006"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         df["construction_type"] = "short_to_long"
@@ -310,3 +310,5 @@ class TestValidateShortToLong(object):
         )
         with pytest.raises(ValueError, match=msg):
             validate_short_to_long(short_to_long_df)
+
+
