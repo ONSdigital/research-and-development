@@ -45,10 +45,15 @@ def run_imputation(
     5) Short form expansion imputation: imputing for questions not asked in short forms
 
     Args:
-        df (pd.DataFrame): the full responses spp data
-        mapper (pd.DataFrame): dataframe with sic to product group mapper info
-        backdata (pd.DataFrame): responses data for the previous period
-        config (Dict): the configuration settings
+        df (pd.DataFrame): the main dataset to run through imputation
+        manual_trimming_df (pd.DataFrame): dataframe with boolean column indicating
+            which references should be manually trimmed in imputation
+        backdata (pd.DataFrame): previous year's data
+        config (dict): the configuration settings.
+        write_csv (Callable): function to write a dataframe to a csv file
+        run_id (int): unique identifier for the run
+        rd_file_exists (Callable): function to check if a file exists
+        rd_read_csv (Callable): function to read a csv file
 
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
