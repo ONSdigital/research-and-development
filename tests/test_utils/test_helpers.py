@@ -61,8 +61,17 @@ class TestTreeToList:
     # Tests that a tree is correctly converted to a list.
     # Tests that it raises a TypeError if the input is not a dictionary.
 
-    # Create a good input tree
-    def create_input_tree(self):
+    def create_input_tree(self) -> dict:
+        '''
+        Create a reegular ("good") directory tree for a positive unit-test.
+        Args:
+            self (class): An instance of TestTreeToList unit-test class.
+
+        Returns:
+            tree (dict): An example of regular directory tree as a dictionary,
+                with lowest-level directories having empty directpries assigned
+                to them. BERD has one level of sub-directories, and PNP has two.
+        '''
         tree = {
             "BERD": {
                 "01": {},
@@ -75,15 +84,33 @@ class TestTreeToList:
         }
         return tree
 
-    # Create an input tree with a type error for negative test
-    def create_wrong_type_tree(self):
+    def create_wrong_type_tree(self) -> dict:
+        '''
+        Create an "bad" input tree with a type error for negative unit-test.
+        
+        Args:
+            self (class): An instance of TestTreeToList unit-test class.
 
-        # The value must be an empty dictionary, not an empty list
+        Returns:
+            bad_tree (dict): An example of  directory tree as a dictionary with
+                a type error. The value must be an empty dictionary, but an
+                empty list is given.
+        '''
+
         bad_tree = {"BERD": []}
         return bad_tree
 
-    # Create an expected dataframe for the test
-    def create_expected_list(self):
+    # 
+    def create_expected_list(self) -> list:
+        '''
+        Create an expected output list for the test.
+        
+        Args:
+            self (class): An instance of TestTreeToList unit-test class.
+
+        Returns:
+            exp_output_list (list): Expected list of full directory paths.
+        '''
         exp_output_list = [
             'R:/2023/BERD', 'R:/2023/BERD/01', 'R:/2023/BERD/02', 'R:/2023/PNP',
             'R:/2023/PNP/03', 'R:/2023/PNP/04', 'R:/2023/PNP/04/qa'
@@ -91,13 +118,28 @@ class TestTreeToList:
         return exp_output_list
 
     def test_tree_to_list(self):
-        """Test for tree_to_list()."""
+        '''
+        Test for tree_to_list(). Runs a positive test to assert that the actual 
+        result equls the expected result, and a negative test to demonstrate
+        that the function would raise a TypeError if the input dictionary has
+        values other than dictionaries.        
+
+        Args:
+            self (class): An instance of TestTreeToList unit-test class.
+
+        Returns:
+            None
+        '''
+
+        # Prepare inputs and expected output
         inp_tree = self.create_input_tree()
         exp_output_list = self.create_expected_list()
         bad_tree = self.create_wrong_type_tree()
 
+        # Run positive test
         result_list = tree_to_list(inp_tree, prefix="R:/2023")
         assert result_list == exp_output_list
 
+        # Run negative test
         with pytest.raises(TypeError):
             tree_to_list(bad_tree, prefix="R:/2023")
