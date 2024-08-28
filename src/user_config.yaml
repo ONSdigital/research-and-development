@@ -80,9 +80,9 @@ s3_paths:
   feather_path: "staging/feather"
   # Freezing data paths
   frozen_data_staged_path: "02_freezing/frozen_data_staged"
-  freezing_changes_to_review_path: "02_freezing/changes_to_review/"
-  freezing_additions_path: "02_freezing/freezing_updates/"
-  freezing_amendments_path: "02_freezing/freezing_updates/"
+  freezing_changes_to_review_path: "02_freezing/changes_to_review"
+  freezing_additions_path: "02_freezing/freezing_updates"
+  freezing_amendments_path: "02_freezing/freezing_updates"
   # Imputation and outliers input paths
   backdata_path: ""
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
