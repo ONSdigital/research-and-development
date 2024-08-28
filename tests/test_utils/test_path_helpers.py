@@ -188,7 +188,7 @@ def test_validate_snapshot_files_success_blank(config, caplog):
               'global': {'network_or_hdfs': "network"},
               'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
               'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
-              'updated_snapshot_path': None,
+              'updated_snapshot_path': "",
               }
         } 
 

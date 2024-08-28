@@ -48,7 +48,7 @@ def snapshot_validation(config: dict) -> dict:
     if f"{survey_year}12" not in paths['frozen_snapshot_path']:
         msg += f"{survey_year} is not included in the frozen snapshot path.\n"
 
-    if paths['updated_snapshot_path'] is not None and (f"{survey_year}12" not in paths['updated_snapshot_path']):
+    if paths['updated_snapshot_path'] != "" and (f"{survey_year}12" not in paths['updated_snapshot_path']):
         msg += f"{survey_year} is not included in the updated snapshot path.\n"
       
     return msg
