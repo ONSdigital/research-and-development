@@ -16,18 +16,23 @@ def zero_totals(df : pd.DataFrame) -> pd.DataFrame:
         A dataframe with values filled in.   
 
     """
-        df.loc[df['203'] == 0, ['222', '223']] = 0
-        df.loc[df['204'] == 0, ['202', '203', '205', '206', '207']] = 0
-        df.loc[df['210'] == 0, ['219', '220', '209']] = 0
-        df.loc[df['211'] == 0, ['204', '210']] = 0
-        df.loc[df['218'] == 0, ['212', '214', '216', '242', '250', '243', '244', '245', '246', '211', '225', '226', '227', '228', '229', '237']] = 0
-        df.loc[df['305'] == 0, ['302', '303', '304']] = 0
-        df.loc[df['507'] == 0, ['501', '503', '505']] = 0
-        df.loc[df['508'] == 0, ['502', '504', '506']] = 0
-        df.loc[df['411'] == 0, ['405', '407', '409']] = 0
-        df.loc[df['412'] == 0, ['406', '408', '410']] = 0
+    columns = ['203', '204', '210', '211', '218', '305', '507', '508', '411', '412']
 
-        return df
+    for col in columns:
+        df[[col]] = df[[col]].fillna(value = 0)
+
+    df.loc[df['203'] == 0, ['222', '223']] = 0
+    df.loc[df['204'] == 0, ['202', '203', '205', '206', '207']] = 0
+    df.loc[df['210'] == 0, ['219', '220', '209']] = 0
+    df.loc[df['211'] == 0, ['204', '210']] = 0
+    df.loc[df['218'] == 0, ['212', '214', '216', '242', '250', '243', '244', '245', '246', '211', '225', '226', '227', '228', '229', '237']] = 0
+    df.loc[df['305'] == 0, ['302', '303', '304']] = 0
+    df.loc[df['507'] == 0, ['501', '503', '505']] = 0
+    df.loc[df['508'] == 0, ['502', '504', '506']] = 0
+    df.loc[df['411'] == 0, ['405', '407', '409']] = 0
+    df.loc[df['412'] == 0, ['406', '408', '410']] = 0
+
+    return df
 
 def breakdown_checks(no_null_df : pd.DataFrame) -> dict:
     """Function to check that the breakdown values match the criteria provided. 
@@ -65,7 +70,7 @@ def breakdown_checks(no_null_df : pd.DataFrame) -> dict:
 
 
 
-    def breakdown_validation(no_null_df : pd.DataFrame) -> dict:
+def breakdown_validation(no_null_df : pd.DataFrame) -> dict:
     """Function to check that the breakdown values match the criteria provided. 
     
     Args:
@@ -130,7 +135,7 @@ def breakdown_checks(no_null_df : pd.DataFrame) -> dict:
     
     return bool_dict, msg
 
-def run_breakdown_validation(df: pd.DataFrame) -> pd.DataFrame:
+def breakdown_validation_logger(df: pd.DataFrame) -> pd.DataFrame:
     """Runs the breakdown_validation function and outputs the msg to the logger"""
     # not_null_df = df.dropna(subset=['222', '223', '203', '202', '204', '205', '206', '207', '221', '209', '219', '220', '210', '204', '211', '212', 
     # '214', '216', '242', '250', '243', '244', '245', '246', '218', '225', '226', '227', '228', '229', '237', '302', '303', '304', '305', '501', '503', 

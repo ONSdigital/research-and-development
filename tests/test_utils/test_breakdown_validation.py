@@ -1,4 +1,4 @@
-from src.utils.breakdown_validation import breakdown_validation, run_breakdown_validation
+from src.utils.breakdown_validation import breakdown_validation, breakdown_validation_logger
 from pandas import DataFrame as pandasDF
 import pytest
 import logging
@@ -31,7 +31,7 @@ class TestBreakdownValidation:
         input_df = input_df.loc[(input_df['reference'] == 'A')]
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            breakdown_validation_logger(input_df)
             assert msg in caplog.text
   
     def test_breakdown_validation_fail(self):
@@ -39,7 +39,7 @@ class TestBreakdownValidation:
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'B')]
         with pytest.raises(ValueError):
-            run_breakdown_validation(input_df)
+            breakdown_validation_logger(input_df)
 
     def test_breakdown_validation_fail_all_null(self, caplog):
         """Test for run_breakdown_validation function where the values do not meet the criteria."""
@@ -47,7 +47,7 @@ class TestBreakdownValidation:
         input_df = input_df.loc[(input_df['reference'] == 'C')]
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            breakdown_validation_logger(input_df)
             assert msg in caplog.text
 
     def test_breakdown_validation_fail_totals_zero(self, caplog):
@@ -56,7 +56,7 @@ class TestBreakdownValidation:
         input_df = input_df.loc[(input_df['reference'] == 'D')]
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            breakdown_validation_logger(input_df)
             assert msg in caplog.text
 
     def test_breakdown_validation_msg(self):
@@ -65,5 +65,5 @@ class TestBreakdownValidation:
         input_df = input_df.loc[(input_df['reference'] == 'B')]
         msg = "Columns 202 + 223 do not equal column 204 for reference: B.\n "
         with pytest.raises(ValueError) as e:
-            run_breakdown_validation(input_df)
+            breakdown_validation_logger(input_df)
         assert str(e.value) == msg
