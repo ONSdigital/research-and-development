@@ -153,7 +153,7 @@ def carry_forwards(df, backdata, impute_vars):
     df.loc[match_cond, "imp_marker"] = "CF"
 
     # other columns we would like to keep from the backdata for QA purposes
-    more_cols = ["formtype"]
+    more_cols = ["formtype", "imp_class", "imp_marker"]
 
     # Drop merge related columns
     to_drop = [
