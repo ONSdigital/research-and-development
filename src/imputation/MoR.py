@@ -287,7 +287,6 @@ def group_calc_link(group, target_vars, config):
         config (Dict): Confuration settings
     """
     valid_group_size = True
-
     for var in target_vars:
         # Create mask to not use 0s in mean calculation
         non_null_mask = pd.notnull(group[f"{var}_gr"])
@@ -295,8 +294,9 @@ def group_calc_link(group, target_vars, config):
         group = group.sort_values(f"{var}_gr")
 
         group[f"{var}_gr_trim"] = False
+        trimmed_bounds, qa = trim_bounds(group.loc[non_null_mask, :], f"{var}_gr", config)
         group.loc[non_null_mask, f"{var}_gr_trim"] = (
-            trim_bounds(group.loc[non_null_mask, :], f"{var}_gr", config)
+            trimmed_bounds
             .loc[:, f"{var}_gr_trim"]
             .values
         )
