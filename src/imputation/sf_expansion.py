@@ -40,7 +40,7 @@ def expansion_impute(
     exclude_trim_mask = group_copy[trim_col].isin([False])
 
     # Create a mask to exclude short froms imputed by MoR or CF
-    excl_mor_mask = ~group_copy["imp_marker"].isin(["MoR", "CF"])
+    excl_mor_mask = group_copy["imp_marker"].isin(["R", "TMI", "constructed"])
 
     # Masks to select correct records for summing
     long_responder_mask = clear_mask & long_mask & exclude_trim_mask
@@ -86,7 +86,7 @@ def expansion_impute(
         imputed_sf_vals = scale_factor * returned_master_vals
 
         # Write imputed value to all records
-        group_copy.loc[short_mask, f"{bd_col}_imputed"] = imputed_sf_vals
+        group_copy.loc[to_expand_mask, f"{bd_col}_imputed"] = imputed_sf_vals
 
     # Indicate how the short_form expansion has been computed, whether with the
     # civil and defence fallback, or by imputation class.
@@ -102,7 +102,6 @@ def apply_expansion(
     breakdown_dict: dict,
     threshold_num: int = 3,
 ):
-
     # Renaming this df to use in the for loop
     expanded_df = df.copy()
 
