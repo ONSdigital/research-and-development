@@ -358,11 +358,12 @@ def apply_links(cf_df, links_df, target_vars, config, formtype):
         )
         cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
-    # Apply MoR for the breakdown variables under 211 and 305
+    # Apply MoR for the breakdown variables
+    q_targets = list(config["breakdowns"])
     if formtype == "long":
-        q_targets = ["211", "305"]
-    else:
-        q_targets = list(config["breakdowns"])
+        q_targets = [
+            q for q in q_targets if q in config["imputation"]["lf_target_vars"]
+        ]
     for var in q_targets:
         for breakdown in config["breakdowns"][var]:
             # As above but using different elements to multiply

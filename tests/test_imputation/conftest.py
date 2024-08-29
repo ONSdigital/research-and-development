@@ -13,11 +13,11 @@ def imputation_config() -> dict:
             "lower_trim_perc": 15,
             "upper_trim_perc": 15,
             "sf_expansion_threshold": 3,
-            "lf_target_vars": ["211", "305", "emp_researcher", "emp_technician"]
+            "lf_target_vars": ["211", "emp_researcher", "emp_technician"],
+            "sum_cols": ["emp_total"]
         },
         "breakdowns": {
-            "211": ["212", "214"],
-            "305": ["302", "303", "304"],
+            "211": ["212", "214", "216"],
             "emp_total": ["emp_researcher", "emp_technician"]
         }
     }
