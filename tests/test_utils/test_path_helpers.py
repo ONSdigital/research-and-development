@@ -150,12 +150,12 @@ def test_create_staging_config(config, expected_staging_dict):
 def test_validate_snapshot_files_success(config, caplog):
     """Tests for staging_validation function."""
     config = {'years' : {'survey_year': 2023,},
-              'global': {'network_or_hdfs': "network"},
+              'global': {'platform': "network"},
               'network_paths': { 'root': "R:/DAP_emulation/",
               'frozen_snapshot_path': "/2023_snapshots/snapshot_file-202312.json",
               'updated_snapshot_path': '2023_snapshots/updated_snapshot_file-202312.json',
               }
-        } 
+        }
 
     msg = 'The snapshot paths are valid.'
     with caplog.at_level(logging.INFO):
@@ -165,15 +165,15 @@ def test_validate_snapshot_files_success(config, caplog):
 def test_validate_snapshot_files_fail(config, caplog):
     """Tests for staging_validation function."""
     config = {
-        
+
         'years' : {'survey_year': 2023,},
-              'global': {'network_or_hdfs': "network"},
+              'global': {'platform': "network"},
               'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
               'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
               'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
               }
-        } 
- 
+        }
+
     msg = "2023 is not included in the frozen snapshot path.\n"
     with pytest.raises(ValueError, match=msg):
         snapshot_validation_logger(config)
@@ -183,14 +183,14 @@ def test_validate_snapshot_files_fail(config, caplog):
 def test_validate_snapshot_files_success_blank(config, caplog):
     """Tests for staging_validation function."""
     config = {
-        
+
         'years' : {'survey_year': 2023,},
-              'global': {'network_or_hdfs': "network"},
+              'global': {'platform': "network"},
               'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
               'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
               'updated_snapshot_path': "",
               }
-        } 
+        }
 
     msg = 'The snapshot paths are valid.\n'
     with caplog.at_level(logging.INFO):

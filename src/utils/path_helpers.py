@@ -4,6 +4,7 @@ import logging
 
 PathHelpLogger = logging.getLogger(__name__)
 
+
 def get_paths(config: dict) -> dict:
     """Return either network_paths or hdfs_paths despending on the environment."""
     platform = config["global"]["platform"]
@@ -40,18 +41,22 @@ def create_module_config(config: dict, module_name: str) -> dict:
 
     return module_dict
 
+
 def snapshot_validation(config: dict) -> dict:
     paths = get_paths(config)
-    survey_year = str(config["years"]["survey_year"])    
+    survey_year = str(config["years"]["survey_year"])
     msg = ""
 
-    if f"{survey_year}12" not in paths['frozen_snapshot_path']:
+    if f"{survey_year}12" not in paths["frozen_snapshot_path"]:
         msg += f"{survey_year} is not included in the frozen snapshot path.\n"
 
-    if (paths['updated_snapshot_path'] != "") and (f"{survey_year}12" not in paths['updated_snapshot_path']):
+    if (paths["updated_snapshot_path"] != "") and (
+        f"{survey_year}12" not in paths["updated_snapshot_path"]
+    ):
         msg += f"{survey_year} is not included in the updated snapshot path.\n"
-      
+
     return msg
+
 
 def snapshot_validation_logger(config: dict) -> dict:
     """Checks that the mapping filenames are valid"""
@@ -62,8 +67,8 @@ def snapshot_validation_logger(config: dict) -> dict:
     else:
         PathHelpLogger.error("There are errors with the snapshot paths.\n")
         raise ValueError(msg)
+    return None
 
-    return config
 
 def create_staging_config(config: dict) -> dict:
     """Create a configuration dict with all full paths needed for staging.
@@ -77,23 +82,21 @@ def create_staging_config(config: dict) -> dict:
     Returns:
         dict: A configuration dictionary will all paths needed for staging.
     """
-    config = snapshot_validation_logger(config)
-    
     paths = get_paths(config)
     berd_path = paths["berd_path"]
 
-   
     staging_dict = create_module_config(config, "staging")
-    
+
     # add new paths to the staging section of the config
     staging_dict["frozen_snapshot_path"] = paths["frozen_snapshot_path"]
     staging_dict["updated_snapshot_path"] = paths["updated_snapshot_path"]
     staging_dict["postcode_masterlist"] = paths["postcode_masterlist"]
     staging_dict["backdata_path"] = paths["backdata_path"]
-    staging_dict["pnp_staging_qa_path"] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
+    staging_dict[
+        "pnp_staging_qa_path"
+    ] = f"{paths['pnp_path']}{config['pnp_paths']['staging_qa_path']}"
     staging_dict["manual_outliers_path"] = f"{berd_path}{paths['manual_outliers_path']}"
     staging_dict["manual_imp_trim_path"] = f"{berd_path}{paths['manual_imp_trim_path']}"
-    
 
     return staging_dict
 
@@ -260,7 +263,10 @@ def validate_mapping_filenames(config: dict) -> dict:
 
 
 def filename_validation(config: dict) -> dict:
-    """Checks that the mapping filenames are valid"""
+    """Checks that the snapshot and mapping filenames are valid"""
+    # check the snapshot filenames have the current year in them
+    snapshot_validation_logger(config)
+
     bool_dict, msg = validate_mapping_filenames(config)
 
     if all(bool_dict.values()):
