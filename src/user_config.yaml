@@ -71,6 +71,30 @@ hdfs_paths:
   postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
   pcode_val_path: "01_staging/staging_qa/postcode_validation"
   # mapper paths
+s3_paths:
+  root: "/ons/rdbe_dev/"
+  # staging input paths
+  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
+  updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
+  feather_path: "staging/feather"
+  # Freezing data paths
+  frozen_data_staged_path: "02_freezing/frozen_data_staged"
+  freezing_changes_to_review_path: "02_freezing/changes_to_review"
+  freezing_additions_path: "02_freezing/freezing_updates"
+  freezing_amendments_path: "02_freezing/freezing_updates"
+  # Imputation and outliers input paths
+  backdata_path: ""
+  manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  # Construction paths
+  all_data_construction_file_path:  "04_construction/manual_construction/test_construction_file.csv"
+  postcode_construction_file_path: "04_construction/manual_construction/test_postcode_construction_file.csv"
+  construction_file_path_ni:  "04_construction/manual_construction/test_construction_file.csv"
+  # postcode paths
+  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
+  pcode_val_path: "01_staging/staging_qa/postcode_validation"
+  # mapper paths
 2022_mappers:
   mappers_version: "v1"
   postcode_mapper: "postcodes_2022.csv"

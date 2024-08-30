@@ -34,7 +34,7 @@ def run_outliers(
         df_manual_supplied (pd.DataFrame): Dataframe with manual outlier flags
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
-            This will be the hdfs or network version depending on settings.
+            This will be the s3, hdfs or network version depending on settings.
         run_id (int): The current run id
 
     Returns:

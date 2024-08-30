@@ -19,7 +19,7 @@ from src.utils.path_helpers import (
 @pytest.fixture(scope="module")
 def config():
     config = {
-        "global": {"network_or_hdfs": "network"},
+        "global": {"platform": "network"},
         "network_paths": {
             "root": "R:/DAP_emulation/",
             "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
