@@ -1,0 +1,167 @@
+[imp_class]
+old_name = "imp_class"
+Deduced_Data_Type = "object"
+
+[formtype]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
+
+[clear_class_size]
+old_name = "clear_class_size"
+Deduced_Data_Type = "int64"
+
+[211_trimmed_count]
+old_name = "211_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[211_ALT_trimmed_count]
+old_name = "211_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[211_zero_count]
+old_name = "211_zero_count"
+Deduced_Data_Type = "float64"
+
+[305_trimmed_count]
+old_name = "305_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[305_ALT_trimmed_count]
+old_name = "305_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[305_zero_count]
+old_name = "305_zero_count"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_trimmed_count]
+old_name = "emp_researcher_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_ALT_trimmed_count]
+old_name = "emp_researcher_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_zero_count]
+old_name = "emp_researcher_zero_count"
+Deduced_Data_Type = "float64"
+
+[emp_technician_trimmed_count]
+old_name = "emp_technician_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_technician_ALT_trimmed_count]
+old_name = "emp_technician_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_technician_zero_count]
+old_name = "emp_technician_zero_count"
+Deduced_Data_Type = "float64"
+
+[emp_other_trimmed_count]
+old_name = "emp_other_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_other_ALT_trimmed_count]
+old_name = "emp_other_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_other_zero_count]
+old_name = "emp_other_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_trimmed_count]
+old_name = "headcount_res_m_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_ALT_trimmed_count]
+old_name = "headcount_res_m_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_zero_count]
+old_name = "headcount_res_m_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_trimmed_count]
+old_name = "headcount_res_f_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_ALT_trimmed_count]
+old_name = "headcount_res_f_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_zero_count]
+old_name = "headcount_res_f_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_trimmed_count]
+old_name = "headcount_tec_m_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_ALT_trimmed_count]
+old_name = "headcount_tec_m_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_zero_count]
+old_name = "headcount_tec_m_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_trimmed_count]
+old_name = "headcount_tec_f_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_ALT_trimmed_count]
+old_name = "headcount_tec_f_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_zero_count]
+old_name = "headcount_tec_f_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_trimmed_count]
+old_name = "headcount_oth_m_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_ALT_trimmed_count]
+old_name = "headcount_oth_m_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_zero_count]
+old_name = "headcount_oth_m_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_trimmed_count]
+old_name = "headcount_oth_f_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_ALT_trimmed_count]
+old_name = "headcount_oth_f_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_zero_count]
+old_name = "headcount_oth_f_zero_count"
+Deduced_Data_Type = "float64"
+
+[emp_total_trimmed_count]
+old_name = "emp_total_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_total_ALT_trimmed_count]
+old_name = "emp_total_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[emp_total_zero_count]
+old_name = "emp_total_zero_count"
+Deduced_Data_Type = "float64"
+
+[headcount_total_trimmed_count]
+old_name = "headcount_total_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_total_ALT_trimmed_count]
+old_name = "headcount_total_ALT_trimmed_count"
+Deduced_Data_Type = "float64"
+
+[headcount_total_zero_count]
+old_name = "headcount_total_zero_count"
+Deduced_Data_Type = "float64"

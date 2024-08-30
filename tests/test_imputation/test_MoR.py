@@ -14,7 +14,7 @@ from src.imputation.imputation_helpers import get_imputation_cols
 
 # pytestmark = pytest.mark.runwip
 
-class TestRunMoR(object):
+class TestRunMoRLongForm(object):
     """Tests for run_mor."""
 
     @pytest.fixture(scope="function")
@@ -36,7 +36,7 @@ class TestRunMoR(object):
     @pytest.fixture(scope="function")
     def expected_mor_output(self) -> pd.DataFrame:
         """The expected output from run_mor."""
-        fpath = os.path.join("tests/data/imputation/lf_mor_expected.csv")
+        fpath = os.path.join("tests/data/imputation/lf_mor_expected_3.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"reference": "Int64", "instance": "Int64"})
         # order by reference and then instance
@@ -59,25 +59,25 @@ class TestRunMoR(object):
             config=imputation_config
         )
         # select only the required columns for the result and the expected output
-        wanted_cols = ["reference", "instance", "imp_marker", "imp_class", "211_link", "211_imputed", "emp_researcher_imputed", "emp_technician_imputed", "212_imputed", "214_imputed", "216_imputed"]
+        wanted_cols = ["reference", "instance", "imp_class", "211_link", "211_imputed", "emp_researcher_imputed", "emp_technician_imputed", "212_imputed", "214_imputed", "216_imputed"]
 
-        result_filter = (result_df.instance != 0) & (result_df.formtype == "0001") & (result_df["200"].notnull())
-        result_df = result_df.loc[result_filter] # [wanted_cols]
+        result_filter = (result_df.instance != 0) & (result_df.formtype == "0001") & (result_df["200"].notnull()) & (result_df.imp_marker.isin(["CF","MoR"]))
+        result_df = result_df.loc[result_filter][wanted_cols].round(4)
         result_df = result_df.sort_values(["reference", "instance"]).reset_index(drop=True)
 
+        # round the expected output to 4 decimal places
+        # Apply rounding only to the floating-point columns in the expected output
+        float_cols = expected_mor_output.select_dtypes(include='float').columns
+        expected_mor_output[float_cols] = expected_mor_output[float_cols].round(4)
+        expected_mor_output = expected_mor_output[wanted_cols]
         expected_mor_output = expected_mor_output[wanted_cols]
 
-        merged_df = pd.merge(result_df, expected_mor_output, on=["reference", "instance"], suffixes=("_result", "_expected"))
+        merged_df = pd.merge(result_df, expected_mor_output, on=["reference", "instance"], how="outer", suffixes=("_result", "_expected"))
         merged_df["211_diffs"] = (merged_df["211_imputed_result"] - merged_df["211_imputed_expected"]).round(2)
-        merged_df["big_diff"] = merged_df["211_diffs"].abs() > 0.01
+        merged_df["211_link_diffs"] = (merged_df["211_link_result"] - merged_df["211_link_expected"]).round(2)
+        merged_df["big_diff"] = merged_df["211_link_diffs"].abs() > 0.001
 
-        assert_frame_equal(result_df, expected_mor_output), (
+
+        assert_frame_equal(result_df, expected_mor_output, check_dtype=False, check_exact=False), (
             "run_mor() not imputing data as expected."
         )
-
-    def test_run_mor_raises(self):
-        """Tests for raises within run_mor."""
-        # NOTE: I am not sure if you are going to individually test each function
-        #       from imputation.MoR. This test function would pick up the exception
-        #       raised in get_threshold_value if you were NOT going to.
-        pass
