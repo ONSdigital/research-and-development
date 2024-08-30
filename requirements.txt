@@ -1,6 +1,6 @@
 arrow
 # cookiecutter
-coverage
+coverage==4.5.4 
 detect-secrets
 # myst-parser
 numpy>=1.15.4 # required for users in DAP to run pipeline (added here for consistency)
