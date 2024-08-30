@@ -21,7 +21,9 @@ formtype_short = "0006"
 TMILogger = logging.getLogger(__name__)
 
 
-def apply_to_original(filtered_df: pd.DataFrame, original_df: pd.DataFrame) -> pd.DataFrame:
+def apply_to_original(
+    filtered_df: pd.DataFrame, original_df: pd.DataFrame
+) -> pd.DataFrame:
     """Overwrite a dataframe with updated row values."""
     original_df.update(filtered_df)
     return original_df
@@ -156,7 +158,7 @@ def apply_trim_check(
         trim_threshold (Union[int, float]): The trim threshold.
 
     Returns:
-        pd.DataFrame: A dataframe containing the trim status (above/below) 
+        pd.DataFrame: A dataframe containing the trim status (above/below)
             threshold.
     """
     # tag for those classes with more than trim_threshold
@@ -230,9 +232,7 @@ def trim_bounds(
         lower_keep_index = remove_lower - 1
         upper_keep_index = full_length - remove_upper
         df.loc[lower_keep_index:upper_keep_index, f"{variable}_trim"] = False
-        trimmed_length = len(
-            df[df[f"{variable}_trim"] == False]
-        )
+        trimmed_length = len(df[df[f"{variable}_trim"].isin([False])])
     num_of_zeroes = len(df[df[variable] == 0])
     qa_df = {
         f"{variable}_trimmed_count": [trimmed_length],
@@ -344,7 +344,7 @@ def create_mean_dict(
                 mean_dict[var] = means
             else:
                 mean_dict[var].update(means)
-            
+
             # format qa
             trim_qa["imp_class"] = k
             trim_qa["clear_class_size"] = clear_class_size
@@ -358,7 +358,9 @@ def create_mean_dict(
     return mean_dict, df, full_qa
 
 
-def apply_tmi(df: pd.DataFrame, target_variables: list, mean_dict: dict) -> pd.DataFrame:
+def apply_tmi(
+    df: pd.DataFrame, target_variables: list, mean_dict: dict
+) -> pd.DataFrame:
     """A function to replace the unclear statuses with the mean values.
 
     Args:
@@ -368,7 +370,7 @@ def apply_tmi(df: pd.DataFrame, target_variables: list, mean_dict: dict) -> pd.D
 
     Returns:
         pd.DataFrame: The passed dataframe with TMI imputation applied.
-    """#
+    """
     df = df.copy()
 
     filtered_df = filter_by_column_content(
@@ -385,7 +387,6 @@ def apply_tmi(df: pd.DataFrame, target_variables: list, mean_dict: dict) -> pd.D
 
     for var in target_variables:
         for imp_class_key in class_keys:
-
             # Get grouped dataframe
             imp_class_df = grp.get_group(imp_class_key)
 
@@ -417,7 +418,7 @@ def run_longform_tmi(
     """Function to run longform TMI imputation.
 
     Args:
-        shortform_df (pd.DataFrame): the dataset filtered for long form entries.
+        longform_df (pd.DataFrame): the dataset filtered for long form entries.
         config (Dict[str, Any]): the configuration settings.
 
     Returns:
@@ -513,7 +514,7 @@ def run_tmi(
     Returns:
         final_df(pd.DataFrame): A dataframe with imputed values added and count
             columns included.
-        qa_df: Qa dataframe.
+        qa_df: QA dataframe.
         trim_counts (pd.DataFrame): The qa dataframe for trim counts.
     """
     # changing type of Civil or Defence column 200 helps with imputation classes
@@ -537,7 +538,9 @@ def run_tmi(
     # apply TMI imputation to long forms and then short forms
     longform_tmi_df, qa_df_long, l_trim_counts = run_longform_tmi(longform_df, config)
 
-    shortform_tmi_df, qa_df_short, s_trim_counts = run_shortform_tmi(shortform_df, config)
+    shortform_tmi_df, qa_df_short, s_trim_counts = run_shortform_tmi(
+        shortform_df, config
+    )
 
     # concatinate the short and long form with the excluded dataframes
     full_df = pd.concat([longform_tmi_df, shortform_tmi_df, excluded_df])
@@ -573,7 +576,11 @@ def run_tmi(
 
     trim_counts = pd.concat([l_trim_counts, s_trim_counts])
     # group by imputation class and format data
-    trim_counts = trim_counts.groupby(["imp_class", "formtype", "clear_class_size"]).first().reset_index()
+    trim_counts = (
+        trim_counts.groupby(["imp_class", "formtype", "clear_class_size"])
+        .first()
+        .reset_index()
+    )
     trim_counts = trim_counts.sort_values(["formtype", "imp_class"])
 
     TMILogger.info("TMI imputation completed.")
