@@ -128,14 +128,42 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def random_assign_civdef(
+def _get_random_civdef(ref: int, proportions: Tuple[float, float]) -> str:
+    """Get a random value (C or D) using proportions and a given seed.
+
+    Args:
+        ref (int): The reference, to be used as a seed used by the randomiser.
+        proportions (Tuple[float, float]): The proportion of C and D in the data.
+
+    Returns:
+        str: The randomised values (C or D).
+    """
+    ref_seed = ref % 1000
+    np.random.seed(seed=ref_seed)
+    value = np.random.choice(["C", "D"], size=1, p=proportions)[0]
+    return value
+
+
+def assign_random_civdef(
     df: pd.DataFrame, proportions: Tuple[float, float]
 ) -> pd.DataFrame:
-    """Assign "C" for civil or "D" for defence randomly based on
-    the proportions supplied.
+    """Assign "C" or "D" randomly based on the proportions supplied.
+
+    C is for Civil, while D is for Defence.
+    Each assignment is based on a seed derived from the reference column, so will
+    always be the same for the same reference, provided the proportions remain the same.
+
+    Args:
+        df (pd.DataFrame): The dataframe to create the imputed column within.
+        proportions (Tuple[float, float]): The proportions of C and D.
+
+    Returns:
+        pd.DataFrame: The updated dataframe.
     """
-    np.random.seed(seed=42)
-    df["200_imputed"] = np.random.choice(["C", "D"], size=len(df), p=proportions)
+
+    df["200_imputed"] = df["reference"].apply(
+        lambda x: _get_random_civdef(int(x), proportions)
+    )
     return df
 
 
@@ -177,7 +205,7 @@ def apply_civdev_imputation(
 
     # randomly assign civil or defence based on proportions in whole clear df
     to_impute_df = df.loc[to_impute_mask].copy()
-    to_impute_df = random_assign_civdef(to_impute_df, proportions)
+    to_impute_df = assign_random_civdef(to_impute_df, proportions)
     to_impute_df["200_imp_marker"] = "fall_back_imputed"
 
     # PASS 2: refine based on product group imputation class
@@ -193,7 +221,7 @@ def apply_civdev_imputation(
 
     for pg_class, class_group_df in pg_grp:
         if pg_class in pg_dict.keys():
-            class_group_df = random_assign_civdef(class_group_df, pg_dict[pg_class])
+            class_group_df = assign_random_civdef(class_group_df, pg_dict[pg_class])
             class_group_df["200_imp_marker"] = "pg_group_imputed"
 
         tmi.apply_to_original(class_group_df, filtered_df)
@@ -213,7 +241,7 @@ def apply_civdev_imputation(
 
     for pg_sic_class, class_group_df in pg_sic_grp:
         if pg_sic_class in pgsic_dict.keys():
-            class_group_df = random_assign_civdef(
+            class_group_df = assign_random_civdef(
                 class_group_df, pgsic_dict[pg_sic_class]
             )
             class_group_df["200_imp_marker"] = "pg_sic_group_imputed"
