@@ -1,8 +1,9 @@
 """Tests for construction_helpers.py."""
 import pandas as pd
 import numpy as np
-
+import pytest
 from pandas._testing import assert_frame_equal
+
 
 from src.construction.construction_helpers import (
     prepare_forms_gb,
@@ -11,6 +12,7 @@ from src.construction.construction_helpers import (
     finalise_forms_gb,
     add_constructed_nonresponders,
     remove_short_to_long_0,
+    prep_new_rows,
 )
 
 class TestPrepareFormGB:
@@ -62,13 +64,13 @@ class TestPrepareFormGB:
     def create_expected_construction_output(self) -> pd.DataFrame:
         """Create expected construction output df."""
 
-        output_cols = ["reference", "construction_type", "formtype", "instance", "period", "period_year"]
+        output_cols = ["reference", "construction_type", "formtype", "instance", "period", "604", "period_year"]
         data = [
-            ["F", "new", "0006", 0, 202412, 2024],
-            ["G", "short_to_long", "0001", 0, 202412, 2024],
-            ["G", "short_to_long", "0001", 1, 202412, 2024],
-            ["G", "short_to_long", "0001", 2, 202412, 2024],
-            ["H", None, "0001", 1, 202412, 2024],
+            ["F", "new", "0006", 0, 202412, None, 2024],
+            ["G", "short_to_long", "0001", 0, 202412, "Yes", 2024],
+            ["G", "short_to_long", "0001", 1, 202412, "Yes", 2024],
+            ["G", "short_to_long", "0001", 2, 202412, "Yes", 2024],
+            ["H", None, "0001", 1, 202412, None, 2024],
         ]
         output_construction_df = pd.DataFrame(data=data, columns=output_cols)
         return output_construction_df
@@ -226,13 +228,13 @@ class TestAddConstructedNonresponders:
     # Create updated snapshot df
     def create_test_snapshot_df(self) -> pd.DataFrame:
         """Create a test snapshot df"""
-        input_cols = ["reference"]
+        input_cols = ["reference", "formtype", "cellnumber"]
         data = [
-            ["A"],
-            ["B"],
-            ["C"],
-            ["D"],
-            ["E"],
+            ["A", 1, 12],
+            ["B", 1, 12],
+            ["C", 1, 12],
+            ["D", 1, 12],
+            ["E", 1, 12],
         ]
         input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
         return input_snapshot_df
@@ -240,13 +242,13 @@ class TestAddConstructedNonresponders:
     # Create construction df
     def create_test_construction_df(self) -> pd.DataFrame:
         """Create a test construction df."""
-        input_cols = ["reference", "construction_type"]
+        input_cols = ["reference", "construction_type", "formtype", "cellnumber"]
         data = [
-            ["F", "new"],
-            ["G", "short_to_long"],
-            ["H", None],
-            ["I", "new"],
-            ["J", None],
+            ["F", "new", 1, 12],
+            ["G", "short_to_long", 1, 12],
+            ["H", None, 1, 12],
+            ["I", "new", 1, 12],
+            ["J", None, 1, 12],
         ]
         input_construction_df = pd.DataFrame(data=data, columns=input_cols)
         return input_construction_df
@@ -254,15 +256,15 @@ class TestAddConstructedNonresponders:
     # Create an expected dataframe for the test
     def create_expected_snapshot_output(self) -> pd.DataFrame:
         """Create expected snapshot output df."""
-        output_cols = ["reference", "construction_type"]
+        output_cols = ["reference", "formtype", "cellnumber"]
         data = [
-            ["A", None],
-            ["B", None],
-            ["C", None],
-            ["D", None],
-            ["E", None],
-            ["F", "new"],
-            ["I", "new"],
+            ["A", 1, 12],
+            ["B", 1, 12],
+            ["C", 1, 12],
+            ["D", 1, 12],
+            ["E", 1, 12],
+            ["F", 1, 12],
+            ["I", 1, 12],
         ]
         output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
         return output_snapshot_df
@@ -271,12 +273,12 @@ class TestAddConstructedNonresponders:
     def create_expected_construction_output(self) -> pd.DataFrame:
         """Create expected construction output df."""
 
-        output_cols = ["reference", "construction_type"]
+        output_cols = ["reference", "construction_type", "formtype", "cellnumber"]
 
         data = [
-            ["G", "short_to_long"],
-            ["H", None],
-            ["J", None],
+            ["G", "short_to_long", 1, 12],
+            ["H", None, 1, 12],
+            ["J", None, 1, 12],
         ]
         output_construction_df = pd.DataFrame(data=data, columns=output_cols)
         return output_construction_df
@@ -295,6 +297,8 @@ class TestAddConstructedNonresponders:
         )
 
         # Check the output
+        print(snapshot_output)
+        print(expected_snapshot_output)
         assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Snapshot output is not as expected"
         assert_frame_equal(construction_output.reset_index(drop=True), expected_construction_output), "Construction output is not as expected"
 
@@ -359,3 +363,34 @@ class TestRemoveShortToLong0:
 
         # Check the output
         assert_frame_equal(snapshot_output.reset_index(drop=True), expected_snapshot_output), "Output is not as expected"
+
+
+class TestPrepNewRows:
+    """Test for prep_new_rows()."""
+
+    def test_prep_new_rows(self):
+        # Create test data
+        rows_to_add = pd.DataFrame({
+            'reference': ['A', 'B', 'C'],
+            'formtype': [np.nan, '0001', np.nan],
+            'cellnumber': ['123', np.nan, '456']
+        })
+        updated_snapshot_df = pd.DataFrame({
+            'reference': ['A', 'B', 'C'],
+            'formtype': ['0006', '0001', '0006'],
+            'cellnumber': ['789', '987', '654']
+        })
+
+        # Expected output
+        expected_rows_to_add = pd.DataFrame({
+            'reference': ['A', 'B', 'C'],
+            'formtype': ['0006', '0001', '0006'],
+            'cellnumber': ['123', '987', '456']
+        })
+
+        # Run the function
+        output_rows_to_add = prep_new_rows(rows_to_add, updated_snapshot_df)
+
+        # Check the output
+        pd.testing.assert_frame_equal(output_rows_to_add, expected_rows_to_add), "Output is not as expected"
+

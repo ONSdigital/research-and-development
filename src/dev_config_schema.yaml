@@ -24,7 +24,7 @@ global:
     singular: True
     dtype: "bool"
     accept_nonetype: False
-  network_or_hdfs:
+  platform:
     singular: True
     dtype: "str"
     accept_nonetype: False

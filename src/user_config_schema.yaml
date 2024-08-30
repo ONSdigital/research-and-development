@@ -23,6 +23,10 @@ hdfs_paths:
   singular: False
   dtype: "path"
   accept_nonetype: True
+s3_paths:
+  singular: False
+  dtype: "path"
+  accept_nonetype: True
 2022_mappers:
   singular: False
   dtype: "path"
