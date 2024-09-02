@@ -59,7 +59,7 @@ class TestRunMoRLongForm(object):
             config=imputation_config
         )
         # select only the required columns for the result and the expected output
-        wanted_cols = ["reference", "instance", "imp_class", "211_link", "211_imputed", "emp_researcher_imputed", "emp_technician_imputed", "212_imputed", "214_imputed", "216_imputed"]
+        wanted_cols = ["reference", "instance", "imp_class", "imp_marker", "211_link", "211_imputed", "emp_researcher_imputed", "emp_technician_imputed", "212_imputed", "214_imputed", "216_imputed"]
 
         result_filter = (result_df.instance != 0) & (result_df.formtype == "0001") & (result_df["200"].notnull()) & (result_df.imp_marker.isin(["CF","MoR"]))
         result_df = result_df.loc[result_filter][wanted_cols].round(4)
