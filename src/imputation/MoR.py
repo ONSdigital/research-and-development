@@ -35,12 +35,12 @@ def run_mor(df, backdata, impute_vars, config):
 
     # apply MoR for long form responders
     imputed_df_long, links_df_long = calculate_mor(
-        carried_forwards_df, remainder_df, backdata, impute_vars, config, "long"
+        carried_forwards_df, remainder_df, backdata, config, "long"
     )
 
     # apply MoR for short form responders
     imputed_df_short, links_df_short = calculate_mor(
-        carried_forwards_df, remainder_df, backdata, impute_vars, config, "short"
+        carried_forwards_df, remainder_df, backdata, config, "short"
     )
 
     imputed_df = pd.concat(
@@ -67,6 +67,10 @@ def mor_preprocessing(df, backdata):
     # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
 
+    # ensure the "formtype" column is in the correct format
+    df["formtype"] = df["formtype"].apply(convert_formtype)
+    backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
+
     stat_cond = df["status"].isin(bad_statuses)
     sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
     lf_cond = df["formtype"] == "0001"
@@ -77,8 +81,6 @@ def mor_preprocessing(df, backdata):
     # Ensure backdata is as we require
     wanted_cond = backdata["imp_marker"].isin(["R", "CF", "MoR", "TMI"])
     backdata = backdata.copy().loc[wanted_cond, :]
-
-    backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
 
     return to_impute_df, remainder_df, backdata
 
@@ -116,6 +118,7 @@ def carry_forwards(df, backdata, impute_vars):
 
     # keep only the rows needed, see function docstring for details.
     no_match_cond = df["_merge"] == "left_only"
+
     form_sent_out_cond = (df["status"] == "Form sent out") & (df["instance"] == 1)
     check_needed_cond = (df["status"] == "Check needed") & (df["instance"] == 0)
     keep_cond = no_match_cond | form_sent_out_cond | check_needed_cond
@@ -151,7 +154,7 @@ def carry_forwards(df, backdata, impute_vars):
     df.loc[match_cond, "imp_marker"] = "CF"
 
     # other columns we would like to keep from the backdata for QA purposes
-    more_cols = ["formtype"]
+    more_cols = ["formtype", "imp_class", "imp_marker"]
 
     # Drop merge related columns
     to_drop = [
@@ -195,8 +198,8 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     responders only (imp_marker = R).
 
     PRN sampled cells (which only occur in short forms) are not included for the current
-    period, a matched pair could still be valid if the reference was PRN in the previous
-    period.
+    period, however a matched pair could still be valid if the reference was PRN in the
+    previous period.
 
     Args:
         current_df (pd.DataFrame): pre-processed current data.
@@ -205,7 +208,6 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     """
     # Select only clear, or equivalently, imp_marker R.
     # Exclude PRN cells in the current period.
-
     prev_df = filter_for_links(prev_df.copy(), is_current=False)
     current_df = filter_for_links(current_df.copy(), is_current=True)
 
@@ -234,11 +236,11 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
 
     # Calculate the ratios for the relevant variables
     for target in target_vars:
-        mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
-        gr_df.loc[mask, f"{target}_gr"] = (
-            gr_df.loc[mask, target] / gr_df.loc[mask, f"{target}_prev"]
+        # Calculate a growth rate if both the current and previous values are non-zero
+        valid_mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
+        gr_df.loc[valid_mask, f"{target}_gr"] = (
+            gr_df.loc[valid_mask, target] / gr_df.loc[valid_mask, f"{target}_prev"]
         )
-
     return gr_df
 
 
@@ -356,11 +358,12 @@ def apply_links(cf_df, links_df, target_vars, config, formtype):
         )
         cf_df.loc[matched_mask, "imp_marker"] = "MoR"
 
-    # Apply MoR for the breakdown variables under 211 and 305
+    # Apply MoR for the breakdown variables
+    q_targets = list(config["breakdowns"])
     if formtype == "long":
-        q_targets = ["211", "305"]
-    else:
-        q_targets = list(config["breakdowns"])
+        q_targets = [
+            q for q in q_targets if q in config["imputation"]["lf_target_vars"]
+        ]
     for var in q_targets:
         for breakdown in config["breakdowns"][var]:
             # As above but using different elements to multiply
@@ -380,17 +383,15 @@ def apply_links(cf_df, links_df, target_vars, config, formtype):
     return cf_df
 
 
-def calculate_mor(cf_df, remainder_df, backdata, impute_vars, config, formtype):
+def calculate_mor(cf_df, remainder_df, backdata, config, formtype):
     """Apply the MoR method to long form responders.
 
     Args:
         cf_df (pd.DataFrame): DataFrame of carried forwards values to impute.
         remainder_df (pd.DataFrame): DataFrame of remaining values.
         backdata (pd.DataFrame): One period of backdata.
-        target_vars ([string]): List of target variables.
-        impute_vars ([string]): List of variables to impute.
         config (Dict): The configuration settings for the pipeline.
-        formtype (str): The formtype of the data being imputed.
+        formtype (str): The formtype of the data being imputed, long or short.
 
     Returns:
         pd.DataFrame: df with MoR applied for long forms
@@ -409,11 +410,7 @@ def calculate_mor(cf_df, remainder_df, backdata, impute_vars, config, formtype):
         backdata = backdata.copy().loc[(backdata["formtype"] == "0006"), :]
 
     else:
-        # TODO: the complex cases of short to long, long to short.
-
-        # for now, don't impute short forms
-        links_df = pd.DataFrame()
-        return cf_df, links_df
+        raise ValueError("formtype must be 'long' or 'short'")
 
     gr_df = calculate_growth_rates(remainder_df, backdata, target_vars)
     links_df = calculate_links(gr_df, target_vars, config)

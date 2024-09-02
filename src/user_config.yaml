@@ -8,10 +8,10 @@ global:
   postcode_csv_check: True
   load_ni_data: True
   # Freezing settings
-  run_with_snapshot_until_freezing: True     # Run until point of freezing - last run is first freeze
+  run_with_snapshot_until_freezing: False     # Run until point of freezing - last run is first freeze
   load_updated_snapshot_for_comparison: False # Run with new json snapshot, and compare to specified frozen csv
   run_updates_and_freeze: False               # Add specified changes to frozen csv, and refreeze
-  run_frozen_data: False                    # Run with specified frozen csv
+  run_frozen_data: True                    # Run with specified frozen csv
   # Construction Settings
   run_all_data_construction: False
   run_postcode_construction: False
@@ -26,7 +26,7 @@ global:
   output_ni_full_responses: False
   output_mapping_qa: False
   output_mapping_ni_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
