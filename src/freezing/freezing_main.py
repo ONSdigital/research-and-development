@@ -5,7 +5,7 @@ from typing import Callable
 
 import pandas as pd
 
-from src.freezing.freezing_utils import  _add_last_frozen_column
+from src.freezing.freezing_utils import _add_last_frozen_column
 from src.freezing.freezing_apply_changes import apply_freezing
 from src.staging.validation import validate_data_with_schema
 from src.utils.helpers import convert_formtype
@@ -29,16 +29,17 @@ def run_freezing(
         snapshot_df (pd.DataFrame): The staged and vaildated snapshot data.
         config (dict): The pipeline configuration
         write_csv (callable): Function to write to a csv file. This will be the
+            s3, hdfs or network version depending on settings.
+        read_csv (callable): Function to read a csv file. This will be the s3,
             hdfs or network version depending on settings.
-        read_csv (callable): Function to read a csv file. This will be the hdfs or
-            network version depending on settings.
-        check_file_exists (callable): Function to check if a file exists.
+        check_file_exists (callable): Function to check if file exists. This will
+            be the s3, hdfs or network version depending on settings.
         run_id (int): The run id for this run.
     Returns:
         prepared_frozen_data (pd.DataFrame): As snapshot_df but with records amended
             and added from the freezing files.
     """
-    
+
     # read in validated config settings
     run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
     load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
@@ -66,9 +67,11 @@ def run_freezing(
             frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
         )
         prepared_frozen_data.reset_index(drop=True, inplace=True)
+        prepared_frozen_data["statusencoded"] = prepared_frozen_data["statusencoded"].astype(str)
 
     elif run_frozen_data:
         prepared_frozen_data = read_frozen_csv(config, read_csv)
+        prepared_frozen_data["statusencoded"] = prepared_frozen_data["statusencoded"].astype(str)
 
     else:
         prepared_frozen_data = snapshot_df.copy()
@@ -95,7 +98,7 @@ def read_frozen_csv(config: dict, read_csv: Callable) -> pd.DataFrame:
 
     Args:
         config (dict): The pipeline configuration.
-        read_csv (callable): Function to read a csv file. This will be the
+        read_csv (callable): Function to read a csv file. This will be the s3,
             hdfs or network version depending on settings.
 
     Returns:

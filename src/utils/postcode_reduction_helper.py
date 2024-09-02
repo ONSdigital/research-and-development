@@ -69,7 +69,7 @@ def input_large_csv(
 
     # read in the postcode lookup file
     print(f"Reading the postcode  lookup file {in_file}...")
-    df = read_csv_func(in_file, cols=key_cols)
+    df = read_csv_func(in_file, usecols=key_cols)
 
     time_taken = (datetime.now() - start_time).total_seconds()
     print(f"Time taken to read in postcode lookup file: {time_taken} seconds")

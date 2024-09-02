@@ -13,36 +13,45 @@ import logging
 import pathlib
 import hashlib
 import shutil
-from typing import List, Union
+from typing import Union
 
 import yaml
 
 from src.utils.wrappers import time_logger_wrap
 
 # Set up logger
-lfmod_logger = logging.getLogger(__name__)
+LocalModLogger = logging.getLogger(__name__)
 
 
-def rd_read_csv(filepath: str, cols: List[str] = None) -> pd.DataFrame:
-    """Reads a csv from a local network drive into a Pandas DataFrame
+def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
+    """Reads a csv file from a local Windows drive or a network drive into a
+    Pandas Dataframe using Python open() function.
+    If "thousands" argument is not specified, sets it to ",".
+    Allows to use any additional keyword arguments of Pandas read_csv method.
+
     Args:
         filepath (str): Filepath
-        cols (List[str]): Optional list of columns to be read in
+        kwargs: Optional dictionary of Pandas read_csv arguments
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
     # Open the file in read mode
     with open(filepath, "r", encoding="utf-8") as file:
-        # Import csv file and convert to Dataframe
-        if not cols:
-            df = pd.read_csv(file, thousands=",")
-        else:
-            try:
-                df = pd.read_csv(file, usecols=cols, thousands=",", encoding="utf-8")
-            except Exception:
-                lfmod_logger.error(f"Could not find specified columns in {filepath}")
-                lfmod_logger.info("Columns specified: " + str(cols))
-                raise ValueError
+
+        # If "thousands" argument is not specified, set it to ","
+        if "thousands" not in kwargs:
+            kwargs["thousands"] = ","
+
+        # Read the scv file using the path and keyword arguments
+        try:
+            df = pd.read_csv(file, **kwargs)
+        except Exception:
+            LocalModLogger.error(f"Could not read specified file: {filepath}")
+            if kwargs:
+                LocalModLogger.info("The following arguments failed: " + str(kwargs))
+            if "usecols" in kwargs:
+                LocalModLogger.info("Columns not found: " + str(kwargs["usecols"]))
+            raise ValueError
     return df
 
 
@@ -134,12 +143,12 @@ def check_file_exists(filename: str, filepath: str) -> bool:
     # If file exists locally and is non-empty
     if rd_file and file_size > 0:
         output = True
-        lfmod_logger.info(f"File {filename} exists and is non-empty")
+        LocalModLogger.info(f"File {filename} exists and is non-empty")
 
     # If file exists locally but is empty
     elif rd_file and file_size == 0:
         output = False
-        lfmod_logger.warning(f"File {filename} exists but is empty")
+        LocalModLogger.warning(f"File {filename} exists but is empty")
 
     return output
 

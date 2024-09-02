@@ -6,7 +6,7 @@ years:
 global:
   # Staging and validation settings
   postcode_csv_check: True
-  load_ni_data: False
+  load_ni_data: True
   # Freezing settings
   run_with_snapshot_until_freezing: False     # Run until point of freezing - last run is first freeze
   load_updated_snapshot_for_comparison: False # Run with new json snapshot, and compare to specified frozen csv
@@ -26,7 +26,7 @@ global:
   output_ni_full_responses: False
   output_mapping_qa: False
   output_mapping_ni_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
@@ -56,6 +56,30 @@ hdfs_paths:
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged" # path for folder
   frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-07_v906" # pragma: allowlist secret
+  freezing_changes_to_review_path: "02_freezing/changes_to_review"
+  freezing_additions_path: "02_freezing/freezing_updates"
+  freezing_amendments_path: "02_freezing/freezing_updates"
+  # Imputation and outliers input paths
+  backdata_path: ""
+  manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/manual_outlier_2023-08-29_v67.csv"
+  # Construction paths
+  all_data_construction_file_path:  "04_construction/manual_construction/test_construction_file.csv"
+  postcode_construction_file_path: "04_construction/manual_construction/test_postcode_construction_file.csv"
+  construction_file_path_ni:  "04_construction/manual_construction/test_construction_file.csv"
+  # postcode paths
+  postcode_masterlist: "/ons/rdbe_dev/mappers/2023/ONSPD_NOV_2022_UK.csv"
+  pcode_val_path: "01_staging/staging_qa/postcode_validation"
+  # mapper paths
+s3_paths:
+  root: "/ons/rdbe_dev/"
+  # staging input paths
+  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
+  updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
+  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
+  feather_path: "staging/feather"
+  # Freezing data paths
+  frozen_data_staged_path: "02_freezing/frozen_data_staged"
   freezing_changes_to_review_path: "02_freezing/changes_to_review"
   freezing_additions_path: "02_freezing/freezing_updates"
   freezing_amendments_path: "02_freezing/freezing_updates"

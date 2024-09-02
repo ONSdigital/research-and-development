@@ -23,7 +23,7 @@ def run_estimation(
         df (pd.DataFrame): The main dataset were estimation will be applied.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
-            This will be the hdfs or network version depending on settings.
+            This will be the s3, hdfs or network version depending on settings.
         run_id (int): The current run id
 
     Returns:
