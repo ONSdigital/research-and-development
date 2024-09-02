@@ -46,9 +46,6 @@ def run_mor(df, backdata, impute_vars, config):
         [remainder_df, imputed_df_long, imputed_df_short]
     ).reset_index(drop=True)
 
-    # TODO: put the group size in the qa
-    # imputed_df = imputed_df.drop("cf_group_size", axis=1)
-
     links_df = pd.concat([links_df_long, links_df_short]).reset_index(drop=True)
 
     return imputed_df, links_df
@@ -61,9 +58,6 @@ def mor_preprocessing(df, backdata):
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
     """
-    # Add a QA column for the group size
-    # df["cf_group_size"] = np.nan
-
     # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
 
