@@ -122,7 +122,7 @@ def check_files_exist(file_list: List, config: dict, isfile: callable):
 
     # Check if the output dirs supplied are string, change to list if so
 
-    platform = config["globak"]["platform"]
+    platform = config["global"]["platform"]
 
     if isinstance(file_list, str):
         file_list = [file_list]
@@ -140,7 +140,6 @@ def check_files_exist(file_list: List, config: dict, isfile: callable):
 
 
 def transfer_files(source, destination, method, logger, copy_files, move_files):
-
     """
     Transfer files from source to destination using the specified method and log
     the action.
