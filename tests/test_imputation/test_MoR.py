@@ -26,7 +26,7 @@ class TestRunMoRLongForm(object):
         return df
 
     @pytest.fixture(scope="function")
-    def dummy_mor_backdata(self) -> pd.DataFrame:
+    def dummy_lf_mor_backdata(self) -> pd.DataFrame:
         """Dummy backdata used for testing MoR imputation."""
         fpath = os.path.join("tests/data/imputation/lf_mor_backdata_anon.csv")
         df = pd.read_csv(fpath)
@@ -34,7 +34,7 @@ class TestRunMoRLongForm(object):
         return df
 
     @pytest.fixture(scope="function")
-    def expected_mor_output(self) -> pd.DataFrame:
+    def expected_lf_mor_output(self) -> pd.DataFrame:
         """The expected output from run_mor."""
         fpath = os.path.join("tests/data/imputation/lf_mor_expected.csv")
         df = pd.read_csv(fpath)
@@ -46,15 +46,15 @@ class TestRunMoRLongForm(object):
     def test_run_mor_long_form(
             self,
            input_lf_mor_df,
-            dummy_mor_backdata,
-            expected_mor_output,
+            dummy_lf_mor_backdata,
+            expected_lf_mor_output,
             imputation_config
         ):
         """General tests for run_mor."""
         impute_vars = get_imputation_cols(imputation_config)
         result_df, qa = run_mor(
             df=input_lf_mor_df,
-            backdata=dummy_mor_backdata,
+            backdata=dummy_lf_mor_backdata,
             impute_vars=impute_vars,
             config=imputation_config
         )
@@ -68,15 +68,15 @@ class TestRunMoRLongForm(object):
 
         # round the expected output to 4 decimal places
         # Apply rounding only to the floating-point columns in the expected output
-        float_cols = expected_mor_output.select_dtypes(include='float').columns
-        expected_mor_output[float_cols] = expected_mor_output[float_cols].round(4)
-        expected_mor_output = expected_mor_output[wanted_cols]
+        float_cols = expected_lf_mor_output.select_dtypes(include='float').columns
+        expected_lf_mor_output[float_cols] = expected_lf_mor_output[float_cols].round(4)
+        expected_lf_mor_output = expected_lf_mor_output[wanted_cols]
 
         # Ana hasn't calulated all the columns in the expected output, so we need to drop them for now
         result_df = result_df.drop(columns=["emp_researcher_imputed", "emp_technician_imputed"], axis=1)
-        expected_mor_output = expected_mor_output.drop(columns=["emp_researcher_imputed", "emp_technician_imputed"], axis=1)
+        expected_lf_mor_output = expected_lf_mor_output.drop(columns=["emp_researcher_imputed", "emp_technician_imputed"], axis=1)
 
-        assert_frame_equal(result_df, expected_mor_output, check_dtype=False, check_exact=False), (
+        assert_frame_equal(result_df, expected_lf_mor_output, check_dtype=False, check_exact=False), (
             "run_mor() not imputing data as expected."
         )
 
