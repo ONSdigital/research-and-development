@@ -36,7 +36,7 @@ class TestRunMoRLongForm(object):
     @pytest.fixture(scope="function")
     def expected_mor_output(self) -> pd.DataFrame:
         """The expected output from run_mor."""
-        fpath = os.path.join("tests/data/imputation/lf_mor_expected_3.csv")
+        fpath = os.path.join("tests/data/imputation/lf_mor_expected.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"reference": "Int64", "instance": "Int64"})
         # order by reference and then instance
