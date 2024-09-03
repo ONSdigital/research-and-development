@@ -175,11 +175,7 @@ def run_imputation(
     # remove rows and columns no longer needed from the imputed dataframe
     imputed_df = hlp.tidy_imputation_dataframe(
         imputed_df,
-        config,
-        ImputationMainLogger,
         to_impute_cols,
-        write_csv,
-        run_id,
     )
 
     # optionally output backdata for imputation
