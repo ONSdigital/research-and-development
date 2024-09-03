@@ -52,11 +52,20 @@ def run_mor(df, backdata, impute_vars, config):
 
 
 def mor_preprocessing(df, backdata):
-    """Apply pre-processing ready for MoR
+    """Apply filtering and pre-processing ready for MoR.
+
+    This function creates imputation classes, cleans the "formtype" column.
+
+    The function then filters the data ready for imputation
 
     Args:
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
+
+    Returns:
+        pd.DataFrame: DataFrame of records to impute
+        pd.DataFrame: DataFrame of remaining records not to be imputed
+        pd.DataFrame: DataFrame of backdata records to use for impuation
     """
     # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
@@ -80,8 +89,7 @@ def mor_preprocessing(df, backdata):
 
 
 def carry_forwards(df, backdata, impute_vars):
-    """Carry forwards matcing `backdata` values into `df` for
-    each column in `impute_vars`.
+    """Carry forwards matcing `backdata` values for references to be imputed.
 
     Records are matched based on 'reference'.
 
@@ -199,6 +207,9 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         current_df (pd.DataFrame): pre-processed current data.
         prev_df (pd.DataFrame): pre-processed backdata.
         target_vars ([string]): target vars to impute.
+
+    Returns:
+        pd.DataFrame: DataFrame of growth rates for each target variable.
     """
     # Select only clear, or equivalently, imp_marker R.
     # Exclude PRN cells in the current period.
@@ -245,6 +256,9 @@ def calculate_links(gr_df, target_vars, config):
         gr_df (pd.DataFrame): DataFrame of growth rates for each target variable
         target_vars ([string]): List of target variables to use.
         config (Dict): Confuration settings.
+
+    Returns:
+        pd.DataFrame: DataFrame with calculated links for each imp_class
     """
     # Apply trimming and calculate means for each imp class
     gr_df = gr_df.groupby("imp_class")
@@ -266,7 +280,8 @@ def calculate_links(gr_df, target_vars, config):
             ]
         )
     )
-    return gr_df[column_order].reset_index(drop=True)
+    gr_df = gr_df[column_order].reset_index(drop=True)
+    return gr_df
 
 
 def get_threshold_value(config: dict) -> int:
@@ -282,12 +297,23 @@ def get_threshold_value(config: dict) -> int:
 
 
 def group_calc_link(group, target_vars, config):
-    """Apply the MoR method to each group
+    """Apply the MoR method to each group as part of the groupby operation.
+
+    The calling function `calculate_links` groups the data by imp_class and then calls
+    this function for each group using the .apply() method.
+
+    This function sorts the group by the growth rate, trims the data, calculates the
+    mean growth rate for each variable, which is also called the "link".
+
+    However, if the group is not of a valid size, the link is set to 1.
 
     Args:
         group (pd.core.groupby.DataFrameGroupBy): Imputation class group
         link_vars ([string]): List of the linked variables.
         config (Dict): Confuration settings
+
+    Returns:
+        pd.core.groupby.DataFrameGroupBy: Group with calculated links.
     """
     threshold_num = get_threshold_value(config)
     for var in target_vars:
@@ -324,12 +350,19 @@ def group_calc_link(group, target_vars, config):
 def apply_links(cf_df, links_df, target_vars, config, formtype):
     """Apply the links to the carried forwards values.
 
+    The links dataframe is merged with the carried forwards dataframe and the links are
+    applied to the carried forwards values. If the link is null or 0, the carried
+    forward value is not changed.
+
     Args:
         cf_df (pd.DataFrame): DataFrame of carried forwards values.
         links_df (pd.DataFrame): DataFrame containing calculated links.
         target_vars ([string]): List of target variables.
         config (Dict): Dictorary of configuration.
         formtype (str): whether the formtype is long or short.
+
+    Returns:
+        pd.DataFrame: DataFrame with MoR imputed values.
     """
     # Reduce the mor_df so we only have the variables we need and one row
     # per imputation class
