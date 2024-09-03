@@ -23,8 +23,6 @@ def expansion_impute(
     """Calculate the expansion imputated values for short forms using long form data"""
     group_copy = group.copy()
 
-    imp_class = group_copy["imp_class"].values[0]
-
     # Make cols into str just in case coming through as ints
     bd_cols = [str(col) for col in break_down_cols]
 
@@ -57,10 +55,6 @@ def expansion_impute(
     # "civil defence fallback" group will be used instead.
 
     if (group_type == "imp_class_group") & (threshold_check <= threshold_num):
-        SFExpansionLogger.debug(
-            f"Imputation class: {imp_class} has fewer than {threshold_num} "
-            "clear responders."
-        )
         return group_copy
 
     # Get long forms only for summing the master_col (scalar value)

@@ -2,7 +2,6 @@
 import itertools
 import re
 import pandas as pd
-import numpy as np
 
 from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
 from src.construction.construction_helpers import convert_formtype
@@ -46,7 +45,6 @@ def run_mor(df, backdata, impute_vars, config):
     imputed_df = pd.concat(
         [remainder_df, imputed_df_long, imputed_df_short]
     ).reset_index(drop=True)
-    imputed_df = imputed_df.drop("cf_group_size", axis=1)
 
     links_df = pd.concat([links_df_long, links_df_short]).reset_index(drop=True)
 
@@ -54,16 +52,21 @@ def run_mor(df, backdata, impute_vars, config):
 
 
 def mor_preprocessing(df, backdata):
-    """Apply pre-processing ready for MoR
+    """Apply filtering and pre-processing ready for MoR.
+
+    This function creates imputation classes, cleans the "formtype" column.
+
+    The function then filters the data ready for imputation
 
     Args:
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
-    """
-    # Add a QA column for the group size
-    df["cf_group_size"] = np.nan
 
-    # TODO move this to imputation main
+    Returns:
+        pd.DataFrame: DataFrame of records to impute
+        pd.DataFrame: DataFrame of remaining records not to be imputed
+        pd.DataFrame: DataFrame of backdata records to use for impuation
+    """
     # Create imp_class column
     df = create_imp_class_col(df, "200", "201")
 
@@ -86,8 +89,7 @@ def mor_preprocessing(df, backdata):
 
 
 def carry_forwards(df, backdata, impute_vars):
-    """Carry forwards matcing `backdata` values into `df` for
-    each column in `impute_vars`.
+    """Carry forwards matcing `backdata` values for references to be imputed.
 
     Records are matched based on 'reference'.
 
@@ -205,6 +207,9 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
         current_df (pd.DataFrame): pre-processed current data.
         prev_df (pd.DataFrame): pre-processed backdata.
         target_vars ([string]): target vars to impute.
+
+    Returns:
+        pd.DataFrame: DataFrame of growth rates for each target variable.
     """
     # Select only clear, or equivalently, imp_marker R.
     # Exclude PRN cells in the current period.
@@ -251,21 +256,32 @@ def calculate_links(gr_df, target_vars, config):
         gr_df (pd.DataFrame): DataFrame of growth rates for each target variable
         target_vars ([string]): List of target variables to use.
         config (Dict): Confuration settings.
+
+    Returns:
+        pd.DataFrame: DataFrame with calculated links for each imp_class
     """
     # Apply trimming and calculate means for each imp class
     gr_df = gr_df.groupby("imp_class")
     gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier
-    column_order = ["imp_class", "reference", "cf_group_size"] + list(
+    column_order = ["imp_class", "reference"] + list(
         itertools.chain(
             *[
-                (var, f"{var}_prev", f"{var}_gr", f"{var}_gr_trim", f"{var}_link")
+                (
+                    var,
+                    f"{var}_prev",
+                    f"{var}_group_size",
+                    f"{var}_gr",
+                    f"{var}_gr_trim",
+                    f"{var}_link",
+                )
                 for var in target_vars
             ]
         )
     )
-    return gr_df[column_order].reset_index(drop=True)
+    gr_df = gr_df[column_order].reset_index(drop=True)
+    return gr_df
 
 
 def get_threshold_value(config: dict) -> int:
@@ -281,40 +297,47 @@ def get_threshold_value(config: dict) -> int:
 
 
 def group_calc_link(group, target_vars, config):
-    """Apply the MoR method to each group
+    """Apply the MoR method to each group as part of the groupby operation.
+
+    The calling function `calculate_links` groups the data by imp_class and then calls
+    this function for each group using the .apply() method.
+
+    This function sorts the group by the growth rate, trims the data, calculates the
+    mean growth rate for each variable, which is also called the "link".
+
+    However, if the group is not of a valid size, the link is set to 1.
 
     Args:
         group (pd.core.groupby.DataFrameGroupBy): Imputation class group
         link_vars ([string]): List of the linked variables.
         config (Dict): Confuration settings
+
+    Returns:
+        pd.core.groupby.DataFrameGroupBy: Group with calculated links.
     """
-    valid_group_size = True
+    threshold_num = get_threshold_value(config)
     for var in target_vars:
         # Create mask to not use 0s in mean calculation
         non_null_mask = pd.notnull(group[f"{var}_gr"])
 
+        # Sort the group by the growth rate and then trim
         group = group.sort_values(f"{var}_gr")
 
         group[f"{var}_gr_trim"] = False
-        trimmed_bounds, qa = trim_bounds(group.loc[non_null_mask, :], f"{var}_gr", config)
-        group.loc[non_null_mask, f"{var}_gr_trim"] = (
-            trimmed_bounds
-            .loc[:, f"{var}_gr_trim"]
-            .values
+        trimmed_bounds, qa = trim_bounds(
+            group.loc[non_null_mask, :], f"{var}_gr", config
         )
+        group.loc[non_null_mask, f"{var}_gr_trim"] = trimmed_bounds.loc[
+            :, f"{var}_gr_trim"
+        ].values
 
         num_valid_vars = sum(~group[f"{var}_gr_trim"] & non_null_mask)
 
-        if var == "211":
-            group["cf_group_size"] = num_valid_vars
-            threshold_num = get_threshold_value(config)
-
-            if num_valid_vars < threshold_num:
-                valid_group_size = False
+        group[f"{var}_group_size"] = num_valid_vars
 
         # If the group is a valid size, and there are non-null, non-zero values for this
         # 'var', then calculate the mean
-        if valid_group_size & (sum(~group[f"{var}_gr_trim"] & non_null_mask) != 0):
+        if num_valid_vars >= threshold_num:
             group[f"{var}_link"] = group.loc[
                 ~group[f"{var}_gr_trim"] & non_null_mask, f"{var}_gr"
             ].mean()
@@ -327,12 +350,19 @@ def group_calc_link(group, target_vars, config):
 def apply_links(cf_df, links_df, target_vars, config, formtype):
     """Apply the links to the carried forwards values.
 
+    The links dataframe is merged with the carried forwards dataframe and the links are
+    applied to the carried forwards values. If the link is null or 0, the carried
+    forward value is not changed.
+
     Args:
         cf_df (pd.DataFrame): DataFrame of carried forwards values.
         links_df (pd.DataFrame): DataFrame containing calculated links.
         target_vars ([string]): List of target variables.
         config (Dict): Dictorary of configuration.
         formtype (str): whether the formtype is long or short.
+
+    Returns:
+        pd.DataFrame: DataFrame with MoR imputed values.
     """
     # Reduce the mor_df so we only have the variables we need and one row
     # per imputation class

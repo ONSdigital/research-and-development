@@ -18,17 +18,12 @@ def evaluate_imputed_ixx(
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 or 305 values, multiplied by the imputed 211.
     """
-    imp_class = group["imp_class"].values[0]
-
     # Return the groupby object unaltered if there are no TMI values
     # in the imputation class
     TMI_mask = group["imp_marker"] == "TMI"
     imputed_subgroup = group.loc[TMI_mask]
 
     if imputed_subgroup.empty:
-        ExpansionLogger.debug(
-            f"Imputation class {imp_class} has no TMI rows to process."
-        )
         return group
 
     # Make cols into str just in case coming through as ints
