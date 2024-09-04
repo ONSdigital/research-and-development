@@ -350,18 +350,16 @@ def calculate_totals(df):
 
 def tidy_imputation_dataframe(
     df: pd.DataFrame,
-    config: Dict,
-    logger: logging.Logger,
     to_impute_cols: List,
-    write_csv: Callable,
-    run_id: int,
 ) -> pd.DataFrame:
     """Remove rows and columns not needed after imputation."""
     # Create lists for the qa cols
     imp_cols = [f"{col}_imputed" for col in to_impute_cols]
 
-    # Update the original breakdown questions and target variables with the imputed
-    df[to_impute_cols] = df[imp_cols]
+    # Create mask for rows that have been imputed
+    imputed_mask = df["imp_marker"].isin(["TMI", "CF", "MoR", "R"])
+    # Update columns with imputed version
+    df.loc[imputed_mask, to_impute_cols] = df.loc[imputed_mask, imp_cols]
 
     # Remove all qa columns
     to_drop = [
