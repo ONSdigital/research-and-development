@@ -9,6 +9,7 @@ import pandas as pd
 
 import src.staging.staging_helpers as helpers
 from src.staging import validation as val
+from src.utils.breakdown_validation import run_breakdown_validation
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -142,6 +143,8 @@ def run_staging(  # noqa: C901
                     feather_path, feather_fname, full_responses, rd_write_feather
                 )
 
+        # Check breakdowns
+        updated_snapshot_df = run_breakdown_validation(full_responses)
         # Flag invalid records
         val.flag_no_rand_spenders(full_responses, "raise")
 
@@ -279,7 +282,6 @@ def run_staging(  # noqa: C901
     # Return staged BERD data, additional data and mappers
     return (
         full_responses,
-        # secondary_full_responses,
         manual_outliers,
         postcode_mapper,
         backdata,
