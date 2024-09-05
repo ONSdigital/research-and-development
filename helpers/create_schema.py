@@ -11,9 +11,9 @@ import os
 root = "R:/BERD Results System Development 2023/DAP_emulation/"
 input_dir = "2023_surveys/BERD/06_imputation/imputation_qa/"
 
-output_name = "full_responses_imputed"
+output_name = "tmi_trim_count_qa"
 year = 2023
-suff = "24-08-20_v10.csv"
+suff = "24-08-30_v733.csv"
 
 # Output folder for all schemas
 out_dir = r"config\output_schemas"

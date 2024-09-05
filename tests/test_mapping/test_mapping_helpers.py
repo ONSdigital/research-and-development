@@ -13,7 +13,6 @@ from src.mapping.mapping_helpers import (
 )
 
 from src.utils.path_helpers import validate_mapping_filenames
-
 class TestJoinWithNullCheck(object):
     """Tests for join_with_null_check function."""
 

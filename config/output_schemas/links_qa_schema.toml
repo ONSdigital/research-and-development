@@ -1,0 +1,275 @@
+[imp_class]
+old_name = "imp_class"
+Deduced_Data_Type = "object"
+
+[reference]
+old_name = "reference"
+Deduced_Data_Type = "int64"
+
+[cf_group_size]
+old_name = "cf_group_size"
+Deduced_Data_Type = "int64"
+
+[211]
+old_name = "211"
+Deduced_Data_Type = "float64"
+
+[211_prev]
+old_name = "211_prev"
+Deduced_Data_Type = "float64"
+
+[211_gr]
+old_name = "211_gr"
+Deduced_Data_Type = "float64"
+
+[211_gr_trim]
+old_name = "211_gr_trim"
+Deduced_Data_Type = "bool"
+
+[211_link]
+old_name = "211_link"
+Deduced_Data_Type = "float64"
+
+[305]
+old_name = "305"
+Deduced_Data_Type = "float64"
+
+[305_prev]
+old_name = "305_prev"
+Deduced_Data_Type = "float64"
+
+[305_gr]
+old_name = "305_gr"
+Deduced_Data_Type = "float64"
+
+[305_gr_trim]
+old_name = "305_gr_trim"
+Deduced_Data_Type = "bool"
+
+[305_link]
+old_name = "305_link"
+Deduced_Data_Type = "float64"
+
+[emp_researcher]
+old_name = "emp_researcher"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_prev]
+old_name = "emp_researcher_prev"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_gr]
+old_name = "emp_researcher_gr"
+Deduced_Data_Type = "float64"
+
+[emp_researcher_gr_trim]
+old_name = "emp_researcher_gr_trim"
+Deduced_Data_Type = "bool"
+
+[emp_researcher_link]
+old_name = "emp_researcher_link"
+Deduced_Data_Type = "float64"
+
+[emp_technician]
+old_name = "emp_technician"
+Deduced_Data_Type = "float64"
+
+[emp_technician_prev]
+old_name = "emp_technician_prev"
+Deduced_Data_Type = "float64"
+
+[emp_technician_gr]
+old_name = "emp_technician_gr"
+Deduced_Data_Type = "float64"
+
+[emp_technician_gr_trim]
+old_name = "emp_technician_gr_trim"
+Deduced_Data_Type = "bool"
+
+[emp_technician_link]
+old_name = "emp_technician_link"
+Deduced_Data_Type = "float64"
+
+[emp_other]
+old_name = "emp_other"
+Deduced_Data_Type = "float64"
+
+[emp_other_prev]
+old_name = "emp_other_prev"
+Deduced_Data_Type = "float64"
+
+[emp_other_gr]
+old_name = "emp_other_gr"
+Deduced_Data_Type = "float64"
+
+[emp_other_gr_trim]
+old_name = "emp_other_gr_trim"
+Deduced_Data_Type = "bool"
+
+[emp_other_link]
+old_name = "emp_other_link"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m]
+old_name = "headcount_res_m"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_prev]
+old_name = "headcount_res_m_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_gr]
+old_name = "headcount_res_m_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_res_m_gr_trim]
+old_name = "headcount_res_m_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_res_m_link]
+old_name = "headcount_res_m_link"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f]
+old_name = "headcount_res_f"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_prev]
+old_name = "headcount_res_f_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_gr]
+old_name = "headcount_res_f_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_res_f_gr_trim]
+old_name = "headcount_res_f_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_res_f_link]
+old_name = "headcount_res_f_link"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m]
+old_name = "headcount_tec_m"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_prev]
+old_name = "headcount_tec_m_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_gr]
+old_name = "headcount_tec_m_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_m_gr_trim]
+old_name = "headcount_tec_m_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_tec_m_link]
+old_name = "headcount_tec_m_link"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f]
+old_name = "headcount_tec_f"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_prev]
+old_name = "headcount_tec_f_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_gr]
+old_name = "headcount_tec_f_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_tec_f_gr_trim]
+old_name = "headcount_tec_f_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_tec_f_link]
+old_name = "headcount_tec_f_link"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m]
+old_name = "headcount_oth_m"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_prev]
+old_name = "headcount_oth_m_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_gr]
+old_name = "headcount_oth_m_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_m_gr_trim]
+old_name = "headcount_oth_m_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_oth_m_link]
+old_name = "headcount_oth_m_link"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f]
+old_name = "headcount_oth_f"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_prev]
+old_name = "headcount_oth_f_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_gr]
+old_name = "headcount_oth_f_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_oth_f_gr_trim]
+old_name = "headcount_oth_f_gr_trim"
+Deduced_Data_Type = "bool"
+
+[headcount_oth_f_link]
+old_name = "headcount_oth_f_link"
+Deduced_Data_Type = "float64"
+
+[formtype]
+old_name = "formtype"
+Deduced_Data_Type = "int64"
+
+[emp_total]
+old_name = "emp_total"
+Deduced_Data_Type = "float64"
+
+[emp_total_prev]
+old_name = "emp_total_prev"
+Deduced_Data_Type = "float64"
+
+[emp_total_gr]
+old_name = "emp_total_gr"
+Deduced_Data_Type = "float64"
+
+[emp_total_gr_trim]
+old_name = "emp_total_gr_trim"
+Deduced_Data_Type = "float64"
+
+[emp_total_link]
+old_name = "emp_total_link"
+Deduced_Data_Type = "float64"
+
+[headcount_total]
+old_name = "headcount_total"
+Deduced_Data_Type = "float64"
+
+[headcount_total_prev]
+old_name = "headcount_total_prev"
+Deduced_Data_Type = "float64"
+
+[headcount_total_gr]
+old_name = "headcount_total_gr"
+Deduced_Data_Type = "float64"
+
+[headcount_total_gr_trim]
+old_name = "headcount_total_gr_trim"
+Deduced_Data_Type = "float64"
+
+[headcount_total_link]
+old_name = "headcount_total_link"
+Deduced_Data_Type = "float64"

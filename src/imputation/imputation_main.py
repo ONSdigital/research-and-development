@@ -106,7 +106,7 @@ def run_imputation(
         df, links_df = run_mor(df, backdata, to_impute_cols, config)
 
     # Run TMI for long forms and short forms
-    imputed_df, qa_df = tmi.run_tmi(df, config)
+    imputed_df, qa_df, trim_counts_qa = tmi.run_tmi(df, config)
 
     # Perform TMI step 5, which calculates employment and headcount totals
     imputed_df = hlp.calculate_totals(imputed_df)
@@ -147,6 +147,7 @@ def run_imputation(
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
         )
         wrong_604_filename = f"{survey_year}_wrong_604_error_qa_{tdate}_v{run_id}.csv"
+        trimmed_counts_filename = f"{survey_year}_tmi_trim_count_qa_{tdate}_v{run_id}.csv"
 
         # create trimming qa dataframe with required columns from schema
         schema_path = config["schema_paths"]["manual_trimming_schema"]
@@ -157,6 +158,7 @@ def run_imputation(
         write_csv(os.path.join(qa_path, full_imp_filename), imputed_df)
         write_csv(os.path.join(qa_path, wrong_604_filename), wrong_604_qa_df)
         write_csv(os.path.join(qa_path, links_filename), links_df)
+        write_csv(os.path.join(qa_path, trimmed_counts_filename), trim_counts_qa)
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 
@@ -173,11 +175,7 @@ def run_imputation(
     # remove rows and columns no longer needed from the imputed dataframe
     imputed_df = hlp.tidy_imputation_dataframe(
         imputed_df,
-        config,
-        ImputationMainLogger,
         to_impute_cols,
-        write_csv,
-        run_id,
     )
 
     # optionally output backdata for imputation
