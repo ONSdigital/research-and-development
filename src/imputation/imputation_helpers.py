@@ -1,7 +1,7 @@
 """Utility functions  to be used in the imputation module."""
 import logging
 import pandas as pd
-from typing import List, Dict, Tuple, Callable
+from typing import List, Tuple
 from itertools import chain
 
 from src.staging.validation import load_schema
@@ -272,7 +272,6 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
 
 
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
-
     # Exclude the records from the reference list
     exclusion_str = "|".join(exclusion_list)
 
@@ -353,13 +352,11 @@ def tidy_imputation_dataframe(
     to_impute_cols: List,
 ) -> pd.DataFrame:
     """Remove rows and columns not needed after imputation."""
-    # Create lists for the qa cols
-    imp_cols = [f"{col}_imputed" for col in to_impute_cols]
-
     # Create mask for rows that have been imputed
     imputed_mask = df["imp_marker"].isin(["TMI", "CF", "MoR", "R"])
     # Update columns with imputed version
-    df.loc[imputed_mask, to_impute_cols] = df.loc[imputed_mask, imp_cols]
+    for col in to_impute_cols:
+        df.loc[imputed_mask, col] = df.loc[imputed_mask, f"{col}_imputed"]
 
     # Remove all qa columns
     to_drop = [
