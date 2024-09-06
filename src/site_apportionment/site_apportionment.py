@@ -198,6 +198,7 @@ def create_category_df(
     groupby_cols: List[str],
     code_cols: List[str],
     site_cols: List[str],
+    geo_cols: List[str],
     value_cols: List[str],
 ) -> pd.DataFrame:
     """
@@ -217,13 +218,15 @@ def create_category_df(
         groupby_cols (List[str]): List of columns to group by.
         code_cols (List[str]): List of code columns.
         site_cols (List[str]): List of site column.
+        geo_cols (List[str]): List of geographic columns from the config.
         value_cols (List[str]): List of columns containing numeric values.
 
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
     """
     # Make the dataframe with columns of all columns except for site columns
-    category_cols = [x for x in orig_cols if x not in site_cols]
+    site_and_geog_cols = site_cols + geo_cols
+    category_cols = [x for x in orig_cols if x not in site_and_geog_cols]
     category_df = df.copy()[category_cols]
 
     # ensure the product group and C or D codes are notnull
@@ -285,7 +288,7 @@ def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
 
 
 def create_sites_df(
-    df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str]
+    df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str], geo_cols: List[str]
 ) -> pd.DataFrame:
     """
     Creates a DataFrame with reference, period, instance, postcode and percent.
@@ -294,11 +297,12 @@ def create_sites_df(
         df (pd.DataFrame): The input DataFrame.
         groupby_cols (List[str]): Columns to group by: reference, period.
         site_cols (List[str]): Columns of sites (instance, postcode, percent).
+        geo_cols
 
     Returns:
         pd.DataFrame: The DataFrame with sites.
     """
-    sites_df = df.copy()[groupby_cols + site_cols]
+    sites_df = df.copy()[groupby_cols + site_cols + geo_cols]
 
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
@@ -309,11 +313,8 @@ def create_sites_df(
     # De-duplicate by summing percents
     sites_df[percent_col] = sites_df[percent_col].fillna(0)
     agg_dict = {instance_col: "first", percent_col: "sum"}
-    sites_df = (
-        sites_df.groupby(groupby_cols + [postcode_col, postcodes_harmonised_col])
-        .agg(agg_dict)
-        .reset_index()
-    )
+    cols = [c for c in (site_cols + geo_cols) if c not in groupby_cols]
+    sites_df = sites_df.groupby(groupby_cols + cols).agg(agg_dict).reset_index()
 
     return sites_df
 
@@ -486,6 +487,8 @@ def run_apportion_sites(
     # imputation.
     value_cols: List[str] = get_imputation_cols(config)
 
+    geo_cols: List[str] = config["mappers"]["geo_cols"]
+
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
 
@@ -503,11 +506,12 @@ def run_apportion_sites(
         groupby_cols,
         code_cols,
         site_cols,
+        geo_cols,
         value_cols,
     )
 
     # sites_df: dataframe with sites, percents and everythung else
-    sites_df = create_sites_df(to_apportion_df, groupby_cols, site_cols)
+    sites_df = create_sites_df(to_apportion_df, groupby_cols, site_cols, geo_cols)
 
     # Calculate weights
     sites_df = calc_weights_for_sites(sites_df, groupby_cols)
