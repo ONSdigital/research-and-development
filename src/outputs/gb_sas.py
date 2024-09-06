@@ -16,7 +16,6 @@ def output_gb_sas(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    postcode_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 
@@ -27,7 +26,6 @@ def output_gb_sas(
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        postcode_mapper (pd.DataFrame): maps the postcode to region code
     """
     output_path = config["outputs_paths"]["outputs_master"]
 

@@ -302,7 +302,8 @@ def create_sites_df(
     Returns:
         pd.DataFrame: The DataFrame with sites.
     """
-    sites_df = df.copy()[groupby_cols + site_cols + geo_cols]
+    all_cols = groupby_cols + site_cols + geo_cols
+    sites_df = df.copy()[all_cols]
 
     # Remove instances that have no postcodes
     sites_df = sites_df[sites_df[postcode_col].str.len() > 0]
@@ -312,9 +313,15 @@ def create_sites_df(
 
     # De-duplicate by summing percents
     sites_df[percent_col] = sites_df[percent_col].fillna(0)
-    agg_dict = {instance_col: "first", percent_col: "sum"}
-    cols = [c for c in (site_cols + geo_cols) if c not in groupby_cols]
-    sites_df = sites_df.groupby(groupby_cols + cols).agg(agg_dict).reset_index()
+
+    agg_dict = {c: "first" for c in ([instance_col] + geo_cols)}
+    agg_dict[percent_col] = "sum"
+
+    sites_df = (
+        sites_df.groupby(groupby_cols + [postcode_col, postcodes_harmonised_col])
+        .agg(agg_dict)
+        .reset_index()
+    )
 
     return sites_df
 
@@ -487,7 +494,7 @@ def run_apportion_sites(
     # imputation.
     value_cols: List[str] = get_imputation_cols(config)
 
-    geo_cols: List[str] = config["mappers"]["geo_cols"]
+    geo_cols: List[str] = ["itl"] + config["mappers"]["geo_cols"]
 
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)
