@@ -918,6 +918,7 @@ class TestCreateCategoryDf(object):
         self.code_cols = ["201", "200", "pg_numeric"]
         # excluding postcode_harmonised as it is irrelevant to this test
         self.site_cols = ["instance", "601", "602"]
+        self.geo_cols = ["itl"]
         self.value_cols = ["210"]
 
     def test_create_category_df_on_pass(self, category_df_input):
@@ -929,6 +930,7 @@ class TestCreateCategoryDf(object):
             self.groupby_cols,
             self.code_cols,
             self.site_cols,
+            self.geo_cols,
             self.value_cols,
         )
         exp_cols = [
@@ -962,6 +964,7 @@ class TestCreateCategoryDf(object):
             self.groupby_cols,
             self.code_cols,
             self.site_cols,
+            self.geo_cols,
             self.value_cols,
         )
         exp_cols = [
