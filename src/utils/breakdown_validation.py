@@ -7,6 +7,8 @@ from pandas import DataFrame as pandasDF
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
+# checks that need to be done: the last col in the list is the total col
+# the sum of the other cols should equal the total
 equals_checks = {
     'check1': ['222', '223', '203'],
     'check2': ['202', '203', '204'],
@@ -23,6 +25,7 @@ equals_checks = {
     'check13': ['406', '408', '410', '412'],
 }
 
+# checks that need to be done: the second value should not be greater than the first
 greater_than_checks = {
     'check14': ['209', '221'],
 }
@@ -138,9 +141,8 @@ def run_breakdown_validation(
     Returns:
         pd.DataFrame
     """
-    if check == 'all':
-        df = replace_nulls_with_zero(df)
 
+    df = replace_nulls_with_zero(df)
     rows_to_validate = remove_all_nulls_rows(df)
     msg, count = equal_validation(rows_to_validate)
     msg, count = greater_than_validation(rows_to_validate, msg, count)
@@ -150,6 +152,7 @@ def run_breakdown_validation(
     if not msg:
         BreakdownValidationLogger.info("All breakdown values are valid.")
     else:
+        # BreakdownValidationLogger.info(msg)
         raise ValueError(msg)
 
 
