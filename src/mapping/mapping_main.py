@@ -25,14 +25,9 @@ def run_mapping(
     rd_file_exists: Callable,
     run_id: int,
 ):
-
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
-        "ultfoc_mapper_path",
-        config,
-        MappingMainLogger,
-        rd_file_exists,
-        rd_read_csv
+        "ultfoc_mapper_path", config, MappingMainLogger, rd_file_exists, rd_read_csv
     )
 
     # Load ITL mapper
@@ -50,7 +45,7 @@ def run_mapping(
         config,
         MappingMainLogger,
         rd_file_exists,
-        rd_read_csv,    
+        rd_read_csv,
     )
 
     # Load and validate the PG mappers
@@ -91,7 +86,7 @@ def run_mapping(
     responses = run_pg_conversion(responses, pg_num_alpha, sic_pg_num)
     responses = join_fgn_ownership(responses, ultfoc_mapper)
     responses = validate_join_cellno_mapper(responses, cellno_df, config)
-    responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
+    responses = join_itl_regions(responses, postcode_mapper, itl_mapper, config)
 
     # unpack the responses
     full_responses, ni_full_responses = responses
@@ -109,9 +104,7 @@ def run_mapping(
         full_responses_filename = (
             f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
         )
-        rd_write_csv(
-            os.path.join(qa_path, full_responses_filename), full_responses
-        )
+        rd_write_csv(os.path.join(qa_path, full_responses_filename), full_responses)
     MappingMainLogger.info("Finished Mapping QA calculation.")
 
     if config["global"]["output_mapping_ni_qa"] and not ni_full_responses.empty:

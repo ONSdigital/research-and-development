@@ -92,7 +92,6 @@ def output_short_form(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    postcode_itl_mapper: pd.DataFrame,
 ):
     """Run the outputs module.
 

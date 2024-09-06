@@ -32,11 +32,9 @@ def run_outputs(  # noqa: C901
     run_id: int,
     postcode_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
-    itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
 ):
-
     """Run the outputs module.
 
     Args:
@@ -51,7 +49,6 @@ def run_outputs(  # noqa: C901
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
         postcode_mapper (pd.DataFrame): Links postcode to region code
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
-        itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
@@ -70,7 +67,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
 
@@ -100,7 +96,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished TAU output.")
 
