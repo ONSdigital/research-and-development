@@ -24,7 +24,6 @@ def output_tau(
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
     """
     output_path = config["outputs_paths"]["outputs_master"]
     # Prepare the columns needed for outputs:

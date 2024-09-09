@@ -297,8 +297,7 @@ def create_sites_df(
         df (pd.DataFrame): The input DataFrame.
         groupby_cols (List[str]): Columns to group by: reference, period.
         site_cols (List[str]): Columns of sites (instance, postcode, percent).
-        geo_cols
-
+        geo_cols (List[str]): List of geographic columns from the config.
     Returns:
         pd.DataFrame: The DataFrame with sites.
     """

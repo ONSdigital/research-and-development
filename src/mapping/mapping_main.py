@@ -25,6 +25,22 @@ def run_mapping(
     rd_file_exists: Callable,
     run_id: int,
 ):
+    """Perform mapping to the responses dataframes and output QA to csv.
+
+    Args:
+        full_responses (pd.DataFrame): The full responses dataframe.
+        ni_full_responses (pd.DataFrame): The Northern Ireland full responses dataframe.
+        postcode_mapper (pd.DataFrame): The postcode mapper dataframe.
+        config (dict): The configuration settings.
+        rd_read_csv (Callable): Function to read a csv file.
+        rd_write_csv (Callable): Function to write a dataframe to a csv file.
+        rd_file_exists (Callable): Function to check if a file exists.
+        run_id (int): Unique identifier for the run.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland 
+            full responses dataframes with the mappers added.
+    """
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
         "ultfoc_mapper_path", config, MappingMainLogger, rd_file_exists, rd_read_csv

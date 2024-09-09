@@ -272,6 +272,22 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
 
 
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
+    """Split the dataframe based on the imputation class.
+
+    Removes records where the imputation class includes strings in the passed list.
+    Many records include a "nan" in either q200 (R&D type- Civil or Defence) and q201
+    (Product Group)- these will generally be filtered out from the imputation classes.
+
+    Where short forms are under consideration, "817" imputation classes will be excluded
+    
+    Args:
+        df (pd.DataFrame): The dataframe to split
+        exclusion_list (List, optional): A list of imputation classes to exclude. 
+    
+    Returns:
+        pd.DataFrame: The filtered dataframe with the invalid imp classes removed
+        pd.DataFrame: The excluded dataframe
+    """
     # Exclude the records from the reference list
     exclusion_str = "|".join(exclusion_list)
 
@@ -351,7 +367,15 @@ def tidy_imputation_dataframe(
     df: pd.DataFrame,
     to_impute_cols: List,
 ) -> pd.DataFrame:
-    """Remove rows and columns not needed after imputation."""
+    """Update cols with imputed values and remove rows and columns no longer needed.
+    
+    Args:
+        df (pd.DataFrame): The dataframe with imputed values.
+        to_impute_cols (List): The columns that were imputed.
+
+    Returns:
+        pd.DataFrame: The dataframe with the imputed values applied and qa cols dropped.
+    """
     # Create mask for rows that have been imputed
     imputed_mask = df["imp_marker"].isin(["TMI", "CF", "MoR", "R"])
     # Update columns with imputed version
