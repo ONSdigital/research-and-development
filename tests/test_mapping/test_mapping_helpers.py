@@ -214,6 +214,16 @@ class TestUpdateRefList(object):
 
 class TestCreateAdditionalNiCols(object):
     """Tests for create_additional_ni_cols function."""
+    def config(self) -> dict:
+        """A dummy config for running join_itl_regions tests."""
+        config = {
+            "mappers": {
+                "geo_cols": ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"],
+                "gb_itl": "LAU121CD",
+                "ni_itl": "N92000002",
+            }
+        }
+        return config
 
     def test_create_additional_ni_cols(self):
         """Test create_additional_ni_cols function."""
@@ -235,16 +245,18 @@ class TestCreateAdditionalNiCols(object):
             "form_status",
             "602",
             "formtype",
+            "itl",
         ]
         expected_data = [
-            [1, 10, 1, "Yes", 600, 100.0, "0003"],
-            [2, 20, 1, "Yes", 600, 100.0, "0003"],
-            [3, 30, 1, "Yes", 600, 100.0, "0003"],
+            [1, 10, 1, "Yes", 600, 100.0, "0003", "N92000002"],
+            [2, 20, 1, "Yes", 600, 100.0, "0003", "N92000002"],
+            [3, 30, 1, "Yes", 600, 100.0, "0003", "N92000002"],
         ]
         expected_df = pd.DataFrame(data=expected_data, columns=expected_columns)
 
         # Call the function
-        output_df = create_additional_ni_cols(df)
+        config = self.config()
+        output_df = create_additional_ni_cols(df, config)
 
         # Check if the output matches the expected DataFrame
         assert output_df.equals(

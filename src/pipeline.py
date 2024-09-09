@@ -152,7 +152,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
         full_responses,
         ni_df,
         postcode_mapper,
