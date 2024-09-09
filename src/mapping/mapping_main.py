@@ -111,7 +111,7 @@ def run_mapping(
 
     # Process the NI full responses if they exist
     if not ni_full_responses.empty:
-        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
+        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses, config)
 
     # output QA files
     qa_path = config["mapping_paths"]["qa_path"]

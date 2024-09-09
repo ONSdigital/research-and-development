@@ -261,8 +261,6 @@ def stage_validate_harmonise_postcodes(
     1. Loads a master list of postcodes from a CSV file.
     2. Validates the postcode column in the full_responses DataFrame against the
        master list.
-    2. Validates the postcode column in the full_responses DataFrame against
-        the master list.
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
@@ -290,11 +288,10 @@ def stage_validate_harmonise_postcodes(
     postcode_mapper = config["mapping_paths"]["postcode_mapper"]
     check_file_exists(postcode_mapper, raise_error=True)
     postcode_mapper = read_csv(postcode_mapper)
-    postcode_masterlist = postcode_mapper["pcd2"]
-
+    
     # Validate the postcode column in the full_responses DataFrame
     full_responses, invalid_df = pcval.run_full_postcode_process(
-        full_responses, postcode_masterlist, config
+        full_responses, postcode_mapper, config
     )
 
     # Log the saving of invalid postcodes to a file
@@ -312,7 +309,7 @@ def stage_validate_harmonise_postcodes(
     # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
-    return full_responses, postcode_mapper
+    return full_responses, postcode_mapper,
 
 
 def filter_pnp_data(full_responses):

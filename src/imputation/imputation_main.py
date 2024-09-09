@@ -28,8 +28,6 @@ def run_imputation(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    rd_file_exists: Callable,
-    rd_read_csv: Callable,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
 
@@ -51,8 +49,6 @@ def run_imputation(
         config (dict): the configuration settings.
         write_csv (Callable): function to write a dataframe to a csv file
         run_id (int): unique identifier for the run
-        rd_file_exists (Callable): function to check if a file exists
-        rd_read_csv (Callable): function to read a csv file
 
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
@@ -136,20 +132,6 @@ def run_imputation(
 
     ImputationMainLogger.info("Finished Imputation calculation.")
 
-    # run postcode construction now that impuation is complete
-    run_postcode_construction = config["global"]["run_postcode_construction"]
-    if run_postcode_construction:
-        imputed_df = run_construction(
-            imputed_df,
-            config,
-            rd_file_exists,
-            rd_read_csv,
-            is_run_postcode_construction = True,
-        )
-
-    # Re-calculate itl mapping now that imputation and postcode construction are done.
-    imputed_df = join_itl_regions(full_responses, postcode_mapper, itl_mapper, config)
-
     # Output QA files
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
@@ -180,6 +162,17 @@ def run_imputation(
         imputed_df,
         to_impute_cols,
     )
+
+    # run postcode construction now that impuation is complete
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    if run_postcode_construction:
+        imputed_df = run_construction(
+            imputed_df,
+            config,
+            rd_file_exists,
+            rd_read_csv,
+            is_run_postcode_construction = True,
+        )
 
     # optionally output backdata for imputation
     if config["global"]["output_backdata"]:
