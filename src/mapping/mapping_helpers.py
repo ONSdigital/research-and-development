@@ -169,11 +169,11 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
         df (pd.DataFrame): with cellnumber and selectiontype cols updated.
     """
     ref_list_filtered = ref_list_df.loc[
-        (ref_list_df.formtype == "1") & (ref_list_df.cellnumber != 817)
+        (ref_list_df.formtype == "1") # & (ref_list_df.cellnumber != 817)
     ]
     df = pd.merge(
         full_df,
-        ref_list_filtered[["reference", "cellnumber"]],
+        ref_list_filtered[["reference", "cellnumber", "selectiontype"]],
         how="outer",
         on="reference",
         suffixes=("", "_new"),
@@ -190,10 +190,13 @@ def update_ref_list(full_df: pd.DataFrame, ref_list_df: pd.DataFrame) -> pd.Data
     # update cellnumber and selectiontype where there is a match
     match_cond = df["_merge"] == "both"
     df = df.copy()
-    df.loc[match_cond, "cellnumber"] = 817
-    df.loc[match_cond, "selectiontype"] = "L"
+    df["in_ref_list"] = pd.NA
+    df.loc[match_cond, "in_ref_list"] = "In ref list"
+    # df.loc[match_cond, "cellnumber"] = 817
+    # df.loc[match_cond, "selectiontype"] = "L"
 
-    df = df.drop(["_merge", "cellnumber_new"], axis=1)
+    drop_cols = ["_merge"] #, "cellnumber_new", "selectiontype_new"]
+    # df = df.drop(drop_cols, axis=1)
 
     return df
 

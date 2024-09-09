@@ -359,7 +359,8 @@ def tidy_imputation_dataframe(
     # Create mask for rows that have been imputed
     imputed_mask = df["imp_marker"].isin(["TMI", "CF", "MoR", "R"])
     # Update columns with imputed version
-    df.loc[imputed_mask, to_impute_cols] = df.loc[imputed_mask, imp_cols]
+    for col in to_impute_cols:
+        df.loc[imputed_mask, col] = df.loc[imputed_mask, f"{col}_imputed"]
 
     # Remove all qa columns
     to_drop = [

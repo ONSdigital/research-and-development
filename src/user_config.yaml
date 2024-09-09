@@ -24,7 +24,7 @@ global:
   output_full_responses: False
   output_pnp_full_responses: False
   output_ni_full_responses: False
-  output_mapping_qa: False
+  output_mapping_qa: True
   output_mapping_ni_qa: False
   output_imputation_qa: False
   output_auto_outliers: False
