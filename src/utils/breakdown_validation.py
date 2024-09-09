@@ -28,6 +28,7 @@ equals_checks = {
 # checks that need to be done: the second value should not be greater than the first
 greater_than_checks = {
     'check14': ['209', '221'],
+    'check15': ['211', '202'],
 }
 
 
@@ -142,10 +143,22 @@ def run_breakdown_validation(
         pd.DataFrame
     """
 
-    df = replace_nulls_with_zero(df)
-    rows_to_validate = remove_all_nulls_rows(df)
+    if check == 'constructed':
+        BreakdownValidationLogger.info("Running breakdown validation for constructed data")
+        validation_df = df[df['is_constructed'] == True]
+        not_for_validating_df = df[df['is_constructed'] == False]
+    else:
+        validation_df = df
+
+    validation_df = replace_nulls_with_zero(validation_df)
+    rows_to_validate = remove_all_nulls_rows(validation_df)
     msg, count = equal_validation(rows_to_validate)
     msg, count = greater_than_validation(rows_to_validate, msg, count)
+
+    if check != 'all':
+        df = pd.concat([validation_df, not_for_validating_df], ignore_index=True)
+    else:
+        df = validation_df
 
     BreakdownValidationLogger.info(f"There are {count} errors with the breakdown values")
 
@@ -154,6 +167,5 @@ def run_breakdown_validation(
     else:
         # BreakdownValidationLogger.info(msg)
         raise ValueError(msg)
-
 
     return df

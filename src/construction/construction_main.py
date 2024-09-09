@@ -192,7 +192,7 @@ def run_construction(  # noqa: C901
     ).reset_index(drop=True)
 
     # Check breakdowns
-    updated_snapshot_df = run_breakdown_validation(updated_snapshot_df)
+    updated_snapshot_df = run_breakdown_validation(updated_snapshot_df, check="constructed")
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
