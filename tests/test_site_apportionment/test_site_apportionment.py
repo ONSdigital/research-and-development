@@ -43,40 +43,20 @@ def create_exp_percent_test_output_df():
         "status",
         "imp_marker",
         "postcodes_harmonised",
+        "itl"
     ]
-
     data = [
-        [1, 0, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-        [1, 1, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-        [1, 2, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-        [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY"],
-        [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
-        [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
-        [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ"],
-        [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU"],
-        [
-            3,
-            2,
-            "0001",
-            np.nan,
-            np.nan,
-            1.0,
-            "Check needed",
-            "No mean found",
-            "NP30 7ZZ",
-        ],
-        [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ"],
-        [
-            5,
-            1,
-            "0001",
-            "SA50 5BE",
-            100.0,
-            1.0,
-            "Form sent out",
-            "No mean found",
-            "SA50 5BE",
-        ],
+        [1, 0, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+        [1, 1, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+        [1, 2, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+        [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY", "cym"],
+        [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF", "cym"],
+        [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA", "cym"],
+        [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "cym"],
+        [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU", "cym"],
+        [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ", "cym"],
+        [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ", "cym"],
+        [5, 1, "0001", "SA50 5BE", 100.0, 1.0, "Form sent out", "No mean found", "SA50 5BE", "cym"],
     ]
 
     exp_output_df = pandasDF(data=data, columns=exp_output_columns)
@@ -98,46 +78,28 @@ class TestSetPercentages:
             "status",
             "imp_marker",
             "postcodes_harmonised",
+            "itl"
         ]
 
         data = [
-            [1, 0, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
-            [1, 1, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
-            [1, 2, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX"],
-            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY"],
-            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
-            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
-            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ"],
-            [3, 1, "0001", "DE72 3AU", np.nan, 1.0, "Check needed", "TMI", "DE72 3AU"],
-            [
-                3,
-                2,
-                "0001",
-                np.nan,
-                np.nan,
-                1.0,
-                "Check needed",
-                "No mean found",
-                "NP30 7ZZ",
-            ],
-            [4, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "TMI", "CF10 BZZ"],
-            [
-                5,
-                1,
-                "0001",
-                np.nan,
-                np.nan,
-                np.nan,
-                "Form sent out",
-                "No mean found",
-                "SA50 5BE",
-            ],
+            [1, 0, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [1, 1, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [1, 2, "0006", np.nan, np.nan, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY", "cym"],
+            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF", "cym"],
+            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA", "cym"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "cym"],
+            [3, 1, "0001", "DE72 3AU", np.nan, 1.0, "Check needed", "TMI", "DE72 3AU", "cym"],
+            [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ", "cym"],
+            [4, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "TMI", "CF10 BZZ", "cym"],
+            [5, 1, "0001", np.nan, np.nan, np.nan, "Form sent out", "No mean found", "SA50 5BE", "cym"],
         ]
 
         input_df = pandasDF(data=data, columns=input_columns)
         return input_df
 
     def test_set_percentage(self, create_exp_percent_test_output_df):
+        """Test for the set_percentages function."""
         input_df = self.create_input_df()
         expected_output_df = create_exp_percent_test_output_df
 
@@ -160,35 +122,16 @@ class TestSplitSitesDf:
             "status",
             "imp_marker",
             "postcodes_harmonised",
+            "itl"
         ]
 
         data1 = [
-            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF"],
-            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA"],
-            [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU"],
-            [
-                3,
-                2,
-                "0001",
-                np.nan,
-                np.nan,
-                1.0,
-                "Check needed",
-                "No mean found",
-                "NP30 7ZZ",
-            ],
-            [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ"],
-            [
-                5,
-                1,
-                "0001",
-                "SA50 5BE",
-                100.0,
-                1.0,
-                "Form sent out",
-                "No mean found",
-                "SA50 5BE",
-            ],
+            [2, 1, "0001", "CB1 3NF", 60.0, 2.0, "Clear", "R", "CB1 3NF", "cym"],
+            [2, 2, "0001", "BA1 5DA", 40.0, 2.0, "Clear", "R", "BA1 5DA", "cym"],
+            [3, 1, "0001", "DE72 3AU", 100.0, 1.0, "Check needed", "TMI", "DE72 3AU", "cym"],
+            [3, 2, "0001", np.nan, np.nan, 1.0, "Check needed", "No mean found", "NP30 7ZZ", "cym"],
+            [4, 1, "0001", "CF10 BZZ", 100.0, 1.0, "Form sent out", "TMI", "CF10 BZZ", "cym"],
+            [5, 1, "0001", "SA50 5BE", 100.0, 1.0, "Form sent out", "No mean found", "SA50 5BE", "cym"],
         ]
 
         exp_output_df1 = pandasDF(data=data1, columns=exp_output_cols1)
@@ -210,14 +153,15 @@ class TestSplitSitesDf:
             "status",
             "imp_marker",
             "postcodes_harmonised",
+            "itl"
         ]
 
         data2 = [
-            [1, 0, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-            [1, 1, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-            [1, 2, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX"],
-            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY"],
-            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ"],
+            [1, 0, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [1, 1, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [1, 2, "0006", np.nan, 100.0, np.nan, "Clear", "R", "NP10 5XX", "cym"],
+            [2, 0, "0001", np.nan, np.nan, 2.0, "Clear", "R", "NP20 6YY", "cym"],
+            [3, 0, "0001", np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "cym"],
         ]
         exp_output_df2 = pandasDF(data=data2, columns=exp_output_cols2)
         exp_output_df2 = exp_output_df2.astype({"601": object})
@@ -722,45 +666,16 @@ def sites_df_input():
         "imp_marker",
         "postcodes_harmonised",
         "period",
+        "itl"
     ]
     input_data = [
-        [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-        [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101"],
-        [
-            1,
-            3,
-            "RH12 1XL",
-            np.nan,
-            np.nan,
-            "Clear",
-            "R",
-            "RH12 1XL",
-            "202101",
-        ],  # Nan 602 - Ensure conv to 0
-        [
-            1,
-            4,
-            "RH12 1XZ",
-            100.0,
-            np.nan,
-            "Clear",
-            "R",
-            "RH12 1XZ",
-            "202101",
-        ],  # different postcode
-        [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [2, 2, "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102"],
-        [
-            3,
-            1,
-            np.nan,
-            np.nan,
-            1.0,
-            "Check needed",
-            "TMI",
-            "NP30 7ZZ",
-            "202102",
-        ],  # NaN 601 - Ensure dropped
+        [1, 1, "RH12 1XL", 100.0, np.nan, "Clear", "R", "RH12 1XL", "202101", "cym"],
+        [1, 2, "RH12 1XL", 125.0, np.nan, "Clear", "R", "RH12 1XL", "202101", "cym"],
+        [1, 3, "RH12 1XL", np.nan, np.nan, "Clear", "R", "RH12 1XL", "202101", "cym"],  # Nan 602 - Ensure conv to 0
+        [1, 4, "RH12 1XZ", 100.0, np.nan, "Clear", "R", "RH12 1XZ", "202101", "cym"],  # different postcode
+        [2, 1, "NP44 2NZ", np.nan, 2.0, "Clear", "R", "NP44 2NZ", "202102", "cym"],
+        [2, 2, "NP44 2NZ", 50.0, 2.0, "Clear", "R", "NP44 2NZ", "202102", "cym"],
+        [3, 1, np.nan, np.nan, 1.0, "Check needed", "TMI", "NP30 7ZZ", "202102", "cym"],  # NaN 601 - Ensure dropped
     ]
     input_df = pandasDF(data=input_data, columns=input_cols)
 
@@ -775,10 +690,12 @@ class TestCreateSitesDf(object):
         """Set class attributes that are passed as parameters."""
         self.groupby_cols = ["reference", "period"]
         self.site_cols = ["instance", "601", "602", "postcodes_harmonised"]
+        self.geo_cols = ["itl"]
 
     def test_create_sites_df_on_pass(self, sites_df_input):
         """General tests for create_sites_df."""
-        output = create_sites_df(sites_df_input, self.groupby_cols, self.site_cols)
+        output = create_sites_df(sites_df_input, self.groupby_cols, self.site_cols, self.geo_cols)
+        print(output)
         # assert the resultant dataframe is as expected
         exp_columns = [
             "reference",
@@ -786,12 +703,13 @@ class TestCreateSitesDf(object):
             "601",
             "postcodes_harmonised",
             "instance",
+            "itl",
             "602",
         ]
         exp_data = [
-            [1, "202101", "RH12 1XL", "RH12 1XL", 1, 225.0],
-            [1, "202101", "RH12 1XZ", "RH12 1XZ", 4, 100.0],
-            [2, "202102", "NP44 2NZ", "NP44 2NZ", 1, 50.0],
+            [1, "202101", "RH12 1XL", "RH12 1XL", 1, "cym", 225.0],
+            [1, "202101", "RH12 1XZ", "RH12 1XZ", 4, "cym", 100.0],
+            [2, "202102", "NP44 2NZ", "NP44 2NZ", 1, "cym", 50.0]
         ]
         expected = pandasDF(data=exp_data, columns=exp_columns)
         assert output.equals(expected), "create_sites_df not behaving as expected."
@@ -918,6 +836,7 @@ class TestCreateCategoryDf(object):
         self.code_cols = ["201", "200", "pg_numeric"]
         # excluding postcode_harmonised as it is irrelevant to this test
         self.site_cols = ["instance", "601", "602"]
+        self.geo_cols = ["itl"]
         self.value_cols = ["210"]
 
     def test_create_category_df_on_pass(self, category_df_input):
@@ -929,6 +848,7 @@ class TestCreateCategoryDf(object):
             self.groupby_cols,
             self.code_cols,
             self.site_cols,
+            self.geo_cols,
             self.value_cols,
         )
         exp_cols = [
@@ -962,6 +882,7 @@ class TestCreateCategoryDf(object):
             self.groupby_cols,
             self.code_cols,
             self.site_cols,
+            self.geo_cols,
             self.value_cols,
         )
         exp_cols = [

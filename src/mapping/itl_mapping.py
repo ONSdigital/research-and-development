@@ -9,7 +9,7 @@ def join_itl_regions(
     responses: Tuple[pd.DataFrame, pd.DataFrame],
     postcode_mapper: pd.DataFrame,
     itl_mapper: pd.DataFrame,
-    is_ni: bool = False,
+    config: dict,
     pc_col: str = "postcodes_harmonised",
 ):
     """Joins the itl regions onto the full dataframe using the mapper provided
@@ -17,7 +17,9 @@ def join_itl_regions(
     Args:
         responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         postcode_mapper (pd.DataFrame): Mapper containing postcodes and regions
-        formtype (list): List of the formtypes to run through function
+        itl_mapper (pd.DataFrame): Mapper containing ITL regions
+        config (dict): Pipeline configuration settings
+        pc_col (str, optional): The column name for the postcodes.
 
     Returns:
         Tuple(gb_df: pd.DataFrame, ni_df: pd.DataFrame): dfs with the ITL regions joined
@@ -28,8 +30,9 @@ def join_itl_regions(
     gb_df = join_with_null_check(gb_df, postcode_mapper, "postcode mapper", pc_col)
 
     # next join the itl mapper to add the region columns
-    geo_cols = ["LAU121CD", "ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
-    itl_mapper = itl_mapper[geo_cols].rename(columns={"LAU121CD": "itl"})
+    gb_itl_col = config["mappers"]["gb_itl"]
+    geo_cols = [gb_itl_col] + config["mappers"]["geo_cols"]
+    itl_mapper = itl_mapper[geo_cols].rename(columns={gb_itl_col: "itl"})
 
     # TODO: remove the "warn" parameter when the ITL mapper is fixed
     gb_df = join_with_null_check(gb_df, itl_mapper, "itl mapper", "itl", warn=True)
@@ -38,6 +41,6 @@ def join_itl_regions(
     pd.set_option("display.max_rows", None)
     # if the ni_df is not empty, add the itl column to it
     if not ni_df.empty:
-        ni_df["itl"] = "N92000002"
+        ni_df["itl"] = config["mappers"]["ni_itl"]
 
     return gb_df, ni_df

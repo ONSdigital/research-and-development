@@ -25,14 +25,25 @@ def run_mapping(
     rd_file_exists: Callable,
     run_id: int,
 ):
+    """Perform mapping to the responses dataframes and output QA to csv.
 
+    Args:
+        full_responses (pd.DataFrame): The full responses dataframe.
+        ni_full_responses (pd.DataFrame): The Northern Ireland full responses dataframe.
+        postcode_mapper (pd.DataFrame): The postcode mapper dataframe.
+        config (dict): The configuration settings.
+        rd_read_csv (Callable): Function to read a csv file.
+        rd_write_csv (Callable): Function to write a dataframe to a csv file.
+        rd_file_exists (Callable): Function to check if a file exists.
+        run_id (int): Unique identifier for the run.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland 
+            full responses dataframes with the mappers added.
+    """
     # Load ultfoc (Foreign Ownership) mapper
     ultfoc_mapper = stage_hlp.load_validate_mapper(
-        "ultfoc_mapper_path",
-        config,
-        MappingMainLogger,
-        rd_file_exists,
-        rd_read_csv
+        "ultfoc_mapper_path", config, MappingMainLogger, rd_file_exists, rd_read_csv
     )
 
     # Load ITL mapper
@@ -50,7 +61,7 @@ def run_mapping(
         config,
         MappingMainLogger,
         rd_file_exists,
-        rd_read_csv,    
+        rd_read_csv,
     )
 
     # Load and validate the PG mappers
@@ -91,7 +102,7 @@ def run_mapping(
     responses = run_pg_conversion(responses, pg_num_alpha, sic_pg_num)
     responses = join_fgn_ownership(responses, ultfoc_mapper)
     responses = validate_join_cellno_mapper(responses, cellno_df, config)
-    responses = join_itl_regions(responses, postcode_mapper, itl_mapper)
+    responses = join_itl_regions(responses, postcode_mapper, itl_mapper, config)
 
     # unpack the responses
     full_responses, ni_full_responses = responses
@@ -109,9 +120,7 @@ def run_mapping(
         full_responses_filename = (
             f"{survey_year}_full_responses_mapped_{tdate}_v{run_id}.csv"
         )
-        rd_write_csv(
-            os.path.join(qa_path, full_responses_filename), full_responses
-        )
+        rd_write_csv(os.path.join(qa_path, full_responses_filename), full_responses)
     MappingMainLogger.info("Finished Mapping QA calculation.")
 
     if config["global"]["output_mapping_ni_qa"] and not ni_full_responses.empty:

@@ -45,6 +45,18 @@ class TestRenameItl(object):
 class TestAggregateItl(object):
     """Tests for aggregate_itl."""
 
+    @pytest.fixture(scope="module")
+    def config(self) -> dict:
+        config = {
+            "years": {"survey_year": 2022},
+            "mappers": {
+                "geo_cols": ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"],
+                "gb_itl": "LAU121CD",
+                "ni_itl": "N92000002",
+            }
+        }
+        return config
+
     @pytest.fixture(scope="function")
     def ni_input_data(self) -> pd.DataFrame:
         """UK input data for output_intram_by_itl tests."""
@@ -136,6 +148,7 @@ class TestAggregateItl(object):
         ni_input_data,
         gb_itl1_output,
         gb_itl2_output,
+        config,
     ):
         """Test for aggregate_itl with GB data."""
         print(gb_input_data)
@@ -143,8 +156,7 @@ class TestAggregateItl(object):
         print(gb_itl1_output)
         print(gb_itl2_output)
 
-
-        itl1, itl2 = aggregate_itl(gb_input_data, ni_input_data, 2022)
+        itl1, itl2 = aggregate_itl(gb_input_data, ni_input_data, config)
         itl1 = itl1.round(4)
         itl2 = itl2.round(4)
         assert itl1.equals(gb_itl1_output), "GB ITL1 Output Not as Expected."
@@ -157,9 +169,10 @@ class TestAggregateItl(object):
         ni_input_data,
         uk_itl1_output,
         uk_itl2_output,
+        config,
     ):
         """Test fpr aggregate_itl with NI data."""
-        itl1, itl2 = aggregate_itl(gb_input_data, ni_input_data, 2022, uk_output=True)
+        itl1, itl2 = aggregate_itl(gb_input_data, ni_input_data, config, uk_output=True)
 
         itl1 = itl1.round(4)
         itl2 = itl2.round(4)
