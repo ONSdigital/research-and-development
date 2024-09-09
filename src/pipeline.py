@@ -118,7 +118,7 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         mods.rd_read_csv,
         mods.rd_file_exists,
-        run_id
+        run_id,
     )
     MainLogger.info("Finished Freezing...")
 
@@ -146,7 +146,7 @@ def run_pipeline(user_config_path, dev_config_path):
             config,
             mods.rd_file_exists,
             mods.rd_read_csv,
-            is_run_all_data_construction = True,
+            is_run_all_data_construction=True,
         )
     MainLogger.info("Finished Construction...")
 
@@ -174,7 +174,7 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         run_id,
         mods.rd_file_exists,
-        mods.rd_read_csv
+        mods.rd_read_csv,
     )
     MainLogger.info("Finished  Imputation...")
 
@@ -218,9 +218,7 @@ def run_pipeline(user_config_path, dev_config_path):
         config,
         mods.rd_write_csv,
         run_id,
-        postcode_mapper,
         pg_detailed,
-        itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
     )

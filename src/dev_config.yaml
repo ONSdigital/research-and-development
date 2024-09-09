@@ -115,6 +115,10 @@ schema_paths:
   staged_BERD_full_responses_schema: "config/output_schemas/staged_BERD_full_responses_schema.toml"
   invalid_unrecognised_postcodes_schema: "config/output_schemas/invalid_unrecognised_postcodes_schema.toml"
 # Export config for users
+mappers:
+  geo_cols: ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
+  gb_itl: "LAU121CD"
+  ni_itl: "N92000002"
 outliers:
   flag_cols: ["701", "702", "703", "704", "705", "706", "707"] # NOT for user config. Columns to flag for outliers.
 devtest:

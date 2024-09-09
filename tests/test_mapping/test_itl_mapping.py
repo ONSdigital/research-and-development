@@ -4,6 +4,17 @@ import pytest
 
 from src.mapping.itl_mapping import join_itl_regions
 
+@pytest.fixture(scope="module")
+def config() -> dict:
+    """A dummy config for running join_itl_regions tests."""
+    config = {
+        "mappers": {
+            "geo_cols": ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"],
+            "gb_itl": "LAU121CD",
+            "ni_itl": "N92000002",
+        }
+    }
+    return config
 
 class TestJoinITLRegions(object):
     """Tests for join_itl_regions."""
@@ -119,10 +130,11 @@ class TestJoinITLRegions(object):
         itl_mapper,
         expected_gb_output,
         expected_ni_output,
+        config
     ):
         """General tests for join_itl_regions."""
         input_data = (gb_input_data, ni_input_data)
-        gb_output, ni_output = join_itl_regions(input_data, postcode_mapper, itl_mapper)
+        gb_output, ni_output = join_itl_regions(input_data, postcode_mapper, itl_mapper, config)
 
         assert gb_output.equals(
             expected_gb_output

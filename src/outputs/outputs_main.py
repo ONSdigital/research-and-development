@@ -30,13 +30,10 @@ def run_outputs(  # noqa: C901
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    postcode_mapper: pd.DataFrame,
     pg_detailed: pd.DataFrame,
-    itl1_detailed: pd.DataFrame,
     civil_defence_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
 ):
-
     """Run the outputs module.
 
     Args:
@@ -48,10 +45,7 @@ def run_outputs(  # noqa: C901
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.
-        postcode_mapper (pd.DataFrame): Links postcode to region code
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups
-        itl1_detailed (pd.DataFrame): Detailed descriptons of ITL1 regions
         civil_defence_detailed (pd.DataFrame): Detailed descriptons of civil/defence
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
@@ -70,7 +64,6 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished short form output.")
 
@@ -100,20 +93,13 @@ def run_outputs(  # noqa: C901
             config,
             write_csv,
             run_id,
-            postcode_mapper,
         )
         OutputMainLogger.info("Finished TAU output.")
 
     # Running GB SAS output
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
-        output_gb_sas(
-            outputs_df,
-            config,
-            write_csv,
-            run_id,
-            postcode_mapper,
-        )
+        output_gb_sas(outputs_df, config, write_csv, run_id)
         OutputMainLogger.info("Finished GB SAS output.")
 
     # Running NI SAS output
