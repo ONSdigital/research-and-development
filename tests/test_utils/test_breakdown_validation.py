@@ -1,3 +1,7 @@
+import pandas as pd
+import pytest
+import logging
+
 from src.utils.breakdown_validation import (
     run_breakdown_validation,
     replace_nulls_with_zero,
@@ -5,9 +9,7 @@ from src.utils.breakdown_validation import (
     equal_validation,
     greater_than_validation,
 )
-import pandas as pd
-import pytest
-import logging
+
 
 class TestRunBreakdownValidation:
     """Unit tests for run_breakdown_validation function."""
@@ -22,7 +24,7 @@ class TestRunBreakdownValidation:
         data = [
              ['A', 1, 10, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
              ['B', 1, 1, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
-             ['C', 1,],
+             ['C', 1, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,	None, None,	None, None, None, None, None, None, None, None, None, None, None],
              ['D', 1, None, 0, None, None, 0, None, None, None, None, None, None, None, 0, 0, None, None, None, None, None, None, None, None, None, None, None, None, 0, None,	None, None,	None, None, None, None,	None, None, 0, None, None, None, 0,	None, None,	None, 0, None, None, None, 0, None,	None, None,	0, None],
              ]
 
@@ -40,31 +42,6 @@ class TestRunBreakdownValidation:
             run_breakdown_validation(input_df)
             assert msg in caplog.text
 
-    def test_breakdown_validation_fail(self):
-        """Test for run_breakdown_validation function where the values do not meet the criteria."""
-        input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'B')]
-        with pytest.raises(ValueError):
-            run_breakdown_validation(input_df)
-
-    def test_breakdown_validation_fail_all_null(self, caplog):
-        """Test for run_breakdown_validation function where the values do not meet the criteria."""
-        input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'C')]
-        msg = 'All breakdown values are valid.\n'
-        with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
-            assert msg in caplog.text
-
-    def test_breakdown_validation_fail_totals_zero(self, caplog):
-        """Test for run_breakdown_validation function where the values do not meet the criteria."""
-        input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'D')]
-        msg = 'All breakdown values are valid.\n'
-        with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
-            assert msg in caplog.text
-
     def test_breakdown_validation_msg(self):
         """Test for run_breakdown_validation function to check the returned message."""
         input_df = self.create_input_df()
@@ -74,6 +51,23 @@ class TestRunBreakdownValidation:
             run_breakdown_validation(input_df)
         assert str(e.value) == msg
 
+    def test_breakdown_validation_fail_all_null(self, caplog):
+        """Test for run_breakdown_validation function where there are no values."""
+        input_df = self.create_input_df()
+        input_df = input_df.loc[(input_df['reference'] == 'C')]
+        msg = 'All breakdown values are valid.\n'
+        with caplog.at_level(logging.INFO):
+            run_breakdown_validation(input_df)
+            assert msg in caplog.text
+
+    def test_breakdown_validation_fail_totals_zero(self, caplog):
+        """Test for run_breakdown_validation function where there are zeros."""
+        input_df = self.create_input_df()
+        input_df = input_df.loc[(input_df['reference'] == 'D')]
+        msg = 'All breakdown values are valid.\n'
+        with caplog.at_level(logging.INFO):
+            run_breakdown_validation(input_df)
+            assert msg in caplog.text
 
 class TestReplaceNullsWithZero:
     """Unit tests for replace_nulls_with_zero function."""
@@ -167,8 +161,7 @@ class TestEqualValidation:
         data = [
             ['A', 1, 10, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
             ['B', 1, 1, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
-            ['C', 1, 10, 20, 30, 40, 100, 10, 20, 30, 40, 50, 60, 70, 80, 90, 10, 20, 30, 40, 50, 60, 70, 80, 1, 2, 3, 4, 100, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, None],
-            ['D', 1, None, 0, None, None, 0, None, None, None, None, None, None, None, 0, 0, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None],
+            ['C', 1, None, 0, None, None, 0, None, None, None, None, None, None, None, 0, 0, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None],
         ]
 
         input_df = pd.DataFrame(data=data, columns=input_cols)
@@ -198,9 +191,9 @@ class TestEqualValidation:
         assert result_count == count
 
     def test_equal_validation_all_null(self, caplog):
-        """Test for equal_validation function where all values are null."""
+        """Test for equal_validation function where all values are zero or null."""
         input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'D')].reset_index(drop=True)
+        input_df = input_df.loc[(input_df['reference'] == 'C')].reset_index(drop=True)
         msg = ""
         count = 0
         with caplog.at_level(logging.INFO):
@@ -222,9 +215,8 @@ class TestGreaterThanValidation:
 
         data = [
             ['A', 1, 10, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
-            ['B', 1, 1, 30, 15, 15, 40, 10, 10, 20, 10, 15, 20, 10, 45, 85, 10, 10, 10, 10, 10, 10, 10, 10, 1, 1, 2, 1, 85, 20, 20, 20, 20, 2, 3, 50, 20, 10, 80, 50, 20, 25, 95, 60, 20, 10, 90, 80, 20, 10, 110, 80, 90, 20, 190, None],
-            ['C', 1, 10, 20, 30, 40, 100, 10, 20, 30, 40, 50, 60, 70, 80, 90, 10, 20, 30, 40, 50, 60, 70, 80, 1, 2, 3, 4, 100, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, None],
-            ['D', 1, None, 0, None, None, 0, None, None, None, None, None, None, None, 0, 0, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None],
+            ['B', 1, 10, 20, 30, 40, 100, 10, 20, 30, 40, 50, 60, 70, 80, 90, 10, 20, 30, 40, 50, 60, 70, 80, 1, 2, 3, 4, 100, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, None],
+            ['C', 1, None, 0, None, None, 0, None, None, None, None, None, None, None, 0, 0, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None, None, None, 0, None],
         ]
 
         input_df = pd.DataFrame(data=data, columns=input_cols)
@@ -243,21 +235,20 @@ class TestGreaterThanValidation:
             assert result_msg == msg
             assert result_count == count
 
-    # def test_greater_than_validation_fail(self):
-    #     """Test for greater_than_validation function where the values do not meet the criteria."""
-    #     input_df = self.create_input_df()
-    #     input_df = input_df.loc[(input_df['reference'] == 'B')]
-    #     msg = "Column 221 is greater than 209 for reference: B, instance 1.\n "
-    #     count = 1
-    #     result_msg, result_count = greater_than_validation(input_df, "", 0)
-    #     print(result_msg)
-    #     assert result_msg == msg
-    #     assert result_count == count
+    def test_greater_than_validation_partial_match(self):
+        """Test for greater_than_validation function where some values match and some do not."""
+        input_df = self.create_input_df()
+        input_df = input_df.loc[(input_df['reference'] == 'B')].reset_index(drop=True)
+        msg = "Column 221 is greater than 209 for reference: B, instance 1.\n "
+        count = 1
+        result_msg, result_count = greater_than_validation(input_df, "", 0)
+        assert result_msg == msg
+        assert result_count == count
 
     def test_greater_than_validation_all_null(self, caplog):
         """Test for greater_than_validation function where all values are null."""
         input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'D')]
+        input_df = input_df.loc[(input_df['reference'] == 'C')]
         msg = ""
         count = 0
         with caplog.at_level(logging.INFO):
@@ -265,16 +256,5 @@ class TestGreaterThanValidation:
             assert "Doing checks for values that should be greater than..." in caplog.text
             assert result_msg == msg
             assert result_count == count
-
-    def test_greater_than_validation_partial_match(self):
-        """Test for greater_than_validation function where some values match and some do not."""
-        input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'C')].reset_index(drop=True)
-        msg = "Column 221 is greater than 209 for reference: C, instance 1.\n "
-        count = 1
-        result_msg, result_count = greater_than_validation(input_df, "", 0)
-        assert result_msg == msg
-        assert result_count == count
-
 
 
