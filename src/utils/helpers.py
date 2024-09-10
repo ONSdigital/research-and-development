@@ -130,7 +130,12 @@ def validate_updated_postcodes(
             column updated and the itl columns re-mapped.
     """
     # filter out records that have been constructed or imputed with backdata
-    mask = df["imp_marker"].isin(["CF", "MoR", "constructed"])
+    imp_marker_mask = df["imp_marker"].isin(["CF", "MoR", "constructed"])
+    if "is_constructed" in df.columns:
+        constructed_mask = df["is_constructed"].isin([True])
+        mask = imp_marker_mask | constructed_mask
+    else:
+        mask = imp_marker_mask
     filtered_df = df.copy().loc[mask]
 
     # re-calculate the itl columns based on imputed and constructed columns
