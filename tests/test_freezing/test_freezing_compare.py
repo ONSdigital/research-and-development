@@ -2,9 +2,12 @@
 
 import pandas as pd
 from pandas._testing import assert_frame_equal
+import logging
 
 from src.freezing.freezing_compare import get_amendments, get_additions
 
+# create a test logger to pass to functions
+test_logger = logging.getLogger(__name__)
 
 class TestGetAmendments:
     """Tests for get_amendments()."""
@@ -89,7 +92,7 @@ class TestGetAmendments:
 
         # Run the function
         result = get_amendments(
-            input_frozen_df, input_amendments_df
+            input_frozen_df, input_amendments_df, test_logger
         )
 
         expected_outcome_df = expected_outcome_df[result.columns]
@@ -157,7 +160,7 @@ class TestGetAdditions:
 
         # Run the function
         result = get_additions(
-            input_frozen_df, input_additions_df
+            input_frozen_df, input_additions_df, test_logger
         )
 
         # Check the output

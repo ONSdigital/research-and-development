@@ -4,11 +4,11 @@ import os
 import pandas as pd
 from typing import Callable
 
-FreezingLogger = logging.getLogger(__name__)
 
 def get_amendments(
     frozen_csv: pd.DataFrame,
     updated_snapshot: pd.DataFrame,
+    FreezingLogger: logging.Logger
     ) -> pd.DataFrame:
     """Get amended records from updated snapshot.
 
@@ -19,6 +19,7 @@ def get_amendments(
         frozen_csv (pd.DataFrame): The staged and validated frozen data.
         updated_snapshot (pd.DataFrame): The staged and validated updated
             snapshot data.
+        FreezingLogger (logging.Logger): The logger to log to.
 
     Returns:
         amendments_df (pd.DataFrame): The records that have changed.
@@ -100,13 +101,14 @@ def get_amendments(
 
         return amendments_df
     else:
-        freezing_logger.info("No amendments found.")
+        FreezingLogger.info("No amendments found.")
         return None
 
 
 def get_additions(
     frozen_csv: pd.DataFrame,
     updated_snapshot: pd.DataFrame,
+    FreezingLogger: logging.Logger
     ) -> pd.DataFrame:
     """Get added records from the updated snapshot.
 
@@ -115,6 +117,7 @@ def get_additions(
     Args:
         frozen_csv (pd.DataFrame): The staged and validated frozen data.
         updated_snapshot (pd.DataFrame): The staged and validated updated snapshot data.
+        FreezingLogger (logging.Logger): The logger to log to.
 
     Returns:
         additions_df (pd.DataFrame): The new records identified in the updated snapshot data.
@@ -146,7 +149,7 @@ def get_additions(
         additions_df["accept_changes"] = False
         return additions_df
     else:
-        freezing_logger.info("No additions found.")
+        FreezingLogger.info("No additions found.")
         return None
 
 
@@ -156,6 +159,7 @@ def output_freezing_files(
     config: dict,
     write_csv: Callable,
     run_id: int,
+    FreezingLogger: logging.Logger
     ) -> bool:
     """Save CSVs of amendments and additions for user approval.
 
@@ -166,6 +170,7 @@ def output_freezing_files(
         write_csv (callable): Function to write to a csv file. This will be the
             hdfs or network version depending on settings.
         run_id (int): The run id for this run.
+        FreezingLogger (logging.Logger): The logger to log to.
 
     Returns:
         bool: True if the files were written successfully.

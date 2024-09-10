@@ -39,14 +39,6 @@ class TestJoinITLRegions(object):
         return df
 
     @pytest.fixture(scope="function")
-    def ni_input_data(self) -> pd.DataFrame:
-        """UK input data for output_intram_by_itl tests."""
-        columns = ["formtype", "211"]
-        data = [["0003", 213.0], ["0003", 25.0], ["0003", 75.0], ["0003", 167.0]]
-        df = pd.DataFrame(data=data, columns=columns)
-        return df
-
-    @pytest.fixture(scope="function")
     def postcode_mapper(self) -> pd.DataFrame:
         """Postcode mapper for output_intram_by_itl tests."""
         columns = ["pcd2", "itl"]
@@ -109,37 +101,18 @@ class TestJoinITLRegions(object):
         expected_output = pd.DataFrame(data=data, columns=columns)
         return expected_output
 
-    @pytest.fixture(scope="function")
-    def expected_ni_output(self):
-        """Expected output for join_itl_regions tests."""
-        columns = ["formtype", "211", "itl"]
-        data = [
-            ["0003", 213.0, "N92000002"],
-            ["0003", 25.0, "N92000002"],
-            ["0003", 75.0, "N92000002"],
-            ["0003", 167.0, "N92000002"],
-        ]
-        expected_output = pd.DataFrame(data=data, columns=columns)
-        return expected_output
-
     def test_join_itl_regions(
         self,
         gb_input_data,
-        ni_input_data,
         postcode_mapper,
         itl_mapper,
         expected_gb_output,
-        expected_ni_output,
         config
     ):
         """General tests for join_itl_regions."""
-        input_data = (gb_input_data, ni_input_data)
-        gb_output, ni_output = join_itl_regions(input_data, postcode_mapper, itl_mapper, config)
+        input_data = (gb_input_data)
+        gb_output = join_itl_regions(input_data, postcode_mapper, itl_mapper, config)
 
         assert gb_output.equals(
             expected_gb_output
-        ), "join_itl_regions not behaving as expected."
-
-        assert ni_output.equals(
-            expected_ni_output
         ), "join_itl_regions not behaving as expected."
