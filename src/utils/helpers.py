@@ -132,19 +132,26 @@ def validate_updated_postcodes(
         pd.DataFrame: The updated full responses dataframe with the postcodes_harmonised
             column updated and the itl columns re-mapped.
     """
-    df, invalid_postcodes = run_full_postcode_process(df, postcode_mapper, config)
+    # filter out records that have been constructed or imputed with backdata
+    mask = df["imp_marker"].isin(["CF", "MoR", "constructed"])
+    filtered_df = df.copy().loc[mask]
+    filtered_df, invalid_postcodes = run_full_postcode_process(filtered_df, postcode_mapper, config)
     #TODO: output invalid postcodes after impuatation.
 
     # re-calculate the itl columns based on imputed and constructed columns
     geo_cols = config["mappers"]["geo_cols"]   
-    df = df.copy().drop(["itl"] + geo_cols, axis=1)
-    df = join_itl_regions(
-        df,
+    filtered_df = filtered_df.copy().drop(["itl"] + geo_cols, axis=1)
+    filtered_df = join_itl_regions(
+        filtered_df,
         postcode_mapper,
         itl_mapper,
         config,
         pc_col="postcodes_harmonised",
     ) 
+
+    filtered_df = filtered_df[list(df.columns)]
+
+    df = pd.concat([df.loc[~mask], filtered_df])
     return df
 
 
