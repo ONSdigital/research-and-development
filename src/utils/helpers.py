@@ -1,12 +1,14 @@
-"""Define helper functions that wrap regularly-used functions."""
+"""Define helper functions to be used throughout the pipeline.."""
+import yaml
+import toml
+import logging
+import pandas as pd
 
 from typing import Union
 
-import pandas as pd
-import yaml
-import toml
-
 from src.utils.defence import type_defence
+from src.staging.postcode_validation import run_full_postcode_process
+from src.mapping.itl_mapping import join_itl_regions
 
 # Define paths
 user_config_path = "config/userconfig.toml"
@@ -111,6 +113,39 @@ def values_in_column(
         values = list(values)
     result = set(values).issubset(set(df[col_name]))
     return result
+
+
+def validate_updated_postcodes(
+        df: pd.DataFrame, 
+        postcode_mapper: pd.DataFrame, 
+        itl_mapper: pd.DataFrame,
+        config: dict,
+        MainLogger: logging.Logger
+    ) -> pd.DataFrame:
+    
+    # validate the constructed and imputed postcodes
+    df, invalid_df= run_full_postcode_process(
+        df,
+        postcode_mapper,
+        config,
+    )
+    # There shouldn't be invalid postcodes at this stage, if there are they will be
+    # printed to the screen
+    if not invalid_df.empty:
+        MainLogger.warning(
+            f"Invalid postcodes found in the imputed dataframe: {invalid_df}"
+        )
+    # re-calculate the itl columns based on imputed and constructed columns
+    geo_cols = config["mappers"]["geo_cols"]   
+    df = df.copy().drop(["itl"] + geo_cols, axis=1)
+    df = join_itl_regions(
+        df,
+        postcode_mapper,
+        itl_mapper,
+        config,
+        pc_col="postcodes_harmonised",
+    ) 
+    return df
 
 
 def tree_to_list(

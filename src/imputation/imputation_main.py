@@ -163,17 +163,6 @@ def run_imputation(
         to_impute_cols,
     )
 
-    # run postcode construction now that impuation is complete
-    run_postcode_construction = config["global"]["run_postcode_construction"]
-    if run_postcode_construction:
-        imputed_df = run_construction(
-            imputed_df,
-            config,
-            rd_file_exists,
-            rd_read_csv,
-            is_run_postcode_construction = True,
-        )
-
     # optionally output backdata for imputation
     if config["global"]["output_backdata"]:
         ImputationMainLogger.info("Outputting backdata for imputation.")

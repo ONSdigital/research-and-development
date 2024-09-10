@@ -10,12 +10,11 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
-from src.staging.postcode_validation import run_full_postcode_process
+from src.utils.helpers import validate_updated_postcodes
 from src.freezing.freezing_main import run_freezing
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
 from src.mapping.mapping_main import run_mapping
-from src.mapping.itl_mapping import join_itl_regions
 from src.imputation.imputation_main import run_imputation  # noqa
 from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
@@ -179,8 +178,6 @@ def run_pipeline(user_config_path, dev_config_path):
     MainLogger.info("Finished  Imputation...")
 
     # Perform postcode construction now imputation is complete
-    #TODO: could we have a script in the construction module that runs the postcode 
-    # construction and then does the validation and itl mapping?
     run_postcode_construction = config["global"]["run_postcode_construction"]
     if run_postcode_construction:
         imputed_df = run_construction(
@@ -190,29 +187,14 @@ def run_pipeline(user_config_path, dev_config_path):
             mods.rd_read_csv,
             is_run_postcode_construction = True,
         )
-    # validate the constructed and imputed postcodes
-    imputed_df, invalid_df= run_full_postcode_process(
-        imputed_df,
-        postcode_mapper,
-        config,
-    )
-    # There shouldn't be invalid postcodes at this stage, if there are they will be
-    # printed to the screen
-    if not invalid_df.empty:
-        MainLogger.warning(
-            f"Invalid postcodes found in the imputed dataframe: {invalid_df}"
-        )
-    # re-calculate the itl columns based on imputed and constructed columns
-    geo_cols = config["mappers"]["geo_cols"]   
-    imputed_df = imputed_df.copy().drop(["itl"] + geo_cols, axis=1)
-    imputed_df = join_itl_regions(
+
+    imputed_df = validate_updated_postcodes(
         imputed_df,
         postcode_mapper,
         itl_mapper,
         config,
-        pc_col="postcodes_harmonised",
-    ) 
-    #TODO: up to here in postcodes construction script in construction module
+        MainLogger,
+     )   
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
