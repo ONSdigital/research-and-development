@@ -1,6 +1,5 @@
 """Code to join the ITL regions onto the full dataframe using the mapper provided."""
 import pandas as pd
-from typing import Tuple
 
 from src.mapping.mapping_helpers import join_with_null_check
 
@@ -11,7 +10,8 @@ def join_itl_regions(
     itl_mapper: pd.DataFrame,
     config: dict,
     pc_col: str = "postcodes_harmonised",
-):
+    warn_only: bool = False,
+) -> pd.DataFrame:
     """Joins the itl regions onto the full dataframe using the mapper provided.
 
     First, the itl column is added to the dataframe by joining the postcode_mapper.
@@ -23,6 +23,7 @@ def join_itl_regions(
         itl_mapper (pd.DataFrame): Mapper containing ITL regions
         config (dict): Pipeline configuration settings
         pc_col (str, optional): The column name for the postcodes.
+        nullcheck (bool, optional): Whether to perform null checks on the mappers.
 
     Returns:
         pd.DataFrame: the responses dataframe with the ITL regions joined
@@ -30,9 +31,9 @@ def join_itl_regions(
     Unit Test:
         See [test_itl_mapping](./tests/mapping/test_itl_mapping.py)
     """
-    # first create itl column 
+    # first create itl column
     postcode_mapper = postcode_mapper.rename(columns={"pcd2": pc_col})
-    df = join_with_null_check(df, postcode_mapper, "postcode mapper", pc_col)
+    df = join_with_null_check(df, postcode_mapper, "postcode mapper", pc_col, warn_only)
 
     # next join the itl mapper to add the region columns
     gb_itl_col = config["mappers"]["gb_itl"]

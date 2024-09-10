@@ -136,11 +136,8 @@ def carry_forwards(df, backdata, impute_vars):
         df.loc[match_cond, var] = df.loc[match_cond, f"{var}_prev"]
 
     # Update the postcodes_harmonised column from the updated column 601
-    df.loc[match_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
-    # fill nulls with "referencepostcode" as we do when we first construct the column
-    df["postcodes_harmonised"] = df["postcodes_harmonised"].fillna(
-        df["referencepostcode"]
-    )
+    pc_update_cond = match_cond & df["601"].notnull()
+    df.loc[pc_update_cond, "postcodes_harmonised"] = df.loc[match_cond, "601"]
 
     # Update the imputation classes based on the new 200 and 201 values
     df = create_imp_class_col(df, "200", "201")

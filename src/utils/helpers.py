@@ -142,6 +142,7 @@ def validate_updated_postcodes(
         itl_mapper,
         config,
         pc_col="postcodes_harmonised",
+        warn_only=True,
     )
 
     filtered_df = filtered_df[list(df.columns)]
