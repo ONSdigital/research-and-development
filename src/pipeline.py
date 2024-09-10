@@ -193,7 +193,6 @@ def run_pipeline(user_config_path, dev_config_path):
         postcode_mapper,
         itl_mapper,
         config,
-        MainLogger,
      )   
 
     # Outlier detection module

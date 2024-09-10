@@ -1,13 +1,12 @@
 """Define helper functions to be used throughout the pipeline.."""
 import yaml
 import toml
-import logging
 import pandas as pd
 
 from typing import Union
 
 from src.utils.defence import type_defence
-from src.staging.postcode_validation import run_full_postcode_process
+from src.staging.postcode_validation import format_postcodes, run_full_postcode_process
 from src.mapping.itl_mapping import join_itl_regions
 
 # Define paths
@@ -120,21 +119,22 @@ def validate_updated_postcodes(
         postcode_mapper: pd.DataFrame, 
         itl_mapper: pd.DataFrame,
         config: dict,
-        MainLogger: logging.Logger
     ) -> pd.DataFrame:
+    """Update the postcodes_harmonised column and re-map the itl columns.
     
-    # validate the constructed and imputed postcodes
-    df, invalid_df= run_full_postcode_process(
-        df,
-        postcode_mapper,
-        config,
-    )
-    # There shouldn't be invalid postcodes at this stage, if there are they will be
-    # printed to the screen
-    if not invalid_df.empty:
-        MainLogger.warning(
-            f"Invalid postcodes found in the imputed dataframe: {invalid_df}"
-        )
+    Args:
+        df (pd.DataFrame): The full responses dataframe.
+        postcode_mapper (pd.DataFrame): The postcode mapper dataframe mapping to itl.
+        itl_mapper (pd.DataFrame): The ITL mapper dataframe mapping to ITL regions.
+        config (dict): The pipeline configuration settings.
+
+    Returns:
+        pd.DataFrame: The updated full responses dataframe with the postcodes_harmonised
+            column updated and the itl columns re-mapped.
+    """
+    df, invalid_postcodes = run_full_postcode_process(df, postcode_mapper, config)
+    #TODO: output invalid postcodes after impuatation.
+
     # re-calculate the itl columns based on imputed and constructed columns
     geo_cols = config["mappers"]["geo_cols"]   
     df = df.copy().drop(["itl"] + geo_cols, axis=1)
