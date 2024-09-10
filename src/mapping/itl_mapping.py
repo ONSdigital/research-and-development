@@ -23,7 +23,7 @@ def join_itl_regions(
         itl_mapper (pd.DataFrame): Mapper containing ITL regions
         config (dict): Pipeline configuration settings
         pc_col (str, optional): The column name for the postcodes.
-        nullcheck (bool, optional): Whether to perform null checks on the mappers.
+        warn_only (bool, optional): Whether to warn only rather than error on nulls.
 
     Returns:
         pd.DataFrame: the responses dataframe with the ITL regions joined
