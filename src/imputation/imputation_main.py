@@ -10,12 +10,11 @@ from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
-
-# from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.imputation.MoR import run_mor
 from src.construction.construction_main import run_construction
+from src.mapping.itl_mapping import join_itl_regions
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -29,8 +28,6 @@ def run_imputation(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    rd_file_exists: Callable,
-    rd_read_csv: Callable,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.
 
@@ -52,8 +49,6 @@ def run_imputation(
         config (dict): the configuration settings.
         write_csv (Callable): function to write a dataframe to a csv file
         run_id (int): unique identifier for the run
-        rd_file_exists (Callable): function to check if a file exists
-        rd_read_csv (Callable): function to read a csv file
 
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
@@ -135,6 +130,8 @@ def run_imputation(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    ImputationMainLogger.info("Finished Imputation calculation.")
+
     # Output QA files
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
@@ -160,23 +157,8 @@ def run_imputation(
         write_csv(os.path.join(qa_path, links_filename), links_df)
         write_csv(os.path.join(qa_path, trimmed_counts_filename), trim_counts_qa)
 
-    ImputationMainLogger.info("Finished Imputation calculation.")
-
-    run_postcode_construction = config["global"]["run_postcode_construction"]
-    if run_postcode_construction:
-        imputed_df = run_construction(
-            imputed_df,
-            config,
-            rd_file_exists,
-            rd_read_csv,
-            is_run_postcode_construction = True,
-        )
-
     # remove rows and columns no longer needed from the imputed dataframe
-    imputed_df = hlp.tidy_imputation_dataframe(
-        imputed_df,
-        to_impute_cols,
-    )
+    imputed_df = hlp.tidy_imputation_dataframe(imputed_df, to_impute_cols)
 
     # optionally output backdata for imputation
     if config["global"]["output_backdata"]:

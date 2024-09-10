@@ -304,7 +304,7 @@ def update_full_responses(
 @time_logger_wrap
 @exception_wrap
 def run_full_postcode_process(
-    df: pd.DataFrame, postcode_masterlist: pd.DataFrame, config: dict
+    df: pd.DataFrame, postcode_mapper: pd.DataFrame, config: dict
 ):
     """This function creates the postcodes_harmonised column containing
        valid UK postcodes only.
@@ -322,8 +322,8 @@ def run_full_postcode_process(
 
     Args:
         df (pd.DataFrame): The DataFrame containing the postcodes.
-        postcode_masterlist (pd.DataFrame): The dataframe containing the correct
-        postocdes to check against
+        postcode_mapper (pd.DataFrame): The dataframe containing the correct
+            postocdes to check against
         config (dict): The postcode settings from the config settings
 
     Returns:
@@ -332,6 +332,8 @@ def run_full_postcode_process(
     """
     if not isinstance(df, pd.DataFrame):
         raise TypeError(f"The dataframe you are attempting to validate is {type(df)}")
+    
+    postcode_masterlist = postcode_mapper["pcd2"]
 
     # Create new column and fill with "601" and the nulls with "referencepostcode"
     df["postcodes_harmonised"] = df["601"].fillna(df["referencepostcode"])

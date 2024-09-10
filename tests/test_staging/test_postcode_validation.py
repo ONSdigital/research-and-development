@@ -72,12 +72,24 @@ def mock_get_masterlist(postcode_masterlist):
     return pd.Series(["NP10 8XG", "SW1P 4DF", "PO15 5RR"])
 
 
-# Test case for run_full_postcode_process
-def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
-    # Monkeypatch the get_masterlist function to use the mock implementation
-    monkeypatch.setattr(
-        "src.staging.postcode_validation.get_masterlist", mock_get_masterlist
+@pytest.fixture
+def postcode_mapper():
+    # Return a mock postcode_mapper dataframe
+    pc_mapper = pd.DataFrame(
+            {
+            "pcd2": ["NP10 8XG", "SW1P 4DF", "PO15 5RR"],
+            "itl": ["W06000020", "E09000033", "E07000086"], # Mock ITL regions
+        } 
     )
+    return pc_mapper
+
+
+# Test case for run_full_postcode_process
+def test_run_full_postcode_process(test_data_df, postcode_mapper, caplog):
+    # Monkeypatch the get_masterlist function to use the mock implementation
+    # monkeypatch.setattr(
+    #     "src.staging.postcode_validation.get_masterlist", mock_get_masterlist
+    # )
 
     # Make a fake path to the masterlist
     fake_path = "path/to/missing_masterlist.csv"
@@ -85,7 +97,7 @@ def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
     config = generate_config(True)
 
     # Call the function under test
-    run_full_postcode_process(test_data_df, fake_path, config)
+    run_full_postcode_process(test_data_df, postcode_mapper, config)
 
     # Using caplog to check the logged warning messages
     if config["global"]["postcode_csv_check"]:
@@ -109,7 +121,7 @@ def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
             "postcodes_harmonised": ["NP10 8XG", "PO15 5RR", "SW1P 4DF"],
         }
     )
-    df, df_result = run_full_postcode_process(df_valid, fake_path, config)
+    df, df_result = run_full_postcode_process(df_valid, postcode_mapper, config)
     exp_output1 = pd.DataFrame(
         columns=[
             "reference",
@@ -136,7 +148,7 @@ def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
             "postcodes_harmonised": ["EFG 456", "HIJ 789"],
         }
     )
-    run_full_postcode_process(df_invalid, fake_path, config)
+    run_full_postcode_process(df_invalid, postcode_mapper, config)
     assert (
         "Total list of unique invalid postcodes found: ['EFG 456', 'HIJ 789']"
         in caplog.text
@@ -144,7 +156,7 @@ def test_run_full_postcode_process(test_data_df, monkeypatch, caplog):
 
     # Mixed valid and invalid postcodes - as is in the test_data
 
-    run_full_postcode_process(test_data_df, fake_path, config)
+    run_full_postcode_process(test_data_df, postcode_mapper, config)
     if config["global"]["postcode_csv_check"]:
         assert (
             "Total list of unique invalid postcodes found: ['KL1M 2NO', 'HIJ 789']"

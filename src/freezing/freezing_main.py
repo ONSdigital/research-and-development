@@ -53,10 +53,10 @@ def run_freezing(
         frozen_data_for_comparison = frozen_data_for_comparison.convert_dtypes()
 
         # Use the updated snapshot to generate freezing files for the next run
-        additions_df = get_additions(frozen_data_for_comparison, updated_snapshot)
-        amendments_df = get_amendments(frozen_data_for_comparison, updated_snapshot)
+        additions_df = get_additions(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
+        amendments_df = get_amendments(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
         output_freezing_files(
-            amendments_df, additions_df, config, write_csv, run_id
+            amendments_df, additions_df, config, write_csv, run_id, FreezingLogger
         )
         prepared_frozen_data = snapshot_df.copy()
 

@@ -102,13 +102,16 @@ def run_mapping(
     responses = run_pg_conversion(responses, pg_num_alpha, sic_pg_num)
     responses = join_fgn_ownership(responses, ultfoc_mapper)
     responses = validate_join_cellno_mapper(responses, cellno_df, config)
-    responses = join_itl_regions(responses, postcode_mapper, itl_mapper, config)
 
     # unpack the responses
     full_responses, ni_full_responses = responses
 
+    # Join the ITL regions mapper to the BERD full_responses dataframe
+    full_responses = join_itl_regions(full_responses, postcode_mapper, itl_mapper, config)
+
+    # Process the NI full responses if they exist
     if not ni_full_responses.empty:
-        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses)
+        ni_full_responses = hlp.create_additional_ni_cols(ni_full_responses, config)
 
     # output QA files
     qa_path = config["mapping_paths"]["qa_path"]
@@ -134,4 +137,4 @@ def run_mapping(
     MappingMainLogger.info("Finished Mapping NI QA calculation.")
 
     # return mapped_df
-    return (full_responses, ni_full_responses)
+    return (full_responses, ni_full_responses, itl_mapper)
