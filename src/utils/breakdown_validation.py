@@ -165,7 +165,6 @@ def run_breakdown_validation(
     if not msg:
         BreakdownValidationLogger.info("All breakdown values are valid.")
     else:
-        # BreakdownValidationLogger.info(msg)
         raise ValueError(msg)
 
     return df
