@@ -6,7 +6,6 @@ import pandas as pd
 from typing import Union
 
 from src.utils.defence import type_defence
-from src.staging.postcode_validation import format_postcodes, run_full_postcode_process
 from src.mapping.itl_mapping import join_itl_regions
 
 # Define paths
@@ -91,9 +90,7 @@ def convert_formtype(formtype_value: str) -> str:
 
 
 def values_in_column(
-        df: pd.DataFrame,
-        col_name: str,
-        values: Union[list, pd.Series]
+    df: pd.DataFrame, col_name: str, values: Union[list, pd.Series]
 ) -> bool:
     """Determine whether a list of values are all present in a dataframe column.
 
@@ -115,13 +112,13 @@ def values_in_column(
 
 
 def validate_updated_postcodes(
-        df: pd.DataFrame, 
-        postcode_mapper: pd.DataFrame, 
-        itl_mapper: pd.DataFrame,
-        config: dict,
-    ) -> pd.DataFrame:
+    df: pd.DataFrame,
+    postcode_mapper: pd.DataFrame,
+    itl_mapper: pd.DataFrame,
+    config: dict,
+) -> pd.DataFrame:
     """Update the postcodes_harmonised column and re-map the itl columns.
-    
+
     Args:
         df (pd.DataFrame): The full responses dataframe.
         postcode_mapper (pd.DataFrame): The postcode mapper dataframe mapping to itl.
@@ -135,11 +132,9 @@ def validate_updated_postcodes(
     # filter out records that have been constructed or imputed with backdata
     mask = df["imp_marker"].isin(["CF", "MoR", "constructed"])
     filtered_df = df.copy().loc[mask]
-    filtered_df, invalid_postcodes = run_full_postcode_process(filtered_df, postcode_mapper, config)
-    #TODO: output invalid postcodes after impuatation.
 
     # re-calculate the itl columns based on imputed and constructed columns
-    geo_cols = config["mappers"]["geo_cols"]   
+    geo_cols = config["mappers"]["geo_cols"]
     filtered_df = filtered_df.copy().drop(["itl"] + geo_cols, axis=1)
     filtered_df = join_itl_regions(
         filtered_df,
@@ -147,7 +142,7 @@ def validate_updated_postcodes(
         itl_mapper,
         config,
         pc_col="postcodes_harmonised",
-    ) 
+    )
 
     filtered_df = filtered_df[list(df.columns)]
 
@@ -155,13 +150,11 @@ def validate_updated_postcodes(
     return df
 
 
-def tree_to_list(
-    tree: dict, path_list: list = [], prefix: str = ""
-) -> list:
+def tree_to_list(tree: dict, path_list: list = [], prefix: str = "") -> list:
     """
     Convert a dictionary of paths to a list.
 
-    This function converts a directory tree that is provided as a dictionary to a 
+    This function converts a directory tree that is provided as a dictionary to a
     list of full paths. This is done recursively, so the number of tiers is not
     pre-defined. Returns a list of absolute directory paths.
     Directory and subdirectory names must be the keys in the dictionary.
@@ -191,7 +184,7 @@ def tree_to_list(
         path_list (list): A list of full paths that is populated when the function
             runs. Must be empty when you call the function.
         prefix (str): The common prefix. It should start with the platform-
-            specific root, such as "R:/dap_emulation" or "dapsen/workspace_zone_res_dev",
+            specific root, such as "R:/dap_emulation" or "dapsen/workspace_zone_res_dev"
             followed by the year_surveys. Do not add a forward slash at the end.
 
     Returns:
@@ -203,12 +196,10 @@ def tree_to_list(
 
     # Input must be a dictionary of dictionaries or an empty dictionary
     if isinstance(tree, dict):
-
         # The recursive iteration will proceed if the current tree is not empty.
         # The recursive iterations will stop once we reach the lowest level
         # indicated by an empty dictionary.
         if tree:
-
             # For a non-empty dictionary, iterating through all top-level keys.
             for key in tree:
                 if prefix == "":
