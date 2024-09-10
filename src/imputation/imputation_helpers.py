@@ -363,10 +363,7 @@ def calculate_totals(df):
     return df
 
 
-def tidy_imputation_dataframe(
-    df: pd.DataFrame,
-    to_impute_cols: List,
-) -> pd.DataFrame:
+def tidy_imputation_dataframe(df: pd.DataFrame, to_impute_cols: List) -> pd.DataFrame:
     """Update cols with imputed values and remove rows and columns no longer needed.
     
     Args:

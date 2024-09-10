@@ -10,6 +10,7 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
+from src.utils.helpers import validate_updated_postcodes
 from src.freezing.freezing_main import run_freezing
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
@@ -152,7 +153,7 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
         full_responses,
         ni_df,
         postcode_mapper,
@@ -173,10 +174,26 @@ def run_pipeline(user_config_path, dev_config_path):
         config,
         mods.rd_write_csv,
         run_id,
-        mods.rd_file_exists,
-        mods.rd_read_csv,
     )
     MainLogger.info("Finished  Imputation...")
+
+    # Perform postcode construction now imputation is complete
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    if run_postcode_construction:
+        imputed_df = run_construction(
+            imputed_df,
+            config,
+            mods.rd_file_exists,
+            mods.rd_read_csv,
+            is_run_postcode_construction = True,
+        )
+
+    imputed_df = validate_updated_postcodes(
+        imputed_df,
+        postcode_mapper,
+        itl_mapper,
+        config,
+     )   
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
