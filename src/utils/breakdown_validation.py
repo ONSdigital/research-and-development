@@ -43,14 +43,12 @@ def replace_nulls_with_zero(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame
     """
     BreakdownValidationLogger.info("Replacing nulls with zeros where total zero")
-    for check, columns in equals_checks.items():
+    for columns in equals_checks.values():
         total_column = columns[-1]
         breakdown_columns = columns[:-1]
-        for index, row in df.iterrows():
-            if row[total_column] == 0:
-                for column in breakdown_columns:
-                    if pd.isnull(row[column]):
-                        df.at[index, column] = 0
+        zero_mask = df[total_column] == 0
+        for column in breakdown_columns:
+            df.loc[zero_mask, column] = df.loc[zero_mask, column].fillna(0)
     return df
 
 
@@ -145,10 +143,10 @@ def run_breakdown_validation(
 
     if check == 'constructed':
         BreakdownValidationLogger.info("Running breakdown validation for constructed data")
-        validation_df = df[df['is_constructed'] == True]
-        not_for_validating_df = df[df['is_constructed'] == False]
+        validation_df = df[df['is_constructed'] == True].copy()
+        not_for_validating_df = df[df['is_constructed'] == False].copy()
     else:
-        validation_df = df
+        validation_df = df.copy()
 
     validation_df = replace_nulls_with_zero(validation_df)
     rows_to_validate = remove_all_nulls_rows(validation_df)
