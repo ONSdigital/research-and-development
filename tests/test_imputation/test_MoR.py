@@ -23,6 +23,7 @@ class TestRunMoRLongForm(object):
         fpath = os.path.join("tests/data/imputation/lf_mor_input_anon.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"reference": "Int64", "instance": "Int64"})
+        df["referencepostcode"] = pd.NA
         return df
 
     @pytest.fixture(scope="function")
@@ -86,6 +87,7 @@ class TestRunMoRShortForm(object):
         fpath = os.path.join("tests/data/imputation/sf_mor_input_anon.csv")
         df = pd.read_csv(fpath)
         df = df.astype({"reference": "Int64", "instance": "Int64"})
+        df["referencepostcode"] = pd.NA
         return df
 
     @pytest.fixture(scope="function")
