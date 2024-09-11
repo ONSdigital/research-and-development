@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 from src.construction.construction_read_validate import read_validate_construction_files
+from src.utils.breakdown_validation import run_breakdown_validation
 
 from src.construction.construction_helpers import (
     prepare_forms_gb,
@@ -46,7 +47,7 @@ def run_construction(  # noqa: C901
             will be the hdfs or network version depending on settings.
         read_csv (callable): Function to read a csv file. This will be the hdfs
             or network version depending on settings.
-        is_run_all_data_construction (bool): A logical parameter to perform all 
+        is_run_all_data_construction (bool): A logical parameter to perform all
             construction. If this flag is True, and there is a construction
             file, all construction steps will be done before the imputation.
         is_run_postcode_construction (bool): A logical parameter to perform
@@ -120,7 +121,7 @@ def run_construction(  # noqa: C901
         validate_construction_references(
             construction_df=construction_df,
             snapshot_df=snapshot_df,
-            logger=construction_logger, 
+            logger=construction_logger,
         )
 
     # Drop columns without constructed values
@@ -189,6 +190,10 @@ def run_construction(  # noqa: C901
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
+
+    # Check breakdowns
+    if run_construction:
+        updated_snapshot_df = run_breakdown_validation(updated_snapshot_df, check="constructed")
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 

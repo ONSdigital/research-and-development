@@ -279,7 +279,6 @@ def run_staging(  # noqa: C901
     # Return staged BERD data, additional data and mappers
     return (
         full_responses,
-        # secondary_full_responses,
         manual_outliers,
         postcode_mapper,
         backdata,
