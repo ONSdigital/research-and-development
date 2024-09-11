@@ -6,7 +6,7 @@ years:
 global:
   # Staging and validation settings
   postcode_csv_check: True
-  load_ni_data: True
+  load_ni_data: False
   # Freezing settings
   run_with_snapshot_until_freezing: True      # Run until point of freezing - last run is first freeze
   load_updated_snapshot_for_comparison: False # Run with new json snapshot, and compare to specified frozen csv
