@@ -1,6 +1,6 @@
 config_validation:
   validate: True
-  path: src/user_config_schema.yaml
+  path: /home/cdsw/research-and-development/src/user_config_schema.yaml
 years:
   survey_year: 2023
 global:

@@ -1,6 +1,6 @@
 config_validation:
   validate: True
-  path: src/dev_config_schema.yaml
+  path: /home/cdsw/research-and-development/src/dev_config_schema.yaml
 global:
   # Logging settings
   log_to_file: True # Write logs to .log file

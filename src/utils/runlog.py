@@ -82,7 +82,7 @@ class RunLog:
         """
         Get all of the logs from the pipeline run and append them to self.saved_logs df.
         """
-        with open("logs/main.log", "r") as f:
+        with open("/home/cdsw/research-and-development/logs/main.log", "r") as f:
             # Split logs by line
             lines = f.read().splitlines()
 

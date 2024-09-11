@@ -22,7 +22,7 @@ def logger_creator(global_config):
         format="%(asctime)s - %(name)s - %(funcName)s - %(levelname)s:%(message)s",
         # Log to both console and file
         handlers=[
-            logging.FileHandler("logs/main.log", mode="w"),
+            logging.FileHandler("/home/cdsw/research-and-development/logs/main.log", mode="w"),
             logging.StreamHandler(),
         ],
     )
