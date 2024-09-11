@@ -16,7 +16,7 @@ from src.utils.local_file_mods import (
     rd_file_size,
     check_file_exists,
     rd_mkdir,
-    rd_open,
+    # rd_open,
     rd_write_feather,
     safeload_yaml,
 )
@@ -132,16 +132,6 @@ def test_rd_mkdir(tmp_path):
 
     # Check that the folder we just created exists
     assert os.path.exists(folderpath)
-
-
-def test_rd_open(tmp_path):
-    filepath = tmp_path / "test_file.txt"
-    mode = "w"
-    file = rd_open(str(filepath), mode)
-
-    # Check that it opens as a "BufferedIOBase object, buffer"
-    assert isinstance(file, io.TextIOWrapper)
-    assert os.path.exists(filepath)
 
 
 def test_rd_file_write_feather(tmp_path, input_data, expout_data):

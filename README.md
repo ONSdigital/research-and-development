@@ -1,6 +1,6 @@
 # Research and Development Project
 
-![Code Coverage](https://img.shields.io/badge/Coverage-46%25-orange.svg)
+![Code Coverage](https://img.shields.io/badge/Coverage-61%25-yellow.svg)
 
 Calculating national and regional research and development expenditure as part of [national accounts](https://www.ons.gov.uk/economy/nationalaccounts).
 

@@ -10,11 +10,11 @@ from src.imputation import tmi_imputation as tmi
 from src.staging.validation import load_schema
 from src.imputation.apportionment import run_apportionment
 from src.imputation.short_to_long import run_short_to_long
-
-# from src.imputation.MoR import run_mor
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.imputation.MoR import run_mor
+from src.construction.construction_main import run_construction
+from src.mapping.itl_mapping import join_itl_regions
 from src.outputs.outputs_helpers import create_output_df
 
 
@@ -42,10 +42,13 @@ def run_imputation(
     5) Short form expansion imputation: imputing for questions not asked in short forms
 
     Args:
-        df (pd.DataFrame): the full responses spp data
-        mapper (pd.DataFrame): dataframe with sic to product group mapper info
-        backdata (pd.DataFrame): responses data for the previous period
-        config (Dict): the configuration settings
+        df (pd.DataFrame): the main dataset to run through imputation
+        manual_trimming_df (pd.DataFrame): dataframe with boolean column indicating
+            which references should be manually trimmed in imputation
+        backdata (pd.DataFrame): previous year's data
+        config (dict): the configuration settings.
+        write_csv (Callable): function to write a dataframe to a csv file
+        run_id (int): unique identifier for the run
 
     Returns:
         pd.DataFrame: dataframe with the imputed columns updated
@@ -98,7 +101,10 @@ def run_imputation(
         df, links_df = run_mor(df, backdata, to_impute_cols, config)
 
     # Run TMI for long forms and short forms
-    imputed_df, qa_df = tmi.run_tmi(df, config)
+    imputed_df, qa_df, trim_counts_qa = tmi.run_tmi(df, config)
+
+    # Perform TMI step 5, which calculates employment and headcount totals
+    imputed_df = hlp.calculate_totals(imputed_df)
 
     # After imputation, correction to overwrite the "604" == "No" in any records with
     # Status "check needed"
@@ -124,17 +130,21 @@ def run_imputation(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
+    ImputationMainLogger.info("Finished Imputation calculation.")
+
     # Output QA files
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
 
     if config["global"]["output_imputation_qa"]:
         ImputationMainLogger.info("Outputting Imputation QA files.")
+        links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
         trim_qa_filename = f"{survey_year}_trimming_qa_{tdate}_v{run_id}.csv"
         full_imp_filename = (
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
         )
         wrong_604_filename = f"{survey_year}_wrong_604_error_qa_{tdate}_v{run_id}.csv"
+        trimmed_counts_filename = f"{survey_year}_tmi_trim_count_qa_{tdate}_v{run_id}.csv"
 
         # create trimming qa dataframe with required columns from schema
         schema_path = config["schema_paths"]["manual_trimming_schema"]
@@ -144,21 +154,11 @@ def run_imputation(
         write_csv(os.path.join(qa_path, trim_qa_filename), trimming_qa_output)
         write_csv(os.path.join(qa_path, full_imp_filename), imputed_df)
         write_csv(os.path.join(qa_path, wrong_604_filename), wrong_604_qa_df)
-        if config["global"]["load_backdata"]:
-            links_filename = f"{survey_year}_links_qa_{tdate}_v{run_id}.csv"
-            write_csv(os.path.join(qa_path, links_filename), links_df)
-
-    ImputationMainLogger.info("Finished Imputation calculation.")
+        write_csv(os.path.join(qa_path, links_filename), links_df)
+        write_csv(os.path.join(qa_path, trimmed_counts_filename), trim_counts_qa)
 
     # remove rows and columns no longer needed from the imputed dataframe
-    imputed_df = hlp.tidy_imputation_dataframe(
-        imputed_df,
-        config,
-        ImputationMainLogger,
-        to_impute_cols,
-        write_csv,
-        run_id,
-    )
+    imputed_df = hlp.tidy_imputation_dataframe(imputed_df, to_impute_cols)
 
     # optionally output backdata for imputation
     if config["global"]["output_backdata"]:

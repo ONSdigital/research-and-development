@@ -10,6 +10,7 @@ from src.utils.config import config_setup
 from src.utils.wrappers import logger_creator
 from src.utils.path_helpers import filename_validation
 from src.staging.staging_main import run_staging
+from src.utils.helpers import validate_updated_postcodes
 from src.freezing.freezing_main import run_freezing
 from src.northern_ireland.ni_main import run_ni
 from src.construction.construction_main import run_construction
@@ -44,23 +45,29 @@ def run_pipeline(user_config_path, dev_config_path):
     config = filename_validation(config)
 
     # Check the environment switch
-    network_or_hdfs = config["global"]["network_or_hdfs"]
+    platform = config["global"]["platform"]
 
-    if network_or_hdfs == "network":
+    if platform == "s3":
+        from src.utils import s3_mods as mods
+
+        # Creating boto3 client and adding it to the config dict
+        config["client"] = mods.create_client(config)
+    elif platform == "network":
+        # If the platform is "network" or "hdfs", there is no need for a client.
+        # Adding a client = None for consistency.
+        config["client"] = None
         from src.utils import local_file_mods as mods
-
-    elif network_or_hdfs == "hdfs":
+    elif platform == "hdfs":
+        config["client"] = None
         from src.utils import hdfs_mods as mods
-
     else:
-        MainLogger.error("The network_or_hdfs configuration is wrong")
-        raise ImportError
+        MainLogger.error(f"The selected platform {platform} is wrong")
+        raise ImportError(f"Cannot import {platform}_mods")
 
     # Set up the run logger
     runlog_obj = runlog.RunLog(
         config,
         version,
-        mods.rd_open,
         mods.rd_file_exists,
         mods.rd_mkdir,
         mods.rd_read_csv,
@@ -101,14 +108,18 @@ def run_pipeline(user_config_path, dev_config_path):
         mods.rd_write_csv,
         mods.rd_read_feather,
         mods.rd_write_feather,
-        mods.rd_isfile,
         run_id,
     )
 
     # Freezing module
     MainLogger.info("Starting Freezing...")
     full_responses = run_freezing(
-        full_responses, config, mods.rd_write_csv, mods.rd_read_csv, run_id
+        full_responses,
+        config,
+        mods.rd_write_csv,
+        mods.rd_read_csv,
+        mods.rd_file_exists,
+        run_id,
     )
     MainLogger.info("Finished Freezing...")
 
@@ -129,19 +140,27 @@ def run_pipeline(user_config_path, dev_config_path):
 
     # Construction module
     MainLogger.info("Starting Construction...")
-    full_responses = run_construction(
-        full_responses, config, mods.rd_file_exists, mods.rd_read_csv
-    )
+    run_all_data_construction = config["global"]["run_all_data_construction"]
+    if run_all_data_construction:
+        full_responses = run_construction(
+            full_responses,
+            config,
+            mods.rd_file_exists,
+            mods.rd_read_csv,
+            is_run_all_data_construction=True,
+        )
     MainLogger.info("Finished Construction...")
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
-    (mapped_df, ni_full_responses) = run_mapping(
+    (mapped_df, ni_full_responses, itl_mapper) = run_mapping(
         full_responses,
         ni_df,
         postcode_mapper,
         config,
+        mods.rd_read_csv,
         mods.rd_write_csv,
+        mods.rd_file_exists,
         run_id,
     )
     MainLogger.info("Finished Mapping...")
@@ -157,6 +176,24 @@ def run_pipeline(user_config_path, dev_config_path):
         run_id,
     )
     MainLogger.info("Finished  Imputation...")
+
+    # Perform postcode construction now imputation is complete
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    if run_postcode_construction:
+        imputed_df = run_construction(
+            imputed_df,
+            config,
+            mods.rd_file_exists,
+            mods.rd_read_csv,
+            is_run_postcode_construction = True,
+        )
+
+    imputed_df = validate_updated_postcodes(
+        imputed_df,
+        postcode_mapper,
+        itl_mapper,
+        config,
+     )   
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
@@ -198,14 +235,10 @@ def run_pipeline(user_config_path, dev_config_path):
         config,
         mods.rd_write_csv,
         run_id,
-        postcode_mapper,
         pg_detailed,
-        itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
     )
-
-    MainLogger.info("Finished All Output modules.")
 
     MainLogger.info("Finishing Pipeline .......................")
 

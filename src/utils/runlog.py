@@ -1,5 +1,5 @@
 import os
-import csv
+# import csv
 from datetime import datetime
 from typing import Tuple
 
@@ -13,24 +13,22 @@ class RunLog:
         self,
         config,
         version,
-        file_open_func,
         file_exists_func,
         mkdir_func,
-        read_func,
+        read_csv_func,
         write_csv_func,
     ):
         # config based attrs
         self.config = config
-        self.environment = config["global"]["network_or_hdfs"]
+        self.environment = config["global"]["platform"]
         self.logs_folder = config[f"{self.environment}_paths"]["logs_foldername"]
         self.log_filenames = config["log_filenames"]
         # user information
         self.user = self._generate_username()
         # attrs containing callables
-        self.file_open_func = file_open_func
         self.file_exists_func = file_exists_func
         self.mkdir_func = mkdir_func
-        self.read_func = read_func
+        self.read_csv_func = read_csv_func
         self.write_func = write_csv_func
         self.write_csv_func = write_csv_func
         # pipeline information
@@ -59,11 +57,13 @@ class RunLog:
         main_path = self.log_filenames["main"]
         mainfile = os.path.join(self.logs_folder, main_path)
         latest_id = 0
-        # Check if file exists using the open function provided
-        if self.file_open_func and self.file_exists_func(mainfile):
-            with self.file_open_func(mainfile, "r") as file:
-                runfile = pd.read_csv(file)
+        # If the file exists, read it using the read_csv function
+        if self.file_exists_func(mainfile):
+            runfile = self.read_csv_func(mainfile)
+            # Check if the dataframe has at least one data row
+            if len(runfile):
                 latest_id = max(runfile.run_id)
+                
         # increment the latest id by 1
         run_id = latest_id + 1
         return run_id
@@ -126,22 +126,23 @@ class RunLog:
         return write_csv_setting, write_hdf5_setting, write_sql_setting
 
     def log_csv_creator(self, filepath: str, columns: list) -> None:
-        """Creates a csv file in DAP with user
-        defined headers if it doesn't exist.
+        """Creates a csv file in DAP with user-defined headers if it doesn't
+        exist. There may be no runlog if the pipeline is running for the first
+        time, run_id would be 1. If so, create a CSV file with column names and
+        no data rows, so that new entries can be inserted in it.
+
         Args:
             filename (string): Example: "name_of_file.csv"
             columns (list): Example: ["a","b","c","d"]
+
+        Returns: None
         """
-
-        # Check if the file exists
+        # Check if the runolg file exists. 
         if not self.file_exists_func(filepath):
-            # open the file in write mode inside Hadoop context
-            with self.file_open_func(filepath, "wt") as file:
-                # Create new csv file in specified folder
-                writer = csv.writer(file)
-                # Add the headers to the new csv
-                writer.writerow(columns)
-
+            # Create an empty dataframe with column names
+            df = pd.DataFrame(columns=columns)
+            # Create new csv file in specified folder
+            self.write_csv_func(filepath, df)
         return None
 
     def create_runlog_files(self):
@@ -178,7 +179,10 @@ class RunLog:
         self.ndct = {}
         # Use all the 2nd level yaml keys as headers
         for i in dct.keys():
-            nrow = {k: [v] for k, v in dct[i][0].items()}
+            if i != "client":
+                nrow = {k: [v] for k, v in dct[i][0].items()}
+            else:
+                nrow = {}
             self.ndct.update(nrow)
         config_log_df = pd.DataFrame(self.ndct)
         # Add run_id and user to configs
@@ -203,7 +207,7 @@ class RunLog:
         if write_csv:
             # write the runlog to a csv file
             file_path = str(os.path.join(self.logs_folder, logfile_name))
-            return self.read_func(file_path)
+            return self.read_csv_func(file_path)
         elif write_hdf5:
             # write the runlog to a hdf5 file
             logfile_name = f"{os.path.splitext(logfile_name)[0]}.hdf"
@@ -232,7 +236,7 @@ class RunLog:
             if update:
                 self.write_func(file_path, logs_df)
             else:
-                df = self.read_func(file_path)
+                df = self.read_csv_func(file_path)
                 df = df.append(logs_df)
                 self.write_func(file_path, df)
         if write_hdf5:

@@ -8,6 +8,7 @@ from src.imputation.imputation_helpers import (
     fix_604_error,
     create_r_and_d_instance,
     check_604_fix,
+    calculate_totals,
 )
 
 
@@ -232,3 +233,65 @@ class TestCreateRAndDInstance:
 
         result_df, qa_df = create_r_and_d_instance(input_df)
         assert_frame_equal(result_df.reset_index(drop=True), expected_df)
+
+class TestCalculateTotals:
+    """Unit tests for calculate_totals function."""
+
+    def test_calculate_totals(self):
+        """Test for function calculate_totals."""
+        # Create an input dataframe for the test
+        input_cols = [
+            "formtype",
+            "emp_researcher_imputed",
+            "emp_technician_imputed",
+            "emp_other_imputed",
+            "headcount_res_m_imputed",
+            "headcount_tec_m_imputed",
+            "headcount_oth_m_imputed",
+            "headcount_res_f_imputed",
+            "headcount_tec_f_imputed",
+            "headcount_oth_f_imputed",
+        ]
+
+        data = [
+            ["0001", 10, 5, 3, 20, 10, 5, 15, 8, 4],
+            ["0001", 8, 4, 2, 15, 7, 3, 12, 6, 2],
+            ["0006", 6, 3, 1, 10, 5, 2, 8, 4, 1],
+        ]
+
+        input_df = pd.DataFrame(data=data, columns=input_cols)
+
+        # Create an expected dataframe for the test
+        expected_cols = [
+            "formtype",
+            "emp_researcher_imputed",
+            "emp_technician_imputed",
+            "emp_other_imputed",
+            "headcount_res_m_imputed",
+            "headcount_tec_m_imputed",
+            "headcount_oth_m_imputed",
+            "headcount_res_f_imputed",
+            "headcount_tec_f_imputed",
+            "headcount_oth_f_imputed",
+            "emp_total_imputed",
+            "headcount_tot_m_imputed",
+            "headcount_tot_f_imputed",
+            "headcount_total_imputed",
+        ]
+
+        expected_data = [
+            ["0001", 10, 5, 3, 20, 10, 5, 15, 8, 4, 18, 35, 27, 62],
+            ["0001", 8, 4, 2, 15, 7, 3, 12, 6, 2, 14, 25, 20, 45],
+            ["0006", 6, 3, 1, 10, 5, 2, 8, 4, 1, np.nan, np.nan, np.nan, np.nan],
+        ]
+
+        expected_df = pd.DataFrame(data=expected_data, columns=expected_cols)
+
+        # Apply the calculate_totals function to the input dataframe
+        result_df = calculate_totals(input_df)
+
+        # display the full dataframe without truncating columns
+        pd.set_option("display.max_columns", None)
+
+        # Assert that the result dataframe is equal to the expected dataframe
+        pd.testing.assert_frame_equal(result_df, expected_df, check_dtype=False)

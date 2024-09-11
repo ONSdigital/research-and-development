@@ -1,7 +1,7 @@
 """Utility functions  to be used in the imputation module."""
 import logging
 import pandas as pd
-from typing import List, Dict, Tuple, Callable
+from typing import List, Tuple
 from itertools import chain
 
 from src.staging.validation import load_schema
@@ -272,7 +272,22 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
 
 
 def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"]):
+    """Split the dataframe based on the imputation class.
 
+    Removes records where the imputation class includes strings in the passed list.
+    Many records include a "nan" in either q200 (R&D type- Civil or Defence) and q201
+    (Product Group)- these will generally be filtered out from the imputation classes.
+
+    Where short forms are under consideration, "817" imputation classes will be excluded
+    
+    Args:
+        df (pd.DataFrame): The dataframe to split
+        exclusion_list (List, optional): A list of imputation classes to exclude. 
+    
+    Returns:
+        pd.DataFrame: The filtered dataframe with the invalid imp classes removed
+        pd.DataFrame: The excluded dataframe
+    """
     # Exclude the records from the reference list
     exclusion_str = "|".join(exclusion_list)
 
@@ -303,20 +318,66 @@ def fill_sf_zeros(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def tidy_imputation_dataframe(
-    df: pd.DataFrame,
-    config: Dict,
-    logger: logging.Logger,
-    to_impute_cols: List,
-    write_csv: Callable,
-    run_id: int,
-) -> pd.DataFrame:
-    """Remove rows and columns not needed after imputation."""
-    # Create lists for the qa cols
-    imp_cols = [f"{col}_imputed" for col in to_impute_cols]
+def calculate_totals(df):
+    """Calculate the employment and headcount totals for the imputed columns.
 
-    # Update the original breakdown questions and target variables with the imputed
-    df[to_impute_cols] = df[imp_cols]
+    This should be carried out for long form entries only as emp_total and
+    headcount_total are themselves target variables in short forms.
+
+    Imputation is applied to "target variables", and after this, imputed values for
+    "breakdown variables" are calculated. After both MoR and TMI imputation have been
+    carried out, but before short form expansion imputation, the totals for employment
+    and headcount are calculated.
+
+    Args:
+        df (pd.DataFrame): The dataframe with imputed data
+
+    Returns:
+        pd.DataFrame: The dataframe with the totals calculated
+    """
+    mask = df["formtype"] == "0001"
+
+    df.loc[mask, "emp_total_imputed"] = (
+        df.loc[mask, "emp_researcher_imputed"]
+        + df.loc[mask, "emp_technician_imputed"]
+        + df.loc[mask, "emp_other_imputed"]
+    )
+
+    df.loc[mask, "headcount_tot_m_imputed"] = (
+        df.loc[mask, "headcount_res_m_imputed"]
+        + df.loc[mask, "headcount_tec_m_imputed"]
+        + df.loc[mask, "headcount_oth_m_imputed"]
+    )
+
+    df.loc[mask, "headcount_tot_f_imputed"] = (
+        df.loc[mask, "headcount_res_f_imputed"]
+        + df.loc[mask, "headcount_tec_f_imputed"]
+        + df.loc[mask, "headcount_oth_f_imputed"]
+    )
+
+    df.loc[mask, "headcount_total_imputed"] = (
+        df.loc[mask, "headcount_tot_m_imputed"]
+        + df.loc[mask, "headcount_tot_f_imputed"]
+    )
+
+    return df
+
+
+def tidy_imputation_dataframe(df: pd.DataFrame, to_impute_cols: List) -> pd.DataFrame:
+    """Update cols with imputed values and remove rows and columns no longer needed.
+    
+    Args:
+        df (pd.DataFrame): The dataframe with imputed values.
+        to_impute_cols (List): The columns that were imputed.
+
+    Returns:
+        pd.DataFrame: The dataframe with the imputed values applied and qa cols dropped.
+    """
+    # Create mask for rows that have been imputed
+    imputed_mask = df["imp_marker"].isin(["TMI", "CF", "MoR", "R"])
+    # Update columns with imputed version
+    for col in to_impute_cols:
+        df.loc[imputed_mask, col] = df.loc[imputed_mask, f"{col}_imputed"]
 
     # Remove all qa columns
     to_drop = [

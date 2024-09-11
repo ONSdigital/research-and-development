@@ -83,6 +83,8 @@ def prepare_forms_gb(
 def prepare_short_to_long(updated_snapshot_df, construction_df):
     """Create addional instances for short to long construction"""
 
+    construction_df.loc[construction_df["construction_type"] == "short_to_long", "604"] = "Yes"
+
     # Check which references are going to be converted to long forms
     # and how many instances they have
     ref_count = construction_df.loc[
@@ -193,6 +195,11 @@ def add_constructed_nonresponders(
     new_rows = construction_df["construction_type"].str.contains("new", na=False)
     rows_to_add = construction_df[new_rows]
     construction_df = construction_df[~new_rows]
+    missing_columns = set(updated_snapshot_df.columns) - set(rows_to_add.columns)
+    for col in missing_columns:
+        rows_to_add[col] = np.nan
+    rows_to_add = prep_new_rows(rows_to_add, updated_snapshot_df)
+    rows_to_add = rows_to_add[updated_snapshot_df.columns]
     updated_snapshot_df = pd.concat([updated_snapshot_df, rows_to_add])
     return updated_snapshot_df, construction_df
 
@@ -223,3 +230,42 @@ def remove_short_to_long_0(
     ]
 
     return updated_snapshot_df
+
+
+def prep_new_rows(
+        rows_to_add: pd.DataFrame, 
+        updated_snapshot_df: pd.DataFrame
+    ) -> pd.DataFrame:
+    """Prepare new rows from construction to be added to the snapshot.
+
+    Args:
+        rows_to_add (pd.DataFrame): The rows that will be added to the snapshot.
+        updated_snapshot_df (pd.DataFrame): The current snapshot of data.
+
+    Raises:
+        ValueError: Raised if there are rows with missing formtype/cellnumber.
+
+    Returns:
+        pd.DataFrame: The new rows (from construction) containing formtype and 
+            cellnumber.
+    """
+    # iterate through new rows and add formtype/cellnumber from snapshot
+    for index, row in rows_to_add.iterrows():
+        if pd.isna(row['formtype']) or pd.isna(row['cellnumber']):
+            reference = row['reference']
+            snapshot_row = updated_snapshot_df[updated_snapshot_df['reference'] == reference].iloc[0]
+            if pd.isna(row['formtype']):
+                rows_to_add.at[index, 'formtype'] = snapshot_row['formtype']
+            if pd.isna(row['cellnumber']):
+                rows_to_add.at[index, 'cellnumber'] = snapshot_row['cellnumber']
+    # obtain references with missing formtype/cellnumber
+    missing_references = rows_to_add[
+        rows_to_add['formtype'].isna() | rows_to_add['cellnumber'].isna()
+    ]['reference']
+    if not missing_references.empty:
+        raise ValueError(
+            "Missing formtype and/or cellnumber for new reference in construction: "
+            f"ref {missing_references.tolist()}"
+        )
+
+    return rows_to_add

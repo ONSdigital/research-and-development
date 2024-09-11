@@ -7,8 +7,8 @@ PathHelpLogger = logging.getLogger(__name__)
 
 def get_paths(config: dict) -> dict:
     """Return either network_paths or hdfs_paths despending on the environment."""
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-    paths = config[f"{network_or_hdfs}_paths"]
+    platform = config["global"]["platform"]
+    paths = config[f"{platform}_paths"]
     paths["year"] = config["years"]["survey_year"]
     paths["berd_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/BERD/")
     paths["pnp_path"] = os.path.join(paths["root"], f"{paths['year']}_surveys/PNP/")
@@ -40,6 +40,34 @@ def create_module_config(config: dict, module_name: str) -> dict:
     }
 
     return module_dict
+
+
+def snapshot_validation(config: dict) -> dict:
+    paths = get_paths(config)
+    survey_year = str(config["years"]["survey_year"])
+    msg = ""
+
+    if f"{survey_year}12" not in paths["frozen_snapshot_path"]:
+        msg += f"{survey_year} is not included in the frozen snapshot path.\n"
+
+    if (paths["updated_snapshot_path"] != "") and (
+        f"{survey_year}12" not in paths["updated_snapshot_path"]
+    ):
+        msg += f"{survey_year} is not included in the updated snapshot path.\n"
+
+    return msg
+
+
+def snapshot_validation_logger(config: dict) -> dict:
+    """Checks that the mapping filenames are valid"""
+    msg = snapshot_validation(config)
+
+    if msg == "":
+        PathHelpLogger.info("The snapshot paths are valid.\n")
+    else:
+        PathHelpLogger.error("There are errors with the snapshot paths.\n")
+        raise ValueError(msg)
+    return None
 
 
 def create_staging_config(config: dict) -> dict:
@@ -114,10 +142,11 @@ def create_mapping_config(config: dict) -> dict:
     year = paths["year"]
     year_dict = config[f"{year}_mappers"]
 
-    paths["mappers"] = os.path.join(root_path, f"{paths['year']}_surveys/mappers/")
-
     version = year_dict["mappers_version"]
-    map_folder = os.path.join(paths["mappers"], f"{version}/")
+
+    map_folder = os.path.join(root_path, f"{paths['year']}_surveys/mappers/{version}/")
+
+    paths["mappers"] = map_folder
 
     mapping_dict = {
         k: f"{map_folder}{v}" for k, v in year_dict.items() if k != "mappers_version"
@@ -234,7 +263,10 @@ def validate_mapping_filenames(config: dict) -> dict:
 
 
 def filename_validation(config: dict) -> dict:
-    """Checks that the mapping filenames are valid"""
+    """Checks that the snapshot and mapping filenames are valid"""
+    # check the snapshot filenames have the current year in them
+    snapshot_validation_logger(config)
+
     bool_dict, msg = validate_mapping_filenames(config)
 
     if all(bool_dict.values()):

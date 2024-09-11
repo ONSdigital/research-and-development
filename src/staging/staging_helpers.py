@@ -15,7 +15,6 @@ from src.staging import postcode_validation as pcval
 from src.staging import spp_snapshot_processing as processing
 from src.staging import spp_parser
 
-
 # Create logger for this module
 StagingHelperLogger = logging.getLogger(__name__)
 
@@ -77,7 +76,11 @@ def getmappername(mapper_path_key: str, split: bool) -> str:
 
 
 def load_validate_mapper(
-    mapper_path_key: str, config: dict, logger: logging.Logger
+    mapper_path_key: str,
+    config: dict,
+    logger: logging.Logger,
+    rd_file_exists: callable,
+    rd_read_csv: callable,
 ) -> pd.DataFrame:
     """
     Loads a specified mapper, validates it using a schema and an optional
@@ -94,6 +97,10 @@ def load_validate_mapper(
         mapper_path_key (str): The key to retrieve the mapper path from the config.
         config (dict): A dictionary containing configuration options.
         logger (logging.Logger): A logger to log information and errors.
+        rd_file_exists (callable): A platform-specific function that checks if a
+            file exists in a certain path.
+        rd_read_csv(callable): A platform-specific function that reads a csv
+            file into a Pandas dataframe from a given path.
 
     Returns:
         pd.DataFrame: The loaded and validated mapper DataFrame.
@@ -104,13 +111,6 @@ def load_validate_mapper(
     """
     # Get the path of the mapper from the config dictionary
     mapper_path = config["mapping_paths"][mapper_path_key]
-    network_or_hdfs = config["global"]["network_or_hdfs"]
-
-    if network_or_hdfs == "network":
-        from src.utils import local_file_mods as mods
-
-    elif network_or_hdfs == "hdfs":
-        from src.utils import hdfs_mods as mods
 
     # Get the name of the mapper from the mapper path key
     mapper_name = getmappername(mapper_path_key, split=True)
@@ -119,10 +119,10 @@ def load_validate_mapper(
     logger.info(f"Loading {getmappername(mapper_path_key, split=True)} from file...")
 
     # Check if the file exists at the mapper path, raise an error if it doesn't
-    mods.rd_file_exists(mapper_path, raise_error=True)
+    rd_file_exists(mapper_path, raise_error=True)
 
     # Read the file at the mapper path into a DataFrame
-    mapper_df = mods.rd_read_csv(mapper_path)
+    mapper_df = rd_read_csv(mapper_path)
 
     # Construct the path of the schema from the mapper name
     schema_prefix = "_".join(word for word in mapper_name.split() if word != "mapper")
@@ -145,7 +145,7 @@ def load_snapshot_feather(feather_file, read_feather):
 
 
 def load_val_snapshot_json(
-    frozen_snapshot_path: str, load_json: Callable, config: dict, network_or_hdfs: str
+    frozen_snapshot_path: str, load_json: Callable, config: dict,
 ) -> Tuple[pd.DataFrame, str]:
     """
     Loads and validates a snapshot of survey data from a JSON file.
@@ -162,7 +162,6 @@ def load_val_snapshot_json(
         data.
         load_json (function): The function to use to load the JSON file.
         config (dict): A dictionary containing configuration options.
-        network_or_hdfs (str): A string indicating whether the data is being
         loaded from a network or HDFS.
 
     Returns:
@@ -178,26 +177,29 @@ def load_val_snapshot_json(
 
     # Get response rate
     res_rate = "{:.2f}".format(processing.response_rate(contributors_df, responses_df))
-
-    # the anonymised snapshot data we use in the DevTest environment
-    # does not include the instance column. This fix should be removed
-    # when new anonymised data is given.
-    if network_or_hdfs == "hdfs" and config["global"]["dev_test"]:
-        responses_df = fix_anon_data(responses_df, config)
     StagingHelperLogger.info("Finished Data Ingest...")
 
     # Validate snapshot data
-    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
+    val.validate_data_with_schema(
+        contributors_df, "./config/contributors_schema.toml"
+    )
     val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+
+    if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
+        responses_df["instance"] = 0
 
     # Data Transmutation
     full_responses = processing.full_responses(contributors_df, responses_df)
+    # the anonymised snapshot data we use in the DevTest environment
+    # does not include the instance column. This fix should be removed
+    # when new anonymised data is given.
+    if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
+        full_responses = fix_anon_data(full_responses, config)
 
     StagingHelperLogger.info(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
     # Validate and force data types for the full responses df
-    # TODO Find a fix for the datatype casting before uncommenting
     val.combine_schemas_validate_full_df(
         full_responses,
         "./config/contributors_schema.toml",
@@ -259,8 +261,6 @@ def stage_validate_harmonise_postcodes(
     1. Loads a master list of postcodes from a CSV file.
     2. Validates the postcode column in the full_responses DataFrame against the
        master list.
-    2. Validates the postcode column in the full_responses DataFrame against
-        the master list.
     3. Writes any invalid postcodes to a CSV file.
     4. Returns the original DataFrame and the master list of postcodes.
 
@@ -288,11 +288,10 @@ def stage_validate_harmonise_postcodes(
     postcode_mapper = config["mapping_paths"]["postcode_mapper"]
     check_file_exists(postcode_mapper, raise_error=True)
     postcode_mapper = read_csv(postcode_mapper)
-    postcode_masterlist = postcode_mapper["pcd2"]
-
+    
     # Validate the postcode column in the full_responses DataFrame
     full_responses, invalid_df = pcval.run_full_postcode_process(
-        full_responses, postcode_masterlist, config
+        full_responses, postcode_mapper, config
     )
 
     # Log the saving of invalid postcodes to a file
@@ -310,7 +309,7 @@ def stage_validate_harmonise_postcodes(
     # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
-    return full_responses, postcode_mapper
+    return full_responses, postcode_mapper,
 
 
 def filter_pnp_data(full_responses):

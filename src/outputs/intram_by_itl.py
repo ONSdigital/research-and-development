@@ -81,7 +81,7 @@ def rename_itl(df: pd.DataFrame, itl: int, year) -> pd.DataFrame:
 def aggregate_itl(
     gb_df: pd.DataFrame,
     ni_df: pd.DataFrame,
-    CURRENT_YEAR,
+    config,
     uk_output: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Aggregates a dataframe to an ITL level.
@@ -89,12 +89,14 @@ def aggregate_itl(
     Args:
         gb_df (pd.DataFrame): The GB microdata with weights applied.
         ni_df (pd.DataFrame): The NI microdata (weights are 1).
+        config (Dict[str, Any]): Pipeline configuation settings.
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: The ITL1 and ITL2 dataframes.
     """
-    GEO_COLS = ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
+    CURRENT_YEAR = config["years"]["survey_year"]
+    GEO_COLS = config["mappers"]["geo_cols"]
     BASE_COLS = ["postcodes_harmonised", "formtype", "211"]
     df = gb_df[GEO_COLS + BASE_COLS]
 
@@ -138,10 +140,9 @@ def output_intram_by_itl(
     """
     # Declare Config Values
     OUTPUT_PATH = config["outputs_paths"]["outputs_master"]
-    CURRENT_YEAR = config["years"]["survey_year"]
 
     # Aggregate to ITL2 and ITL1 (Keep 3 and 4 letter codes)
-    itl1, itl2 = aggregate_itl(gb_df, ni_df, CURRENT_YEAR, uk_output)
+    itl1, itl2 = aggregate_itl(gb_df, ni_df, config, uk_output)
 
     # Export UK outputs
     area = "gb" if not uk_output else "uk"

@@ -66,11 +66,11 @@ def run_ni_staging(
     Args:
         config (dict): The pipeline configuration
         check_file_exists (Callable): Function to check if file exists
-            This will be the hdfs or network version depending on settings.
+            This will be the s3, hdfs or network version depending on settings.
         read_csv (Callable): Function to read a csv file.
-            This will be the hdfs or network version depending on settings.
+            This will be the s3, hdfs or network version depending on settings.
         write_csv (Callable): Function to write to a csv file.
-            This will be the hdfs or network version depending on settings.
+            This will be the s3, hdfs or network version depending on settings.
         run_id (int): The run id for this run.
     Returns:
         ni_full_responses (pd.DataFrame): The staged and vaildated NI data.
