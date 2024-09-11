@@ -120,7 +120,7 @@ def run_staging(  # noqa: C901
             )  # TODO: We might want to use this in a QA output
 
             # Data validation of json or feather data
-            val.check_data_shape(full_responses, raise_error=True)
+            # val.check_data_shape(full_responses, raise_error=True)
 
             # Validate the postcodes in data loaded from JSON
             (

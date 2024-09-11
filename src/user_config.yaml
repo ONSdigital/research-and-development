@@ -49,8 +49,8 @@ global:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # Run until point of freezing - last run is first freeze
-  updated_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
+  frozen_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v2/snapshot_202312_a_copy_of_202012_anon.json" # Run until point of freezing - last run is first freeze
+  updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v2/snapshot_202312_a_copy_of_202012_anon.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
