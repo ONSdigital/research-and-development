@@ -76,13 +76,14 @@ class TestValidateAnyRefinstInFrozen(object):
 @pytest.fixture(scope="function")
 def frozen_df() -> pd.DataFrame:
     """A dummy frozen_df for testing."""
-    columns = ["reference", "instance", "num", "non_num", "last_frozen"]
+    columns = ["reference", "instance", "num", "non_num", "last_frozen", "status"]
     data = [
-        [0, 1, 4, True, "previous_run"],
-        [0, 2, 5, False, "previous_run"],
-        [1, 1, 8, True, "previous_run"],
-        [1, 2, 9, True, "previous_run"],
-        [2, 1, 10, False, "previous_run"]
+        [0, 1.0, 4, True, "previous_run", "clear"],
+        [0, 2.0, 5, False, "previous_run", "clear"],
+        [1, 1.0, 8, True, "previous_run", "clear"],
+        [1, 2.0, 9, True, "previous_run", "clear"],
+        [2, 1.0, 10, False, "previous_run", "clear"],
+        [6, None, 10, False, "previous_run", "Form sent out"]
     ]
     df = pd.DataFrame(columns=columns, data=data)
     return df
@@ -97,10 +98,10 @@ class TestApplyAmendments(object):
     @pytest.fixture(scope="function")
     def dummy_amendments(self) -> pd.DataFrame:
         """A dummy amendments dataframe."""
-        columns = ["reference", "instance", "num_updated", "non_num_updated", "accept_changes"]
+        columns = ["reference", "instance", "num_updated", "non_num_updated", "accept_changes", "status"]
         data = [
-            [0, 1, 3, True, True],
-            [0, 2, 4, True, False],
+            [0, 1.0, 3, True, True, "clear"],
+            [0, 2.0, 4, True, False, "clear"],
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
@@ -109,13 +110,14 @@ class TestApplyAmendments(object):
         """The expected dataframe after amendments are applied."""
         # get date
         today = datetime.datetime.now().strftime("%y-%m-%d")
-        columns = ["reference", "instance", "num", "non_num", "last_frozen"]
+        columns = ["reference", "instance", "num", "non_num", "last_frozen", "status"]
         data = [
-            [0, 1, 3, True, f"{today}_v1"],
-            [0, 2, 4, True, f"{today}_v1"],
-            [1, 1, 8, True, "previous_run"],
-            [1, 2, 9, True, "previous_run"],
-            [2, 1, 10, False, "previous_run"]
+            [0, 1.0, 3, True, f"{today}_v1", "clear"],
+            [0, 2.0, 4, True, f"{today}_v1", "clear"],
+            [1, 1.0, 8, True, "previous_run", "clear"],
+            [1, 2.0, 9, True, "previous_run", "clear"],
+            [2, 1.0, 10, False, "previous_run", "clear"],
+            [6, None, 10, False, "previous_run", "Form sent out"]
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -123,7 +125,6 @@ class TestApplyAmendments(object):
     def test_apply_amendments(self, frozen_df, dummy_amendments):
         """General tests for apply_amendments"""
         amended = apply_amendments(frozen_df, dummy_amendments, 1, test_logger)
-        # amended.drop("last_frozen", axis=1, inplace=True)
         amended.sort_values(by=["reference", "instance"], ascending=True, inplace=True)
         expected = self.expected_amended()
         print(amended)
@@ -157,25 +158,27 @@ class TestApplyAdditions(object):
     @pytest.fixture(scope="function")
     def dummy_additions(self) -> pd.DataFrame:
         """A dummy amendments dataframe."""
-        columns = ["reference", "instance", "num", "non_num", "accept_changes"]
+        columns = ["reference", "instance", "num", "non_num", "accept_changes", "status"]
         data = [
-            [3, 0, 10, True, True],
-            [3, 1, 11, False, False],
+            [3, 0.0, 10, True, True, "clear"],
+            [3, 1.0, 11, False, False, "clear"],
+            [6, 0.0, 10, False, True, "clear"]
         ]
         df = pd.DataFrame(columns=columns, data=data)
         return df
 
     def expected_additions(self) -> pd.DataFrame:
         """The expected dataframe after amendments are applied."""
-        columns = ["reference", "instance", "num", "non_num"]
+        columns = ["reference", "instance", "num", "non_num", "status"]
         data = [
-            [0, 1, 4, True],
-            [0, 2, 5, False],
-            [1, 1, 8, True],
-            [1, 2, 9, True],
-            [2, 1, 10, False],
-            [3, 0, 10, True],
-            [3, 1, 11, False],
+            [0, 1.0, 4, True, "clear"],
+            [0, 2.0, 5, False, "clear"],
+            [1, 1.0, 8, True, "clear"],
+            [1, 2.0, 9, True, "clear"],
+            [2, 1.0, 10, False, "clear"],
+            [3, 0.0, 10, True, "clear"],
+            [3, 1.0, 11, False, "clear"],
+            [6, 0.0, 10, False, "clear"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
         return df
@@ -186,8 +189,6 @@ class TestApplyAdditions(object):
         amended.drop("last_frozen", axis=1, inplace=True)
         amended.sort_values(by=["reference", "instance"], ascending=True, inplace=True)
         expected = self.expected_additions()
-        print(amended)
-        print(expected)
         assert_frame_equal(amended, expected), (
             "Additions not applied as expected."
         )
@@ -196,9 +197,8 @@ class TestApplyAdditions(object):
         """Tests for apply_additions when additions_df is invalid."""
         with caplog.at_level(logging.INFO):
             # alter amendments
-            dummy_additions["reference"] = 0
+            dummy_additions["reference"] = 1
             result = apply_additions(frozen_df, dummy_additions, 1, test_logger)
-            print(result)
             assert_frame_equal(result, frozen_df), (
                 "Original df not returned when additions are invalid"
             )

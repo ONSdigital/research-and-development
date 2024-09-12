@@ -207,7 +207,8 @@ def apply_additions(
     accepted_additions_df = additions_df[additions_df.reference.isin(changes_refs)]
 
     # removes the old form sent out where we have a new clear response
-    main_df = main_df[~main_df.reference.isin(accepted_additions_df.reference)]
+    remove_status = ['Form sent out', 'Ceased trading (NIL4)', 'Out of scope (NIL3)', 'Dormant (NIL5)']
+    main_df = main_df[~((main_df.reference.isin(accepted_additions_df.reference)) & (main_df.status.isin(remove_status)))]
 
     accepted_additions_df = accepted_additions_df.drop("accept_changes", axis=1)
     if accepted_additions_df.shape[0] > 0:
