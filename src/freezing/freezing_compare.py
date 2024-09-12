@@ -200,3 +200,34 @@ def output_freezing_files(
     else:
         FreezingLogger.info("File(s) to review output sucessfully.")
         return True
+
+def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
+    """Checks for references in both the additions and amendments.
+    If a reference is found in both: move all the relevant rows into
+    amendments and remove from additions.
+
+    Args:
+        additions_df (pd.DataFrame): The records that have been added.
+        amendments_df (pd.DataFrame): The records that have changed.
+        FreezingLogger (logging.Logger): The logger to log to.
+
+    Returns:
+        bool: True if there are split cases.
+    """
+    if additions_df is not None and amendments_df is not None:
+        split_cases = additions_df[additions_df["reference"].isin(amendments_df["reference"])]
+        if not split_cases.empty:
+            FreezingLogger.info("Split cases found.")
+            additions_df = additions_df[~additions_df.reference.isin(split_cases.reference)]
+            amendments_df = amendments_df.append(split_cases, ignore_index=True)
+            return additions_df, amendments_df
+    return additions_df, amendments_df
+
+
+def run_comparison(frozen_data_for_comparison, updated_snapshot, config, write_csv, run_id, FreezingLogger):
+    additions_df = get_additions(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
+    amendments_df = get_amendments(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
+    additions_df, amendments_df = check_for_split_cases(additions_df, amendments_df, FreezingLogger)
+    output_freezing_files(
+            amendments_df, additions_df, config, write_csv, run_id, FreezingLogger
+        )

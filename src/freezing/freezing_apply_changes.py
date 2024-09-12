@@ -105,31 +105,6 @@ def validate_any_refinst_in_frozen(
     return result
 
 
-def validate_all_refinst_in_frozen(
-        frozen_df: pd.DataFrame,
-        df2: pd.DataFrame,
-    ) -> bool:
-    """Validate that all ref/inst combinations in a list are in a df.
-
-    Args:
-        frozen_df (pd.DataFrame): The frozen csv df.
-        df2 (pd.DataFrame): The ammendments/additions df.
-
-    Returns:
-        bool: Whether all ref/inst are in the dataframe.
-    """
-    frozen_copy = frozen_df.copy()
-    frozen_copy["refinst"] = (
-        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(float).astype(str)
-    )
-    result = values_in_column(
-        frozen_copy,
-        "refinst",
-        df2["reference"].astype(str) + df2["instance"].astype(float).astype(str)
-    )
-    return result
-
-
 def validate_amendments_df(
         frozen_df: pd.DataFrame,
         amendments_df: pd.DataFrame,
@@ -147,14 +122,14 @@ def validate_amendments_df(
     """
     # check that all ref/inst combs are in staged frozen data
     FreezingLogger.info(
-        "Checking if all ref/inst in the amendments df are present in the frozen"
+        "Checking if any ref/inst in the amendments df are present in the frozen"
         " data..."
     )
-    present = validate_all_refinst_in_frozen(frozen_df, amendments_df)
+    present = validate_any_refinst_in_frozen(frozen_df, amendments_df)
     if not present:
         FreezingLogger.info(
-            "Not all reference/instance combinations found within the amendments"
-            " file are present in the snapshot."
+            "There are no matching reference/instance combinations found within the amendments"
+            " file that are present in the snapshot - there needs to be at least one."
         )
         return False
     return True
@@ -176,7 +151,7 @@ def validate_additions_df(
     """
     # check that all ref/inst combs are not staged frozen data
     FreezingLogger.info(
-        "Checking if all ref/inst in the amendments df are missing from the frozen"
+        "Checking if any ref/inst in the additions df are in the frozen"
         " data..."
     )
 
@@ -243,7 +218,7 @@ def apply_amendments(
     # add amended records to main df
     amended_df = pd.concat([main_df, accepted_amendments_df])
     FreezingLogger.info(
-        f"{accepted_amendments_df.shape[0]} records amended during freezing"
+        f"{accepted_amendments_df.shape[0]} record(s) amended during freezing"
     )
     return amended_df
 
@@ -276,12 +251,18 @@ def apply_additions(
     accepted_additions_df = additions_df[
         additions_df.reference.isin(changes_refs)
     ]
+
+    # this deals with form sent out, instance 0: remove the old and add clear responses
+    main_df = main_df[
+        ~main_df.reference.isin(accepted_additions_df.reference)
+    ]
+
     accepted_additions_df = accepted_additions_df.drop("accept_changes", axis=1)
     if accepted_additions_df.shape[0] > 0:
         accepted_additions_df = _add_last_frozen_column(accepted_additions_df, run_id)
         added_df = pd.concat([main_df, accepted_additions_df], ignore_index=True)
         FreezingLogger.info(
-            f"{accepted_additions_df.shape[0]} records added during freezing"
+            f"{accepted_additions_df.shape[0]} record(s) added during freezing"
         )
     else:
         FreezingLogger.info("Additions file contained no records marked for inclusion")
