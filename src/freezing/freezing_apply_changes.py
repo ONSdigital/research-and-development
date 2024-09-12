@@ -105,35 +105,6 @@ def validate_any_refinst_in_frozen(
     return result
 
 
-def validate_amendments_df(
-        frozen_df: pd.DataFrame,
-        amendments_df: pd.DataFrame,
-        FreezingLogger: logging.Logger,
-    ) -> bool:
-    """Validate the amendments df.
-
-    Args:
-        frozen_df (pd.DataFrame): The frozen csv df.
-        amendments_df (pd.DataFrame): The amendments df.
-        FreezingLogger (logging.Logger): The logger to log to.
-
-    Returns:
-        bool: Whether or not the amendments df is valid.
-    """
-    # check that all ref/inst combs are in staged frozen data
-    FreezingLogger.info(
-        "Checking if any ref/inst in the amendments df are present in the frozen"
-        " data..."
-    )
-    present = validate_any_refinst_in_frozen(frozen_df, amendments_df)
-    if not present:
-        FreezingLogger.info(
-            "There are no matching reference/instance combinations found within the amendments"
-            " file that are present in the snapshot - there needs to be at least one."
-        )
-        return False
-    return True
-
 def validate_additions_df(
         frozen_df: pd.DataFrame,
         additions_df: pd.DataFrame,
@@ -149,7 +120,7 @@ def validate_additions_df(
     Returns:
         bool: Whether or not the additions df is valid.
     """
-    # check that all ref/inst combs are not staged frozen data
+    # check that the ref/inst combos are not staged frozen data
     FreezingLogger.info(
         "Checking if any ref/inst in the additions df are in the frozen"
         " data..."
@@ -182,10 +153,6 @@ def apply_amendments(
     Returns:
         amended_df (pd.DataFrame): The main snapshot with amendments applied.
     """
-    if not validate_amendments_df(main_df, amendments_df, FreezingLogger):
-        FreezingLogger.info("Skipping amendments since the amendments csv is invalid...")
-        return main_df
-
     changes_refs = amendments_df[
         amendments_df.accept_changes==True
     ].reference.unique()
@@ -252,7 +219,7 @@ def apply_additions(
         additions_df.reference.isin(changes_refs)
     ]
 
-    # this deals with form sent out, instance 0: remove the old and add clear responses
+    # removes the old form sent out where we have a new clear response
     main_df = main_df[
         ~main_df.reference.isin(accepted_additions_df.reference)
     ]

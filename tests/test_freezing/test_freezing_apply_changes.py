@@ -108,8 +108,8 @@ class TestApplyAmendments(object):
     def expected_amended(self) -> pd.DataFrame:
         """The expected dataframe after amendments are applied."""
         # get date
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
-        columns = ["reference", "instance", "num", "non_num"]
+        today = datetime.datetime.now().strftime("%y-%m-%d")
+        columns = ["reference", "instance", "num", "non_num", "last_frozen"]
         data = [
             [0, 1, 3, True, f"{today}_v1"],
             [0, 2, 4, True, f"{today}_v1"],
@@ -131,24 +131,6 @@ class TestApplyAmendments(object):
         assert_frame_equal(amended, expected), (
             "Amendments not applied as expected."
         )
-
-    def test_apply_amendments_invalid(self, frozen_df, dummy_amendments, caplog):
-        """Tests for apply_amendments when amendments_df is invalid."""
-        with caplog.at_level(logging.INFO):
-            # alter additions
-            dummy_amendments["reference"] = 6
-            result = apply_amendments(frozen_df, dummy_amendments, 1, test_logger)
-            assert_frame_equal(result, frozen_df), (
-                "Original df not returned when amendments are invalid."
-            )
-            # check logger messages
-            expected_logs = [
-                "Skipping amendments since the amendments csv is invalid..."
-
-            ]
-            records = [rec.msg for rec in caplog.records]
-            for log in expected_logs:
-                assert (log in records), ("error")
 
     def test_apply_amendments_no_amendments(self, frozen_df, dummy_amendments, caplog):
         """Tests for apply_amendments when the amendments df is empty."""
