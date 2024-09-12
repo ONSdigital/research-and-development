@@ -8,8 +8,8 @@ from typing import Callable
 def get_amendments(
     frozen_csv: pd.DataFrame,
     updated_snapshot: pd.DataFrame,
-    FreezingLogger: logging.Logger
-    ) -> pd.DataFrame:
+    FreezingLogger: logging.Logger,
+) -> pd.DataFrame:
     """Get amended records from updated snapshot.
 
     Get all records that are present in both the frozen_csv and the updated
@@ -24,7 +24,9 @@ def get_amendments(
     Returns:
         amendments_df (pd.DataFrame): The records that have changed.
     """
-    FreezingLogger.info("Looking for records that have changed in the updated snapshot.")
+    FreezingLogger.info(
+        "Looking for records that have changed in the updated snapshot."
+    )
     key_cols = ["reference", "period", "instance"]
     numeric_cols = [
         "202", "203", "204", "205", "206", "207", "209", "210",
@@ -57,13 +59,13 @@ def get_amendments(
 
     # If there are any records to amend, calculate differences
     if amendments_df.shape[0] > 0:
-
         for each in numeric_cols:
             amendments_df[f"{each}_diff"] = (
                 amendments_df[f"{each}_updated"] - amendments_df[f"{each}_original"]
             )
             amendments_df.loc[
-                amendments_df[f"{each}_diff"] > 0.00001, f"is_{each}_diff_nonzero_or_true"
+                amendments_df[f"{each}_diff"] > 0.00001,
+                f"is_{each}_diff_nonzero_or_true",
             ] = True
 
         for each in non_numeric_cols:
@@ -74,13 +76,16 @@ def get_amendments(
                 amendments_df[f"is_{each}_diff_nonzero_or_true"], f"{each}_diff"
             ] = amendments_df[f"{each}_updated"]
 
-        # Take a slice of the df which is just the cols ending with _diff_nonzero_or_true
+        # Take a slice of the df which is just the cols ending with
+        # _diff_nonzero_or_true.
         # Do a column-wise any() on this slice, which returns a series where the
         # value is True if any of the *_diff_nonzero_or_true cols in that row were True
         # Add that series as a column to the original df
         # Remove any rows from the df where is_any_diff_nonzero_or_true is False
         amendments_df["is_any_diff_nonzero_or_true"] = amendments_df[
-            amendments_df.columns[amendments_df.columns.str.endswith("_diff_nonzero_or_true")]
+            amendments_df.columns[
+                amendments_df.columns.str.endswith("_diff_nonzero_or_true")
+            ]
         ].any(axis="columns")
         amendments_df = amendments_df.loc[amendments_df["is_any_diff_nonzero_or_true"]]
 
@@ -94,7 +99,9 @@ def get_amendments(
             *non_numeric_cols_diff,
         ]
         amendments_df = amendments_df[select_cols]
-        amendments_df.columns = [col.replace("_updated", "") for col in amendments_df.columns]
+        amendments_df.columns = [
+            col.replace("_updated", "") for col in amendments_df.columns
+        ]
 
         # Add markers
         amendments_df["accept_changes"] = False
@@ -108,8 +115,8 @@ def get_amendments(
 def get_additions(
     frozen_csv: pd.DataFrame,
     updated_snapshot: pd.DataFrame,
-    FreezingLogger: logging.Logger
-    ) -> pd.DataFrame:
+    FreezingLogger: logging.Logger,
+) -> pd.DataFrame:
     """Get added records from the updated snapshot.
 
     Get all records that are present in the updated snapshot but not the main
@@ -120,7 +127,8 @@ def get_additions(
         FreezingLogger (logging.Logger): The logger to log to.
 
     Returns:
-        additions_df (pd.DataFrame): The new records identified in the updated snapshot data.
+        additions_df (pd.DataFrame): The new records identified in
+            the updated snapshot data.
     """
     FreezingLogger.info("Looking for new records in the updated snapshot.")
     key_cols = ["reference", "period", "instance"]
@@ -159,8 +167,8 @@ def output_freezing_files(
     config: dict,
     write_csv: Callable,
     run_id: int,
-    FreezingLogger: logging.Logger
-    ) -> bool:
+    FreezingLogger: logging.Logger,
+) -> bool:
     """Save CSVs of amendments and additions for user approval.
 
     Args:
@@ -176,22 +184,22 @@ def output_freezing_files(
         bool: True if the files were written successfully.
     """
 
-    freezing_changes_to_review_path = config["freezing_paths"]["freezing_changes_to_review_path"]
+    freezing_changes_to_review_path = config["freezing_paths"][
+        "freezing_changes_to_review_path"
+    ]
     FreezingLogger.info("Outputting changes to review file(s).")
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
 
     # Check if the dataframes are empty before writing
     if amendments_df is not None:
-        filename = (
-            f"{survey_year}_freezing_amendments_to_review_{tdate}_v{run_id}.csv"
+        filename = f"{survey_year}_freezing_amendments_to_review_{tdate}_v{run_id}.csv"
+        write_csv(
+            os.path.join(freezing_changes_to_review_path, filename), amendments_df
         )
-        write_csv(os.path.join(freezing_changes_to_review_path, filename), amendments_df)
 
     if additions_df is not None:
-        filename = (
-            f"{survey_year}_freezing_additions_to_review_{tdate}_v{run_id}.csv"
-        )
+        filename = f"{survey_year}_freezing_additions_to_review_{tdate}_v{run_id}.csv"
         write_csv(os.path.join(freezing_changes_to_review_path, filename), additions_df)
 
     if amendments_df is None and additions_df is None:
@@ -200,6 +208,7 @@ def output_freezing_files(
     else:
         FreezingLogger.info("File(s) to review output sucessfully.")
         return True
+
 
 def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
     """Checks for references in both the additions and amendments.
@@ -215,19 +224,36 @@ def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
         bool: True if there are split cases.
     """
     if additions_df is not None and amendments_df is not None:
-        split_cases = additions_df[additions_df["reference"].isin(amendments_df["reference"])]
+        split_cases = additions_df[
+            additions_df["reference"].isin(amendments_df["reference"])
+        ]
         if not split_cases.empty:
             FreezingLogger.info("Split cases found.")
-            additions_df = additions_df[~additions_df.reference.isin(split_cases.reference)]
+            additions_df = additions_df[
+                ~additions_df.reference.isin(split_cases.reference)
+            ]
             amendments_df = amendments_df.append(split_cases, ignore_index=True)
             return additions_df, amendments_df
     return additions_df, amendments_df
 
 
-def run_comparison(frozen_data_for_comparison, updated_snapshot, config, write_csv, run_id, FreezingLogger):
-    additions_df = get_additions(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
-    amendments_df = get_amendments(frozen_data_for_comparison, updated_snapshot, FreezingLogger)
-    additions_df, amendments_df = check_for_split_cases(additions_df, amendments_df, FreezingLogger)
+def run_comparison(
+    frozen_data_for_comparison,
+    updated_snapshot,
+    config,
+    write_csv,
+    run_id,
+    FreezingLogger,
+):
+    additions_df = get_additions(
+        frozen_data_for_comparison, updated_snapshot, FreezingLogger
+    )
+    amendments_df = get_amendments(
+        frozen_data_for_comparison, updated_snapshot, FreezingLogger
+    )
+    additions_df, amendments_df = check_for_split_cases(
+        additions_df, amendments_df, FreezingLogger
+    )
     output_freezing_files(
-            amendments_df, additions_df, config, write_csv, run_id, FreezingLogger
-        )
+        amendments_df, additions_df, config, write_csv, run_id, FreezingLogger
+    )

@@ -41,8 +41,12 @@ def run_freezing(
     """
 
     # read in validated config settings
-    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
-    load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
+    run_with_snapshot_until_freezing = config["global"][
+        "run_with_snapshot_until_freezing"
+    ]
+    load_updated_snapshot_for_comparison = config["global"][
+        "load_updated_snapshot_for_comparison"
+    ]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
     run_frozen_data = config["global"]["run_frozen_data"]
 
@@ -52,7 +56,14 @@ def run_freezing(
         frozen_data_for_comparison = read_frozen_csv(config, read_csv)
         frozen_data_for_comparison = frozen_data_for_comparison.convert_dtypes()
 
-        run_comparison(frozen_data_for_comparison, updated_snapshot, config, write_csv, run_id, FreezingLogger)
+        run_comparison(
+            frozen_data_for_comparison,
+            updated_snapshot,
+            config,
+            write_csv,
+            run_id,
+            FreezingLogger,
+        )
 
         prepared_frozen_data = snapshot_df.copy()
 
@@ -63,19 +74,24 @@ def run_freezing(
             frozen_data, config, check_file_exists, read_csv, run_id, FreezingLogger
         )
         prepared_frozen_data.reset_index(drop=True, inplace=True)
-        prepared_frozen_data["statusencoded"] = prepared_frozen_data["statusencoded"].astype(str)
+        prepared_frozen_data["statusencoded"] = prepared_frozen_data[
+            "statusencoded"
+        ].astype(str)
 
     elif run_frozen_data:
         prepared_frozen_data = read_frozen_csv(config, read_csv)
-        prepared_frozen_data["statusencoded"] = prepared_frozen_data["statusencoded"].astype(str)
+        prepared_frozen_data["statusencoded"] = prepared_frozen_data[
+            "statusencoded"
+        ].astype(str)
 
     else:
         prepared_frozen_data = snapshot_df.copy()
         prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
-
     if run_with_snapshot_until_freezing or run_updates_and_freeze:
-        frozen_data_staged_output_path = config["freezing_paths"]["frozen_data_staged_output_path"]
+        frozen_data_staged_output_path = config["freezing_paths"][
+            "frozen_data_staged_output_path"
+        ]
         FreezingLogger.info("Outputting frozen data file.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]

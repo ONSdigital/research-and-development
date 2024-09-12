@@ -8,6 +8,7 @@ import pandas as pd
 from src.utils.helpers import values_in_column
 from src.freezing.freezing_utils import _add_last_frozen_column
 
+
 def apply_freezing(
     main_df: pd.DataFrame,
     config: dict,
@@ -15,7 +16,7 @@ def apply_freezing(
     read_csv: Callable,
     run_id: int,
     FreezingLogger: logging.Logger,
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """Read user-edited freezing files and apply them to the main snapshot.
     Args:
         main_df (pd.DataFrame): The main snapshot.
@@ -66,24 +67,19 @@ def apply_freezing(
         additions_df = read_csv(additions_filepath)
         if additions_df.empty:
             FreezingLogger.warning(
-            f"Additions file {additions_filepath} is empty, skipping..."
-        )
+                f"Additions file {additions_filepath} is empty, skipping..."
+            )
         else:
             additions_df["instance"] = additions_df["instance"].astype("Int64")
-            main_df = apply_additions(
-                main_df,
-                additions_df,
-                run_id,
-                FreezingLogger
-            )
+            main_df = apply_additions(main_df, additions_df, run_id, FreezingLogger)
 
     return main_df
 
 
 def validate_any_refinst_in_frozen(
-        frozen_df: pd.DataFrame,
-        df2: pd.DataFrame,
-    ) -> bool:
+    frozen_df: pd.DataFrame,
+    df2: pd.DataFrame,
+) -> bool:
     """Validate that any of the ref/inst combinations from df2 are in the frozen df.
 
     Args:
@@ -95,21 +91,21 @@ def validate_any_refinst_in_frozen(
     """
     frozen_copy = frozen_df.copy()
     df2_copy = df2.copy()
-    frozen_copy["refinst"] = (
-        frozen_copy["reference"].astype(str) + frozen_copy["instance"].astype(str)
-    )
-    df2_copy["refinst"] = (
-        df2_copy["reference"].astype(str) + df2_copy["instance"].astype(str)
-    )
+    frozen_copy["refinst"] = frozen_copy["reference"].astype(str) + frozen_copy[
+        "instance"
+    ].astype(str)
+    df2_copy["refinst"] = df2_copy["reference"].astype(str) + df2_copy[
+        "instance"
+    ].astype(str)
     result = any([x in list(frozen_copy["refinst"]) for x in list(df2_copy["refinst"])])
     return result
 
 
 def validate_additions_df(
-        frozen_df: pd.DataFrame,
-        additions_df: pd.DataFrame,
-        FreezingLogger: logging.Logger,
-    ) -> None:
+    frozen_df: pd.DataFrame,
+    additions_df: pd.DataFrame,
+    FreezingLogger: logging.Logger,
+) -> None:
     """Validate the additions df.
 
     Args:
@@ -122,8 +118,7 @@ def validate_additions_df(
     """
     # check that the ref/inst combos are not staged frozen data
     FreezingLogger.info(
-        "Checking if any ref/inst in the additions df are in the frozen"
-        " data..."
+        "Checking if any ref/inst in the additions df are in the frozen data..."
     )
 
     any_present = validate_any_refinst_in_frozen(frozen_df, additions_df)
@@ -140,8 +135,8 @@ def apply_amendments(
     main_df: pd.DataFrame,
     amendments_df: pd.DataFrame,
     run_id: int,
-    FreezingLogger: logging.Logger
-    ) -> pd.DataFrame:
+    FreezingLogger: logging.Logger,
+) -> pd.DataFrame:
     """Apply amendments to the main snapshot.
 
     Args:
@@ -154,17 +149,13 @@ def apply_amendments(
         amended_df (pd.DataFrame): The main snapshot with amendments applied.
     """
     changes_refs = amendments_df[
-        amendments_df.accept_changes==True
+        amendments_df.accept_changes == True
     ].reference.unique()
 
-    accepted_amendments_df = amendments_df[
-        amendments_df.reference.isin(changes_refs)
-    ]
+    accepted_amendments_df = amendments_df[amendments_df.reference.isin(changes_refs)]
 
     if accepted_amendments_df.shape[0] == 0:
-        FreezingLogger.info(
-            "Amendments file contained no records marked for inclusion"
-        )
+        FreezingLogger.info("Amendments file contained no records marked for inclusion")
         return main_df
 
     # Drop the diff columns and accept_changes col
@@ -173,7 +164,7 @@ def apply_amendments(
     )
     accepted_amendments_df = accepted_amendments_df.drop("accept_changes", axis=1)
 
-    #rename columns
+    # rename columns
     accepted_amendments_df.columns = [
         col.replace("_updated", "") for col in accepted_amendments_df.columns
     ]
@@ -194,8 +185,8 @@ def apply_additions(
     main_df: pd.DataFrame,
     additions_df: pd.DataFrame,
     run_id: int,
-    FreezingLogger: logging.Logger
-    ) -> pd.DataFrame:
+    FreezingLogger: logging.Logger,
+) -> pd.DataFrame:
     """Apply additions to the main snapshot.
 
     Args:
@@ -211,18 +202,12 @@ def apply_additions(
         FreezingLogger.info("Skipping additions since the additions csv is invalid...")
         return main_df
     # Drop records where accept_changes is False and if any remain, add them to main df
-    changes_refs = additions_df[
-        additions_df.accept_changes==True
-    ].reference.unique()
+    changes_refs = additions_df[additions_df.accept_changes == True].reference.unique()
 
-    accepted_additions_df = additions_df[
-        additions_df.reference.isin(changes_refs)
-    ]
+    accepted_additions_df = additions_df[additions_df.reference.isin(changes_refs)]
 
     # removes the old form sent out where we have a new clear response
-    main_df = main_df[
-        ~main_df.reference.isin(accepted_additions_df.reference)
-    ]
+    main_df = main_df[~main_df.reference.isin(accepted_additions_df.reference)]
 
     accepted_additions_df = accepted_additions_df.drop("accept_changes", axis=1)
     if accepted_additions_df.shape[0] > 0:
