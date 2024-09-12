@@ -25,9 +25,16 @@ def create_config():
             "ownership": ["225", "226", "227", "228", "229", "237", "218"],
             "equality": ["211", "218"]
         },
+        "3xx_totals": {
+            "purchases": ['302', '303', '304', '305']
+        },
         "4xx_totals": {
             "emp_civil": ["405", "407", "409", "411"],
             "emp_defence": ["406", "408", "410", "412"]
+        },
+        "5xx_totals": {
+            "hc_res_m": ['501', '503', '505', '507'],
+            "hc_res_f": ['502', '504', '506', '508'],
         },
         "less_than_checks": {
             "cap_ex": ["209", "221"],
@@ -52,13 +59,16 @@ class TestGetConstructionEqualityDicts:
             "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
             "ownership": ["225", "226", "227", "228", "229", "237", "218"],
             "equality": ["211", "218"],
+            "purchases": ['302', '303', '304', '305'],
             "emp_civil": ["405", "407", "409", "411"],
             "emp_defence": ["406", "408", "410", "412"],
+            "hc_res_m": ['501', '503', '505', '507'],
+            "hc_res_f": ['502', '504', '506', '508'],
         }
         result = get_construction_equality_dicts(config)
         assert result == expected_output
 
-class TestRunBreakdownValidation:
+class TestRunBreakdownValidation():
     """Unit tests for run_breakdown_validation function."""
 
     def create_input_df(self):
@@ -80,40 +90,44 @@ class TestRunBreakdownValidation:
         return input_df
 
 
-    def test_breakdown_validation_success(self, caplog):
+    def test_breakdown_validation_success(self, caplog, create_config):
         """Test for run_breakdown_validation function where the values match."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'A')]
+        config = create_config
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            run_breakdown_validation(input_df, config)
             assert msg in caplog.text
 
-    def test_breakdown_validation_msg(self):
+    def test_breakdown_validation_msg(self, create_config):
         """Test for run_breakdown_validation function to check the returned message."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'B')]
+        config = create_config
         msg = "Columns ['202', '203'] do not equal column 204 for reference: B, instance 1.\n "
         with pytest.raises(ValueError) as e:
-            run_breakdown_validation(input_df)
+            run_breakdown_validation(input_df, config)
         assert str(e.value) == msg
 
-    def test_breakdown_validation_fail_all_null(self, caplog):
+    def test_breakdown_validation_fail_all_null(self, caplog, create_config):
         """Test for run_breakdown_validation function where there are no values."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'C')]
+        config = create_config
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            run_breakdown_validation(input_df, config)
             assert msg in caplog.text
 
-    def test_breakdown_validation_fail_totals_zero(self, caplog):
+    def test_breakdown_validation_fail_totals_zero(self, caplog, create_config):
         """Test for run_breakdown_validation function where there are zeros."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'D')]
+        config = create_config
         msg = 'All breakdown values are valid.\n'
         with caplog.at_level(logging.INFO):
-            run_breakdown_validation(input_df)
+            run_breakdown_validation(input_df, config)
             assert msg in caplog.text
 
 class TestReplaceNullsWithZero:
@@ -136,14 +150,15 @@ class TestReplaceNullsWithZero:
 
         return input_df
 
-    def test_replace_nulls_with_zero(self, caplog):
+    def test_replace_nulls_with_zero(self, caplog, create_config):
         """Test for replace_nulls_with_zero function where nulls are replaced with zeros."""
         input_df = self.create_input_df()
         expected_df = input_df.copy()
+        config = create_config
         expected_df.loc[2, ["202", "205", "206", "207", "219", "220", "209", "210", "211", '212', '214', '216', '242', '250', '243', '244', '245', '246', '247', '248', '249', '218', '225', '226', '227', '228', '229', '237', '302', '303', '304', '305', '501', '503', '505', '507', '502', '504', '506', '508', '405', '407', '409', '411', '406', '408', '410', '412']] = 0
 
         with caplog.at_level(logging.INFO):
-            result_df = replace_nulls_with_zero(input_df)
+            result_df = replace_nulls_with_zero(input_df, config)
             assert "Replacing nulls with zeros where total zero" in caplog.text
             pd.testing.assert_frame_equal(result_df, expected_df)
 
@@ -215,36 +230,39 @@ class TestEqualValidation:
 
         return input_df
 
-    def test_equal_validation_success(self, caplog):
+    def test_equal_validation_success(self, caplog, create_config):
         """Test for equal_validation function where the values match."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'A')]
+        config = create_config
         msg = ""
         count = 0
         with caplog.at_level(logging.INFO):
-            result_msg, result_count = equal_validation(input_df)
+            result_msg, result_count = equal_validation(input_df, config)
             assert "Doing breakdown total checks..." in caplog.text
             assert result_msg == msg
             assert result_count == count
 
-    def test_equal_validation_fail(self):
+    def test_equal_validation_fail(self, create_config):
         """Test for equal_validation function where the values do not meet the criteria."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'B')].reset_index(drop=True)
+        config = create_config
         msg = "Columns ['202', '203'] do not equal column 204 for reference: B, instance 1.\n "
         count = 1
-        result_msg, result_count = equal_validation(input_df)
+        result_msg, result_count = equal_validation(input_df, config)
         assert result_msg == msg
         assert result_count == count
 
-    def test_equal_validation_all_null(self, caplog):
+    def test_equal_validation_all_null(self, caplog, create_config):
         """Test for equal_validation function where all values are zero or null."""
         input_df = self.create_input_df()
         input_df = input_df.loc[(input_df['reference'] == 'C')].reset_index(drop=True)
+        config = create_config
         msg = ""
         count = 0
         with caplog.at_level(logging.INFO):
-            result_msg, result_count = equal_validation(input_df)
+            result_msg, result_count = equal_validation(input_df, config)
             assert "Doing breakdown total checks..." in caplog.text
             assert result_msg == msg
             assert result_count == count

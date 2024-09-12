@@ -4,34 +4,6 @@ import pandas as pd
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
-# checks that need to be done: the last col in the list is the total col
-# the sum of the other cols should equal the total
-equals_checks = {
-    "check1": ["222", "223", "203"],
-    "check2": ["202", "203", "204"],
-    "check3": ["205", "206", "207", "204"],
-    "check4": ["219", "220", "209", "210"],
-    "check5": ["204", "210", "211"],
-    "check6": [ # noqa
-        "212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248",  # noqa
-        "249", "218"  # noqa
-    ], # noqa
-    "check7": ["211", "218"],
-    "check8": ["225", "226", "227", "228", "229", "237", "218"],
-    "check9": ["302", "303", "304", "305"],
-    "check10": ["501", "503", "505", "507"],
-    "check11": ["502", "504", "506", "508"],
-    "check12": ["405", "407", "409", "411"],
-    "check13": ["406", "408", "410", "412"],
-}
-
-# checks that need to be done: the second value should not be greater than the first
-greater_than_checks = {
-    "check14": ["209", "221"],
-    "check15": ["211", "202"],
-}
-
-
 def get_construction_equality_dicts(config: dict) -> dict:
     """
     Get the equality checks for the construction data.
@@ -56,7 +28,7 @@ def get_construction_equality_dicts(config: dict) -> dict:
     return construction_equality_checks
 
 
-def replace_nulls_with_zero(df: pd.DataFrame) -> pd.DataFrame:
+def replace_nulls_with_zero(df: pd.DataFrame, config) -> pd.DataFrame:
     """
     Replace nulls with zeros where the total is zero.
 
@@ -67,6 +39,8 @@ def replace_nulls_with_zero(df: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame
     """
     BreakdownValidationLogger.info("Replacing nulls with zeros where total zero")
+    equals_checks = get_construction_equality_dicts(config)
+
     for columns in equals_checks.values():
         total_column = columns[-1]
         breakdown_columns = columns[:-1]
@@ -100,17 +74,20 @@ def remove_all_nulls_rows(df: pd.DataFrame) -> pd.DataFrame:
     return rows_to_validate
 
 
-def equal_validation(rows_to_validate: pd.DataFrame) -> pd.DataFrame:
+def equal_validation(rows_to_validate: pd.DataFrame, config:dict) -> pd.DataFrame:
     """
     Check where the sum of some columns should equal another column.
 
     Args:
         rows_to_validate (pd.DataFrame): The dataframe to check.
+        config (dict): The config dictionary.
 
     Returns:
         tuple(str, int)
     """
     BreakdownValidationLogger.info("Doing breakdown total checks...")
+    equals_checks = get_construction_equality_dicts(config)
+
     msg = ""
     count = 0
     for index, row in rows_to_validate.iterrows():
@@ -152,6 +129,10 @@ def greater_than_validation(
     BreakdownValidationLogger.info(
         "Doing checks for values that should be greater than..."
     )
+    greater_than_checks = {
+    "check14": ["209", "221"],
+    "check15": ["211", "202"],
+}
     for index, row in rows_to_validate.iterrows():
         for key, columns in greater_than_checks.items():
             should_be_greater = columns[0]
@@ -169,7 +150,7 @@ def greater_than_validation(
     return msg, count
 
 
-def run_breakdown_validation(df: pd.DataFrame, check: str = "all") -> pd.DataFrame:
+def run_breakdown_validation(df: pd.DataFrame, config: dict, check: str = "all") -> pd.DataFrame:
     """
     Function to validate the breakdown totals.
 
@@ -190,9 +171,9 @@ def run_breakdown_validation(df: pd.DataFrame, check: str = "all") -> pd.DataFra
     else:
         validation_df = df.copy()
 
-    validation_df = replace_nulls_with_zero(validation_df)
+    validation_df = replace_nulls_with_zero(validation_df, config)
     rows_to_validate = remove_all_nulls_rows(validation_df)
-    msg, count = equal_validation(rows_to_validate)
+    msg, count = equal_validation(rows_to_validate, config)
     msg, count = greater_than_validation(rows_to_validate, msg, count)
 
     if check != "all":
