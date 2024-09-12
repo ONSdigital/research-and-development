@@ -1,35 +1,59 @@
 """Function to validate the breakdown totals."""
-import os
 import logging
 import pandas as pd
-import numpy as np
-from pandas import DataFrame as pandasDF
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
 # checks that need to be done: the last col in the list is the total col
 # the sum of the other cols should equal the total
 equals_checks = {
-    'check1': ['222', '223', '203'],
-    'check2': ['202', '203', '204'],
-    'check3': ['205', '206', '207', '204'],
-    'check4': ['219', '220', '209', '210'],
-    'check5': ['204', '210', '211'],
-    'check6': ['212', '214', '216', '242', '250', '243', '244', '245', '246', '247', '248', '249', '218'],
-    'check7': ['211', '218'],
-    'check8': ['225', '226', '227', '228', '229', '237', '218'],
-    'check9': ['302', '303', '304', '305'],
-    'check10': ['501', '503', '505', '507'],
-    'check11': ['502', '504', '506', '508'],
-    'check12': ['405', '407', '409', '411'],
-    'check13': ['406', '408', '410', '412'],
+    "check1": ["222", "223", "203"],
+    "check2": ["202", "203", "204"],
+    "check3": ["205", "206", "207", "204"],
+    "check4": ["219", "220", "209", "210"],
+    "check5": ["204", "210", "211"],
+    "check6": [ # noqa
+        "212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248",  # noqa
+        "249", "218"  # noqa
+    ], # noqa
+    "check7": ["211", "218"],
+    "check8": ["225", "226", "227", "228", "229", "237", "218"],
+    "check9": ["302", "303", "304", "305"],
+    "check10": ["501", "503", "505", "507"],
+    "check11": ["502", "504", "506", "508"],
+    "check12": ["405", "407", "409", "411"],
+    "check13": ["406", "408", "410", "412"],
 }
 
 # checks that need to be done: the second value should not be greater than the first
 greater_than_checks = {
-    'check14': ['209', '221'],
-    'check15': ['211', '202'],
+    "check14": ["209", "221"],
+    "check15": ["211", "202"],
 }
+
+
+def get_construction_equality_dicts(config: dict) -> dict:
+    """
+    Get the equality checks for the construction data.
+
+    Args:
+        config (dict): The config dictionary.
+
+    Returns:
+        dict
+    """
+    # use the config to get breakdown totals
+    all_checks_dict = config["consistency_checks"]
+
+    # isolate the relationships suitlable for checking in the construction module
+    construction_dicts = [key for key in all_checks_dict.keys() if "xx_total" in key]
+
+    # create a dictionary of the relationships to check
+    construction_equality_checks = {}
+    for item in construction_dicts:
+        construction_equality_checks.update(all_checks_dict[item])
+
+    return construction_equality_checks
 
 
 def replace_nulls_with_zero(df: pd.DataFrame) -> pd.DataFrame:
@@ -65,12 +89,14 @@ def remove_all_nulls_rows(df: pd.DataFrame) -> pd.DataFrame:
     BreakdownValidationLogger.info("Removing rows with all null values from validation")
     rows_to_validate = df.dropna(
         subset=[
-            '222', '223', '203', '202', '204', '205', '206', '207', '221', '209', '219',
-            '220', '210', '204', '211', '212', '214', '216', '242', '250', '243', '244',
-            '245', '246', '218', '225', '226', '227', '228', '229', '237', '302', '303',
-            '304', '305', '501', '503', '505', '507', '502', '504', '506', '508', '405',
-            '407', '409', '411', '406', '408', '410', '412'
-            ], how='all').reset_index(drop=True)
+            "222", "223", "203", "202", "204", "205", "206", "207", "221", "209", "219",  # noqa
+            "220", "210", "204", "211", "212", "214", "216", "242", "250", "243", "244",  # noqa
+            "245", "246", "218", "225", "226", "227", "228", "229", "237", "302", "303",  # noqa
+            "304", "305", "501", "503", "505", "507", "502", "504", "506", "508", "405",  # noqa
+            "407", "409", "411", "406", "408", "410", "412"  # noqa
+        ], # noqa
+        how="all",
+    ).reset_index(drop=True)
     return rows_to_validate
 
 
@@ -91,19 +117,27 @@ def equal_validation(rows_to_validate: pd.DataFrame) -> pd.DataFrame:
         for key, columns in equals_checks.items():
             total_column = columns[-1]
             breakdown_columns = columns[:-1]
-            if rows_to_validate[columns].isnull().all(axis=1).iloc[index] or (rows_to_validate[columns] == 0).all(axis=1).iloc[index]:
+            if (
+                rows_to_validate[columns].isnull().all(axis=1).iloc[index]
+                or (rows_to_validate[columns] == 0).all(axis=1).iloc[index]
+            ):
                 continue
-            if not (rows_to_validate[breakdown_columns].sum(axis=1) == rows_to_validate[total_column]).iloc[index]:
-                msg += f"Columns {breakdown_columns} do not equal column {total_column} for reference: {row['reference']}, instance {row['instance']}.\n "
+            if not (
+                rows_to_validate[breakdown_columns].sum(axis=1)
+                == rows_to_validate[total_column]
+            ).iloc[index]:
+                msg += (
+                    f"Columns {breakdown_columns} do not equal column"
+                    f" {total_column} for reference: {row['reference']}, instance"
+                    f" {row['instance']}.\n "
+                )
                 count += 1
     return msg, count
 
 
 def greater_than_validation(
-    rows_to_validate: pd.DataFrame,
-    msg: str,
-    count: int
-    ) -> pd.DataFrame:
+    rows_to_validate: pd.DataFrame, msg: str, count: int
+) -> pd.DataFrame:
     """
     Check where one value should be greater than another.
 
@@ -115,21 +149,27 @@ def greater_than_validation(
     Returns:
         pd.DataFrame
     """
-    BreakdownValidationLogger.info("Doing checks for values that should be greater than...")
+    BreakdownValidationLogger.info(
+        "Doing checks for values that should be greater than..."
+    )
     for index, row in rows_to_validate.iterrows():
         for key, columns in greater_than_checks.items():
             should_be_greater = columns[0]
             should_not_be_greater = columns[1]
-            if (rows_to_validate[should_not_be_greater] > rows_to_validate[should_be_greater]).all():
-                msg += f"Column {should_not_be_greater} is greater than {should_be_greater} for reference: {row['reference']}, instance {row['instance']}.\n "
+            if (
+                rows_to_validate[should_not_be_greater]
+                > rows_to_validate[should_be_greater]
+            ).all():
+                msg += (
+                    f"Column {should_not_be_greater} is greater than"
+                    f" {should_be_greater} for reference: {row['reference']}, instance"
+                    f" {row['instance']}.\n "
+                )
                 count += 1
     return msg, count
 
 
-def run_breakdown_validation(
-    df: pd.DataFrame,
-    check: str = 'all'
-    ) -> pd.DataFrame:
+def run_breakdown_validation(df: pd.DataFrame, check: str = "all") -> pd.DataFrame:
     """
     Function to validate the breakdown totals.
 
@@ -141,10 +181,12 @@ def run_breakdown_validation(
         pd.DataFrame
     """
 
-    if check == 'constructed':
-        BreakdownValidationLogger.info("Running breakdown validation for constructed data")
-        validation_df = df[df['is_constructed'] == True].copy()
-        not_for_validating_df = df[df['is_constructed'] == False].copy()
+    if check == "constructed":
+        BreakdownValidationLogger.info(
+            "Running breakdown validation for constructed data"
+        )
+        validation_df = df[df["is_constructed"] == True].copy()
+        not_for_validating_df = df[df["is_constructed"] == False].copy()
     else:
         validation_df = df.copy()
 
@@ -153,12 +195,14 @@ def run_breakdown_validation(
     msg, count = equal_validation(rows_to_validate)
     msg, count = greater_than_validation(rows_to_validate, msg, count)
 
-    if check != 'all':
+    if check != "all":
         df = pd.concat([validation_df, not_for_validating_df], ignore_index=True)
     else:
         df = validation_df
 
-    BreakdownValidationLogger.info(f"There are {count} errors with the breakdown values")
+    BreakdownValidationLogger.info(
+        f"There are {count} errors with the breakdown values"
+    )
 
     if not msg:
         BreakdownValidationLogger.info("All breakdown values are valid.")

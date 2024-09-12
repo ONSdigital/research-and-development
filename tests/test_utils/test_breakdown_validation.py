@@ -3,6 +3,7 @@ import pytest
 import logging
 
 from src.utils.breakdown_validation import (
+    get_construction_equality_dicts,
     run_breakdown_validation,
     replace_nulls_with_zero,
     remove_all_nulls_rows,
@@ -10,6 +11,52 @@ from src.utils.breakdown_validation import (
     greater_than_validation,
 )
 
+@pytest.fixture(scope="module")
+def create_config():
+    """Create a config dictionary for the tests."""
+    test_config = {"consistency_checks": {
+        "2xx_totals": {
+            "purchases": ["222", "223", "203"],
+            "sal_oth_expend": ["202", "203", "204"],
+            "research_expend": ["205", "206", "207", "204"],
+            "capex": ["219", "220", "209", "210"],
+            "intram": ["204", "210", "211"],
+            "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
+            "ownership": ["225", "226", "227", "228", "229", "237", "218"],
+            "equality": ["211", "218"]
+        },
+        "4xx_totals": {
+            "emp_civil": ["405", "407", "409", "411"],
+            "emp_defence": ["406", "408", "410", "412"]
+        },
+        "less_than_checks": {
+            "cap_ex": ["209", "221"],
+            "salaries": ["211", "202"]
+        }
+    }}
+    return test_config
+
+
+class TestGetConstructionEqualityDicts:
+    """Unit tests for get_construction_equality_dicts function."""
+
+    def test_get_construction_equality_dicts(self, create_config):
+        """Test for get_construction_equality_dicts function."""
+        config = create_config
+        expected_output = {
+            "purchases": ["222", "223", "203"],
+            "sal_oth_expend": ["202", "203", "204"],
+            "research_expend": ["205", "206", "207", "204"],
+            "capex": ["219", "220", "209", "210"],
+            "intram": ["204", "210", "211"],
+            "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
+            "ownership": ["225", "226", "227", "228", "229", "237", "218"],
+            "equality": ["211", "218"],
+            "emp_civil": ["405", "407", "409", "411"],
+            "emp_defence": ["406", "408", "410", "412"],
+        }
+        result = get_construction_equality_dicts(config)
+        assert result == expected_output
 
 class TestRunBreakdownValidation:
     """Unit tests for run_breakdown_validation function."""
@@ -256,5 +303,3 @@ class TestGreaterThanValidation:
             assert "Doing checks for values that should be greater than..." in caplog.text
             assert result_msg == msg
             assert result_count == count
-
-
