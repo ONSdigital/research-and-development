@@ -354,7 +354,7 @@ def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
     Returns:
         dict: The loaded yaml file as as dictionary.
     """
-    print(os.getcwd())
+
     if not os.path.exists(path):
         raise FileNotFoundError(
             f"Attempted to load yaml at: {path}. File does not exist."
