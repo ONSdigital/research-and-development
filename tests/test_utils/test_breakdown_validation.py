@@ -3,7 +3,8 @@ import pytest
 import logging
 
 from src.utils.breakdown_validation import (
-    get_construction_equality_dicts,
+    get_equality_dicts,
+    # get_all_wanted_columns,
     run_breakdown_validation,
     replace_nulls_with_zero,
     remove_all_nulls_rows,
@@ -36,37 +37,74 @@ def create_config():
             "hc_res_m": ['501', '503', '505', '507'],
             "hc_res_f": ['502', '504', '506', '508'],
         },
-        "less_than_checks": {
-            "cap_ex": ["209", "221"],
-            "salaries": ["211", "202"]
+        "apportioned_totals": {
+            "employment": ["emp_researcher", "emp_technician", "emp_other", "emp_total"],
+            "hc_male": ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"],
+            "hc_female": ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"],
+            "hc_tot": ["heacount_tot_m", "headcount_tot_f", "headcount_tot"]
         }
     }}
     return test_config
 
 
-class TestGetConstructionEqualityDicts:
-    """Unit tests for get_construction_equality_dicts function."""
+def test_get_equality_dicts_construction(create_config):
+    """Test for get_equality_dicts function in the construction case."""
+    config = create_config
+    expected_output = {
+        "purchases": ["222", "223", "203"],
+        "sal_oth_expend": ["202", "203", "204"],
+        "research_expend": ["205", "206", "207", "204"],
+        "capex": ["219", "220", "209", "210"],
+        "intram": ["204", "210", "211"],
+        "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
+        "ownership": ["225", "226", "227", "228", "229", "237", "218"],
+        "equality": ["211", "218"],
+        "purchases": ['302', '303', '304', '305'],
+        "emp_civil": ["405", "407", "409", "411"],
+        "emp_defence": ["406", "408", "410", "412"],
+        "hc_res_m": ['501', '503', '505', '507'],
+        "hc_res_f": ['502', '504', '506', '508'],
+    }
+    result = get_equality_dicts(config, "construction")
+    assert result == expected_output
 
-    def test_get_construction_equality_dicts(self, create_config):
-        """Test for get_construction_equality_dicts function."""
-        config = create_config
-        expected_output = {
-            "purchases": ["222", "223", "203"],
-            "sal_oth_expend": ["202", "203", "204"],
-            "research_expend": ["205", "206", "207", "204"],
-            "capex": ["219", "220", "209", "210"],
-            "intram": ["204", "210", "211"],
-            "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
-            "ownership": ["225", "226", "227", "228", "229", "237", "218"],
-            "equality": ["211", "218"],
-            "purchases": ['302', '303', '304', '305'],
-            "emp_civil": ["405", "407", "409", "411"],
-            "emp_defence": ["406", "408", "410", "412"],
-            "hc_res_m": ['501', '503', '505', '507'],
-            "hc_res_f": ['502', '504', '506', '508'],
-        }
-        result = get_construction_equality_dicts(config)
-        assert result == expected_output
+
+def test_get_equality_dicts_imputation(create_config):
+    """Test for get__equality_dicts function in the imputation case."""
+    config = create_config
+    expected_output = {
+        "purchases": ["222", "223", "203"],
+        "sal_oth_expend": ["202", "203", "204"],
+        "research_expend": ["205", "206", "207", "204"],
+        "capex": ["219", "220", "209", "210"],
+        "intram": ["204", "210", "211"],
+        "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
+        "ownership": ["225", "226", "227", "228", "229", "237", "218"],
+        "equality": ["211", "218"],
+        "purchases": ['302', '303', '304', '305'],
+        "employment": ["emp_researcher", "emp_technician", "emp_other", "emp_total"],
+        "hc_male": ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"],
+        "hc_female": ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"],
+        "hc_tot": ["heacount_tot_m", "headcount_tot_f", "headcount_tot"]
+    }
+    result = get_equality_dicts(config, "imputation")
+    assert result == expected_output
+
+
+# def test_get_all_wanted_columns(create_config):
+#     """Test for get_all_wanted_columns function."""
+#     config = create_config
+#     expected_output = [
+#     "220", "210", "204", "211", "212", "214", "216", "242", "250", "243", "244",  # noqa
+#     "245", "246", "218", "225", "226", "227", "228", "229", "237", "302", "303",  # noqa
+#     "304", "305", "501", "503", "505", "507", "502", "504", "506", "508", "405",  # noqa
+#     "407", "409", "411", "406", "408", "410", "412"  # noqa
+#     ] # noqa
+#     print(expected_output)
+
+#     result = get_all_wanted_columns(config)
+
+#     assert set(result) == set(expected_output)
 
 class TestRunBreakdownValidation():
     """Unit tests for run_breakdown_validation function."""

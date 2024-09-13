@@ -4,7 +4,7 @@ import pandas as pd
 
 BreakdownValidationLogger = logging.getLogger(__name__)
 
-def get_construction_equality_dicts(config: dict) -> dict:
+def get_equality_dicts(config: dict, sublist: str="all") -> dict:
     """
     Get the equality checks for the construction data.
 
@@ -18,14 +18,36 @@ def get_construction_equality_dicts(config: dict) -> dict:
     all_checks_dict = config["consistency_checks"]
 
     # isolate the relationships suitlable for checking in the construction module
-    construction_dicts = [key for key in all_checks_dict.keys() if "xx_total" in key]
+    if sublist == "construction":
+        wanted_dicts = [key for key in all_checks_dict.keys() if "xx_totals" in key]
+    elif sublist == "imputation":
+        wanted_dicts = ["2xx_totals", "3xx_totals", "apportioned_totals"]
+    else:
+        wanted_dicts = list(all_checks_dict.keys())
 
     # create a dictionary of the relationships to check
     construction_equality_checks = {}
-    for item in construction_dicts:
+    for item in wanted_dicts:
         construction_equality_checks.update(all_checks_dict[item])
 
     return construction_equality_checks
+
+
+def get_all_wanted_columns(config: dict) -> list:
+    """
+    Get all the columns that we want to check.
+
+    Args:
+        config (dict): The config dictionary.
+
+    Returns:
+        list: A list of all the columns to check.
+    """
+    equals_checks = get_equality_dicts(config, "construction")
+    all_columns = []
+    for list_item in equals_checks.values():
+        all_columns += list_item
+    return all_columns
 
 
 def replace_nulls_with_zero(df: pd.DataFrame, config) -> pd.DataFrame:
@@ -39,7 +61,7 @@ def replace_nulls_with_zero(df: pd.DataFrame, config) -> pd.DataFrame:
         pd.DataFrame
     """
     BreakdownValidationLogger.info("Replacing nulls with zeros where total zero")
-    equals_checks = get_construction_equality_dicts(config)
+    equals_checks = get_equality_dicts(config, "construction")
 
     for columns in equals_checks.values():
         total_column = columns[-1]
@@ -86,7 +108,7 @@ def equal_validation(rows_to_validate: pd.DataFrame, config:dict) -> pd.DataFram
         tuple(str, int)
     """
     BreakdownValidationLogger.info("Doing breakdown total checks...")
-    equals_checks = get_construction_equality_dicts(config)
+    equals_checks = get_equality_dicts(config, "construction")
 
     msg = ""
     count = 0
