@@ -4,14 +4,15 @@
 # from importlib import reload
 
 from src.utils.helpers import tree_to_list
-import src.utils.local_file_mods as mods
+import src.utils.hdfs_mods as mods
 # reload(tree_to_list)
 
 
 def run_make_dirs():
-    root = "D:/data/res_dev"
+    root = "/ons/rdbe_dev"
 
-    tree = {"2023_surveys": {
+    tree = {"2021_surveys": {
+    
             "BERD": {
                 "01_staging": {
                     "feather": {},
