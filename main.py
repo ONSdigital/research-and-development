@@ -1,7 +1,11 @@
 from importlib import reload
 import time
 import os
-print(os.getcwd())
+
+start_dir = os.getcwd()
+if start_dir.startswith("/home"):
+    os.chdir("research-and-development")
+print(f"Current directory is {os.getcwd()}")
 # import src.pipeline as src
 
 # # reload the pipeline module to implement any changes
