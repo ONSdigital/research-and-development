@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 import os
 import pandas as pd
-from typing import Callable
+from typing import Callable, Tuple
 
 
 def get_amendments(
@@ -210,7 +210,11 @@ def output_freezing_files(
         return True
 
 
-def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
+def bring_together_split_cases(
+    additions_df: pd.DataFrame,
+    amendments_df: pd.DataFrame,
+    FreezingLogger: logging.Logger
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Checks for references in both the additions and amendments.
     If a reference is found in both: move all the relevant rows into
     amendments and remove from additions.
@@ -221,14 +225,15 @@ def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
         FreezingLogger (logging.Logger): The logger to log to.
 
     Returns:
-        bool: True if there are split cases.
+        Tuple[pd.DataFrame, pd.DataFrame]: The updated additions and amendments
+            dataframes.
     """
     if additions_df is not None and amendments_df is not None:
         split_cases = additions_df[
             additions_df["reference"].isin(amendments_df["reference"])
         ]
         if not split_cases.empty:
-            FreezingLogger.info("Split cases found.")
+            FreezingLogger.info("Split cases found and being brought together...")
             additions_df = additions_df[
                 ~additions_df.reference.isin(split_cases.reference)
             ]
@@ -238,20 +243,34 @@ def check_for_split_cases(additions_df, amendments_df, FreezingLogger):
 
 
 def run_comparison(
-    frozen_data_for_comparison,
-    updated_snapshot,
-    config,
-    write_csv,
-    run_id,
-    FreezingLogger,
-):
+    frozen_data_for_comparison: pd.DataFrame,
+    updated_snapshot: pd.DataFrame,
+    config: dict,
+    write_csv: Callable,
+    run_id: int,
+    FreezingLogger: logging.Logger,
+) -> None:
+    """Main function to run comparison of frozen data and updated snapshot.
+    Function outputs two csv files, one for additions and one for amendments.
+
+    Args:
+        frozen_data_for_comparison (pd.DataFrame): The staged and validated frozen data.
+        updated_snapshot (pd.DataFrame): The staged and validated updated snapshot data.
+        config (dict): The pipeline configuration
+        write_csv (callable): Function to write to a csv file.
+        run_id (int): The run id for this run.
+        FreezingLogger (logging.Logger): The logger to log to.
+
+    Returns:
+        None
+    """
     additions_df = get_additions(
         frozen_data_for_comparison, updated_snapshot, FreezingLogger
     )
     amendments_df = get_amendments(
         frozen_data_for_comparison, updated_snapshot, FreezingLogger
     )
-    additions_df, amendments_df = check_for_split_cases(
+    additions_df, amendments_df = bring_together_split_cases(
         additions_df, amendments_df, FreezingLogger
     )
     output_freezing_files(

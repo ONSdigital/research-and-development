@@ -1,11 +1,11 @@
 """Tests for freezing_compare.py."""
 
 import pandas as pd
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 import logging
 
 from src.freezing.freezing_compare import get_amendments, get_additions
-from src.freezing.freezing_compare import check_for_split_cases
+from src.freezing.freezing_compare import bring_together_split_cases
 
 # create a test logger to pass to functions
 test_logger = logging.getLogger(__name__)
@@ -171,7 +171,7 @@ class TestGetAdditions:
 
 
 class TestCheckForSplitCases:
-    """Tests for check_for_split_cases()."""
+    """Tests for bring_together_split_cases()."""
 
     def create_test_additions_df(self) -> pd.DataFrame:
         """Create a test additions df."""
@@ -221,8 +221,8 @@ class TestCheckForSplitCases:
         expected_amendments_df = pd.DataFrame(data=data, columns=input_cols)
         return expected_amendments_df
 
-    def test_check_for_split_cases(self):
-        """Test for check_for_split_cases()."""
+    def test_bring_together_split_cases(self):
+        """Test for bring_together_split_cases()."""
         # Create test dataframes
         input_additions_df = self.create_test_additions_df()
         input_amendments_df = self.create_test_amendments_df()
@@ -230,18 +230,18 @@ class TestCheckForSplitCases:
         expected_amendments_df = self.create_expected_amendments_df()
 
         # Run the function
-        result_additions_df, result_amendments_df = check_for_split_cases(
+        result_additions_df, result_amendments_df = bring_together_split_cases(
             input_additions_df, input_amendments_df, test_logger
         )
 
         # Check the output
         assert_frame_equal(
             expected_additions_df, result_additions_df.reset_index(drop=True)
-        ), "check_for_split_cases() additions output is not as expected."
+        ), "bring_together_split_cases() additions output is not as expected."
 
         assert_frame_equal(
             expected_amendments_df, result_amendments_df.reset_index(drop=True)
-        ), "check_for_split_cases() amendments output is not as expected."
+        ), "bring_together_split_cases() amendments output is not as expected."
 
 
 
