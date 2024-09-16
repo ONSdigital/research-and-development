@@ -10,7 +10,6 @@ from src.construction.all_data_construction import all_data_construction
 from src.construction.postcode_construction import postcode_data_construction
 
 
-
 construction_logger = logging.getLogger(__name__)
 
 
