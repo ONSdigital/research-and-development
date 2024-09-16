@@ -19,7 +19,25 @@ from src.construction.construction_validation import (
 )
 
 
-def all_data_construction(construction_df,snapshot_df,construction_logger, is_northern_ireland = False):
+def all_data_construction(
+    construction_df: pd.DataFrame,
+    snapshot_df: pd.DataFrame,
+    construction_logger: logging.Logger,
+    is_northern_ireland: bool = False
+    ) -> pd.DataFrame:
+    """Run all data construction on the GB or NI data.
+    This process is different from the postcode only construction that happens
+    after imputation.
+
+    Args:
+        construction_df (pd.DataFrame): The construction data
+        snapshot_df (pd.DataFrame): The snapshot data
+        construction_logger (logging.Logger): The logger for the construction
+        is_northern_ireland (bool, optional): Whether the data is for Northern Ireland. Defaults to False.
+
+    Returns:
+        pd.DataFrame: The snapshot data with the constructed values
+    """
     # to ensure compatibility, change short_to_long to construction_type
     # short_to_long used for 2022
     if "short_to_long" in construction_df.columns:

@@ -13,9 +13,9 @@ global:
   run_updates_and_freeze: False               # Add specified changes to frozen csv, and refreeze
   run_frozen_data: False                      # Run with specified frozen csv
   # Construction Settings
-  run_all_data_construction: True
-  run_postcode_construction: True
-  run_ni_construction: True
+  run_all_data_construction: False
+  run_postcode_construction: False
+  run_ni_construction: False
   load_manual_outliers: False
   load_manual_imputation: False
   # Backdata output settings
@@ -25,17 +25,17 @@ global:
   output_pnp_full_responses: False
   output_ni_full_responses: False
   output_mapping_qa: False
-  output_mapping_ni_qa: True
+  output_mapping_ni_qa: False
   output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
-  output_estimation_qa: True
+  output_estimation_qa: False
   output_apportionment_qa: False
   # Final output settings
   output_long_form: False
   output_short_form: False
-  output_gb_sas: True
-  output_ni_sas: True
+  output_gb_sas: False
+  output_ni_sas: False
   output_tau: False
   output_intram_by_pg_gb: False
   output_intram_by_pg_uk: False

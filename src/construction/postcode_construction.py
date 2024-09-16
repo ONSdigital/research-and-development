@@ -18,8 +18,23 @@ from src.construction.construction_validation import (
     validate_construction_references,
 )
 
-def postcode_data_construction(construction_df, snapshot_df, construction_logger):
+def postcode_data_construction(
+    construction_df: pd.DataFrame,
+    snapshot_df: pd.DataFrame,
+    construction_logger: logging.Logger
+    ) -> pd.DataFrame:
+    """Run postcode construction on GB data.
+    This process is different from the all data construction that happens
+    before mapping.
 
+    Args:
+        construction_df (pd.DataFrame): The construction data
+        snapshot_df (pd.DataFrame): The snapshot data
+        construction_logger (logging.Logger): The logger for the construction.
+
+    Returns:
+        pd.DataFrame: The snapshot data with the constructed values
+    """
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
 
