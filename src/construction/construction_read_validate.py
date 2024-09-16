@@ -34,9 +34,9 @@ def read_validate_all_construction_files(
         config (dict): The pipeline configuration.
         check_file_exists (Callable): Function to check if file exists.
         read_csv (Callable): Function to read a csv file.
+        construction_logger (logging.Logger): The logger for the construction module.
         is_northern_ireland (bool, optional): If true, do construction
             on Northern Ireland data instead of GB data.
-        run_construction (bool, optional): If true, run the all data construction.
 
     Returns:
         pd.DataFrame: The construction dataframe.
@@ -52,11 +52,7 @@ def read_validate_all_construction_files(
         construction_file_path = paths["all_data_construction_file_path"]
         schema_path = "./config/all_data_construction_schema.toml"
 
-
-
-
     # Check the construction file exists and has records, then read it
-
     if not check_file_exists(construction_file_path):
         raise FileNotFoundError(
             f"Construction file not found at: {construction_file_path}"

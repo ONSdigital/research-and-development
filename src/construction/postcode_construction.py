@@ -14,7 +14,6 @@ from src.construction.construction_helpers import (
     finalise_forms_gb,
 )
 from src.construction.construction_validation import (
-    concat_construction_dfs,
     validate_short_to_long,
     validate_construction_references,
 )
