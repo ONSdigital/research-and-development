@@ -112,6 +112,6 @@ class TestValidateUltfocMapper(object):
             [24, "GB"],
         ]
         df = pd.DataFrame(data=data, columns=columns)
-        return df
-        result = validate_ultfoc_mapper(ultfoc_mapper_input_pass)
+
+        result = validate_ultfoc_mapper(df)
         assert result is None
