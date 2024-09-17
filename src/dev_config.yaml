@@ -201,7 +201,7 @@ breakdowns:
     - "headcount_oth_f"
 consistency_checks:
   2xx_totals:
-    purchases: ["222", "223", "203"]
+    purchases_split: ["222", "223", "203"]
     sal_oth_expend: ["202", "203", "204"]
     research_expend: ["205", "206", "207", "204"]
     capex: ["219", "220", "209", "210"]
@@ -221,7 +221,7 @@ consistency_checks:
     employment: ["emp_researcher", "emp_technician", "emp_other", "emp_total"]
     hc_male: ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"]
     hc_female: ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"]
-    hc_tot: ["heacount_tot_m", "headcount_tot_f", "headcount_tot"]
+    hc_tot: ["headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
 s3:
   ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
