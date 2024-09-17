@@ -25,6 +25,7 @@ def postcode_data_construction(
     Returns:
         pd.DataFrame: The snapshot data with the constructed values
     """
+    construction_logger.info("Running postcode construction")
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
 
@@ -45,5 +46,5 @@ def postcode_data_construction(
     ).reset_index(drop=True)
 
     construction_logger.info(f"Postcode construction edited {construction_df.shape[0]} rows.")
-
+    construction_logger.info("Finished postcode construction")
     return updated_snapshot_df

@@ -139,7 +139,7 @@ def run_pipeline(user_config_path, dev_config_path):
         ni_df = pd.DataFrame()
 
     # Construction module
-    MainLogger.info("Starting Construction...")
+    MainLogger.info("Starting Construction module...")
     run_all_data_construction = config["global"]["run_all_data_construction"]
     if run_all_data_construction:
         full_responses = run_construction(
@@ -149,7 +149,9 @@ def run_pipeline(user_config_path, dev_config_path):
             mods.rd_read_csv,
             is_run_all_data_construction=True,
         )
-    MainLogger.info("Finished Construction...")
+    else:
+        MainLogger.info("All data construction is not enabled")
+    MainLogger.info("Finished Construction module...")
 
     # Mapping module
     MainLogger.info("Starting Mapping...")
@@ -193,7 +195,7 @@ def run_pipeline(user_config_path, dev_config_path):
         postcode_mapper,
         itl_mapper,
         config,
-     )   
+     )
 
     # Outlier detection module
     MainLogger.info("Starting Outlier Detection...")
