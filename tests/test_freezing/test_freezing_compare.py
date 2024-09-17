@@ -101,7 +101,7 @@ class TestGetAmendments:
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result
-        ), "get_amendments() output is not as expected."
+        )
 
 
 class TestGetAdditions:
@@ -167,10 +167,10 @@ class TestGetAdditions:
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result.reset_index(drop=True)
-        ), "get_additions() output is not as expected."
+        )
 
 
-class TestCheckForSplitCases:
+class TestBringTogetherSplitCases:
     """Tests for bring_together_split_cases()."""
 
     def create_test_additions_df(self) -> pd.DataFrame:
@@ -237,11 +237,11 @@ class TestCheckForSplitCases:
         # Check the output
         assert_frame_equal(
             expected_additions_df, result_additions_df.reset_index(drop=True)
-        ), "bring_together_split_cases() additions output is not as expected."
+        )
 
         assert_frame_equal(
             expected_amendments_df, result_amendments_df.reset_index(drop=True)
-        ), "bring_together_split_cases() amendments output is not as expected."
+        )
 
 
 
