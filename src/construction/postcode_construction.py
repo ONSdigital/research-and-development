@@ -8,11 +8,12 @@ from src.outputs.outputs_helpers import create_period_year
 
 from src.construction.construction_helpers import replace_values_in_construction
 
+
 def postcode_data_construction(
     construction_df: pd.DataFrame,
     snapshot_df: pd.DataFrame,
-    construction_logger: logging.Logger
-    ) -> pd.DataFrame:
+    construction_logger: logging.Logger,
+) -> pd.DataFrame:
     """Run postcode construction on GB data.
     This process is different from the all data construction that happens
     before mapping.
@@ -39,12 +40,16 @@ def postcode_data_construction(
     # Add flags to indicate row was constructed
     construction_df["is_constructed"] = True
 
-    updated_snapshot_df, construction_df = replace_values_in_construction(updated_snapshot_df, construction_df)
+    updated_snapshot_df, construction_df = replace_values_in_construction(
+        updated_snapshot_df, construction_df
+    )
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    construction_logger.info(f"Postcode construction edited {construction_df.shape[0]} rows.")
+    construction_logger.info(
+        f"Postcode construction edited {construction_df.shape[0]} rows."
+    )
     construction_logger.info("Finished postcode construction")
     return updated_snapshot_df

@@ -24,8 +24,8 @@ def all_data_construction(
     construction_df: pd.DataFrame,
     snapshot_df: pd.DataFrame,
     construction_logger: logging.Logger,
-    is_northern_ireland: bool = False
-    ) -> pd.DataFrame:
+    is_northern_ireland: bool = False,
+) -> pd.DataFrame:
     """Run all data construction on the GB or NI data.
     This process is different from the postcode only construction that happens
     after imputation.
@@ -100,7 +100,9 @@ def all_data_construction(
                 updated_snapshot_df, construction_df
             )
 
-    updated_snapshot_df, construction_df = replace_values_in_construction(updated_snapshot_df, construction_df)
+    updated_snapshot_df, construction_df = replace_values_in_construction(
+        updated_snapshot_df, construction_df
+    )
 
     if "construction_type" in construction_df.columns:
         if "short_to_long" in construction_df["construction_type"].values:
@@ -119,9 +121,10 @@ def all_data_construction(
 
     # Check breakdowns
     if not is_northern_ireland:
-        updated_snapshot_df = run_breakdown_validation(updated_snapshot_df, check="constructed")
+        updated_snapshot_df = run_breakdown_validation(
+            updated_snapshot_df, check="constructed"
+        )
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
-

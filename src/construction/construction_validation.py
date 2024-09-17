@@ -109,18 +109,19 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
     df = df[df.construction_type == "short_to_long"]
 
     # Check if 'formtype' column exists
-    if 'formtype' not in df.columns:
+    if "formtype" not in df.columns:
         raise ValueError(
             "The 'formtype' column is missing, which is required for short to long "
             "construction."
-            )
+        )
 
     # Check if any row has missing 'formtype' value
-    missing_formtype = df[df.construction_type == 'short_to_long'][df.formtype.isnull()]
+    missing_formtype = df[df.construction_type == "short_to_long"][df.formtype.isnull()]
     if not missing_formtype.empty:
-        missing_refs = missing_formtype['reference'].unique()
+        missing_refs = missing_formtype["reference"].unique()
         raise ValueError(
-            f"'formtype' missing for short to long construction: ref {missing_refs}")
+            f"'formtype' missing for short to long construction: ref {missing_refs}"
+        )
 
     if len(df) == 0:
         return None

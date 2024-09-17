@@ -5,7 +5,10 @@ from typing import Callable
 import pandas as pd
 import numpy as np
 
-from src.construction.construction_read_validate import read_validate_all_construction_files, read_validate_postcode_construction_file
+from src.construction.construction_read_validate import (
+    read_validate_all_construction_files,
+    read_validate_postcode_construction_file,
+)
 from src.construction.all_data_construction import all_data_construction
 from src.construction.postcode_construction import postcode_data_construction
 
@@ -52,20 +55,36 @@ def run_construction(  # noqa: C901
     if is_northern_ireland:
         run_construction = config["global"]["run_ni_construction"]
         run_postcode_construction = False
-        df = read_validate_all_construction_files(config, check_file_exists, read_csv,construction_logger, is_northern_ireland = True)
-        updated_snapshot_df = all_data_construction(df, snapshot_df,construction_logger, is_northern_ireland = True)
+        df = read_validate_all_construction_files(
+            config,
+            check_file_exists,
+            read_csv,
+            construction_logger,
+            is_northern_ireland=True,
+        )
+        updated_snapshot_df = all_data_construction(
+            df, snapshot_df, construction_logger, is_northern_ireland=True
+        )
 
     elif is_run_all_data_construction:
         run_construction = config["global"]["run_all_data_construction"]
         run_postcode_construction = False
-        df = read_validate_all_construction_files(config, check_file_exists, read_csv, construction_logger)
-        updated_snapshot_df = all_data_construction(df, snapshot_df, construction_logger)
+        df = read_validate_all_construction_files(
+            config, check_file_exists, read_csv, construction_logger
+        )
+        updated_snapshot_df = all_data_construction(
+            df, snapshot_df, construction_logger
+        )
 
     elif is_run_postcode_construction:
         run_postcode_construction = config["global"]["run_postcode_construction"]
         run_construction = False
-        df = read_validate_postcode_construction_file(config, check_file_exists, read_csv, construction_logger)
-        updated_snapshot_df = postcode_data_construction(df, snapshot_df, construction_logger)
+        df = read_validate_postcode_construction_file(
+            config, check_file_exists, read_csv, construction_logger
+        )
+        updated_snapshot_df = postcode_data_construction(
+            df, snapshot_df, construction_logger
+        )
 
     # Skip this module if not needed
     if not run_construction and not run_postcode_construction:

@@ -80,10 +80,7 @@ def read_validate_all_construction_files(
 
 
 def read_validate_postcode_construction_file(
-    config: dict,
-    check_file_exists: Callable,
-    read_csv: Callable,
-    construction_logger
+    config: dict, check_file_exists: Callable, read_csv: Callable, construction_logger
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read and validate construction files for the construction module.
 
