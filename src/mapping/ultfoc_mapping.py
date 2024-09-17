@@ -82,7 +82,7 @@ def join_fgn_ownership(
         # Put all references in the single column, with no prefix
         report = ""
         for ref in unmapped_list:
-            report += "\n + str(ref)"
+            report += "\n" + str(ref)
 
         MappingLogger.info(f"The following references were unmapped:{report}")
 

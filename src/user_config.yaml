@@ -113,7 +113,7 @@ s3_paths:
   mappers_version: "v1"
   postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
-  ultfoc_mapper_path: "BERD_2023_ultfoc_negative.csv"
+  ultfoc_mapper_path: "BERD_2023_ultfoc.csv"
   ref_list_817_mapper_path: "BERD_2023_ref_list.csv"
   cellno_path: 'BERD_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
