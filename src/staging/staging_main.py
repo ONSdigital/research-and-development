@@ -163,11 +163,7 @@ def run_staging(  # noqa: C901
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
-        wanted_cols = ["reference", "manual_outlier"]
-        manual_outliers = rd_read_csv(manual_path, wanted_cols)
-        manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
-            False
-        )
+        manual_outliers = rd_read_csv(manual_path)
         manual_outliers = manual_outliers.drop_duplicates(
             subset=["reference"], keep="first"
         )

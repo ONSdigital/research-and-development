@@ -231,9 +231,6 @@ def run_auto_flagging(
     # flags is True
     df = decide_outliers(df, flag_value_cols)
 
-    # Create empty column for user to edit
-    df["manual_outlier"] = np.nan
-
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()
 
