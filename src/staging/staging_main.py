@@ -184,7 +184,10 @@ def run_staging(  # noqa: C901
     # Get the latest manual trim file
     manual_trim_path = staging_dict["manual_imp_trim_path"]
 
-    if config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path):
+    if (
+        config["global"]["load_manual_imputation"] and
+        rd_file_exists(manual_trim_path)
+    ):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
         manual_trim_df = rd_read_csv(manual_trim_path, wanted_cols)

@@ -84,7 +84,7 @@ def run_mapping(
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
-    # For survey year only 2022 ait's necessary to update the reference list
+    # For survey year only 2022 it's necessary to update the reference list
     year = config["years"]["survey_year"]
     if year == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
