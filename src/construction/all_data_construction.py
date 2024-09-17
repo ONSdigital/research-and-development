@@ -12,6 +12,7 @@ from src.construction.construction_helpers import (
     add_constructed_nonresponders,
     remove_short_to_long_0,
     finalise_forms_gb,
+    replace_values_in_construction,
 )
 from src.construction.construction_validation import (
     validate_short_to_long,
@@ -33,7 +34,8 @@ def all_data_construction(
         construction_df (pd.DataFrame): The construction data
         snapshot_df (pd.DataFrame): The snapshot data
         construction_logger (logging.Logger): The logger for the construction
-        is_northern_ireland (bool, optional): Whether the data is for Northern Ireland. Defaults to False.
+        is_northern_ireland (bool, optional): Whether the data is for Northern Ireland.
+            Defaults to False.
 
     Returns:
         pd.DataFrame: The snapshot data with the constructed values
@@ -98,29 +100,7 @@ def all_data_construction(
                 updated_snapshot_df, construction_df
             )
 
-    # Update the values with the constructed ones
-    construction_df.set_index(
-        [
-            "reference",
-            "instance",
-            "period_year",
-        ],
-        inplace=True,
-    )
-    updated_snapshot_df.set_index(
-        [
-            "reference",
-            "instance",
-            "period_year",
-        ],
-        inplace=True,
-    )
-    updated_snapshot_df.update(construction_df)
-    updated_snapshot_df.reset_index(inplace=True)
-
-    updated_snapshot_df = updated_snapshot_df.astype(
-        {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
-    )
+    updated_snapshot_df, construction_df = replace_values_in_construction(updated_snapshot_df, construction_df)
 
     if "construction_type" in construction_df.columns:
         if "short_to_long" in construction_df["construction_type"].values:

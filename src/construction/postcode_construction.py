@@ -6,17 +6,7 @@ import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
 
-from src.construction.construction_helpers import (
-    prepare_forms_gb,
-    clean_construction_type,
-    add_constructed_nonresponders,
-    remove_short_to_long_0,
-    finalise_forms_gb,
-)
-from src.construction.construction_validation import (
-    validate_short_to_long,
-    validate_construction_references,
-)
+from src.construction.construction_helpers import replace_values_in_construction
 
 def postcode_data_construction(
     construction_df: pd.DataFrame,
@@ -48,34 +38,12 @@ def postcode_data_construction(
     # Add flags to indicate row was constructed
     construction_df["is_constructed"] = True
 
-    # Update the values with the constructed ones
-    construction_df.set_index(
-        [
-            "reference",
-            "instance",
-            "period_year",
-        ],
-        inplace=True,
-    )
-    updated_snapshot_df.set_index(
-        [
-            "reference",
-            "instance",
-            "period_year",
-        ],
-        inplace=True,
-    )
-    updated_snapshot_df.update(construction_df)
-    updated_snapshot_df.reset_index(inplace=True)
-
-    updated_snapshot_df = updated_snapshot_df.astype(
-        {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
-    )
+    updated_snapshot_df, construction_df = replace_values_in_construction(updated_snapshot_df, construction_df)
 
     updated_snapshot_df = updated_snapshot_df.sort_values(
         ["reference", "instance"], ascending=[True, True]
     ).reset_index(drop=True)
 
-    construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
+    construction_logger.info(f"Postcode construction edited {construction_df.shape[0]} rows.")
 
     return updated_snapshot_df
