@@ -83,7 +83,9 @@ def prepare_forms_gb(
 def prepare_short_to_long(updated_snapshot_df, construction_df):
     """Create addional instances for short to long construction"""
 
-    construction_df.loc[construction_df["construction_type"] == "short_to_long", "604"] = "Yes"
+    construction_df.loc[
+        construction_df["construction_type"] == "short_to_long", "604"
+    ] = "Yes"
 
     # Check which references are going to be converted to long forms
     # and how many instances they have
@@ -233,9 +235,8 @@ def remove_short_to_long_0(
 
 
 def prep_new_rows(
-        rows_to_add: pd.DataFrame, 
-        updated_snapshot_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    rows_to_add: pd.DataFrame, updated_snapshot_df: pd.DataFrame
+) -> pd.DataFrame:
     """Prepare new rows from construction to be added to the snapshot.
 
     Args:
@@ -246,22 +247,24 @@ def prep_new_rows(
         ValueError: Raised if there are rows with missing formtype/cellnumber.
 
     Returns:
-        pd.DataFrame: The new rows (from construction) containing formtype and 
+        pd.DataFrame: The new rows (from construction) containing formtype and
             cellnumber.
     """
     # iterate through new rows and add formtype/cellnumber from snapshot
     for index, row in rows_to_add.iterrows():
-        if pd.isna(row['formtype']) or pd.isna(row['cellnumber']):
-            reference = row['reference']
-            snapshot_row = updated_snapshot_df[updated_snapshot_df['reference'] == reference].iloc[0]
-            if pd.isna(row['formtype']):
-                rows_to_add.at[index, 'formtype'] = snapshot_row['formtype']
-            if pd.isna(row['cellnumber']):
-                rows_to_add.at[index, 'cellnumber'] = snapshot_row['cellnumber']
+        if pd.isna(row["formtype"]) or pd.isna(row["cellnumber"]):
+            reference = row["reference"]
+            snapshot_row = updated_snapshot_df[
+                updated_snapshot_df["reference"] == reference
+            ].iloc[0]
+            if pd.isna(row["formtype"]):
+                rows_to_add.at[index, "formtype"] = snapshot_row["formtype"]
+            if pd.isna(row["cellnumber"]):
+                rows_to_add.at[index, "cellnumber"] = snapshot_row["cellnumber"]
     # obtain references with missing formtype/cellnumber
     missing_references = rows_to_add[
-        rows_to_add['formtype'].isna() | rows_to_add['cellnumber'].isna()
-    ]['reference']
+        rows_to_add["formtype"].isna() | rows_to_add["cellnumber"].isna()
+    ]["reference"]
     if not missing_references.empty:
         raise ValueError(
             "Missing formtype and/or cellnumber for new reference in construction: "
@@ -269,3 +272,43 @@ def prep_new_rows(
         )
 
     return rows_to_add
+
+
+def replace_values_in_construction(
+    updated_snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """Replace values in the snapshot dataframe with those in the construction dataframe.
+
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot dataframe.
+        construction_df (pd.DataFrame): The construction dataframe.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: The updated snapshot dataframe and the
+            modified construction dataframe.
+    """
+    # Update the values with the constructed ones
+    construction_df.set_index(
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
+    )
+    updated_snapshot_df.set_index(
+        [
+            "reference",
+            "instance",
+            "period_year",
+        ],
+        inplace=True,
+    )
+    updated_snapshot_df.update(construction_df)
+    updated_snapshot_df.reset_index(inplace=True)
+
+    updated_snapshot_df = updated_snapshot_df.astype(
+        {"reference": "Int64", "instance": "Int64", "period_year": "Int64"}
+    )
+
+    return updated_snapshot_df, construction_df
