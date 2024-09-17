@@ -38,7 +38,7 @@ def run_mapping(
         run_id (int): Unique identifier for the run.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland 
+        Tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland
             full responses dataframes with the mappers added.
     """
     # Load ultfoc (Foreign Ownership) mapper
@@ -84,9 +84,9 @@ def run_mapping(
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
 
-    # For survey year 2022 and 2023 it's necessary to update the reference list
-    # TODO: include in the config the ability to decide for future years about ref list
-    if config["years"]["survey_year"] in [2022, 2023]:
+    # For survey year only 2022 it's necessary to update the reference list
+    year = config["years"]["survey_year"]
+    if year == 2022:
         ref_list_817_mapper = stage_hlp.load_validate_mapper(
             "ref_list_817_mapper_path",
             config,
@@ -95,6 +95,8 @@ def run_mapping(
             rd_read_csv,
         )
         full_responses = hlp.update_ref_list(full_responses, ref_list_817_mapper)
+    else:
+        MappingMainLogger.info(f"Reference list not updated for survey year {year}.")
 
     # create a tuple for the full_responses and ni_full_responses
     responses = (full_responses, ni_full_responses)
@@ -107,7 +109,9 @@ def run_mapping(
     full_responses, ni_full_responses = responses
 
     # Join the ITL regions mapper to the BERD full_responses dataframe
-    full_responses = join_itl_regions(full_responses, postcode_mapper, itl_mapper, config)
+    full_responses = join_itl_regions(
+        full_responses, postcode_mapper, itl_mapper, config
+    )
 
     # Process the NI full responses if they exist
     if not ni_full_responses.empty:
