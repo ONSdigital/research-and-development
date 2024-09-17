@@ -13,7 +13,8 @@ class TestManualOutliers:
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
             "auto_outlier": [False, False, True],
-            "manual_outlier": [True, np.nan, False],
+            "manual_outlier": [True, np.nan, np.nan],
+            "auto_override_outlier_status": [np.nan, np.nan, False],
         }
 
         input_data = pd.DataFrame(data)
@@ -25,7 +26,8 @@ class TestManualOutliers:
             "reference": [1, 2, 3],
             "instance": [0, 0, 0],
             "auto_outlier": [False, False, True],
-            "manual_outlier": [True, np.nan, False],
+            "manual_outlier": [True, np.nan, np.nan],
+            "auto_override_outlier_status": [np.nan, np.nan, False],
             "outlier": [True, False, False],
         }
 

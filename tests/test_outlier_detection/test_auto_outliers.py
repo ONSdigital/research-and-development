@@ -1042,7 +1042,6 @@ class TestOneValueOutlier:
             "703_outlier_flag",
             "704_outlier_flag",
             "auto_outlier",
-            "manual_outlier",
         ]
 
         data = [
@@ -1063,7 +1062,6 @@ class TestOneValueOutlier:
                 False,
                 True,
                 True,
-                np.nan,
             ],
             [
                 2,
@@ -1082,7 +1080,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 True,
-                np.nan,
             ],
             [
                 3,
@@ -1101,7 +1098,6 @@ class TestOneValueOutlier:
                 False,
                 True,
                 True,
-                np.nan,
             ],
             [
                 4,
@@ -1120,7 +1116,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 True,
-                np.nan,
             ],
             [
                 5,
@@ -1139,7 +1134,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 False,
-                np.nan,
             ],
             [
                 6,
@@ -1158,7 +1152,6 @@ class TestOneValueOutlier:
                 True,
                 False,
                 True,
-                np.nan,
             ],
             [
                 7,
@@ -1177,7 +1170,6 @@ class TestOneValueOutlier:
                 True,
                 False,
                 True,
-                np.nan,
             ],
             [
                 8,
@@ -1196,7 +1188,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 True,
-                np.nan,
             ],
             [
                 9,
@@ -1215,7 +1206,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 False,
-                np.nan,
             ],
             [
                 10,
@@ -1234,7 +1224,6 @@ class TestOneValueOutlier:
                 False,
                 False,
                 True,
-                np.nan,
             ],
         ]
 

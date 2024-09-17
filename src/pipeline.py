@@ -96,7 +96,6 @@ def run_pipeline(user_config_path, dev_config_path):
         postcode_mapper,
         backdata,
         pg_detailed,
-        itl1_detailed,
         civil_defence_detailed,
         sic_division_detailed,
         manual_trimming_df,
@@ -187,7 +186,7 @@ def run_pipeline(user_config_path, dev_config_path):
             config,
             mods.rd_file_exists,
             mods.rd_read_csv,
-            is_run_postcode_construction = True,
+            is_run_postcode_construction=True,
         )
 
     imputed_df = validate_updated_postcodes(
