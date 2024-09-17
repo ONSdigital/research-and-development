@@ -172,11 +172,7 @@ def run_staging(  # noqa: C901
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
-        wanted_cols = ["reference", "manual_outlier"]
-        manual_outliers = rd_read_csv(manual_path, wanted_cols)
-        manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
-            False
-        )
+        manual_outliers = rd_read_csv(manual_path)
         manual_outliers = manual_outliers.drop_duplicates(
             subset=["reference"], keep="first"
         )
@@ -215,15 +211,6 @@ def run_staging(  # noqa: C901
     val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
 
     StagingMainLogger.info("Backdata File Loaded Successfully...")
-
-    # Loading ITL1 detailed mapper
-    itl1_detailed_mapper = helpers.load_validate_mapper(
-        "itl1_detailed_mapper_path",
-        config,
-        StagingMainLogger,
-        rd_file_exists,
-        rd_read_csv,
-    )
 
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
@@ -290,7 +277,6 @@ def run_staging(  # noqa: C901
         postcode_mapper,
         backdata,
         pg_detailed_mapper,
-        itl1_detailed_mapper,
         civil_defence_detailed_mapper,
         sic_division_detailed_mapper,
         manual_trim_df,

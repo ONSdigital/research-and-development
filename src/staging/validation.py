@@ -104,8 +104,7 @@ def check_data_shape(
     return cols_match
 
 
-@time_logger_wrap  # noqa: C901
-def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
+def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):  # noqa: C901
     """Takes the schema from the toml file and validates the survey data df.
 
     Args:

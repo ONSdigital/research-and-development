@@ -236,6 +236,7 @@ def create_exports_config(config: dict) -> dict:
 def validate_mapping_filenames(config: dict) -> dict:
     year = str(config["years"]["survey_year"])
     year_mapper_dict = config[f"{year}_mappers"]
+    version = year_mapper_dict["mappers_version"]
     bool_dict = {}
     msg = ""
 
@@ -247,14 +248,14 @@ def validate_mapping_filenames(config: dict) -> dict:
             msg += f"{key} is empty."
 
         # check filename is correct
-        if value != "v1":
+        if value != version:
             file_type = ".csv"
             if file_type not in value:
                 bool_dict[key] = False
                 msg += f"The file: {value} is not a {file_type} file type."
 
         # check year is correct
-        if value != "v1":
+        if value != version:
             if year not in value:
                 bool_dict[key] = False
                 msg += f"{year} is not included in {key}."
