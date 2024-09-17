@@ -193,7 +193,9 @@ def run_construction(  # noqa: C901
 
     # Check breakdowns
     if run_construction:
-        updated_snapshot_df = run_breakdown_validation(updated_snapshot_df, check="constructed")
+        updated_snapshot_df = run_breakdown_validation(
+            updated_snapshot_df, config, check="constructed"
+        )
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")
 
