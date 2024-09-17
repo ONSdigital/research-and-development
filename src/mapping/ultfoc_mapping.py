@@ -70,7 +70,7 @@ def join_fgn_ownership(
 
     # Keep the unique references only
     unmapped_refs = unmapped_gb_df[["reference"]].drop_duplicates()
-    
+
     # Calculate the number of unmapped references
     num_unmapped = unmapped_refs.shape[0]
 
@@ -82,17 +82,17 @@ def join_fgn_ownership(
         # Put all references in the single column, with no prefix
         report = ""
         for ref in unmapped_list:
-            report += "\n + str(ref)
-        
+            report += "\n + str(ref)"
+
         MappingLogger.info(f"The following references were unmapped:{report}")
-        
+
         # If there were unmapped ultfoc values, give them GB
         MappingLogger.info("Filling in the unmapped ultfoc with GB")
         mapped_gb_df["ultfoc"] = mapped_gb_df["ultfoc"].fillna("GB")
         mapped_gb_df["ultfoc"] = mapped_gb_df["ultfoc"].replace("", "GB")
     else:
         # If there are no unmapped ultfoc, just report success
-        MappingLogger.info(f"All references are mapped to ultfoc.")
+        MappingLogger.info("All references are mapped to ultfoc.")
 
     MappingLogger.info("Mapping and validation of ultfoc successfully completed.")
     return mapped_gb_df, mapped_ni_df
