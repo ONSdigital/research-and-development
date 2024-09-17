@@ -21,7 +21,11 @@ def apply_manual_outliers(df: pd.DataFrame) -> pd.DataFrame:
     msg = f"Manual outlier flags have been identified for {num_manual_flagged} records."  # noqa
 
     # Overwriting auto-outliers with manual outliers
-    df["outlier"] = df["manual_outlier"].combine_first(df["auto_override_outlier_status"]).combine_first(df["auto_outlier"])
+    df["outlier"] = (
+        df["manual_outlier"]
+        .combine_first(df["auto_override_outlier_status"])
+        .combine_first(df["auto_outlier"])
+    )
 
     # Log the number of manually applied True flags (only count for instance 0)
 

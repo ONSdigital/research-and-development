@@ -73,7 +73,9 @@ def run_outliers(
     # continue to run, we set the manual file to be equal to the auto output and filter
     # the relevant columns. This way we don't filter out any manual outliers.
     if not config["global"]["load_manual_outliers"]:
-        df_manual_supplied = pd.DataFrame(columns=["reference", "manual_outlier", "auto_override_outlier_status"])
+        df_manual_supplied = pd.DataFrame(
+            columns=["reference", "manual_outlier", "auto_override_outlier_status"]
+        )
         OutlierMainLogger.info(
             "Skipping loading of manual outliers. manual_outlier column treated as NaN"
         )

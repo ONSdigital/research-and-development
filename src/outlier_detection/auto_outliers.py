@@ -35,7 +35,6 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
         raise ImportError
 
     if not isinstance(flag_value_cols, list):
-
         AutoOutlierLogger.error(
             "In config, flag_value_cols must be specified as a list."
         )
