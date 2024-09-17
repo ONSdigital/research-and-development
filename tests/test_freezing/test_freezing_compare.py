@@ -1,10 +1,11 @@
 """Tests for freezing_compare.py."""
 
 import pandas as pd
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 import logging
 
 from src.freezing.freezing_compare import get_amendments, get_additions
+from src.freezing.freezing_compare import bring_together_split_cases
 
 # create a test logger to pass to functions
 test_logger = logging.getLogger(__name__)
@@ -100,7 +101,7 @@ class TestGetAmendments:
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result
-        ), "get_amendments() output is not as expected."
+        )
 
 
 class TestGetAdditions:
@@ -166,4 +167,81 @@ class TestGetAdditions:
         # Check the output
         assert_frame_equal(
             expected_outcome_df, result.reset_index(drop=True)
-        ), "get_additions() output is not as expected."
+        )
+
+
+class TestBringTogetherSplitCases:
+    """Tests for bring_together_split_cases()."""
+
+    def create_test_additions_df(self) -> pd.DataFrame:
+        """Create a test additions df."""
+        input_cols = ["reference", "period", "instance", "other"]
+        data = [
+            ["A", 202412, 2.0, 1.0],
+            ["B", 202412, None, None],
+            ["C", 202412, 0.0, 1.0],
+            ["D", 202412, 1.0, 2.0],
+            ["E", 202412, None, 4.0],
+        ]
+        input_additions_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_additions_df
+
+    def create_test_amendments_df(self) -> pd.DataFrame:
+        """Create a test amendments df."""
+        input_cols = ["reference", "period", "instance", "other"]
+        data = [
+            ["C", 202412, 0.0, 1.0],
+            ["D", 202412, 1.0, 2.0],
+            ["F", 202412, None, 4.0],
+        ]
+        input_amendments_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_amendments_df
+
+    def create_expected_additions_df(self) -> pd.DataFrame:
+        """Create the expected additions df after split cases are handled."""
+        input_cols = ["reference", "period", "instance", "other"]
+        data = [
+            ["A", 202412, 2.0, 1.0],
+            ["B", 202412, None, None],
+            ["E", 202412, None, 4.0],
+        ]
+        expected_additions_df = pd.DataFrame(data=data, columns=input_cols)
+        return expected_additions_df
+
+    def create_expected_amendments_df(self) -> pd.DataFrame:
+        """Create the expected amendments df after split cases are handled."""
+        input_cols = ["reference", "period", "instance", "other"]
+        data = [
+            ["C", 202412, 0.0, 1.0],
+            ["D", 202412, 1.0, 2.0],
+            ["F", 202412, None, 4.0],
+            ["C", 202412, 0.0, 1.0],
+            ["D", 202412, 1.0, 2.0],
+        ]
+        expected_amendments_df = pd.DataFrame(data=data, columns=input_cols)
+        return expected_amendments_df
+
+    def test_bring_together_split_cases(self):
+        """Test for bring_together_split_cases()."""
+        # Create test dataframes
+        input_additions_df = self.create_test_additions_df()
+        input_amendments_df = self.create_test_amendments_df()
+        expected_additions_df = self.create_expected_additions_df()
+        expected_amendments_df = self.create_expected_amendments_df()
+
+        # Run the function
+        result_additions_df, result_amendments_df = bring_together_split_cases(
+            input_additions_df, input_amendments_df, test_logger
+        )
+
+        # Check the output
+        assert_frame_equal(
+            expected_additions_df, result_additions_df.reset_index(drop=True)
+        )
+
+        assert_frame_equal(
+            expected_amendments_df, result_amendments_df.reset_index(drop=True)
+        )
+
+
+
