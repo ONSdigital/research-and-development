@@ -47,7 +47,6 @@ def read_validate_all_construction_files(
     if is_northern_ireland:
         construction_file_path = paths["construction_file_path_ni"]
         schema_path = "./config/construction_ni_schema.toml"
-        run_postcode_construction = False
     else:
         construction_file_path = paths["all_data_construction_file_path"]
         schema_path = "./config/all_data_construction_schema.toml"
@@ -129,6 +128,5 @@ def read_validate_postcode_construction_file(
         logger=construction_logger,
         _raise=True,
     )
-    pc_construction_df["force_imputation"] = True
 
     return pc_construction_df
