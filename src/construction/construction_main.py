@@ -3,7 +3,6 @@ import logging
 from typing import Callable
 
 import pandas as pd
-import numpy as np
 
 from src.construction.construction_read_validate import (
     read_validate_all_construction_files,
@@ -63,7 +62,7 @@ def run_construction(  # noqa: C901
             is_northern_ireland=True,
         )
         updated_snapshot_df = all_data_construction(
-            df, snapshot_df, construction_logger, is_northern_ireland=True
+            df, snapshot_df, construction_logger, config, is_northern_ireland=True
         )
 
     elif is_run_all_data_construction:
@@ -73,7 +72,7 @@ def run_construction(  # noqa: C901
             config, check_file_exists, read_csv, construction_logger
         )
         updated_snapshot_df = all_data_construction(
-            df, snapshot_df, construction_logger
+            df, snapshot_df, construction_logger, config
         )
 
     elif is_run_postcode_construction:

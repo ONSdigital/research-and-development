@@ -24,6 +24,7 @@ def all_data_construction(
     construction_df: pd.DataFrame,
     snapshot_df: pd.DataFrame,
     construction_logger: logging.Logger,
+    config: dict,
     is_northern_ireland: bool = False,
 ) -> pd.DataFrame:
     """Run all data construction on the GB or NI data.
@@ -122,7 +123,7 @@ def all_data_construction(
     # Check breakdowns
     if not is_northern_ireland:
         updated_snapshot_df = run_breakdown_validation(
-            updated_snapshot_df, check="constructed"
+            updated_snapshot_df, config, check="constructed"
         )
 
     construction_logger.info(f"Construction edited {construction_df.shape[0]} rows.")

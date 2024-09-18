@@ -199,6 +199,30 @@ breakdowns:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
+consistency_checks:
+  2xx_totals:
+    purchases_split: ["222", "223", "203"]
+    sal_oth_expend: ["202", "203", "204"]
+    research_expend: ["205", "206", "207", "204"]
+    capex: ["219", "220", "209", "210"]
+    intram: ["204", "210", "211"]
+    funding: ['212', '214', '216', '242', '250', '243', '244', '245', '246', '247', '248', '249', '218']
+    ownership: ['225', '226', '227', '228', '229', '237', '218']
+    equality: ['211', '218']
+  3xx_totals:
+    purchases: ['302', '303', '304', '305']
+  4xx_totals:
+    emp_civil: ['405', '407', '409', '411']
+    emp_defence: ['406', '408', '410', '412']
+  5xx_totals:
+    hc_res_m: ['501', '503', '505', '507']
+    hc_res_f: ['502', '504', '506', '508']
+  apportioned_totals:
+    employment: ["emp_researcher", "emp_technician", "emp_other", "emp_total"]
+    hc_male: ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"]
+    hc_female: ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"]
+    hc_tot: ["headcount_tot_m", "headcount_tot_f", "headcount_total"]
+
 s3:
   ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
   s3_bucket: "onscdp-dev-data01-5320d6ca"

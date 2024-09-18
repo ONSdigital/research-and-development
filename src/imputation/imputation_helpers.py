@@ -279,11 +279,11 @@ def split_df_on_imp_class(df: pd.DataFrame, exclusion_list: List = ["817", "nan"
     (Product Group)- these will generally be filtered out from the imputation classes.
 
     Where short forms are under consideration, "817" imputation classes will be excluded
-    
+
     Args:
         df (pd.DataFrame): The dataframe to split
-        exclusion_list (List, optional): A list of imputation classes to exclude. 
-    
+        exclusion_list (List, optional): A list of imputation classes to exclude.
+
     Returns:
         pd.DataFrame: The filtered dataframe with the invalid imp classes removed
         pd.DataFrame: The excluded dataframe
@@ -363,9 +363,22 @@ def calculate_totals(df):
     return df
 
 
+def breakdown_checks_after_imputation(df: pd.DataFrame) -> None:
+    """After imputation check required columns still sum correctly.
+
+    Args:
+        df (pd.DataFrame): The dataframe with imputed values.
+
+    Returns:
+        None
+    """
+    # create dictionary of checks: the last col in the list is the total col
+    # the sum of the other cols should equal the total
+
+
 def tidy_imputation_dataframe(df: pd.DataFrame, to_impute_cols: List) -> pd.DataFrame:
     """Update cols with imputed values and remove rows and columns no longer needed.
-    
+
     Args:
         df (pd.DataFrame): The dataframe with imputed values.
         to_impute_cols (List): The columns that were imputed.
