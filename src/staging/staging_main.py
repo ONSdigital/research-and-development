@@ -10,6 +10,8 @@ import pandas as pd
 import src.staging.staging_helpers as helpers
 from src.staging import validation as val
 
+# from src.utils.breakdown_validation import run_breakdown_validation
+
 StagingMainLogger = logging.getLogger(__name__)
 
 
@@ -95,8 +97,8 @@ def run_staging(  # noqa: C901
             # Load data from first feather file found
             StagingMainLogger.info("Skipping data validation. Loading from feather")
             full_responses = helpers.load_snapshot_feather(
-                feather_file,
-                rd_read_feather)
+                feather_file, rd_read_feather
+            )
 
             # Read in postcode mapper (needed later in the pipeline)
             postcode_mapper = config["mapping_paths"]["postcode_mapper"]
@@ -112,7 +114,9 @@ def run_staging(  # noqa: C901
 
             rd_file_exists(snapshot_path, raise_error=True)
             full_responses, response_rate = helpers.load_val_snapshot_json(
-                snapshot_path, rd_load_json, config,
+                snapshot_path,
+                rd_load_json,
+                config,
             )
 
             StagingMainLogger.info(
@@ -158,16 +162,18 @@ def run_staging(  # noqa: C901
         rd_file_exists(postcode_mapper, raise_error=True)
         postcode_mapper = rd_read_csv(postcode_mapper)
 
+    # Staging of the main snapshot data is now complete
+    StagingMainLogger.info("Staging of main snapshot data complete.")
+    # run validation on the breakdowns
+    # run_breakdown_validation(full_responses, config, "staged")
+
+    # Staging of the additional data
     if config["global"]["load_manual_outliers"]:
         # Stage the manual outliers file
         StagingMainLogger.info("Loading Manual Outlier File")
         manual_path = staging_dict["manual_outliers_path"]
         rd_file_exists(manual_path, raise_error=True)
-        wanted_cols = ["reference", "manual_outlier"]
-        manual_outliers = rd_read_csv(manual_path, wanted_cols)
-        manual_outliers["manual_outlier"] = manual_outliers["manual_outlier"].fillna(
-            False
-        )
+        manual_outliers = rd_read_csv(manual_path)
         manual_outliers = manual_outliers.drop_duplicates(
             subset=["reference"], keep="first"
         )
@@ -182,9 +188,7 @@ def run_staging(  # noqa: C901
     # Get the latest manual trim file
     manual_trim_path = staging_dict["manual_imp_trim_path"]
 
-    if (
-        config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path)
-    ):
+    if config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
         wanted_cols = ["reference", "instance", "manual_trim"]
         manual_trim_df = rd_read_csv(manual_trim_path, wanted_cols)
@@ -209,15 +213,6 @@ def run_staging(  # noqa: C901
 
     StagingMainLogger.info("Backdata File Loaded Successfully...")
 
-    # Loading ITL1 detailed mapper
-    itl1_detailed_mapper = helpers.load_validate_mapper(
-        "itl1_detailed_mapper_path",
-        config,
-        StagingMainLogger,
-        rd_file_exists,
-        rd_read_csv,
-    )
-
     # Loading Civil or Defence detailed mapper
     civil_defence_detailed_mapper = helpers.load_validate_mapper(
         "civil_defence_detailed_mapper_path",
@@ -241,7 +236,7 @@ def run_staging(  # noqa: C901
         config,
         StagingMainLogger,
         rd_file_exists,
-        rd_read_csv
+        rd_read_csv,
     )
 
     # seaparate PNP data from full_responses (BERD data)
@@ -283,7 +278,6 @@ def run_staging(  # noqa: C901
         postcode_mapper,
         backdata,
         pg_detailed_mapper,
-        itl1_detailed_mapper,
         civil_defence_detailed_mapper,
         sic_division_detailed_mapper,
         manual_trim_df,

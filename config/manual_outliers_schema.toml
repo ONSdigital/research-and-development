@@ -11,7 +11,17 @@ Possible_Categorical_Values = ["nan"]
 [manual_outlier]
 Description = "nan"
 Deduced_Data_Type = "boolean"
-Nullable = false
+Nullable = true
+Current_Data_Type = "str"
+Length = "nan"
+Min_values = "nan"
+Max_values = "nan"
+Possible_Categorical_Values = [true, false]
+
+[auto_override_outlier_status]
+Description = "nan"
+Deduced_Data_Type = "boolean"
+Nullable = true
 Current_Data_Type = "str"
 Length = "nan"
 Min_values = "nan"

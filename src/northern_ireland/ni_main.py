@@ -41,16 +41,19 @@ def run_ni(
         run_id,
     )
 
-    NIModuleLogger.info("Running NI construction")
-    ni_df = run_construction(
-        ni_full_responses_df,
-        config,
-        check_file_exists,
-        read_csv,
-        is_northern_ireland=True,
-    )
+    if config["global"]["run_ni_construction"]:
+        NIModuleLogger.info("Running NI construction")
+        ni_full_responses_df = run_construction(
+            ni_full_responses_df,
+            config,
+            check_file_exists,
+            read_csv,
+            is_northern_ireland=True,
+        )
+    else:
+        NIModuleLogger.info("NI construction is not enabled")
 
     NIModuleLogger.info("Running NI headcount and fte")
-    full_ni_df = run_ni_headcount_fte(ni_df)
+    full_ni_df = run_ni_headcount_fte(ni_full_responses_df)
 
     return full_ni_df

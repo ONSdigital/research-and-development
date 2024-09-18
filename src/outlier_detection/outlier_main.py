@@ -62,7 +62,7 @@ def run_outliers(
     if config["global"]["output_auto_outliers"]:
         OutlierMainLogger.info("Starting the output of the automatic outliers file")
         file_path = (
-            auto_outlier_path + f"/{survey_year}_manual_outlier_{tdate}_v{run_id}.csv"
+            auto_outlier_path + f"/{survey_year}_auto_outlier_{tdate}_v{run_id}.csv"
         )
         write_csv(file_path, filtered_df)
         OutlierMainLogger.info("Finished writing CSV to %s", auto_outlier_path)
@@ -73,14 +73,15 @@ def run_outliers(
     # continue to run, we set the manual file to be equal to the auto output and filter
     # the relevant columns. This way we don't filter out any manual outliers.
     if not config["global"]["load_manual_outliers"]:
-        df_manual_supplied = filtered_df[["reference", "manual_outlier"]]
+        df_manual_supplied = pd.DataFrame(
+            columns=["reference", "manual_outlier", "auto_override_outlier_status"]
+        )
         OutlierMainLogger.info(
             "Skipping loading of manual outliers. manual_outlier column treated as NaN"
         )
 
     # update outlier flag column with manual outliers
     OutlierMainLogger.info("Starting Manual Outlier Application")
-    df_auto_flagged = df_auto_flagged.drop(["manual_outlier"], axis=1)
     outlier_df = df_auto_flagged.merge(df_manual_supplied, on=["reference"], how="left")
     flagged_outlier_df = manual.apply_manual_outliers(outlier_df)
     OutlierMainLogger.info("Finished Manual Outlier Application")

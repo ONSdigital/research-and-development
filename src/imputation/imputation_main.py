@@ -13,9 +13,8 @@ from src.imputation.short_to_long import run_short_to_long
 from src.imputation.sf_expansion import run_sf_expansion
 from src.imputation import manual_imputation as mimp
 from src.imputation.MoR import run_mor
-from src.construction.construction_main import run_construction
-from src.mapping.itl_mapping import join_itl_regions
 from src.outputs.outputs_helpers import create_output_df
+from src.utils.breakdown_validation import run_breakdown_validation
 
 
 ImputationMainLogger = logging.getLogger(__name__)
@@ -144,7 +143,9 @@ def run_imputation(
             f"{survey_year}_full_responses_imputed_{tdate}_v{run_id}.csv"
         )
         wrong_604_filename = f"{survey_year}_wrong_604_error_qa_{tdate}_v{run_id}.csv"
-        trimmed_counts_filename = f"{survey_year}_tmi_trim_count_qa_{tdate}_v{run_id}.csv"
+        trimmed_counts_filename = (
+            f"{survey_year}_tmi_trim_count_qa_{tdate}_v{run_id}.csv"
+        )
 
         # create trimming qa dataframe with required columns from schema
         schema_path = config["schema_paths"]["manual_trimming_schema"]
@@ -159,6 +160,9 @@ def run_imputation(
 
     # remove rows and columns no longer needed from the imputed dataframe
     imputed_df = hlp.tidy_imputation_dataframe(imputed_df, to_impute_cols)
+
+    # Check the imputed values are consistent with breakdown cols summing to totals.
+    run_breakdown_validation(imputed_df, config, check="imputed")
 
     # optionally output backdata for imputation
     if config["global"]["output_backdata"]:

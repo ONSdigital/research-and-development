@@ -35,7 +35,6 @@ def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[
         raise ImportError
 
     if not isinstance(flag_value_cols, list):
-
         AutoOutlierLogger.error(
             "In config, flag_value_cols must be specified as a list."
         )
@@ -230,9 +229,6 @@ def run_auto_flagging(
     # create 'master' outlier column- which is True if any of the other
     # flags is True
     df = decide_outliers(df, flag_value_cols)
-
-    # Create empty column for user to edit
-    df["manual_outlier"] = np.nan
 
     # log the number of True flags in the master outlier flag column
     num_flagged = df[df["auto_outlier"]]["auto_outlier"].count()

@@ -76,15 +76,15 @@ network_paths:
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged/"
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-08-19_v690.csv"
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-09-12_v1322.csv"
   freezing_changes_to_review_path: "02_freezing/changes_to_review/"
-  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-08-19_v689.csv"
-  freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-08-19_v689.csv"
+  freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-09-12_v1324.csv"
+  freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-09-12_v1324.csv"
   # Imputation and outliers input paths
   # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
   backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_published_v347.csv"
   manual_imp_trim_path: "06_imputation/manual_trimming/trimming_qa_2023-11-27_v359.csv"
-  manual_outliers_path: "07_outliers/manual_outliers/2023_manual_outlier_24-08-21_v703.csv"
+  manual_outliers_path: "07_outliers/manual_outliers/2023_manual_outliers_v1.csv"
   # Construction paths
   all_data_construction_file_path: "04_construction/manual_construction/2023_test_construction_file_breakdowns.csv"
   postcode_construction_file_path: "04_construction/manual_construction/2023_test_postcode_construction_file.csv"
@@ -199,6 +199,30 @@ breakdowns:
     - "headcount_tec_f"
     - "headcount_oth_m"
     - "headcount_oth_f"
+consistency_checks:
+  2xx_totals:
+    purchases_split: ["222", "223", "203"]
+    sal_oth_expend: ["202", "203", "204"]
+    research_expend: ["205", "206", "207", "204"]
+    capex: ["219", "220", "209", "210"]
+    intram: ["204", "210", "211"]
+    funding: ['212', '214', '216', '242', '250', '243', '244', '245', '246', '247', '248', '249', '218']
+    ownership: ['225', '226', '227', '228', '229', '237', '218']
+    equality: ['211', '218']
+  3xx_totals:
+    purchases: ['302', '303', '304', '305']
+  4xx_totals:
+    emp_civil: ['405', '407', '409', '411']
+    emp_defence: ['406', '408', '410', '412']
+  5xx_totals:
+    hc_res_m: ['501', '503', '505', '507']
+    hc_res_f: ['502', '504', '506', '508']
+  apportioned_totals:
+    employment: ["emp_researcher", "emp_technician", "emp_other", "emp_total"]
+    hc_male: ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"]
+    hc_female: ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"]
+    hc_tot: ["headcount_tot_m", "headcount_tot_f", "headcount_total"]
+
 s3:
   ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
   s3_bucket: "onscdp-dev-data01-5320d6ca"
