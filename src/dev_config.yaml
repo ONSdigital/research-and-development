@@ -7,11 +7,11 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings
-  dev_test : False
-  platform: "network" #whether to load from hdfs, network (Windows) or s3 (CDP)
+  dev_test : True
+  platform: "s" #whether to load from hdfs, network (Windows) or s3 (CDP)
   # Construction Settings
-  load_reference_list: True # the reference list corrections should always be loaded in year 1
-  load_from_feather: True
+  load_reference_list: False # the reference list corrections should always be loaded in year 1
+  load_from_feather: False
   # Apportionment to sites settings
   apportion_sites: True
 runlog_writer:
@@ -23,7 +23,7 @@ runlog_writer:
 hdfs_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
 s3_paths:
-  logs_foldername: "/ons/rdbe_dev/logs/run_logs"
+  logs_foldername: "/user/george.zorinyants/logs"
 staging_paths:
   folder: "01_staging"
   feather_output: "feather"

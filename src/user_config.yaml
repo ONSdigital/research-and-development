@@ -49,8 +49,8 @@ global:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # Run until point of freezing - last run is first freeze
-  updated_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
+  frozen_snapshot_path: "/user/george.zorinyants/landing_zone/ons/berd_survey/2021/anonymised/snapshot-202012-002-fba5c4ba-fb8c-4a62-87bb-66c725eea5fd.json" # Run until point of freezing - last run is first freeze
+  updated_snapshot_path: ""
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
@@ -72,7 +72,7 @@ hdfs_paths:
   pcode_val_path: "01_staging/staging_qa/postcode_validation"
   # mapper paths
 s3_paths:
-  root: "/ons/rdbe_dev/"
+  root: "/user/george.zorinyants/"
   # staging input paths
   frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
   updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
