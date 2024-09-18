@@ -163,7 +163,7 @@ def run_staging(  # noqa: C901
 
     # Staging of the main snapshot data is now complete
     StagingMainLogger.info("Staging of main snapshot data complete.")
-    # run validatoin on the breakdowns
+    # run validation on the breakdowns
     run_breakdown_validation(full_responses, config, "staged")
 
     # Staging of the additional data

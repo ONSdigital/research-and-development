@@ -62,7 +62,7 @@ def run_construction(  # noqa: C901
             is_northern_ireland=True,
         )
         updated_snapshot_df = all_data_construction(
-            df, snapshot_df, construction_logger, is_northern_ireland=True
+            df, snapshot_df, construction_logger, config, is_northern_ireland=True
         )
 
     elif is_run_all_data_construction:
@@ -72,7 +72,7 @@ def run_construction(  # noqa: C901
             config, check_file_exists, read_csv, construction_logger
         )
         updated_snapshot_df = all_data_construction(
-            df, snapshot_df, construction_logger
+            df, snapshot_df, construction_logger, config
         )
 
     elif is_run_postcode_construction:
