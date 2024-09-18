@@ -8,7 +8,7 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : True
-  platform: "hdfs" #whether to load from hdfs, network (Windows) or s3 (CDP)
+  platform: "network" #whether to load from hdfs, network (Windows) or s3 (CDP)
   # Construction Settings
   load_reference_list: True # the reference list corrections should always be loaded in year 1
   load_from_feather: True
