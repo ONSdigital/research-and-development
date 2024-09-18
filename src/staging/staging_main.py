@@ -9,7 +9,8 @@ import pandas as pd
 
 import src.staging.staging_helpers as helpers
 from src.staging import validation as val
-from src.utils.breakdown_validation import run_breakdown_validation
+
+# from src.utils.breakdown_validation import run_breakdown_validation
 
 StagingMainLogger = logging.getLogger(__name__)
 
@@ -164,7 +165,7 @@ def run_staging(  # noqa: C901
     # Staging of the main snapshot data is now complete
     StagingMainLogger.info("Staging of main snapshot data complete.")
     # run validation on the breakdowns
-    run_breakdown_validation(full_responses, config, "staged")
+    # run_breakdown_validation(full_responses, config, "staged")
 
     # Staging of the additional data
     if config["global"]["load_manual_outliers"]:

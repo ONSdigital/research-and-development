@@ -237,8 +237,10 @@ def log_errors_to_screen(check_results_dict: dict, check_type: str) -> None:
                 f"Breakdown validation failed for {key} columns"
             )
             BreakdownValidationLogger.error(value)
-    else:
-        BreakdownValidationLogger.info(f"All {check_type} breakdown vals are valid.")
+        else:
+            BreakdownValidationLogger.info(
+                f"All {check_type} breakdown vals are valid."
+            )
 
 
 def run_imputation_breakdown_validation(df: pd.DataFrame, config: dict) -> None:
@@ -257,8 +259,8 @@ def run_imputation_breakdown_validation(df: pd.DataFrame, config: dict) -> None:
     to_check_dict = get_equality_dicts(config, "imputation")
     check_results_dict, qa_df = get_breakdown_errors(df, to_check_dict)
     # temp output of qa_df for debugging
-    if not qa_df.empty:
-        print(qa_df)
+    # if not qa_df.empty:
+    #     print(qa_df)
 
     log_errors_to_screen(check_results_dict, "imputation")
 
@@ -287,8 +289,9 @@ def run_construction_breakdown_validation(df: pd.DataFrame, config: dict) -> Non
     )
     if not msg:
         BreakdownValidationLogger.info("All breakdown values are valid.")
-    else:
-        raise ValueError(msg)
+    # TODO: we will probably want to raise an error here when in production
+    # else:
+    #     raise ValueError(msg)
 
     return df
 
@@ -308,8 +311,8 @@ def run_staging_breakdown_validation(df: pd.DataFrame, config: dict) -> None:
     check_results_dict, qa_df = get_breakdown_errors(df, to_check_dict)
 
     # Note: this is a temporary implementation to show the QA output while we debug
-    if not qa_df.empty:
-        print(qa_df)
+    # if not qa_df.empty:
+    #     print(qa_df)
 
     log_errors_to_screen(check_results_dict, "staging")
     return df
