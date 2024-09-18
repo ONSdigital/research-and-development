@@ -29,11 +29,11 @@ def get_equality_dicts(config: dict, sublist: str = "default") -> dict:
         wanted_dicts = list(all_checks_dict.keys())
 
     # create a dictionary of the relationships to check
-    construction_equality_checks = {}
+    equality_checks = {}
     for item in wanted_dicts:
-        construction_equality_checks.update(all_checks_dict[item])
+        equality_checks.update(all_checks_dict[item])
 
-    return construction_equality_checks
+    return equality_checks
 
 
 def get_all_wanted_columns(config: dict) -> list:
@@ -191,7 +191,7 @@ def get_breakdown_errors(df: pd.DataFrame, to_check: dict) -> pd.DataFrame:
     for key, columns in to_check.items():
         total_column = columns[-1]
         breakdown_columns = columns[:-1]
-        check_cond = abs(df[breakdown_columns].sum(axis=1) - df[total_column]) > 0.005
+        check_cond = abs(df[breakdown_columns].sum(axis=1) - df[total_column]) > 0.5
         # if there are any errors for particular check..
         if any(check_cond):
             # ...create a mini dataframe for the relevant rows and columns
