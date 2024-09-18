@@ -3,7 +3,7 @@ import time
 import os
 
 start_dir = os.getcwd()
-if start_dir.startswith("/home"):
+if not start_dir.endswith("research-and-development"):
     os.chdir("research-and-development")
 print(f"Current directory is {os.getcwd()}")
 import src.pipeline as src
