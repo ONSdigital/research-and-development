@@ -106,21 +106,23 @@ s3_paths:
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2022.csv'
   sic_pg_num_mapper_path: 'sic_pg_num_2022.csv'
   pg_detailed_mapper_path: "pg_detailed_2022.csv"
-  itl1_detailed_mapper_path: "itl1_detailed_2022.csv"
   civil_defence_detailed_mapper_path: "civil_defence_detailed_2022.csv"
   sic_division_detailed_mapper_path: "sic_div_detailed_2022.csv"
 2023_mappers:
-  mappers_version: "v1"
+  mappers_version: "v2"
   postcode_mapper: "postcodes_2023.csv"
   itl_mapper_path: "itl_2023.csv"
+<<<<<<< HEAD
   ultfoc_mapper_path: "BERD_2023_ultfoc_anon.csv"
   ref_list_817_mapper_path: "BERD_2023_ref_list_anon.csv"
+=======
+  ultfoc_mapper_path: "BERD_2023_ultfoc.csv"
+>>>>>>> origin
   cellno_path: 'BERD_2023_cellno_coverage.csv'
   pg_num_alpha_mapper_path: 'pg_num_alpha_2023.csv'
   sic_pg_alpha_mapper_path: 'sic_pg_alpha_2023.csv'
   sic_pg_num_mapper_path: 'sic_pg_num_2023.csv'
   pg_detailed_mapper_path: "pg_detailed_2023.csv"
-  itl1_detailed_mapper_path: "itl1_detailed_2023.csv"
   civil_defence_detailed_mapper_path: "civil_defence_detailed_2023.csv"
   sic_division_detailed_mapper_path: "sic_div_detailed_2023.csv"
 # outliers and imputation settings

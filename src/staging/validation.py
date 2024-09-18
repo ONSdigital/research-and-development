@@ -94,9 +94,7 @@ def check_data_shape(
         ValidationLogger.warning(missing_file_cols)
         ValidationLogger.warning(missing_df_cols)
         if raise_error:
-            raise ColumnMismatch(  # noqa: F821
-                "Error: The the number of columns do not match. Halted"
-            )
+            raise ValueError("Error: The the number of columns do not match. Halted")
 
     ValidationLogger.info(
         f"Length of data: {len(df_cols_set)}. Length of schema: "
@@ -106,8 +104,7 @@ def check_data_shape(
     return cols_match
 
 
-@time_logger_wrap  # noqa: C901
-def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
+def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):  # noqa: C901
     """Takes the schema from the toml file and validates the survey data df.
 
     Args:
@@ -129,7 +126,6 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):
 
     # Cast each column individually and catch any errors
     for column in dtypes_dict.keys():
-
         # Fix for the columns which contain empty strings. We want to cast as NaN
         if dtypes_dict[column] == "pd.NA":
             # Replace whatever is in that column with np.nan

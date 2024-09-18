@@ -4,7 +4,6 @@ import numpy as np
 
 # Local Imports
 from src.mapping.mapping_helpers import (
-    mapper_null_checks,
     col_validation_checks,
     check_mapping_unique,
     update_ref_list,
@@ -267,11 +266,16 @@ class TestValidateMappingFilenames(object):
     def test_validate_mapper_config_raises_file_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
-            '2022_mappers': {'itl_mapper_path': "itl_2022.cs",
-            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-            'ultfoc_mapper_path': None,}
-            } 
+            '2022_mappers': {
+                'mappers_version': "v1",
+                'itl_mapper_path': "itl_2022.cs",
+                'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",
+            },
+            '2023_mappers': {
+                'itl_mapper_path': "itl_2023.csv",
+                'ultfoc_mapper_path': None,
+            }
+            }
 
         result, message = validate_mapping_filenames(config)
 
@@ -283,11 +287,16 @@ class TestValidateMappingFilenames(object):
     def test_validate_mapper_config_raises_year_incorrect(self):
         config = {
             'years' : {'survey_year': 2022,},
-            '2022_mappers': {'itl_mapper_path': "itl_202.csv",
-            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
-            '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
-            'ultfoc_mapper_path': None,}
-            } 
+            '2022_mappers': {
+                'mappers_version': "v1",
+                'itl_mapper_path': "itl_202.csv",
+                'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",
+            },
+            '2023_mappers': {
+                'itl_mapper_path': "itl_2023.csv",
+                'ultfoc_mapper_path': None,
+            }
+            }
 
         result, message = validate_mapping_filenames(config)
 
@@ -299,15 +308,18 @@ class TestValidateMappingFilenames(object):
     def test_validate_mapper_config_raises_missing_file(self):
         config = {
             'years' : {'survey_year': 2022,},
-            '2022_mappers': {'itl_mapper_path': "",
-            'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",},
+            '2022_mappers': {
+                'mappers_version': "v1",
+                'itl_mapper_path': "",
+                'ultfoc_mapper_path': "BERD_2022_ultfoc.csv",
+            },
             '2023_mappers': {'itl_mapper_path': "itl_2023.csv",
             'ultfoc_mapper_path': None,}
-            } 
+            }
 
         result, message = validate_mapping_filenames(config)
 
         expected_bool = {False, False}
 
-        assert (result == expected_bool, 
+        assert (result == expected_bool,
         "Output from test_validate_mapper_config_raises_missing_file not as expected.")

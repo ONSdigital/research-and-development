@@ -41,38 +41,6 @@ def check_for_duplicates(
     return None
 
 
-def concat_construction_dfs(
-    df1: pd.DataFrame,
-    df2: pd.DataFrame,
-    validate_dupes: bool = False,
-    logger: logging.Logger = None,
-) -> pd.DataFrame:
-    """Merge the construction and postcode construction dataframes into one.
-
-    Args:
-        df1 (pd.DataFrame): The first dataframe (construction).
-        df2 (pd.DataFrame): The second dataframe (postcode construction).
-        validate (bool, optional): Whether or not to check for duplicate
-            instance+reference in the merged dataframes. Defaults to False.
-        logger (logging.Logger, optional): A logger to log to. Defaults to None.
-
-    Returns:
-        pd.DataFrame: The merged dataframe.
-    """
-    type_defence(df1, "df1", pd.DataFrame)
-    type_defence(df2, "df1", pd.DataFrame)
-    type_defence(validate_dupes, "validate_dupes", bool)
-    type_defence(logger, "logger", (logging.Logger, type(None)))
-    if logger:
-        logger.info("Merging dataframes for construction...")
-    merged = pd.concat([df1, df2]).reset_index(drop=True)
-    if validate_dupes:
-        if logger:
-            logger.info("Merged dataframes are being checked for duplicates...")
-        check_for_duplicates(merged, ["reference", "instance"], logger)
-    return merged
-
-
 def validate_columns_not_empty(
     df: pd.DataFrame,
     columns: Union[str, list],
@@ -141,18 +109,19 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
     df = df[df.construction_type == "short_to_long"]
 
     # Check if 'formtype' column exists
-    if 'formtype' not in df.columns:
+    if "formtype" not in df.columns:
         raise ValueError(
             "The 'formtype' column is missing, which is required for short to long "
             "construction."
-            )
+        )
 
     # Check if any row has missing 'formtype' value
-    missing_formtype = df[df.construction_type == 'short_to_long'][df.formtype.isnull()]
+    missing_formtype = df[df.construction_type == "short_to_long"][df.formtype.isnull()]
     if not missing_formtype.empty:
-        missing_refs = missing_formtype['reference'].unique()
+        missing_refs = missing_formtype["reference"].unique()
         raise ValueError(
-            f"'formtype' missing for short to long construction: ref {missing_refs}")
+            f"'formtype' missing for short to long construction: ref {missing_refs}"
+        )
 
     if len(df) == 0:
         return None

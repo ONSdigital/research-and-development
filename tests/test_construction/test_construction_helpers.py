@@ -13,6 +13,7 @@ from src.construction.construction_helpers import (
     add_constructed_nonresponders,
     remove_short_to_long_0,
     prep_new_rows,
+    replace_values_in_construction,
 )
 
 class TestPrepareFormGB:
@@ -393,4 +394,64 @@ class TestPrepNewRows:
 
         # Check the output
         pd.testing.assert_frame_equal(output_rows_to_add, expected_rows_to_add), "Output is not as expected"
+
+
+class TestReplaceValuesInConstruction:
+    """Test for replace_values_in_construction()."""
+
+    def create_test_snapshot_df(self) -> pd.DataFrame:
+        """Create a test snapshot df."""
+        input_cols = ["reference", "instance", "period_year", "value"]
+        data = [
+            [1, 0, 2024, "A"],
+            [2, 0, 2024, "B"],
+            [3, 0, 2024, "C"],
+            [4, 0, 2024, "D"],
+        ]
+        input_snapshot_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_snapshot_df
+
+    def create_test_construction_df(self) -> pd.DataFrame:
+        """Create a test construction df."""
+        input_cols = ["reference", "instance", "period_year", "value"]
+        data = [
+            [1, 0, 2024, "X"],
+            [2, 0, 2024, "Y"],
+            [5, 0, 2024, "Z"],
+        ]
+        input_construction_df = pd.DataFrame(data=data, columns=input_cols)
+        return input_construction_df
+
+    def create_expected_snapshot_output(self) -> pd.DataFrame:
+        """Create expected snapshot output df."""
+        output_cols = ["reference", "instance", "period_year", "value"]
+        data = [
+            [1, 0, 2024, "X"],
+            [2, 0, 2024, "Y"],
+            [3, 0, 2024, "C"],
+            [4, 0, 2024, "D"],
+        ]
+        output_snapshot_df = pd.DataFrame(data=data, columns=output_cols)
+        return output_snapshot_df
+
+    def test_replace_values_in_construction(self):
+        """Test for replace_values_in_construction()."""
+        # Create test dataframes
+        input_snapshot_df = self.create_test_snapshot_df()
+        input_construction_df = self.create_test_construction_df()
+        expected_snapshot_output = self.create_expected_snapshot_output()
+
+        # Run the function
+        snapshot_output, _ = replace_values_in_construction(
+            input_snapshot_df, input_construction_df
+        )
+
+        # Check the output
+        assert_frame_equal(
+            snapshot_output.reset_index(drop=True),
+            expected_snapshot_output,
+            check_dtype=False
+        )
+
+
 
