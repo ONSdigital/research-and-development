@@ -206,15 +206,16 @@ class TestRunBreakdownValidation():
             run_breakdown_validation(input_df, config, "constructed")
             assert msg in caplog.text
 
-    def test_breakdown_validation_msg(self, create_config):
-        """Test for run_breakdown_validation function to check the returned message."""
-        input_df = self.create_input_df()
-        input_df = input_df.loc[(input_df['reference'] == 'B')]
-        config = create_config
-        msg = "Columns ['202', '203'] do not equal column 204 for reference: B, instance 1.\n "
-        with pytest.raises(ValueError) as e:
-            run_breakdown_validation(input_df, config, "constructed")
-        assert str(e.value) == msg
+    #TODO: we're currently not raising an error but will later put this back in
+    # def test_breakdown_validation_msg(self, create_config):
+    #     """Test for run_breakdown_validation function to check the returned message."""
+    #     input_df = self.create_input_df()
+    #     input_df = input_df.loc[(input_df['reference'] == 'B')]
+    #     config = create_config
+    #     msg = "Columns ['202', '203'] do not equal column 204 for reference: B, instance 1.\n "
+    #     with pytest.raises(ValueError) as e:
+    #         run_breakdown_validation(input_df, config, "constructed")
+    #     assert str(e.value) == msg
 
     def test_breakdown_validation_fail_all_null(self, caplog, create_config):
         """Test for run_breakdown_validation function where there are no values."""
