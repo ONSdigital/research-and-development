@@ -70,14 +70,14 @@ def run_staging(  # noqa: C901
     # set up dictionaries with all the paths needed for the staging module
     staging_dict = config["staging_paths"]
 
-    stage_frozen_snapshot = config["global"]["run_with_snapshot_until_freezing"]
+    stage_frozen_snapshot = config["global"]["run_with_snapshot"] | config["global"]["run_with_snapshot_and_freeze"]
     stage_updated_snapshot = config["global"]["load_updated_snapshot_for_comparison"]
     if stage_frozen_snapshot or stage_updated_snapshot:
         feather_path = staging_dict["feather_output"]
 
         if stage_frozen_snapshot:
             snapshot_name = os.path.basename(
-                staging_dict["frozen_snapshot_path"]
+                staging_dict["snapshot_path"]
             ).split(".", 1)[0]
 
             feather_file = os.path.join(feather_path, f"{snapshot_name}.feather")
@@ -108,7 +108,7 @@ def run_staging(  # noqa: C901
         else:  # Read from JSON
             # Check data file exists, raise an error if it does not.
             if stage_frozen_snapshot:
-                snapshot_path = staging_dict["frozen_snapshot_path"]
+                snapshot_path = staging_dict["snapshot_path"]
             elif stage_updated_snapshot:
                 snapshot_path = staging_dict["updated_snapshot_path"]
 
@@ -167,117 +167,130 @@ def run_staging(  # noqa: C901
     # run validation on the breakdowns
     # run_breakdown_validation(full_responses, config, "staged")
 
-    # Staging of the additional data
-    if config["global"]["load_manual_outliers"]:
-        # Stage the manual outliers file
-        StagingMainLogger.info("Loading Manual Outlier File")
-        manual_path = staging_dict["manual_outliers_path"]
-        rd_file_exists(manual_path, raise_error=True)
-        manual_outliers = rd_read_csv(manual_path)
-        manual_outliers = manual_outliers.drop_duplicates(
-            subset=["reference"], keep="first"
+    if not config["global"]["load_updated_snapshot_for_comparison"]:
+        # Staging of the additional data
+        if config["global"]["load_manual_outliers"]:
+            # Stage the manual outliers file
+            StagingMainLogger.info("Loading Manual Outlier File")
+            manual_path = staging_dict["manual_outliers_path"]
+            rd_file_exists(manual_path, raise_error=True)
+            manual_outliers = rd_read_csv(manual_path)
+            manual_outliers = manual_outliers.drop_duplicates(
+                subset=["reference"], keep="first"
+            )
+            val.validate_data_with_schema(
+                manual_outliers, "./config/manual_outliers_schema.toml"
+            )
+            StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+        else:
+            manual_outliers = None
+            StagingMainLogger.info("Loading of Manual Outlier File skipped")
+
+        # Get the latest manual trim file
+        manual_trim_path = staging_dict["manual_imp_trim_path"]
+
+        if config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path):
+            StagingMainLogger.info("Loading Imputation Manual Trimming File")
+            manual_trim_df = rd_read_csv(manual_trim_path)
+            manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
+            manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
+            manual_trim_df = manual_trim_df.drop_duplicates(
+                subset=["reference", "instance"], keep="first"
+            )
+            val.validate_data_with_schema(
+                manual_trim_df, "./config/manual_trim_schema.toml"
+            )
+        else:
+            manual_trim_df = None
+            StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
+
+        # stage the backdata for MoR
+        StagingMainLogger.info("Loading Backdata File")
+        backdata_path = staging_dict["backdata_path"]
+        rd_file_exists(backdata_path, raise_error=True)
+        backdata = rd_read_csv(backdata_path)
+        val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
+
+        StagingMainLogger.info("Backdata File Loaded Successfully...")
+
+        # Loading Civil or Defence detailed mapper
+        civil_defence_detailed_mapper = helpers.load_validate_mapper(
+            "civil_defence_detailed_mapper_path",
+            config,
+            StagingMainLogger,
+            rd_file_exists,
+            rd_read_csv,
         )
-        val.validate_data_with_schema(
-            manual_outliers, "./config/manual_outliers_schema.toml"
+
+        # Loading SIC division detailed mapper
+        sic_division_detailed_mapper = helpers.load_validate_mapper(
+            "sic_division_detailed_mapper_path",
+            config,
+            StagingMainLogger,
+            rd_file_exists,
+            rd_read_csv,
         )
-        StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
+
+        pg_detailed_mapper = helpers.load_validate_mapper(
+            "pg_detailed_mapper_path",
+            config,
+            StagingMainLogger,
+            rd_file_exists,
+            rd_read_csv,
+        )
+
+        # seaparate PNP data from full_responses (BERD data)
+        # NOTE: PNP data can be output for QA but won't be further processed in the pipeline
+        if stage_frozen_snapshot or stage_updated_snapshot:
+            full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
+
+        if config["global"]["output_full_responses"]:
+            StagingMainLogger.info("Starting output of staged BERD data...")
+            staging_folder = staging_dict["staging_output_path"]
+            tdate = datetime.now().strftime("%y-%m-%d")
+            survey_year = config["years"]["survey_year"]
+            staged_filename = (
+                f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
+            )
+            rd_write_csv(f"{staging_folder}/{staged_filename}", full_responses)
+            StagingMainLogger.info("Finished output of staged BERD data.")
+        else:
+            StagingMainLogger.info("Skipping output of staged BERD data...")
+
+        # Output the staged PNP data.
+        if config["global"]["output_pnp_full_responses"]:
+            StagingMainLogger.info("Starting output of staged PNP data...")
+            staging_folder = staging_dict["pnp_staging_qa_path"]
+            tdate = datetime.now().strftime("%y-%m-%d")
+            survey_year = config["years"]["survey_year"]
+            staged_filename = (
+                f"{survey_year}_staged_PNP_full_responses_{tdate}_v{run_id}.csv"
+            )
+            rd_write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
+            StagingMainLogger.info("Finished output of staged PNP data.")
+        else:
+            StagingMainLogger.info("Skipping output of staged PNP data...")
+
+        # Return staged BERD data, additional data and mappers
+        return (
+            full_responses,
+            manual_outliers,
+            postcode_mapper,
+            backdata,
+            pg_detailed_mapper,
+            civil_defence_detailed_mapper,
+            sic_division_detailed_mapper,
+            manual_trim_df,
+        )
+
     else:
-        manual_outliers = None
-        StagingMainLogger.info("Loading of Manual Outlier File skipped")
-
-    # Get the latest manual trim file
-    manual_trim_path = staging_dict["manual_imp_trim_path"]
-
-    if config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path):
-        StagingMainLogger.info("Loading Imputation Manual Trimming File")
-        manual_trim_df = rd_read_csv(manual_trim_path)
-        manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
-        manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
-        manual_trim_df = manual_trim_df.drop_duplicates(
-            subset=["reference", "instance"], keep="first"
-        )
-        val.validate_data_with_schema(
-            manual_trim_df, "./config/manual_trim_schema.toml"
-        )
-    else:
-        manual_trim_df = None
-        StagingMainLogger.info("Loading of Imputation Manual Trimming File skipped")
-
-    # stage the backdata for MoR
-    StagingMainLogger.info("Loading Backdata File")
-    backdata_path = staging_dict["backdata_path"]
-    rd_file_exists(backdata_path, raise_error=True)
-    backdata = rd_read_csv(backdata_path)
-    val.validate_data_with_schema(backdata_path, "./config/backdata_schema.toml")
-
-    StagingMainLogger.info("Backdata File Loaded Successfully...")
-
-    # Loading Civil or Defence detailed mapper
-    civil_defence_detailed_mapper = helpers.load_validate_mapper(
-        "civil_defence_detailed_mapper_path",
-        config,
-        StagingMainLogger,
-        rd_file_exists,
-        rd_read_csv,
-    )
-
-    # Loading SIC division detailed mapper
-    sic_division_detailed_mapper = helpers.load_validate_mapper(
-        "sic_division_detailed_mapper_path",
-        config,
-        StagingMainLogger,
-        rd_file_exists,
-        rd_read_csv,
-    )
-
-    pg_detailed_mapper = helpers.load_validate_mapper(
-        "pg_detailed_mapper_path",
-        config,
-        StagingMainLogger,
-        rd_file_exists,
-        rd_read_csv,
-    )
-
-    # seaparate PNP data from full_responses (BERD data)
-    # NOTE: PNP data can be output for QA but won't be further processed in the pipeline
-    if stage_frozen_snapshot or stage_updated_snapshot:
-        full_responses, pnp_full_responses = helpers.filter_pnp_data(full_responses)
-
-    if config["global"]["output_full_responses"]:
-        StagingMainLogger.info("Starting output of staged BERD data...")
-        staging_folder = staging_dict["staging_output_path"]
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
-        staged_filename = (
-            f"{survey_year}_staged_BERD_full_responses_{tdate}_v{run_id}.csv"
-        )
-        rd_write_csv(f"{staging_folder}/{staged_filename}", full_responses)
-        StagingMainLogger.info("Finished output of staged BERD data.")
-    else:
-        StagingMainLogger.info("Skipping output of staged BERD data...")
-
-    # Output the staged PNP data.
-    if config["global"]["output_pnp_full_responses"]:
-        StagingMainLogger.info("Starting output of staged PNP data...")
-        staging_folder = staging_dict["pnp_staging_qa_path"]
-        tdate = datetime.now().strftime("%y-%m-%d")
-        survey_year = config["years"]["survey_year"]
-        staged_filename = (
-            f"{survey_year}_staged_PNP_full_responses_{tdate}_v{run_id}.csv"
-        )
-        rd_write_csv(f"{staging_folder}/{staged_filename}", pnp_full_responses)
-        StagingMainLogger.info("Finished output of staged PNP data.")
-    else:
-        StagingMainLogger.info("Skipping output of staged PNP data...")
-
-    # Return staged BERD data, additional data and mappers
-    return (
+        return (
         full_responses,
-        manual_outliers,
-        postcode_mapper,
-        backdata,
-        pg_detailed_mapper,
-        civil_defence_detailed_mapper,
-        sic_division_detailed_mapper,
-        manual_trim_df,
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
     )

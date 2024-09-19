@@ -71,7 +71,7 @@ export_paths:
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
   logs_foldername: "logs/run_logs" # dev config
-  frozen_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # dev config
+  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # dev config
   updated_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Freezing data paths

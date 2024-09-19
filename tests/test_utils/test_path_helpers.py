@@ -22,7 +22,7 @@ def config():
         "global": {"platform": "network"},
         "network_paths": {
             "root": "R:/DAP_emulation/",
-            "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+            "snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
             "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
             "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
             "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
@@ -91,7 +91,7 @@ def test_get_paths(config):
     """Test get_paths function."""
     expected_network_paths = {
         "root": "R:/DAP_emulation/",
-        "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+        "snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
         "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "ni_full_responses_path": "03_northern_ireland/2021/TEST_ni.csv",
@@ -122,7 +122,7 @@ def test_get_paths(config):
 def expected_staging_dict():
     expected_staging_dict = {
         "feather_output": "R:/DAP_emulation/2022_surveys/BERD/01_staging/feather",
-        "frozen_snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
+        "snapshot_path": "/2023_snapshots/snapshot_file-202212.json",
         "updated_snapshot_path": "2023_snapshots/updated_snapshot_file-202212.json",
         "postcode_masterlist": "postcode_masterlist_path/postcode.csv",
         "manual_outliers_path": (
@@ -152,7 +152,7 @@ def test_validate_snapshot_files_success(config, caplog):
     config = {'years' : {'survey_year': 2023,},
               'global': {'platform': "network"},
               'network_paths': { 'root': "R:/DAP_emulation/",
-              'frozen_snapshot_path': "/2023_snapshots/snapshot_file-202312.json",
+              'snapshot_path': "/2023_snapshots/snapshot_file-202312.json",
               'updated_snapshot_path': '2023_snapshots/updated_snapshot_file-202312.json',
               }
         }
@@ -169,7 +169,7 @@ def test_validate_snapshot_files_fail(config, caplog):
         'years' : {'survey_year': 2023,},
               'global': {'platform': "network"},
               'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
-              'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
+              'snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-20212-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
               'updated_snapshot_path': '/ons/rdbe_dev/berd_survey/anonymised/v1/snapshot-202312-002.json',
               }
         }
@@ -187,7 +187,7 @@ def test_validate_snapshot_files_success_blank(config, caplog):
         'years' : {'survey_year': 2023,},
               'global': {'platform': "network"},
               'network_paths': {'root': "R:/BERD Results System Development 2023/DAP_emulation/",
-              'frozen_snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
+              'snapshot_path': "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json",
               'updated_snapshot_path': "",
               }
         }

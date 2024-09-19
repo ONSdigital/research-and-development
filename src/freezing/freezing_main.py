@@ -41,14 +41,14 @@ def run_freezing(
     """
 
     # read in validated config settings
-    run_with_snapshot_until_freezing = config["global"][
-        "run_with_snapshot_until_freezing"
+    run_with_snapshot_and_freeze = config["global"][
+        "run_with_snapshot_and_freeze"
     ]
     load_updated_snapshot_for_comparison = config["global"][
         "load_updated_snapshot_for_comparison"
     ]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
-    run_frozen_data = config["global"]["run_frozen_data"]
+    run_with_frozen_data = config["global"]["run_with_frozen_data"]
 
     if load_updated_snapshot_for_comparison:
         FreezingLogger.info("Comparing the updated snapshot with the frozen data.")
@@ -65,7 +65,7 @@ def run_freezing(
             FreezingLogger,
         )
 
-        prepared_frozen_data = snapshot_df.copy()
+        return None
 
     # Read the freezing files and apply them
     elif run_updates_and_freeze:
@@ -78,7 +78,7 @@ def run_freezing(
             "statusencoded"
         ].astype(str)
 
-    elif run_frozen_data:
+    elif run_with_frozen_data:
         prepared_frozen_data = read_frozen_csv(config, read_csv)
         prepared_frozen_data["statusencoded"] = prepared_frozen_data[
             "statusencoded"
@@ -88,7 +88,7 @@ def run_freezing(
         prepared_frozen_data = snapshot_df.copy()
         prepared_frozen_data = _add_last_frozen_column(prepared_frozen_data, run_id)
 
-    if run_with_snapshot_until_freezing or run_updates_and_freeze:
+    if run_with_snapshot_and_freeze or run_updates_and_freeze:
         frozen_data_staged_output_path = config["freezing_paths"][
             "frozen_data_staged_output_path"
         ]

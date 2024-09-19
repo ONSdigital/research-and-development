@@ -326,13 +326,13 @@ class TestValidateFreezingConfigSettings(object):
         """Test validate_freezing_config_settings with no errors."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": True,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": True,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -341,17 +341,17 @@ class TestValidateFreezingConfigSettings(object):
         }
         validate_freezing_config_settings(user_config)
 
-    def test_validate_freezing_config_settings_run_first_snapshot_without_frozen_snapshot_path(self):
-        """Test validate_freezing_config_settings with run_with_snapshot_until_freezing True but no frozen_snapshot_path."""
+    def test_validate_freezing_config_settings_run_first_snapshot_without_snapshot_path(self):
+        """Test validate_freezing_config_settings with run_with_snapshot True but no snapshot_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": True,
-                "run_frozen_data": False,
+                "run_with_snapshot": True,
+                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": None,
+                "snapshot_path": None,
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -363,17 +363,17 @@ class TestValidateFreezingConfigSettings(object):
                            " a frozen snapshot path must be provided."):
             validate_freezing_config_settings(user_config)
 
-    def test_validate_freezing_config_settings_run_frozen_data_without_frozen_data_staged_path(self):
-        """Test validate_freezing_config_settings with run_frozen_data True but no frozen_data_staged_path."""
+    def test_validate_freezing_config_settings_run_with_frozen_data_without_frozen_data_staged_path(self):
+        """Test validate_freezing_config_settings with run_with_frozen_data True but no frozen_data_staged_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": True,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": True,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -388,13 +388,13 @@ class TestValidateFreezingConfigSettings(object):
         """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no updated_snapshot_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": False,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": None,
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -410,13 +410,13 @@ class TestValidateFreezingConfigSettings(object):
         """Test validate_freezing_config_settings with load_updated_snapshot_for_comparison True but no frozen_data_staged_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": False,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -432,13 +432,13 @@ class TestValidateFreezingConfigSettings(object):
         """Test validate_freezing_config_settings with run_updates_and_freeze True but no frozen_data_staged_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": False,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": True,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": "/path/to/freezing_adds",
@@ -454,13 +454,13 @@ class TestValidateFreezingConfigSettings(object):
         """Test validate_freezing_config_settings with run_updates_and_freeze True but no freezing_adds_and_amends_path."""
         user_config = {
             "global": {
-                "run_with_snapshot_until_freezing": False,
-                "run_frozen_data": False,
+                "run_with_snapshot": False,
+                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": True,
             },
             "hdfs_paths": {
-                "frozen_snapshot_path": "/path/to/frozen_snapshot",
+                "snapshot_path": "/path/to/frozen_snapshot",
                 "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
                 "freezing_additions_path": None,
@@ -564,10 +564,10 @@ class TestValidateFreezingRunConfig(object):
         """
         config = {
             "global": {
-                "run_with_snapshot_until_freezing": values[0],
+                "run_with_snapshot": values[0],
                 "load_updated_snapshot_for_comparison": values[1],
                 "run_updates_and_freeze": values[2],
-                "run_frozen_data": values[3]
+                "run_with_frozen_data": values[3]
             }
         }
         return config
