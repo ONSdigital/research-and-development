@@ -190,8 +190,7 @@ def run_staging(  # noqa: C901
 
     if config["global"]["load_manual_imputation"] and rd_file_exists(manual_trim_path):
         StagingMainLogger.info("Loading Imputation Manual Trimming File")
-        wanted_cols = ["reference", "instance", "manual_trim"]
-        manual_trim_df = rd_read_csv(manual_trim_path, wanted_cols)
+        manual_trim_df = rd_read_csv(manual_trim_path)
         manual_trim_df["manual_trim"] = manual_trim_df["manual_trim"].fillna(False)
         manual_trim_df["instance"] = manual_trim_df["instance"].fillna(1)
         manual_trim_df = manual_trim_df.drop_duplicates(
