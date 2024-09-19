@@ -76,7 +76,7 @@ def prepare_forms_gb(
     form_sent_condition = (snapshot_df.formtype == "0006") & (
         snapshot_df.status == "Form sent out"
     )
-    snapshot_df.loc[form_sent_condition, "instance"] = 0
+    snapshot_df.loc[form_sent_condition & ~snapshot_df.reference.isin(unique_references), "instance"] = 0
     return (snapshot_df, construction_df)
 
 
