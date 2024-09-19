@@ -69,6 +69,10 @@ def prepare_forms_gb(
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
     construction_df = create_period_year(construction_df)
+
+    # Set instances:
+    # Exclude short to long constructions as they have already had instances applied
+    # that we don't want to overwrite
     # Set instance=1 so longforms with status 'Form sent out' match correctly
     form_sent_condition = (snapshot_df.formtype == "0001") & (
         snapshot_df.status == "Form sent out"
