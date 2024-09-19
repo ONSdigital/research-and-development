@@ -217,11 +217,6 @@ consistency_checks:
   5xx_totals:
     hc_res_m: ['501', '503', '505', '507']
     hc_res_f: ['502', '504', '506', '508']
-  apportioned_totals:
-    employment: ["emp_researcher", "emp_technician", "emp_other", "emp_total"]
-    hc_male: ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"]
-    hc_female: ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"]
-    hc_tot: ["headcount_tot_m", "headcount_tot_f", "headcount_total"]
 
 s3:
   ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
