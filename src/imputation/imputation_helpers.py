@@ -85,9 +85,12 @@ def instance_fix(df: pd.DataFrame):
     References with status 'Form sent out' initially have a null in the instance
     column.
     """
-    mask = (df.formtype == "0001") & (df.status == "Form sent out") & (df.is_constructed == False)
-    df.loc[mask, "instance"] = 1
+    mask = (df.formtype == "0001") & (df.status == "Form sent out")
 
+    if "is_constructed" in df.columns:
+        mask = mask & (df.is_constructed.isin([False]))
+
+    df.loc[mask, "instance"] = 1
     return df
 
 
