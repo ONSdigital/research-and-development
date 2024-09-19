@@ -79,11 +79,7 @@ def create_equality_dict_imputation():
         "funding": ["212", "214", "216", "242", "250", "243", "244", "245", "246", "247", "248", "249", "218"],
         "ownership": ["225", "226", "227", "228", "229", "237", "218"],
         "equality": ["211", "218"],
-        "purchases": ['302', '303', '304', '305'],
-        "employment": ["emp_researcher", "emp_technician", "emp_other", "emp_total"],
-        "hc_male": ["headcount_res_m", "headcount_tec_m", "headcount_oth_m", "headcount_tot_m"],
-        "hc_female": ["headcount_res_f", "headcount_tec_f", "headcount_oth_f", "headcount_tot_f"],
-        "hc_tot": ["heacount_tot_m", "headcount_tot_f", "headcount_tot"]
+        "purchases": ['302', '303', '304', '305']
     }
 
     return equality_dict

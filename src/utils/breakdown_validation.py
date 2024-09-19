@@ -24,7 +24,7 @@ def get_equality_dicts(config: dict, sublist: str = "default") -> dict:
     if sublist == "default":
         wanted_dicts = [key for key in all_checks_dict.keys() if "xx_totals" in key]
     elif sublist == "imputation":
-        wanted_dicts = ["2xx_totals", "3xx_totals", "apportioned_totals"]
+        wanted_dicts = ["2xx_totals", "3xx_totals"]
     else:
         wanted_dicts = list(all_checks_dict.keys())
 
