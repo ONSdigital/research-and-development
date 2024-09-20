@@ -24,7 +24,7 @@ def get_equality_dicts(config: dict, sublist: str = "default") -> dict:
     if sublist == "default":
         wanted_dicts = [key for key in all_checks_dict.keys() if "xx_totals" in key]
     elif sublist == "imputation":
-        wanted_dicts = ["2xx_totals", "3xx_totals", "apportioned_totals"]
+        wanted_dicts = ["2xx_totals", "3xx_totals"]
     else:
         wanted_dicts = list(all_checks_dict.keys())
 
@@ -231,16 +231,16 @@ def log_errors_to_screen(check_results_dict: dict, check_type: str) -> None:
     Returns:
         None
     """
+    count = 0
     for key, value in check_results_dict.items():
         if not value.empty:
             BreakdownValidationLogger.error(
                 f"Breakdown validation failed for {key} columns"
             )
             BreakdownValidationLogger.error(value)
-        else:
-            BreakdownValidationLogger.info(
-                f"All {check_type} breakdown vals are valid."
-            )
+            count += 1
+    if count == 0:
+        BreakdownValidationLogger.info(f"All {check_type} breakdown vals are valid.")
 
 
 def run_imputation_breakdown_validation(df: pd.DataFrame, config: dict) -> None:

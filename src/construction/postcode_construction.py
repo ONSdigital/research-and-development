@@ -1,8 +1,5 @@
 import logging
-from typing import Callable
-
 import pandas as pd
-import numpy as np
 
 from src.outputs.outputs_helpers import create_period_year
 

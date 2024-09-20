@@ -83,6 +83,12 @@ def all_data_construction(
     updated_snapshot_df["is_constructed"] = False
     updated_snapshot_df["force_imputation"] = False
     construction_df["is_constructed"] = True
+    if "force_imputation" not in construction_df.columns:
+        construction_df["force_imputation"] = False
+    else:
+        construction_df["force_imputation"] = construction_df[
+            "force_imputation"
+        ].fillna(False)
 
     # Run GB specific actions
     if not is_northern_ireland:

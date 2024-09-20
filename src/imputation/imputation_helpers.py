@@ -86,8 +86,11 @@ def instance_fix(df: pd.DataFrame):
     column.
     """
     mask = (df.formtype == "0001") & (df.status == "Form sent out")
-    df.loc[mask, "instance"] = 1
 
+    if "is_constructed" in df.columns:
+        mask = mask & (df.is_constructed.isin([False]))
+
+    df.loc[mask, "instance"] = 1
     return df
 
 

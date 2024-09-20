@@ -63,20 +63,30 @@ def prepare_forms_gb(
     if "construction_type" in construction_df.columns:
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.construction_type.unique():
-            snapshot_df = prepare_short_to_long(snapshot_df, construction_df)
+            snapshot_df, unique_references = prepare_short_to_long(
+                snapshot_df, construction_df
+            )
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
     construction_df = create_period_year(construction_df)
+
+    # Set instances:
+    # Exclude short to long constructions as they have already had instances applied
+    # that we don't want to overwrite
     # Set instance=1 so longforms with status 'Form sent out' match correctly
     form_sent_condition = (snapshot_df.formtype == "0001") & (
         snapshot_df.status == "Form sent out"
     )
-    snapshot_df.loc[form_sent_condition, "instance"] = 1
+    snapshot_df.loc[
+        form_sent_condition & ~snapshot_df.reference.isin(unique_references), "instance"
+    ] = 1
     # Set instance=0 so shortforms with status 'Form sent out' match correctly
     form_sent_condition = (snapshot_df.formtype == "0006") & (
         snapshot_df.status == "Form sent out"
     )
-    snapshot_df.loc[form_sent_condition, "instance"] = 0
+    snapshot_df.loc[
+        form_sent_condition & ~snapshot_df.reference.isin(unique_references), "instance"
+    ] = 0
     return (snapshot_df, construction_df)
 
 
@@ -102,7 +112,9 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
     # For every short_to_long reference,
     # this copies the instance 0 the relevant number of times,
     # updating to the corresponding instance number
+    unique_references = []
     for index, value in ref_count.items():
+        unique_references.append(index)
         for instance in range(1, value):
             short_to_long_df_instance = short_to_long_df.loc[
                 short_to_long_df["reference"] == index
@@ -112,7 +124,13 @@ def prepare_short_to_long(updated_snapshot_df, construction_df):
                 [updated_snapshot_df, short_to_long_df_instance]
             )
 
-    return updated_snapshot_df
+    updated_snapshot_df.loc[
+        updated_snapshot_df["reference"].isin(unique_references)
+        & updated_snapshot_df["instance"].isnull(),
+        "instance",
+    ] = 0
+
+    return updated_snapshot_df, unique_references
 
 
 def clean_construction_type(value: str) -> str:
@@ -146,9 +164,9 @@ def finalise_forms_gb(updated_snapshot_df: pd.DataFrame) -> pd.DataFrame:
             and short forms reset.
     """
 
-    constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed == True]
+    constructed_df = updated_snapshot_df[updated_snapshot_df.is_constructed.isin([True])]
     not_constructed_df = updated_snapshot_df[
-        updated_snapshot_df.is_constructed == False
+        updated_snapshot_df.is_constructed.isin([False])
     ]
 
     # Long form records with a postcode in 601 use this as the postcode
@@ -277,7 +295,7 @@ def prep_new_rows(
 def replace_values_in_construction(
     updated_snapshot_df: pd.DataFrame, construction_df: pd.DataFrame
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Replace values in the snapshot dataframe with those in the construction dataframe.
+    """Replace values in the snapshot with those from construction dataframe.
 
     Args:
         updated_snapshot_df (pd.DataFrame): The updated snapshot dataframe.
