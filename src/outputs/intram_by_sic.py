@@ -10,20 +10,24 @@ OutputMainLogger = logging.getLogger(__name__)
 def output_intram_by_sic(
     df: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
     sic_div_detailed: pd.DataFrame,
-):
+) -> Dict[str, int]:
     """Run the outputs module.
 
     Args:
         df (pd.DataFrame): The dataset main with weights not applied
         config (dict): The configuration settings.
+        intram_tot_dict (dict): Dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         sic_div_detailed (pd.DataFrame): Format of the SIC output as mapper
 
+    Returns:
+        intram_tot_dict (dict): Dictionary with the intramural totals.
     """
     output_path = config["outputs_paths"]["outputs_master"]
     period = config["years"]["survey_year"]
@@ -91,3 +95,8 @@ def output_intram_by_sic(
     survey_year = config["years"]["survey_year"]
     filename = f"{survey_year}_output_intram_by_sic_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_intram_by_sic/{filename}", df_selected)
+
+    # Update intram totals dict for comparison of aggregates across outputs
+    intram_tot_dict["intram_by_sic"] = value_tot
+
+    return intram_tot_dict

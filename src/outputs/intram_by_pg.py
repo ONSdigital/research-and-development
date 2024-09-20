@@ -12,10 +12,11 @@ def output_intram_by_pg(
     ni_df: pd.DataFrame,
     pg_detailed: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
     uk_output: bool = False,
-):
+) -> Dict[str, int]:
     """Run the outputs module.
 
     Args:
@@ -23,10 +24,14 @@ def output_intram_by_pg(
         ni_df (pd.DataFrame): The NI datasets
         pg_detailed (pd.DataFrame): Detailed info for the product groups.
         config (dict): The configuration settings.
+        intram_tot_dict (dict): Dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
         uk_output (bool): If True, the output will include NI data.
+
+    Returns:
+        intram_tot_dict (dict): Dictionary with the intramural totals.
     """
     output_path = config["outputs_paths"]["outputs_master"]
     # assign columns for easier use
@@ -65,6 +70,9 @@ def output_intram_by_pg(
         columns={value_col: value_title}
     )
 
+    # calculate the intram total for QA across different outputs
+    intram_tot_dict["intram_by_pg"] = round(value_tot, 0)
+
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
@@ -76,3 +84,5 @@ def output_intram_by_pg(
         f"{output_path}/output_intram_by_pg_{'uk' if uk_output else 'gb'}/{filename}",
         df_merge,
     )
+
+    return intram_tot_dict

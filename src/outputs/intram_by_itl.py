@@ -23,7 +23,7 @@ def save_detailed_csv(
     run_id: int,
     write_csv: Callable,
     overwrite: bool = True,
-):
+) -> Dict[str, int]:
     """Save a df as a csv with a detailed filename.
 
     Args:
@@ -40,6 +40,8 @@ def save_detailed_csv(
         FileExistsError: An error raised if overwrite is false and the file
             already exists.
 
+    Returns:
+        Dict[str, int]: A dictionary of intramural totals.
     """
     date = datetime.now().strftime("%y-%m-%d")
     save_name = f"{survey_year}_{title}_{date}_v{run_id}.csv"
@@ -124,6 +126,7 @@ def output_intram_by_itl(
     gb_df: pd.DataFrame,
     ni_df: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
     uk_output: bool = False,
@@ -134,6 +137,7 @@ def output_intram_by_itl(
         gb_df (pd.DataFrame): GB microdata with weights applied.
         ni_df (pd.DataFrame): NI microdata (weights are 1),
         config (Dict[str, Any]): Project config.
+        intram_tot_dict (Dict[str, int]): Dictionary with the intramural totals.
         write_csv (Callable): A function to write to a csv file.
         run_id (int): The current run ID.
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
@@ -148,6 +152,13 @@ def output_intram_by_itl(
     area = "gb" if not uk_output else "uk"
     itl_dfs = [itl1, itl2]
     for i, itl_df in enumerate(itl_dfs, start=1):
+        # update the dictionary of intramural totals
+        if not uk_output:
+            # get the name of the column which contains the string "211"
+            col_name = itl_df.columns[itl_df.columns.str.contains("211")][0]
+            intram_tot_dict[f"GB_ITL{i}"] = round(itl_df[col_name].sum(), 0)
+
+        # Save the ITL data
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"
         save_detailed_csv(
             itl_df,
@@ -158,3 +169,5 @@ def output_intram_by_itl(
             write_csv,
             overwrite=True,
         )
+
+    return intram_tot_dict
