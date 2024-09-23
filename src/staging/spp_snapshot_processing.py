@@ -111,3 +111,4 @@ def response_rate(contributors: pd.DataFrame, responses: pd.DataFrame) -> float:
     SppProcessingLogger.info(f"The response rate is {int(rounded_resp_rate*100)}%")
 
     return response_rate
+
