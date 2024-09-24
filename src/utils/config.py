@@ -302,15 +302,15 @@ def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
     Returns:
         Tuple[bool, bool, bool, bool]: The main freezing config settings.
     """
-    run_with_snapshot_until_freezing = config["global"]["run_with_snapshot_until_freezing"]
+    run_with_snapshot = config["global"]["run_with_snapshot"]
     load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
-    run_frozen_data = config["global"]["run_frozen_data"]
+    run_with_frozen_data = config["global"]["run_with_frozen_data"]
     values = [
-        run_with_snapshot_until_freezing,
+        run_with_snapshot,
         load_updated_snapshot_for_comparison,
         run_updates_and_freeze,
-        run_frozen_data
+        run_with_frozen_data
     ]
     if len([val for val in values if val==True]) > 1:
         raise ValueError(
@@ -325,27 +325,27 @@ def validate_freezing_config_settings(user_config: dict):
 
     # Determine and validate freezing settings
     (
-        run_with_snapshot_until_freezing,
+        run_with_snapshot,
         load_updated_snapshot_for_comparison,
-        run_updates_and_freeze, 
-        run_frozen_data,
+        run_updates_and_freeze,
+        run_with_frozen_data,
     ) = validate_freezing_run_config(user_config)
 
-    frozen_snapshot_path = user_config["hdfs_paths"]["frozen_snapshot_path"]
+    snapshot_path = user_config["hdfs_paths"]["snapshot_path"]
     frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
 
     updated_snapshot_path = user_config["hdfs_paths"]["updated_snapshot_path"]
     freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
     freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
 
-    if run_with_snapshot_until_freezing:
-        if frozen_snapshot_path is None:
+    if run_with_snapshot:
+        if snapshot_path is None:
             raise ValueError(
                 "If running first snapshot of results, a frozen snapshot path must be"
                 " provided."
             )
 
-    if run_frozen_data:
+    if run_with_frozen_data:
         if frozen_data_staged_path is None:
             raise ValueError(
                 "If running frozen data, a frozen data staged path must be provided."
