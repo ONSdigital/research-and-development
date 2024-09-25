@@ -14,14 +14,16 @@ GbSasLogger = logging.getLogger(__name__)
 def output_gb_sas(
     df: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
-):
+) -> Dict[str, int]:
     """Run the outputs module.
 
     Args:
         df (pd.DataFrame): The dataset main with estimation weights
         config (dict): The configuration settings.
+        intram_tot_dict (dict): Dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
@@ -51,6 +53,9 @@ def output_gb_sas(
     # Create oth_sc
     df1["oth_sc"] = df1[["242", "248", "250"]].fillna(0).sum(axis=1)
 
+    # caluclate the intram total for QA across different outputs
+    intram_tot_dict["GB_sas"] = round(df1["211"].sum(), 0)
+
     # Create GB SAS output dataframe with required columns from schema
     schema_path = config["schema_paths"]["gb_sas_schema"]
     schema_dict = load_schema(schema_path)
@@ -61,3 +66,5 @@ def output_gb_sas(
     survey_year = config["years"]["survey_year"]
     filename = f"{survey_year}_output_gb_sas_{tdate}_v{run_id}.csv"
     write_csv(f"{output_path}/output_gb_sas/{filename}", output)
+
+    return intram_tot_dict

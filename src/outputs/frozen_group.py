@@ -17,10 +17,11 @@ def output_frozen_group(
     df_gb: pd.DataFrame,
     df_ni: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
     deduplicate: bool = True,
-) -> None:
+) -> Dict[str, int]:
     """Creates a "frozen group" output  for the entire UK. In BERD (GB) data,
     creates foreign ownership and cora status. Selects the columns we need for
     this type of output. Combines BERD and NI data. Adds size bands. De-
@@ -33,6 +34,7 @@ def output_frozen_group(
         df_ni (pd.DataFrame): The NI microdata; weights are 1
         ultfoc_mapper (pd.DataFrame): Ultimate foreign owner mappper.
         config (dict): The configuration settings.
+        intram_tot_dict: (dict): Intram totals for various outputs for QA
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
@@ -196,6 +198,9 @@ def output_frozen_group(
     for zcol in zero_columns:
         df_agg[zcol] = 0
 
+    # Update intram totals dict for comparison of aggregates across outputs
+    intram_tot_dict["frozen_group"] = round(df_agg["211"].sum(), 0)
+
     # Create frozen group output dataframe with required columns from schema
     schema_path = config["schema_paths"]["frozen_group_schema"]
     schema_dict = load_schema(schema_path)
@@ -205,6 +210,6 @@ def output_frozen_group(
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     filename = f"{survey_year}_output_frozen_group_{tdate}_v{run_id}.csv"
-    write_csv(f"{output_path}/output_frozen_group/{filename}", output)
+    write_csv(f"{output_path}output_frozen_group/{filename}", output)
 
-    return None
+    return intram_tot_dict

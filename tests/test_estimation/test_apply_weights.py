@@ -159,7 +159,7 @@ class TestApplyWeights:
         input_df, input_columns = self.create_input_df()
         exp_output_df = self.create_expected_output()
 
-        result_df, cols_list = appw.apply_weights(input_df, config, 4)
+        result_df = appw.apply_weights(input_df, config, True, 4)
 
         input_columns.remove("reference")
         input_columns.remove("a_weight")
@@ -167,6 +167,3 @@ class TestApplyWeights:
         assert_frame_equal(
             result_df, exp_output_df, check_like=True, check_exact=False, rtol=0.05
         )
-        assert sorted(cols_list) == sorted(
-            input_columns
-        ), "input column list and returned column list are not equal"
