@@ -63,7 +63,7 @@ pipeline {
                 unstash name: 'Checkout'
 
                 sh '''
-                PATH=$WORKSPACE/venv/bin:/usr/local/bin:$PATH
+                PATH=$WORKSPACE/venv/bin:/usr/local/bin:/root/.local/bin:$PATH
 
                 python3 -m pip install -U pip
                 pip3 install virtualenv
@@ -72,15 +72,14 @@ pipeline {
                     virtualenv venv
                 fi
                 . venv/bin/activate
+                export PIP_USER=false
 
-                python -m pip install -U pip
-                pip3 install pypandoc==1.7.5
+                pip3 install pypandoc
 
                 # Remove pydoop from requirements before it's installed.
                 awk '!/pydoop.*/' requirements.txt > temp && mv temp requirements.txt
 
                 pip3 install -r requirements.txt
-                pip3 install pyspark==2.4.0
 
                 pip3 freeze
 
@@ -105,8 +104,13 @@ pipeline {
                 sh '''
                 . venv/bin/activate
 
-                coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
-              -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py
+                python3 -m pytest --junitxml "junit-report.xml" "./tests"
+                '''
+
+                junit restResults: 'junit-report.xml'
+
+                /* coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
+                    -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py
                 '''
                 /*
                 // Lines below create a coverage report for on Jenkins. Currently commented out
@@ -141,8 +145,8 @@ pipeline {
             steps {
                 onStage()
                 colourText('info', "Building Python package.")
-                unstash name: 'Checkout'
-                unstash name: 'venv'
+                // unstash name: 'Checkout'
+                // unstash name: 'venv'
 
                 sh '''
                 . venv/bin/activate
