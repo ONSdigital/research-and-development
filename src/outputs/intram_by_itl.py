@@ -153,10 +153,9 @@ def output_intram_by_itl(
     itl_dfs = [itl1, itl2]
     for i, itl_df in enumerate(itl_dfs, start=1):
         # update the dictionary of intramural totals
-        if not uk_output:
-            # get the name of the column which contains the string "211"
-            col_name = itl_df.columns[itl_df.columns.str.contains("211")][0]
-            intram_tot_dict[f"GB_ITL{i}"] = round(itl_df[col_name].sum(), 0)
+        # get the name of the column which contains the string "211"
+        col_name = itl_df.columns[itl_df.columns.str.contains("211")][0]
+        intram_tot_dict[f"{area}_itl{i}"] = round(itl_df[col_name].sum(), 0)
 
         # Save the ITL data
         output_dir = f"{OUTPUT_PATH}/output_intram_{area}_itl{i}/"

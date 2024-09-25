@@ -140,11 +140,12 @@ def run_outputs(  # noqa: C901
             )
         else:
             OutputMainLogger.info("Starting Intram by PG (UK) output...")
-            output_intram_by_pg(
+            intram_tot_dict = output_intram_by_pg(
                 outputs_df,
                 ni_full_responses,
                 pg_detailed,
                 config,
+                intram_tot_dict,
                 write_csv,
                 run_id,
                 uk_output=True,
@@ -172,10 +173,11 @@ def run_outputs(  # noqa: C901
             )
         else:
             OutputMainLogger.info("Starting Intram by ITL (UK) output...")
-            output_intram_by_itl(
+            intram_tot_dict = output_intram_by_itl(
                 outputs_df,
                 ni_full_responses,
                 config,
+                intram_tot_dict,
                 write_csv,
                 run_id,
                 uk_output=True,

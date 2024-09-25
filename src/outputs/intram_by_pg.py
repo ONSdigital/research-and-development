@@ -71,7 +71,7 @@ def output_intram_by_pg(
     )
 
     # calculate the intram total for QA across different outputs
-    intram_tot_dict["intram_by_pg"] = round(value_tot, 0)
+    intram_tot_dict[f"intram_by_pg_{'uk' if uk_output else 'gb'}"] = round(value_tot, 0)
 
     # Outputting the CSV file with timestamp and run_id
     tdate = datetime.now().strftime("%y-%m-%d")

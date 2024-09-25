@@ -17,7 +17,7 @@ def output_gb_sas(
     intram_tot_dict: Dict[str, int],
     write_csv: Callable,
     run_id: int,
-):
+) -> Dict[str, int]:
     """Run the outputs module.
 
     Args:
