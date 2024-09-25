@@ -97,6 +97,6 @@ def output_intram_by_sic(
     write_csv(f"{output_path}/output_intram_by_sic/{filename}", df_selected)
 
     # Update intram totals dict for comparison of aggregates across outputs
-    intram_tot_dict["intram_by_sic"] = value_tot
+    intram_tot_dict["intram_by_sic"] = round(value_tot, 0)
 
     return intram_tot_dict
