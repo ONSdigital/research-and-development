@@ -80,7 +80,6 @@ pipeline {
                 awk '!/pydoop.*/' requirements.txt > temp && mv temp requirements.txt
 
                 pip3 install -r requirements.txt
-                pip3 install pyspark==3.2.3
 
                 pip3 freeze
 
