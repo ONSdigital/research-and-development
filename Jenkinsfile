@@ -107,7 +107,7 @@ pipeline {
                 python3 -m pytest --junitxml "junit-report.xml" "./tests"
                 '''
 
-                junit restResults: 'junit-report.xml'
+                junit testResults: 'junit-report.xml'
 
                 /* coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
                     -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py
