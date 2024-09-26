@@ -19,15 +19,16 @@ from src.outputs.intram_by_itl import output_intram_by_itl
 from src.outputs.intram_by_civil_defence import output_intram_by_civil_defence
 from src.outputs.intram_by_sic import output_intram_by_sic
 from src.outputs.total_fte import qa_output_total_fte
+from src.outputs.intram_totals import output_intram_totals
 
 OutputMainLogger = logging.getLogger(__name__)
 
 
 def run_outputs(  # noqa: C901
-    estimated_df: pd.DataFrame,
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
     config: Dict[str, Any],
+    intram_tot_dict: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
     pg_detailed: pd.DataFrame,
@@ -37,11 +38,10 @@ def run_outputs(  # noqa: C901
     """Run the outputs module.
 
     Args:
-        estimated_df (pd.DataFrame): The main dataset containing
-            short and long form output
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         ni_full_responses(pd.DataFrame): Dataset with all NI data
         config (dict): The configuration settings.
+        intram_tot_dict (dict): Dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
@@ -50,10 +50,8 @@ def run_outputs(  # noqa: C901
         sic_division_detailed (pd.DataFrame): Detailed descriptons of SIC divisions
     """
 
-    weighted_df = weighted_df.copy().loc[weighted_df.instance != 0]
-
     (ni_full_responses, outputs_df, tau_outputs_df) = form_output_prep(
-        estimated_df, weighted_df, ni_full_responses
+        weighted_df, ni_full_responses, config
     )
 
     # Running short form output
@@ -88,9 +86,10 @@ def run_outputs(  # noqa: C901
     # Running TAU output
     if config["global"]["output_tau"]:
         OutputMainLogger.info("Starting TAU output...")
-        output_tau(
+        intram_tot_dict = output_tau(
             tau_outputs_df,
             config,
+            intram_tot_dict,
             write_csv,
             run_id,
         )
@@ -99,7 +98,9 @@ def run_outputs(  # noqa: C901
     # Running GB SAS output
     if config["global"]["output_gb_sas"]:
         OutputMainLogger.info("Starting GB SAS output...")
-        output_gb_sas(outputs_df, config, write_csv, run_id)
+        intram_tot_dict = output_gb_sas(
+            outputs_df, config, intram_tot_dict, write_csv, run_id
+        )
         OutputMainLogger.info("Finished GB SAS output.")
 
     # Running NI SAS output
@@ -119,11 +120,12 @@ def run_outputs(  # noqa: C901
     # Running Intram by PG output (GB)
     if config["global"]["output_intram_by_pg_gb"]:
         OutputMainLogger.info("Starting Intram by PG (GB) output...")
-        output_intram_by_pg(
+        intram_tot_dict = output_intram_by_pg(
             outputs_df,
             ni_full_responses,
             pg_detailed,
             config,
+            intram_tot_dict,
             write_csv,
             run_id,
             uk_output=False,
@@ -138,11 +140,12 @@ def run_outputs(  # noqa: C901
             )
         else:
             OutputMainLogger.info("Starting Intram by PG (UK) output...")
-            output_intram_by_pg(
+            intram_tot_dict = output_intram_by_pg(
                 outputs_df,
                 ni_full_responses,
                 pg_detailed,
                 config,
+                intram_tot_dict,
                 write_csv,
                 run_id,
                 uk_output=True,
@@ -152,10 +155,11 @@ def run_outputs(  # noqa: C901
     # Running Intram by ITL (GB)
     if config["global"]["output_intram_gb_itl"]:
         OutputMainLogger.info("Starting Intram by ITL (GB) output...")
-        output_intram_by_itl(
+        intram_tot_dict = output_intram_by_itl(
             outputs_df,
             ni_full_responses,
             config,
+            intram_tot_dict,
             write_csv,
             run_id,
         )
@@ -169,10 +173,11 @@ def run_outputs(  # noqa: C901
             )
         else:
             OutputMainLogger.info("Starting Intram by ITL (UK) output...")
-            output_intram_by_itl(
+            intram_tot_dict = output_intram_by_itl(
                 outputs_df,
                 ni_full_responses,
                 config,
+                intram_tot_dict,
                 write_csv,
                 run_id,
                 uk_output=True,
@@ -182,10 +187,11 @@ def run_outputs(  # noqa: C901
     # Running frozen group
     if config["global"]["output_frozen_group"]:
         OutputMainLogger.info("Starting frozen group output...")
-        output_frozen_group(
+        intram_tot_dict = output_frozen_group(
             outputs_df,
             ni_full_responses,
             config,
+            intram_tot_dict,
             write_csv,
             run_id,
         )
@@ -206,9 +212,10 @@ def run_outputs(  # noqa: C901
     # Running Intram by SIC
     if config["global"]["output_intram_by_sic"]:
         OutputMainLogger.info("Starting Intram by SIC output...")
-        output_intram_by_sic(
+        intram_tot_dict = output_intram_by_sic(
             outputs_df,
             config,
+            intram_tot_dict,
             write_csv,
             run_id,
             sic_division_detailed,
@@ -219,3 +226,9 @@ def run_outputs(  # noqa: C901
     if config["global"]["output_fte_total_qa"]:
         qa_output_total_fte(outputs_df, config, write_csv, run_id)
         OutputMainLogger.info("Finished FTE total QA output.")
+
+    if config["global"]["output_intram_totals"]:
+        output_intram_totals(intram_tot_dict, config, write_csv, run_id)
+        OutputMainLogger.info("Finished Intramural totals output.")
+
+    OutputMainLogger.info("Finished Outputs module.")

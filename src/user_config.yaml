@@ -7,11 +7,13 @@ global:
   # Staging and validation settings
   postcode_csv_check: True
   load_ni_data: True
+  # Pipeline run type
+  run_with_snapshot: True                         # Run until point of freezing
+  run_with_snapshot_and_freeze: False             # Last run with frozen snapshot - produces frozen csv
+  run_with_frozen_data: False                     # Run with specified frozen csv
   # Freezing settings
-  run_with_snapshot_until_freezing: True      # Run until point of freezing - last run is first freeze
-  load_updated_snapshot_for_comparison: False # Run with new json snapshot, and compare to specified frozen csv
-  run_updates_and_freeze: False               # Add specified changes to frozen csv, and refreeze
-  run_frozen_data: False                      # Run with specified frozen csv
+  load_updated_snapshot_for_comparison: False     # Run with new json snapshot, and compare to specified frozen csv
+  run_updates_and_freeze: False                   # Add specified changes to frozen csv, and refreeze
   # Construction Settings
   run_all_data_construction: False
   run_postcode_construction: False
@@ -46,10 +48,11 @@ global:
   output_fte_total_qa: False
   output_status_filtered: False
   output_frozen_group: False
+  output_intram_totals: False
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # Run until point of freezing - last run is first freeze
+  snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # Run until point of freezing - last run is first freeze
   updated_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
@@ -74,7 +77,7 @@ hdfs_paths:
 s3_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  frozen_snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
+  snapshot_path: "/ons/rdbe_dev/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json" # first snapshot of run
   updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v1/NEW_SNAPSHOT_TODO.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"

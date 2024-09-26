@@ -155,13 +155,15 @@ class TestOutputIntramByPG(object):
         pth = self.setup_tmp_dir(pathlib.Path(tmp_path), ni)
         # alter path so that tests pass
         config["outputs_paths"]["outputs_master"] = os.path.dirname(pth)
+        intram_dict = {"estimated": 600}
         if not ni:
             input_data_ni = pd.DataFrame()
-        output_intram_by_pg(
+        intram_dict = output_intram_by_pg(
             gb_df=input_data_gb,
             ni_df=input_data_ni,
             pg_detailed=pg_detailed_df,
             config=config,
+            intram_tot_dict=intram_dict,
             write_csv=write_csv_func,
             run_id=1,
             uk_output=ni,

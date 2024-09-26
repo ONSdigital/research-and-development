@@ -4,8 +4,11 @@ import pandas as pd
 from typing import Callable, Dict, Any
 from datetime import datetime
 
-import src.site_apportionment.site_apportionment as sap
-import src.site_apportionment.output_status_filtered as osf
+from src.site_apportionment.site_apportionment import run_apportion_sites
+from src.site_apportionment.output_status_filtered import (
+    output_status_filtered,
+    calc_weighted_intram_tot,
+)
 
 SitesMainLogger = logging.getLogger(__name__)
 
@@ -15,7 +18,6 @@ def run_site_apportionment(
     config: Dict[str, Any],
     write_csv: Callable,
     run_id: int,
-    output_type: str,
 ) -> pd.DataFrame:
     """Run the apportionment to sites module.
 
@@ -25,13 +27,12 @@ def run_site_apportionment(
     Same percentages are used for each product group.
 
     Args:
+        df (pd.DataFrame): Main dataset before the outputs module.
         config (dict): The pipeline configuration
-        df (pd.DataFrame): Main dataset before the outputs
+        intram_tot_dict (dict): Dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         run_id (int): The current run id
-        output_type (str): The type of output being processed, either "estimated_df"
-            or "weighted_df". Needed for the QA file naming.
     Returns:
         df_out (pd.DataFrame): Percentages filled in for short forms and applied
             to apportion  for long forms
@@ -43,18 +44,27 @@ def run_site_apportionment(
 
     # Conditionally output the records to be removed
     if config["global"]["output_status_filtered"]:
-        osf.output_status_filtered(df, imp_markers_to_keep, config, write_csv, run_id)
+        output_status_filtered(df, imp_markers_to_keep, config, write_csv, run_id)
+
+    # Calculate the intramural totals before apportionment
+    intram_tot_dict = {}
+    intram_tot_dict = calc_weighted_intram_tot(df, imp_markers_to_keep, intram_tot_dict)
 
     SitesMainLogger.info("Starting apportionment to sites...")
-    df_out = sap.run_apportion_sites(df, imp_markers_to_keep, config)
+    df_out = run_apportion_sites(df, imp_markers_to_keep, config, intram_tot_dict)
+
+    # recaluculate the intermural totals after apportionment
+    intram_tot_dict = calc_weighted_intram_tot(
+        df_out, imp_markers_to_keep, intram_tot_dict
+    )
 
     # Output QA files
     if config["global"]["output_apportionment_qa"]:
         SitesMainLogger.info("Outputting Apportionment files.")
         tdate = datetime.now().strftime("%y-%m-%d")
         survey_year = config["years"]["survey_year"]
-        filename = f"{survey_year}_{output_type}_apportioned_{tdate}_v{run_id}.csv"
+        filename = f"{survey_year}_estimated_apportioned_{tdate}_v{run_id}.csv"
         write_csv(f"{qa_path}/{filename}", df_out)
 
     SitesMainLogger.info("Finished apportionment to sites.")
-    return df_out
+    return df_out, intram_tot_dict

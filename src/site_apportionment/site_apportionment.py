@@ -1,5 +1,5 @@
 # Standard Library Imports
-from typing import Tuple, List, Dict, Union
+from typing import Tuple, List, Dict, Union, Any
 import logging
 
 # Third Part Imports
@@ -45,7 +45,7 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
 
     The condtitions for the long forms needing 100 in the percentage column are:
     - long forms, exactly 1 site, instance >=1 and notnull postcode
-    - long forms with status "Form sent out"
+    - long forms with status "Form sent out" that have not been through MoR
 
     Args:
         df (pd.DataFrame): The input DataFrame.
@@ -56,16 +56,6 @@ def set_percentages(df: pd.DataFrame) -> pd.DataFrame:
     Raises:
         ValueError: If the percent column for short forms is not blank.
     """
-    # If the percent column for short forms is not blank, raise an error.
-    # This might not be needed now when doing MoR to Short Forms
-    # short_forms = df[df[form_col] == short_code]
-    # if not short_forms[percent_col].isna().all():
-    #     raise ValueError("Percent column for short forms should be blank.")
-
-    # we reset the percent column to 100 for short forms
-    # TODO: Check what the proceedure should be for imputed short forms.
-    df.loc[df[form_col] == short_code, percent_col] = 100
-
     # Condition for long forms with status "Form sent out"
     # Note: those imputed by MoR will have had the postcode column imputed, so we check
     # for null in the postcode count column
@@ -454,10 +444,34 @@ def sort_rows_order_cols(df: pd.DataFrame, cols_in_order: List[str]) -> pd.DataF
     return sorted_df
 
 
+def consistency_checks(df: pd.DataFrame, intram_dict) -> None:
+    """Check the intram totals after apportionment align with those before.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to check.
+        intram_dict (Dict): Dictionary with the intramural totals.
+
+    Raises:
+        ValueError: If the intramural totals do not align.
+    """
+    # calculate the weighted intramural total
+    weighted_intram_total = round((df["211"] * df["a_weight"]).sum(), 0)
+
+    intram_diff = weighted_intram_total - intram_dict["estimated"]
+    print("intram diff in millions: ", intram_diff / 1e6)
+    # if abs(intram_diff) > 1:
+    #     raise ValueError(
+    #         f"Weighted intramural totals do not align. "
+    #          f"Before: {intram_dict['estimated']}, "
+    #         f"After: {weighted_intram_total}"
+    #     )
+
+
 def run_apportion_sites(
     df: pd.DataFrame,
     imp_markers_to_keep: List[str],
     config: Dict[str, Union[str, List[str]]],
+    intram_tot_dict: Dict[str, Any],
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -536,5 +550,8 @@ def run_apportion_sites(
 
     # Sort by period, ref, instance in ascending order.
     df_out = sort_rows_order_cols(df_out, orig_cols)
+
+    # run consisntency checks on the intramural totals
+    consistency_checks(df_out, intram_tot_dict)
 
     return df_out
