@@ -20,7 +20,7 @@ from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
-
+from src.utils.singleton_boto import SingletonBoto
 
 MainLogger = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ def run_pipeline(user_config_path, dev_config_path):
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
 
-    #create singletion boto3 client object & pass in bucket string
     
     # Set up the logger
     global_config = config["global"]
@@ -50,10 +49,12 @@ def run_pipeline(user_config_path, dev_config_path):
     platform = config["global"]["platform"]
 
     if platform == "s3":
-        from src.utils import s3_mods as mods
+        #create singletion boto3 client object & pass in bucket string
+        boto3_client = SingletonBoto.get_client()
 
+        from src.utils import s3_mods as mods
         # Creating boto3 client and adding it to the config dict
-        config["client"] = mods.create_client(config)
+        config["client"] = boto3_client
     elif platform == "network":
         # If the platform is "network" or "hdfs", there is no need for a client.
         # Adding a client = None for consistency.
