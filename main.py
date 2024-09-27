@@ -2,6 +2,9 @@ from importlib import reload
 import time
 import os
 
+os.chdir('../../../home/cdsw/research-and-development')
+print(f"Current working directory is {os.getcwd()}")
+
 import src.pipeline as src
 
 # reload the pipeline module to implement any changes

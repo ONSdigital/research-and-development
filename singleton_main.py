@@ -4,6 +4,11 @@ This class will be:
     Accessible globally throughout the codebase
     Only one instance will exist, and this instance is used every time
 '''
+import os
+
+os.chdir('../../../home/cdsw/research-and-development')
+print(f"Current working directory is {os.getcwd()}")
+
 from src.utils.singleton_boto import SingletonBoto
 
 

@@ -33,11 +33,22 @@ from io import StringIO
 import boto3
 import raz_client
 
+import singletion_boto3
+
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
 
 # set up logging
 s3_logger = logging.getLogger(__name__)
+
+s3_client = SingletonBoto().get_client()
+
+#s3_bucket = SingletonBoto().get_bucket()
+
+ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
+s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
+
+config = 
 
 def create_client(config: dict):
     """Initialise and configure a boto3 client. 
@@ -51,7 +62,7 @@ def create_client(config: dict):
         boto3 client
     """
     client = boto3.client("s3")
-    raz_client.configure_ranger_raz(client, ssl_file=config["s3"]["ssl_file"])
+    raz_client.configure_ranger_raz(client, ssl_file=ssl_file_dev)
     return client
 
 
@@ -138,7 +149,8 @@ def rd_load_json(filepath: str) -> dict:
         datadict (dict): The entire contents of the JSON file.
     """
     # Use the boto3 client from the config
-    s3_client = config["client"]
+    
+    # s3_client = config["client"]
 
     # Load the json file using the client method
     with s3_client.get_object(

@@ -3,7 +3,7 @@ from functools import wraps
 from time import perf_counter
 import traceback
 import pandas as pd
-from table_logger import TableLogger
+
 import logging.config
 
 
