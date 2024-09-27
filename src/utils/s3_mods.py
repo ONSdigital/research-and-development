@@ -185,6 +185,7 @@ def rd_mkdir(path: str, config: dict) -> None:
     Returns:
         None
     """
+    
     _ = create_folder_on_s3(
         client=config["client"],
         bucket_name=config["s3"]["s3_bucket"],
