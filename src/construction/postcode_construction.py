@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 
 from src.outputs.outputs_helpers import create_period_year
-
+from src.staging.postcode_validation import format_postcodes
 from src.construction.construction_helpers import replace_values_in_construction
 
 
@@ -24,6 +24,15 @@ def postcode_data_construction(
         pd.DataFrame: The snapshot data with the constructed values
     """
     construction_logger.info("Running postcode construction")
+
+    # Create postcode_harmonised column
+    construction_df["postcodes_harmonised"] = construction_df["601"].fillna(
+        construction_df["referencepostcode"]
+    )
+    construction_df["postcodes_harmonised"] = construction_df[
+        "postcodes_harmonised"
+    ].apply(format_postcodes)
+
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
 
