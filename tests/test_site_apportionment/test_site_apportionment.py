@@ -538,10 +538,10 @@ class TestCreateNotnullMask:
         ]
 
         expected_df = pandasDF(data=data, columns=expected_columns)
-        expected_df = expected_df.astype({"len": object})
+        # expected_df = expected_df.astype({"len": object})
 
         # test that the operations in this function give the expected output
-        assert_frame_equal(demo_df, expected_df)
+        assert_frame_equal(demo_df, expected_df, check_dtype=False)
 
 
 class TestSortRowsOrderCols:

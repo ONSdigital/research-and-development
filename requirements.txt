@@ -19,6 +19,6 @@ setuptools
 table-logger
 toml
 typing
-# boto3
-# raz_client
-# rdsa-utils
+boto3
+raz_client
+rdsa-utils
