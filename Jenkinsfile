@@ -4,7 +4,7 @@
 def artifactoryStr = 'art-p-01'
 artServer = Artifactory.server "${artifactoryStr}"
 buildInfo = Artifactory.newBuildInfo()
-def agentPython3Version = 'python_3.6.1'
+def agentPython3Version = 'python_3.10'
 def artifactVersion
 
 // Define a function to push packaged code to Artifactory
