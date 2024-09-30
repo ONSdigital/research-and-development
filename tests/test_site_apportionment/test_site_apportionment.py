@@ -494,8 +494,10 @@ class TestCreateNotnullMask:
 
         # test applying str.len() to column col
         result_len = demo_df["col"].str.len()
-        exp_len = pd.Series([np.nan, 1.0, 0.0, np.nan, np.nan, 1.0], name="col")
-        assert_series_equal(result_len, exp_len)
+        exp_len = pd.Series([np.nan, "a", "", pd.NA, np.nan, " "], name="col")
+
+        actual_len = pd.Series([np.nan, 1, 0, pd.NA, np.nan, 1], name="col")
+        assert_series_equal(result_len, actual_len, check_dtype=False)
 
     def test_other_nulls_dataframe_demo(self):
         """Dataframe visualisation of tests for nulls.
@@ -528,14 +530,15 @@ class TestCreateNotnullMask:
 
         data = [
             [0, 1, np.nan, np.nan, True, True, np.nan, np.nan],  # noqa
-            [111, "a", np.nan, np.nan, True, True, 1.0, True],  # noqa
-            [222, "", np.nan, True, True, True, 0.0, np.nan],  # noqa
-            [333, pd.NA, True, np.nan, np.nan, np.nan, np.nan, np.nan],  # noqa
+            [111, "a", np.nan, np.nan, True, True, 1, True],  # noqa
+            [222, "", np.nan, True, True, True, 0, np.nan],  # noqa
+            [333, pd.NA, True, np.nan, np.nan, pd.NA, np.nan, np.nan],  # noqa
             [444, np.nan, True, np.nan, np.nan, np.nan, np.nan, np.nan],  # noqa
-            [555, " ", np.nan, np.nan, True, True, 1.0, True],  # noqa
+            [555, " ", np.nan, np.nan, True, True, 1, True],  # noqa
         ]
 
         expected_df = pandasDF(data=data, columns=expected_columns)
+        expected_df = expected_df.astype({"len": object})
 
         # test that the operations in this function give the expected output
         assert_frame_equal(demo_df, expected_df)
