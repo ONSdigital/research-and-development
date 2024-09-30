@@ -145,8 +145,8 @@ pipeline {
             steps {
                 onStage()
                 colourText('info', "Building Python package.")
-                // unstash name: 'Checkout'
-                // unstash name: 'venv'
+                unstash name: 'Checkout'
+                unstash name: 'venv'
 
                 sh '''
                 . venv/bin/activate

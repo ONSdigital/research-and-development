@@ -2,7 +2,7 @@ arrow==1.2.3
 coverage
 detect-secrets
 # myst-parser
-numpy==1.24.4 # required for users in DAP to run pipeline (added here for consistency)
+numpy==1.19.5 # required for users in DAP to run pipeline (added here for consistency)
 pandas==1.5.3
 pip
 postcodes_uk
