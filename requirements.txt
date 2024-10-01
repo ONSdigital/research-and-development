@@ -9,7 +9,7 @@ postcodes_uk
 pre-commit==2.17.0
 # pydoop # Needed in dev/test and DAP but not in local
 pyarrow
-pytest==5.4.3 # postcodes_uk relies on pytest 5.4.3
+pytest # postcodes_uk relies on pytest 5.4.3
 python-dotenv
 pyyaml
 readme-coverage-badger
