@@ -112,6 +112,5 @@ def run_make_dirs():
 
 
 if __name__ == "__main__":
-    global config
 
     run_make_dirs()
