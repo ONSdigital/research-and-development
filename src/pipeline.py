@@ -21,7 +21,6 @@ from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
 
-
 MainLogger = logging.getLogger(__name__)
 
 
@@ -37,6 +36,7 @@ def run_pipeline(user_config_path, dev_config_path):
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
 
+    
     # Set up the logger
     global_config = config["global"]
     logger = logger_creator(global_config)
@@ -48,17 +48,20 @@ def run_pipeline(user_config_path, dev_config_path):
     platform = config["global"]["platform"]
 
     if platform == "s3":
-        from src.utils import s3_mods as mods
+        #create singletion boto3 client object & pass in bucket string
+        from src.utils.singleton_boto import SingletonBoto
+        boto3_client = SingletonBoto.get_client()
 
+        from src.utils import s3_mods as mods
         # Creating boto3 client and adding it to the config dict
-        config["client"] = mods.create_client(config)
+        # config["client"] = boto3_client
     elif platform == "network":
         # If the platform is "network" or "hdfs", there is no need for a client.
         # Adding a client = None for consistency.
-        config["client"] = None
+        # config["client"] = None
         from src.utils import local_file_mods as mods
     elif platform == "hdfs":
-        config["client"] = None
+        # config["client"] = None
         from src.utils import hdfs_mods as mods
     else:
         MainLogger.error(f"The selected platform {platform} is wrong")

@@ -2,6 +2,12 @@ from importlib import reload
 import time
 import os
 
+# Change to the project repository location
+my_wd = os.getcwd()
+my_repo = "research-and-development"
+if not my_wd.endswith(my_repo):
+    os.chdir(my_repo)
+
 import src.pipeline as src
 
 # reload the pipeline module to implement any changes

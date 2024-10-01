@@ -185,7 +185,7 @@ def load_val_snapshot_json(
     )
     val.validate_data_with_schema(responses_df, "./config/long_response.toml")
 
-    if config["global"]["platform"] == "hdfs" and config["global"]["dev_test"]:
+    if config["global"]["platform"] == "s3" and config["global"]["dev_test"]:
         responses_df["instance"] = 0
 
     # Data Transmutation

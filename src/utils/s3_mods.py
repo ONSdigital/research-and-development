@@ -25,6 +25,7 @@ To do:
 import json
 import logging
 
+
 # Third party libraries
 import pandas as pd
 from io import StringIO
@@ -35,25 +36,16 @@ import raz_client
 
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
+from src.utils.singleton_boto import SingletonBoto
 
 # set up logging
 s3_logger = logging.getLogger(__name__)
 
-def create_client(config: dict):
-    """Initialise and configure a boto3 client. 
-    
-    This function configures the raz_client, which is needed for authentication 
-    between CDSW session and the s3 server, using the parameters stored in the config.
+s3_client = SingletonBoto.get_client()
 
-    Args:
-        config (dict): Combined config (s3 parameters are in developer config)
-    Returns:
-        boto3 client
-    """
-    client = boto3.client("s3")
-    raz_client.configure_ranger_raz(client, ssl_file=config["s3"]["ssl_file"])
-    return client
 
+ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
+s3_bucket_dev =     "onscdp-dev-data01-5320d6ca"
 
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
@@ -69,10 +61,9 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
-    # Open the boto3 client
-    s3_client = config["client"]
+    
     with s3_client.get_object(
-        Bucket=config["s3"]["s3_bucket"],
+        Bucket=s3_bucket_dev,
         Key=filepath
     )['Body'] as file:
 
@@ -116,12 +107,9 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
     # "Rewind" the stream to the start of the buffer
     csv_buffer.seek(0)
 
-    # Use the boto3 client from the config
-    s3_client = config["client"]
-
     # Write the buffer into the s3 bucket
     _ = s3_client.put_object(
-        Bucket=config["s3"]["s3_bucket"],
+        Bucket=s3_bucket_dev,
         Body=csv_buffer.getvalue(),
         Key=filepath
     )
@@ -137,12 +125,10 @@ def rd_load_json(filepath: str) -> dict:
     Returns:
         datadict (dict): The entire contents of the JSON file.
     """
-    # Use the boto3 client from the config
-    s3_client = config["client"]
 
     # Load the json file using the client method
     with s3_client.get_object(
-        Bucket=config["s3"]["s3_bucket"],
+        Bucket=s3_bucket_dev,
         Key=filepath
     )['Body'] as json_file:
         datadict = json.load(json_file)
@@ -165,8 +151,8 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """
 
     result = file_exists(
-        client=config["client"],
-        bucket_name=config["s3"]["s3_bucket"],
+        client=s3_client,
+        bucket_name=s3_bucket_dev,
         object_name=filepath)
 
     if not result and raise_error:
@@ -184,9 +170,11 @@ def rd_mkdir(path: str) -> None:
     Returns:
         None
     """
+    
     _ = create_folder_on_s3(
-        client=config["client"],
-        bucket_name=config["s3"]["s3_bucket"],
+        # client=config["client"],
+        s3_client,
+        bucket_name=s3_bucket_dev,
         folder_path=path,
     )
 

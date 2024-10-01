@@ -28,17 +28,7 @@ global:
     singular: True
     dtype: "str"
     accept_nonetype: False
-  # Construction Settings
-  load_reference_list:
-    singular: True
-    dtype: "bool"
-    accept_nonetype: False
   load_from_feather:
-    singular: True
-    dtype: "bool"
-    accept_nonetype: False
-  # Apportionment to sites settings
-  apportion_sites:
     singular: True
     dtype: "bool"
     accept_nonetype: False
