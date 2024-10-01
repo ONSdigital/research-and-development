@@ -49,23 +49,6 @@ s3_client = SingletonBoto.get_client()
 ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
 s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
 
-
-# def create_client(config: dict):
-#     """Initialise and configure a boto3 client. 
-    
-#     This function configures the raz_client, which is needed for authentication 
-#     between CDSW session and the s3 server, using the parameters stored in the config.
-
-#     Args:
-#         config (dict): Combined config (s3 parameters are in developer config)
-#     Returns:
-#         boto3 client
-#     """
-#     client = boto3.client("s3")
-#     raz_client.configure_ranger_raz(client, ssl_file=ssl_file_dev)
-#     return client
-
-
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     """Reads a csv from s3 bucket into a Pandas Dataframe using boto3.
