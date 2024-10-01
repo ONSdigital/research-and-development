@@ -71,7 +71,7 @@ s3_paths:
   postcode_construction_file_path: "04_construction/manual_construction/test_postcode_construction_file.csv"
   construction_file_path_ni:  "04_construction/manual_construction/test_construction_file.csv"
   # postcode paths
-  postcode_masterlist: "/bat/res_dev/mappersONSPD_NOV_2022_UK.csv"
+  postcode_masterlist: "/bat/res_dev/mappers/ONSPD_NOV_2022_UK_first_100.csv"
   pcode_val_path: "01_staging/staging_qa/postcode_validation"
   # mapper paths
 hdfs_paths:
