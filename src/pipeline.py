@@ -20,7 +20,6 @@ from src.outlier_detection.outlier_main import run_outliers
 from src.estimation.estimation_main import run_estimation
 from src.site_apportionment.site_apportionment_main import run_site_apportionment
 from src.outputs.outputs_main import run_outputs
-from src.utils.singleton_boto import SingletonBoto
 
 MainLogger = logging.getLogger(__name__)
 
@@ -49,6 +48,7 @@ def run_pipeline(user_config_path, dev_config_path):
     platform = config["global"]["platform"]
 
     if platform == "s3":
+        from src.utils.singleton_boto import SingletonBoto
         #create singletion boto3 client object & pass in bucket string
         boto3_client = SingletonBoto.get_client()
 

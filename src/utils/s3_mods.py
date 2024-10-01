@@ -40,11 +40,7 @@ from src.utils.singleton_boto import SingletonBoto
 
 # set up logging
 s3_logger = logging.getLogger(__name__)
-
-# s3_client = SingletonBoto().get_client()
 s3_client = SingletonBoto.get_client()
-
-#s3_bucket = SingletonBoto().get_bucket()
 
 ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
 s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
@@ -196,12 +192,11 @@ def rd_mkdir(path: str) -> None:
     Returns:
         None
     """
-    bucket_name_dev = "onscdp-dev-data01-5320d6ca"
     
     _ = create_folder_on_s3(
         # client=config["client"],
         s3_client,
-        bucket_name=bucket_name_dev,
+        bucket_name=s3_bucket_dev,
         folder_path=path,
     )
 
