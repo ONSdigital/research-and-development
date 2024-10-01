@@ -20,7 +20,7 @@ jobs:
           awk '!/pydoop.*/' requirements.txt> temp && mv temp requirements.txt
 # 3) Set up Python
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 # 4) Install dependencies from requirements.txt
