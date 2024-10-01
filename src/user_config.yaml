@@ -77,8 +77,8 @@ s3_paths:
 hdfs_paths:
   root: "/ons/rdbe_dev/"
   # staging input paths
-  snapshot_path: "/bat/res_dev/anonymised/snapshot_202312_a_copy_of_202012_anon.json"  #  Run until point of freezing - last run is first freeze
-  updated_snapshot_path: "/bat/res_dev/anonymised/snapshot_202312_a_copy_of_202012_anon.json"
+  snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v2/snapshot_202312_a_copy_of_202012_anon.json"  #  Run until point of freezing - last run is first freeze
+  updated_snapshot_path: "/ons/rdbe_dev/berd_survey/anonymised/v2/snapshot_202312_a_copy_of_202012_anon.json"
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
   feather_path: "staging/feather"
   # Freezing data paths
