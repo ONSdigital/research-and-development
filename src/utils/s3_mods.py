@@ -31,8 +31,8 @@ import pandas as pd
 from io import StringIO
 
 # Third party libraries specific to s3 bucket
-import boto3
-import raz_client
+# import boto3
+# import raz_client
 
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
@@ -46,28 +46,12 @@ ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
 s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
 
 
-# def create_client(config: dict):
-#     """Initialise and configure a boto3 client. 
-    
-#     This function configures the raz_client, which is needed for authentication 
-#     between CDSW session and the s3 server, using the parameters stored in the config.
-
-#     Args:
-#         config (dict): Combined config (s3 parameters are in developer config)
-#     Returns:
-#         boto3 client
-#     """
-#     client = boto3.client("s3")
-#     raz_client.configure_ranger_raz(client, ssl_file=ssl_file_dev)
-#     return client
-
-
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     """Reads a csv from s3 bucket into a Pandas Dataframe using boto3.
     If "thousands" argument is not specified, sets thousands=",", so that long
     integers with commas between thousands and millions, etc., are read
-    correctly. 
+    correctly.
     Allows to use any additional keyword arguments of Pandas read_csv method.
 
     Args:
@@ -76,13 +60,8 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
-    # Open the boto3 client
-    # s3_client = config["client"]
-    with s3_client.get_object(
-        Bucket=s3_bucket_dev,
-        Key=filepath
-    )['Body'] as file:
 
+    with s3_client.get_object(Bucket=s3_bucket_dev, Key=filepath)["Body"] as file:
         # If "thousands" argument is not specified, set it to ","
         if "thousands" not in kwargs:
             kwargs["thousands"] = ","
@@ -91,10 +70,8 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         try:
             df = pd.read_csv(file, **kwargs)
         except Exception as e:
-            s3_logger.error(
-                f"Could not read specified file {filepath}. Error: {e}"
-            )
- 
+            s3_logger.error(f"Could not read specified file {filepath}. Error: {e}")
+
             raise e
     return df
 
@@ -114,23 +91,15 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
 
     # Write the dataframe to the buffer in the CSV format
     data.to_csv(
-        csv_buffer,
-        header=True,
-        date_format="%Y-%m-%d %H:%M:%S.%f+00",
-        index=False
+        csv_buffer, header=True, date_format="%Y-%m-%d %H:%M:%S.%f+00", index=False
     )
 
     # "Rewind" the stream to the start of the buffer
     csv_buffer.seek(0)
 
-    # Use the boto3 client from the config
-    # s3_client = config["client"]
-
     # Write the buffer into the s3 bucket
     _ = s3_client.put_object(
-        Bucket=s3_bucket_dev,
-        Body=csv_buffer.getvalue(),
-        Key=filepath
+        Bucket=s3_bucket_dev, Body=csv_buffer.getvalue(), Key=filepath
     )
     return None
 
@@ -144,15 +113,9 @@ def rd_load_json(filepath: str) -> dict:
     Returns:
         datadict (dict): The entire contents of the JSON file.
     """
-    # Use the boto3 client from the config
-    
-    # s3_client = config["client"]
 
     # Load the json file using the client method
-    with s3_client.get_object(
-        Bucket=s3_bucket_dev,
-        Key=filepath
-    )['Body'] as json_file:
+    with s3_client.get_object(Bucket=s3_bucket_dev, Key=filepath)["Body"] as json_file:
         datadict = json.load(json_file)
 
     return datadict
@@ -173,9 +136,8 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """
 
     result = file_exists(
-        client=s3_client,
-        bucket_name=s3_bucket_dev,
-        object_name=filepath)
+        client=s3_client, bucket_name=s3_bucket_dev, object_name=filepath
+    )
 
     if not result and raise_error:
         raise FileExistsError(f"File: {filepath} does not exist")
@@ -192,7 +154,7 @@ def rd_mkdir(path: str) -> None:
     Returns:
         None
     """
-    
+
     _ = create_folder_on_s3(
         # client=config["client"],
         s3_client,

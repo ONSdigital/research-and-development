@@ -14,7 +14,6 @@ boto3_client = SingletonBoto.get_client()
 def run_make_dirs():
     # root = "s3a://onscdp-dev-data01-5320d6ca/bat/res_dev/project_data"
 
-    global config
     root = "/user/anne.griffith/res_dev/2022_surveys"
     # root = "/bat/res_dev/project_data"
 
@@ -86,7 +85,7 @@ def run_make_dirs():
         },
     }
 
-    dir_list = tree_to_list(tree, prefix=root)
+    dir_list = tree_to_list(tree, path_list=[], prefix=root)
     for s in dir_list:
         print(s)
         mods.rd_mkdir(s)
