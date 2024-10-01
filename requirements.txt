@@ -19,6 +19,6 @@ setuptools
 # sphinx
 toml
 typing
-boto3
-raz_client
+# boto3
+# raz_client
 # rdsa_utils
