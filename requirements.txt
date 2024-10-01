@@ -22,4 +22,4 @@ toml
 typing
 boto3
 raz_client
-rdsa-utils
+rdsa_utils
