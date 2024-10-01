@@ -29,7 +29,7 @@ def run_make_dirs():
     
     root = "/bat/res_dev/project_data"
     
-    tree = {"2022_surveys": {
+    tree = {"2021_surveys": {
             "BERD": {
                 "01_staging": {
                     "feather": {},
