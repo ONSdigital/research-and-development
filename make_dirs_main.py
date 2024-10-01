@@ -86,7 +86,7 @@ def run_make_dirs():
         },
     }
 
-    dir_list = tree_to_list(tree, prefix=root)
+    dir_list = tree_to_list(tree, path_list=[],prefix=root)
     for s in dir_list:
         print(s)
         mods.rd_mkdir(s)
