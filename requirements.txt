@@ -16,7 +16,7 @@ readme-coverage-badger
 requests
 setuptools
 # sphinx
-table-logger
+# table-logger
 toml
 typing
 # boto3
