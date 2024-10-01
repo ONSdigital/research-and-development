@@ -17,9 +17,8 @@ readme-coverage-badger
 requests
 setuptools
 # sphinx
-table-logger
 toml
 typing
 boto3
 raz_client
-rdsa_utils
+# rdsa_utils
