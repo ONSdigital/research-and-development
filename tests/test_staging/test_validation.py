@@ -89,9 +89,9 @@ def test_validate_data_with_schema(mock_load_schema):
     validate_data_with_schema(dumy_data, "mock_schema.toml")
 
     # Check data types after validation
-    assert dumy_data["col1"].dtypes == np.int
+    assert dumy_data["col1"].dtypes == int
     assert dumy_data["col2"].dtypes == pd.StringDtype()
-    assert dumy_data["col3"].dtypes == np.float
+    assert dumy_data["col3"].dtypes == float
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtypes)
 
 
@@ -124,6 +124,8 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
     """Test the validate_data_with_shcema  to data types are correct in
     the source data
     """
+
+    #TODO: This test doesn't really do anything as the function is not returning anything
     # Dumy data for testing
     dumy_data = pd.DataFrame(
         {
@@ -146,11 +148,22 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
     )
 
     # Check data types after validation
-    assert dumy_data[["reference", "q201"]].dtypes.all() == np.int
-    assert dumy_data[["createdby", "q200"]].dtypes.all() == pd.StringDtype()
-    assert dumy_data[["instance", "q203"]].dtypes.all() == np.float
-    assert pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
-    assert dumy_data["q307"].dtypes == np.bool
+    # Check if the columns "reference" and "q201" are of integer type
+    are_int_columns = dumy_data[["reference", "q201"]].apply(pd.api.types.is_integer_dtype).all()
+    # Check if the columns "createdby" and "q200" are of string type
+    are_str_columns = dumy_data[["createdby", "q200"]].apply(pd.api.types.is_string_dtype).all()
+    # Check if the columns "instance" and "q203" are of float type
+    are_float_columns = dumy_data[["instance", "q203"]].apply(pd.api.types.is_float_dtype).all()
+    # Check if the columns "date" is of datetime type
+    is_datetime_column = pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
+    # Check if the columns "q307" is of boolean type
+    is_bool_column = dumy_data["q307"].dtypes == bool
+
+    assert are_int_columns
+    assert are_str_columns
+    assert are_float_columns
+    assert is_datetime_column
+    assert is_bool_column
 
 
 class TestManyToOne(unittest.TestCase):

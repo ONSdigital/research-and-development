@@ -1,7 +1,6 @@
 """Apply outlier detection to the dataset."""
 import logging
 import pandas as pd
-import numpy as np
 from typing import List
 import math
 
@@ -47,8 +46,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     Outliers are only computed from valid, positive responses
     of PRN sampled data (selectiontype = P).
     Short to long form conversion has been done, so only use instance 0.
-    Valid responses have statuses of Clear or Clear Overridden
-    (statusencoded = 210 or 211).
+    Valid responses have statuses of Clear or Clear - overridden
 
     Args:
         df (pd.DataFrame): The dataframe of responses to be filtered.
@@ -58,7 +56,7 @@ def filter_valid(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         pd.DataFrame: The filtered dataframe
     """
     sample_cond = df.selectiontype == "P"
-    status_cond = df.statusencoded.isin(["210", "211"])
+    status_cond = df["status"].isin(["Clear", "Clear - overridden"])
     pos_cond = df[value_col] > 0
     ins_cond = df["instance"] == 0
 
