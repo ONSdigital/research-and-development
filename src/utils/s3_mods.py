@@ -175,7 +175,7 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
     return result
 
 
-def rd_mkdir(path: str) -> None:
+def rd_mkdir(path: str, config: dict) -> None:
     """Function to create a directory in s3 bucket.
 
     Args:
