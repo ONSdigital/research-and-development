@@ -41,13 +41,11 @@ from src.utils.singleton_boto import SingletonBoto
 # set up logging
 s3_logger = logging.getLogger(__name__)
 
-# s3_client = SingletonBoto().get_client()
 s3_client = SingletonBoto.get_client()
 
-#s3_bucket = SingletonBoto().get_bucket()
 
 ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
-s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
+s3_bucket_dev =     "onscdp-dev-data01-5320d6ca"
 
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
@@ -63,8 +61,7 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Dataframe created from csv
     """
-    # Open the boto3 client
-    # s3_client = config["client"]
+    
     with s3_client.get_object(
         Bucket=s3_bucket_dev,
         Key=filepath
@@ -110,9 +107,6 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
     # "Rewind" the stream to the start of the buffer
     csv_buffer.seek(0)
 
-    # Use the boto3 client from the config
-    # s3_client = config["client"]
-
     # Write the buffer into the s3 bucket
     _ = s3_client.put_object(
         Bucket=s3_bucket_dev,
@@ -131,9 +125,6 @@ def rd_load_json(filepath: str) -> dict:
     Returns:
         datadict (dict): The entire contents of the JSON file.
     """
-    # Use the boto3 client from the config
-    
-    # s3_client = config["client"]
 
     # Load the json file using the client method
     with s3_client.get_object(
@@ -179,12 +170,11 @@ def rd_mkdir(path: str) -> None:
     Returns:
         None
     """
-    bucket_name_dev = "onscdp-dev-data01-5320d6ca"
     
     _ = create_folder_on_s3(
         # client=config["client"],
         s3_client,
-        bucket_name=bucket_name_dev,
+        bucket_name=s3_bucket_dev,
         folder_path=path,
     )
 

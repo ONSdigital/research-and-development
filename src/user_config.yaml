@@ -75,7 +75,7 @@ hdfs_paths:
   pcode_val_path: "01_staging/staging_qa/postcode_validation"
   # mapper paths
 s3_paths:
-  root: "/user/anne.griffith/res_dev"
+  root: "/bat/res_devres_dev"
   # staging input paths
   snapshot_path: "/bat/res_dev/anonymised/snapshot_202312_a_copy_of_202012_anon.json"  #  Run until point of freezing - last run is first freeze
   updated_snapshot_path: "/bat/res_dev/anonymised/snapshot_202312_a_copy_of_202012_anon.json" 
