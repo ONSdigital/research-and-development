@@ -1,4 +1,4 @@
-import postcodes_uk
+# import postcodes_uk
 import pandas as pd
 
 import logging
@@ -61,7 +61,10 @@ def validate_postcode_pattern(pcode: str) -> bool:
     pcode = pcode.upper().strip()
 
     # Validation step
-    valid_bool = postcodes_uk.validate(pcode)
+    #TODO: we can't use the postcodes_uk package, so we need to remove all code 
+    # that depends on it. For now, we will just return True
+    # valid_bool = postcodes_uk.validate(pcode)
+    valid_bool = True
     return valid_bool
 
 

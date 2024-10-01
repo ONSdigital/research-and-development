@@ -7,7 +7,7 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings
-  dev_test : True
+  dev_test : False
   platform: network #whether to load from hdfs, network (Windows) or s3 (CDP)
   load_from_feather: False
 runlog_writer:

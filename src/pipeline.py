@@ -36,7 +36,6 @@ def run_pipeline(user_config_path, dev_config_path):
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
 
-    
     # Set up the logger
     global_config = config["global"]
     logger = logger_creator(global_config)
@@ -48,11 +47,13 @@ def run_pipeline(user_config_path, dev_config_path):
     platform = config["global"]["platform"]
 
     if platform == "s3":
-        #create singletion boto3 client object & pass in bucket string
+        # create singletion boto3 client object & pass in bucket string
         from src.utils.singleton_boto import SingletonBoto
-        boto3_client = SingletonBoto.get_client()
+
+        boto3_client = SingletonBoto.get_client()  # noqa
 
         from src.utils import s3_mods as mods
+
         # Creating boto3 client and adding it to the config dict
         # config["client"] = boto3_client
     elif platform == "network":

@@ -40,9 +40,7 @@ from src.utils.singleton_boto import SingletonBoto
 
 # set up logging
 s3_logger = logging.getLogger(__name__)
-
 s3_client = SingletonBoto.get_client()
-
 
 ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
 s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
