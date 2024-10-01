@@ -15,11 +15,11 @@ runlog_writer:
   write_hdf5: False # Write the runlog to an HDF5 file
   write_sql: False # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
-  log_path: "/ons/rdbe_dev/"
+  log_path: "/bat/res_dev/project_data/logs"
 hdfs_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
 s3_paths:
-  logs_foldername: "/user/anne.griffith/res_dev/logs/run_logs"
+  logs_foldername: "/bat/res_dev/project_data/logs/run_logs"
 staging_paths:
   folder: "01_staging"
   feather_output: "feather"
