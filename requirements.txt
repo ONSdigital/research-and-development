@@ -1,5 +1,5 @@
 arrow==1.2.3
-coverage
+coverage==7.6.1
 detect-secrets
 # myst-parser
 numpy==1.19.5 # required for users in DAP to run pipeline (added here for consistency)
@@ -9,16 +9,15 @@ postcodes_uk
 pre-commit==2.17.0
 # pydoop # Needed in dev/test and DAP but not in local
 pyarrow
-pytest
+pytest==8.3.2
 python-dotenv
 pyyaml
 readme-coverage-badger
 requests
 setuptools
-# sphinx
-table-logger
 toml
+tomli==2.0.1
 typing
 # boto3
 # raz_client
-# rdsa-utils
+# rdsa-utils==2.0.2
