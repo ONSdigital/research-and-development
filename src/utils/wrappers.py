@@ -3,7 +3,7 @@ from functools import wraps
 from time import perf_counter
 import traceback
 import pandas as pd
-from table_logger import TableLogger
+# from table_logger import TableLogger
 import logging.config
 
 
@@ -159,44 +159,44 @@ def df_change_class_wrap(func):
     return call
 
 
-def df_measure_change(df, rows_before, cols_before, table_config):
-    """Log the change in a dataframe caused by a function."""
-    shape = df.shape
-    rows_after, cols_after = shape[0], shape[1]
-
-    def _change_direction(before, after):
-        """Get the direction of the change."""
-        # Evalutate the direction of change
-        change = ["gained", "removed"][after < before]
-
-        return change
-
-    row_change = _change_direction(rows_before, rows_after)
-    col_change = _change_direction(cols_before, cols_after)
-
-    # Get absolute difference in change
-    row_diff = abs(rows_after - rows_before)
-    col_diff = abs(cols_after - cols_before)
-
-    if table_config == "Table":
-        # Make table to log the changes in df
-        tbl = TableLogger(
-            columns="df Changes,Rows,Columns",
-            float_format="{:,.2f}".format,
-            default_colwidth=15,
-        )
-
-        tbl("From", rows_before, cols_before)
-        tbl("To", rows_after, cols_after)
-        tbl("Change", f"{row_diff} ({row_change})", f"{col_diff} ({col_change})")
-    elif table_config == "SingleLine":
-        logger.info(f"""Difference in rows: {row_diff} ({row_change})""")
-        logger.info(f"""Difference in columns {col_diff} ({col_change})""")
-    else:
-        logger.warning(
-            """Trouble at mill!!! Mistake in config.
-                          Either 'Table' or 'SingleLine' must be specified."""
-        )
+#def df_measure_change(df, rows_before, cols_before, table_config):
+#    """Log the change in a dataframe caused by a function."""
+#    shape = df.shape
+#    rows_after, cols_after = shape[0], shape[1]
+#
+#    def _change_direction(before, after):
+#        """Get the direction of the change."""
+#        # Evalutate the direction of change
+#        change = ["gained", "removed"][after < before]
+#
+#        return change
+#
+#    row_change = _change_direction(rows_before, rows_after)
+#    col_change = _change_direction(cols_before, cols_after)
+#
+#    # Get absolute difference in change
+#    row_diff = abs(rows_after - rows_before)
+#    col_diff = abs(cols_after - cols_before)
+#
+#    if table_config == "Table":
+#        # Make table to log the changes in df
+#        tbl = TableLogger(
+#            columns="df Changes,Rows,Columns",
+#            float_format="{:,.2f}".format,
+#            default_colwidth=15,
+#        )
+#
+#        tbl("From", rows_before, cols_before)
+#        tbl("To", rows_after, cols_after)
+#        tbl("Change", f"{row_diff} ({row_change})", f"{col_diff} ({col_change})")
+#    elif table_config == "SingleLine":
+#        logger.info(f"""Difference in rows: {row_diff} ({row_change})""")
+#        logger.info(f"""Difference in columns {col_diff} ({col_change})""")
+#    else:
+#        logger.warning(
+#            """Trouble at mill!!! Mistake in config.
+#                          Either 'Table' or 'SingleLine' must be specified."""
+#        )
 
 
 def df_change_func_wrap(func):
