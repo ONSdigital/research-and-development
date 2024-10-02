@@ -33,12 +33,12 @@ from io import StringIO
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
 from src.utils.singleton_boto import SingletonBoto
-from src.utils.singleton_config import SingletonConfig
+# from src.utils.singleton_config import SingletonConfig
 
 # set up logging, boto3 client and s3 bucket
 s3_logger = logging.getLogger(__name__)
 s3_client = SingletonBoto.get_client()
-s3_bucket = SingletonConfig.get_config()
+s3_bucket = SingletonBoto.get_bucket()
 
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
