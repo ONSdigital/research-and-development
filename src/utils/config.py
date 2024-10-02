@@ -31,6 +31,8 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
     ]
     combined_config = update_config_with_paths(combined_config, modules)
 
+    validate_freezing_config_settings(combined_config)
+    validate_construction_config_settings(combined_config)
     return combined_config
 
 
@@ -48,8 +50,6 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     dev_config = safeload_yaml(dev_config_path)
     if user_config["config_validation"]["validate"]:
         validate_config(user_config)
-        validate_freezing_config_settings(user_config)
-        validate_construction_config_settings(user_config)
     if dev_config["config_validation"]["validate"]:
         validate_config(dev_config)
 
@@ -303,14 +303,16 @@ def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
         Tuple[bool, bool, bool, bool]: The main freezing config settings.
     """
     run_with_snapshot = config["global"]["run_with_snapshot"]
+    run_with_snapshot_and_freeze = config["global"]["run_with_snapshot_and_freeze"]
     load_updated_snapshot_for_comparison = config["global"]["load_updated_snapshot_for_comparison"]
     run_updates_and_freeze = config["global"]["run_updates_and_freeze"]
     run_with_frozen_data = config["global"]["run_with_frozen_data"]
     values = [
         run_with_snapshot,
+        run_with_snapshot_and_freeze,
         load_updated_snapshot_for_comparison,
         run_updates_and_freeze,
-        run_with_frozen_data
+        run_with_frozen_data,
     ]
     if len([val for val in values if val==True]) > 1:
         raise ValueError(
@@ -320,23 +322,23 @@ def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
     return tuple(values)
 
 
-def validate_freezing_config_settings(user_config: dict):
+def validate_freezing_config_settings(config: dict):
     """Check that correct combination of freezing settings are used."""
 
     # Determine and validate freezing settings
     (
         run_with_snapshot,
+        run_with_snapshot_and_freeze,
         load_updated_snapshot_for_comparison,
         run_updates_and_freeze,
         run_with_frozen_data,
-    ) = validate_freezing_run_config(user_config)
+    ) = validate_freezing_run_config(config)
 
-    snapshot_path = user_config["hdfs_paths"]["snapshot_path"]
-    frozen_data_staged_path = user_config["hdfs_paths"]["frozen_data_staged_path"]
-
-    updated_snapshot_path = user_config["hdfs_paths"]["updated_snapshot_path"]
-    freezing_additions_path = user_config["hdfs_paths"]["freezing_additions_path"]
-    freezing_amendments_path = user_config["hdfs_paths"]["freezing_amendments_path"]
+    snapshot_path = config["staging_paths"]["snapshot_path"]
+    frozen_data_staged_path = config["freezing_paths"]["frozen_data_staged_path"]
+    updated_snapshot_path = config["staging_paths"]["updated_snapshot_path"]
+    freezing_additions_path = config["freezing_paths"]["freezing_additions_path"]
+    freezing_amendments_path = config["freezing_paths"]["freezing_amendments_path"]
 
     if run_with_snapshot:
         if snapshot_path is None:
@@ -368,19 +370,19 @@ def validate_freezing_config_settings(user_config: dict):
             )
 
 
-def validate_construction_config_settings(user_config):
+def validate_construction_config_settings(config):
     """Check that correct combination of construction settings are used."""
 
-    run_all_data_construction = user_config["global"]["run_all_data_construction"]
-    run_postcode_construction = user_config["global"]["run_postcode_construction"]
-    run_ni_construction = user_config["global"]["run_ni_construction"]
-    all_data_construction_file_path = user_config["hdfs_paths"][
+    run_all_data_construction = config["global"]["run_all_data_construction"]
+    run_postcode_construction = config["global"]["run_postcode_construction"]
+    run_ni_construction = config["global"]["run_ni_construction"]
+    all_data_construction_file_path = config["construction_paths"][
         "all_data_construction_file_path"
     ]
-    postcode_construction_file_path = user_config["hdfs_paths"][
+    postcode_construction_file_path = config["construction_paths"][
         "postcode_construction_file_path"
     ]
-    construction_file_path_ni = user_config["hdfs_paths"]["construction_file_path_ni"]
+    construction_file_path_ni = config["construction_paths"]["construction_file_path_ni"]
 
     if run_all_data_construction:
         if all_data_construction_file_path is None:
