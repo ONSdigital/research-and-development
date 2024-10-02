@@ -1176,7 +1176,7 @@ Possible_Categorical_Values = [ "Clear", "Clear - overridden", "Form saved", "Cl
 
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64[ns]"
+Deduced_Data_Type = "datetime64[ns, UTC]"
 Nullable = false
 Current_Data_Type = [ "None", "str",]
 Length = "nan"
@@ -1476,7 +1476,7 @@ Possible_Categorical_Values = [ "WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", 
 
 [birthdate]
 Description = "Datetime format = format=%d/%m/%Y"
-Deduced_Data_Type = "datetime64[ns]"
+Deduced_Data_Type = "datetime64[ns, UTC]"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -1536,7 +1536,7 @@ Possible_categorical_Values = [ "nan",]
 
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64[ns]"
+Deduced_Data_Type = "datetime64[ns, UTC]"
 Nullable = false
 Current_Data_Type = [ "None", "str",]
 Length = "nan"
