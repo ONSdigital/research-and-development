@@ -331,7 +331,7 @@ class TestStageValidateHarmonisePostcodes(object):
         # assert that invalid postcodes have been saved out
         files = os.listdir(tmp_path)
         filename = (
-            f"2022_invalid_unrecognised_postcodes_{self.get_todays_date()}_v1.csv"
+            f"2022_invalid_postcodes_{self.get_todays_date()}_v1.csv"
         )
         assert (
             filename in files

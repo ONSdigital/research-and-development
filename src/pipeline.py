@@ -37,7 +37,7 @@ def run_pipeline(user_config_path, dev_config_path):
     # Load, validate and merge the user and developer configs
     config = config_setup(user_config_path, dev_config_path)
 
-    
+
     # Set up the logger
     global_config = config["global"]
     logger = logger_creator(global_config)

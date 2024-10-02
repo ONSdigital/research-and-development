@@ -302,14 +302,14 @@ def stage_validate_harmonise_postcodes(
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     invalid_filename = (
-        f"{survey_year}_invalid_unrecognised_postcodes_{tdate}_v{run_id}.csv"
+        f"{survey_year}_invalid_postcodes_{tdate}_v{run_id}.csv"
     )
     write_csv(f"{pcodes_folder}/{invalid_filename}", invalid_df)
 
     # Log the end of postcode validation
     StagingHelperLogger.info("Finished PostCode Validation")
 
-    return full_responses, postcode_mapper,
+    return full_responses, postcode_mapper
 
 
 def filter_pnp_data(full_responses):
