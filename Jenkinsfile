@@ -16,6 +16,8 @@ def pushToPyPiArtifactoryRepo_temp(String projectName, String version, String so
 
 // This section defines the Jenkins pipeline
 pipeline {
+    agent any
+
     libraries {
         lib('jenkins-pipeline-shared@feature/dap-ci-scripts')
     }
@@ -34,11 +36,9 @@ pipeline {
         skipDefaultCheckout true
     }
 
-    agent any
-
     stages {
         stage('Checkout') {
-            agent { label 'download.jenkins.slave' }
+            // agent { label 'download.jenkins.slave' }
             steps {
                 onStage()
                 colourText('info', "Checking out code from source control.")
@@ -76,9 +76,6 @@ pipeline {
 
                 pip3 install pypandoc
 
-                # Remove pydoop from requirements before it's installed.
-                awk '!/pydoop.*/' requirements.txt > temp && mv temp requirements.txt
-
                 pip3 install -r requirements.txt
 
                 pip3 freeze
@@ -109,31 +106,12 @@ pipeline {
 
                 junit testResults: 'junit-report.xml'
 
-                /* coverage run --branch --source=./${PROJECT_NAME} --omit=src/utils/hdfs_mods.py,src/utils/wrappers.py,src/utils/runlog.py,src/_version.py,src/pipeline.py \
-                    -m pytest -ra ./tests --ignore=tests/test_utils/test_hdfs_mods.py
-                '''
-                /*
-                // Lines below create a coverage report for on Jenkins. Currently commented out
-                // as it gives errors when no imports are used in unit tests. import src.main
-                // causes pre-commit to complain. Easier to leave out for now.
-                coverage xml -o python_coverage.xml && coverage report -m --fail-under=${MIN_COVERAGE_PC}
 
-
-                cobertura autoUpdateHealth: false,
-                        autoUpdateStability: false,
-                        coberturaReportFile: 'python_coverage.xml',
-                        conditionalCoverageTargets: '70, 0, 0',
-                        failUnhealthy: false,
-                        failUnstable: false,
-                        lineCoverageTargets: '80, 0, 0',
-                        maxNumberOfBuilds: 0,
-                        methodCoverageTargets: '80, 0, 0',
-                        onlyStable: false,
-                        zoomCoverageChart: false */
             }
         }
 
         stage('Build and publish Python Package') {
+            agent { label "build.${agentPython3Version}" }
             when {
                 anyOf{
                     branch BUILD_BRANCH
@@ -141,7 +119,6 @@ pipeline {
                 }
                 beforeAgent true
             }
-            agent { label "test.${agentPython3Version}" }
             steps {
                 onStage()
                 colourText('info', "Building Python package.")
@@ -160,9 +137,13 @@ pipeline {
                 }
             }
         }
-
-
-
     }
-
+    post {
+        success {
+            updateGitlabStatus_temp('Jenkins', 'success')
+        }
+        failure {
+            updateGitlabStatus_temp('Jenkins', 'failed')
+        }
+    }
 }
