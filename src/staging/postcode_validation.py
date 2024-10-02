@@ -19,13 +19,13 @@ def check_log_unreal_postcodes(
     Args:
         validation_df (pd.DataFrame): Copy of the full dataframe
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
-        postocdes to check against
+            postocdes to check against
         config (dict): Dictionary containing config settings
 
     Returns:
-        invalid_postcode_df (pd.DataFrame):  Dataframe with postcodes for issue output (unreal)
+        invalid_postcode_df (pd.DataFrame):  Dataframe with postcodes for issue output
         unreal_postcodes (pd.DataFrame): Dataframe containing only rows where postcodes
-        could not be matched against masterlist
+            could not be matched against masterlist
     """
 
     # Clean postcodes to match the masterlist
@@ -43,7 +43,8 @@ def check_log_unreal_postcodes(
 
     # Save to df
     invalid_postcode_df = create_issue_df(
-        validation_df, unreal_postcodes, # "not found in masterlist"
+        validation_df,
+        unreal_postcodes,  # "not found in masterlist"
     )
 
     # Log the unreal postcodes
@@ -66,7 +67,6 @@ def format_postcodes(postcode: str):
         formatted_postcode (str): Postcode in correct format
     """
     if pd.notna(postcode):
-
         formatted_postcode = postcode.upper().strip().replace(" ", "")
 
         if len(formatted_postcode) >= 5:
@@ -89,6 +89,7 @@ def get_masterlist(postcode_masterlist) -> pd.Series:
     Returns:
         pd.Series: A series of postcodes
     """
+    # TODO: pretty sure this isn't needed now
     masterlist = postcode_masterlist.squeeze()
 
     return masterlist
@@ -113,20 +114,20 @@ def check_pcs_real(
 
     Returns:
         unreal_postcodes (pd.DataFrame): A dataframe containing all the
-        original postcodes not found in the masterlist
+            original postcodes not found in the masterlist
 
     """
 
     if config["global"]["postcode_csv_check"]:
+        # TODO: pretty sure this isn't needed now as we're passing in a series
         master_series = get_masterlist(postcode_masterlist)
 
         # Check if postcode are real
-        check = df[
-            ~df["postcodes_harmonised"].isin(master_series)
-        ]
+        check = df[~df["postcodes_harmonised"].isin(master_series)]
         unreal_postcodes = df.loc[check.index, "postcodes_harmonised"]
 
     else:
+        # TODO: follow up this logic: what is supposed to happen and is it needed?
         emptydf = pd.DataFrame(columns=["postcodes_harmonised"])
         unreal_postcodes = emptydf.loc[
             ~emptydf["postcodes_harmonised"], "postcodes_harmonised"
@@ -144,7 +145,7 @@ def create_issue_df(full_df: pd.DataFrame, flagged_df: pd.DataFrame):
 
     Returns:
         issue_df (pd.DataFrame): A dataframe containing the information required for the
-        postcode issue output
+            postcode issue output
     """
     issue_df = pd.DataFrame(
         {
@@ -162,8 +163,7 @@ def create_issue_df(full_df: pd.DataFrame, flagged_df: pd.DataFrame):
 def update_full_responses(
     df: pd.DataFrame, combined_invalid_postcodes_df: pd.DataFrame
 ):
-    """Updates the full response dataframe to exclude invalid postcodes
-    from postcodes_harmonised and format.
+    """Update response dataframe to exclude invalid postcodes and then format.
 
     Args:
         df (pd.DataFrame): Original full dataframe
