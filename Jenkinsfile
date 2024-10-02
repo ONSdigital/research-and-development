@@ -150,7 +150,8 @@ pipeline {
 
                 sh '''
                 . venv/bin/activate
-                pip3 install wheel==0.29.0
+                pip3 install setuptools
+                pip3 install wheel
                 python3 setup.py build bdist_wheel
                 '''
 
