@@ -327,14 +327,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": True,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -346,14 +349,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": True,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": None,
-                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -368,14 +374,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": True,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": False,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": None,
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -389,14 +398,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": None,
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -411,14 +423,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": None,
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -433,14 +448,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": True,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": None,
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": None,
                 "freezing_additions_path": "/path/to/freezing_adds",
                 "freezing_amendments_path": "/path/to/freezing_amends",
             },
@@ -455,14 +473,17 @@ class TestValidateFreezingConfigSettings(object):
         user_config = {
             "global": {
                 "run_with_snapshot": False,
+                "run_with_snapshot_and_freeze" : False,
                 "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
                 "run_updates_and_freeze": True,
             },
-            "hdfs_paths": {
+            "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
-                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "updated_snapshot_path": "/path/to/updated_snapshot",
+            },
+            "freezing_paths": {
+                "frozen_data_staged_path": "/path/to/frozen_data_staged",
                 "freezing_additions_path": None,
                 "freezing_amendments_path": None,
             },
@@ -484,7 +505,7 @@ class TestValidateConstructionConfigSettings(object):
                 "run_postcode_construction": True,
                 "run_ni_construction": False,
             },
-            "hdfs_paths": {
+            "construction_paths": {
                 "all_data_construction_file_path": "/path/to/all_data",
                 "postcode_construction_file_path": "/path/to/postcodes",
                 "construction_file_path_ni": None,
@@ -500,7 +521,7 @@ class TestValidateConstructionConfigSettings(object):
                 "run_postcode_construction": False,
                 "run_ni_construction": False,
             },
-            "hdfs_paths": {
+            "construction_paths": {
                 "all_data_construction_file_path": None,
                 "postcode_construction_file_path": "/path/to/postcodes",
                 "construction_file_path_ni": "/path/to/ni",
@@ -519,7 +540,7 @@ class TestValidateConstructionConfigSettings(object):
                 "run_postcode_construction": True,
                 "run_ni_construction": False,
             },
-            "hdfs_paths": {
+            "construction_paths": {
                 "all_data_construction_file_path": "/path/to/all_data",
                 "postcode_construction_file_path": None,
                 "construction_file_path_ni": "/path/to/ni",
@@ -538,7 +559,7 @@ class TestValidateConstructionConfigSettings(object):
                 "run_postcode_construction": False,
                 "run_ni_construction": True,
             },
-            "hdfs_paths": {
+            "construction_paths": {
                 "all_data_construction_file_path": "/path/to/all_data",
                 "postcode_construction_file_path": "/path/to/postcodes",
                 "construction_file_path_ni": None,
@@ -565,25 +586,26 @@ class TestValidateFreezingRunConfig(object):
         config = {
             "global": {
                 "run_with_snapshot": values[0],
-                "load_updated_snapshot_for_comparison": values[1],
-                "run_updates_and_freeze": values[2],
-                "run_with_frozen_data": values[3]
+                "run_with_snapshot_and_freeze": values[1],
+                "load_updated_snapshot_for_comparison": values[2],
+                "run_updates_and_freeze": values[3],
+                "run_with_frozen_data": values[4]
             }
         }
         return config
 
     def test_validate_freezing_run_config(self):
         """General tests for validate_main_config."""
-        config = self.create_input_config([True, False, False,  False])
+        config = self.create_input_config([True, False, False, False, False])
         results = validate_freezing_run_config(config=config)
-        assert results == (True, False, False, False), (
+        assert results == (True, False, False, False, False), (
             "Freezing config validation did not return the expected config values."
         )
 
 
     def test_validate_freezing_run_config_raises(self):
         """Failing tests for validate_main_config."""
-        config = self.create_input_config(values=[True, True, True, False])
+        config = self.create_input_config(values=[True, True, True, True, False])
         msg = "Only one type of pipeline run is allowed.*"
         with pytest.raises(ValueError, match=msg):
             validate_freezing_run_config(config)
