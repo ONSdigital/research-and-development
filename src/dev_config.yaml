@@ -4,11 +4,11 @@ config_validation:
 global:
   # Logging settings
   log_to_file: True # Write logs to .log file
-  logging_level: "DEBUG"
+  logging_level: "INFO"
   table_config: "SingleLine"
   # Environment settings
-  dev_test : False
-  platform: network #whether to load from hdfs, network (Windows) or s3 (CDP)
+  dev_test : True
+  platform: s3 #whether to load from hdfs, network (Windows) or s3 (CDP)
   load_from_feather: False
 runlog_writer:
   write_csv: True # Write the runlog to a CSV file
