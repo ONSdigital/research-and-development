@@ -205,7 +205,7 @@ def test_check_pcs_real_with_invalid_postcodes(test_data_df, monkeypatch):
     )
 
     # Call the function under test
-    result_df = check_pcs_real(test_data_df, check_real_df, postcode_masterlist, config)
+    result_df = check_pcs_real(test_data_df, postcode_masterlist, config)
     result_df = result_df.reset_index(drop=True)
     if config["global"]["postcode_csv_check"]:
 
@@ -240,7 +240,7 @@ def test_check_pcs_real_with_valid_postcodes(test_data_df, monkeypatch):
 
     # Call the function under test
     unreal_postcodes = check_pcs_real(
-        test_data_df, check_real_df, postcode_masterlist, config
+        test_data_df, postcode_masterlist, config
     )
     # NP10 8XG and SW1P 4DF are real. Should not be presentin unreal_postcode
     assert (
