@@ -399,9 +399,9 @@ class TestValidateFreezingConfigSettings(object):
             "global": {
                 "run_with_snapshot": False,
                 "run_with_snapshot_and_freeze" : False,
-                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
+                "run_with_frozen_data": False,
             },
             "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
@@ -424,9 +424,9 @@ class TestValidateFreezingConfigSettings(object):
             "global": {
                 "run_with_snapshot": False,
                 "run_with_snapshot_and_freeze" : False,
-                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": True,
                 "run_updates_and_freeze": False,
+                "run_with_frozen_data": False,
             },
             "staging_paths": {
                 "snapshot_path": "/path/to/frozen_snapshot",
@@ -449,8 +449,8 @@ class TestValidateFreezingConfigSettings(object):
             "global": {
                 "run_with_snapshot": False,
                 "run_with_snapshot_and_freeze" : False,
-                "run_with_frozen_data": False,
                 "load_updated_snapshot_for_comparison": False,
+                "run_with_frozen_data": False,
                 "run_updates_and_freeze": True,
             },
             "staging_paths": {

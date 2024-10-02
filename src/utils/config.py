@@ -312,7 +312,7 @@ def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
         run_with_snapshot_and_freeze,
         load_updated_snapshot_for_comparison,
         run_updates_and_freeze,
-        run_with_frozen_data
+        run_with_frozen_data,
     ]
     if len([val for val in values if val==True]) > 1:
         raise ValueError(
@@ -328,8 +328,8 @@ def validate_freezing_config_settings(config: dict):
     # Determine and validate freezing settings
     (
         run_with_snapshot,
-        load_updated_snapshot_for_comparison,
         run_with_snapshot_and_freeze,
+        load_updated_snapshot_for_comparison,
         run_updates_and_freeze,
         run_with_frozen_data,
     ) = validate_freezing_run_config(config)
