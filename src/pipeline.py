@@ -49,9 +49,10 @@ def run_pipeline(user_config_path, dev_config_path):
     if platform == "s3":
         # create singletion boto3 client object & pass in bucket string
         from src.utils.singleton_boto import SingletonBoto
+        from src.utils.singleton_config import SingletonConfig
 
-        boto3_client = SingletonBoto.get_client()  # noqa
-
+        boto3_client = SingletonBoto.get_client(config)
+        s3_bucket = SingletonConfig.get_config(config)
         from src.utils import s3_mods as mods
 
         # Creating boto3 client and adding it to the config dict

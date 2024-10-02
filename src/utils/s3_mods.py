@@ -30,21 +30,15 @@ import logging
 import pandas as pd
 from io import StringIO
 
-# Third party libraries specific to s3 bucket
-# import boto3
-# import raz_client
-
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
 from src.utils.singleton_boto import SingletonBoto
+from src.utils.singleton_config import SingletonConfig
 
-# set up logging
+# set up logging, boto3 client and s3 bucket
 s3_logger = logging.getLogger(__name__)
 s3_client = SingletonBoto.get_client()
-
-ssl_file_dev = "/etc/pki/tls/certs/ca-bundle.crt"
-s3_bucket_dev = "onscdp-dev-data01-5320d6ca"
-
+s3_bucket = SingletonConfig.get_config()
 
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
@@ -61,7 +55,7 @@ def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
         pd.DataFrame: Dataframe created from csv
     """
 
-    with s3_client.get_object(Bucket=s3_bucket_dev, Key=filepath)["Body"] as file:
+    with s3_client.get_object(Bucket=s3_bucket, Key=filepath)["Body"] as file:
         # If "thousands" argument is not specified, set it to ","
         if "thousands" not in kwargs:
             kwargs["thousands"] = ","
@@ -99,7 +93,7 @@ def rd_write_csv(filepath: str, data: pd.DataFrame) -> None:
 
     # Write the buffer into the s3 bucket
     _ = s3_client.put_object(
-        Bucket=s3_bucket_dev, Body=csv_buffer.getvalue(), Key=filepath
+        Bucket=s3_bucket, Body=csv_buffer.getvalue(), Key=filepath
     )
     return None
 
@@ -115,7 +109,7 @@ def rd_load_json(filepath: str) -> dict:
     """
 
     # Load the json file using the client method
-    with s3_client.get_object(Bucket=s3_bucket_dev, Key=filepath)["Body"] as json_file:
+    with s3_client.get_object(Bucket=s3_bucket, Key=filepath)["Body"] as json_file:
         datadict = json.load(json_file)
 
     return datadict
@@ -136,7 +130,7 @@ def rd_file_exists(filepath: str, raise_error=False) -> bool:
     """
 
     result = file_exists(
-        client=s3_client, bucket_name=s3_bucket_dev, object_name=filepath
+        client=s3_client, bucket_name=s3_bucket, object_name=filepath
     )
 
     if not result and raise_error:
@@ -158,7 +152,7 @@ def rd_mkdir(path: str) -> None:
     _ = create_folder_on_s3(
         # client=config["client"],
         s3_client,
-        bucket_name=s3_bucket_dev,
+        bucket_name=s3_bucket,
         folder_path=path,
     )
 
