@@ -60,7 +60,7 @@ Possible_Categorical_Values = [100, 200, 201, 210, 211, 301, 302, 303, 304, 305,
 
 [receiptdate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"
@@ -360,7 +360,7 @@ Possible_Categorical_Values = ["WW", "BB", "FE", "GG", "JG", "HH", "ED", "KJ", "
 
 [birthdate]
 Description = "Datetime format = format=%d/%m/%Y"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -430,7 +430,7 @@ Possible_Categorical_Values = ["ingestion"]
 
 [createddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = ">=1"
@@ -450,7 +450,7 @@ Possible_Categorical_Values = ["data_migration", "Cheri", "Adela", "David"]
 
 [lastupdateddate]
 Description = "Datetime format = %Y-%m-%d %H:%M:%S.%f+00"
-Deduced_Data_Type = "datetime64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = ["None","str"]
 Length = "nan"

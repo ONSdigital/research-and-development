@@ -58,7 +58,7 @@ def mock_load_data(filepath):
         "col1": {"Deduced_Data_Type": "int"},
         "col2": {"Deduced_Data_Type": "str"},
         "col3": {"Deduced_Data_Type": "float"},
-        "col4": {"Deduced_Data_Type": "datetime64"},
+        "col4": {"Deduced_Data_Type": "str"},
     }
     return data_type_schema
 
@@ -101,7 +101,7 @@ def mock_load_both_data(filepath):
         "reference": {"Deduced_Data_Type": "int"},
         "createdby": {"Deduced_Data_Type": "str"},
         "instance": {"Deduced_Data_Type": "float"},
-        "date": {"Deduced_Data_Type": "datetime64"},
+        "date": {"Deduced_Data_Type": "str"},
     }
     data_type_schema2 = {
         "q200": {"Deduced_Data_Type": "str"},
