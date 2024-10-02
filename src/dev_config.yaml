@@ -7,7 +7,7 @@ global:
   logging_level: "DEBUG"
   table_config: "SingleLine"
   # Environment settings
-  dev_test : True
+  dev_test : False
   platform: network #whether to load from hdfs, network (Windows) or s3 (CDP)
   load_from_feather: False
 runlog_writer:
@@ -15,11 +15,11 @@ runlog_writer:
   write_hdf5: False # Write the runlog to an HDF5 file
   write_sql: False # Write the runlog to a SQL database
   display: False # Display the runlog in the terminal
-  log_path: "/ons/rdbe_dev/"
+  log_path: "/bat/res_dev/project_data/logs"
 hdfs_paths:
   logs_foldername: "/ons/rdbe_dev/logs/run_logs"
 s3_paths:
-  logs_foldername: "/user/anne.griffith/res_dev/logs/run_logs"
+  logs_foldername: "/bat/res_dev/project_data/logs/run_logs"
 staging_paths:
   folder: "01_staging"
   feather_output: "feather"
@@ -72,7 +72,7 @@ network_paths:
   ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged/"
-  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-09-12_v1322.csv"
+  frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-09-24_v1490.csv"
   freezing_changes_to_review_path: "02_freezing/changes_to_review/"
   freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-09-12_v1324.csv"
   freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-09-12_v1324.csv"

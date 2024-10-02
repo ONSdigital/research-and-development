@@ -2,8 +2,11 @@ from importlib import reload
 import time
 import os
 
-# os.chdir('../../../home/cdsw/research-and-development')
-# print(f"Current working directory is {os.getcwd()}")
+# Change to the project repository location
+my_wd = os.getcwd()
+my_repo = "research-and-development"
+if not my_wd.endswith(my_repo):
+    os.chdir(my_repo)
 
 import src.pipeline as src
 

@@ -237,7 +237,8 @@ class RunLog:
                 self.write_func(file_path, logs_df)
             else:
                 df = self.read_csv_func(file_path)
-                df = df.append(logs_df)
+                # df = df.append(logs_df)
+                df = pd.concat([df, logs_df], ignore_index=True)
                 self.write_func(file_path, df)
         if write_hdf5:
             # write the runlog to a hdf5 file
@@ -255,7 +256,8 @@ class RunLog:
                 logs_df.to_sql(logfile_name, mode="a", index=False, header=False)
             else:
                 df = pd.read_sql(logfile_name)
-                df = df.append(logs_df)
+                # df = df.append(logs_df)
+                df = pd.concat([df, logs_df], ignore_index=True)
                 df.to_sql(logfile_name, mode="a", index=False, header=False)
 
     def write_runlog(self) -> None:
