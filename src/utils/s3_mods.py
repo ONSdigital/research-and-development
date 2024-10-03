@@ -238,10 +238,33 @@ def rd_isdir(dirpath: str): # -> bool:
         dirpath = dirpath[1:]
 
     # Use the function from rdsa_utils
-    
     response = is_s3_directory(client=s3_client, bucket_name=s3_bucket, object_name=dirpath)
-
     return response
+
+def rd_isfile(filepath: str): # -> bool:
+    """
+    Test if given path is a file in s3 bucket. Check that it exists, not a directory and 
+    the size is greater than 0.
+    
+    Args:
+        filepath (string): The "directory" path in s3 bucket.
+    Returns:
+        status (bool): True if the dirpath is a directory, false otherwise.
+    
+    """
+    if filepath is None:
+        response = False
+    
+    if rd_file_exists(filepath):
+        isdir = rd_isdir(filepath)
+        size = rd_file_size(filepath)
+        response = (not isdir) and (size > 0)
+    else:
+        response = False
+    return response
+    
+
+
 
 
 

@@ -49,3 +49,7 @@ if __name__ == "__main__":
     
 #     print("Got response")
 #     print(response)
+    
+    # Checking rd_isfile
+    response = mods.rd_isfile(my_path)
+    print(response)
