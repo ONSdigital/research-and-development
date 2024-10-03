@@ -199,5 +199,26 @@ def rd_delete_file(filepath: str) -> bool:
     status = delete_file(s3_client, s3_bucket, filepath)
     return status
 
+def rd_md5sum(filepath: str) -> int:
+    """
+    Get md5sum of a specific file on s3.
+    Args:
+        filepath (string): The filepath in s3 bucket.
+    Returns:
+        md5result (int): The control sum md5.
+    """
+
+    try:
+        md5result = s3_client.head_object(
+            Bucket=s3_bucket,
+            Key=filepath
+        )['ETag'][1:-1]
+    except ValueError:
+        md5result = None
+        pass
+    return md5result
+
+
+
 
 
