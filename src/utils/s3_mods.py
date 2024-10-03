@@ -31,7 +31,11 @@ import pandas as pd
 from io import StringIO
 
 # Local libraries
-from rdsa_utils.cdp.helpers.s3_utils import file_exists, create_folder_on_s3
+from rdsa_utils.cdp.helpers.s3_utils import (
+    file_exists,
+    create_folder_on_s3,
+    delete_file,
+)
 from src.utils.singleton_boto import SingletonBoto
 # from src.utils.singleton_config import SingletonConfig
 
@@ -167,3 +171,33 @@ def rd_write_feather(filepath, df):
 def rd_read_feather(filepath):
     """Placeholder Function to read feather file from HDFS"""
     return None
+
+def rd_file_size(filepath: str) -> int:
+    """Function to check the size of a file on s3 bucket.
+
+    Args:
+        filepath (string) -- The filepath in s3 bucket
+
+    Returns:
+        Int - an integer value indicating the size
+        of the file in bytes
+    """
+
+    _response = s3_client.head_object(Bucket=s3_bucket, Key=filepath)
+    file_size = _response['ContentLength']
+
+    return file_size
+
+def rd_delete_file(filepath: str) -> bool:
+    """
+    Delete a file from s3 bucket.
+    Args:
+        filepath (string): The filepath in s3 bucket to be deleted
+    Returns:
+        status (bool): True for successfully completed deletion. Else False.
+    """
+    status = delete_file(s3_client, s3_bucket, filepath)
+    return status
+
+
+

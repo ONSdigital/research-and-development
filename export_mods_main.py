@@ -8,7 +8,6 @@ if not my_wd.endswith(my_repo):
     os.chdir(my_repo)
 
 from src.utils.helpers import tree_to_list
-import src.utils.s3_mods as mods
 from src.utils.singleton_boto import SingletonBoto
 
 config = {
@@ -19,11 +18,19 @@ config = {
 }
 
 boto3_client = SingletonBoto.get_client(config)
+import src.utils.s3_mods as mods
 
 
-def run_file_size():
-    root = "/bat/res_dev/project_data"
 
 
 if __name__ == "__main__":
-    run_make_dirs()
+    
+    my_path = "/bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/2023_staged_BERD_full_responses_24-10-02_v17.csv"
+    my_size = mods.rd_file_size(my_path)
+    
+    print(f"File size is {my_size}")
+    
+    status = mods.rd_delete_file(my_path)
+    if status:
+        print(f"File {my_path} successfully deleted")
+    
