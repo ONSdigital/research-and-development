@@ -36,10 +36,16 @@ if __name__ == "__main__":
 #     if status:
 #         print(f"File {my_path} successfully deleted")
     
-    # Calculating md5sum
-    my_sum = mods.rd_md5sum(my_path)
-    expected_output = "ea94424aceecf11c8a70d289e51c34ea"
-    print(my_sum)
-    if expected_output == my_sum
+    # # Calculating md5sum
+    # my_sum = mods.rd_md5sum(my_path)
+    # expected_output = "ea94424aceecf11c8a70d289e51c34ea"
+    # print(type(my_sum))
+    # if expected_output == my_sum:
+    #     print("Same md5sum")
     
+#     # Calculating rd_isdir 
+#     mydir = "bat"
+#     response = mods.rd_isdir(mydir)
     
+#     print("Got response")
+#     print(response)

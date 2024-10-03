@@ -35,6 +35,7 @@ from rdsa_utils.cdp.helpers.s3_utils import (
     file_exists,
     create_folder_on_s3,
     delete_file,
+    is_s3_directory,
 )
 from src.utils.singleton_boto import SingletonBoto
 # from src.utils.singleton_config import SingletonConfig
@@ -199,7 +200,7 @@ def rd_delete_file(filepath: str) -> bool:
     status = delete_file(s3_client, s3_bucket, filepath)
     return status
 
-def rd_md5sum(filepath: str) -> int:
+def rd_md5sum(filepath: str) -> str:
     """
     Get md5sum of a specific file on s3.
     Args:
@@ -213,10 +214,35 @@ def rd_md5sum(filepath: str) -> int:
             Bucket=s3_bucket,
             Key=filepath
         )['ETag'][1:-1]
-    except ValueError:
+    except s3_client.exceptions.ClientError as e:
+        s3_logger.error(f"Failed to compute the md5 checksum: {str(e)}")
         md5result = None
-        pass
     return md5result
+
+def rd_isdir(dirpath: str): # -> bool:
+    """
+    Test if directory exists in s3 bucket.
+    
+    Args:
+        dirpath (string): The "directory" path in s3 bucket.
+    Returns:
+        status (bool): True if the dirpath is a directory, false otherwise.
+
+    """
+    # The directory name must end with forward slash
+    if not dirpath.endswith('/'):
+        path = dirpath + '/' 
+        
+    # Any slashes at the beginning should be removed
+    while dirpath.startswith('/'):
+        dirpath = dirpath[1:]
+
+    # Use the function from rdsa_utils
+    
+    response = is_s3_directory(client=s3_client, bucket_name=s3_bucket, object_name=dirpath)
+
+    return response
+
 
 
 
