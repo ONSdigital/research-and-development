@@ -15,10 +15,6 @@ Contains the following functions:
 To do:
     Read  feather - possibly, not needed
     Write to feather - possibly, not needed
-    Copy file
-    Move file
-    Compute md5 sum
-    TBC
 """
 
 # Standard libraries
@@ -37,6 +33,7 @@ from rdsa_utils.cdp.helpers.s3_utils import (
     create_folder_on_s3,
     delete_file,
     is_s3_directory,
+    copy_file,
 )
 from src.utils.singleton_boto import SingletonBoto
 # from src.utils.singleton_config import SingletonConfig
@@ -309,6 +306,21 @@ def rd_write_string_to_file(content: bytes, filepath: str):
         Bucket=s3_bucket, Body=str_buffer.getvalue(), Key=filepath
     )
     return None
+
+def rd_copy_file(src_path: str, dst_path: str) -> bool:
+    """
+    Copy a file from one location to another. Uses rdsa_utils.
+    """
+    success = copy_file(
+        client=s3_client,
+        source_bucket_name=s3_bucket,
+        source_object_name=src_path,
+        destination_bucket_name=s3_bucket,
+        destination_object_name=dst_path,
+    ) 
+    return success
+
+
 
 
 

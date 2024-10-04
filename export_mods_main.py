@@ -65,8 +65,15 @@ if __name__ == "__main__":
     # response = mods.rd_read_header(my_path)
     # print(response)
     
-    # Testing rd_write_string_to_file
-    out_path = "/bat/res_dev/project_data/write_string_test.txt"
-    content = "George is great!"
-    mods.rd_write_string_to_file(content, out_path)
-    print("all done")
+    # # Testing rd_write_string_to_file
+    # out_path = "/bat/res_dev/project_data/write_string_test.txt"
+    # content = "Some content"
+    # mods.rd_write_string_to_file(content, out_path)
+    # print("all done")
+    
+    # Testing rd_copy_file
+    src_path = "/bat/res_dev/project_data/write_string_test.txt"
+    dst_path = "/bat/res_dev/write_string_test_copy.txt"
+    success = mods.rd_copy_file(src_path, dst_path)
+    if success:
+        print("File copied successfully")
