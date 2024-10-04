@@ -299,7 +299,7 @@ def rd_write_string_to_file(content: bytes, filepath: str):
     """
     
     # Put context to a new Input-Output buffer 
-    str_buffer = StringIO(content)
+    str_buffer = StringIO(content.decode("utf-8"))
 
     # "Rewind" the stream to the start of the buffer
     str_buffer.seek(0)
@@ -310,10 +310,20 @@ def rd_write_string_to_file(content: bytes, filepath: str):
     )
     return None
 
-def rd_copy_file(src_path: str, dst_path: str) -> bool:
+def short_file_name(full_path:str) -> str:
+    if "/" in full_path:
+        pos = full_path.rfind('/')
+        return full_path[pos + 1:]
+    else:
+        return full_path
+
+
+def rd_copy_file(src_path: str, dst_dir: str) -> bool:
     """
     Copy a file from one location to another. Uses rdsa_utils.
     """
+    dst_path = dst_dir + "/" + short_file_name(src_path)
+
     success = copy_file(
         client=s3_client,
         source_bucket_name=s3_bucket,
@@ -323,10 +333,12 @@ def rd_copy_file(src_path: str, dst_path: str) -> bool:
     ) 
     return success
 
-def rd_move_file(src_path: str, dst_path: str) -> bool:
+def rd_move_file(src_path: str, dst_dir: str) -> bool:
     """
     Move a file from one location to another. Uses rdsa_utils.
     """
+    
+    dst_path = dst_path + "/" + short_file_name(src_path)
     success = move_file(
         client=s3_client,
         source_bucket_name=s3_bucket,
@@ -388,9 +400,13 @@ def rd_search_file(dir_path: str, ending: str) -> str:
     """
     target_file = None
     
+    # Remove preceding forward slashes if needed
+    while dir_path.startswith("/"):
+        dir_path = dir_path[1:]
+    
     # get list of objects with prefix
     response = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=dir_path)
-    
+
     # retrieve key values
     locations = [object['Key'] for object in response['Contents']]
        
