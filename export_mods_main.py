@@ -78,9 +78,16 @@ if __name__ == "__main__":
     # if success:
     #     print("File copied successfully")
     
-    # Testing rd_move_file
-    src_path = "/bat/res_dev/write_string_test_copy.txt"
-    dst_path = "/bat/res_dev/project_data/write_string_moved.txt"
-    success = mods.rd_move_file(src_path, dst_path)
-    if success:
-        print("File moved successfully")
+    # # Testing rd_move_file
+    # src_path = "/bat/res_dev/write_string_test_copy.txt"
+    # dst_path = "/bat/res_dev/project_data/write_string_moved.txt"
+    # success = mods.rd_move_file(src_path, dst_path)
+    # if success:
+    #     print("File moved successfully")
+    
+    # Testing rd_search_file
+    dir_path = "bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/"
+    ending = "24-10-02_v20.csv"
+    
+    found_file = mods.rd_search_file(dir_path, ending)
+    print(f"Found file: {found_file}")

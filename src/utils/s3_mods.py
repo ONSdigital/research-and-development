@@ -275,8 +275,10 @@ def rd_read_header(path: str) -> str:
     Reads the first line of a file on s3. Gets the entire file using boto3 get_objects,
     converts its body into an input stream, reads the first line and remove the carriage
     return character (backslash-n) from the end.
-        Args:
+        
+    Args:
         filepath (string): The "directory" path in s3 bucket.
+    
     Returns:
         status (bool): True if the dirpath is a directory, false otherwise.
     """
@@ -333,6 +335,76 @@ def rd_move_file(src_path: str, dst_path: str) -> bool:
         destination_object_name=dst_path
     )
     return success
+
+# Function to replicate os.walk behavior
+def s3walk(locations: list, prefix: str) -> tuple:
+    """
+    Mimics the functionality of os.walk in s3 bucket using long filenames with slashes.
+    Recursively goes through the long filenames and splits it into "locations" - 
+    subdirectories, and "files" - short file names.
+
+    Args:
+        locations (list): a list of s3 locations that can be "directories"
+        prefix (str): Name of "subdirectory" of root where further locations will be found.
+    
+    Returns:
+        A tuple of (root, (subdir, files)).
+    """
+    # recursively add location to roots starting from prefix
+    def processLocation( root, prefixLocal, location):
+        # add new root location if not available
+        if not prefixLocal in root:
+            root[prefixLocal]=(set(),set())
+        # check how many folders are available after prefix
+        remainder = location[len(prefixLocal):]
+        structure = remainder.split('/')
+        #if we are not yet in the folder of the file we need to continue with a larger prefix
+        if len(structure)>1:
+            # add folder dir
+            root[prefixLocal][0].add(structure[0])
+            #make sure file is added allong the way
+            processLocation(root, prefixLocal+'/'+structure[0],location )
+        else:
+            # add to file
+            root[prefixLocal][1].add(structure[0])
+
+    root={}
+    for location in locations:
+        processLocation(root,prefix,location)
+
+    return root.items()
+
+
+
+def rd_search_file(dir_path: str, ending: str) -> str:
+    """Find a file in a directory with a specific ending.
+    
+    Args:
+        dir_path (str): s3 "directory" where to search for files
+        ending (str): File name ending to search for.
+    Returns:
+        Full file name that ends with the given string.
+    
+    """
+    target_file = None
+    
+    # get list of objects with prefix
+    response = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=dir_path)
+    
+    # retrieve key values
+    locations = [object['Key'] for object in response['Contents']]
+       
+    for _, (__, files) in s3walk(locations, dir_path):
+        for file in files:
+
+            # Check for ending
+            if file.endswith(ending):
+                target_file = str(file)
+    return target_file
+
+    
+    
+
 
 
 
