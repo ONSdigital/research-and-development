@@ -26,7 +26,7 @@ import src.utils.s3_mods as mods
 if __name__ == "__main__":
     
     my_path = "/bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/2023_staged_BERD_full_responses_24-10-02_v20.csv"
-
+    my_dir = "/bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/"
 #     # Checking that file exists
 #     my_size = mods.rd_file_size(my_path)
 #     print(f"File size is {my_size}")
@@ -50,6 +50,14 @@ if __name__ == "__main__":
 #     print("Got response")
 #     print(response)
     
-    # Checking rd_isfile
-    response = mods.rd_isfile(my_path)
-    print(response)
+    # # Checking rd_isfile
+    # response = mods.rd_isfile(my_path)
+    # print(response)
+    
+#     # Checking that rd_stat_size works for files and directories
+#     file_size =  mods.rd_stat_size(my_path)
+#     print(f"File {my_path} size is {file_size} bytes.")
+    
+#     dir_size =  mods.rd_stat_size(my_dir)
+#     print(f"Directory {my_dir} size is {dir_size} bytes.")
+    

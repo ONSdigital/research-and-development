@@ -263,7 +263,11 @@ def rd_isfile(filepath: str): # -> bool:
         response = False
     return response
     
-
+def rd_stat_size(path: str):
+    """
+    Gets the file size of a file or directory in bytes.
+    """
+    return rd_file_size(path)
 
 
 
