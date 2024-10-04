@@ -34,6 +34,7 @@ from rdsa_utils.cdp.helpers.s3_utils import (
     delete_file,
     is_s3_directory,
     copy_file,
+    move_file,
 )
 from src.utils.singleton_boto import SingletonBoto
 # from src.utils.singleton_config import SingletonConfig
@@ -319,6 +320,21 @@ def rd_copy_file(src_path: str, dst_path: str) -> bool:
         destination_object_name=dst_path,
     ) 
     return success
+
+def rd_move_file(src_path: str, dst_path: str) -> bool:
+    """
+    Move a file from one location to another. Uses rdsa_utils.
+    """
+    success = move_file(
+        client=s3_client,
+        source_bucket_name=s3_bucket,
+        source_object_name=src_path,
+        destination_bucket_name=s3_bucket,
+        destination_object_name=dst_path
+    )
+    return success
+
+
 
 
 
