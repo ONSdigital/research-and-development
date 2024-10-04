@@ -61,7 +61,12 @@ if __name__ == "__main__":
 #     dir_size =  mods.rd_stat_size(my_dir)
 #     print(f"Directory {my_dir} size is {dir_size} bytes.")
 
-    # Testing rd_read_header 
-    response = mods.rd_read_header(my_path)
-    print(response)
+    # # Testing rd_read_header 
+    # response = mods.rd_read_header(my_path)
+    # print(response)
     
+    # Testing rd_write_string_to_file
+    out_path = "/bat/res_dev/project_data/write_string_test.txt"
+    content = "George is great!"
+    mods.rd_write_string_to_file(content, out_path)
+    print("all done")

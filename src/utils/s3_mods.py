@@ -293,6 +293,24 @@ def rd_read_header(path: str) -> str:
     
     return response
     
+def rd_write_string_to_file(content: bytes, filepath: str):
+    """
+    Writes a string into the specified file path
+    """
+    
+    # Put context to a new Input-Output buffer 
+    str_buffer = StringIO(content)
+
+    # "Rewind" the stream to the start of the buffer
+    str_buffer.seek(0)
+
+    # Write the buffer into the s3 bucket
+    _ = s3_client.put_object(
+        Bucket=s3_bucket, Body=str_buffer.getvalue(), Key=filepath
+    )
+    return None
+
+
 
 
 
