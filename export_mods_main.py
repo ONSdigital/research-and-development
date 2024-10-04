@@ -60,4 +60,8 @@ if __name__ == "__main__":
     
 #     dir_size =  mods.rd_stat_size(my_dir)
 #     print(f"Directory {my_dir} size is {dir_size} bytes.")
+
+    # Testing rd_read_header 
+    response = mods.rd_read_header(my_path)
+    print(response)
     

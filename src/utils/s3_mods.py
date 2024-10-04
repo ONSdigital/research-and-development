@@ -28,7 +28,8 @@ import logging
 
 # Third party libraries
 import pandas as pd
-from io import StringIO
+from io import StringIO, TextIOWrapper
+
 
 # Local libraries
 from rdsa_utils.cdp.helpers.s3_utils import (
@@ -263,11 +264,36 @@ def rd_isfile(filepath: str): # -> bool:
         response = False
     return response
     
-def rd_stat_size(path: str):
+def rd_stat_size(path: str) -> int:
     """
     Gets the file size of a file or directory in bytes.
+    Alias of as rd_file_size.
+    Works for directories, but returns 0 bytes, which is typical for s3.
     """
     return rd_file_size(path)
+
+def rd_read_header(path: str) -> str:
+    """
+    Reads the first line of a file on s3. Gets the entire file using boto3 get_objects,
+    converts its body into an input stream, reads the first line and remove the carriage
+    return character (backslash-n) from the end.
+        Args:
+        filepath (string): The "directory" path in s3 bucket.
+    Returns:
+        status (bool): True if the dirpath is a directory, false otherwise.
+    """
+    # Create an input/output stream pointer, same as open
+    stream = TextIOWrapper(s3_client.get_object(Bucket=s3_bucket, Key=path)['Body'])
+    
+    # Read the first line from the stream
+    response = stream.readline()
+    
+    # Remove the last character (carriage return, or new line)
+    response = response[:-1]
+    
+    return response
+    
+
 
 
 
