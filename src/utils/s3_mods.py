@@ -44,6 +44,7 @@ s3_logger = logging.getLogger(__name__)
 s3_client = SingletonBoto.get_client()
 s3_bucket = SingletonBoto.get_bucket()
 
+
 # Read a CSV file into a Pandas dataframe
 def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
     """Reads a csv from s3 bucket into a Pandas Dataframe using boto3.
@@ -172,6 +173,7 @@ def rd_read_feather(filepath):
     """Placeholder Function to read feather file from HDFS"""
     return None
 
+
 def rd_file_size(filepath: str) -> int:
     """Function to check the size of a file on s3 bucket.
 
@@ -188,6 +190,7 @@ def rd_file_size(filepath: str) -> int:
 
     return file_size
 
+
 def rd_delete_file(filepath: str) -> bool:
     """
     Delete a file from s3 bucket.
@@ -198,6 +201,7 @@ def rd_delete_file(filepath: str) -> bool:
     """
     status = delete_file(s3_client, s3_bucket, filepath)
     return status
+
 
 def rd_md5sum(filepath: str) -> str:
     """
@@ -218,10 +222,11 @@ def rd_md5sum(filepath: str) -> str:
         md5result = None
     return md5result
 
-def rd_isdir(dirpath: str): # -> bool:
+
+def rd_isdir(dirpath: str) -> bool:
     """
     Test if directory exists in s3 bucket.
-    
+
     Args:
         dirpath (string): The "directory" path in s3 bucket.
     Returns:
@@ -230,30 +235,35 @@ def rd_isdir(dirpath: str): # -> bool:
     """
     # The directory name must end with forward slash
     if not dirpath.endswith('/'):
-        path = dirpath + '/' 
-        
+        dirpath = dirpath + '/'
+
     # Any slashes at the beginning should be removed
     while dirpath.startswith('/'):
         dirpath = dirpath[1:]
 
     # Use the function from rdsa_utils
-    response = is_s3_directory(client=s3_client, bucket_name=s3_bucket, object_name=dirpath)
+    response = is_s3_directory(
+        client=s3_client,
+        bucket_name=s3_bucket,
+        object_name=dirpath
+    )
     return response
 
-def rd_isfile(filepath: str): # -> bool:
+
+def rd_isfile(filepath: str) -> bool:
     """
-    Test if given path is a file in s3 bucket. Check that it exists, not a directory and 
-    the size is greater than 0.
-    
+    Test if given path is a file in s3 bucket. Check that it exists, not a
+    directory and the size is greater than 0.
+
     Args:
         filepath (string): The "directory" path in s3 bucket.
     Returns:
         status (bool): True if the dirpath is a directory, false otherwise.
-    
+
     """
     if filepath is None:
         response = False
-    
+
     if rd_file_exists(filepath):
         isdir = rd_isdir(filepath)
         size = rd_file_size(filepath)
@@ -261,7 +271,8 @@ def rd_isfile(filepath: str): # -> bool:
     else:
         response = False
     return response
-    
+
+
 def rd_stat_size(path: str) -> int:
     """
     Gets the file size of a file or directory in bytes.
@@ -270,35 +281,37 @@ def rd_stat_size(path: str) -> int:
     """
     return rd_file_size(path)
 
+
 def rd_read_header(path: str) -> str:
     """
     Reads the first line of a file on s3. Gets the entire file using boto3 get_objects,
     converts its body into an input stream, reads the first line and remove the carriage
     return character (backslash-n) from the end.
-        
+
     Args:
         filepath (string): The "directory" path in s3 bucket.
-    
+
     Returns:
         status (bool): True if the dirpath is a directory, false otherwise.
     """
     # Create an input/output stream pointer, same as open
     stream = TextIOWrapper(s3_client.get_object(Bucket=s3_bucket, Key=path)['Body'])
-    
+
     # Read the first line from the stream
     response = stream.readline()
-    
+
     # Remove the last character (carriage return, or new line)
     response = response[:-1]
-    
+
     return response
-    
+
+
 def rd_write_string_to_file(content: bytes, filepath: str):
     """
     Writes a string into the specified file path
     """
-    
-    # Put context to a new Input-Output buffer 
+
+    # Put context to a new Input-Output buffer
     str_buffer = StringIO(content.decode("utf-8"))
 
     # "Rewind" the stream to the start of the buffer
@@ -310,12 +323,13 @@ def rd_write_string_to_file(content: bytes, filepath: str):
     )
     return None
 
+
 def _path_long2short(path: "str") -> str:
     """
-    Extracts a short file name from the full path. 
+    Extracts a short file name from the full path.
     If there is at least one forward slash, finds the lates slash to the right
     and rerurns all characrers afrer it.
-    
+
     If there are no slashes, returns the path as is.
     """
     if "/" in path:
@@ -324,17 +338,19 @@ def _path_long2short(path: "str") -> str:
     else:
         return path
 
+
 def _remove_end_slashes(path: "str") -> str:
     """
     Removes any amount of consequitive forward slashes from a path.
     """
     while path.endswith("/"):
         path = path[:-1]
-        
+
     return path
 
+
 def rd_copy_file(src_path: str, dst_path: str) -> bool:
-    
+
     dst_path = _remove_end_slashes(dst_path)
     dst_path += "/" + _path_long2short(src_path)
     """
@@ -346,13 +362,14 @@ def rd_copy_file(src_path: str, dst_path: str) -> bool:
         source_object_name=src_path,
         destination_bucket_name=s3_bucket,
         destination_object_name=dst_path,
-    ) 
+    )
     return success
+
 
 def rd_move_file(src_path: str, dst_path: str) -> bool:
     """
     Move a file from one location to another. Uses rdsa_utils.
-    
+
     """
     dst_path = _remove_end_slashes(dst_path)
     dst_path += "/" + _path_long2short(src_path)
@@ -365,68 +382,70 @@ def rd_move_file(src_path: str, dst_path: str) -> bool:
     )
     return success
 
-# Function to replicate os.walk behavior
+
 def s3walk(locations: list, prefix: str) -> tuple:
     """
     Mimics the functionality of os.walk in s3 bucket using long filenames with slashes.
-    Recursively goes through the long filenames and splits it into "locations" - 
+    Recursively goes through the long filenames and splits it into "locations" -
     subdirectories, and "files" - short file names.
 
     Args:
         locations (list): a list of s3 locations that can be "directories"
-        prefix (str): Name of "subdirectory" of root where further locations will be found.
-    
+        prefix (str): Name of "subdirectory" of root where further locations
+        will be found.
+
     Returns:
         A tuple of (root, (subdir, files)).
     """
     # recursively add location to roots starting from prefix
-    def processLocation( root, prefixLocal, location):
+    def processLocation(root, prefixLocal, location):
         # add new root location if not available
-        if not prefixLocal in root:
-            root[prefixLocal]=(set(),set())
+        if prefixLocal not in root:
+            root[prefixLocal] = (set(), set())
         # check how many folders are available after prefix
         remainder = location[len(prefixLocal):]
         structure = remainder.split('/')
-        #if we are not yet in the folder of the file we need to continue with a larger prefix
-        if len(structure)>1:
+
+        # If we are not yet in the folder of the file we need to continue with
+        # a larger prefix
+        if len(structure) > 1:
             # add folder dir
             root[prefixLocal][0].add(structure[0])
-            #make sure file is added allong the way
-            processLocation(root, prefixLocal+'/'+structure[0],location )
+            # make sure file is added allong the way
+            processLocation(root, prefixLocal + '/' + structure[0], location)
         else:
             # add to file
             root[prefixLocal][1].add(structure[0])
 
-    root={}
+    root = {}
     for location in locations:
-        processLocation(root,prefix,location)
+        processLocation(root, prefix, location)
 
     return root.items()
 
 
-
 def rd_search_file(dir_path: str, ending: str) -> str:
     """Find a file in a directory with a specific ending.
-    
+
     Args:
         dir_path (str): s3 "directory" where to search for files
         ending (str): File name ending to search for.
     Returns:
         Full file name that ends with the given string.
-    
+
     """
     target_file = None
-    
+
     # Remove preceding forward slashes if needed
     while dir_path.startswith("/"):
         dir_path = dir_path[1:]
-    
+
     # get list of objects with prefix
     response = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=dir_path)
 
     # retrieve key values
     locations = [object['Key'] for object in response['Contents']]
-       
+
     for _, (__, files) in s3walk(locations, dir_path):
         for file in files:
 
@@ -434,21 +453,3 @@ def rd_search_file(dir_path: str, ending: str) -> str:
             if file.endswith(ending):
                 target_file = str(file)
     return target_file
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
