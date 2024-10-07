@@ -2,6 +2,13 @@
 import os
 
 from importlib import reload
+
+# Change to the project repository location
+my_wd = os.getcwd()
+my_repo = "research-and-development"
+if not my_wd.endswith(my_repo):
+    os.chdir(my_repo)
+
 from src.outputs import export_files
 
 reload(export_files)

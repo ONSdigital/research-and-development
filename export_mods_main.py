@@ -65,11 +65,11 @@ if __name__ == "__main__":
     # response = mods.rd_read_header(my_path)
     # print(response)
     
-    # # Testing rd_write_string_to_file
-    # out_path = "/bat/res_dev/project_data/write_string_test.txt"
-    # content = "Some content"
-    # mods.rd_write_string_to_file(content, out_path)
-    # print("all done")
+    # Testing rd_write_string_to_file
+    out_path = "/bat/res_dev/project_data/write_string_test.txt"
+    content = "Some content"
+    mods.rd_write_string_to_file(content.encode(encoding, "utf-8"), out_path)
+    print("all done")
     
     # # Testing rd_copy_file
     # src_path = "/bat/res_dev/project_data/write_string_test.txt"
@@ -85,9 +85,9 @@ if __name__ == "__main__":
     # if success:
     #     print("File moved successfully")
     
-    # Testing rd_search_file
-    dir_path = "bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/"
-    ending = "24-10-02_v20.csv"
+#     # Testing rd_search_file
+#     dir_path = "bat/res_dev/project_data/2023_surveys/BERD/01_staging/staging_qa/full_responses_qa/"
+#     ending = "24-10-02_v20.csv"
     
-    found_file = mods.rd_search_file(dir_path, ending)
-    print(f"Found file: {found_file}")
+#     found_file = mods.rd_search_file(dir_path, ending)
+#     print(f"Found file: {found_file}")

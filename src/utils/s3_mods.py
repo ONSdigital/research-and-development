@@ -299,7 +299,7 @@ def rd_write_string_to_file(content: bytes, filepath: str):
     """
     
     # Put context to a new Input-Output buffer 
-    str_buffer = StringIO(content)
+    str_buffer = StringIO(content.decode("utf-8"))
 
     # "Rewind" the stream to the start of the buffer
     str_buffer.seek(0)
@@ -310,7 +310,33 @@ def rd_write_string_to_file(content: bytes, filepath: str):
     )
     return None
 
+def _path_long2short(path: "str") -> str:
+    """
+    Extracts a short file name from the full path. 
+    If there is at least one forward slash, finds the lates slash to the right
+    and rerurns all characrers afrer it.
+    
+    If there are no slashes, returns the path as is.
+    """
+    if "/" in path:
+        last_slash = path.rfind("/")
+        return path[last_slash + 1:]
+    else:
+        return path
+
+def _remove_end_slashes(path: "str") -> str:
+    """
+    Removes any amount of consequitive forward slashes from a path.
+    """
+    while path.endswith("/"):
+        path = path[:-1]
+        
+    return path
+
 def rd_copy_file(src_path: str, dst_path: str) -> bool:
+    
+    dst_path = _remove_end_slashes(dst_path)
+    dst_path += "/" + _path_long2short(src_path)
     """
     Copy a file from one location to another. Uses rdsa_utils.
     """
@@ -326,7 +352,10 @@ def rd_copy_file(src_path: str, dst_path: str) -> bool:
 def rd_move_file(src_path: str, dst_path: str) -> bool:
     """
     Move a file from one location to another. Uses rdsa_utils.
+    
     """
+    dst_path = _remove_end_slashes(dst_path)
+    dst_path += "/" + _path_long2short(src_path)
     success = move_file(
         client=s3_client,
         source_bucket_name=s3_bucket,
@@ -388,9 +417,13 @@ def rd_search_file(dir_path: str, ending: str) -> str:
     """
     target_file = None
     
+    # Remove preceding forward slashes if needed
+    while dir_path.startswith("/"):
+        dir_path = dir_path[1:]
+    
     # get list of objects with prefix
     response = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=dir_path)
-    
+
     # retrieve key values
     locations = [object['Key'] for object in response['Contents']]
        

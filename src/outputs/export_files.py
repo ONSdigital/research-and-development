@@ -131,7 +131,7 @@ def check_files_exist(file_list: List, config: dict, isfile: callable):
     for file in file_list:
         file_path = Path(file)  # Changes to path if str
         OutgoingLogger.debug(f"Using {platform} isfile function")
-        if not isfile(file_path):
+        if not isfile(str(file_path)):
             OutgoingLogger.error(
                 f"File {file} does not exist. Check existence and spelling"
             )
@@ -152,7 +152,9 @@ def transfer_files(source, destination, method, logger, copy_files, move_files):
     """
     transfer_func = {"copy": copy_files, "move": move_files}[method]
     past_tense = {"copy": "copied", "move": "moved"}[method]
-    transfer_func(source, destination)
+    from ipdb import set_trace
+    set_trace()
+    transfer_func(str(source), destination)
 
     logger.info(f"Files {source} successfully {past_tense} to {destination}.")
 
@@ -227,10 +229,12 @@ def run_export(user_config_path: str, dev_config_path: str):
     platform = config["global"]["platform"]
 
     if platform == "s3":
-        from src.utils import s3_mods as mods
+        # create singletion boto3 client object & pass in bucket string
+        from src.utils.singleton_boto import SingletonBoto
 
-        # Creating boto3 client and adding it to the config dict
-        config["client"] = mods.create_client(config)
+        boto3_client = SingletonBoto.get_client(config)  # noqa
+        from src.utils import s3_mods as mods
+        
     elif platform == "network":
         # If the platform is "network" or "hdfs", there is no need for a client.
         # Adding a client = None for consistency.
@@ -301,7 +305,7 @@ def run_export(user_config_path: str, dev_config_path: str):
 
     # Copy or Move files to outgoing folder
     file_transfer_method = config["export_choices"]["copy_or_move_files"]
-
+    
     for file_path in file_select_dict.values():
         file_path = os.path.join(file_path)
         transfer_files(
