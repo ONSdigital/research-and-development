@@ -64,8 +64,8 @@ if __name__ == "__main__":
 
     # Testing rd_write_string_to_file
     out_path = "/bat/res_dev/project_data/write_string_test.txt"
-    content = "Some content"
-    mods.rd_write_string_to_file(content.encode(encoding, "utf-8"), out_path)
+    content = "New content"
+    mods.rd_write_string_to_file(content.encode(encoding="utf-8"), out_path)
     print("all done")
 
     # # Testing rd_copy_file
