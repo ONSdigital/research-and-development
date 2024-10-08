@@ -35,6 +35,8 @@ from rdsa_utils.cdp.helpers.s3_utils import (
     is_s3_directory,
     copy_file,
     move_file,
+    validate_bucket_name,
+    validate_s3_file_path,
 )
 from src.utils.singleton_boto import SingletonBoto
 # from src.utils.singleton_config import SingletonConfig
@@ -453,3 +455,59 @@ def rd_search_file(dir_path: str, ending: str) -> str:
             if file.endswith(ending):
                 target_file = str(file)
     return target_file
+
+
+def read_excel(
+    filepath: str,
+    client: boto3.client = s3_client,
+    bucket_name: str = s3_bucket,
+    **kwargs,
+) -> pd.DataFrame:
+    """
+    Read an Excel file from s3 bucket into a Pandas dataframe.
+
+    Parameters
+    ----------
+    filepath : str
+        The filepath to save the dataframe to.
+    client : boto3.client
+        The boto3 S3 client instance.
+    bucket_name : str
+        The name of the S3 bucket.
+    kwargs : dict
+        Optional dictionary of Pandas read_excel keyword arguments.
+
+    Returns
+    -------
+    pd.DataFrame
+        A dataframe with data, if reading was successful.
+
+    Raises
+    ------
+    InvalidBucketNameError
+        If the bucket name is invalid according to AWS rules.
+    Exception
+        If there is an error reading from s3 or cnverting to Excel.
+
+    """
+
+    bucket_name = validate_bucket_name(bucket_name)
+    filepath = validate_s3_file_path(filepath, allow_s3_scheme=False)
+
+    try:
+        # Get the Excel file from S3
+        response = client.get_object(Bucket=bucket_name, Key=filepath)
+        s3_logger.info(
+            f"Loaded Excel file from S3 bucket {bucket_name}, filepath {filepath}",
+        )
+
+        # Read the Excel file into a Pandas DataFrame
+        df = pd.read_excel(response["Body"], **kwargs)
+
+    except Exception as e:
+        error_message = (
+            f"Error loading file from bucket {bucket_name}, filepath {filepath}: {e}"
+        )
+        s3_logger.error(error_message)
+        raise Exception(error_message) from e
+    return df
