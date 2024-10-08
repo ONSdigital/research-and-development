@@ -62,11 +62,11 @@ if __name__ == "__main__":
     # response = mods.rd_read_header(my_path)
     # print(response)
 
-    # Testing rd_write_string_to_file
-    out_path = "/bat/res_dev/project_data/write_string_test.txt"
-    content = "New content"
-    mods.rd_write_string_to_file(content.encode(encoding="utf-8"), out_path)
-    print("all done")
+    # # Testing rd_write_string_to_file
+    # out_path = "/bat/res_dev/project_data/write_string_test.txt"
+    # content = "New content"
+    # mods.rd_write_string_to_file(content.encode(encoding="utf-8"), out_path)
+    # print("all done")
 
     # # Testing rd_copy_file
     # src_path = "/bat/res_dev/project_data/write_string_test.txt"
@@ -88,3 +88,8 @@ if __name__ == "__main__":
 
 #     found_file = mods.rd_search_file(dir_path, ending)
 #     print(f"Found file: {found_file}")
+
+    # Testing read_excel
+    my_path = "bat/res_dev/project_data/test_excel_gz.xlsx"
+    df = mods.read_excel(my_path)
+    print(df.head())

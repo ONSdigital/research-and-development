@@ -24,7 +24,7 @@ import logging
 
 # Third party libraries
 import pandas as pd
-from io import StringIO, TextIOWrapper
+from io import StringIO, TextIOWrapper, BytesIO
 
 
 # Local libraries
@@ -459,7 +459,7 @@ def rd_search_file(dir_path: str, ending: str) -> str:
 
 def read_excel(
     filepath: str,
-    client: boto3.client = s3_client,
+    client = s3_client,
     bucket_name: str = s3_bucket,
     **kwargs,
 ) -> pd.DataFrame:
@@ -491,18 +491,19 @@ def read_excel(
 
     """
 
-    bucket_name = validate_bucket_name(bucket_name)
-    filepath = validate_s3_file_path(filepath, allow_s3_scheme=False)
+#    bucket_name = validate_bucket_name(bucket_name)
+#    filepath = validate_s3_file_path(filepath, allow_s3_scheme=False)
 
     try:
         # Get the Excel file from S3
+
         response = client.get_object(Bucket=bucket_name, Key=filepath)
         s3_logger.info(
             f"Loaded Excel file from S3 bucket {bucket_name}, filepath {filepath}",
         )
 
         # Read the Excel file into a Pandas DataFrame
-        df = pd.read_excel(response["Body"], **kwargs)
+        df = pd.read_excel(BytesIO(response['Body'].read()), **kwargs)
 
     except Exception as e:
         error_message = (
