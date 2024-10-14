@@ -44,6 +44,8 @@ def postcode_data_construction(
     updated_snapshot_df = snapshot_df.copy()
 
     # Add flags to indicate row was constructed
+    if "is_constructed" not in updated_snapshot_df.columns:
+        updated_snapshot_df["is_constructed"] = False
     construction_df["is_constructed"] = True
 
     updated_snapshot_df, construction_df = replace_values_in_construction(
