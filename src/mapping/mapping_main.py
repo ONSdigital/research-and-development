@@ -110,7 +110,7 @@ def run_mapping(
 
     # Join the ITL regions mapper to the BERD full_responses dataframe
     full_responses = join_itl_regions(
-        full_responses, postcode_mapper, itl_mapper, config
+        full_responses, postcode_mapper, itl_mapper, config, warn_only=True
     )
 
     # Process the NI full responses if they exist

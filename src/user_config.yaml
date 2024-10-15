@@ -2,10 +2,10 @@ config_validation:
   validate: True
   path: src/user_config_schema.yaml
 years:
-  survey_year: 2023
+  survey_year: 2022
 global:
   # Staging and validation settings
-  postcode_csv_check: True
+  postcode_csv_check: False
   load_ni_data: False
   # Pipeline run type
   run_with_snapshot: True                         # Run until point of freezing
@@ -21,14 +21,14 @@ global:
   load_manual_outliers: False
   load_manual_imputation: False
   # Backdata output settings
-  output_backdata: False
+  output_backdata: True
   # QA output settings
-  output_full_responses: True
+  output_full_responses: False
   output_pnp_full_responses: False
   output_ni_full_responses: False
   output_mapping_qa: False
   output_mapping_ni_qa: False
-  output_imputation_qa: False
+  output_imputation_qa: True
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
