@@ -151,8 +151,8 @@ export_choices:
   export_fte_total_qa: None
   export_status_filtered: None
   export_frozen_group: None
-  export_staged_BERD_full_responses: None
+  export_staged_BERD_full_responses: "2023_staged_BERD_full_responses_24-10-02_v20.csv"
   export_staged_NI_full_responses: None
   export_full_responses_imputed: None
   export_full_estimation_qa: None  # "2022_full_estimation_qa_24-07-15_v555.csv"
-  export_invalid_unrecognised_postcodes: "2022_invalid_unrecognised_postcodes_24-07-04_v503.csv"
+  export_invalid_unrecognised_postcodes: None # "2022_invalid_unrecognised_postcodes_24-07-04_v503.csv"

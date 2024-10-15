@@ -53,8 +53,6 @@ def run_pipeline(user_config_path, dev_config_path):
         boto3_client = SingletonBoto.get_client(config)  # noqa
         from src.utils import s3_mods as mods
 
-        # Creating boto3 client and adding it to the config dict
-        # config["client"] = boto3_client
     elif platform == "network":
         # If the platform is "network" or "hdfs", there is no need for a client.
         # Adding a client = None for consistency.
