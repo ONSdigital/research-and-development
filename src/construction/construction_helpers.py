@@ -66,6 +66,11 @@ def prepare_forms_gb(
             snapshot_df, unique_references = prepare_short_to_long(
                 snapshot_df, construction_df
             )
+        else:
+            unique_references = []
+    else:
+        unique_references = []
+
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
     construction_df = create_period_year(construction_df)
