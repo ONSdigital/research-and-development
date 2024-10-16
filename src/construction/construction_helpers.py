@@ -130,7 +130,6 @@ def prepare_short_to_long(
     # For every short_to_long reference,
     # this copies the instance 0 the relevant number of times,
     # updating to the corresponding instance number
-    unique_references = []
     for index, value in ref_count.items():
         unique_references.append(index)
         for instance in range(1, value):
