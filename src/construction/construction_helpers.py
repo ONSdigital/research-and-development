@@ -60,16 +60,16 @@ def prepare_forms_gb(
             convert_formtype
         )
 
+    # Create empty list for short to long construction references
+    # An empty list is required for setting the instance, if there are
+    # no short to long constructions
+    unique_references = []
     if "construction_type" in construction_df.columns:
         # Prepare the short to long form constructions, if any (N/A to NI)
         if "short_to_long" in construction_df.construction_type.unique():
             snapshot_df, unique_references = prepare_short_to_long(
-                snapshot_df, construction_df
+                snapshot_df, construction_df, unique_references
             )
-        else:
-            unique_references = []
-    else:
-        unique_references = []
 
     # Create period_year column (NI already has it)
     snapshot_df = create_period_year(snapshot_df)
@@ -95,9 +95,22 @@ def prepare_forms_gb(
     return (snapshot_df, construction_df)
 
 
-def prepare_short_to_long(updated_snapshot_df, construction_df):
-    """Create addional instances for short to long construction"""
+def prepare_short_to_long(
+    updated_snapshot_df: pd.DataFrame,
+    construction_df: pd.DataFrame,
+    unique_references: list,
+    ) -> Tuple[pd.DataFrame, list]:
+    """Create addional instances for short to long construction.
 
+    Args:
+        updated_snapshot_df (pd.DataFrame): The updated snapshot df.
+        construction_df (pd.DataFrame): The construction df.
+        unique_references (list): Empty list to populate.
+
+    Returns:
+        Tuple[pd.DataFrame, list]: The updated snapshot df
+            and the list of unique references.
+    """
     construction_df.loc[
         construction_df["construction_type"] == "short_to_long", "604"
     ] = "Yes"
