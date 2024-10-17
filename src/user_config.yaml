@@ -23,7 +23,7 @@ global:
   # Backdata output settings
   output_backdata: False
   # QA output settings
-  output_full_responses: True
+  output_full_responses: False
   output_pnp_full_responses: False
   output_ni_full_responses: False
   output_mapping_qa: False
