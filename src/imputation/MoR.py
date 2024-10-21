@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
+from src.staging.postcode_validation import format_postcodes
 from src.construction.construction_helpers import convert_formtype
 
 good_statuses = ["Clear", "Clear - overridden"]
@@ -89,6 +90,10 @@ def mor_preprocessing(df, backdata, is_2022):
     # there is no shortform backdata if the survey year is 2022
     if is_2022:
         imputation_cond = stat_cond & lf_cond
+
+        # The postcode column from 2021 backdata need formatting
+        backdata["601"] = backdata["601"].apply(format_postcodes)
+
     else:
         sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
         imputation_cond = stat_cond & (sf_cond | lf_cond)
