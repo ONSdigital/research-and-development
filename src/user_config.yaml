@@ -5,7 +5,7 @@ years:
   survey_year: 2023
 global:
   # Staging and validation settings
-  postcode_csv_check: False
+  postcode_csv_check: True
   load_ni_data: False
   # Pipeline run type
   run_with_snapshot: True                         # Run until point of freezing
