@@ -75,6 +75,10 @@ def all_data_construction(
 
     # Drop columns without constructed values
     construction_df = construction_df.dropna(axis="columns", how="all")
+    if "statusencoded" in construction_df.columns:
+        construction_df["statusencoded"] = (
+            construction_df["statusencoded"].astype(str).str.split(".").str[0]
+        )
 
     # Make a copy of the snapshot
     updated_snapshot_df = snapshot_df.copy()

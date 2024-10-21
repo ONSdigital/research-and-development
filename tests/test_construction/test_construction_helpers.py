@@ -150,7 +150,7 @@ class TestPrepareShortToLong:
 
         # Run the function
         snapshot_output, unique_references = prepare_short_to_long(
-            input_snapshot_df, input_construction_df
+            input_snapshot_df, input_construction_df, unique_references=[]
         )
 
         snapshot_output = snapshot_output.sort_values(
