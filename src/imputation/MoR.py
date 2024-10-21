@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
+from src.staging.postcode_validation import format_postcodes
 from src.construction.construction_helpers import convert_formtype
 
 good_statuses = ["Clear", "Clear - overridden"]
@@ -82,6 +83,8 @@ def mor_preprocessing(df, backdata, is_2022):
     # ensure the "formtype" column is in the correct format
     df["formtype"] = df["formtype"].apply(convert_formtype)
     backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
+
+    backdata["601"] = backdata["601"].apply(format_postcodes)
 
     lf_cond = df["formtype"] == "0001"
     stat_cond = df["status"].isin(bad_statuses)
