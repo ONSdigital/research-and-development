@@ -2,7 +2,7 @@ config_validation:
   validate: True
   path: src/user_config_schema.yaml
 years:
-  survey_year: 2022
+  survey_year: 2023
 global:
   # Staging and validation settings
   postcode_csv_check: False
@@ -28,7 +28,7 @@ global:
   output_ni_full_responses: False
   output_mapping_qa: False
   output_mapping_ni_qa: False
-  output_imputation_qa: True
+  output_imputation_qa: False
   output_auto_outliers: False
   output_outlier_qa : False
   output_estimation_qa: False
