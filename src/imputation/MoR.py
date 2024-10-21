@@ -84,6 +84,8 @@ def mor_preprocessing(df, backdata, is_2022):
     df["formtype"] = df["formtype"].apply(convert_formtype)
     backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
 
+    backdata["601"] = backdata["601"].apply(format_postcodes)
+
     lf_cond = df["formtype"] == "0001"
     stat_cond = df["status"].isin(bad_statuses)
 
