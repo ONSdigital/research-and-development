@@ -93,9 +93,6 @@ def mor_preprocessing(df, backdata, is_2022):
     if is_2022:
         imputation_cond = stat_cond & lf_cond
 
-        # The postcode column from 2021 backdata need formatting
-        backdata["601"] = backdata["601"].apply(format_postcodes)
-
     else:
         sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
         imputation_cond = stat_cond & (sf_cond | lf_cond)
