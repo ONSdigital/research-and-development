@@ -211,9 +211,8 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         threshold_num,
     )
 
-    # Set dtype of manual_trim column before concatination
+    # Set dtype of manual_trim column to bool before concatination
     convert_dict = {'manual_trim': bool}
-
     expanded_df = expanded_df.astype(convert_dict)
     excluded_df = excluded_df.astype(convert_dict)
     
