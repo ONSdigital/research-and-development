@@ -66,10 +66,13 @@ export_paths:
   export_folder: "outgoing_export"
 network_paths:
   root: "R:/BERD Results System Development 2023/DAP_emulation/"
-  logs_foldername: "logs/run_logs" # dev config
-  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json" # dev config
+  logs_foldername: "logs/run_logs"
+  snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-85ae5659-7147-42c3-a5dd-d69beccc9e09.json"
   updated_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2023_snapshots/snapshot-202312-002-b9b6048a-51c9-4669-919a-e92fc6e9c433.json"
-  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv" # TESTER FILE
+  ni_full_responses_path: "03_northern_ireland/2021/TEST_ni.csv"
+  # 2022 paths
+  # snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2022_snapshots/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
+  # updated_snapshot_path: "R:/BERD Results System Development 2023/DAP_emulation/spp_snapshots/2022_snapshots/snapshot-202212-002-83b5bacd-7c99-45cf-b989-d43d762dd054.json"
   # Freezing data paths
   frozen_data_staged_output_path: "02_freezing/frozen_data_staged/"
   frozen_data_staged_path: "02_freezing/frozen_data_staged/2023_FROZEN_staged_BERD_full_responses_24-09-24_v1490.csv"
@@ -77,7 +80,7 @@ network_paths:
   freezing_additions_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_additions_to_review_24-09-12_v1324.csv"
   freezing_amendments_path: "R:/BERD Results System Development 2023/DAP_emulation/2023_surveys/BERD/02_freezing/freezing_updates/2023_freezing_amendments_to_review_24-09-12_v1324.csv"
   # Imputation and outliers input paths
-  # backdata_path: "R:/BERD Results System Development 2023/2021_data/2021_backdata_expanded.csv"
+  # backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2021_surveys/BERD/06_imputation/backdata_output/2021_backdata_oct_24.csv"
   backdata_path: "R:/BERD Results System Development 2023/DAP_emulation/2022_surveys/BERD/06_imputation/backdata_output/2022_backdata_published_v347.csv"
   manual_imp_trim_path: "06_imputation/manual_trimming/2023_manual_trimming_v1.csv"
   manual_outliers_path: "07_outliers/manual_outliers/2023_manual_outliers_v1.csv"
@@ -217,4 +220,4 @@ consistency_checks:
 s3:
   ssl_file: "/etc/pki/tls/certs/ca-bundle.crt"
   s3_bucket: "onscdp-dev-data01-5320d6ca"
-  #s3_bucket: "onscdp-mig-data01-0221a8af" 
+  #s3_bucket: "onscdp-mig-data01-0221a8af"

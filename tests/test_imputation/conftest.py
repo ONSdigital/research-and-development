@@ -7,6 +7,9 @@ import pytest
 def imputation_config() -> dict:
     """A dummy imputation config for running imputation tetsts."""
     config = {
+        "years": {
+            "survey_year": 2023
+        },
         "imputation": {
             "mor_threshold": 3,
             "trim_threshold": 10,

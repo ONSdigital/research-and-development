@@ -4,6 +4,7 @@ import re
 import pandas as pd
 
 from src.imputation.tmi_imputation import create_imp_class_col, trim_bounds
+from src.staging.postcode_validation import format_postcodes
 from src.construction.construction_helpers import convert_formtype
 
 good_statuses = ["Clear", "Clear - overridden"]
@@ -26,8 +27,10 @@ def run_mor(df, backdata, impute_vars, config):
         pd.DataFrame: df with MoR applied.
         pd.DataFrame: QA DataFrame showing how imputation links are calculated.
     """
+    # If the survey year is 2022, there is no shortform backdata
+    is_2022 = config["years"]["survey_year"] == 2022
 
-    to_impute_df, remainder_df, backdata = mor_preprocessing(df, backdata)
+    to_impute_df, remainder_df, backdata = mor_preprocessing(df, backdata, is_2022)
 
     # Carry forwards method
     carried_forwards_df = carry_forwards(to_impute_df, backdata, impute_vars)
@@ -37,21 +40,27 @@ def run_mor(df, backdata, impute_vars, config):
         carried_forwards_df, remainder_df, backdata, config, "long"
     )
 
-    # apply MoR for short form responders
-    imputed_df_short, links_df_short = calculate_mor(
-        carried_forwards_df, remainder_df, backdata, config, "short"
-    )
+    # If the survey year is 2022, there is no shortform backdata
+    if is_2022:
+        imputed_df = pd.concat([remainder_df, imputed_df_long]).reset_index(drop=True)
+        links_df = links_df_long
 
-    imputed_df = pd.concat(
-        [remainder_df, imputed_df_long, imputed_df_short]
-    ).reset_index(drop=True)
+    else:
+        # apply MoR for short form responders
+        imputed_df_short, links_df_short = calculate_mor(
+            carried_forwards_df, remainder_df, backdata, config, "short"
+        )
 
-    links_df = pd.concat([links_df_long, links_df_short]).reset_index(drop=True)
+        imputed_df = pd.concat(
+            [remainder_df, imputed_df_long, imputed_df_short]
+        ).reset_index(drop=True)
+
+        links_df = pd.concat([links_df_long, links_df_short]).reset_index(drop=True)
 
     return imputed_df, links_df
 
 
-def mor_preprocessing(df, backdata):
+def mor_preprocessing(df, backdata, is_2022):
     """Apply filtering and pre-processing ready for MoR.
 
     This function creates imputation classes, cleans the "formtype" column.
@@ -61,6 +70,7 @@ def mor_preprocessing(df, backdata):
     Args:
         df (pd.DataFrame): full responses for the current year
         backdata (pd.Dataframe): backdata file read in during staging.
+        is_2022 (bool): whether the survey year is 2022
 
     Returns:
         pd.DataFrame: DataFrame of records to impute
@@ -74,10 +84,19 @@ def mor_preprocessing(df, backdata):
     df["formtype"] = df["formtype"].apply(convert_formtype)
     backdata["formtype"] = backdata["formtype"].apply(convert_formtype)
 
-    stat_cond = df["status"].isin(bad_statuses)
-    sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
+    backdata["601"] = backdata["601"].apply(format_postcodes)
+
     lf_cond = df["formtype"] == "0001"
-    imputation_cond = stat_cond & (sf_cond | lf_cond)
+    stat_cond = df["status"].isin(bad_statuses)
+
+    # there is no shortform backdata if the survey year is 2022
+    if is_2022:
+        imputation_cond = stat_cond & lf_cond
+
+    else:
+        sf_cond = (df["formtype"] == "0006") & (df["selectiontype"] == "C")
+        imputation_cond = stat_cond & (sf_cond | lf_cond)
+
     to_impute_df = df.copy().loc[imputation_cond, :]
     remainder_df = df.copy().loc[~imputation_cond, :]
 

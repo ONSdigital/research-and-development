@@ -21,9 +21,9 @@ global:
   load_manual_outliers: False
   load_manual_imputation: False
   # Backdata output settings
-  output_backdata: False
+  output_backdata: True
   # QA output settings
-  output_full_responses: True
+  output_full_responses: False
   output_pnp_full_responses: False
   output_ni_full_responses: False
   output_mapping_qa: False
