@@ -330,7 +330,7 @@ def _path_long2short(path: "str") -> str:
     """
     Extracts a short file name from the full path.
     If there is at least one forward slash, finds the lates slash to the right
-    and rerurns all characrers afrer it.
+    and rerurns all characrers after it.
 
     If there are no slashes, returns the path as is.
     """
@@ -352,12 +352,40 @@ def _remove_end_slashes(path: "str") -> str:
 
 
 def rd_copy_file(src_path: str, dst_path: str) -> bool:
-
-    dst_path = _remove_end_slashes(dst_path)
-    dst_path += "/" + _path_long2short(src_path)
     """
     Copy a file from one location to another. Uses rdsa_utils.
+    If destination path ends with any number of forward slashes, they are
+    removed. This is needed for the library method copy_file to work correctly.
+
+    Library method copy_file requires that the paths are file paths:
+    old_dir/old.file and new_dir/new.file. The rd_copy_file takes full file name 
+    with the full file path as a source, and just a directory path as a
+    destination, like this: old_dir/old.file and new_dir/ or new_dir without the
+    slash at the end. old.file will become new_dir/old.file, i.e. the file is 
+    copied with the same name, not renamed.
+    Supplementary function _path_long2short decouples old.file from the full 
+    source path and "glues it" to the end of destination path.
+    
+    Args:
+        src_path (string): Full path of the source file, not including the
+        bucket name, but including the quasi-directories and slashes preceding
+        the file name.
+
+        dst_path (string): Full path of the destination directory, not including
+        bucket name, but including the quasi-directories and slashes preceding
+        the file name. It must be a directory, not a file. I
+
+    Returns:
+        status (bool): True if copying was successful, False otherwise.
     """
+
+    # If destination ends with any number of slashes, they are removed
+    dst_path = _remove_end_slashes(dst_path)
+
+    # Disconnect the source file name from the full source path and adds it tp
+    # the end of destination directory, separated by one forward slash.
+    dst_path += "/" + _path_long2short(src_path)
+
     success = copy_file(
         client=s3_client,
         source_bucket_name=s3_bucket,
