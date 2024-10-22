@@ -17,6 +17,6 @@ setuptools
 toml
 tomli==2.0.1
 typing
-boto3
-raz_client
-rdsa-utils==2.0.2
+# boto3
+# raz_client
+# rdsa-utils==2.0.2
