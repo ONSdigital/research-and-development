@@ -33,9 +33,17 @@ def apply_weights(
     # TODO remove the forcing to numeric when validation fixed
     # if the dataframe is for QA output, create new columns with the weights applied.
     if for_qa:
-        for col in cols_list:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-            df[f"{col}_estimated"] = round(df[col] * df["a_weight"], round_val)
+
+        estimated_cols = pd.concat(
+            [round(df[col] * df["a_weight"], round_val).rename(f"{col}_estimated") for col in cols_list],
+            axis=1
+        )
+        df = pd.concat([df, estimated_cols], axis=1)
+
+        #for col in cols_list:
+        #    df[col] = pd.to_numeric(df[col], errors="coerce")
+        #    df[f"{col}_estimated"] = round(df[col] * df["a_weight"], round_val)
+
     # if the dataframe is for the final output, apply the weights to the original cols.
     else:
         for col in cols_list:

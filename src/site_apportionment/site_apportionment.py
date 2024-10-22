@@ -546,7 +546,7 @@ def run_apportion_sites(
     df_cart = df_cart[orig_cols]
 
     # Append the apportionned data back to the remaining unchanged data
-    df_out = df_out.append(df_cart, ignore_index=True)
+    df_out = pd.concat([df_out, df_cart], ignore_index=True)
 
     # Sort by period, ref, instance in ascending order.
     df_out = sort_rows_order_cols(df_out, orig_cols)
