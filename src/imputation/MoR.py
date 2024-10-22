@@ -240,13 +240,13 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     prev_df = (
         prev_df[["reference", "imp_class", "imp_marker"] + target_vars]
         .groupby(["reference", "imp_class"])
-        .sum()
+        .sum(numeric_only=True)
     ).reset_index()
 
     current_df = (
         current_df[["reference", "imp_class", "imp_marker"] + target_vars]
         .groupby(["reference", "imp_class"])
-        .sum()
+        .sum(numeric_only=True)
     ).reset_index()
 
     # Merge the clear current and previous data

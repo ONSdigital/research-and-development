@@ -85,7 +85,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     trimmed_211_df, nontrimmed_df = split_df_on_trim(filtered_df, "211_trim")
 
     # Trimmed groups
-    non_trim_grouped = nontrimmed_df.groupby("imp_class")
+    non_trim_grouped = nontrimmed_df.groupby("imp_class", group_keys=False)
 
     # Calculate the imputation values for 2xx questions
     result_211_df = non_trim_grouped.apply(
@@ -102,7 +102,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
     trimmed_305_df, nontrimmed_df = split_df_on_trim(result_211_df, "305_trim")
 
     # Groupby imp_class again
-    non_trim_grouped = nontrimmed_df.groupby("imp_class")
+    non_trim_grouped = nontrimmed_df.groupby("imp_class", group_keys=False)
 
     result_211_305_df = non_trim_grouped.apply(
         evaluate_imputed_ixx, "305", break_down_cols=breakdown_qs_3xx
