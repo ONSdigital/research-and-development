@@ -8,7 +8,7 @@ global:
   table_config: "SingleLine"
   # Environment settings
   dev_test : False
-  platform: network #whether to load from hdfs, network (Windows) or s3 (CDP)
+  platform: s3 # network #whether to load from hdfs, network (Windows) or s3 (CDP)
   load_from_feather: False
 runlog_writer:
   write_csv: True # Write the runlog to a CSV file
