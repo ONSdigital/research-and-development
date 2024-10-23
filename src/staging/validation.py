@@ -145,7 +145,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):  # noq
             elif "datetime" in dtypes_dict[column]:
                 try:
                     survey_df[column] = pd.to_datetime(
-                        survey_df[column], errors="coerce"
+                        survey_df[column], errors="coerce", dayfirst=True
                     )
                 except TypeError:
                     raise TypeError(

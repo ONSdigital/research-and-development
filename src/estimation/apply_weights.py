@@ -40,10 +40,6 @@ def apply_weights(
         )
         df = pd.concat([df, estimated_cols], axis=1)
 
-        #for col in cols_list:
-        #    df[col] = pd.to_numeric(df[col], errors="coerce")
-        #    df[f"{col}_estimated"] = round(df[col] * df["a_weight"], round_val)
-
     # if the dataframe is for the final output, apply the weights to the original cols.
     else:
         for col in cols_list:
