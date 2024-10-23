@@ -211,6 +211,10 @@ def combine_schemas_validate_full_df(
             survey_df[column] = survey_df[column].astype("float64", errors="ignore")
         elif dtypes[column] == "str":
             survey_df[column] = survey_df[column].astype("string")
+        elif pd.api.types.is_datetime64tz_dtype(survey_df[column]):
+            # Remove timezone information
+            survey_df[column] = survey_df[column].dt.tz_localize(None)
+            survey_df[column] = survey_df[column].astype(dtypes[column])
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
     ValidationLogger.info("Finished data type casting process")
