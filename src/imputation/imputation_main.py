@@ -108,7 +108,7 @@ def run_imputation(
     # After imputation, correction to overwrite the "604" == "No" in any records with
     # Status "check needed"
     chk_mask = imputed_df["status"].str.contains("Check needed")
-    imputation_mask = imputed_df["imp_marker"].isin(["TMI", "CF", "MoR"])
+    imputation_mask = imputed_df["imp_marker"] == "TMI"
     # Changing all records that meet the criteria to "604" == "Yes"
     imputed_df.loc[(chk_mask & imputation_mask), "604"] = "Yes"
 
