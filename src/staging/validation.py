@@ -145,7 +145,7 @@ def validate_data_with_schema(survey_df: pd.DataFrame, schema_path: str):  # noq
             elif "datetime" in dtypes_dict[column]:
                 try:
                     survey_df[column] = pd.to_datetime(
-                        survey_df[column], errors="coerce"
+                        survey_df[column], errors="coerce", dayfirst=True
                     )
                 except TypeError:
                     raise TypeError(
@@ -211,6 +211,12 @@ def combine_schemas_validate_full_df(
             survey_df[column] = survey_df[column].astype("float64", errors="ignore")
         elif dtypes[column] == "str":
             survey_df[column] = survey_df[column].astype("string")
+        elif pd.api.types.is_datetime64tz_dtype(survey_df[column]):
+            # Remove timezone information because some columns values are
+            # time-zone (tz) aware. To make the column homogeneous, we remove the
+            # tz info where it exists.
+            survey_df[column] = survey_df[column].dt.tz_localize(None)
+            survey_df[column] = survey_df[column].astype(dtypes[column])
         else:
             survey_df[column] = survey_df[column].astype(dtypes[column])
     ValidationLogger.info("Finished data type casting process")

@@ -563,6 +563,16 @@ def run_tmi(
     imputed_only_df = imputed_only_df.sort_values(
         ["formtype", "imp_class"], ascending=True
     ).reset_index(drop=True)
+    
+    # Set dtype of manual_trim column to bool before concatination
+    convert_dict = {'manual_trim': bool,
+                    'empty_pgsic_group': bool,
+                    'empty_pg_group': bool,
+                    '305_trim': bool,
+                    '211_trim': bool}
+    full_qa_df = full_qa_df.astype(convert_dict)
+    imputed_only_df = imputed_only_df.astype(convert_dict)
+
     full_qa_df = pd.concat([full_qa_df, imputed_only_df]).reset_index(drop=True)
 
     # rearange the rows to put the manual_trim column at the end

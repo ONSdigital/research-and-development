@@ -69,7 +69,7 @@ def calculate_weighting_factor(
     # Default a_weight = 1 for all entries
     df["a_weight"] = 1.0
 
-    grouped_by_cell = df.groupby("cellnumber").apply(calc_a_weight)
+    grouped_by_cell = df.groupby("cellnumber", group_keys=False).apply(calc_a_weight)
 
     # Create a QA dataframe
     qa_frame = create_a_weight_qa_df(grouped_by_cell)

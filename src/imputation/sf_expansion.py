@@ -114,7 +114,7 @@ def apply_expansion(
         SFExpansionLogger.debug(f"Processing exansion imputation for {master_value}")
 
         # for a first pass, group by civil or defence only
-        groupby_obj_cd = expanded_df.groupby("200")
+        groupby_obj_cd = expanded_df.groupby("200", group_keys=False)
 
         # Calculate the imputation values for master question
         expanded_df = groupby_obj_cd.apply(
@@ -129,7 +129,7 @@ def apply_expansion(
         expanded_df.reset_index(drop=True, inplace=True)
 
         # For the second pass, group by imputation class
-        groupby_obj_impcl = expanded_df.groupby("imp_class")
+        groupby_obj_impcl = expanded_df.groupby("imp_class", group_keys=False)
 
         # Calculate the imputation values for master question
         expanded_df = groupby_obj_impcl.apply(
@@ -211,6 +211,15 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         threshold_num,
     )
 
+    # Set dtype of manual_trim column to bool before concatination
+    convert_dict = {'manual_trim': bool,
+                    'empty_pgsic_group': bool,
+                    'empty_pg_group': bool,
+                    '305_trim': bool,
+                    '211_trim': bool}
+    expanded_df = expanded_df.astype(convert_dict)
+    excluded_df = excluded_df.astype(convert_dict)
+    
     # Re-include those records from the reference list before returning df
     result_df = pd.concat([expanded_df, excluded_df], axis=0)
 
