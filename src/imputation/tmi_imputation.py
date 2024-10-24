@@ -565,7 +565,11 @@ def run_tmi(
     ).reset_index(drop=True)
     
     # Set dtype of manual_trim column to bool before concatination
-    convert_dict = {'manual_trim': bool}
+    convert_dict = {'manual_trim': bool,
+                    'empty_pgsic_group': bool,
+                    'empty_pg_group': bool,
+                    '305_trim': bool,
+                    '211_trim': bool}
     full_qa_df = full_qa_df.astype(convert_dict)
     imputed_only_df = imputed_only_df.astype(convert_dict)
 

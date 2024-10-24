@@ -212,7 +212,9 @@ def combine_schemas_validate_full_df(
         elif dtypes[column] == "str":
             survey_df[column] = survey_df[column].astype("string")
         elif pd.api.types.is_datetime64tz_dtype(survey_df[column]):
-            # Remove timezone information
+            # Remove timezone information because some columns values are
+            # time-zone (tz) aware. To make the column homogeneous, we remove the
+            # tz info where it exists.
             survey_df[column] = survey_df[column].dt.tz_localize(None)
             survey_df[column] = survey_df[column].astype(dtypes[column])
         else:

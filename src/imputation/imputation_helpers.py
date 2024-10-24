@@ -263,7 +263,9 @@ def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
     if not df.empty:
         # TODO: remove this temporary fix to cast Nans to False
         df_copy = df.copy()
-        df_copy.loc[:, trim_bool_col].fillna(False, inplace=True)
+        df_copy.loc[:, trim_bool_col] = df_copy.loc[:, trim_bool_col].fillna(False)
+        #df[trim_bool_col] = df.copy()[trim_bool_col].fillna(False)
+        #df.loc[:,trim_bool_col] = df.copy().loc[:,trim_bool_col].fillna(False)
 
         df_not_trimmed = df_copy.loc[~df_copy[trim_bool_col]]
         df_trimmed = df_copy.loc[df_copy[trim_bool_col]]

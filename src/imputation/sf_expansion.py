@@ -212,7 +212,11 @@ def run_sf_expansion(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     )
 
     # Set dtype of manual_trim column to bool before concatination
-    convert_dict = {'manual_trim': bool}
+    convert_dict = {'manual_trim': bool,
+                    'empty_pgsic_group': bool,
+                    'empty_pg_group': bool,
+                    '305_trim': bool,
+                    '211_trim': bool}
     expanded_df = expanded_df.astype(convert_dict)
     excluded_df = excluded_df.astype(convert_dict)
     
