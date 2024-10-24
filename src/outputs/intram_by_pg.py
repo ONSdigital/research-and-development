@@ -33,7 +33,6 @@ def output_intram_by_pg(
     Returns:
         intram_tot_dict (dict): Dictionary with the intramural totals.
     """
-    output_path = config["outputs_paths"]["outputs_master"]
     # assign columns for easier use
     key_col = "201"
     value_col = "211"
@@ -73,7 +72,19 @@ def output_intram_by_pg(
     # calculate the intram total for QA across different outputs
     intram_tot_dict[f"intram_by_pg_{'uk' if uk_output else 'gb'}"] = round(value_tot, 0)
 
+    save_file_as_csv(df_merge, config, write_csv, run_id, uk_output)
+
+    return intram_tot_dict
+
+def save_file_as_csv(
+        df_merge,
+        config,
+        write_csv,
+        run_id,
+        uk_output):
     # Outputting the CSV file with timestamp and run_id
+    output_path = config["outputs_paths"]["outputs_master"]
+
     tdate = datetime.now().strftime("%y-%m-%d")
     survey_year = config["years"]["survey_year"]
     filename = (
@@ -84,5 +95,3 @@ def output_intram_by_pg(
         f"{output_path}/output_intram_by_pg_{'uk' if uk_output else 'gb'}/{filename}",
         df_merge,
     )
-
-    return intram_tot_dict
