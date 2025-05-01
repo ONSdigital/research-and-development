@@ -7,8 +7,8 @@ on:
       - develop
 # runs on version 20.04 of ubuntu
 jobs:
-  # pytest-coverage-comment:
-  #   runs-on: ubuntu-20.04
+  pytest-coverage-comment:
+  runs-on: ubuntu-24.04
     steps:
 
 # 1) Checkout the code

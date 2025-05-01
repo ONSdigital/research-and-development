@@ -168,6 +168,25 @@ def assign_random_civdef(
     return df
 
 
+def impute_by_class(
+    df: pd.DataFrame, class_proportions: Dict[str, Tuple[float, float]], class_col: str
+) -> pd.DataFrame:
+    """Impute values by class using the proportions from specified class dictionary.
+
+    Args:
+
+    Returns:
+    """
+
+    def impute_group(group):
+        group_class = group.name
+        if group_class in class_proportions:
+            group = assign_random_civdef(group, class_proportions[group_class])
+        return group
+
+    return df.groupby(class_col, group_keys=False).apply(impute_group)
+
+
 def apply_civdev_imputation(
     df: pd.DataFrame,
     pgsic_dict: Dict[str, Tuple[float, float]],
@@ -216,21 +235,24 @@ def apply_civdev_imputation(
     cond2 = ~to_impute_df["pg_class"].str.contains("nan")
 
     # create a new variable that applies filtered conditions to to_impute_df
-    filtered_df = to_impute_df.loc[cond1 & cond2].copy()
+    pg_filtered_df = to_impute_df.loc[cond1 & cond2].copy()
 
     # loop through the pg imputation classes to apply imputation
-    pg_grp = filtered_df.groupby("pg_class")
+    # pg_grp = filtered_df.groupby("pg_class")
 
-    for pg_class, class_group_df in pg_grp:
-        if pg_class in pg_dict.keys():
-            class_group_df = assign_random_civdef(class_group_df, pg_dict[pg_class])
-            class_group_df["200_imp_marker"] = "pg_group_imputed"
+    # for pg_class, class_group_df in pg_grp:
+    #     if pg_class in pg_dict.keys():
+    #         class_group_df = assign_random_civdef(class_group_df, pg_dict[pg_class])
+    #         class_group_df["200_imp_marker"] = "pg_group_imputed"
 
-        # Apply changes from class_group_df to filtered_df
-        filtered_df.update(class_group_df)
+    #     # Apply changes from class_group_df to filtered_df
+    #     filtered_df.update(class_group_df)
 
+    # impute values C/D using the pg proportions
+    pg_imputed_df = impute_by_class(pg_filtered_df, pg_dict, "pg_class")
+    pg_imputed_df["200_imp_marker"] = "pg_group_imputed"
     # Apply changes from filtered_df to to_impute_df
-    to_impute_df.update(filtered_df)
+    to_impute_df.update(pg_filtered_df)
 
     # PASS 3: refine again based on product group and SIC imputation class
 
@@ -239,23 +261,26 @@ def apply_civdev_imputation(
     cond4 = ~to_impute_df["pg_sic_class"].str.contains("nan")
 
     # create a new variable that applies filtered conditions to to_impute_df
-    filtered_df2 = to_impute_df.loc[cond3 & cond4].copy()
+    pgsic_filtered_df = to_impute_df.loc[cond3 & cond4].copy()
 
     # loop through the pg_sic imputation classes to apply imputation
-    pg_sic_grp = filtered_df2.groupby("pg_sic_class")
+    # pg_sic_grp = pgsic_filtered_df.groupby("pg_sic_class")
 
-    for pg_sic_class, class_group_df in pg_sic_grp:
-        if pg_sic_class in pgsic_dict.keys():
-            class_group_df = assign_random_civdef(
-                class_group_df, pgsic_dict[pg_sic_class]
-            )
-            class_group_df["200_imp_marker"] = "pg_sic_group_imputed"
+    # for pg_sic_class, class_group_df in pg_sic_grp:
+    #     if pg_sic_class in pgsic_dict.keys():
+    #         class_group_df = assign_random_civdef(
+    #             class_group_df, pgsic_dict[pg_sic_class]
+    #         )
+    #         class_group_df["200_imp_marker"] = "pg_sic_group_imputed"
 
-        # Apply changes from class_group_df to filtered_df2
-        filtered_df2.update(class_group_df)
+    #     # Apply changes from class_group_df to filtered_df2
+    #     pgsic_filtered_df.update(class_group_df)
 
+    # impute values C/D using the pgsic proportions
+    pgsic_imputed_df = impute_by_class(pgsic_filtered_df, pgsic_dict, "pg_sic_class")
+    pgsic_imputed_df["200_imp_marker"] = "pg_sic_group_imputed"
     # Apply changes from filtered_df2 to to_impute_df
-    to_impute_df.update(filtered_df2)
+    to_impute_df.update(pgsic_filtered_df)
 
     # Apply changes from to_impute_df to df
     df.update(to_impute_df)

@@ -8,6 +8,7 @@ from src.imputation.impute_civ_def import (
     create_civdef_dict,
     calc_cd_proportions,
     _get_random_civdef,
+    impute_by_class,
 )
 
 
@@ -227,3 +228,48 @@ class TestGetRandomCivdef(object):
             print(f"rand: {rand}")
         unique = set(values)
         assert len(unique) == 1, "Multiple random values found from one seed."
+
+class TestImputeByClass:
+    """Unit tests for impute_by_class function."""
+
+    def create_input_df(self):
+        """Create an input dataframe for the test."""
+        input_cols = [
+            "reference",
+            "instance",
+            "200",
+            "201",
+            "202",
+            "status",
+            "cellnumber",
+            "rusic",
+            "pg_sic_class",
+        ]
+
+        data = [
+            [1001, 1, np.nan, "AC", 100, "Clear", "800", "1234", "AC_1234"],
+            [1001, 2, np.nan, "AC", 200, "Clear", "800", "1234", "AC_1234"],
+            [1001, 3, np.nan, "AC", 0, "Clear", "800", "1234", "AC_1234"],
+            [3003, 1, np.nan, "ZZ", 230, "Clear", "800", "12", "ZZ_12"],
+            [3003, 2, np.nan, "ZZ", 59, "Clear", "800", "12", "ZZ_12"],
+            [3003, 3, np.nan, "ZZ", 0, "Clear", "800", "12", "ZZ_12"],
+        ]
+
+        input_df = pandasDF(data=data, columns=input_cols)
+        return input_df
+
+    def test_impute_by_class(self):
+        """Test for impute_by_class function."""
+        input_df = self.create_input_df()
+
+        # Mock proportions for testing
+        pgsic_dict = {"AC_1234": (0.7, 0.3), "ZZ_12": (0.5, 0.5)}
+        pg_dict = {"AC": (0.8, 0.2), "ZZ": (0.5, 0.5)}
+
+        pg_result_df = impute_by_class(input_df, pg_dict, "201")
+        pgsic_result_df = impute_by_class(input_df, pgsic_dict, "pg_sic_class")
+
+        # Check that missing values in column "200" are imputed
+        expected_values = ["C", "C", "C", "D", "D", "D"]
+        assert list(pg_result_df["200_imputed"]) == expected_values
+        assert list(pgsic_result_df["200_imputed"]) == expected_values
