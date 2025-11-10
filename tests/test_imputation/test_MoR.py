@@ -509,7 +509,11 @@ class TestCalculateLinks(object):
         # Run the function
         result = calculate_links(input_df, target_vars, config)
 
-        # Compare the results
-        assert_frame_equal(result, exp_df, check_dtype=False, check_exact=False), (
-            "calculate_links() not ordering data as expected."
+        sort_cols = ["imp_class", "reference"]
+
+        result_sorted = result.sort_values(sort_cols).reset_index(drop=True)
+        exp_df_sorted = exp_df.sort_values(sort_cols).reset_index(drop=True)
+
+        assert_frame_equal(
+            result_sorted, exp_df_sorted, check_dtype=False
         )

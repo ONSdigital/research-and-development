@@ -66,8 +66,9 @@ def create_imp_class_col(
     if not all(col in df.columns for col in column_list):
         raise ValueError("column_list contains columns not in the dataframe")
 
-    # Ensure cols are treated as objects to handle mixed data types and missing values
-    df_copy = df[column_list].copy().astype(object).fillna("nan").astype(str)
+    # Ensure cols are treated as strings to handle mixed data types and missing values
+    # Nulls will automatically be converted to "nan" when cast to str
+    df_copy = df[column_list].copy().fillna("nan").astype(str)
 
     # create a new column with the concatenation of the columns in column_list with  "_"
     df[class_name] = df_copy.agg("_".join, axis=1)
@@ -287,7 +288,7 @@ def check_604_fix(df) -> pd.DataFrame:
     """Check the refs with no R&D have one instance 0 and one instance 1 only."""
     mult_604_mask = get_mult_604_mask(df)
     filtered_df = df.copy().loc[mult_604_mask][["reference", "instance"]]
-    filtered_df["ref_count"] = filtered_df.groupby("reference").transform(sum)
+    filtered_df["ref_count"] = filtered_df.groupby("reference").transform("sum")
 
     check_df = filtered_df.copy().loc[filtered_df.ref_count > 1]
 
@@ -332,15 +333,17 @@ def create_r_and_d_instance(
     return final_df, mult_604_qa_df
 
 
-def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
+def split_df_on_trim(
+    df: pd.DataFrame, trim_bool_col: str
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Splits the dataframe in based on if it was trimmed or not"""
 
     if not df.empty:
         df_copy = df.copy()
-        df_copy.loc[:, trim_bool_col] = df_copy.loc[:, trim_bool_col].fillna(False)
+        df_copy[trim_bool_col] = df_copy[trim_bool_col].fillna("False")
 
-        df_not_trimmed = df_copy.loc[~df_copy[trim_bool_col]]
-        df_trimmed = df_copy.loc[df_copy[trim_bool_col]]
+        df_not_trimmed = df_copy.loc[df_copy[trim_bool_col] == "False"]
+        df_trimmed = df_copy.loc[df_copy[trim_bool_col] == "True"]
 
         return df_trimmed, df_not_trimmed
 
@@ -598,7 +601,7 @@ def concat_with_bool(dfs: List[pd.DataFrame]) -> pd.DataFrame:
             if (
                 df[col].notna().any()  # Ensure the col has at least one non-null value
                 and df[col].dtype == "object"
-                and df[col].fillna(False).isin([True, False]).all()
+                and df[col].fillna(False).astype(bool).isin([True, False]).all()
             ):
                 all_bool_columns.add(col)
 
@@ -692,6 +695,9 @@ def remove_defence_for_pnp(df: pd.DataFrame, to_impute_cols: list) -> pd.DataFra
     """
     Remove and log any defence rows for PNP data.
 
+    If any defence rows contain a postcode in col 601, however, this row is retained,
+    but the imputation columns are set to null.
+
     Args:
         df (pd.DataFrame): The DataFrame containing the full responses data.
 
@@ -703,7 +709,7 @@ def remove_defence_for_pnp(df: pd.DataFrame, to_impute_cols: list) -> pd.DataFra
 
     defence_rows = df.copy().loc[df["200"] == "D"]
     if len(defence_rows) > 0:
-        def_list = list(defence_rows["reference"].unique())
+        def_list = [str(x) for x in defence_rows["reference"].unique()]
         ImputationHelpersLogger.info(f"Defence rows found in PNP data: {def_list}")
 
         # update the full responses df to remove defence rows but leaving

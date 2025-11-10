@@ -2,6 +2,7 @@
 
 import logging
 import pandas as pd
+import numpy as np
 from typing import List, Union
 
 from src.imputation.imputation_helpers import split_df_on_imp_class, split_df_on_trim
@@ -43,7 +44,7 @@ def evaluate_imputed_ixx(
         sum_breakdown_q = group.loc[clear_mask, bd_col].sum()
 
         # calculate the imputed values
-        if master_imp_val > 0:
+        if master_imp_val > 0 and sum_master_q and not np.isnan(sum_master_q):
             imputed_value = (sum_breakdown_q / sum_master_q) * master_imp_val
         else:
             imputed_value = 0

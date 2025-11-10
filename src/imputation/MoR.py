@@ -258,7 +258,7 @@ def calculate_links(gr_df, target_vars, config):
         pd.DataFrame: DataFrame with calculated links for each imp_class
     """
     # Apply trimming and calculate means for each imp class
-    gr_df = gr_df.groupby("imp_class")
+    gr_df = gr_df.groupby("imp_class", group_keys=False)
     gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier

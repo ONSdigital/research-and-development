@@ -29,19 +29,19 @@ def merge_manual_imputation(
         dtypes_dict = {
             "reference": df["reference"].dtype,
             "instance": df["instance"].dtype,
-            "manual_trim": bool,
+            "manual_trim": str,
         }
         manual_trim_df = manual_trim_df.astype(dtypes_dict)
 
         df = df.merge(manual_trim_df, on=["reference", "instance"], how="left")
-        df["manual_trim"] = df["manual_trim"].fillna(False).astype(bool)
+        df["manual_trim"] = df["manual_trim"].fillna("False").astype(str)
 
         ManualImputationLogger.info(
             "manual imputation dataframe joined to responses dataframe"
         )
     else:
         if "manual_trim" not in df.columns:
-            df["manual_trim"] = False
+            df["manual_trim"] = "False"
     return df
 
 

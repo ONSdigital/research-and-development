@@ -44,9 +44,9 @@ def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The main dataset with 202 subtotals.
     """
-    df["tot_202_all"] = df.groupby("reference")["202"].transform(sum)
+    df["tot_202_all"] = df.groupby("reference")["202"].transform("sum")
 
-    df["tot_202_CD"] = df.groupby(["reference", "200"])["202"].transform(sum)
+    df["tot_202_CD"] = df.groupby(["reference", "200"])["202"].transform("sum")
 
     return df
 

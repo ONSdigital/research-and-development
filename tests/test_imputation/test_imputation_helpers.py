@@ -21,6 +21,7 @@ from src.imputation.imputation_helpers import (
     instance_fix,
     get_mult_604_mask,
     split_df_on_trim,
+    split_df_on_imp_class,
     remove_defence_for_pnp,
 )
 
@@ -894,30 +895,26 @@ class TestSplitDfOnTrim:
             pd.DataFrame(
                 data = [
                     [1000, np.nan],
-                    [1001, True],
-                    [1002, False],
+                    [1001, "True"],
+                    [1002, "False"],
                     [1003, np.nan],
                 ],
-                columns = [
-                    'reference', 'manual_trim',
-                ],
+                columns = ['reference', 'manual_trim'],
             ),
             "manual_trim",
 
             # expected : (exp_df_trimmed, exp_df_not_trimmed)
             pd.DataFrame(
                 data = [
-                [1001, True],
+                [1001, "True"],
                 ],
-                columns = [
-                    'reference', 'manual_trim'
-                ]
+                columns = ['reference', 'manual_trim']
             ),
             pd.DataFrame(
                 data = [
-                [1000, False],
-                [1002, False],
-                [1003, False],
+                [1000, "False"],
+                [1002, "False"],
+                [1003, "False"],
                 ],
                 columns = [
                     'reference', 'manual_trim'
@@ -930,13 +927,13 @@ class TestSplitDfOnTrim:
             pd.DataFrame(
                 data = [
                     [2000, np.nan, np.nan],
-                    [2001, True, True],
-                    [2002, True, False],
-                    [2003, False, True],
-                    [2004, np.nan, True],
-                    [2005, np.nan, False],
-                    [2006, True, np.nan],
-                    [2007, False, np.nan],
+                    [2001, "True", "True"],
+                    [2002, "True", "False"],
+                    [2003, "False", "True"],
+                    [2004, np.nan, "True"],
+                    [2005, np.nan, "False"],
+                    [2006, "True", np.nan],
+                    [2007, "False", np.nan],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -947,9 +944,9 @@ class TestSplitDfOnTrim:
             # expected : (exp_df_trimmed, exp_df_not_trimmed)
             pd.DataFrame(
                 data = [
-                    [2001, True, True],
-                    [2002, True, False],
-                    [2006, True, np.nan],
+                    [2001, "True", "True"],
+                    [2002, "True", "False"],
+                    [2006, "True", np.nan],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -957,11 +954,11 @@ class TestSplitDfOnTrim:
             ),
             pd.DataFrame(
                 data = [
-                    [2000, False, np.nan],
-                    [2003, False, True],
-                    [2004, False, True],
-                    [2005, False, False],
-                    [2007, False, np.nan],
+                    [2000, "False", np.nan],
+                    [2003, "False", "True"],
+                    [2004, "False", "True"],
+                    [2005, "False", "False"],
+                    [2007, "False", np.nan],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -974,13 +971,13 @@ class TestSplitDfOnTrim:
             pd.DataFrame(
                 data = [
                     [2000, np.nan, np.nan],
-                    [2001, True, True],
-                    [2002, True, False],
-                    [2003, False, True],
-                    [2004, np.nan, True],
-                    [2005, np.nan, False],
-                    [2006, True, np.nan],
-                    [2007, False, np.nan],
+                    [2001, "True", "True"],
+                    [2002, "True", "False"],
+                    [2003, "False", "True"],
+                    [2004, np.nan, "True"],
+                    [2005, np.nan, "False"],
+                    [2006, "True", np.nan],
+                    [2007, "False", np.nan],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -991,9 +988,9 @@ class TestSplitDfOnTrim:
             # expected : (exp_df_trimmed, exp_df_not_trimmed)
             pd.DataFrame(
                 data = [
-                    [2001, True, True],
-                    [2003, False, True],
-                    [2004, np.nan, True],
+                    [2001, "True", "True"],
+                    [2003, "False", "True"],
+                    [2004, np.nan, "True"],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -1001,11 +998,11 @@ class TestSplitDfOnTrim:
             ),
             pd.DataFrame(
                 data = [
-                    [2000, np.nan, False],
-                    [2002, True, False],
-                    [2005, np.nan, False],
-                    [2006, True, False],
-                    [2007, False, False],
+                    [2000, np.nan, "False"],
+                    [2002, "True", "False"],
+                    [2005, np.nan, "False"],
+                    [2006, "True", "False"],
+                    [2007, "False", "False"],
                 ],
                 columns = [
                     'reference', '211_trim', '305_trim',
@@ -1085,13 +1082,13 @@ class TestRemoveDefenceForPNP():
 
         to_impute_cols = ["211"]
         result_df = remove_defence_for_pnp(input_df, to_impute_cols)
-        pd.testing.assert_frame_equal(
+        assert_frame_equal(
             result_df.reset_index(drop=True), exp_df.reset_index(drop=True)
         )
 
         # Test if the function presents a list of  the defence refs to the info logger
         #  before removing them
-        defence_rows = [49900000510, 49900184433]
+        defence_rows = ['49900000510', '49900184433']
 
         with patch("src.imputation.imputation_helpers.ImputationHelpersLogger") as mock_logger:
             remove_defence_for_pnp(input_df, to_impute_cols)

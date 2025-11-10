@@ -214,6 +214,7 @@ def create_mean_dict(
     # gather qa df's
     trim_qa_dfs = []
 
+    # TODO: This code should be updated
     for var in target_variable_list:
         for k in class_keys:
             # Get subgroup dataframe
@@ -246,6 +247,7 @@ def create_mean_dict(
     full_qa = pd.concat(trim_qa_dfs, axis=0)
     df = pd.concat(df_list)
     df["qa_index"] = df.index
+    # TODO: future warning for using groupby on a col that is excluded from the result
     df = df.groupby(["pre_index"], as_index=False).first()
 
     return mean_dict, df, full_qa

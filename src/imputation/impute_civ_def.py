@@ -72,7 +72,7 @@ def create_civdef_dict(df: pd.DataFrame) -> Tuple[Dict[str, float], pd.DataFrame
     filtered_df2 = df[cond2]
 
     # evaluate which pg classes are needed for empty pg_sic groups
-    num_empty = filtered_df2.groupby("pg_class")["empty_pgsic_group"].transform(sum)
+    num_empty = filtered_df2.groupby("pg_class")["empty_pgsic_group"].transform("sum")
     filtered_df2 = filtered_df2.loc[num_empty > 0]
 
     # Group by the pg-only imputation class the loop through the groups
@@ -93,7 +93,7 @@ def calc_empty_group(
     df["valid_civdef_val"] = ~df["200"].isnull() & clear_mask
 
     # calculate the number of valid entries in the class for column 200
-    num_valid = df.groupby(class_name)["valid_civdef_val"].transform(sum)
+    num_valid = df.groupby(class_name)["valid_civdef_val"].transform("sum")
 
     # exclude classes that are not valid
     valid_class_mask = ~(df[class_name].str.contains("nan"))
