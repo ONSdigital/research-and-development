@@ -1,10 +1,7 @@
 """Define helper functions to be used throughout the pipeline.."""
 
 import yaml
-import tomli
 import pandas as pd
-
-from typing import Union
 
 from src.utils.defence import type_defence
 from src.mapping.itl_mapping import join_itl_regions
@@ -28,47 +25,7 @@ class ConfigSettings:
         return config
 
 
-def user_config_reader(configfile: str = user_config_path) -> dict:
-    """Function to parse the userconfig.toml file
-
-    Args:
-        configfile (str, optional): _description_. Defaults to user_config_path.
-
-    Returns:
-        dict: A nested dictionary where the keys are section titles within the TOML
-        file.
-        If only one variable under the section title in the TOML file is given
-        then it is passed directly as a dictionary value. If more than one
-        variable is defined then they are parsed as a dictionary themselves.
-        An example of what is returned is given below:
-
-        {'title': 'TOML Example config', 'period': {'start_period':
-        datetime.date(1990, 10, 10), 'end_period': datetime.date(2000, 10, 5)}}
-    """
-    with open(configfile, "rb") as file:
-        toml_dict = tomli.load(file)
-
-    return toml_dict
-
-
-def period_select() -> tuple:
-    """Function returning the start and end date under consideration.
-
-
-    Returns:
-        tuple: A tuple containing two datetime.date objects. The first is the
-        start date of the period under consideration, the second is the
-        end date of that period.
-        Example:
-            (datetime.date(1990, 10, 10), datetime.date(2000, 10, 5))
-    """
-
-    period_dict = user_config_reader()["period"]
-
-    return period_dict["start_period"], period_dict["end_period"]
-
-
-def convert_formtype(formtype_value: str) -> str:
+def convert_formtype(formtype_value: str) -> str | None:
     """Convert the formtype to a standardised format.
 
     Args:
@@ -91,15 +48,13 @@ def convert_formtype(formtype_value: str) -> str:
         return None
 
 
-def values_in_column(
-    df: pd.DataFrame, col_name: str, values: Union[list, pd.Series]
-) -> bool:
+def values_in_column(df: pd.DataFrame, col_name: str, values: list | pd.Series) -> bool:
     """Determine whether a list of values are all present in a dataframe column.
 
     Args:
         df (pd.DataFrame): The dataframe.
         col_name (str): The column name.
-        values (Union[list, pd.Series]): The values to check.
+        values (list | pd.Series): The values to check.
 
     Returns:
         bool: Whether or values are in the column.

@@ -2,10 +2,10 @@
 
 # Core imports
 import logging
-from typing import Callable, Tuple
 import os
 
 import pandas as pd
+from collections.abc import Callable
 
 import src.staging.staging_helpers as helpers
 from src.staging import validation as val
@@ -17,13 +17,13 @@ StagingMainLogger = logging.getLogger(__name__)
 
 def run_staging(  # noqa: C901
     config: dict,
-    rd_file_exists: callable,
-    rd_load_json: callable,
-    rd_read_csv: callable,
-    rd_write_csv: callable,
+    rd_file_exists: Callable,
+    rd_load_json: Callable,
+    rd_read_csv: Callable,
+    rd_write_csv: Callable,
     rd_read_feather: Callable,
     rd_write_feather: Callable,
-) -> Tuple:
+) -> tuple:
     """Run the staging and validation module.
 
     The snapshot data is ingested from a json file, and parsed into dataframes,
@@ -169,8 +169,9 @@ def run_staging(  # noqa: C901
 
     # Staging of the main snapshot data is now complete
     StagingMainLogger.info("Staging of main snapshot data complete.")
-    # run validation on the breakdowns
-    # run_breakdown_validation(full_responses, config, "staged")
+    # Update the sic codes in the full_responses dataframe
+    if not full_responses.empty:
+        full_responses = helpers.sic_fixer(full_responses, config)
 
     if not config["global"]["load_updated_snapshot_for_comparison"]:
         # Staging of the additional data
@@ -183,7 +184,7 @@ def run_staging(  # noqa: C901
             manual_outliers = manual_outliers.drop_duplicates(
                 subset=["reference"], keep="first"
             )
-            val.validate_data_with_schema(
+            manual_outliers = val.validate_data_with_schema(
                 manual_outliers, "./config/manual_outliers_schema.toml"
             )
             StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
@@ -204,7 +205,7 @@ def run_staging(  # noqa: C901
             manual_trim_df = manual_trim_df.drop_duplicates(
                 subset=["reference", "instance"], keep="first"
             )
-            val.validate_data_with_schema(
+            manual_trim_df = val.validate_data_with_schema(
                 manual_trim_df, "./config/manual_trim_schema.toml"
             )
         else:
@@ -218,7 +219,9 @@ def run_staging(  # noqa: C901
             rd_file_exists(backdata_path, raise_error=True)
 
             backdata = rd_read_csv(backdata_path)
-            val.validate_data_with_schema(backdata, "./config/backdata_schema.toml")
+            backdata = val.validate_data_with_schema(
+                backdata, "./config/backdata_schema.toml"
+            )
             StagingMainLogger.info("Backdata File Loaded Successfully...")
         else:
             backdata = None

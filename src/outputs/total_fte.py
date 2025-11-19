@@ -2,16 +2,18 @@
 
 import logging
 import pandas as pd
-from src.utils.helpers import filename_amender
-from typing import Callable, Dict, Any
 
+from typing import Any
+from collections.abc import Callable
+
+from src.utils.helpers import filename_amender
 
 OutputMainLogger = logging.getLogger(__name__)
 
 
 def qa_output_total_fte(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ):
     """Run the outputs module.

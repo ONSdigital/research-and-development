@@ -1,5 +1,5 @@
 # Standard Library Imports
-from typing import Tuple, List, Dict, Union, Any
+from typing import Any
 import logging
 
 # Third Part Imports
@@ -25,9 +25,9 @@ civdef_col: str = "200"
 marker_col: str = "imp_marker"
 status_col: str = "status"
 
-groupby_cols: List[str] = [ref_col, period_col]
-code_cols: List[str] = [product_col, civdef_col, pg_num_col]
-site_cols: List[str] = [
+groupby_cols: list[str] = [ref_col, period_col]
+code_cols: list[str] = [product_col, civdef_col, pg_num_col]
+site_cols: list[str] = [
     instance_col,
     postcode_col,
     percent_col,
@@ -116,8 +116,8 @@ def count_unique_postcodes_in_col(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def split_dataframes(
-    df: pd.DataFrame, imp_markers_to_keep: List[str]
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    df: pd.DataFrame, imp_markers_to_keep: list[str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split dataframe into two, one for site apportionment and the remainder.
 
@@ -127,10 +127,10 @@ def split_dataframes(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        imp_markers_to_keep (List[str]): A list of markers to keep.
+        imp_markers_to_keep (list[str]): A list of markers to keep.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: One dataframe with records to be apportioned,
+        tuple[pd.DataFrame, pd.DataFrame]: One dataframe with records to be apportioned,
             and a second containing all other records.
     """
 
@@ -170,10 +170,10 @@ def deduplicate_codes_values(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        group_cols (List[str]): List of columns to group by.
-        value_cols (List[str]): List of columns containing numeric values.
-        textual_cols (List[str]): List of columns containing textual values.
-        methods (List[str]): List of aggregation methods for values (0,
+        group_cols (list[str]): list of columns to group by.
+        value_cols (list[str]): list of columns containing numeric values.
+        textual_cols (list[str]): list of columns containing textual values.
+        methods (list[str]): list of aggregation methods for values (0,
             default method is sum) and categorties (1, default method is first).
 
     Returns:
@@ -192,13 +192,13 @@ def deduplicate_codes_values(
 
 def create_category_df(
     df: pd.DataFrame,
-    imp_markers_to_keep: List[str],
-    orig_cols: List[str],
-    groupby_cols: List[str],
-    code_cols: List[str],
-    site_cols: List[str],
-    geo_cols: List[str],
-    value_cols: List[str],
+    imp_markers_to_keep: list[str],
+    orig_cols: list[str],
+    groupby_cols: list[str],
+    code_cols: list[str],
+    site_cols: list[str],
+    geo_cols: list[str],
+    value_cols: list[str],
 ) -> pd.DataFrame:
     """
     Creates a DataFrame with product group codes, numerical values and all other
@@ -212,13 +212,13 @@ def create_category_df(
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        imp_markers_to_keep (List[str]): List of imputation markers to keep.
-        orig_cols (List[str]): List of original columns.
-        groupby_cols (List[str]): List of columns to group by.
-        code_cols (List[str]): List of code columns.
-        site_cols (List[str]): List of site column.
-        geo_cols (List[str]): List of geographic columns from the config.
-        value_cols (List[str]): List of columns containing numeric values.
+        imp_markers_to_keep (list[str]): list of imputation markers to keep.
+        orig_cols (list[str]): list of original columns.
+        groupby_cols (list[str]): list of columns to group by.
+        code_cols (list[str]): list of code columns.
+        site_cols (list[str]): list of site column.
+        geo_cols (list[str]): list of geographic columns from the config.
+        value_cols (list[str]): list of columns containing numeric values.
 
     Returns:
         pd.DataFrame: The DataFrame with codes and numerical values.
@@ -290,16 +290,16 @@ def count_duplicate_sites(sites_df: pd.DataFrame) -> int:
 
 
 def create_sites_df(
-    df: pd.DataFrame, groupby_cols: List[str], site_cols: List[str], geo_cols: List[str]
+    df: pd.DataFrame, groupby_cols: list[str], site_cols: list[str], geo_cols: list[str]
 ) -> pd.DataFrame:
     """
     Creates a DataFrame with reference, period, instance, postcode and percent.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        groupby_cols (List[str]): Columns to group by: reference, period.
-        site_cols (List[str]): Columns of sites (instance, postcode, percent).
-        geo_cols (List[str]): List of geographic columns from the config.
+        groupby_cols (list[str]): Columns to group by: reference, period.
+        site_cols (list[str]): Columns of sites (instance, postcode, percent).
+        geo_cols (list[str]): list of geographic columns from the config.
     Returns:
         pd.DataFrame: The DataFrame with sites.
     """
@@ -327,7 +327,7 @@ def create_sites_df(
     return sites_df
 
 
-def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.DataFrame:
+def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: list[str]) -> pd.DataFrame:
     """
     Calculate weights for geographic sites.
 
@@ -339,7 +339,7 @@ def calc_weights_for_sites(df: pd.DataFrame, groupby_cols: List[str]) -> pd.Data
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        groupby_cols (List[str]): List of columns to group by.
+        groupby_cols (list[str]): list of columns to group by.
 
     Returns:
         pd.DataFrame: The DataFrame with weights calculated for each site.
@@ -409,14 +409,14 @@ def create_cartesian_product(
 
 
 def weight_values(
-    df: pd.DataFrame, value_cols: List[str], weight_col: str
+    df: pd.DataFrame, value_cols: list[str], weight_col: str
 ) -> pd.DataFrame:
     """
     Multiplies the specified columns by the weight column.
 
     Args:
         df (pd.DataFrame): The input DataFrame.
-        value_cols (List[str]): The columns to be weighted.
+        value_cols (list[str]): The columns to be weighted.
         weight_col (str): The column to use as weights.
 
     Returns:
@@ -427,13 +427,13 @@ def weight_values(
     return df
 
 
-def sort_rows_order_cols(df: pd.DataFrame, cols_in_order: List[str]) -> pd.DataFrame:
+def sort_rows_order_cols(df: pd.DataFrame, cols_in_order: list[str]) -> pd.DataFrame:
     """
     Sorts the DataFrame by the specified columns in ascending order.
 
     Args:
         df (pd.DataFrame): The DataFrame to sort.
-        cols_in_order (List[str]): The columns to sort by.
+        cols_in_order (list[str]): The columns to sort by.
 
     Returns:
         pd.DataFrame: The sorted DataFrame.
@@ -448,7 +448,7 @@ def sort_rows_order_cols(df: pd.DataFrame, cols_in_order: List[str]) -> pd.DataF
     df = df[cols_in_order]
 
     # Sort the rows on values in chosen columns
-    cols_to_sort_by: List[str] = [period_col, ref_col, instance_col]
+    cols_to_sort_by: list[str] = [period_col, ref_col, instance_col]
     sorted_df = df.sort_values(by=cols_to_sort_by, ascending=True).reset_index(
         drop=True
     )
@@ -461,7 +461,7 @@ def consistency_checks(df: pd.DataFrame, intram_dict) -> None:
 
     Args:
         df (pd.DataFrame): The DataFrame to check.
-        intram_dict (Dict): Dictionary with the intramural totals.
+        intram_dict (dict): dictionary with the intramural totals.
 
     Raises:
         ValueError: If the intramural totals do not align.
@@ -475,9 +475,9 @@ def consistency_checks(df: pd.DataFrame, intram_dict) -> None:
 
 def run_apportion_sites(
     df: pd.DataFrame,
-    imp_markers_to_keep: List[str],
-    config: Dict[str, Union[str, List[str]]],
-    intram_tot_dict: Dict[str, Any],
+    imp_markers_to_keep: list[str],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, Any],
 ) -> pd.DataFrame:
     """Apportion the numerical values for each product group across multiple sites.
 
@@ -499,21 +499,21 @@ def run_apportion_sites(
 
     Args:
         df (pd.DataFrame): Dataframe containing all input data.
-        imp_markers_to_keep (List[str]): A list of imputation markers to keep.
-        config (Dict[str, Union[str, List[str]]]): Configuration dictionary.
+        imp_markers_to_keep (list[str]): A list of imputation markers to keep.
+        config (dict[str, Any]): Configuration dictionary.
 
     Returns:
         pd.DataFrame: A dataframe with the same columns, with applied site
             apportionment.
     """
     # Get the original columns set
-    orig_cols: List[str] = list(df.columns)
+    orig_cols: list[str] = list(df.columns)
     # Create a list of the value columns that we want to apportion
     # These are the same as the columns we impute so we use a function from
     # imputation.
-    value_cols: List[str] = get_imputation_cols(config)
+    value_cols: list[str] = get_imputation_cols(config)
 
-    geo_cols: List[str] = ["itl"] + config["mappers"]["geo_cols"]
+    geo_cols: list[str] = ["itl"] + config["mappers"]["geo_cols"]
 
     # Calculate the number of unique non-blank postcodes
     df = count_unique_postcodes_in_col(df)

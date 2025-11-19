@@ -2,8 +2,11 @@
 
 import logging
 import pandas as pd
+
+from typing import Any
+from collections.abc import Callable
+
 from src.utils.helpers import filename_amender
-from typing import Callable, Dict, Any
 
 OutputMainLogger = logging.getLogger(__name__)
 
@@ -12,11 +15,11 @@ def output_intram_by_pg(
     gb_df: pd.DataFrame,
     ni_df: pd.DataFrame,
     pg_detailed: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, int],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, int],
     write_csv: Callable,
     uk_output: bool = False,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Run the outputs module.
 
     Args:
@@ -24,13 +27,13 @@ def output_intram_by_pg(
         ni_df (pd.DataFrame): The NI datasets
         pg_detailed (pd.DataFrame): Detailed info for the product groups.
         config (dict): The configuration settings.
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         uk_output (bool): If True, the output will include NI data.
 
     Returns:
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
     """
     df_merge, value_tot = _generate_intarm_by_pg(
         gb_df, ni_df, pg_detailed, config, uk_output
@@ -48,7 +51,7 @@ def _generate_intarm_by_pg(
     gb_df: pd.DataFrame,
     ni_df: pd.DataFrame,
     pg_detailed: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     uk_output: bool = False,
 ):
     """Generate the intramural by PG output dataframe and intramural by PG total.
@@ -104,7 +107,7 @@ def _generate_intarm_by_pg(
 
 def _save_output_intram_as_csv(
     df_merge: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
     uk_output: bool = False,
 ):

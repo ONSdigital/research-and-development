@@ -2,7 +2,6 @@ import os
 
 # import csv
 from datetime import datetime
-from typing import Tuple
 
 import pandas as pd
 
@@ -117,7 +116,7 @@ class RunLog:
 
         return self.mainlog_df
 
-    def _get_runlog_settings(self) -> Tuple[bool, bool, bool]:
+    def _get_runlog_settings(self) -> tuple[bool, bool, bool]:
         """Get the runlog settings from the config file."""
         runlog_settings = self.config["runlog_writer"]
         write_csv_setting = runlog_settings["write_csv"]

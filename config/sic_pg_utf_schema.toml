@@ -1,8 +1,8 @@
 ["SIC 2007_CODE"]
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "sic"
 
 ["2016 > Form PG"]
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "int64"
 
 
 

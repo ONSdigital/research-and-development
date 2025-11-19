@@ -1,7 +1,6 @@
 """Utilities to validate the construction process."""
 
 import logging
-from typing import Union, Tuple
 
 import pandas as pd
 import numpy as np
@@ -10,13 +9,13 @@ from src.utils.defence import type_defence
 
 
 def check_for_duplicates(
-    df: pd.DataFrame, columns: Union[list, str], logger: logging.Logger = None
+    df: pd.DataFrame, columns: list[str], logger: logging.Logger = None
 ) -> None:
     """Check a dataframe for duplicate values across multiple columns.
 
     Args:
         df (pd.DataFrame): The dataframe to check for duplicates
-        columns (Union[list, str]): The columns to check duplicates across.
+        columns (list[str]): The columns to check duplicates across.
         logger (logging.Logger, optional): The logger to log to. Defaults to None.
     """
     # defence checks
@@ -44,7 +43,7 @@ def check_for_duplicates(
 
 def validate_columns_not_empty(
     df: pd.DataFrame,
-    columns: Union[str, list],
+    columns: list[str],
     logger: logging.Logger = None,
     _raise: bool = True,
 ) -> None:
@@ -52,7 +51,7 @@ def validate_columns_not_empty(
 
     Args:
         df (pd.DataFrame): The dataframe to check.
-        columns (Union[str, list]): The columns to check.
+        columns (list[str]): The columns to check.
         logger (logging.Logger, optional): A logger. Defaults to None.
         _raise (bool, optional): Whether to raise an error if all columns are
             empty. Defaults to True.
@@ -142,7 +141,7 @@ def validate_short_to_long(df: pd.DataFrame, logger: logging.Logger = None) -> N
 
 def _references_in_snapshot(
     construction_df: pd.DataFrame, snapshot_refs: list, logger: logging.Logger = None
-) -> Tuple[bool, list]:
+) -> tuple[bool, list]:
     """Determine if the references in a df are in a snapshot.
 
     Args:
@@ -151,7 +150,7 @@ def _references_in_snapshot(
         logger (logging.Logger): The logger to log to.
 
     Returns:
-        Tuple[bool, list]: Whether or not all references are in the snapshot,
+        tuple[bool, list]: Whether or not all references are in the snapshot,
             a list of all references missing from the snapshot.
     """
     type_defence(construction_df, "construction_df", pd.DataFrame)

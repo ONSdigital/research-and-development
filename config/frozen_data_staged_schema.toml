@@ -436,19 +436,19 @@ Deduced_Data_Type = "object"
 
 [frozensicoutdated]
 old_name = "frozensicoutdated"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 
 [rusicoutdated]
 old_name = "rusicoutdated"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 
 [frozensic]
 old_name = "frozensic"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 
 [rusic]
 old_name = "rusic"
-Deduced_Data_Type = "int64"
+Deduced_Data_Type = "str"
 
 [frozenemployees]
 old_name = "frozenemployees"

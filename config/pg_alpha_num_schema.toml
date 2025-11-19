@@ -1,5 +1,5 @@
 [pg_numeric]
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "int64"
 
 [pg_alpha]
 Deduced_Data_Type = "str"

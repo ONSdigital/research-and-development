@@ -3,8 +3,6 @@
 import logging
 import pandas as pd
 
-from typing import Tuple
-
 BreakdownValidationLogger = logging.getLogger(__name__)
 
 
@@ -380,7 +378,7 @@ def run_staging_breakdown_validation(df: pd.DataFrame, config: dict) -> None:
 
 def filter_on_condition(
     df: pd.DataFrame, condition: pd.Series
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Function to filter a dataframe based on a condition.
 
     Args:

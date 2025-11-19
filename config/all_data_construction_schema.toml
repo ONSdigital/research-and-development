@@ -69,7 +69,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockedby]
 Description = "All empty strings"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -79,7 +79,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockeddate]
 Description = "All None type"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -109,7 +109,7 @@ Possible_Categorical_Values = ["T", "H", "F", "J", "D", "A", "K", "C", "B", "L",
 
 [frozensicoutdated]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -119,7 +119,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusicoutdated]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -129,7 +129,7 @@ Possible_Categorical_Values = ["nan"]
 
 [frozensic]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -139,7 +139,7 @@ Possible_Categorical_Values = ["nan"]
 
 [rusic]
 Description = "nan"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
@@ -409,7 +409,7 @@ Possible_Categorical_Values = ["L"]
 
 [inclusionexclusion]
 Description = 'All values are " "'
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"

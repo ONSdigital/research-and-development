@@ -10,13 +10,10 @@ import json
 import os
 import pandas as pd
 import logging
-import pathlib
 import shutil
-from typing import Union
-
 import yaml
 
-from src.utils.wrappers import time_logger_wrap
+from rdsa_utils.typing import PathLike
 from rdsa_utils.helpers.python import (
     md5_sum,
     file_size,
@@ -30,7 +27,7 @@ from rdsa_utils.helpers.python import (
 LocalModLogger = logging.getLogger(__name__)
 
 
-def rd_read_csv(filepath: str, **kwargs) -> pd.DataFrame:
+def rd_read_csv(filepath: PathLike, **kwargs) -> pd.DataFrame:
     """Reads a csv file from a local Windows drive or a network drive into a
     Pandas Dataframe using Python open() function.
     If "thousands" argument is not specified, sets it to ",".
@@ -164,7 +161,6 @@ def rd_mkdir(path):
     return None
 
 
-@time_logger_wrap
 def rd_write_feather(filepath, df):
     """Writes a Pandas Dataframe to a feather file on a local network drive
 
@@ -176,7 +172,6 @@ def rd_write_feather(filepath, df):
     return True
 
 
-@time_logger_wrap
 def rd_read_feather(filepath):
     """Reads a feather file from a local network drive into a Pandas DataFrame
 
@@ -295,7 +290,7 @@ def rd_move_file(src_path: str, dst_path: str):
 
 def rd_list_files(path: str, ext: str = None, order: str = None):
     """
-    Lists all files in a directory on the local file system.
+    lists all files in a directory on the local file system.
 
     Returns
     -------
@@ -344,11 +339,11 @@ def rd_search_file(dir_path, ending):
     return target_file
 
 
-def safeload_yaml(path: Union[str, pathlib.Path]) -> dict:
+def safeload_yaml(path: PathLike) -> dict:
     """Load a .yaml file from a path.
 
     Args:
-        path (Union[str, pathlib.Path]): The path to load the .yaml file from.
+        path (PathLike): The path to load the .yaml file from.
 
     Raises:
         FileNotFoundError: Raised if there is no file at the given path.

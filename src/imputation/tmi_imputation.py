@@ -2,7 +2,7 @@
 
 # Standard library imports
 import logging
-from typing import Dict, List, Tuple, Any, Union
+from typing import Any
 
 # Third party imports
 import pandas as pd
@@ -37,16 +37,14 @@ def sort_df(target_variable: str, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def apply_trim_check(
-    df: pd.DataFrame,
-    variable: str,
-    trim_threshold: Union[int, float],
+    df: pd.DataFrame, variable: str, trim_threshold: int | float
 ) -> pd.DataFrame:
     """Check that the number of records is above the required threshold for trimming.
 
     Args:
         df (pd.DataFrame): The dataframe containing the records.
         variable (str): The variable to check.
-        trim_threshold (Union[int, float]): The trim threshold.
+        trim_threshold (int | float): The trim threshold.
 
     Returns:
         pd.DataFrame: A dataframe containing the trim status (above/below)
@@ -70,8 +68,8 @@ def apply_trim_check(
 def trim_bounds(
     df: pd.DataFrame,
     variable: str,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Applies a marker to specifiy whether a mean calculation is to be trimmed.
 
     If the 'variable' column contains more than 'trim_threshold' non-zero values,
@@ -80,10 +78,10 @@ def trim_bounds(
 
     Args:
         df (pd.DataFrame): Dataframe of the imputation class
-        config (Dict): the configuration settings
+        config (dict): the configuration settings
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]
+        tuple[pd.DataFrame, pd.DataFrame]
     """
     # get the trimming parameters from the config
     # TODO: add a function to check the config settings make sense
@@ -136,10 +134,10 @@ def trim_bounds(
 
 def calculate_mean(
     df: pd.DataFrame, imp_class: str, target_variable: str
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Calculate the mean of the given target variable and imputation class.
 
-    Dictionary values are created for the mean of the given target variable for
+    dictionary values are created for the mean of the given target variable for
     the given imputation class, and also for the 'count' or number of values
     used to calculate the mean.
 
@@ -151,7 +149,7 @@ def calculate_mean(
             to be evaluated.
 
     Returns:
-        Dict[str, float]
+        dict[str, float]
     """
 
     # remove the "trim" tagged rows
@@ -176,9 +174,9 @@ def calculate_mean(
 
 def create_mean_dict(
     df: pd.DataFrame,
-    target_variable_list: List[str],
-    config: Dict[str, Any],
-) -> Tuple[Dict, pd.DataFrame, pd.DataFrame]:
+    target_variable_list: list[str],
+    config: dict[str, Any],
+) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     """Calculate trimmed mean values for each target variable and imputation class.
 
     Returns a dictionary of mean values and counts for each unique class and variable
@@ -186,12 +184,12 @@ def create_mean_dict(
 
     Args:
         df (pd.DataFrame): The dataframe for imputation.
-        target_variable (List(str)): A list of target variables for which the mean is
+        target_variable (list(str)): A list of target variables for which the mean is
             to be evaluated.
-        config: Dict[str, Any]: The pipeline configuration settings.
+        config: dict[str, Any]: The pipeline configuration settings.
 
     Returns:
-        Tuple[Dict, pd.DataFrame, pd.DataFrame]
+        tuple[dict, pd.DataFrame, pd.DataFrame]
     """
     TMILogger.debug("Creating mean dictionaries")
     df_list = []
@@ -259,7 +257,7 @@ def apply_tmi(
     Args:
         df (pd.DataFrame): The dataframe to add imputed values to.
         target_variables (list): The target variables for TMI imputation.
-        mean_dict (Dict): A dictionary of means.
+        mean_dict (dict): A dictionary of means.
 
     Returns:
         pd.DataFrame: The passed dataframe with TMI imputation applied.
@@ -298,13 +296,13 @@ def apply_tmi(
 
 def run_longform_tmi(
     longform_df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Function to run longform TMI imputation.
 
     Args:
         longform_df (pd.DataFrame): the dataset filtered for long form entries.
-        config (Dict[str, Any]): the configuration settings.
+        config (dict[str, Any]): the configuration settings.
 
     Returns:
         pd.DataFrame: A dataframe with the imputed values added.
@@ -338,13 +336,13 @@ def run_longform_tmi(
 
 def run_shortform_tmi(
     to_impute_df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Function to run shortform TMI imputation.
 
     Args:
         shortform_df (pd.DataFrame): the dataset filtered for short form entries.
-        config (Dict[str, Any]): the configuration settings.
+        config (dict[str, Any]): the configuration settings.
 
     Returns:
         pd.DataFrame: A dataframe with the imputed values added.
@@ -376,16 +374,16 @@ def run_shortform_tmi(
 
 def tmi_prep(
     full_df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Return dataframes for longform and shortform imputation and for excluded rows.
 
     Args:
         full_df (pd.DataFrame): The full responses dataframe.
-        config (Dict): the configuration settings.
+        config (dict): the configuration settings.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
             longform_df: A dataframe with longform rows to be imputed.
             shortform_df: A dataframe with shortform rows to be imputed.
             excluded_df: A dataframe with rows that do not need to be imputed.
@@ -411,13 +409,13 @@ def tmi_prep(
 
 def run_tmi(
     full_df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Function to run TMI imputation.
 
     Args:
         full_df (pd.DataFrame): The full responses dataframe.
-        config (Dict): the configuration settings.
+        config (dict): the configuration settings.
 
     Returns:
         final_df(pd.DataFrame): A dataframe with imputed values added and count

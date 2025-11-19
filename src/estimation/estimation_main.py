@@ -1,7 +1,8 @@
 """Main file for the estimation module."""
 
 import logging
-from typing import Any, Callable, Dict
+from typing import Any
+from collections.abc import Callable
 import pandas as pd
 
 from src.estimation import apply_weights as appweights
@@ -13,7 +14,7 @@ EstMainLogger = logging.getLogger(__name__)
 
 def run_estimation(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> pd.DataFrame:
     """

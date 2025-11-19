@@ -20,7 +20,7 @@ def check_log_unreal_postcodes(
         validation_df (pd.DataFrame): Copy of the full dataframe
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
             postocdes to check against
-        config (dict): Dictionary containing config settings
+        config (dict): dictionary containing config settings
 
     Returns:
         invalid_postcode_df (pd.DataFrame):  Dataframe with postcodes for issue output
@@ -102,7 +102,7 @@ def check_pcs_real(
         df (pd.DataFrame): The DataFrame containing the postcodes.
         postcode_masterlist (pd.DataFrame): The dataframe containing the correct
         postocdes to check against
-        config (dict): Dictionary containing config settings
+        config (dict): dictionary containing config settings
 
     Returns:
         unreal_postcodes (pd.DataFrame): A dataframe containing all the

@@ -1,5 +1,4 @@
 from src.utils.wrappers import validate_dataframe_not_empty
-from typing import List
 import pandas as pd
 import logging
 
@@ -7,13 +6,13 @@ SppProcessingLogger = logging.getLogger(__name__)
 
 
 def create_response_dataframe(
-    df: pd.DataFrame, unique_id_cols: List[str]
+    df: pd.DataFrame, unique_id_cols: list[str]
 ) -> pd.DataFrame:
     """Create a response dataframe using pivot_table to reshape the data.
 
     Arguments:
         df -- DataFrame to create the response dataframe from
-        unique_id_cols -- List of column names that uniquely identify the data
+        unique_id_cols -- list of column names that uniquely identify the data
 
     Returns:
         response_df -- Response DataFrame
@@ -26,14 +25,14 @@ def create_response_dataframe(
 
 
 def create_contextual_dataframe(
-    df: pd.DataFrame, unique_id_cols: List[str]
+    df: pd.DataFrame, unique_id_cols: list[str]
 ) -> pd.DataFrame:
     """Create a contextual dataframe by dropping 'questioncode' and 'response' columns
     and removing duplicates.
 
     Arguments:
         df -- DataFrame to create the contextual dataframe from
-        unique_id_cols -- List of column names that uniquely identify the data
+        unique_id_cols -- list of column names that uniquely identify the data
 
     Returns:
         contextual_df -- Contextual DataFrame

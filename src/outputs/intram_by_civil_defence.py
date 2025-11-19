@@ -2,7 +2,10 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+
+from typing import Any
+from collections.abc import Callable
+
 from src.utils.helpers import filename_amender
 
 OutputMainLogger = logging.getLogger(__name__)
@@ -10,7 +13,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 def output_intram_by_civil_defence(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> pd.DataFrame:
     """Run the outputs module.
@@ -62,7 +65,7 @@ def generate_intram_by_civil_defence(
 
 def _save_output_intram_civil_def_as_csv(
     df_for_output: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ):
     """Save the intramural by civil_defence output as a CSV file.

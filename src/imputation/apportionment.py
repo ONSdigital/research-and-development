@@ -3,8 +3,6 @@
 import logging
 import pandas as pd
 
-from typing import Dict, List
-
 from src.imputation.imputation_helpers import copy_first_to_group
 
 ApportionmentLogger = logging.getLogger(__name__)
@@ -52,7 +50,7 @@ def calc_202_totals(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def calc_fte_column(
-    df: pd.DataFrame, fte_dict: Dict[str, List[str]], round_val: int = 4
+    df: pd.DataFrame, fte_dict: dict[str, list[str]], round_val: int = 4
 ) -> pd.DataFrame:
     """Create new columns for FTE values.
 
@@ -60,7 +58,7 @@ def calc_fte_column(
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
-        fte_dict (Dict[str, List[str]]): A dictionary containing the new
+        fte_dict (dict[str, list[str]]): A dictionary containing the new
             column name as key and a list of the old column names as value.
         round_val (int): The number of decimal places for rounding.
 
@@ -86,13 +84,13 @@ def calc_fte_column(
 
 
 def calc_headcount_column(
-    df: pd.DataFrame, hc_dict: Dict[str, str], round_val=4
+    df: pd.DataFrame, hc_dict: dict[str, str], round_val=4
 ) -> pd.DataFrame:
     """Create a new column for headcount values.
 
     Args:
         df (pd.DataFrame): The main dataset for apportionment.
-        fc_dict (Dict[str, str]): A dictionary containing the new
+        fc_dict (dict[str, str]): A dictionary containing the new
             column name as key and old column names as the value.
         round_val (int): The number of decimal places for rounding.
     Returns:

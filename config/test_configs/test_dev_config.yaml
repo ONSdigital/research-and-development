@@ -116,7 +116,9 @@ schema_paths:
   full_responses_mapped_schema: "config/output_schemas/full_responses_mapped_schema.toml"
   pnp_national_accounts_schema: "config/output_schemas/pnp_national_accounts_schema.toml"
 
-# Export config for users
+# Other config settings
+staging:
+  sic_cols: ["frozensicoutdated","rusicoutdated", "frozensic", "rusic", "SIC 2007_CODE"]
 mappers:
   geo_cols: ["ITL221CD", "ITL221NM", "ITL121CD", "ITL121NM"]
   gb_itl: "LAU121CD"

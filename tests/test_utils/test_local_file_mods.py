@@ -2,10 +2,10 @@ import pytest
 import os
 import json
 import pathlib
-from typing import Union
 
 import pandas as pd
 import yaml
+from rdsa_utils.typing import PathLike
 
 from src.utils.local_file_mods import (
     rd_read_csv,
@@ -146,12 +146,12 @@ def test_rd_file_write_feather(tmp_path, input_data, expout_data):
     pd.testing.assert_frame_equal(df, expout_data)
 
 
-def write_dict_to_yaml(_dict: dict, path: Union[str, pathlib.Path]) -> None:
+def write_dict_to_yaml(_dict: dict, path: PathLike) -> None:
     """Write a dictionary as a yaml file
 
     Args:
         _dict (dict): The data to save to the yaml file.
-        path (Union[str, pathlib.Path]): The save path (including file ext).
+        path (PathLike): The save path (including file ext).
 
     Returns:
         None

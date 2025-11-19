@@ -2,7 +2,8 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+from typing import Any
+from collections.abc import Callable
 
 from src.outlier_detection import auto_outliers as auto
 from src.outlier_detection import manual_outliers as manual
@@ -14,7 +15,7 @@ OutlierMainLogger = logging.getLogger(__name__)
 def run_outliers(
     df: pd.DataFrame,
     df_manual_supplied: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> pd.DataFrame:
     """

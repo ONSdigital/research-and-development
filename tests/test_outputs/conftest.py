@@ -2,7 +2,7 @@
 # Standard Library Imports
 import pytest
 import os
-from typing import Callable
+from collections.abc import Callable
 
 # Local Imports
 from src.utils.config import config_setup

@@ -403,7 +403,7 @@ class TestCalcWeightFactor:
 
         result_df, result_qa_df = calw.calculate_weighting_factors(input_df)
 
-        # List of DataFrames and columns to round
+        # list of DataFrames and columns to round
         dfs = [result_qa_df, result_df, expected_df, expected_qa_df]
         columns = ["a_weight", "g_weight"]
 
@@ -521,7 +521,7 @@ class TestCalcWeightsSecondCheck:
 
         result_df, result_qa_df = calw.calculate_weighting_factors(input_df)
 
-        # List of DataFrames and columns to round
+        # list of DataFrames and columns to round
         dfs = [result_qa_df, result_df, expected_df, expected_qa_df]
         columns = ["a_weight", "g_weight"]
 

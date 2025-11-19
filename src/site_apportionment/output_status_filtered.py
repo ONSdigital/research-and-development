@@ -2,7 +2,9 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, List, Any
+
+from typing import Any
+from collections.abc import Callable
 
 from src.utils.helpers import filename_amender
 
@@ -11,17 +13,17 @@ StatusFilteredLogger = logging.getLogger(__name__)
 
 
 def calc_weighted_intram_tot(
-    df: pd.DataFrame, imp_markers_to_keep: List[str], intram_totals: Dict
-) -> Dict[str, int]:
+    df: pd.DataFrame, imp_markers_to_keep: list[str], intram_totals: dict
+) -> dict[str, int]:
     """Calculate the weighted and unweighted intramural totals.
 
     Args:
         df (pd.DataFrame): The dataframe to calculate the totals for.
-        imp_markers_to_keep (List[str]): The list of imp_markers to keep.
-        intram_totals (Dict): The dictionary to store the totals in.
+        imp_markers_to_keep (list[str]): The list of imp_markers to keep.
+        intram_totals (dict): The dictionary to store the totals in.
 
     Returns:
-        Dict[str, int]: Intramural totals for unweighted and estimated values.
+        dict[str, int]: Intramural totals for unweighted and estimated values.
     """
     filtered_df = df.copy().loc[df.imp_marker.isin(imp_markers_to_keep)]
 
@@ -39,7 +41,7 @@ def calc_weighted_intram_tot(
 
 
 def save_removed_markers(
-    df: pd.DataFrame, imp_markers_to_keep: List[str]
+    df: pd.DataFrame, imp_markers_to_keep: list[str]
 ) -> pd.DataFrame:
     """Filter rows neither clear nor imputed for output QA, based on imp_marker."""
     to_remove = ~df["imp_marker"].isin(imp_markers_to_keep)
@@ -48,7 +50,7 @@ def save_removed_markers(
 
 def keep_good_markers(
     df: pd.DataFrame,
-    imp_markers_to_keep: List[str],
+    imp_markers_to_keep: list[str],
 ) -> pd.DataFrame:
     """Keep only rows that are clear or imputed, based on the imp_marker column."""
     series_to_keep = df["imp_marker"].isin(imp_markers_to_keep)
@@ -57,8 +59,8 @@ def keep_good_markers(
 
 def output_status_filtered(
     df: pd.DataFrame,
-    imp_markers_to_keep: List[str],
-    config: Dict[str, Any],
+    imp_markers_to_keep: list[str],
+    config: dict[str, Any],
     write_csv: Callable,
 ):
     """Output rows that are neither clear nor imputed, before these are removed.

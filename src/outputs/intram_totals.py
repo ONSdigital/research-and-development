@@ -1,7 +1,9 @@
 """The main file for the frozen group output."""
 
 import logging
-from typing import Callable, Dict, Any
+
+from typing import Any
+from collections.abc import Callable
 
 import pandas as pd
 from src.utils.helpers import filename_amender
@@ -10,14 +12,14 @@ OutputMainLogger = logging.getLogger(__name__)
 
 
 def output_intram_totals(
-    intram_tot_dict: Dict[str, int],
-    config: Dict[str, Any],
+    intram_tot_dict: dict[str, int],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> None:
     """Output the intramural totals.
 
     Args:
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         config (dict): The configuration settings.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.

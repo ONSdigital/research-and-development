@@ -8,7 +8,7 @@ Deduced_Data_Type = "Int64"
 
 [rusic]
 old_name = "current_sic"
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 
 [legalstatus]
 old_name = "legal status"

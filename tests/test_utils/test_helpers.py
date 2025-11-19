@@ -37,9 +37,9 @@ class TestValuesInColumn(object):
     @pytest.mark.parametrize(
         "values, expected",
         [
-            ([1, 2, 3], True),  # True/List
+            ([1, 2, 3], True),  # True/list
             (pd.Series([0, 5, 8]), True),  # True/Series
-            ([1, 2, 4], False),  # False/List
+            ([1, 2, 4], False),  # False/list
             (pd.Series([15]), False),  # False/Series
         ]
     )
@@ -55,7 +55,7 @@ class TestValuesInColumn(object):
         )
 
 
-class TestTreeToList:
+class TestTreeTolist:
     """Test for tree_to_list()."""
 
     # Tests that a tree is correctly converted to a list.
@@ -65,7 +65,7 @@ class TestTreeToList:
         '''
         Create a reegular ("good") directory tree for a positive unit-test.
         Args:
-            self (class): An instance of TestTreeToList unit-test class.
+            self (class): An instance of TestTreeTolist unit-test class.
 
         Returns:
             tree (dict): An example of regular directory tree as a dictionary,
@@ -89,7 +89,7 @@ class TestTreeToList:
         Create an "bad" input tree with a type error for negative unit-test.
 
         Args:
-            self (class): An instance of TestTreeToList unit-test class.
+            self (class): An instance of TestTreeTolist unit-test class.
 
         Returns:
             bad_tree (dict): An example of  directory tree as a dictionary with
@@ -105,7 +105,7 @@ class TestTreeToList:
         Create an expected output list for the test.
 
         Args:
-            self (class): An instance of TestTreeToList unit-test class.
+            self (class): An instance of TestTreeTolist unit-test class.
 
         Returns:
             exp_output_list (list): Expected list of full directory paths.
@@ -122,7 +122,7 @@ class TestTreeToList:
         result equls the expected result.
 
         Args:
-            self (class): An instance of TestTreeToList unit-test class.
+            self (class): An instance of TestTreeTolist unit-test class.
 
         Returns:
             None
@@ -142,7 +142,7 @@ class TestTreeToList:
         values other than dictionaries and shows a correct error message.
 
         Args:
-            self (class): An instance of TestTreeToList unit-test class.
+            self (class): An instance of TestTreeTolist unit-test class.
 
         Returns:
             None

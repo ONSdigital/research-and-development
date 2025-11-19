@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Dict
+from collections.abc import Callable
 
 import pandas as pd
 import numpy as np
@@ -16,7 +16,7 @@ FreezingApplyLogger = logging.getLogger(__name__)
 
 def apply_freezing(
     main_df: pd.DataFrame,
-    config: Dict,
+    config: dict,
     check_file_exists: Callable,
     read_csv: Callable,
 ) -> pd.DataFrame:
@@ -88,7 +88,7 @@ def apply_freezing(
 def apply_amendments(
     main_df: pd.DataFrame,
     amendments_df: pd.DataFrame,
-    config: Dict,
+    config: dict,
 ) -> pd.DataFrame:
     """Apply amendments to the main snapshot.
 
@@ -144,7 +144,7 @@ def apply_amendments(
     # update last_frozen column
     accepted_amendments_df = _add_last_frozen_column(accepted_amendments_df, config)
 
-    # List of tuples with values to filter
+    # list of tuples with values to filter
     values_to_filter = (
         accepted_amendments_df[["reference", "instance"]].apply(tuple, axis=1).tolist()
     )
@@ -170,7 +170,7 @@ def apply_amendments(
 def apply_additions(
     main_df: pd.DataFrame,
     additions_df: pd.DataFrame,
-    config: Dict,
+    config: dict,
 ) -> pd.DataFrame:
     """Apply additions to the main snapshot.
 
@@ -228,7 +228,7 @@ def apply_additions(
 def apply_deletions(
     main_df: pd.DataFrame,
     deletions_df: pd.DataFrame,
-    config: Dict,
+    config: dict,
 ) -> pd.DataFrame:
     """Apply deletions to the main snapshot.
 

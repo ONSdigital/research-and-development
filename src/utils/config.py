@@ -1,14 +1,13 @@
 """Simple utils to assist the config."""
 
 from copy import deepcopy
-from typing import Union, Tuple, Dict
 
 from src.utils.defence import type_defence, validate_file_extension
 from src.utils.local_file_mods import safeload_yaml
 from src.utils.path_helpers import update_config_with_paths, filename_year_validation
 
 
-def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
+def config_setup(user_config_path: str, dev_config_path: str) -> dict:
     """Set up the config for the pipeline.
 
     Args:
@@ -16,7 +15,7 @@ def config_setup(user_config_path: str, dev_config_path: str) -> Dict:
         dev_config_path (str): The path to the developer config file.
 
     Returns:
-        Dict: The merged user and developer configs.
+        dict: The merged user and developer configs.
     """
     user_config, dev_config = load_validate_configs(user_config_path, dev_config_path)
     combined_config = merge_configs(user_config, dev_config)
@@ -39,7 +38,7 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
         dev_config_path (str): The path to the developer config file.
 
     Returns:
-        Tuple[Dict, Dict]: The user and developer configs.
+        tuple[dict, dict]: The user and developer configs.
     """
     user_config = safeload_yaml(user_config_path)
     dev_config = safeload_yaml(dev_config_path)
@@ -54,7 +53,7 @@ def load_validate_configs(user_config_path: str, dev_config_path: str):
     return user_config, dev_config
 
 
-def merge_configs(config1: Dict, config2: Dict) -> Dict:
+def merge_configs(config1: dict, config2: dict) -> dict:
     """Merge two config files.
 
     Takes two config files and merges them into a single config file.
@@ -131,11 +130,11 @@ def _validate_path(path: str, schema_config: dict):
         validate_file_extension(path, file_ext)
 
 
-def _validate_numeric(value: Union[float, int], param_nm: str, config: dict):
+def _validate_numeric(value: float | int, param_nm: str, config: dict):
     """Validate a numerical value to ensure it falls within a specified range.
 
     Args:
-        value (Union[float, int]): The numerical value to be validated.
+        value (float | int): The numerical value to be validated.
         param_nm (str): The name of the parameter being validated (for error messages).
         config (dict): The configuration schema containing the min and max values.
 
@@ -163,14 +162,14 @@ def _validate_numeric(value: Union[float, int], param_nm: str, config: dict):
             )
 
 
-def _nulltype_conversion(value: str) -> Union[str, None]:
+def _nulltype_conversion(value: str) -> str | None:
     """Account for user disparities in the form of NoneType they pass.
 
     Args:
         value (str): The value passed by a user.
 
     Returns:
-        Union[str, None]: The altered value.
+        str | None: The altered value.
     """
     type_defence(value, "value", str)
     if value.lower() in ["", "null", "none"]:
@@ -285,7 +284,7 @@ def validate_config(config: dict) -> None:
         )
 
 
-def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
+def validate_freezing_run_config(config: dict) -> tuple[bool, bool, bool, bool]:
     """Validate the four main config parameters of the freezing module.
 
     Args:
@@ -295,7 +294,7 @@ def validate_freezing_run_config(config: dict) -> Tuple[bool, bool, bool, bool]:
         ValueError: Raised if multiple pipeline run options are True.
 
     Returns:
-        Tuple[bool, bool, bool, bool]: The main freezing config settings.
+        tuple[bool, bool, bool, bool]: The main freezing config settings.
     """
     run_with_snapshot = config["global"]["run_with_snapshot"]
     run_with_snapshot_and_freeze = config["global"]["run_with_snapshot_and_freeze"]
@@ -422,7 +421,7 @@ def validate_survey_config(config: dict) -> dict:
     """
     survey_config = config.get("survey", {})
     if survey_config.get("survey_type") == "PNP":
-        # List of values not compatible with PNP
+        # list of values not compatible with PNP
         values = [config.get("global", {}).get("load_ni_data", True)]
         if any(values):
             raise ValueError(
@@ -447,7 +446,7 @@ def validate_pnp_config(config: dict) -> None:
     """
     # Check if PNP is set
     if config["survey"]["survey_type"] == "PNP":
-        # List of values not compatible with PNP
+        # list of values not compatible with PNP
         incompatible_settings = [
             "run_ni_construction",
             "load_manual_outliers",

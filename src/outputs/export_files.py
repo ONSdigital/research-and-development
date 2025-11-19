@@ -5,7 +5,6 @@ import os
 import logging
 from datetime import datetime
 import tomli
-from typing import List
 from pathlib import Path
 import getpass
 
@@ -120,7 +119,7 @@ def get_file_choice(paths, config: dict):
     return selection_dict
 
 
-def check_files_exist(file_list: List, config: dict, isfile: callable):
+def check_files_exist(file_list: list, config: dict, isfile: callable):
     """Check that all the files in the file list exist using
     the imported isfile function."""
 
@@ -183,7 +182,7 @@ def get_username():
 
 
 def log_exports(
-    list_file_exported: List, pipeline_run_datetime: datetime, logger: logging.Logger
+    list_file_exported: list, pipeline_run_datetime: datetime, logger: logging.Logger
 ):
     """
     Logs the details of the exported files.
@@ -193,7 +192,7 @@ def log_exports(
     time are formatted as "YYYY-MM-DD HH:MM:SS".
 
     Args:
-        list_file_exported (List[str]): A list of the names of the files that were
+        list_file_exported (list[str]): A list of the names of the files that were
             exported.
         pipeline_run_datetime (datetime): The date and time when the pipeline was run.
         logger (logging.Logger): The logger to use for logging the export details.

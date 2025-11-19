@@ -3,7 +3,8 @@
 import logging
 import os
 import pandas as pd
-from typing import Callable, Dict, Any
+from typing import Any
+from collections.abc import Callable
 
 from src.imputation import imputation_helpers as hlp
 from src.imputation import tmi_imputation as tmi
@@ -25,7 +26,7 @@ def run_imputation(  # noqa: C901
     df: pd.DataFrame,
     manual_trimming_df: pd.DataFrame,
     backdata: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> pd.DataFrame:
     """Run all the processes for the imputation module.

@@ -1,5 +1,4 @@
 import pandas as pd
-from typing import Tuple
 
 # Import modules to test
 from src.staging.spp_parser import parse_snap_data
@@ -20,7 +19,7 @@ class TestParseSPP:
 
         return dummy_snapdata
 
-    def exp_output(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def exp_output(self) -> tuple[pd.DataFrame, pd.DataFrame]:
         contributor_df = pd.DataFrame(
             [{"ref": "123", "con": "789"}, {"ref": "456", "con": "910"}]
         )

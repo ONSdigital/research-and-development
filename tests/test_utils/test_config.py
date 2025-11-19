@@ -2,13 +2,11 @@
 
 import pytest
 import os
-import pathlib
-from typing import Union
-
 import yaml
 
+from rdsa_utils.typing import PathLike
+
 from src.utils.config import (
-    safeload_yaml,
     merge_configs,
     validate_config,
     _validate_numeric,
@@ -24,12 +22,12 @@ from src.utils.config import (
 )
 
 
-def write_dict_to_yaml(_dict: dict, path: Union[str, pathlib.Path]) -> None:
+def write_dict_to_yaml(_dict: dict, path: PathLike) -> None:
     """Write a dictionary as a yaml file
 
     Args:
         _dict (dict): The data to save to the yaml file.
-        path (Union[str, pathlib.Path]): The save path (including file ext).
+        path (PathLike): The save path (including file ext).
 
     Returns:
         None
@@ -577,11 +575,11 @@ class TestValidateConstructionConfigSettings(object):
 class TestValidateFreezingRunConfig(object):
     """Tests for validate_main_config."""
 
-    def create_input_config(self, values: Union[tuple, list]) -> dict:
+    def create_input_config(self, values: tuple | list) -> dict:
         """Create a dummy input config.
 
         Args:
-            values (Union[tuple, list]): The values to apply to the config.
+            values (tuple | list): The values to apply to the config.
 
         Returns:
             dict: The dummy config dictionary.

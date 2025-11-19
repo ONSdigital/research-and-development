@@ -2,11 +2,12 @@
 
 # Standard Library Imports
 import logging
-import pathlib
 import os
 import re
 
-from typing import Callable, Dict, Any, Union, Tuple
+from typing import Any
+from collections.abc import Callable
+from rdsa_utils.typing import PathLike
 
 from src.utils.helpers import filename_amender
 from src.utils.breakdown_validation import get_all_wanted_columns
@@ -20,17 +21,17 @@ OutputMainLogger = logging.getLogger(__name__)
 
 def save_detailed_csv(
     df: pd.DataFrame,
-    output_dir: Union[pathlib.Path, str],
-    config: Dict[str, Any],
+    output_dir: PathLike,
+    config: dict[str, Any],
     title: str,
     write_csv: Callable,
     overwrite: bool = True,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Save a df as a csv with a detailed filename.
 
     Args:
         df (pd.DataFrame): The dataframe to save
-        output_dir (Union[pathlib.Path, str]): The directory to save the dataframe to.
+        output_dir (PathLike): The directory to save the dataframe to.
         survey_year (str): The year that the data is from (from config).
         title (str): The filename to save the df as (excluding date, run id).
         write_csv (Callable): A function to write to a csv file.
@@ -42,7 +43,7 @@ def save_detailed_csv(
             already exists.
 
     Returns:
-        Dict[str, int]: A dictionary of intramural totals.
+        dict[str, int]: A dictionary of intramural totals.
     """
     save_name = filename_amender(filename=title, config=config)
     save_path = os.path.join(output_dir, save_name)
@@ -85,17 +86,17 @@ def aggregate_itl(
     ni_df: pd.DataFrame,
     config,
     uk_output: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Aggregates a dataframe to an ITL level.
 
     Args:
         gb_df (pd.DataFrame): The GB microdata with weights applied.
         ni_df (pd.DataFrame): The NI microdata (weights are 1).
-        config (Dict[str, Any]): Pipeline configuation settings.
+        config (dict[str, Any]): Pipeline configuation settings.
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: The ITL1 and ITL2 dataframes.
+        tuple[pd.DataFrame, pd.DataFrame]: The ITL1 and ITL2 dataframes.
     """
     current_year = config["survey"]["survey_year"]
     geo_cols = config["mappers"]["geo_cols"]
@@ -131,8 +132,8 @@ def aggregate_itl(
 def output_intram_by_itl(
     gb_df: pd.DataFrame,
     ni_df: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, int],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, int],
     write_csv: Callable,
     uk_output: bool = False,
 ):
@@ -141,8 +142,8 @@ def output_intram_by_itl(
     Args:
         gb_df (pd.DataFrame): GB microdata with weights applied.
         ni_df (pd.DataFrame): NI microdata (weights are 1),
-        config (Dict[str, Any]): Project config.
-        intram_tot_dict (Dict[str, int]): Dictionary with the intramural totals.
+        config (dict[str, Any]): Project config.
+        intram_tot_dict (dict[str, int]): dictionary with the intramural totals.
         write_csv (Callable): A function to write to a csv file.
         uk_output (bool, optional): Whether to output UK or GB data. Defaults to False.
     """

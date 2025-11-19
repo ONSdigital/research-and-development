@@ -141,32 +141,32 @@ Deduced_Data_Type = "int"
 [Lockdate]
 name = ""
 old_name = "lockeddate"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [Lockby]
 name = ""
 old_name = "lockedby"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [MC]
 name = ""
 old_name = "MC"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [Month]
 name = ""
 old_name = "Month"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [NS]
 name = ""
 old_name = "NS"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [Nonresp]
 name = ""
 old_name = "Nonresp"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [PC]
 name = ""
@@ -196,7 +196,7 @@ Deduced_Data_Type = "int"
 [CellSelection]
 name = ""
 old_name = "CellSelection"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [SICcurfro]
 name = ""
@@ -206,7 +206,7 @@ Deduced_Data_Type = "int"
 [DataSource]
 name = ""
 old_name = "DataSource"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [SICprevfro]
 name = ""
@@ -216,17 +216,17 @@ Deduced_Data_Type = "int"
 [SICprev]
 name = ""
 old_name = "SICprev"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [Tel]
 name = ""
 old_name = "Tel"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [CurrentSIC]
 name = ""
 old_name = "CurrentSIC"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [TOfro]
 name = ""
@@ -236,7 +236,7 @@ Deduced_Data_Type = "int"
 [TOIDBR]
 name = ""
 old_name = "TOIDBR"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [Year]
 name = ""
@@ -251,17 +251,17 @@ Deduced_Data_Type = "int"
 [q0001]
 name = ""
 old_name = "q0001"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [q0002]
 name = ""
 old_name = "q0002"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [q0003]
 name = ""
 old_name = "q0003"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 
 [q0101]
 name = ""

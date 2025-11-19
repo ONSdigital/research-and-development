@@ -11,7 +11,7 @@ Paths and file names as well as the survey year are read in from the config file
 
 import pandas as pd
 
-from typing import Callable
+from collections.abc import Callable
 from datetime import datetime
 
 from src.utils.config import config_setup

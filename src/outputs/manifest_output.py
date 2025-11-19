@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 import logging
-from typing import Dict, Any
+from typing import Any
 
 
 # set up logging
@@ -43,7 +43,7 @@ class Manifest:
         isfile_func: callable,
         read_header_func: callable,
         string_to_file_func: callable,
-        config: Dict[str, Any],
+        config: dict[str, Any],
         dry_run: bool = False,
         delete_on_fail=False,
     ):

@@ -156,7 +156,7 @@ class TestCheckMappingUnique(object):
             check_mapping_unique(test_mapper_nonunique_df, "ultfoc")
 
 
-class TestUpdateRefList(object):
+class TestUpdateReflist(object):
     """Tests for update_ref_list."""
 
     @pytest.fixture(scope="function")

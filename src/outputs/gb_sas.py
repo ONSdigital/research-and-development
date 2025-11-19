@@ -2,7 +2,8 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+from typing import Any
+from collections.abc import Callable
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
@@ -14,16 +15,16 @@ GbSasLogger = logging.getLogger(__name__)
 
 def output_gb_sas(
     df: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, int],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, int],
     write_csv: Callable,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Run the outputs module.
 
     Args:
         df (pd.DataFrame): The dataset main with estimation weights
         config (dict): The configuration settings.
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         ultfoc_mapper (pd.DataFrame): The ULTFOC mapper DataFrame.

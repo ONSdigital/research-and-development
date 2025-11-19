@@ -1,6 +1,5 @@
 import pandas as pd
 import logging
-from typing import Tuple
 
 CalcWeights_Logger = logging.getLogger(__name__)
 
@@ -92,18 +91,18 @@ def calc_lower_s(df: pd.DataFrame) -> int:
     return s
 
 
-def calculate_weighting_factors(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def calculate_weighting_factors(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Calculate the weighting factor 'a' for each cell in the survery data
 
     Note: A 'cell' is a group of businesses.
 
     Args:
         df (pd.DataFrame): The input df containing survey data
-        cellno_dict (dict): Dictionary of cellnumbers and UNI_counts
+        cellno_dict (dict): dictionary of cellnumbers and UNI_counts
         exp_col (str, optional): The column that is used to calculate n.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]:
+        tuple[pd.DataFrame, pd.DataFrame]:
         1) Returns the full dataframe with the added
         new column "a_weight".
         2) Returns a QA dataframe of all variables used in the calculation

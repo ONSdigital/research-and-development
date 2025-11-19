@@ -1,7 +1,7 @@
 """The main file for the construction module."""
 
 import logging
-from typing import Callable
+from collections.abc import Callable
 
 import pandas as pd
 

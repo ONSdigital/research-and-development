@@ -2,7 +2,8 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+from typing import Any
+from collections.abc import Callable
 
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
@@ -90,7 +91,7 @@ def run_shortform_prep(
 
 def output_short_form(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ):
     """Run the outputs module.

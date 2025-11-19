@@ -4,7 +4,6 @@ doesn't impact on the readability of the existing code."""
 import logging
 import pandas as pd
 import numpy as np
-from typing import Dict, Tuple
 
 from src.imputation.imputation_helpers import create_imp_class_col
 
@@ -13,7 +12,7 @@ CivdefLogger = logging.getLogger(__name__)
 clear_statuses = ["Clear", "Clear - overridden"]
 
 
-def calc_cd_proportions(df: pd.DataFrame):  # -> Tuple[float, float]:
+def calc_cd_proportions(df: pd.DataFrame):  # -> tuple[float, float]:
     """Calc the proportion of civil and defence entries
 
     The proportions are calculated for a dataframe representing a
@@ -29,7 +28,7 @@ def calc_cd_proportions(df: pd.DataFrame):  # -> Tuple[float, float]:
     return proportion_civ, proportion_def
 
 
-def create_civdef_dict(df: pd.DataFrame) -> Tuple[Dict[str, float], pd.DataFrame]:
+def create_civdef_dict(df: pd.DataFrame) -> tuple[dict[str, float], pd.DataFrame]:
     """Create dictionaries with values to use for civil and defence imputation.
 
     Two dictionaries are created, one for imputation classes based on both
@@ -41,7 +40,7 @@ def create_civdef_dict(df: pd.DataFrame) -> Tuple[Dict[str, float], pd.DataFrame
             imputation class
 
     Returns:
-        Dict[str, Tuple(float, float)]
+        dict[str, tuple(float, float)]
     """
     # create dictionary to hold civil or defence ratios for each class
     pgsic_dict = {}
@@ -129,12 +128,12 @@ def prep_cd_imp_classes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _get_random_civdef(ref: int, proportions: Tuple[float, float]) -> str:
+def _get_random_civdef(ref: int, proportions: tuple[float, float]) -> str:
     """Get a random value (C or D) using proportions and a given seed.
 
     Args:
         ref (int): The reference, to be used as a seed used by the randomiser.
-        proportions (Tuple[float, float]): The proportion of C and D in the data.
+        proportions (tuple[float, float]): The proportion of C and D in the data.
 
     Returns:
         str: The randomised values (C or D).
@@ -146,7 +145,7 @@ def _get_random_civdef(ref: int, proportions: Tuple[float, float]) -> str:
 
 
 def assign_random_civdef(
-    df: pd.DataFrame, proportions: Tuple[float, float]
+    df: pd.DataFrame, proportions: tuple[float, float]
 ) -> pd.DataFrame:
     """Assign "C" or "D" randomly based on the proportions supplied.
 
@@ -156,7 +155,7 @@ def assign_random_civdef(
 
     Args:
         df (pd.DataFrame): The dataframe to create the imputed column within.
-        proportions (Tuple[float, float]): The proportions of C and D.
+        proportions (tuple[float, float]): The proportions of C and D.
 
     Returns:
         pd.DataFrame: The updated dataframe.
@@ -170,8 +169,8 @@ def assign_random_civdef(
 
 def apply_civdev_imputation(
     df: pd.DataFrame,
-    pgsic_dict: Dict[str, Tuple[float, float]],
-    pg_dict: Dict[str, Tuple[float, float]],
+    pgsic_dict: dict[str, tuple[float, float]],
+    pg_dict: dict[str, tuple[float, float]],
 ) -> pd.DataFrame:
     """Apply imputation for R&D type for non-responders and 'No R&D'.
 
@@ -186,9 +185,9 @@ def apply_civdev_imputation(
 
     Args:
         df (pd.DataFrame): The dataframe of all responses
-        pgsic_dict (Dict[str, Tuple(float, float)]): Dictionary with
+        pgsic_dict (dict[str, tuple(float, float)]): dictionary with
             proportions to use in imputation based on product group and SIC.
-        pg_dict (Dict[str, Tuple(float, float)]): Dictionary with proportions
+        pg_dict (dict[str, tuple(float, float)]): dictionary with proportions
             to use in imputation based on product group only.
 
     Returns:
@@ -223,7 +222,9 @@ def apply_civdev_imputation(
 
     for pg_class, class_group_df in pg_grp:
         if pg_class in pg_dict.keys():
-            class_group_df = assign_random_civdef(class_group_df, pg_dict[pg_class])
+            class_group_df = assign_random_civdef(
+                class_group_df, pg_dict[str(pg_class)]
+            )
             class_group_df["200_imp_marker"] = "pg_group_imputed"
 
         # Apply changes from class_group_df to filtered_df
@@ -247,7 +248,7 @@ def apply_civdev_imputation(
     for pg_sic_class, class_group_df in pg_sic_grp:
         if pg_sic_class in pgsic_dict.keys():
             class_group_df = assign_random_civdef(
-                class_group_df, pgsic_dict[pg_sic_class]
+                class_group_df, pgsic_dict[str(pg_sic_class)]
             )
             class_group_df["200_imp_marker"] = "pg_sic_group_imputed"
 

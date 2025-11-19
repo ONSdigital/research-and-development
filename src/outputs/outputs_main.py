@@ -1,13 +1,11 @@
 """The main file for the Outputs module."""
 
-# Standard Library Imports
 import logging
-from typing import Callable, Dict, Any
 
-# Third Party Imports
+from typing import Any
+from collections.abc import Callable
 import pandas as pd
 
-# Local Imports
 from src.outputs.form_output_prep import form_output_prep
 from src.outputs.frozen_group import output_frozen_group
 from src.outputs.short_form import output_short_form
@@ -29,8 +27,8 @@ OutputMainLogger = logging.getLogger(__name__)
 def run_outputs(  # noqa: C901
     weighted_df: pd.DataFrame,
     ni_full_responses: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, Any],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, Any],
     write_csv: Callable,
     pg_detailed: pd.DataFrame,
     sic_division_detailed: pd.DataFrame,
@@ -41,7 +39,7 @@ def run_outputs(  # noqa: C901
         weighted_df (pd.DataFrame): Dataset with weights computed but not applied
         ni_full_responses(pd.DataFrame): Dataset with all NI data
         config (dict): The configuration settings.
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
         pg_detailed (pd.DataFrame): Detailed descriptons of alpha PG groups

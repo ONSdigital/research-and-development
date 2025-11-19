@@ -2,7 +2,6 @@
 
 import logging
 import pandas as pd
-from typing import Tuple
 
 from src.mapping import mapping_helpers as hlp
 
@@ -10,18 +9,19 @@ MappingLogger = logging.getLogger(__name__)
 
 
 def join_fgn_ownership(
-    responses: Tuple[pd.DataFrame, pd.DataFrame],
+    responses: tuple[pd.DataFrame, pd.DataFrame],
     mapper_df: pd.DataFrame,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Validate and join the foreign ownership (ultfoc) mapper to the responses dataframes.
 
     Args:
-        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
+        responses (tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         mapper_df (pd.DataFrame): The mapper DataFrame.
 
     Returns:
-        pd.DataFrame: The combined DataFrame resulting from the left join.
+        tuple[pd.DataFrame, pd.DataFrame]: The GB & NI responses dataframes with the
+            ultfoc column added.
     """
     # perform validation on the foreign ownership (ultfoc) mapper
     hlp.check_mapping_unique(mapper_df, "ruref")

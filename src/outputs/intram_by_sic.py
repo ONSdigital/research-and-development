@@ -2,31 +2,34 @@
 
 import logging
 import pandas as pd
+
+from typing import Any
+from collections.abc import Callable
+
 from src.utils.helpers import filename_amender
-from typing import Callable, Dict, Any
 
 OutputMainLogger = logging.getLogger(__name__)
 
 
 def output_intram_by_sic(
     df: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, int],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, int],
     write_csv: Callable,
     sic_div_detailed: pd.DataFrame,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Run the outputs module.
 
     Args:
         df (pd.DataFrame): The dataset main with weights not applied
         config (dict): The configuration settings.
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
          This will be the hdfs or network version depending on settings.
         sic_div_detailed (pd.DataFrame): Format of the SIC output as mapper
 
     Returns:
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
     """
     output_path = config["outputs_paths"]["outputs_master"]
     period = config["survey"]["survey_year"]

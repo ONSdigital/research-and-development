@@ -2,7 +2,9 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+
+from typing import Any
+from collections.abc import Callable
 
 from src.site_apportionment.site_apportionment import run_apportion_sites
 from src.site_apportionment.output_status_filtered import (
@@ -16,7 +18,7 @@ SitesMainLogger = logging.getLogger(__name__)
 
 def run_site_apportionment(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ) -> pd.DataFrame:
     """Run the apportionment to sites module.
@@ -29,7 +31,7 @@ def run_site_apportionment(
     Args:
         df (pd.DataFrame): Main dataset before the outputs module.
         config (dict): The pipeline configuration
-        intram_tot_dict (dict): Dictionary with the intramural totals.
+        intram_tot_dict (dict): dictionary with the intramural totals.
         write_csv (Callable): Function to write to a csv file.
             This will be the hdfs or network version depending on settings.
     Returns:

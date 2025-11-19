@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import Callable
+from collections.abc import Callable
 
 from src.mapping import mapping_helpers as hlp
 from src.mapping.pg_conversion import run_pg_conversion
@@ -39,7 +39,7 @@ def run_mapping(
         rd_file_exists (Callable): Function to check if a file exists.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland
+        tuple[pd.DataFrame, pd.DataFrame]: The BERD full responses and Northern Ireland
             full responses dataframes with the mappers added.
     """
     # Load ultfoc (Foreign Ownership) mapper
@@ -88,6 +88,7 @@ def run_mapping(
         rd_read_csv,
     )
     val.validate_many_to_one(sic_pg_num, "SIC 2007_CODE", "2016 > Form PG")
+    sic_pg_num = stage_hlp.sic_fixer(sic_pg_num, config)
 
     # For survey year only 2022 it's necessary to update the reference list
     year = config["survey"]["survey_year"]

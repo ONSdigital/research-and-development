@@ -2,7 +2,10 @@
 
 import logging
 import pandas as pd
-from typing import Callable, Dict, Any
+
+from typing import Any
+from collections.abc import Callable
+
 import src.outputs.map_output_cols as map_o
 from src.staging.validation import load_schema
 from src.outputs.outputs_helpers import create_output_df
@@ -13,7 +16,7 @@ OutputMainLogger = logging.getLogger(__name__)
 
 def output_ni_sas(
     df: pd.DataFrame,
-    config: Dict[str, Any],
+    config: dict[str, Any],
     write_csv: Callable,
 ):
     """Run the outputs module.

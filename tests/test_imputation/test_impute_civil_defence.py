@@ -55,7 +55,7 @@ class TestCalcCDPorportions:
         assert out_d2 == 0.0
 
 
-class TestCreateCivdefDict:
+class TestCreateCivdefdict:
     """Unit tests for create_civdef_dict function."""
 
     def create_input_df(self):

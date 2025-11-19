@@ -1,6 +1,5 @@
 """Module containing all functions relating to short form expansion."""
 
-from typing import List, Union
 import pandas as pd
 import logging
 
@@ -18,7 +17,7 @@ def expansion_impute(
     trim_col: str,
     group_type: str,
     threshold_num: int,
-    break_down_cols: List[Union[str, int]],
+    break_down_cols: list[str | int],
 ) -> pd.DataFrame:
     """Calculate the expansion imputated values for short forms using long form data"""
     group_copy = group.copy()
@@ -92,7 +91,7 @@ def expansion_impute(
 # @df_change_func_wrap
 def apply_expansion(
     df: pd.DataFrame,
-    master_values: List,
+    master_values: list,
     breakdown_dict: dict,
     threshold_num: int = 3,
 ):

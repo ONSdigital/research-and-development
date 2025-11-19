@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 
-from typing import Tuple, Dict, Any
+from typing import Any
 
 
 ManualImputationLogger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ def merge_manual_imputation(
     to the DataFrame.
 
     Args:
-        config (Dict[str, Any]): The configuration dictionary.
+        config (dict[str, Any]): The configuration dictionary.
         df (pd.DataFrame): The dataframe to be imputed.
         isfile_func (callable): The function to use to check if the file exists.
     Returns:
@@ -50,8 +50,8 @@ def join_manual_trim_df_for_qa(
     qa_df: pd.DataFrame,
     links_df: pd.DataFrame,
     trimmed_df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    config: dict[str, Any],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Joins the manual trimming dataframe to a sweries of QA dataframes.
 
@@ -61,10 +61,10 @@ def join_manual_trim_df_for_qa(
         qa_df (pd.DataFrame): The QA dataframe for trimming
         links_df (pd.DataFrame): The dataframe containing imputation links
         trimmed_df (pd.DataFrame): The responses that were trimmed in manual trimming
-        config (Dict[str, Any]): The configuration dictionary.
+        config (dict[str, Any]): The configuration dictionary.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: The dataframes with
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: The dataframes with
             the manual_trim column added.
     """
     imputed_df = pd.concat([imputed_df, trimmed_df])

@@ -1,7 +1,7 @@
 """Read and validate construction files the construction module."""
 
 import logging
-from typing import Callable, Tuple
+from collections.abc import Callable
 
 import pandas as pd
 
@@ -15,6 +15,7 @@ from src.construction.construction_validation import (
 )
 
 from src.staging.validation import validate_data_with_schema
+from src.staging.staging_helpers import sic_fixer
 
 construction_logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def read_validate_all_construction_files(
     read_csv: Callable,
     construction_logger,
     is_northern_ireland: bool = False,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Read and validate construction files for the construction module.
 
     Function reads config to determine which constructions are required/if it
@@ -63,6 +64,10 @@ def read_validate_all_construction_files(
         read_csv_func=read_csv,
         file_exists_func=check_file_exists,
     )
+    # Update SIC columns to five-digit strings
+    if not construction_df.empty:
+        construction_df = sic_fixer(construction_df, config)
+
     # NI data has no instance but needs an instance of 1
     if is_northern_ireland:
         construction_df["instance"] = 1
@@ -70,7 +75,7 @@ def read_validate_all_construction_files(
 
     else:
         # Validate construction data and check it doesn't contain duplicates
-        validate_data_with_schema(construction_df, schema_path)
+        construction_df = validate_data_with_schema(construction_df, schema_path)
         check_for_duplicates(
             df=construction_df,
             columns=["reference", "instance"],
@@ -82,7 +87,7 @@ def read_validate_all_construction_files(
 
 def read_validate_postcode_construction_file(
     config: dict, check_file_exists: Callable, read_csv: Callable, construction_logger
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Read and validate construction files for the construction module.
 
     Function reads config to determine which constructions are required/if it
@@ -114,7 +119,9 @@ def read_validate_postcode_construction_file(
         file_exists_func=check_file_exists,
     )
 
-    validate_data_with_schema(pc_construction_df, postcode_schema_path)
+    pc_construction_df = validate_data_with_schema(
+        pc_construction_df, postcode_schema_path
+    )
     check_for_duplicates(
         df=pc_construction_df,
         columns=["reference", "instance"],

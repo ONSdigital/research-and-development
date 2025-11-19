@@ -1,4 +1,4 @@
-from typing import Callable, Tuple
+from collections.abc import Callable
 import logging
 import os
 import pandas as pd
@@ -178,7 +178,7 @@ def get_additions_deletions(
     frozen_csv: pd.DataFrame,
     updated_snapshot: pd.DataFrame,
     config: dict,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Get added records from the updated snapshot.
 
     Get all records that are present in the updated snapshot but not the main
@@ -213,7 +213,7 @@ def bring_together_split_cases(
     amendments_df: pd.DataFrame,
     additions_df: pd.DataFrame,
     deletions_df: pd.DataFrame,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Checks for references in both the additions and amendments.
     If a reference is found in both: move all the relevant rows into
     amendments and remove from additions.
@@ -224,7 +224,7 @@ def bring_together_split_cases(
         deletions_df (pd.DataFrame): The records that have been deleted.
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: The amendments,
+        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: The amendments,
             additions and deletions dataframes.
     """
     if not additions_df.empty:

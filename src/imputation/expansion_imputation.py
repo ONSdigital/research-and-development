@@ -2,7 +2,6 @@
 
 import logging
 import pandas as pd
-from typing import List, Union
 
 from src.imputation.imputation_helpers import split_df_on_imp_class, split_df_on_trim
 
@@ -12,7 +11,7 @@ ExpansionLogger = logging.getLogger(__name__)
 def evaluate_imputed_ixx(
     group: pd.core.groupby.DataFrameGroupBy,
     master_col: str,
-    break_down_cols: List[Union[str, int]],
+    break_down_cols: list[str | int],
 ) -> pd.DataFrame:
     """Evaluate the imputed 2xx or 3xx as the sum of all 2xx or 3xx
     over the sum of all 211 or 305 values, multiplied by the imputed 211.
@@ -67,7 +66,7 @@ def run_expansion(df: pd.DataFrame, config: dict):
 
     Args:
         df (pd.DataFrame): the full dataframe after TMI imputation
-        config (Dict): the configuration settings
+        config (dict): the configuration settings
     Returns:
         pd.DataFrame: the full dataframe with imputed 2xx and 3xx columns.
     """

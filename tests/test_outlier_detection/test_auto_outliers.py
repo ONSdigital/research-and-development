@@ -46,7 +46,7 @@ class TestValidateConfigOverOne:
             auto.validate_config(0.0, 2.0, ["701", "702", "703"])
 
 
-class TestValidateConfigNotList:
+class TestValidateConfigNotlist:
     """Unit tests for validate_config function."""
 
     def test_validate_config(self, caplog):

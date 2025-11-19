@@ -1,5 +1,5 @@
 [sic]
-Deduced_Data_Type = "Int64"
+Deduced_Data_Type = "str"
 
 [pg_alpha]
 Deduced_Data_Type = "str"

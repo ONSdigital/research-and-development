@@ -1,8 +1,6 @@
 import pandas as pd
 import logging
 
-from typing import Tuple
-
 MappingLogger = logging.getLogger(__name__)
 
 
@@ -135,7 +133,7 @@ def pg_to_pg_mapper(
 
 
 def run_pg_conversion(
-    responses: Tuple[pd.DataFrame, pd.DataFrame],
+    responses: tuple[pd.DataFrame, pd.DataFrame],
     pg_num_alpha: pd.DataFrame,
     sic_pg_num: pd.DataFrame,
     pg_column: str = "201",
@@ -146,7 +144,7 @@ def run_pg_conversion(
     Then map from numeric to alpha-numeric.
 
     Args:
-        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
+        responses (tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         pg_num_alpha (pd.DataFrame): Mapper from numeric to alpha-numeric PG.
         pg_column: The original product group column, default 201
 

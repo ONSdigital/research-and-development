@@ -3,8 +3,6 @@
 import pandas as pd
 import numpy as np
 import pytest
-from typing import Tuple
-
 
 from src.staging.spp_snapshot_processing import (
     create_response_dataframe,
@@ -15,7 +13,7 @@ from src.staging.spp_snapshot_processing import (
 
 
 @pytest.fixture
-def dummy_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
+def dummy_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     # Set up the dummy data
     contributor_schema = {
         "reference": "int64",

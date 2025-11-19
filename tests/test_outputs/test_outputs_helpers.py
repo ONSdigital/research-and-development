@@ -77,7 +77,7 @@ class TestRegions(object):
         assert isinstance(output, dict), "Output from 'regions' not of type 'dict'."
         exp_keys = ["England", "Wales", "Scotland", "NI", "GB", "UK"]
         assert sorted(exp_keys) == sorted(output.keys()), (
-            f"Dictionary returned by regions() expected keys {exp_keys}. Got "
+            f"dictionary returned by regions() expected keys {exp_keys}. Got "
             f"{list(output.keys())}."
         )
 

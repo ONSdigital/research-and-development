@@ -1,7 +1,8 @@
 """The main file for the frozen group output."""
 
 import logging
-from typing import Callable, Dict, Any
+from typing import Any
+from collections.abc import Callable
 
 import pandas as pd
 
@@ -17,11 +18,11 @@ OutputMainLogger = logging.getLogger(__name__)
 def output_frozen_group(
     df_gb: pd.DataFrame,
     df_ni: pd.DataFrame,
-    config: Dict[str, Any],
-    intram_tot_dict: Dict[str, int],
+    config: dict[str, Any],
+    intram_tot_dict: dict[str, int],
     write_csv: Callable,
     deduplicate: bool = False,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Creates a "frozen group" output  for the entire UK. In BERD (GB) data,
     creates foreign ownership and cora status. Selects the columns we need for
     this type of output. Combines BERD and NI data. Adds size bands. De-

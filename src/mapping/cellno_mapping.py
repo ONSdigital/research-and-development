@@ -3,8 +3,6 @@
 import pandas as pd
 import logging
 
-from typing import Tuple
-
 from src.mapping.mapping_helpers import check_mapping_unique, join_with_null_check
 
 MappingLogger = logging.getLogger(__name__)
@@ -35,17 +33,18 @@ def clean_validate_cellno_mapper(cellno_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def validate_join_cellno_mapper(
-    responses: Tuple[pd.DataFrame, pd.DataFrame], cellno_df: pd.DataFrame, config: dict
-) -> pd.DataFrame:
+    responses: tuple[pd.DataFrame, pd.DataFrame], cellno_df: pd.DataFrame, config: dict
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Validate the join_cellno_mapper function.
 
     Args:
-        responses (Tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
+        responses (tuple[pd.DataFrame, pd.DataFrame]): The GB & NI responses dataframes
         cellno_df (pd.DataFrame): The cellnumber mapper dataframe.
         config (dict): The configuration dictionary.
 
     Returns:
-        pd.DataFrame: The shortform responses dataframe with a column for universe count
+        tuple[pd.DataFrame, pd.DataFrame]: The shortform responses dataframe with a
+            column for universe count
     """
     gb_df, ni_df = responses
     cellno_df = clean_validate_cellno_mapper(cellno_df)

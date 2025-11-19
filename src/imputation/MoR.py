@@ -3,6 +3,7 @@
 import itertools
 import re
 import pandas as pd
+import numpy as np
 
 from src.imputation.imputation_helpers import get_imputation_cols, create_imp_class_col
 from src.imputation.tmi_imputation import trim_bounds
@@ -60,6 +61,9 @@ def mor_preprocessing(df, backdata, config):
 
     lf_cond = df["formtype"] == "0001"
     stat_cond = df["status"].isin(bad_statuses)
+
+    # ensure no nulls in backdata imp_class column
+    backdata["imp_class"] = backdata["imp_class"].fillna("nan").astype(str)
 
     # the case where there are only long forms is treated differently
     if is_lf_only(config):
@@ -239,26 +243,31 @@ def calculate_growth_rates(current_df, prev_df, target_vars):
     # Calculate the ratios for the relevant variables
     for target in target_vars:
         # Calculate a growth rate if both the current and previous values are non-zero
-        valid_mask = (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0)
-        gr_df.loc[valid_mask, f"{target}_gr"] = (
-            gr_df.loc[valid_mask, target] / gr_df.loc[valid_mask, f"{target}_prev"]
+        gr_df.loc[:, f"{target}_gr"] = np.where(
+            (gr_df[f"{target}_prev"] != 0) & (gr_df[target] != 0),
+            gr_df[target] / gr_df[f"{target}_prev"],
+            np.nan,
         )
     return gr_df
 
 
-def calculate_links(gr_df, target_vars, config):
+def calculate_links(
+    df: pd.DataFrame, target_vars: list[str], config: dict
+) -> pd.DataFrame:
     """Calculate the Means of Ratios (links) for each imp_class
 
     Args:
-        gr_df (pd.DataFrame): DataFrame of growth rates for each target variable
-        target_vars ([string]): List of target variables to use.
-        config (Dict): Confuration settings.
+        df (pd.DataFrame): DataFrame of growth rates for each target variable
+        target_vars ([string]): list of target variables to use.
+        config (dict): Confuration settings.
 
     Returns:
         pd.DataFrame: DataFrame with calculated links for each imp_class
     """
     # Apply trimming and calculate means for each imp class
-    gr_df = gr_df.groupby("imp_class")
+    gr_df = df.groupby("imp_class")
+
+    # loop through all the target vars in turn
     gr_df = gr_df.apply(group_calc_link, target_vars, config)
 
     # Reorder columns to make QA easier
@@ -306,8 +315,8 @@ def group_calc_link(group, target_vars, config):
 
     Args:
         group (pd.core.groupby.DataFrameGroupBy): Imputation class group
-        link_vars ([string]): List of the linked variables.
-        config (Dict): Confuration settings
+        link_vars ([string]): list of the linked variables.
+        config (dict): Confuration settings
 
     Returns:
         pd.core.groupby.DataFrameGroupBy: Group with calculated links.
@@ -354,8 +363,8 @@ def apply_links(cf_df, links_df, target_vars, config, formtype):
     Args:
         cf_df (pd.DataFrame): DataFrame of carried forwards values.
         links_df (pd.DataFrame): DataFrame containing calculated links.
-        target_vars ([string]): List of target variables.
-        config (Dict): Dictorary of configuration.
+        target_vars ([string]): list of target variables.
+        config (dict): dictorary of configuration.
         formtype (str): whether the formtype is long or short.
 
     Returns:
@@ -419,7 +428,7 @@ def calculate_mor(cf_df, remainder_df, backdata, config, formtype):
         cf_df (pd.DataFrame): DataFrame of carried forwards values to impute.
         remainder_df (pd.DataFrame): DataFrame of remaining values.
         backdata (pd.DataFrame): One period of backdata.
-        config (Dict): The configuration settings for the pipeline.
+        config (dict): The configuration settings for the pipeline.
         formtype (str): The formtype of the data being imputed, long or short.
 
     Returns:

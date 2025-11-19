@@ -17,7 +17,7 @@ def mapper_null_checks(
     Args:
         mapper_df (pd.DataFrame): The mapper DataFrame to check.
         mapper_name (str): The name of the mapper being validated.
-        validate_cols (list, optional): List of columns to validate.
+        validate_cols (list, optional): list of columns to validate.
             If None, all columns are validated.
         warn (bool,optional): Whether to warn instead of raising an error.
     Raises:
@@ -26,11 +26,11 @@ def mapper_null_checks(
 
     """
     # Check for null values in selected columns
-    # List is defaulted to None unless specified
+    # list is defaulted to None unless specified
     if validate_cols is None:
         validate_cols = mapper_df.columns.tolist()
 
-    # List to store columns with null values
+    # list to store columns with null values
     null_cols = []
 
     # Check for NULL values of all columns in the list

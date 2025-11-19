@@ -2,20 +2,19 @@
 
 import logging
 import pandas as pd
-from typing import List
 import math
 
 
 AutoOutlierLogger = logging.getLogger(__name__)
 
 
-def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: List[str]):
+def validate_config(upper_clip: float, lower_clip: float, flag_value_cols: list[str]):
     """Validate the outlier config settings.
 
     Args:
         upper_clip (float): The percentage for upper clipping as float
         lower_clip (float): The percentage for lower clipping as float
-        flag_value_cols (list[str]): List of names of columns to flag.
+        flag_value_cols (list[str]): list of names of columns to flag.
 
     Raises:
         ImportError if upper_clip or lower_clip have invalid values
@@ -160,7 +159,7 @@ def flag_outliers(
     return df
 
 
-def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFrame:
+def decide_outliers(df: pd.DataFrame, flag_value_cols: list[str]) -> pd.DataFrame:
     """Determine whether a reference should be treated as an outlier.
 
     If any of the colunns in the list flag_value_cols has been flagged as an
@@ -169,7 +168,7 @@ def decide_outliers(df: pd.DataFrame, flag_value_cols: List[str]) -> pd.DataFram
 
     Args:
         df (pd.DataFrame): The main dataset where outliers are to be calculated
-        flag_value_cols: (List[str]): The names of the columns to flag
+        flag_value_cols: (list[str]): The names of the columns to flag
         for outliers
 
     Returns:
@@ -206,7 +205,7 @@ def log_outlier_info(df: pd.DataFrame, value_col: str):
 
 
 def run_auto_flagging(
-    df: pd.DataFrame, upper_clip: float, lower_clip: float, flag_value_cols: List[str]
+    df: pd.DataFrame, upper_clip: float, lower_clip: float, flag_value_cols: list[str]
 ) -> pd.DataFrame:
     """Flag outliers based on clipping values specified in the config.
 
@@ -228,7 +227,7 @@ def run_auto_flagging(
         df (pd.DataFrame): The main dataset where outliers are to be calculated
         upper_clip (float): The percentage for upper clipping
         lower_clip (float): The percentage for lower clipping
-        flag_value_cols: (List[str]): The names of the columns to flag
+        flag_value_cols: (list[str]): The names of the columns to flag
         for outliers
 
     Returns:
