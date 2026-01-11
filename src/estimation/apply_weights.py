@@ -33,16 +33,16 @@ def apply_weights(
     # if the dataframe is for QA output, create new columns with the weights applied.
     if for_qa:
         for col in all_numeric_cols:
-            df[f"{col}_estimated"] = round(df[col] * df["a_weight"], round_val)
+            df[f"{col}_estimated"] = (df[col] * df["a_weight"]).round(round_val)
         for col in employment_cols:
-            df[f"{col}_estimated"] = round(df[f"{col}_estimated"] * df["g_weight"], 0)
+            df[f"{col}_estimated"] = (df[f"{col}_estimated"] * df["g_weight"]).round(0)
 
     # otherwise, apply the weights directly to the existing columns
     else:
         for col in all_numeric_cols:
-            df[col] = round(df[col] * df["a_weight"], round_val)
+            df[col] = (df[col] * df["a_weight"]).round(round_val)
         for col in employment_cols:
-            df[col] = round(df[col] * df["g_weight"], 0)
+            df[col] = (df[col] * df["g_weight"]).round(0)
 
         df = calc_totals(df, config, "employment", 0)
 

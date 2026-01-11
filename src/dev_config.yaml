@@ -110,6 +110,7 @@ schema_paths:
   fte_total_qa_schema: "config/output_schemas/fte_total_qa_schema.toml"
   frozen_group_schema: "config/output_schemas/frozen_group_schema.toml"
   full_estimation_qa_schema: "config/output_schemas/full_estimation_qa_schema.toml"
+  estimation_weights_qa_schema: "config/output_schemas/estimation_weights_qa_schema.toml"
   full_responses_imputed_schema: "config/output_schemas/full_responses_imputed_schema.toml"
   staged_full_responses_schema: "config/output_schemas/staged_full_responses_schema.toml"
   invalid_unrecognised_postcodes_schema: "config/output_schemas/invalid_unrecognised_postcodes_schema.toml"

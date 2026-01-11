@@ -1,0 +1,35 @@
+["Cell Number"]
+old_name = "Cell Number"
+Deduced_Data_Type = "int64"
+
+["N - uni_count"]
+old_name = "N - uni_count"
+Deduced_Data_Type = "int64"
+
+["n - num clear records in cell"]
+old_name = "n - num clear records in cell"
+Deduced_Data_Type = "int64"
+
+["o - num outliers in cell"]
+old_name = "o - num outliers in cell"
+Deduced_Data_Type = "int64"
+
+["E - uni_employment"]
+old_name = "E - uni_employment"
+Deduced_Data_Type = "float64"
+
+["e - sum of employment in cell"]
+old_name = "e - sum of employment in cell"
+Deduced_Data_Type = "float64"
+
+["s - sum of employment outliers in cell"]
+old_name = "s - sum of employment outliers in cell"
+Deduced_Data_Type = "float64"
+
+["a_weight"]
+old_name = "a_weight"
+Deduced_Data_Type = "float64"
+
+["g_weight"]
+old_name = "g_weight"
+Deduced_Data_Type = "float64"

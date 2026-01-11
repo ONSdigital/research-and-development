@@ -119,7 +119,7 @@ export_choices:
   export_short_form: None
   export_long_form: None
   export_tau: None
-  export_gb_sas: "PNP_2023_output_gb_sas_24-11-19_v914.csv"
+  export_gb_sas: None  # "PNP_2023_output_gb_sas_24-11-19_v914.csv"
   export_ni_sas: None
   export_intram_by_pg_gb: None
   export_intram_by_pg_uk: None
@@ -134,7 +134,8 @@ export_choices:
   export_staged_BERD_full_responses: None #"2023_staged_BERD_full_responses_24-11-26_v922.csv"
   export_staged_full_responses: None # "PNP_2023_staged_full_responses_24-11-26_v922.csv"
   export_staged_NI_full_responses: None
-  export_full_responses_imputed: "PNP_2023_full_responses_imputed_24-12-18_v971.csv"
+  export_full_responses_imputed: None  # "PNP_2023_full_responses_imputed_24-12-18_v971.csv"
   export_full_estimation_qa: None  # "2022_full_estimation_qa_24-07-15_v555.csv"
+  export_estimation_weights_qa: "2023_estimation_weights_qa_25-05-13_v138.csv"
   export_invalid_unrecognised_postcodes: None # "2022_invalid_unrecognised_postcodes_24-07-04_v503.csv"
-  export_full_responses_mapped: "PNP_2023_full_responses_mapped_24-12-11_v212.csv"
+  export_full_responses_mapped: None  # "PNP_2023_full_responses_mapped_24-12-11_v212.csv"
