@@ -24,6 +24,11 @@ dev_global:
     singular: True
     dtype: "bool"
     accept_nonetype: False
+relative_paths:
+  old_configs_folder:
+    singular: True
+    dtype: "str"
+    accept_nonetype: False
 runlog_writer:
   write_csv:
     singular: True

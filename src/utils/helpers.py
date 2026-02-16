@@ -2,9 +2,11 @@
 
 import yaml
 import tomli
+import os
 import pandas as pd
 
 from typing import Union
+from collections.abc import Callable
 
 from src.utils.defence import type_defence
 from src.mapping.itl_mapping import join_itl_regions
@@ -252,6 +254,39 @@ def filename_amender(filename, config):
         filename = f"{survey_year}_{filename}_{tdate}_v{run_id}.csv"
 
     return filename
+
+
+def save_config_files(config: dict, rd_copy_file: Callable) -> None:
+    """
+    Save the paths to the user and developer config files in the config dictionary.
+
+    NOTE: running in Windows, there is the possibility that different people create a
+    run with the same run_id. In this case, the old file would be overwritten.
+    As we are no longer developing on Windows, this is not a concern.
+    In the production envrionment, it will not be a problem.
+
+    Args:
+        config (dict): The configuration dictionary.
+        rd_copy_file (Callable): The function to copy files.
+
+    Returns:
+        None
+    """
+    user_config_path = config["global"]["user_config_path"]
+    dev_config_path = config["global"]["dev_config_path"]
+    old_conf_folder = config["relative_paths"]["old_configs_folder"]
+    run_id = config["filename_items"]["run_id"]
+
+    # create the old_configs folder if it doesn't exist
+    if not os.path.exists(old_conf_folder):
+        os.makedirs(old_conf_folder)
+
+    user_output_path = os.path.join(old_conf_folder, f"user_config_{run_id}.yaml")
+    dev_output_path = os.path.join(old_conf_folder, f"dev_config_{run_id}.yaml")
+
+    # Copy the user and developer config files to the old_configs folder
+    rd_copy_file(user_config_path, user_output_path)
+    rd_copy_file(dev_config_path, dev_output_path)
 
 
 def order_dataframe_for_output(

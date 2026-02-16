@@ -9,6 +9,7 @@ import pandas as pd
 from src.utils import runlog
 from src._version import __version__ as version
 from src.utils.config import config_setup, file_validation
+from src.utils.helpers import save_config_files
 from src.utils.logger import logger_creator
 from src.staging.staging_main import run_staging
 from src.utils.helpers import validate_updated_postcodes
@@ -84,6 +85,9 @@ def run_pipeline(user_config_path, dev_config_path):  # noqa C901
     run_id = runlog_obj.run_id
     tdate = datetime.now().strftime("%y-%m-%d")
     config.update({"filename_items": {"run_id": run_id, "tdate": tdate}})
+
+    # write the config yaml files to old_configs folder
+    save_config_files(config, mods.rd_copy_file)
 
     MainLogger.info(f"Reading user config from {user_config_path}.")
     MainLogger.info(f"Reading developer config from {dev_config_path}.")
