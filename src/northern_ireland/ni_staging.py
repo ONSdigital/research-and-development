@@ -91,7 +91,9 @@ def run_ni_staging(
     ni_responses_df["instance"] = 1
 
     # Validate the dataframe using the schema
-    val.validate_data_with_schema(ni_responses_df, ni_responses_schema_path)
+    ni_responses_df = val.validate_data_with_schema(
+        ni_responses_df, ni_responses_schema_path
+    )
 
     # Optionally output the staged NI data
     if config["global"]["output_ni_full_responses"]:

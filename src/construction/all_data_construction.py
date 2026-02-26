@@ -51,15 +51,26 @@ def all_data_construction(  # noqa: C901
 
     # clean construction type column
     if "construction_type" in construction_df.columns:
+        # clean values
         construction_df.construction_type = construction_df.construction_type.apply(
-            lambda x: clean_construction_type(x)
+            clean_construction_type
         )
-        # validate that 'construction_type' is valid
-        valid_types = ["short_to_long", "new", np.nan, "<NA>", "<na>"]
-        if False in list(construction_df.construction_type.isin(valid_types)):
-            raise ValueError(
-                f"Invalid value for construction_type. Expected one of {valid_types}"
+        # standardise nulls
+        construction_df.construction_type = construction_df.construction_type.replace(
+            ["<NA>", "<na>", ""], np.nan
+        )
+        # Validate
+        invalid_mask = (
+            ~construction_df["construction_type"].isin(["short_to_long", "new"])
+            & construction_df["construction_type"].notna()
+        )
+        if invalid_mask.any():
+            e = (
+                f"Invalid value(s) for construction_type: "
+                f"{construction_df.loc[invalid_mask, 'construction_type'].unique()}. "
+                "Expected only 'short_to_long', 'new', or null."
             )
+            raise ValueError(e)
 
     if not is_northern_ireland:
         validate_short_to_long(construction_df, construction_logger)
@@ -104,7 +115,7 @@ def all_data_construction(  # noqa: C901
 
     # Add constructed non-responders (i.e. new rows) to df
     if "construction_type" in construction_df.columns:
-        if "new" in construction_df["construction_type"].values:
+        if "new" in construction_df["construction_type"].dropna().unique():
             updated_snapshot_df, construction_df = add_constructed_nonresponders(
                 updated_snapshot_df, construction_df
             )

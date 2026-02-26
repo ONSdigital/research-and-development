@@ -61,6 +61,9 @@ def mor_preprocessing(df, backdata, config):
     lf_cond = df["formtype"] == "0001"
     stat_cond = df["status"].isin(bad_statuses)
 
+    # ensure no nulls in backdata imp_class column
+    backdata["imp_class"] = backdata["imp_class"].fillna("nan").astype(str)
+
     # the case where there are only long forms is treated differently
     if is_lf_only(config):
         imputation_cond = stat_cond & lf_cond

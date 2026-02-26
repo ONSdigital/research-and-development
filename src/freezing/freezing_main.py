@@ -114,7 +114,9 @@ def read_frozen_csv(
     check_file_exists(frozen_data_staged_path)
     FreezingLogger.info(f"Loading frozen data from {frozen_data_staged_path}...")
     frozen_csv = read_csv(frozen_data_staged_path)
-    validate_data_with_schema(frozen_csv, "./config/frozen_data_staged_schema.toml")
+    frozen_csv = validate_data_with_schema(
+        frozen_csv, "./config/frozen_data_staged_schema.toml"
+    )
 
     frozen_csv["formtype"] = frozen_csv["formtype"].apply(convert_formtype)
     FreezingLogger.info(f"Frozen data successfully read from {frozen_data_staged_path}")

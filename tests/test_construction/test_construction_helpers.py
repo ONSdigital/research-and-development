@@ -162,14 +162,27 @@ class TestPrepareShortToLong:
         ), "Snapshot output is not as expected"
 
 
-def test_clean_construction_type():
+@pytest.mark.parametrize(
+    "input_val,expected",
+    [
+        ("Short-To-Long", "short_to_long"),
+        ("  new  ", "new"),
+        ("Short to long", "short_to_long"),
+        ("short-to long", "short_to_long"),
+        ("NEW", "new"),
+        ("short_to_long", "short_to_long"),
+        ("short   to   long", "short___to___long"),
+        ("", ""),
+        (np.nan, np.nan),
+    ]
+)
+def test_clean_construction_type(input_val, expected):
     """Test for clean_construction_type()."""
-    msg = "Cleaned construction type not as expected"
-    assert clean_construction_type("new") == "new", msg
-    assert clean_construction_type("Short to Long") == "short_to_long", msg
-    assert clean_construction_type("  ") is np.nan, msg
-    assert clean_construction_type("") is np.nan, msg
-    assert clean_construction_type(None) is np.nan, msg
+    output = clean_construction_type(input_val)
+    if pd.isna(expected):
+        assert pd.isna(output), f"Expected NaN but got {output}"
+    else:
+        assert output == expected, f"Expected {expected} but got {output}"
 
 
 class TestFinaliseFormsGB:

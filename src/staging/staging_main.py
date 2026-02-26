@@ -183,7 +183,7 @@ def run_staging(  # noqa: C901
             manual_outliers = manual_outliers.drop_duplicates(
                 subset=["reference"], keep="first"
             )
-            val.validate_data_with_schema(
+            manual_outliers = val.validate_data_with_schema(
                 manual_outliers, "./config/manual_outliers_schema.toml"
             )
             StagingMainLogger.info("Manual Outlier File Loaded Successfully...")
@@ -204,7 +204,7 @@ def run_staging(  # noqa: C901
             manual_trim_df = manual_trim_df.drop_duplicates(
                 subset=["reference", "instance"], keep="first"
             )
-            val.validate_data_with_schema(
+            manual_trim_df = val.validate_data_with_schema(
                 manual_trim_df, "./config/manual_trim_schema.toml"
             )
         else:
@@ -218,7 +218,9 @@ def run_staging(  # noqa: C901
             rd_file_exists(backdata_path, raise_error=True)
 
             backdata = rd_read_csv(backdata_path)
-            val.validate_data_with_schema(backdata, "./config/backdata_schema.toml")
+            backdata = val.validate_data_with_schema(
+                backdata, "./config/backdata_schema.toml"
+            )
             StagingMainLogger.info("Backdata File Loaded Successfully...")
         else:
             backdata = None

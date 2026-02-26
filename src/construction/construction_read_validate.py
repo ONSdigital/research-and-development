@@ -70,7 +70,7 @@ def read_validate_all_construction_files(
 
     else:
         # Validate construction data and check it doesn't contain duplicates
-        validate_data_with_schema(construction_df, schema_path)
+        construction_df = validate_data_with_schema(construction_df, schema_path)
         check_for_duplicates(
             df=construction_df,
             columns=["reference", "instance"],
@@ -114,7 +114,9 @@ def read_validate_postcode_construction_file(
         file_exists_func=check_file_exists,
     )
 
-    validate_data_with_schema(pc_construction_df, postcode_schema_path)
+    pc_construction_df = validate_data_with_schema(
+        pc_construction_df, postcode_schema_path
+    )
     check_for_duplicates(
         df=pc_construction_df,
         columns=["reference", "instance"],

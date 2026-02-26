@@ -50,7 +50,7 @@ Possible_Categorical_Values = ["nan"]
 
 [adjustedresponse]
 Description = "nan"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"

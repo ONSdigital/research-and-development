@@ -4,20 +4,23 @@ import numpy as np
 import pytest
 import unittest
 
+# import monkeypatched functions
 
-# from unittest.mock import MagicMock, patch
+
 from src.staging.validation import (
+    load_schema,
+    check_data_shape,
     validate_data_with_schema,
     combine_schemas_validate_full_df,
     validate_many_to_one,
+    _process_datetime_cols,
+    _process_numeric_cols,
+    _validate_bool_cols,
 )
 
 
 def test_check_data_shape():
     """Test the check_data_shape function."""
-    # Arrange
-    from src.staging.validation import check_data_shape
-
     # Dataframe for test function to use
     dummy_dict = {"col1": [1, 2], "col2": [3, 4]}
     dummy_df = pd.DataFrame(data=dummy_dict)
@@ -36,11 +39,8 @@ def test_check_data_shape():
 
 def test_load_schema():
     """Test the load_schema function."""
-    # Arrange
-    from src.staging.validation import load_schema
-
     # Act: use pytest to assert the result
-    result_1 = load_schema()
+    result_1 = load_schema("./config/contributors_schema.toml")
 
     # Assert
     assert isinstance(result_1, dict)
@@ -50,6 +50,54 @@ def test_load_schema():
     # Assert: test that add fails when the arguments are wrong type
     pytest.raises(TypeError, load_schema, None)
     pytest.raises(TypeError, load_schema, None)
+
+
+def test_process_numeric_cols_int_and_float():
+    s = pd.Series(["1", "2", "a", "", None])
+    # int: should become float64 due to NaNs
+    result = _process_numeric_cols(s, "int")
+    assert result.dtype == "float64"
+    assert np.isnan(result[2])
+    assert np.isnan(result[3])
+    assert np.isnan(result[4])
+    assert result[0] == 1.0
+    assert result[1] == 2.0
+
+    # int: all valid
+    s2 = pd.Series(["1", "2", "3"])
+    result2 = _process_numeric_cols(s2, "int")
+    assert result2.dtype == "int64"
+    assert (result2 == pd.Series([1, 2, 3], dtype="int64")).all()
+
+    # float
+    s3 = pd.Series(["1.5", "2.5", "a"])
+    result3 = _process_numeric_cols(s3, "float")
+    assert result3.dtype == "float64"
+    assert np.isnan(result3[2])
+    assert result3[0] == 1.5
+    assert result3[1] == 2.5
+
+
+def test_process_datetime_cols():
+    s = pd.Series(["2020-01-01", "notadate", None])
+    result = _process_datetime_cols(s)
+    assert pd.api.types.is_datetime64_any_dtype(result)
+    assert pd.isna(result[1])
+    assert pd.isna(result[2])
+    assert result[0] == pd.Timestamp("2020-01-01")
+
+
+def test_validate_bool_cols_with_nulls():
+    s = pd.Series(["True", "False", None, "yes", "no", "maybe"])
+    result = _validate_bool_cols(s, nullable=True)
+    assert result.dtype == "boolean"
+    expected = [True, False, pd.NA, True, False, pd.NA]
+    for i, exp in enumerate(expected):
+        if pd.isna(result[i]):
+            assert pd.isna(result[i])
+        else:
+            # need to use .item() to change numpy bool to python bool for comparison
+            assert result[i].item() is exp
 
 
 # Mock the schema data
@@ -94,6 +142,39 @@ def test_validate_data_with_schema(mock_load_schema):
     assert pd.api.types.is_datetime64_any_dtype(dumy_data["col4"].dtype), "col4 should be of datetime type"
 
 
+def test_validate_data_with_schema_missing_column_warn(mock_load_schema):
+    df = pd.DataFrame({"col1": [1, 2]})
+    # should warn as cols 2,3,4 are missing
+    validate_data_with_schema(df, "mock.toml", warn_or_raise="warn")
+    assert "col1" in df.columns
+    assert "col2" not in df.columns
+
+
+def test_validate_data_with_schema_missing_column_raise(mock_load_schema):
+    df = pd.DataFrame({"col1": [1, 2]})
+    # should raise as cols 2,3,4 are missing
+    with pytest.raises(KeyError):
+        validate_data_with_schema(df, "mock.toml", warn_or_raise="raise")
+
+
+def test_validate_data_with_schema_all_valid_columns(mock_load_schema):
+    df = pd.DataFrame(
+        {
+            "col1": [1, 2],
+            "col2": ["a", "b"],
+            "col3": [1.5, 2.5],
+            "col4": ["2023-01-01", "2023-01-02"],
+        }
+    )
+    df["col4"] = pd.to_datetime(df["col4"])
+    # should pass as all columns are present
+    validate_data_with_schema(df, "mock.toml", warn_or_raise="raise")
+    assert "col1" in df.columns
+    assert "col2" in df.columns
+    assert "col3" in df.columns
+    assert "col4" in df.columns
+
+
 # Mock the schemas data
 def mock_load_both_data(filepath):
     data_type_schema1 = {
@@ -123,8 +204,6 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
     """Test the validate_data_with_shcema  to data types are correct in
     the source data
     """
-
-    #TODO: This test doesn't really do anything as the function is not returning anything
     # Dumy data for testing
     dumy_data = pd.DataFrame(
         {
@@ -138,31 +217,31 @@ def test_combine_schemas_validate_full_df(mock_load_schemas):
             "q307": [True, False, True],
         }
     )
+
+
     # convert date datetime type
     dumy_data["date"] = pd.to_datetime(dumy_data["date"])
 
+    # create an expected datatypes dictionary for the dumy_data dataframe after validation
+    expected_dtypes = {
+        "reference": "int64",
+        "createdby": "string",
+        "instance": "float64",
+        "date": "datetime64[ns]",
+        "q200": "string",
+        "q201": "int64",
+        "q203": "float64",
+        "q307": "bool",
+    }
+
     # Call the function to be tested
-    combine_schemas_validate_full_df(
+    result_df = combine_schemas_validate_full_df(
         dumy_data, "mock_schema1.toml", "mock_schema2.toml"
     )
 
-    # Check data types after validation
-    # Check if the columns "reference" and "q201" are of integer type
-    are_int_columns = dumy_data[["reference", "q201"]].apply(pd.api.types.is_integer_dtype).all()
-    # Check if the columns "createdby" and "q200" are of string type
-    are_str_columns = dumy_data[["createdby", "q200"]].apply(pd.api.types.is_string_dtype).all()
-    # Check if the columns "instance" and "q203" are of float type
-    are_float_columns = dumy_data[["instance", "q203"]].apply(pd.api.types.is_float_dtype).all()
-    # Check if the columns "date" is of datetime type
-    is_datetime_column = pd.api.types.is_datetime64_any_dtype(dumy_data["date"].dtypes)
-    # Check if the columns "q307" is of boolean type
-    is_bool_column = dumy_data["q307"].dtypes == bool
+    for col, expected_dtype in expected_dtypes.items():
+        assert str(result_df[col].dtype) == expected_dtype, f"{col} should be of type {expected_dtype}"
 
-    assert are_int_columns
-    assert are_str_columns
-    assert are_float_columns
-    assert is_datetime_column
-    assert is_bool_column
 
 
 class TestManyToOne(unittest.TestCase):
