@@ -1,14 +1,9 @@
 """Tests for MoR.py."""
 
-# Local Imports
-import os
-
 # Third Party Imports
-import pytest
 import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal
-import numpy as np
 
 # Local Imports
 from src.imputation.MoR import (
@@ -18,7 +13,6 @@ from src.imputation.MoR import (
     group_calc_link,
     calculate_links
 )
-from src.imputation.imputation_helpers import get_imputation_cols, create_imp_class_col
 
 # pytestmark = pytest.mark.runwip
 
@@ -31,7 +25,7 @@ class TestIsLfOnly(object):
                 "survey_year": 2021
             }
         }
-        assert is_lf_only(config) == True
+        assert is_lf_only(config)
 
     def test_berd_2021_backdata(self):
         config = {
@@ -40,7 +34,7 @@ class TestIsLfOnly(object):
                 "survey_year": 2022
             }
         }
-        assert is_lf_only(config) == True
+        assert is_lf_only(config)
 
     def test_neither_condition(self):
         config = {
@@ -49,7 +43,7 @@ class TestIsLfOnly(object):
                 "survey_year": 2021
             }
         }
-        assert is_lf_only(config) == False
+        assert not is_lf_only(config)
 
 
 class TestMoRPreprocessing(object):
@@ -63,20 +57,21 @@ class TestMoRPreprocessing(object):
             "formtype",
             "601",
             "status",
-            "imp_marker"
+            "imp_marker",
+            "imp_class"
         ]
         data = [
-            [1001, 1, "C", "6.0", "CF14 9XY", "Clear", "R"],
-            [1001, 2, "P", "6", "CF14 9XY", "Clear", "R"],
-            [1002, 1, "C", "0006", np.nan, "Form sent out", "CF"],
-            [1003, 1, "C", "0001", "NP10 2RT", "Clear", "MoR"],
-            [1004, 1, "C", "6", np.nan, "Form sent out", "MoR"],
-            [1004, 2, "P", "6.0", np.nan, "Form sent out", "MoR"],
-            [1005, 0, "C", "0001", "SW5 2DW", "Check needed", "MoR"],
-            [1005, 1, "P", "01.0", "SW5 2DW", "Check needed", "MoR"],
-            [1006, 0, np.nan, "6", "CF48 9DU", "Clear - overidden", np.nan],
-            [1006, 1, "C", "6.0", "CF48 9DU", "Clear", "R"],
-            [1006, 2, "P", "6.0", "CF48 9DU", "Clear", "R"],
+            [1001, 1, "C", "6.0", "CF14 9XY", "Clear", "R", "C_AA"],
+            [1001, 2, "P", "6", "CF14 9XY", "Clear", "R", "P_AA"],
+            [1002, 1, "C", "0006", np.nan, "Form sent out", "CF", "C_nan"],
+            [1003, 1, "C", "0001", "NP10 2RT", "Clear", "MoR", "C_AB"],
+            [1004, 1, "C", "6", np.nan, "Form sent out", "MoR", "C_nan"],
+            [1004, 2, "P", "6.0", np.nan, "Form sent out", "MoR", "P_AB"],
+            [1005, 0, "C", "0001", "SW5 2DW", "Check needed", "MoR", "C_CD"],
+            [1005, 1, "P", "01.0", "SW5 2DW", "Check needed", "MoR", "P_CD"],
+            [1006, 0, np.nan, "6", "CF48 9DU", "Clear - overidden", np.nan, np.nan],
+            [1006, 1, "C", "6.0", "CF48 9DU", "Clear", "R", "C_AE"],
+            [1006, 2, "P", "6.0", "CF48 9DU", "Clear", "R", "P_AE"],
         ]
         input_df = pd.DataFrame(data=data, columns=input_columns)
         return input_df
@@ -100,21 +95,22 @@ class TestMoRPreprocessing(object):
             "formtype",
             "601",
             "status",
-            "imp_marker"
+            "imp_marker",
+            "imp_class",
         ]
 
         data = [
-            [1007, 1, "C", "0006", "SW52DW", "Clear", "R"],
-            [1007, 2, "P", "6", "SW52DW", "Clear", "R"],
-            [1008, 1, "C", "0006", np.nan, "Form sent out", np.nan],
-            [1008, 2, "P", "1.0", "NP10 2RT", "Clear", np.nan],
-            [1009, 1, "C", "6.0", np.nan, "Form sent out", "no_imputation"],
-            [1010, 0, np.nan, "0006", "NP10 6RT", "Form sent out", "no_imputation"],
-            [1010, 1, "C", "1", np.nan, "Check needed", np.nan],
-            [1010, 2, "P", "0001", np.nan, "Check needed", np.nan],
-            [1011, 1, "C", "6", np.nan, "Clear - overidden", "R"],
-            [1012, 0, np.nan, "0006", "CF489DU", "Clear", np.nan],
-            [1012, 1, "C", "0006", "CF489DU", "Clear", np.nan],
+            [1007, 1, "C", "0006", "SW52DW", "Clear", "R", "C_AB"],
+            [1007, 2, "P", "6", "SW52DW", "Clear", "R", np.nan],
+            [1008, 1, "C", "0006", np.nan, "Form sent out", np.nan, "C_nan"],
+            [1008, 2, "P", "1.0", "NP10 2RT", "Clear", np.nan, "P_nan"],
+            [1009, 1, "C", "6.0", np.nan, "Form sent out", "no_imputation", "C_nan"],
+            [1010, 0, np.nan, "0006", "NP10 6RT", "Form sent out", "no_imputation", np.nan],
+            [1010, 1, "C", "1", np.nan, "Check needed", np.nan, "C_nan"],
+            [1010, 2, "P", "0001", np.nan, "Check needed", np.nan, "P_nan"],
+            [1011, 1, "C", "6", np.nan, "Clear - overidden", "R", "C_nan"],
+            [1012, 0, np.nan, "0006", "CF489DU", "Clear", np.nan, np.nan],
+            [1012, 1, "C", "0006", "CF489DU", "Clear", np.nan, "C_nan"],
         ]
 
         backdata_df = pd.DataFrame(data=data, columns=backdata_columns)
@@ -130,12 +126,13 @@ class TestMoRPreprocessing(object):
             "601",
             "status",
             "imp_marker",
+            "imp_class"
         ]
 
         data = [
-            [1002, 1, "C", "0006", np.nan, "Form sent out", "CF"],
-            [1004, 1, "C", "0006", np.nan, "Form sent out", "MoR"],
-            [1005, 0, "C", "0001", "SW5 2DW", "Check needed", "MoR"]
+            [1002, 1, "C", "0006", np.nan, "Form sent out", "CF", "C_nan"],
+            [1004, 1, "C", "0006", np.nan, "Form sent out", "MoR", "C_nan"],
+            [1005, 0, "C", "0001", "SW5 2DW", "Check needed", "MoR", "C_CD"]
         ]
 
         expected_to_impute_df = pd.DataFrame(data=data, columns=expected_columns)
@@ -150,19 +147,21 @@ class TestMoRPreprocessing(object):
             "formtype",
             "601",
             "status",
-            "imp_marker"
+            "imp_marker",
+            "imp_class"
             ]
 
         data = [
-            [1001, 1, "C", "0006", "CF14 9XY", "Clear", "R"],
-            [1001, 2, "P", "0006", "CF14 9XY", "Clear", "R"],
-            [1003, 1, "C", "0001", "NP10 2RT", "Clear", "MoR"],
-            [1004, 2, "P", "0006", np.nan, "Form sent out", "MoR"],
-            [1005, 1, "P", np.nan, "SW5 2DW", "Check needed", "MoR"],
-            [1006, 0, np.nan, "0006", "CF48 9DU", "Clear - overidden", np.nan],
-            [1006, 1, "C", "0006", "CF48 9DU", "Clear", "R"],
-            [1006, 2, "P", "0006", "CF48 9DU", "Clear", "R"]
+            [1001, 1, "C", "0006", "CF14 9XY", "Clear", "R", "C_AA"],
+            [1001, 2, "P", "0006", "CF14 9XY", "Clear", "R", "P_AA"],
+            [1003, 1, "C", "0001", "NP10 2RT", "Clear", "MoR", "C_AB"],
+            [1004, 2, "P", "0006", np.nan, "Form sent out", "MoR", "P_AB"],
+            [1005, 1, "P", np.nan, "SW5 2DW", "Check needed", "MoR", "P_CD"],
+            [1006, 0, np.nan, "0006", "CF48 9DU", "Clear - overidden", np.nan, np.nan],
+            [1006, 1, "C", "0006", "CF48 9DU", "Clear", "R", "C_AE"],
+            [1006, 2, "P", "0006", "CF48 9DU", "Clear", "R", "P_AE"]
         ]
+
 
         expected_remainder_df = pd.DataFrame(data=data, columns=expected_columns)
         return expected_remainder_df
@@ -177,12 +176,13 @@ class TestMoRPreprocessing(object):
             "601",
             "status",
             "imp_marker",
-            ]
+            "imp_class",
+        ]
 
         data = [
-            [1007, 1, "C", "0006", "SW5  2DW", "Clear", "R"],
-            [1007, 2, "P", "0006", "SW5  2DW", "Clear", "R"],
-            [1011, 1, "C", "0006", np.nan, "Clear - overidden", "R"],
+            [1007, 1, "C", "0006", "SW5  2DW", "Clear", "R", "C_AB"],
+            [1007, 2, "P", "0006", "SW5  2DW", "Clear", "R", "nan"],
+            [1011, 1, "C", "0006", np.nan, "Clear - overidden", "R", "C_nan"],
         ]
 
         expected_backdata_df = pd.DataFrame(data=data, columns=expected_columns)
@@ -208,18 +208,10 @@ class TestMoRPreprocessing(object):
         ]
         for df in df_list:
             df.reset_index(drop=True, inplace=True)
-            df.replace({None: np.nan}, inplace=True)
 
-        for result_df, expected_df, name in [
-            (to_impute_df, expected_to_impute_df, "to_impute_df"),
-            (remainder_df, expected_remainder_df, "remainder_df"),
-            (backdata_df, expected_backdata_df, "backdata_df")
-        ]:
-            assert_frame_equal(
-                result_df, expected_df, check_dtype=False, check_exact=False
-            ), (
-                f"{name} not as expected."
-            )
+        assert_frame_equal(to_impute_df, expected_to_impute_df, check_dtype=False, check_exact=False, atol=1e-8, rtol=1e-5)
+        assert_frame_equal(remainder_df, expected_remainder_df, check_dtype=False, check_exact=False, atol=1e-8, rtol=1e-5)
+        assert_frame_equal(backdata_df, expected_backdata_df, check_dtype=False, check_exact=False, atol=1e-8, rtol=1e-5)
 
 class Test_calculate_growth_rates(object):
     """Tests for calculate_growth_rates."""

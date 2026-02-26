@@ -134,7 +134,7 @@ def load_validate_mapper(
     schema_path = f"./config/{schema_prefix}_schema.toml"
 
     # Validate the DataFrame against the schema
-    val.validate_data_with_schema(mapper_df, schema_path)
+    mapper_df = val.validate_data_with_schema(mapper_df, schema_path)
 
     # Perform null checks on the mapper DataFrame
     mapper_null_checks(mapper_df, mapper_name, validate_cols)
@@ -190,8 +190,12 @@ def load_val_snapshot_json(
     StagingHelperLogger.success("Finished Data Ingest...")
 
     # Validate snapshot data
-    val.validate_data_with_schema(contributors_df, "./config/contributors_schema.toml")
-    val.validate_data_with_schema(responses_df, "./config/long_response.toml")
+    contributors_df = val.validate_data_with_schema(
+        contributors_df, "./config/contributors_schema.toml"
+    )
+    responses_df = val.validate_data_with_schema(
+        responses_df, "./config/long_response.toml"
+    )
 
     if config["dev_global"]["platform"] == "s3" and config["dev_global"]["dev_test"]:
         responses_df["instance"] = 0
@@ -209,7 +213,7 @@ def load_val_snapshot_json(
         "Finished Data Transmutation and validation of full responses dataframe"
     )
     # Validate and force data types for the full responses df
-    val.combine_schemas_validate_full_df(
+    full_responses = val.combine_schemas_validate_full_df(
         full_responses,
         "./config/contributors_schema.toml",
         "./config/wide_responses.toml",

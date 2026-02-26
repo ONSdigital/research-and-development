@@ -297,7 +297,7 @@ def check_604_fix(df) -> pd.DataFrame:
 
 def create_r_and_d_instance(
     df: pd.DataFrame,
-) -> tuple[pd.DataFrame, pd.DataFrame, list]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Create a duplicate of long form records with no R&D and set instance to 1.
 
     These references initailly have one entry with instance 0.
@@ -332,12 +332,15 @@ def create_r_and_d_instance(
     return final_df, mult_604_qa_df
 
 
-def split_df_on_trim(df: pd.DataFrame, trim_bool_col: str) -> pd.DataFrame:
+def split_df_on_trim(
+    df: pd.DataFrame, trim_bool_col: str
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Splits the dataframe in based on if it was trimmed or not"""
 
     if not df.empty:
         df_copy = df.copy()
-        df_copy.loc[:, trim_bool_col] = df_copy.loc[:, trim_bool_col].fillna(False)
+        df_copy[trim_bool_col] = df_copy[trim_bool_col].fillna(False)
+        df_copy[trim_bool_col] = df_copy[trim_bool_col].astype(bool)
 
         df_not_trimmed = df_copy.loc[~df_copy[trim_bool_col]]
         df_trimmed = df_copy.loc[df_copy[trim_bool_col]]
@@ -581,10 +584,34 @@ def imputation_marker(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def get_bool_columns(dfs: list[pd.DataFrame]) -> set:
+    """Identify boolean-like columns in a list of dataframes.
+
+        dfs (list[pd.DataFrame]): List of dataframes to check.
+
+    Returns:
+        set: A set of boolean-like column names.
+    """
+    bool_columns = set()
+    for df in dfs:
+        for col in df.columns:
+            if (
+                df[col].notna().any()  # Ensure the col has at least one non-null value
+                and df[col].dtype in [bool, "boolean"]
+                and df[col].fillna(False).astype(str).isin(["True", "False"]).all()
+            ):
+                bool_columns.add(col)
+            elif (
+                df[col].notna().any()
+                and df[col].dtype in [object, str, "string"]
+                and df[col].fillna("False").astype(str).isin(["True", "False"]).all()
+            ):
+                bool_columns.add(col)
+    return bool_columns
+
+
 def concat_with_bool(dfs: list[pd.DataFrame]) -> pd.DataFrame:
     """Concatenate a list of dataframes and ensure boolean-like columns are properly
-    cast.
-
     Args:
         dfs (list[pd.DataFrame]): list of dataframes to concatenate.
 
@@ -592,23 +619,22 @@ def concat_with_bool(dfs: list[pd.DataFrame]) -> pd.DataFrame:
         pd.DataFrame: The concatenated dataframe with updated boolean columns.
     """
     # Dynamically identify boolean-like columns in all DataFrames
-    all_bool_columns = set()
-    for df in dfs:
-        for col in df.columns:
-            if (
-                df[col].notna().any()  # Ensure the col has at least one non-null value
-                and df[col].dtype == "object"
-                and df[col].fillna(False).isin([True, False]).all()
-            ):
-                all_bool_columns.add(col)
+    all_bool_columns = get_bool_columns(dfs)
 
     # Ensure boolean-like columns are cast to bool in all DataFrames
     dfs_bool = []
     for df in dfs:
         df = df.copy()  # Avoid modifying the original DataFrame
         for col in all_bool_columns:
-            if col in df.columns:
+            if (col in df.columns) and (df[col].dtype in [bool, "boolean"]):
                 df[col] = df[col].fillna(False).astype(bool)
+            elif (col in df.columns) and (df[col].dtype in [object, str, "string"]):
+                df[col] = (
+                    df[col]
+                    .fillna("False")
+                    .astype(str)
+                    .map({"True": True, "False": False})
+                )
         dfs_bool.append(df)
 
     # Concatenate the DataFrames

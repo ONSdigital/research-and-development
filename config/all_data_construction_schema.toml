@@ -69,7 +69,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockedby]
 Description = "All empty strings"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -79,7 +79,7 @@ Possible_Categorical_Values = ["nan"]
 
 [lockeddate]
 Description = "All None type"
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = true
 Current_Data_Type = ["None","str"]
 Length = 0
@@ -409,7 +409,7 @@ Possible_Categorical_Values = ["L"]
 
 [inclusionexclusion]
 Description = 'All values are " "'
-Deduced_Data_Type = "pd.NA"
+Deduced_Data_Type = "str"
 Nullable = false
 Current_Data_Type = "str"
 Length = "nan"
