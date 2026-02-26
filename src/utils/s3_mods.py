@@ -19,6 +19,7 @@ To do:
 
 import json
 import logging
+from datetime import datetime, timezone
 
 import pandas as pd
 from io import StringIO
@@ -449,3 +450,44 @@ def rd_search_file(dir_path: str, ending: str) -> str:
             if file.endswith(ending):
                 target_file = str(file)
     return target_file
+
+
+def rd_list_manifest_files(prefix: str, cutoff: str = "2024-11-01") -> dict:
+    """
+    Return manifest filenames and their last modified date within a path set by prefix.
+
+    Args:
+        prefix (str): The prefix path to search for manifest files.
+        cutoff (str): The cutoff date in "YYYY-MM-DD" format.
+        Only files modified after this date, when DAP migration was complete,
+          will be included.
+
+    Raises:
+        boto3_client.exceptions.ClientError: If there is an error accessing S3.
+
+    Returns:
+        dict: A dictionary with manifest file keys and their last modified dates, sorted
+              by last modified date in descending order.
+    """
+    try:
+        manifest_files = {}
+        paginator = s3_client.get_paginator("list_objects_v2")
+        cutoff_dt = datetime.strptime(cutoff, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        for page in paginator.paginate(Bucket=s3_bucket, Prefix=prefix):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                last_modified = obj["LastModified"]  # This is a datetime object
+                if last_modified.tzinfo is None:
+                    last_modified = last_modified.replace(tzinfo=timezone.utc)
+                if key.endswith(".mani") and last_modified > cutoff_dt:
+                    manifest_files[key] = last_modified
+
+        # Use lambda to sort dictionary items by their values (last_modified_date)
+        sorted_manifest_files = dict(
+            sorted(manifest_files.items(), key=lambda item: item[1], reverse=True)
+        )
+        return sorted_manifest_files
+
+    except s3_client.exceptions.ClientError as e:
+        s3_logger.error(f"Error listing manifest files with prefix {prefix}: {e}")
+        raise e
